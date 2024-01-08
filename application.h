@@ -35,4 +35,7 @@ private:
 	void process_world();
 	void render();
 
+	GameObject* create_static_box(float pos_x, float pos_y, float width, float height, sf::Color color);
+	GameObject* create_dynamic_box(float pos_x, float pos_y, float angle, float width, float height, sf::Color color);
+
 };

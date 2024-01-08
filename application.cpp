@@ -16,39 +16,8 @@ void Application::start() {
 void Application::init_objects() {
     b2Vec2 gravity(0.0f, -10.0f);
     world = std::make_unique<b2World>(gravity);
-
-    b2BodyDef groundBodyDef;
-    groundBodyDef.position.Set(0.0f, 0.0f);
-    b2Body* groundBody = world->CreateBody(&groundBodyDef);
-    b2PolygonShape groundBox;
-    groundBox.SetAsBox(50.0f, 5.0f);
-    groundBody->CreateFixture(&groundBox, 0.0f);
-
-    std::unique_ptr<sf::Shape> ground_shape = std::make_unique<sf::RectangleShape>(sf::Vector2f(100.0f, 10.0f));
-    ground_shape->setOrigin(50.0f, 5.0f);
-    ground_shape->setFillColor(sf::Color::Blue);
-    std::unique_ptr<GameObject> ground_uptr = std::make_unique<GameObject>(std::move(ground_shape), groundBody);
-    game_objects.push_back(std::move(ground_uptr));
-
-    b2BodyDef bodyDef;
-    bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(0.0f, 50.0f);
-    bodyDef.angle = 0.5f;
-    b2Body* box_body = world->CreateBody(&bodyDef);
-    b2PolygonShape dynamicBox;
-    dynamicBox.SetAsBox(5.0f, 5.0f);
-    b2FixtureDef fixtureDef;
-    fixtureDef.shape = &dynamicBox;
-    fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.3f;
-    fixtureDef.restitution = 0.5f;
-    box_body->CreateFixture(&fixtureDef);
-
-    std::unique_ptr<sf::Shape> box_shape = std::make_unique<sf::RectangleShape>(sf::Vector2f(10.0f, 10.0f));
-    box_shape->setOrigin(5.0f, 5.0f);
-    box_shape->setFillColor(sf::Color::Green);
-    std::unique_ptr<GameObject> box_uptr = std::make_unique<GameObject>(std::move(box_shape), box_body);
-    game_objects.push_back(std::move(box_uptr));
+    create_static_box(0.0f, 0.0f, 100.0f, 10.0f, sf::Color::Blue);
+    create_dynamic_box(0.0f, 50.0f, 0.5f, 10.0f, 10.0f, sf::Color::Green);
 }
 
 void Application::main_loop() {
@@ -116,4 +85,43 @@ void Application::render() {
     }
 
     window->display();
+}
+
+GameObject* Application::create_static_box(float pos_x, float pos_y, float width,  float height, sf::Color color) {
+    b2BodyDef bodyDef;
+    bodyDef.position.Set(pos_x, pos_y);
+    b2Body* body = world->CreateBody(&bodyDef);
+    b2PolygonShape box_shape;
+    box_shape.SetAsBox(width / 2.0f, height / 2.0f);
+    body->CreateFixture(&box_shape, 0.0f);
+    std::unique_ptr<sf::Shape> shape = std::make_unique<sf::RectangleShape>(sf::Vector2f(width, height));
+    shape->setOrigin(width / 2.0f, height / 2.0f);
+    shape->setFillColor(color);
+    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body);
+    GameObject* ptr = uptr.get();
+    game_objects.push_back(std::move(uptr));
+    return ptr;
+}
+
+GameObject* Application::create_dynamic_box(float pos_x, float pos_y, float angle, float width, float height, sf::Color color) {
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position.Set(pos_x, pos_y);
+    bodyDef.angle = angle;
+    b2Body* body = world->CreateBody(&bodyDef);
+    b2PolygonShape dynamicBox;
+    dynamicBox.SetAsBox(width / 2.0f, height / 2.0f);
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &dynamicBox;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.3f;
+    fixtureDef.restitution = 0.5f;
+    body->CreateFixture(&fixtureDef);
+    std::unique_ptr<sf::Shape> shape = std::make_unique<sf::RectangleShape>(sf::Vector2f(width, height));
+    shape->setOrigin(width / 2.0f, height / 2.0f);
+    shape->setFillColor(color);
+    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body);
+    GameObject* ptr = uptr.get();
+    game_objects.push_back(std::move(uptr));
+    return ptr;
 }
