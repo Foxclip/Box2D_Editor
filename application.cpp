@@ -5,42 +5,50 @@ void Application::init() {
     cs.antialiasingLevel = ANTIALIASING;
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs);
     window->setVerticalSyncEnabled(true);
-    shape = sf::CircleShape(10.0f);
-    shape.setFillColor(sf::Color::Green);
-
-    init_physics();
-
+    init_objects();
     view1 = sf::View(sf::FloatRect(0.0f, 0.0f, 800.0f, 600.0f));
-    resetView();
 }
 
 void Application::start() {
     main_loop();
 }
 
-void Application::init_physics() {
+void Application::init_objects() {
     b2Vec2 gravity(0.0f, -10.0f);
     world = std::make_unique<b2World>(gravity);
 
     b2BodyDef groundBodyDef;
-    groundBodyDef.position.Set(0.0f, -10.0f);
+    groundBodyDef.position.Set(0.0f, 0.0f);
     b2Body* groundBody = world->CreateBody(&groundBodyDef);
     b2PolygonShape groundBox;
-    groundBox.SetAsBox(50.0f, 10.0f);
+    groundBox.SetAsBox(50.0f, 5.0f);
     groundBody->CreateFixture(&groundBox, 0.0f);
+
+    std::unique_ptr<sf::Shape> ground_shape = std::make_unique<sf::RectangleShape>(sf::Vector2f(100.0f, 10.0f));
+    ground_shape->setOrigin(50.0f, 5.0f);
+    ground_shape->setFillColor(sf::Color::Blue);
+    std::unique_ptr<GameObject> ground_uptr = std::make_unique<GameObject>(std::move(ground_shape), groundBody);
+    game_objects.push_back(std::move(ground_uptr));
 
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(0.0f, 8.0f);
-    body = world->CreateBody(&bodyDef);
-
+    bodyDef.position.Set(0.0f, 50.0f);
+    bodyDef.angle = 0.5f;
+    b2Body* box_body = world->CreateBody(&bodyDef);
     b2PolygonShape dynamicBox;
-    dynamicBox.SetAsBox(1.0f, 1.0f);
+    dynamicBox.SetAsBox(5.0f, 5.0f);
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &dynamicBox;
     fixtureDef.density = 1.0f;
     fixtureDef.friction = 0.3f;
-    body->CreateFixture(&fixtureDef);
+    fixtureDef.restitution = 0.5f;
+    box_body->CreateFixture(&fixtureDef);
+
+    std::unique_ptr<sf::Shape> box_shape = std::make_unique<sf::RectangleShape>(sf::Vector2f(10.0f, 10.0f));
+    box_shape->setOrigin(5.0f, 5.0f);
+    box_shape->setFillColor(sf::Color::Green);
+    std::unique_ptr<GameObject> box_uptr = std::make_unique<GameObject>(std::move(box_shape), box_body);
+    game_objects.push_back(std::move(box_uptr));
 }
 
 void Application::main_loop() {
@@ -93,9 +101,6 @@ void Application::process_input() {
 
 void Application::process_world() {
     world->Step(timeStep, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-    b2Vec2 position = body->GetPosition();
-    float angle = body->GetAngle();
-    printf("%4.2f %4.2f %4.2f\n", position.x, position.y, angle);
 }
 
 void Application::render() {
@@ -104,7 +109,11 @@ void Application::render() {
     view1.setSize(window->getSize().x * zoomFactor, window->getSize().y * zoomFactor);
     window->setView(view1);
 
-    window->draw(shape);
+    for (int i = 0; i < game_objects.size(); i++) {
+        GameObject* object = game_objects[i].get();
+        object->UpdateVisual();
+        window->draw(*object->shape.get());
+    }
 
     window->display();
 }
