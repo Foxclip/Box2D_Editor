@@ -43,11 +43,28 @@ void Application::process_input() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
             window->close();
         }
+        if (event.type == sf::Event::MouseButtonPressed) {
+            if (event.mouseButton.button == sf::Mouse::Left) {
+                mousePrevPos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+            }
+        }
+        if (event.type == sf::Event::MouseWheelScrolled) {
+            if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
+                zoomFactor *= pow(MOUSE_SCROLL_ZOOM, -event.mouseWheelScroll.delta);
+            }
+        }
+        sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            sf::Vector2i mouseDelta = mousePrevPos - mousePos;
+            viewCenterX += mouseDelta.x * zoomFactor;
+            viewCenterY += mouseDelta.y * zoomFactor;
+        }
+        mousePrevPos = mousePos;
     }
 }
 
 void Application::process_world() {
-    shape.move(sf::Vector2f(1.0f, 0.0f));
+    //shape.move(sf::Vector2f(1.0f, 0.0f));
 }
 
 void Application::render() {
