@@ -7,12 +7,40 @@ void Application::init() {
     window->setVerticalSyncEnabled(true);
     shape = sf::CircleShape(10.0f);
     shape.setFillColor(sf::Color::Green);
+
+    init_physics();
+
     view1 = sf::View(sf::FloatRect(0.0f, 0.0f, 800.0f, 600.0f));
     resetView();
 }
 
 void Application::start() {
     main_loop();
+}
+
+void Application::init_physics() {
+    b2Vec2 gravity(0.0f, -10.0f);
+    world = std::make_unique<b2World>(gravity);
+
+    b2BodyDef groundBodyDef;
+    groundBodyDef.position.Set(0.0f, -10.0f);
+    b2Body* groundBody = world->CreateBody(&groundBodyDef);
+    b2PolygonShape groundBox;
+    groundBox.SetAsBox(50.0f, 10.0f);
+    groundBody->CreateFixture(&groundBox, 0.0f);
+
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position.Set(0.0f, 8.0f);
+    body = world->CreateBody(&bodyDef);
+
+    b2PolygonShape dynamicBox;
+    dynamicBox.SetAsBox(1.0f, 1.0f);
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &dynamicBox;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.3f;
+    body->CreateFixture(&fixtureDef);
 }
 
 void Application::main_loop() {
@@ -64,7 +92,10 @@ void Application::process_input() {
 }
 
 void Application::process_world() {
-    //shape.move(sf::Vector2f(1.0f, 0.0f));
+    world->Step(timeStep, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+    b2Vec2 position = body->GetPosition();
+    float angle = body->GetAngle();
+    printf("%4.2f %4.2f %4.2f\n", position.x, position.y, angle);
 }
 
 void Application::render() {
