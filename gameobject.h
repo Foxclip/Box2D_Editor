@@ -7,9 +7,10 @@ class GameObject {
 public:
 	std::unique_ptr<sf::Shape> shape;
 	b2Body* rigid_body = nullptr;
+	b2Fixture* fixture = nullptr;
 
 	GameObject();
-	GameObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body);
+	GameObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body, b2Fixture* fixture);
 	void UpdateVisual();
 
 private:

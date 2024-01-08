@@ -3,9 +3,10 @@
 
 GameObject::GameObject() { }
 
-GameObject::GameObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body) {
+GameObject::GameObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body, b2Fixture* fixture) {
 	this->shape = std::move(shape);
 	this->rigid_body = rigid_body;
+	this->fixture = fixture;
 }
 
 void GameObject::UpdateVisual() {

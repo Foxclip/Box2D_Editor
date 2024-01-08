@@ -16,8 +16,9 @@ void Application::start() {
 void Application::init_objects() {
     b2Vec2 gravity(0.0f, -10.0f);
     world = std::make_unique<b2World>(gravity);
-    create_static_box(0.0f, 0.0f, 100.0f, 10.0f, sf::Color::Blue);
-    create_dynamic_box(0.0f, 50.0f, 0.5f, 10.0f, 10.0f, sf::Color::Green);
+    GameObject* ground = create_static_box(0.0f, 0.0f, 100.0f, 10.0f, sf::Color::Blue);
+    GameObject* box = create_dynamic_box(0.0f, 50.0f, 0.5f, 10.0f, 10.0f, sf::Color::Green);
+    box->fixture->SetRestitution(0.0f);
 }
 
 void Application::main_loop() {
@@ -93,11 +94,11 @@ GameObject* Application::create_static_box(float pos_x, float pos_y, float width
     b2Body* body = world->CreateBody(&bodyDef);
     b2PolygonShape box_shape;
     box_shape.SetAsBox(width / 2.0f, height / 2.0f);
-    body->CreateFixture(&box_shape, 0.0f);
+    b2Fixture* fixture = body->CreateFixture(&box_shape, 0.0f);
     std::unique_ptr<sf::Shape> shape = std::make_unique<sf::RectangleShape>(sf::Vector2f(width, height));
     shape->setOrigin(width / 2.0f, height / 2.0f);
     shape->setFillColor(color);
-    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body);
+    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body, fixture);
     GameObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;
@@ -116,11 +117,11 @@ GameObject* Application::create_dynamic_box(float pos_x, float pos_y, float angl
     fixtureDef.density = 1.0f;
     fixtureDef.friction = 0.3f;
     fixtureDef.restitution = 0.5f;
-    body->CreateFixture(&fixtureDef);
+    b2Fixture* fixture = body->CreateFixture(&fixtureDef);
     std::unique_ptr<sf::Shape> shape = std::make_unique<sf::RectangleShape>(sf::Vector2f(width, height));
     shape->setOrigin(width / 2.0f, height / 2.0f);
     shape->setFillColor(color);
-    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body);
+    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body, fixture);
     GameObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;
