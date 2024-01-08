@@ -1,64 +1,21 @@
-#include <SFML/Graphics.hpp>
 #include "box2d/box2d.h"
-#include <stdio.h>
-
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
-const int ANTIALIASING = 0;
-std::unique_ptr<sf::RenderWindow> window;
-sf::CircleShape shape(10.0f);
-sf::View view1(sf::FloatRect(0.0f, 0.0f, 800.0f, 600.0f));
-float zoomFactor = 1.0f;
-float viewCenterX = 0, viewCenterY = 0;
-
-void resetView() {
-    viewCenterX = 0.0f;
-    viewCenterY = 0.0f;
-    zoomFactor = 1.0f;
-}
-
-void init() {
-    sf::ContextSettings cs;
-    cs.antialiasingLevel = ANTIALIASING;
-    window = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs);
-    window->setVerticalSyncEnabled(true);
-    shape.setFillColor(sf::Color::Green);
-    resetView();
-}
-
-void process_input() {
-    sf::Event event;
-    while (window->pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
-            window->close();
-        }
-    }
-}
-
-void process_world() {
-
-}
-
-void render() {
-    window->clear();
-    view1.setCenter(viewCenterX, viewCenterY);
-    view1.setSize(window->getSize().x * zoomFactor, window->getSize().y * zoomFactor);
-    window->setView(view1);
-
-    window->draw(shape);
-
-    window->display();
-}
+#include <cstdio>
+#include <iostream>
+#include "application.h"
 
 int main() {
     
-    init();
-
-    while (window->isOpen()) {
-        process_input();
-        process_world();
-        render();
+    try {
+        Application app;
+        app.init();
+        app.start();
+    } catch (std::string msg) {
+        std::cout << "ERROR: " << msg << "\n";
+    } catch (std::exception exc) {
+        std::cout << "ERROR: " << exc.what() << "\n";
     }
+
+    // draggable and zoomable view
 
     return 0;
 }
