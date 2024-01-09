@@ -16,4 +16,3 @@ void GameObject::UpdateVisual() {
 	float angle_deg = angle_rad * 180.0f / std::numbers::pi;
 	shape->setRotation(angle_deg);
 }
-
