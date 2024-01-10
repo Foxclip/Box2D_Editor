@@ -30,8 +30,12 @@ void Application::init_objects() {
         box->fixture->SetFriction(0.3f);
         box->fixture->SetRestitution(0.5f);
     }
-    std::vector<float> lengths = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-    GameObject* car = create_car(b2Vec2(0.0f, 0.0f), lengths, sf::Color::Red);
+    std::vector<float> lengths = { 1.0f, 3.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    GameObject* car = create_car(b2Vec2(0.0f, 8.0f), lengths, sf::Color::Red);
+    car->rigid_body->SetType(b2_dynamicBody);
+    car->fixture->SetDensity(1.0f);
+    car->fixture->SetFriction(0.3f);
+    car->fixture->SetRestitution(0.5f);
 }
 
 void Application::main_loop() {
@@ -121,14 +125,24 @@ GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Co
 GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, sf::Color color) {
     std::unique_ptr<sf::ConvexShape> shape = std::make_unique<sf::ConvexShape>(lengths.size());
     float pi = std::numbers::pi;
+    std::vector<b2Vec2> vertices;
     for (int i = 0; i < lengths.size(); i++) {
         float angle = (float)i / lengths.size() * 2 * pi;
-        sf::Vector2f vector = sf::Vector2f(std::cos(angle), std::sin(angle));
-        sf::Vector2f pos = vector * lengths[i];
-        shape->setPoint(i, pos);
+        b2Vec2 vector = b2Vec2(std::cos(angle), std::sin(angle));
+        b2Vec2 pos = lengths[i] * vector;
+        vertices.push_back(pos);
+        shape->setPoint(i, sf::Vector2f(pos.x, -pos.y));
     }
+    b2BodyDef bodyDef;
+    bodyDef.position = pos;
+    b2Body* body = world->CreateBody(&bodyDef);
+    b2PolygonShape car_shape;
+    car_shape.Set(vertices.data(), vertices.size());
+    b2Fixture* fixture = body->CreateFixture(&car_shape, 1.0f);
+
     shape->setFillColor(color);
-    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), nullptr, nullptr);
+    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body, fixture);
+    uptr->position = pos;
     GameObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;
