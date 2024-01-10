@@ -4,10 +4,9 @@
 
 GameObject::GameObject() { }
 
-GameObject::GameObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body, b2Fixture* fixture) {
+GameObject::GameObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body) {
 	this->shape = std::move(shape);
 	this->rigid_body = rigid_body;
-	this->fixture = fixture;
 }
 
 void GameObject::UpdateVisual() {
@@ -19,4 +18,26 @@ void GameObject::UpdateVisual() {
 	}
 	shape->setPosition(sf::Vector2f(position.x, -position.y));
 	shape->setRotation(-utils::to_degrees(angle));
+}
+
+void GameObject::SetType(b2BodyType type) {
+	rigid_body->SetType(type);
+}
+
+void GameObject::SetDensity(float density) {
+	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+		fixture->SetDensity(density);
+	}
+}
+
+void GameObject::SetFriction(float friction) {
+	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+		fixture->SetFriction(friction);
+	}
+}
+
+void GameObject::SetRestitution(float restitution) {
+	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+		fixture->SetRestitution(restitution);
+	}
 }

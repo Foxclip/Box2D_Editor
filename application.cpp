@@ -25,17 +25,17 @@ void Application::init_objects() {
     std::vector<GameObject*> boxes = { box0, box1, box2 };
     for (int i = 0; i < boxes.size(); i++) {
         GameObject* box = boxes[i];
-        box->rigid_body->SetType(b2_dynamicBody);
-        box->fixture->SetDensity(1.0f);
-        box->fixture->SetFriction(0.3f);
-        box->fixture->SetRestitution(0.5f);
+        box->SetType(b2_dynamicBody);
+        box->SetDensity(1.0f);
+        box->SetFriction(0.3f);
+        box->SetRestitution(0.5f);
     }
-    std::vector<float> lengths = { 1.0f, 3.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
     GameObject* car = create_car(b2Vec2(0.0f, 8.0f), lengths, sf::Color::Red);
-    car->rigid_body->SetType(b2_dynamicBody);
-    car->fixture->SetDensity(1.0f);
-    car->fixture->SetFriction(0.3f);
-    car->fixture->SetRestitution(0.5f);
+    car->SetType(b2_dynamicBody);
+    car->SetDensity(1.0f);
+    car->SetFriction(0.3f);
+    car->SetRestitution(0.5f);
 }
 
 void Application::main_loop() {
@@ -116,7 +116,7 @@ GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Co
     std::unique_ptr<sf::Shape> shape = std::make_unique<sf::RectangleShape>(sf::Vector2f(size.x, size.y));
     shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
     shape->setFillColor(color);
-    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body, fixture);
+    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body);
     GameObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;
@@ -125,23 +125,29 @@ GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Co
 GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, sf::Color color) {
     std::unique_ptr<sf::ConvexShape> shape = std::make_unique<sf::ConvexShape>(lengths.size());
     float pi = std::numbers::pi;
-    std::vector<b2Vec2> vertices;
-    for (int i = 0; i < lengths.size(); i++) {
+    auto get_pos = [&](int i) {
         float angle = (float)i / lengths.size() * 2 * pi;
         b2Vec2 vector = b2Vec2(std::cos(angle), std::sin(angle));
-        b2Vec2 pos = lengths[i] * vector;
-        vertices.push_back(pos);
-        shape->setPoint(i, sf::Vector2f(pos.x, -pos.y));
-    }
+        int index = i < lengths.size() ? i : i % lengths.size();
+        b2Vec2 pos = lengths[index] * vector;
+        return pos;
+    };
     b2BodyDef bodyDef;
     bodyDef.position = pos;
     b2Body* body = world->CreateBody(&bodyDef);
-    b2PolygonShape car_shape;
-    car_shape.Set(vertices.data(), vertices.size());
-    b2Fixture* fixture = body->CreateFixture(&car_shape, 1.0f);
+    for (int i = 0; i < lengths.size(); i++) {
+        b2Vec2 vertices[3];
+        vertices[0] = b2Vec2(0.0f, 0.0f);
+        vertices[1] = get_pos(i);
+        vertices[2] = get_pos(i + 1);
+        b2PolygonShape triangle;
+        triangle.Set(vertices, 3);
+        b2Fixture* fixture = body->CreateFixture(&triangle, 1.0f);
+        shape->setPoint(i, sf::Vector2f(vertices[1].x, -vertices[1].y));
+    }
 
     shape->setFillColor(color);
-    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body, fixture);
+    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body);
     uptr->position = pos;
     GameObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));

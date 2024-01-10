@@ -8,13 +8,16 @@ public:
 	b2Vec2 position;
 	float angle;
 	std::unique_ptr<sf::Shape> shape;
-	b2Body* rigid_body = nullptr;
-	b2Fixture* fixture = nullptr;
 
 	GameObject();
-	GameObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body, b2Fixture* fixture);
+	GameObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body);
 	void UpdateVisual();
+	void SetType(b2BodyType type);
+	void SetDensity(float density);
+	void SetFriction(float friction);
+	void SetRestitution(float restitution);
 
 private:
+	b2Body* rigid_body = nullptr;
 
 };
