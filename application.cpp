@@ -1,4 +1,5 @@
 #include "application.h"
+#include "utils.h"
 
 void Application::init() {
     sf::ContextSettings cs;
@@ -14,14 +15,20 @@ void Application::start() {
 }
 
 void Application::init_objects() {
-    b2Vec2 gravity(0.0f, -10.0f);
+    b2Vec2 gravity(0.0f, -9.8f);
     world = std::make_unique<b2World>(gravity);
-    GameObject* ground = create_box(b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(100.0f, 10.0f), sf::Color::Blue);
-    GameObject* box = create_box(b2Vec2(0.0f, 50.0f), 0.5f, b2Vec2(10.0f, 10.0f), sf::Color::Green);
-    box->rigid_body->SetType(b2_dynamicBody);
-    box->fixture->SetDensity(1.0f);
-    box->fixture->SetFriction(0.3f);
-    box->fixture->SetRestitution(0.0f);
+    GameObject* ground = create_box(b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(10.0f, 1.0f), sf::Color::Blue);
+    GameObject* box0 = create_box(b2Vec2(0.0f, 1.0f), utils::to_radians(10.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
+    GameObject* box1 = create_box(b2Vec2(0.0f, 2.5f), utils::to_radians(20.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
+    GameObject* box2 = create_box(b2Vec2(0.0f, 4.0f), utils::to_radians(30.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
+    std::vector<GameObject*> boxes = { box0, box1, box2 };
+    for (int i = 0; i < boxes.size(); i++) {
+        GameObject* box = boxes[i];
+        box->rigid_body->SetType(b2_dynamicBody);
+        box->fixture->SetDensity(1.0f);
+        box->fixture->SetFriction(0.3f);
+        box->fixture->SetRestitution(0.5f);
+    }
 }
 
 void Application::main_loop() {

@@ -18,8 +18,8 @@ private:
 	std::unique_ptr<sf::RenderWindow> window;
 	sf::View view1;
 	sf::Vector2i mousePrevPos;
-	float zoomFactor = 0.3f;
-	float viewCenterX = 0, viewCenterY = -30.0f;
+	float zoomFactor = 0.03f;
+	float viewCenterX = 0, viewCenterY = -5.0f;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;
