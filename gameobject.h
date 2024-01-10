@@ -5,6 +5,8 @@
 
 class GameObject {
 public:
+	b2Vec2 position;
+	float angle;
 	std::unique_ptr<sf::Shape> shape;
 	b2Body* rigid_body = nullptr;
 	b2Fixture* fixture = nullptr;

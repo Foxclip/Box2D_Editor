@@ -11,8 +11,12 @@ GameObject::GameObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body, b2F
 }
 
 void GameObject::UpdateVisual() {
-	b2Vec2 position = rigid_body->GetPosition();
-	float angle = rigid_body->GetAngle();
-	shape->setPosition(position.x, -position.y);
+	if (rigid_body != nullptr) {
+		b2Vec2 position = rigid_body->GetPosition();
+		float angle = rigid_body->GetAngle();
+		this->position = position;
+		this->angle = angle;
+	}
+	shape->setPosition(sf::Vector2f(position.x, -position.y));
 	shape->setRotation(-utils::to_degrees(angle));
 }

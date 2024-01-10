@@ -1,5 +1,6 @@
 #include "application.h"
 #include "utils.h"
+#include <numbers>
 
 void Application::init() {
     sf::ContextSettings cs;
@@ -29,6 +30,8 @@ void Application::init_objects() {
         box->fixture->SetFriction(0.3f);
         box->fixture->SetRestitution(0.5f);
     }
+    std::vector<float> lengths = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    GameObject* car = create_car(b2Vec2(0.0f, 0.0f), lengths, sf::Color::Red);
 }
 
 void Application::main_loop() {
@@ -110,6 +113,22 @@ GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Co
     shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
     shape->setFillColor(color);
     std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body, fixture);
+    GameObject* ptr = uptr.get();
+    game_objects.push_back(std::move(uptr));
+    return ptr;
+}
+
+GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, sf::Color color) {
+    std::unique_ptr<sf::ConvexShape> shape = std::make_unique<sf::ConvexShape>(lengths.size());
+    float pi = std::numbers::pi;
+    for (int i = 0; i < lengths.size(); i++) {
+        float angle = (float)i / lengths.size() * 2 * pi;
+        sf::Vector2f vector = sf::Vector2f(std::cos(angle), std::sin(angle));
+        sf::Vector2f pos = vector * lengths[i];
+        shape->setPoint(i, pos);
+    }
+    shape->setFillColor(color);
+    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), nullptr, nullptr);
     GameObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;
