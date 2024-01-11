@@ -18,7 +18,13 @@ void Application::start() {
 void Application::init_objects() {
     b2Vec2 gravity(0.0f, -9.8f);
     world = std::make_unique<b2World>(gravity);
-    GameObject* ground = create_ground(b2Vec2(0.0f, 0.0f), sf::Color::White);
+    std::vector<b2Vec2> ground_vertices = {
+        b2Vec2(10.0f, 1.0f),
+        b2Vec2(5.0f, 0.0f),
+        b2Vec2(-5.0f, 0.0f),
+        b2Vec2(-10.0f, 1.0f),
+    };
+    GameObject* ground = create_ground(b2Vec2(0.0f, 0.0f), ground_vertices, sf::Color::White);
     GameObject* box0 = create_box(b2Vec2(0.0f, 1.0f), utils::to_radians(10.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
     GameObject* box1 = create_box(b2Vec2(0.0f, 2.5f), utils::to_radians(20.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
     GameObject* box2 = create_box(b2Vec2(0.0f, 4.0f), utils::to_radians(30.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
@@ -154,22 +160,18 @@ GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, sf::
     return ptr;
 }
 
-GameObject* Application::create_ground(b2Vec2 pos, sf::Color color) {
+GameObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color) {
     b2BodyDef bodyDef;
     bodyDef.position = pos;
     b2Body* body = world->CreateBody(&bodyDef);
     b2ChainShape chain;
-    b2Vec2 vertices[2];
-    b2Vec2 prev(5.0f, 0.0f);
-    vertices[0] = b2Vec2(5.0f, 0.0f);
-    vertices[1] = b2Vec2(-5.0f, 0.0f);
-    b2Vec2 next(-5.0f, 0.0f);
-    chain.CreateChain(vertices, 2, prev, next);
+    chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
     b2Fixture* fixture = body->CreateFixture(&chain, 1.0f);
 
-    sf::VertexArray drawable_vertices(sf::LinesStrip, 2);
-    drawable_vertices[0].position = sf::Vector2f(5.0f, 0.0f);
-    drawable_vertices[1].position = sf::Vector2f(-5.0f, 0.0f);
+    sf::VertexArray drawable_vertices(sf::LinesStrip, vertices.size());
+    for (int i = 0; i < vertices.size(); i++) {
+        drawable_vertices[i].position = sf::Vector2f(vertices[i].x, -vertices[i].y);
+    }
     std::unique_ptr<LineStripShape> line_strip = std::make_unique<LineStripShape>(drawable_vertices);
     line_strip->setLineColor(color);
     std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(line_strip), body);
