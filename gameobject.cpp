@@ -18,8 +18,8 @@ void GameObject::UpdateVisual() {
 		this->position = position;
 		this->angle = angle;
 	}
-	transformable->setPosition(sf::Vector2f(position.x, -position.y));
-	transformable->setRotation(-utils::to_degrees(angle));
+	transformable->setPosition(sf::Vector2f(position.x, position.y));
+	transformable->setRotation(utils::to_degrees(angle));
 }
 
 void GameObject::SetType(b2BodyType type) {

@@ -16,10 +16,10 @@ private:
 	const float MOUSE_SCROLL_ZOOM = 1.2f;
 	const int FPS = 60;
 	std::unique_ptr<sf::RenderWindow> window;
-	sf::View view1;
+	sf::View world_view;
 	sf::Vector2i mousePrevPos;
 	float zoomFactor = 0.03f;
-	float viewCenterX = 0, viewCenterY = -5.0f;
+	float viewCenterX = 0, viewCenterY = 5.0f;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;

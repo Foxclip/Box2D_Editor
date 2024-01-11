@@ -8,7 +8,7 @@ void Application::init() {
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs);
     window->setVerticalSyncEnabled(true);
     init_objects();
-    view1 = sf::View(sf::FloatRect(0.0f, 0.0f, 800.0f, 600.0f));
+    world_view = sf::View(sf::FloatRect(0.0f, 0.0f, 800.0f, 600.0f));
 }
 
 void Application::start() {
@@ -86,7 +86,7 @@ void Application::process_input() {
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
             sf::Vector2i mouseDelta = mousePrevPos - mousePos;
             viewCenterX += mouseDelta.x * zoomFactor;
-            viewCenterY += mouseDelta.y * zoomFactor;
+            viewCenterY += -mouseDelta.y * zoomFactor;
         }
         mousePrevPos = mousePos;
     }
@@ -98,9 +98,9 @@ void Application::process_world() {
 
 void Application::render() {
     window->clear();
-    view1.setCenter(viewCenterX, viewCenterY);
-    view1.setSize(window->getSize().x * zoomFactor, window->getSize().y * zoomFactor);
-    window->setView(view1);
+    world_view.setCenter(viewCenterX, viewCenterY);
+    world_view.setSize(window->getSize().x * zoomFactor, -1.0f * window->getSize().y * zoomFactor);
+    window->setView(world_view);
 
     for (int i = 0; i < game_objects.size(); i++) {
         GameObject* object = game_objects[i].get();
@@ -149,7 +149,7 @@ GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, sf::
         b2PolygonShape triangle;
         triangle.Set(vertices, 3);
         b2Fixture* fixture = body->CreateFixture(&triangle, 1.0f);
-        shape->setPoint(i, sf::Vector2f(vertices[1].x, -vertices[1].y));
+        shape->setPoint(i, sf::Vector2f(vertices[1].x, vertices[1].y));
     }
 
     shape->setFillColor(color);
@@ -170,7 +170,7 @@ GameObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices,
 
     sf::VertexArray drawable_vertices(sf::LinesStrip, vertices.size());
     for (int i = 0; i < vertices.size(); i++) {
-        drawable_vertices[i].position = sf::Vector2f(vertices[i].x, -vertices[i].y);
+        drawable_vertices[i].position = sf::Vector2f(vertices[i].x, vertices[i].y);
     }
     std::unique_ptr<LineStripShape> line_strip = std::make_unique<LineStripShape>(drawable_vertices);
     line_strip->setLineColor(color);
