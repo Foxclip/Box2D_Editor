@@ -4,8 +4,10 @@
 
 GameObject::GameObject() { }
 
-GameObject::GameObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body) {
-	this->shape = std::move(shape);
+GameObject::GameObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body) {
+	this->transformable = dynamic_cast<sf::Transformable*>(drawable.get());
+	assert(this->transformable != nullptr);
+	this->drawable = std::move(drawable);
 	this->rigid_body = rigid_body;
 }
 
@@ -16,8 +18,8 @@ void GameObject::UpdateVisual() {
 		this->position = position;
 		this->angle = angle;
 	}
-	shape->setPosition(sf::Vector2f(position.x, -position.y));
-	shape->setRotation(-utils::to_degrees(angle));
+	transformable->setPosition(sf::Vector2f(position.x, -position.y));
+	transformable->setRotation(-utils::to_degrees(angle));
 }
 
 void GameObject::SetType(b2BodyType type) {
@@ -40,4 +42,19 @@ void GameObject::SetRestitution(float restitution) {
 	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
 		fixture->SetRestitution(restitution);
 	}
+}
+
+LineStripShape::LineStripShape(sf::VertexArray& varray) {
+	this->varray = varray;
+}
+
+void LineStripShape::setLineColor(sf::Color color) {
+	for (int i = 0; i < varray.getVertexCount(); i++) {
+		varray[i].color = color;
+	}
+}
+
+void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+	states.transform *= getTransform();
+	target.draw(varray, states);
 }
