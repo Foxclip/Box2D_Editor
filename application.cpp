@@ -89,7 +89,8 @@ void Application::process_keyboard_event(sf::Event event) {
 
 void Application::process_mouse_event(sf::Event event) {
     mousePos = sf::Mouse::getPosition(*window);
-    b2Vec2 mouse_pos_world = screen_to_world(mousePos);
+    mouseWorldPos = sf_screen_to_world(mousePos);
+    b2Vec2 mouse_pos_world = b2Vec2(mouseWorldPos.x, mouseWorldPos.y);
     if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Left) {
             b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
@@ -122,7 +123,7 @@ void Application::process_keyboard() {
 void Application::process_mouse() {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         if (grabbed_body) {
-            b2Vec2 mouse_pos_world = screen_to_world(mousePos);
+            b2Vec2 mouse_pos_world = b2_screen_to_world(mousePos);
             b2Vec2 grabbed_body_point_world = grabbed_body->GetWorldPoint(grabbed_body_point_local);
             b2Vec2 vec = mouse_pos_world - grabbed_body_point_world;
             b2Vec2 force = MOUSE_FORCE_SCALE * vec;
@@ -153,18 +154,39 @@ void Application::render() {
         window->draw(*object->drawable.get());
     }
 
+    if (grabbed_body) {
+        b2Vec2 grabbed_body_point_world = grabbed_body->GetWorldPoint(grabbed_body_point_local);
+        sf::Vector2f sf_grabbed_point = sf::Vector2f(grabbed_body_point_world.x, grabbed_body_point_world.y);
+        line_primitive[0].position = sf_grabbed_point;
+        line_primitive[0].color = sf::Color::Yellow;
+        line_primitive[1].position = mouseWorldPos;
+        line_primitive[1].color = sf::Color::Yellow;
+        window->draw(line_primitive);
+    }
+
     window->display();
 }
 
-b2Vec2 Application::screen_to_world(sf::Vector2i screen_pos) {
+b2Vec2 Application::b2_screen_to_world(sf::Vector2i screen_pos) {
     sf::Vector2f sfml_pos = window->mapPixelToCoords(screen_pos);
     b2Vec2 b2_pos = b2Vec2(sfml_pos.x, sfml_pos.y);
     return b2_pos;
 }
 
+sf::Vector2f Application::sf_screen_to_world(sf::Vector2i screen_pos) {
+    sf::Vector2f sfml_pos = window->mapPixelToCoords(screen_pos);
+    return sfml_pos;
+}
+
+sf::Vector2i Application::world_to_screen(b2Vec2 world_pos) {
+    sf::Vector2f sfml_pos = sf::Vector2f(world_pos.x, world_pos.y);
+    sf::Vector2i screen_pos = window->mapCoordsToPixel(sfml_pos);
+    return screen_pos;
+}
+
 b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
-    b2Vec2 world_pos = screen_to_world(screen_pos);
-    b2Vec2 world_pos_next = screen_to_world(screen_pos + sf::Vector2i(1, 1));
+    b2Vec2 world_pos = b2_screen_to_world(screen_pos);
+    b2Vec2 world_pos_next = b2_screen_to_world(screen_pos + sf::Vector2i(1, 1));
     b2Vec2 midpoint = 0.5f * (world_pos + world_pos_next);
     QueryCallback callback;
     b2AABB aabb;
