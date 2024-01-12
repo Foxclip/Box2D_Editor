@@ -24,7 +24,7 @@ private:
 	std::unique_ptr<sf::RenderWindow> window;
 	sf::View world_view;
 	sf::Vector2i mousePos;
-	sf::Vector2f mouseWorldPos;
+	sf::Vector2f mousePosWorld;
 	sf::Vector2i mousePrevPos;
 	float zoomFactor = 0.03f;
 	float viewCenterX = 0, viewCenterY = 5.0f;
@@ -35,8 +35,8 @@ private:
 	const float MOUSE_FORCE_SCALE = 50.0f;
 	std::unique_ptr<b2World> world;
 	float timeStep = 1.0f / FPS;
-	b2Body* grabbed_body = nullptr;
-	b2Vec2 grabbed_body_point_local;
+	b2Body* mouse_body = nullptr;
+	b2MouseJoint* mouse_joint = nullptr;
 
 	std::vector<std::unique_ptr<GameObject>> game_objects;
 

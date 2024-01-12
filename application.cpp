@@ -19,6 +19,10 @@ void Application::start() {
 void Application::init_objects() {
     b2Vec2 gravity(0.0f, -9.8f);
     world = std::make_unique<b2World>(gravity);
+
+    b2BodyDef mouse_body_def;
+    mouse_body = world->CreateBody(&mouse_body_def);
+
     std::vector<b2Vec2> ground_vertices = {
         b2Vec2(10.0f, 1.0f),
         b2Vec2(5.0f, 0.0f),
@@ -41,7 +45,7 @@ void Application::init_objects() {
         box->SetRestitution(0.5f);
     }
     //b2DistanceJointDef distance_joint_def;
-    //distance_joint_def.Initialize(box1->rigid_body, box2->rigid_body, box1->rigid_body->GetWorldCenter(), box2->rigid_body->GetWorldCenter() + b2Vec2(0.0f, 0.0f));
+    //distance_joint_def.Initialize(box1->rigid_body, box2->rigid_body, box1->rigid_body->GetWorldCenter(), box2->rigid_body->GetWorldCenter());
     //b2DistanceJoint* distance_joint = (b2DistanceJoint*)world->CreateJoint(&distance_joint_def);
 
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
@@ -89,14 +93,21 @@ void Application::process_keyboard_event(sf::Event event) {
 
 void Application::process_mouse_event(sf::Event event) {
     mousePos = sf::Mouse::getPosition(*window);
-    mouseWorldPos = sf_screen_to_world(mousePos);
-    b2Vec2 mouse_pos_world = b2Vec2(mouseWorldPos.x, mouseWorldPos.y);
+    mousePosWorld = sf_screen_to_world(mousePos);
+    b2Vec2 mouse_pos_world = b2Vec2(mousePosWorld.x, mousePosWorld.y);
     if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Left) {
             b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
             if (grabbed_fixture) {
-                grabbed_body = grabbed_fixture->GetBody();
-                grabbed_body_point_local = grabbed_body->GetLocalPoint(mouse_pos_world);
+                b2Body* grabbed_body = grabbed_fixture->GetBody();
+                b2MouseJointDef mouse_joint_def;
+                mouse_joint_def.bodyA = mouse_body;
+                mouse_joint_def.bodyB = grabbed_body;
+                mouse_joint_def.damping = 1.0f;
+                mouse_joint_def.maxForce = 5000.0f * grabbed_body->GetMass();
+                mouse_joint_def.stiffness = 50.0f;
+                mouse_joint_def.target = mouse_pos_world;
+                mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
             }
         } else if (event.mouseButton.button == sf::Mouse::Right) {
             mousePrevPos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
@@ -104,7 +115,10 @@ void Application::process_mouse_event(sf::Event event) {
     }
     if (event.type == sf::Event::MouseButtonReleased) {
         if (event.mouseButton.button == sf::Mouse::Left) {
-            grabbed_body = nullptr;
+            if (mouse_joint) {
+                world->DestroyJoint(mouse_joint);
+                mouse_joint = nullptr;
+            }
         }
     }
     if (event.type == sf::Event::MouseWheelScrolled) {
@@ -122,12 +136,9 @@ void Application::process_keyboard() {
 
 void Application::process_mouse() {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        if (grabbed_body) {
-            b2Vec2 mouse_pos_world = b2_screen_to_world(mousePos);
-            b2Vec2 grabbed_body_point_world = grabbed_body->GetWorldPoint(grabbed_body_point_local);
-            b2Vec2 vec = mouse_pos_world - grabbed_body_point_world;
-            b2Vec2 force = MOUSE_FORCE_SCALE * vec;
-            grabbed_body->ApplyForce(force, grabbed_body_point_world, true);
+        if (mouse_joint) {
+            b2Vec2 pos = b2_screen_to_world(mousePos);
+            mouse_joint->SetTarget(pos);
         }
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
@@ -154,12 +165,12 @@ void Application::render() {
         window->draw(*object->drawable.get());
     }
 
-    if (grabbed_body) {
-        b2Vec2 grabbed_body_point_world = grabbed_body->GetWorldPoint(grabbed_body_point_local);
-        sf::Vector2f sf_grabbed_point = sf::Vector2f(grabbed_body_point_world.x, grabbed_body_point_world.y);
+    if (mouse_joint) {
+        b2Vec2 b2_grabbed_point = mouse_joint->GetAnchorB();
+        sf::Vector2f sf_grabbed_point = sf::Vector2f(b2_grabbed_point.x, b2_grabbed_point.y);
         line_primitive[0].position = sf_grabbed_point;
         line_primitive[0].color = sf::Color::Yellow;
-        line_primitive[1].position = mouseWorldPos;
+        line_primitive[1].position = mousePosWorld;
         line_primitive[1].color = sf::Color::Yellow;
         window->draw(line_primitive);
     }
