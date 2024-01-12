@@ -18,6 +18,7 @@ public:
 	float angle = 0.0f;
 	std::unique_ptr<sf::Drawable> drawable;
 	sf::Transformable* transformable = nullptr;
+	b2Body* rigid_body = nullptr;
 
 	GameObject();
 	GameObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body);
@@ -28,6 +29,5 @@ public:
 	void SetRestitution(float restitution);
 
 private:
-	b2Body* rigid_body = nullptr;
 
 };
