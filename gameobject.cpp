@@ -72,3 +72,37 @@ CarObject::CarObject(
 	this->wheels = wheels;
 	this->wheel_joints = wheel_joints;
 }
+
+CircleNotchShape::CircleNotchShape(float radius, int point_count, int notch_segment_count) {
+	varray_circle = sf::VertexArray(sf::TriangleFan, point_count + 1);
+	varray_notch = sf::VertexArray(sf::TriangleFan, notch_segment_count + 2);
+	float angle_offset = 0.0f;
+	varray_circle[0] = sf::Vertex(sf::Vector2f(0.0f, 0.0f));
+	for (int i = 0; i < point_count; i++) {
+		std::pair<float, float> pair = utils::getCircleVertex(i, point_count, radius, angle_offset);
+		varray_circle[i] = sf::Vertex(sf::Vector2f(pair.first, pair.second));
+	}
+	varray_notch[0] = sf::Vertex(sf::Vector2f(0.0f, 0.0f));
+	for (int i = 0; i < notch_segment_count + 1; i++) {
+		std::pair<float, float> pair = utils::getCircleVertex(i, point_count, radius, angle_offset);
+		varray_notch[i] = sf::Vertex(sf::Vector2f(pair.first, pair.second));
+	}
+}
+
+void CircleNotchShape::setCircleColor(sf::Color color) {
+	for (int i = 0; i < varray_circle.getVertexCount(); i++) {
+		varray_circle[i].color = color;
+	}
+}
+
+void CircleNotchShape::setNotchColor(sf::Color color) {
+	for (int i = 0; i < varray_notch.getVertexCount(); i++) {
+		varray_notch[i].color = color;
+	}
+}
+
+void CircleNotchShape::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+	states.transform *= getTransform();
+	target.draw(varray_circle, states);
+	target.draw(varray_notch, states);
+}

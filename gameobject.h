@@ -12,6 +12,17 @@ private:
 	sf::VertexArray varray;
 };
 
+class CircleNotchShape : public sf::Drawable, public sf::Transformable {
+public:
+	explicit CircleNotchShape(float radius, int point_count, int notch_segment_count);
+	void setCircleColor(sf::Color color);
+	void setNotchColor(sf::Color color);
+private:
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	sf::VertexArray varray_circle;
+	sf::VertexArray varray_notch;
+};
+
 class GameObject {
 public:
 	b2Vec2 position = b2Vec2(0.0f, 0.0f);

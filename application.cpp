@@ -262,17 +262,17 @@ GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Co
     return ptr;
 }
 
-GameObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color) {
+GameObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color) {
     b2BodyDef bodyDef;
     bodyDef.position = pos;
     b2Body* body = world->CreateBody(&bodyDef);
     b2CircleShape circle_shape;
     circle_shape.m_radius = radius;
     b2Fixture* fixture = body->CreateFixture(&circle_shape, 1.0f);
-    std::unique_ptr<sf::Shape> shape = std::make_unique<sf::CircleShape>(radius);
-    shape->setOrigin(radius, radius);
-    shape->setFillColor(color);
-    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body);
+    std::unique_ptr<CircleNotchShape> circle_notch_shape = std::make_unique<CircleNotchShape>(radius, 30, 4);
+    circle_notch_shape->setCircleColor(sf::Color(255, 255, 0));
+    circle_notch_shape->setNotchColor(sf::Color(64, 64, 0));
+    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(circle_notch_shape), body);
     GameObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;

@@ -61,7 +61,7 @@ private:
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
 
 	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
-	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color);
+	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
 	GameObject* create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
 	GameObject* create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color);
 
