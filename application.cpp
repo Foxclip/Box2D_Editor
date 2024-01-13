@@ -322,6 +322,9 @@ GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std:
             wheel_joint_def.lowerTranslation = -wheel_offset;
             wheel_joint_def.upperTranslation = 0.0f;
             wheel_joint_def.enableLimit = true;
+            wheel_joint_def.maxMotorTorque = 30.0f;
+            wheel_joint_def.motorSpeed = -10.0f;
+            wheel_joint_def.enableMotor = true;
             wheel_joint_def.stiffness = 100.0f;
             wheel_joint_def.damping = 5.0f;
             b2WheelJoint* wheel_joint = (b2WheelJoint*)world->CreateJoint(&wheel_joint_def);
