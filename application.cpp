@@ -189,16 +189,16 @@ void Application::render() {
     if (paused) {
         text.setFont(ui_font);
         text.setString("PAUSED");
-        text.setCharacterSize(48);
+        text.setCharacterSize(24);
         text.setFillColor(sf::Color::Yellow);
         sf::FloatRect text_bounds = text.getLocalBounds();
-        text.setOrigin(text_bounds.left + text_bounds.width / 2.0f, text_bounds.top + text_bounds.height / 2.0f);
-        text.setPosition(ui_view.getCenter());
+        text.setOrigin(text_bounds.left, text_bounds.top);
         const int rect_padding = 10;
+        text.setPosition(rect_padding, rect_padding);
         rect_shape.setSize(sf::Vector2f(text_bounds.width + rect_padding * 2, text_bounds.height + rect_padding * 2));
         rect_shape.setFillColor(sf::Color(0, 0, 0, 128));
-        rect_shape.setOrigin(rect_shape.getSize() / 2.0f);
-        rect_shape.setPosition(text.getPosition());
+        rect_shape.setOrigin(0.0f, 0.0f);
+        rect_shape.setPosition(0.0f, 0.0f);
         window->draw(rect_shape);
         window->draw(text);
     }
