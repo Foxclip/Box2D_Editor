@@ -29,33 +29,36 @@ void Application::init_objects() {
     mouse_body = world->CreateBody(&mouse_body_def);
 
     std::vector<b2Vec2> ground_vertices = {
-        b2Vec2(10.0f, 1.0f),
+        b2Vec2(25.0f, 8.0f),
+        b2Vec2(15.0f, 2.0f),
         b2Vec2(5.0f, 0.0f),
         b2Vec2(-5.0f, 0.0f),
-        b2Vec2(-10.0f, 1.0f),
+        b2Vec2(-15.0f, 2.0f),
+        b2Vec2(-25.0f, 8.0f),
     };
     GameObject* ground = create_ground(b2Vec2(0.0f, 0.0f), ground_vertices, sf::Color::White);
 
-    GameObject* box0 = create_box(b2Vec2(0.0f, 1.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
-    GameObject* box1 = create_box(b2Vec2(0.1f, 2.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
-    GameObject* box2 = create_box(b2Vec2(0.2f, 3.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
-    GameObject* ball = create_ball(b2Vec2(0.0f, 5.0f), 0.5f, sf::Color::Green);
-    std::vector<GameObject*> dynamic_objects = { box0, box1, box2, ball };
-    //std::vector<GameObject*> boxes = { box1, box2 };
-    //std::vector<GameObject*> boxes = { box0 };
-    for (int i = 0; i < dynamic_objects.size(); i++) {
-        GameObject* box = dynamic_objects[i];
-        box->SetType(b2_dynamicBody);
-        box->SetDensity(1.0f);
-        box->SetFriction(0.3f);
-        box->SetRestitution(0.5f);
-    }
+    //GameObject* box0 = create_box(b2Vec2(0.0f, 1.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
+    //GameObject* box1 = create_box(b2Vec2(0.1f, 2.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
+    //GameObject* box2 = create_box(b2Vec2(0.2f, 3.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
+    //GameObject* ball = create_ball(b2Vec2(0.0f, 5.0f), 0.5f, sf::Color::Green);
+    //std::vector<GameObject*> dynamic_objects = { box0, box1, box2, ball };
+    ////std::vector<GameObject*> boxes = { box1, box2 };
+    ////std::vector<GameObject*> boxes = { box0 };
+    //for (int i = 0; i < dynamic_objects.size(); i++) {
+    //    GameObject* box = dynamic_objects[i];
+    //    box->SetType(b2_dynamicBody);
+    //    box->SetDensity(1.0f);
+    //    box->SetFriction(0.3f);
+    //    box->SetRestitution(0.5f);
+    //}
     //b2DistanceJointDef distance_joint_def;
     //distance_joint_def.Initialize(box1->rigid_body, box2->rigid_body, box1->rigid_body->GetWorldCenter(), box2->rigid_body->GetWorldCenter());
     //b2DistanceJoint* distance_joint = (b2DistanceJoint*)world->CreateJoint(&distance_joint_def);
 
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
-    GameObject* car = create_car(b2Vec2(0.0f, 10.0f), lengths, sf::Color::Red);
+    std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+    GameObject* car = create_car(b2Vec2(0.0f, 10.0f), lengths, wheels, sf::Color::Red);
     car->SetType(b2_dynamicBody);
     car->SetDensity(1.0f);
     car->SetFriction(0.3f);
@@ -275,7 +278,7 @@ GameObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color) 
     return ptr;
 }
 
-GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, sf::Color color) {
+GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
     std::unique_ptr<sf::ConvexShape> shape = std::make_unique<sf::ConvexShape>(lengths.size());
     float pi = std::numbers::pi;
     auto get_pos = [&](int i) {
@@ -288,6 +291,8 @@ GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, sf::
     b2BodyDef bodyDef;
     bodyDef.position = pos;
     b2Body* body = world->CreateBody(&bodyDef);
+    std::vector<GameObject*> wheel_objects(wheels.size());
+    std::vector<b2WheelJoint*> wheel_joints(wheels.size());
     for (int i = 0; i < lengths.size(); i++) {
         b2Vec2 vertices[3];
         vertices[0] = b2Vec2(0.0f, 0.0f);
@@ -296,11 +301,37 @@ GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, sf::
         b2PolygonShape triangle;
         triangle.Set(vertices, 3);
         b2Fixture* fixture = body->CreateFixture(&triangle, 1.0f);
+        if (wheels[i] > 0.0f) {
+            b2Vec2 wheel_axis = vertices[1];
+            wheel_axis.Normalize();
+            float wheel_offset = 3.0f;
+            b2Vec2 anchor_pos = vertices[1] + wheel_offset * wheel_axis;
+            GameObject* wheel = create_ball(pos + anchor_pos, wheels[i], sf::Color::Yellow);
+            wheel->SetType(b2_dynamicBody);
+            wheel->SetDensity(1.0f);
+            wheel->SetFriction(0.3f);
+            wheel->SetRestitution(0.5f);
+            wheel_objects[i] = wheel;
+            b2WheelJointDef wheel_joint_def;
+            wheel_joint_def.bodyA = body;
+            wheel_joint_def.bodyB = wheel->rigid_body;
+            wheel_joint_def.collideConnected = false;
+            wheel_joint_def.localAnchorA = anchor_pos;
+            wheel_joint_def.localAnchorB = b2Vec2(0.0f, 0.0f);
+            wheel_joint_def.localAxisA = wheel_axis;
+            wheel_joint_def.lowerTranslation = -wheel_offset;
+            wheel_joint_def.upperTranslation = 0.0f;
+            wheel_joint_def.enableLimit = true;
+            wheel_joint_def.stiffness = 100.0f;
+            wheel_joint_def.damping = 5.0f;
+            b2WheelJoint* wheel_joint = (b2WheelJoint*)world->CreateJoint(&wheel_joint_def);
+            wheel_joints[i] = wheel_joint;
+        }
         shape->setPoint(i, sf::Vector2f(vertices[1].x, vertices[1].y));
     }
 
     shape->setFillColor(color);
-    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body);
+    std::unique_ptr<GameObject> uptr = std::make_unique<CarObject>(std::move(shape), body, wheel_objects, wheel_joints);
     uptr->position = pos;
     GameObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));

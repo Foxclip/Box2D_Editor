@@ -58,3 +58,17 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 	states.transform *= getTransform();
 	target.draw(varray, states);
 }
+
+CarObject::CarObject(
+	std::unique_ptr<sf::Drawable> drawable,
+	b2Body* rigid_body,
+	std::vector<GameObject*> wheels,
+	std::vector<b2WheelJoint*> wheel_joints
+) {
+	this->transformable = dynamic_cast<sf::Transformable*>(drawable.get());
+	assert(this->transformable != nullptr);
+	this->drawable = std::move(drawable);
+	this->rigid_body = rigid_body;
+	this->wheels = wheels;
+	this->wheel_joints = wheel_joints;
+}

@@ -62,7 +62,7 @@ private:
 
 	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color);
-	GameObject* create_car(b2Vec2 pos, std::vector<float> lengths, sf::Color color);
+	GameObject* create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
 	GameObject* create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color);
 
 };
