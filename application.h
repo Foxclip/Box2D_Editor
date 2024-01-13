@@ -23,12 +23,16 @@ private:
 	const int FPS = 60;
 	std::unique_ptr<sf::RenderWindow> window;
 	sf::View world_view;
+	sf::View ui_view;
 	sf::Vector2i mousePos;
 	sf::Vector2f mousePosWorld;
 	sf::Vector2i mousePrevPos;
 	float zoomFactor = 0.03f;
 	float viewCenterX = 0, viewCenterY = 5.0f;
 	sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
+	sf::RectangleShape rect_shape = sf::RectangleShape();
+	sf::Font ui_font;
+	sf::Text text;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;
@@ -37,6 +41,7 @@ private:
 	float timeStep = 1.0f / FPS;
 	b2Body* mouse_body = nullptr;
 	b2MouseJoint* mouse_joint = nullptr;
+	bool paused = false;
 
 	std::vector<std::unique_ptr<GameObject>> game_objects;
 

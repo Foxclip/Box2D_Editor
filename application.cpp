@@ -8,8 +8,13 @@ void Application::init() {
     cs.antialiasingLevel = ANTIALIASING;
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs);
     window->setVerticalSyncEnabled(true);
+    std::string ui_font_filename = "STAN0757.TTF";
+    if (!ui_font.loadFromFile(ui_font_filename)) {
+        throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
+    }
     init_objects();
-    world_view = sf::View(sf::FloatRect(0.0f, 0.0f, 800.0f, 600.0f));
+    world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
+    ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
 }
 
 void Application::start() {
@@ -87,6 +92,7 @@ void Application::process_keyboard_event(sf::Event event) {
     if (event.type == sf::Event::KeyPressed) {
         switch (event.key.code) {
             case sf::Keyboard::R: resetView(); break;
+            case sf::Keyboard::Space: paused = !paused; break;
         }
     }
 }
@@ -150,7 +156,9 @@ void Application::process_mouse() {
 }
 
 void Application::process_world() {
-    world->Step(timeStep, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+    if (!paused) {
+        world->Step(timeStep, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+    }
 }
 
 void Application::render() {
@@ -175,23 +183,43 @@ void Application::render() {
         window->draw(line_primitive);
     }
 
+    ui_view.setCenter(window->getSize().x / 2.0f, window->getSize().y / 2.0f);
+    ui_view.setSize(window->getSize().x, window->getSize().y);
+    window->setView(ui_view);
+    if (paused) {
+        text.setFont(ui_font);
+        text.setString("PAUSED");
+        text.setCharacterSize(48);
+        text.setFillColor(sf::Color::Yellow);
+        sf::FloatRect text_bounds = text.getLocalBounds();
+        text.setOrigin(text_bounds.left + text_bounds.width / 2.0f, text_bounds.top + text_bounds.height / 2.0f);
+        text.setPosition(ui_view.getCenter());
+        const int rect_padding = 10;
+        rect_shape.setSize(sf::Vector2f(text_bounds.width + rect_padding * 2, text_bounds.height + rect_padding * 2));
+        rect_shape.setFillColor(sf::Color(0, 0, 0, 128));
+        rect_shape.setOrigin(rect_shape.getSize() / 2.0f);
+        rect_shape.setPosition(text.getPosition());
+        window->draw(rect_shape);
+        window->draw(text);
+    }
+
     window->display();
 }
 
 b2Vec2 Application::b2_screen_to_world(sf::Vector2i screen_pos) {
-    sf::Vector2f sfml_pos = window->mapPixelToCoords(screen_pos);
+    sf::Vector2f sfml_pos = window->mapPixelToCoords(screen_pos, world_view);
     b2Vec2 b2_pos = b2Vec2(sfml_pos.x, sfml_pos.y);
     return b2_pos;
 }
 
 sf::Vector2f Application::sf_screen_to_world(sf::Vector2i screen_pos) {
-    sf::Vector2f sfml_pos = window->mapPixelToCoords(screen_pos);
+    sf::Vector2f sfml_pos = window->mapPixelToCoords(screen_pos, world_view);
     return sfml_pos;
 }
 
 sf::Vector2i Application::world_to_screen(b2Vec2 world_pos) {
     sf::Vector2f sfml_pos = sf::Vector2f(world_pos.x, world_pos.y);
-    sf::Vector2i screen_pos = window->mapCoordsToPixel(sfml_pos);
+    sf::Vector2i screen_pos = window->mapCoordsToPixel(sfml_pos, world_view);
     return screen_pos;
 }
 
