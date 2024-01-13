@@ -18,8 +18,8 @@ namespace utils {
 
 	std::pair<float, float> getCircleVertex(int index, int point_count, float radius, float offset) {
 		float angle = (float)index / point_count * 2 * std::numbers::pi + offset;
-		float x = std::cos(angle);
-		float y = std::sin(angle);
+		float x = std::cos(angle) * radius;
+		float y = std::sin(angle) * radius;
 		return std::make_pair(x, y);
 	}
 

@@ -38,20 +38,20 @@ void Application::init_objects() {
     };
     GameObject* ground = create_ground(b2Vec2(0.0f, 0.0f), ground_vertices, sf::Color::White);
 
-    //GameObject* box0 = create_box(b2Vec2(0.0f, 1.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
-    //GameObject* box1 = create_box(b2Vec2(0.1f, 2.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
-    //GameObject* box2 = create_box(b2Vec2(0.2f, 3.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
-    //GameObject* ball = create_ball(b2Vec2(0.0f, 5.0f), 0.5f, sf::Color::Green);
-    //std::vector<GameObject*> dynamic_objects = { box0, box1, box2, ball };
-    ////std::vector<GameObject*> boxes = { box1, box2 };
-    ////std::vector<GameObject*> boxes = { box0 };
-    //for (int i = 0; i < dynamic_objects.size(); i++) {
-    //    GameObject* box = dynamic_objects[i];
-    //    box->SetType(b2_dynamicBody);
-    //    box->SetDensity(1.0f);
-    //    box->SetFriction(0.3f);
-    //    box->SetRestitution(0.5f);
-    //}
+    GameObject* box0 = create_box(b2Vec2(0.0f, 1.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
+    GameObject* box1 = create_box(b2Vec2(0.1f, 2.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
+    GameObject* box2 = create_box(b2Vec2(0.2f, 3.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
+    GameObject* ball = create_ball(b2Vec2(0.0f, 5.0f), 0.5f, sf::Color::Green, sf::Color(0, 64, 0));
+    std::vector<GameObject*> dynamic_objects = { box0, box1, box2, ball };
+    //std::vector<GameObject*> boxes = { box1, box2 };
+    //std::vector<GameObject*> boxes = { box0 };
+    for (int i = 0; i < dynamic_objects.size(); i++) {
+        GameObject* box = dynamic_objects[i];
+        box->SetType(b2_dynamicBody);
+        box->SetDensity(1.0f);
+        box->SetFriction(0.3f);
+        box->SetRestitution(0.5f);
+    }
     //b2DistanceJointDef distance_joint_def;
     //distance_joint_def.Initialize(box1->rigid_body, box2->rigid_body, box1->rigid_body->GetWorldCenter(), box2->rigid_body->GetWorldCenter());
     //b2DistanceJoint* distance_joint = (b2DistanceJoint*)world->CreateJoint(&distance_joint_def);
@@ -270,8 +270,8 @@ GameObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, 
     circle_shape.m_radius = radius;
     b2Fixture* fixture = body->CreateFixture(&circle_shape, 1.0f);
     std::unique_ptr<CircleNotchShape> circle_notch_shape = std::make_unique<CircleNotchShape>(radius, 30, 4);
-    circle_notch_shape->setCircleColor(sf::Color(255, 255, 0));
-    circle_notch_shape->setNotchColor(sf::Color(64, 64, 0));
+    circle_notch_shape->setCircleColor(color);
+    circle_notch_shape->setNotchColor(notch_color);
     std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(circle_notch_shape), body);
     GameObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
@@ -306,7 +306,7 @@ GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std:
             wheel_axis.Normalize();
             float wheel_offset = 3.0f;
             b2Vec2 anchor_pos = vertices[1] + wheel_offset * wheel_axis;
-            GameObject* wheel = create_ball(pos + anchor_pos, wheels[i], sf::Color::Yellow);
+            GameObject* wheel = create_ball(pos + anchor_pos, wheels[i], sf::Color::Yellow, sf::Color(64, 64, 0));
             wheel->SetType(b2_dynamicBody);
             wheel->SetDensity(1.0f);
             wheel->SetFriction(0.3f);
