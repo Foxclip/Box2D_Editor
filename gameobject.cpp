@@ -76,7 +76,9 @@ CarObject::CarObject(
 CircleNotchShape::CircleNotchShape(float radius, int point_count, int notch_segment_count) {
 	varray_circle = sf::VertexArray(sf::TriangleFan, point_count + 1);
 	varray_notch = sf::VertexArray(sf::TriangleFan, notch_segment_count + 2);
-	float angle_offset = 0.0f;
+	float segment_angle = 2 * std::numbers::pi / (float)point_count;
+	float notch_angle = segment_angle * notch_segment_count;
+	float angle_offset = -notch_angle / 2.0f;
 	varray_circle[0] = sf::Vertex(sf::Vector2f(0.0f, 0.0f));
 	for (int i = 0; i < point_count; i++) {
 		std::pair<float, float> pair = utils::getCircleVertex(i, point_count, radius, angle_offset);
