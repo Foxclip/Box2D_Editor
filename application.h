@@ -41,7 +41,7 @@ private:
 	float timeStep = 1.0f / FPS;
 	b2Body* mouse_body = nullptr;
 	b2MouseJoint* mouse_joint = nullptr;
-	bool paused = false;
+	bool paused = true;
 
 	std::vector<std::unique_ptr<GameObject>> game_objects;
 
@@ -61,6 +61,7 @@ private:
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
 
 	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
+	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color);
 	GameObject* create_car(b2Vec2 pos, std::vector<float> lengths, sf::Color color);
 	GameObject* create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color);
 
