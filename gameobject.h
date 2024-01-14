@@ -55,3 +55,4 @@ public:
 	std::vector<b2RevoluteJoint*> wheel_joints;
 private:
 };
+

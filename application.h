@@ -23,16 +23,18 @@ private:
 	const int ANTIALIASING = 0;
 	const float MOUSE_SCROLL_ZOOM = 1.2f;
 	const int FPS = 60;
+	const int VERTEX_EDITOR_DISTANCE = 10;
 	std::unique_ptr<sf::RenderWindow> window;
 	sf::View world_view;
 	sf::View ui_view;
 	sf::Vector2i mousePos;
-	sf::Vector2f mousePosWorld;
+	sf::Vector2f sfMousePosWorld;
 	sf::Vector2i mousePrevPos;
 	float zoomFactor = 0.03f;
 	float viewCenterX = 0, viewCenterY = 5.0f;
 	sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
-	sf::RectangleShape rect_shape = sf::RectangleShape();
+	sf::RectangleShape vertex_editor_rect = sf::RectangleShape();
+	sf::RectangleShape paused_rect = sf::RectangleShape();
 	sf::Font ui_font;
 	sf::Text text;
 
@@ -44,6 +46,8 @@ private:
 	b2Body* mouse_body = nullptr;
 	b2MouseJoint* mouse_joint = nullptr;
 	bool paused = true;
+	GameObject* ground = nullptr;
+	b2Vec2 b2MousePosWorld;
 
 	std::vector<std::unique_ptr<GameObject>> game_objects;
 
@@ -61,6 +65,7 @@ private:
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2i world_to_screen(b2Vec2 world_pos);
+	sf::Vector2f world_to_screenf(b2Vec2 world_pos);
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
 
 	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);

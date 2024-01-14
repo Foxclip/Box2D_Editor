@@ -12,6 +12,14 @@ void Application::init() {
     if (!ui_font.loadFromFile(ui_font_filename)) {
         throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
     }
+    vertex_editor_rect.setSize(sf::Vector2f(VERTEX_EDITOR_DISTANCE * 2, VERTEX_EDITOR_DISTANCE * 2));
+    vertex_editor_rect.setFillColor(sf::Color::Transparent);
+    vertex_editor_rect.setOutlineThickness(1.0f);
+    vertex_editor_rect.setOutlineColor(sf::Color::Yellow);
+    vertex_editor_rect.setOrigin(vertex_editor_rect.getSize() / 2.0f);
+    paused_rect.setFillColor(sf::Color(0, 0, 0, 128));
+    paused_rect.setOrigin(0.0f, 0.0f);
+    paused_rect.setPosition(0.0f, 0.0f);
     init_objects();
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -37,7 +45,7 @@ void Application::init_objects() {
         b2Vec2(-15.0f, 2.0f),
         b2Vec2(-25.0f, 8.0f),
     };
-    GameObject* ground = create_ground(b2Vec2(0.0f, 0.0f), ground_vertices, sf::Color::White);
+    ground = create_ground(b2Vec2(0.0f, 0.0f), ground_vertices, sf::Color::White);
 
     GameObject* box0 = create_box(b2Vec2(0.0f, 1.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
     GameObject* box1 = create_box(b2Vec2(0.1f, 2.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
@@ -104,8 +112,8 @@ void Application::process_keyboard_event(sf::Event event) {
 
 void Application::process_mouse_event(sf::Event event) {
     mousePos = sf::Mouse::getPosition(*window);
-    mousePosWorld = sf_screen_to_world(mousePos);
-    b2Vec2 mouse_pos_world = b2Vec2(mousePosWorld.x, mousePosWorld.y);
+    sfMousePosWorld = sf_screen_to_world(mousePos);
+    b2MousePosWorld = b2Vec2(sfMousePosWorld.x, sfMousePosWorld.y);
     if (event.type == sf::Event::MouseButtonPressed) {
         if (event.mouseButton.button == sf::Mouse::Left) {
             b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
@@ -117,7 +125,7 @@ void Application::process_mouse_event(sf::Event event) {
                 mouse_joint_def.damping = 1.0f;
                 mouse_joint_def.maxForce = 5000.0f * grabbed_body->GetMass();
                 mouse_joint_def.stiffness = 50.0f;
-                mouse_joint_def.target = mouse_pos_world;
+                mouse_joint_def.target = b2MousePosWorld;
                 mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
             }
         } else if (event.mouseButton.button == sf::Mouse::Right) {
@@ -183,7 +191,7 @@ void Application::render() {
         sf::Vector2f sf_grabbed_point = sf::Vector2f(b2_grabbed_point.x, b2_grabbed_point.y);
         line_primitive[0].position = sf_grabbed_point;
         line_primitive[0].color = sf::Color::Yellow;
-        line_primitive[1].position = mousePosWorld;
+        line_primitive[1].position = sfMousePosWorld;
         line_primitive[1].color = sf::Color::Yellow;
         window->draw(line_primitive);
     }
@@ -191,6 +199,23 @@ void Application::render() {
     ui_view.setCenter(window->getSize().x / 2.0f, window->getSize().y / 2.0f);
     ui_view.setSize(window->getSize().x, window->getSize().y);
     window->setView(ui_view);
+
+    b2ChainShape* ground_fixture = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
+    b2Vec2 closest_vertex = ground_fixture->m_vertices[0];
+    float closest_vertex_distance = b2Distance(closest_vertex, b2MousePosWorld);
+    for (int i = 1; i < ground_fixture->m_count; i++) {
+        b2Vec2 current_vertex = ground_fixture->m_vertices[i];
+        float distance = b2Distance(current_vertex, b2MousePosWorld);
+        if (distance < closest_vertex_distance) {
+            closest_vertex = current_vertex;
+            closest_vertex_distance = distance;
+        }
+    }
+    if (closest_vertex_distance <= VERTEX_EDITOR_DISTANCE * zoomFactor) {
+        vertex_editor_rect.setPosition(world_to_screenf(closest_vertex));
+        window->draw(vertex_editor_rect);
+    }
+
     if (paused) {
         text.setFont(ui_font);
         text.setString("PAUSED");
@@ -200,11 +225,8 @@ void Application::render() {
         text.setOrigin(text_bounds.left, text_bounds.top);
         const int rect_padding = 10;
         text.setPosition(rect_padding, rect_padding);
-        rect_shape.setSize(sf::Vector2f(text_bounds.width + rect_padding * 2, text_bounds.height + rect_padding * 2));
-        rect_shape.setFillColor(sf::Color(0, 0, 0, 128));
-        rect_shape.setOrigin(0.0f, 0.0f);
-        rect_shape.setPosition(0.0f, 0.0f);
-        window->draw(rect_shape);
+        paused_rect.setSize(sf::Vector2f(text_bounds.width + rect_padding * 2, text_bounds.height + rect_padding * 2));
+        window->draw(paused_rect);
         window->draw(text);
     }
 
@@ -231,6 +253,11 @@ sf::Vector2i Application::world_to_screen(b2Vec2 world_pos) {
     sf::Vector2f sfml_pos = sf::Vector2f(world_pos.x, world_pos.y);
     sf::Vector2i screen_pos = window->mapCoordsToPixel(sfml_pos, world_view);
     return screen_pos;
+}
+
+sf::Vector2f Application::world_to_screenf(b2Vec2 world_pos) {
+    sf::Vector2i vec2i = world_to_screen(world_pos);
+    return sf::Vector2f(vec2i.x, vec2i.y);
 }
 
 b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
