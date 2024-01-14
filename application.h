@@ -1,6 +1,8 @@
 #pragma once
 
 #include "gameobject.h"
+#include <Windows.h>
+#include <winuser.h>
 
 class QueryCallback : public b2QueryCallback {
 public:
@@ -55,6 +57,7 @@ private:
 	void process_mouse();
 	void process_world();
 	void render();
+	void maximize_window();
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2i world_to_screen(b2Vec2 world_pos);

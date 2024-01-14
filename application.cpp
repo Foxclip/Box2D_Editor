@@ -15,6 +15,7 @@ void Application::init() {
     init_objects();
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
+    maximize_window();
 }
 
 void Application::start() {
@@ -208,6 +209,11 @@ void Application::render() {
     }
 
     window->display();
+}
+
+void Application::maximize_window() {
+    sf::WindowHandle windowHandle = window->getSystemHandle();
+    ShowWindow(windowHandle, SW_MAXIMIZE);
 }
 
 b2Vec2 Application::b2_screen_to_world(sf::Vector2i screen_pos) {
