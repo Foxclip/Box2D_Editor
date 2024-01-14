@@ -48,7 +48,7 @@ private:
 	b2Body* mouse_body = nullptr;
 	b2MouseJoint* mouse_joint = nullptr;
 	bool paused = true;
-	GameObject* ground = nullptr;
+	GroundObject* ground = nullptr;
 	b2Vec2 b2MousePosWorld;
 
 	std::vector<std::unique_ptr<GameObject>> game_objects;
@@ -73,7 +73,7 @@ private:
 
 	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
-	GameObject* create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
-	GameObject* create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color);
+	CarObject* create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
+	GroundObject* create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color);
 
 };

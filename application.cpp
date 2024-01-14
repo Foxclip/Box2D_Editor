@@ -176,10 +176,7 @@ void Application::process_keyboard() {
 void Application::process_mouse() {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         if (grabbed_vertex != -1) {
-            b2ChainShape* ground_fixture = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
-            LineStripShape* ground_visual = static_cast<LineStripShape*>(ground->drawable.get());
-            ground_fixture->m_vertices[grabbed_vertex] = b2MousePosWorld;
-            ground_visual->varray[grabbed_vertex].position = sfMousePosWorld;
+            ground->move_vertex(grabbed_vertex, b2MousePosWorld);
         }
         if (mouse_joint) {
             mouse_joint->SetTarget(b2MousePosWorld);
@@ -351,7 +348,7 @@ GameObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, 
     return ptr;
 }
 
-GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
+CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
     std::unique_ptr<sf::ConvexShape> shape = std::make_unique<sf::ConvexShape>(lengths.size());
     float pi = std::numbers::pi;
     auto get_pos = [&](int i) {
@@ -395,14 +392,14 @@ GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std:
     }
 
     shape->setFillColor(color);
-    std::unique_ptr<GameObject> uptr = std::make_unique<CarObject>(std::move(shape), body, wheel_objects, wheel_joints);
+    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(std::move(shape), body, wheel_objects, wheel_joints);
     uptr->position = pos;
-    GameObject* ptr = uptr.get();
+    CarObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;
 }
 
-GameObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color) {
+GroundObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color) {
     b2BodyDef bodyDef;
     bodyDef.position = pos;
     b2Body* body = world->CreateBody(&bodyDef);
@@ -415,8 +412,8 @@ GameObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices,
     }
     std::unique_ptr<LineStripShape> line_strip = std::make_unique<LineStripShape>(drawable_vertices);
     line_strip->setLineColor(color);
-    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(line_strip), body);
-    GameObject* ptr = uptr.get();
+    std::unique_ptr<GroundObject> uptr = std::make_unique<GroundObject>(std::move(line_strip), body);
+    GroundObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;
 }

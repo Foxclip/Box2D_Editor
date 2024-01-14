@@ -108,3 +108,24 @@ void CircleNotchShape::draw(sf::RenderTarget& target, sf::RenderStates states) c
 	target.draw(varray_circle, states);
 	target.draw(varray_notch, states);
 }
+
+void GroundObject::move_vertex(int index, b2Vec2 new_pos) {
+	b2Fixture* old_fixture = rigid_body->GetFixtureList();
+	b2ChainShape* old_chain = static_cast<b2ChainShape*>(old_fixture->GetShape());
+	std::vector<b2Vec2> vertices;
+	vertices.assign(old_chain->m_vertices, old_chain->m_vertices + old_chain->m_count);
+	vertices[index] = new_pos;
+	rigid_body->DestroyFixture(old_fixture);
+	b2ChainShape new_chain; 
+	new_chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
+	b2Fixture* new_fixture = rigid_body->CreateFixture(&new_chain, 1.0f);
+	LineStripShape* visual = static_cast<LineStripShape*>(drawable.get());
+	visual->varray[index].position = sf::Vector2f(new_pos.x, new_pos.y);
+}
+
+GroundObject::GroundObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body) {
+	this->transformable = dynamic_cast<sf::Transformable*>(drawable.get());
+	assert(this->transformable != nullptr);
+	this->drawable = std::move(drawable);
+	this->rigid_body = rigid_body;
+}
