@@ -7,9 +7,9 @@ class LineStripShape : public sf::Drawable, public sf::Transformable {
 public:
 	explicit LineStripShape(sf::VertexArray& varray);
 	void setLineColor(sf::Color color);
+	sf::VertexArray varray;
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	sf::VertexArray varray;
 };
 
 class CircleNotchShape : public sf::Drawable, public sf::Transformable {

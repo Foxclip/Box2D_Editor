@@ -123,7 +123,13 @@ void Application::process_mouse_event(sf::Event event) {
     if (event.type == sf::Event::MouseButtonPressed) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
-                if (!vertex_editor_mode) {
+                if (vertex_editor_mode) {
+                    int index;
+                    b2Vec2 position;
+                    if (mouse_get_ground_vertex(index, position)) {
+                        grabbed_vertex = index;
+                    }
+                } else {
                     b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
                     if (grabbed_fixture) {
                         b2Body* grabbed_body = grabbed_fixture->GetBody();
@@ -144,11 +150,14 @@ void Application::process_mouse_event(sf::Event event) {
         }
     }
     if (event.type == sf::Event::MouseButtonReleased) {
-        if (event.mouseButton.button == sf::Mouse::Left) {
-            if (mouse_joint) {
-                world->DestroyJoint(mouse_joint);
-                mouse_joint = nullptr;
-            }
+        switch (event.mouseButton.button) {
+            case sf::Mouse::Left:
+                grabbed_vertex = -1;
+                if (mouse_joint) {
+                    world->DestroyJoint(mouse_joint);
+                    mouse_joint = nullptr;
+                }
+                break;
         }
     }
     if (event.type == sf::Event::MouseWheelScrolled) {
@@ -166,9 +175,14 @@ void Application::process_keyboard() {
 
 void Application::process_mouse() {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        if (grabbed_vertex != -1) {
+            b2ChainShape* ground_fixture = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
+            LineStripShape* ground_visual = static_cast<LineStripShape*>(ground->drawable.get());
+            ground_fixture->m_vertices[grabbed_vertex] = b2MousePosWorld;
+            ground_visual->varray[grabbed_vertex].position = sfMousePosWorld;
+        }
         if (mouse_joint) {
-            b2Vec2 pos = b2_screen_to_world(mousePos);
-            mouse_joint->SetTarget(pos);
+            mouse_joint->SetTarget(b2MousePosWorld);
         }
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
@@ -212,19 +226,10 @@ void Application::render() {
     window->setView(ui_view);
 
     if (vertex_editor_mode) {
-        b2ChainShape* ground_fixture = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
-        b2Vec2 closest_vertex = ground_fixture->m_vertices[0];
-        float closest_vertex_distance = b2Distance(closest_vertex, b2MousePosWorld);
-        for (int i = 1; i < ground_fixture->m_count; i++) {
-            b2Vec2 current_vertex = ground_fixture->m_vertices[i];
-            float distance = b2Distance(current_vertex, b2MousePosWorld);
-            if (distance < closest_vertex_distance) {
-                closest_vertex = current_vertex;
-                closest_vertex_distance = distance;
-            }
-        }
-        if (closest_vertex_distance <= VERTEX_EDITOR_DISTANCE * zoomFactor) {
-            vertex_editor_rect.setPosition(world_to_screenf(closest_vertex));
+        int index;
+        b2Vec2 position;
+        if (mouse_get_ground_vertex(index, position)) {
+            vertex_editor_rect.setPosition(world_to_screenf(position));
             window->draw(vertex_editor_rect);
         }
     }
@@ -289,6 +294,28 @@ b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
         }
     }
     return nullptr;
+}
+
+bool Application::mouse_get_ground_vertex(int& p_index, b2Vec2& p_position) {
+    b2ChainShape* ground_fixture = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
+    int closest_vertex_i = 0;
+    b2Vec2 closest_vertex_pos = ground_fixture->m_vertices[0];
+    float closest_vertex_dist = b2Distance(closest_vertex_pos, b2MousePosWorld);
+    for (int i = 1; i < ground_fixture->m_count; i++) {
+        b2Vec2 current_vertex = ground_fixture->m_vertices[i];
+        float distance = b2Distance(current_vertex, b2MousePosWorld);
+        if (distance < closest_vertex_dist) {
+            closest_vertex_i = i;
+            closest_vertex_pos = current_vertex;
+            closest_vertex_dist = distance;
+        }
+    }
+    if (closest_vertex_dist <= VERTEX_EDITOR_DISTANCE * zoomFactor) {
+        p_index = closest_vertex_i;
+        p_position = closest_vertex_pos;
+        return true;
+    }
+    return false;
 }
 
 GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {

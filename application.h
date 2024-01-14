@@ -38,6 +38,7 @@ private:
 	sf::Font ui_font;
 	sf::Text text;
 	bool vertex_editor_mode = false;
+	int grabbed_vertex = -1;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;
@@ -68,6 +69,7 @@ private:
 	sf::Vector2i world_to_screen(b2Vec2 world_pos);
 	sf::Vector2f world_to_screenf(b2Vec2 world_pos);
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
+	bool mouse_get_ground_vertex(int& index, b2Vec2& position);
 
 	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
