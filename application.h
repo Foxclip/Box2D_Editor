@@ -37,6 +37,7 @@ private:
 	sf::RectangleShape paused_rect = sf::RectangleShape();
 	sf::Font ui_font;
 	sf::Text text;
+	bool vertex_editor_mode = false;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;

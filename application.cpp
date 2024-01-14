@@ -106,6 +106,12 @@ void Application::process_keyboard_event(sf::Event event) {
         switch (event.key.code) {
             case sf::Keyboard::R: resetView(); break;
             case sf::Keyboard::Space: paused = !paused; break;
+            case sf::Keyboard::LControl: vertex_editor_mode = true; break;
+        }
+    }
+    if (event.type == sf::Event::KeyReleased) {
+        switch (event.key.code) {
+            case sf::Keyboard::LControl: vertex_editor_mode = false; break;
         }
     }
 }
@@ -115,21 +121,26 @@ void Application::process_mouse_event(sf::Event event) {
     sfMousePosWorld = sf_screen_to_world(mousePos);
     b2MousePosWorld = b2Vec2(sfMousePosWorld.x, sfMousePosWorld.y);
     if (event.type == sf::Event::MouseButtonPressed) {
-        if (event.mouseButton.button == sf::Mouse::Left) {
-            b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
-            if (grabbed_fixture) {
-                b2Body* grabbed_body = grabbed_fixture->GetBody();
-                b2MouseJointDef mouse_joint_def;
-                mouse_joint_def.bodyA = mouse_body;
-                mouse_joint_def.bodyB = grabbed_body;
-                mouse_joint_def.damping = 1.0f;
-                mouse_joint_def.maxForce = 5000.0f * grabbed_body->GetMass();
-                mouse_joint_def.stiffness = 50.0f;
-                mouse_joint_def.target = b2MousePosWorld;
-                mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
-            }
-        } else if (event.mouseButton.button == sf::Mouse::Right) {
-            mousePrevPos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+        switch (event.mouseButton.button) {
+            case sf::Mouse::Left:
+                if (!vertex_editor_mode) {
+                    b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
+                    if (grabbed_fixture) {
+                        b2Body* grabbed_body = grabbed_fixture->GetBody();
+                        b2MouseJointDef mouse_joint_def;
+                        mouse_joint_def.bodyA = mouse_body;
+                        mouse_joint_def.bodyB = grabbed_body;
+                        mouse_joint_def.damping = 1.0f;
+                        mouse_joint_def.maxForce = 5000.0f * grabbed_body->GetMass();
+                        mouse_joint_def.stiffness = 50.0f;
+                        mouse_joint_def.target = b2MousePosWorld;
+                        mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
+                    }
+                }
+                break;
+            case sf::Mouse::Right:
+                mousePrevPos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+                break;
         }
     }
     if (event.type == sf::Event::MouseButtonReleased) {
@@ -200,20 +211,22 @@ void Application::render() {
     ui_view.setSize(window->getSize().x, window->getSize().y);
     window->setView(ui_view);
 
-    b2ChainShape* ground_fixture = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
-    b2Vec2 closest_vertex = ground_fixture->m_vertices[0];
-    float closest_vertex_distance = b2Distance(closest_vertex, b2MousePosWorld);
-    for (int i = 1; i < ground_fixture->m_count; i++) {
-        b2Vec2 current_vertex = ground_fixture->m_vertices[i];
-        float distance = b2Distance(current_vertex, b2MousePosWorld);
-        if (distance < closest_vertex_distance) {
-            closest_vertex = current_vertex;
-            closest_vertex_distance = distance;
+    if (vertex_editor_mode) {
+        b2ChainShape* ground_fixture = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
+        b2Vec2 closest_vertex = ground_fixture->m_vertices[0];
+        float closest_vertex_distance = b2Distance(closest_vertex, b2MousePosWorld);
+        for (int i = 1; i < ground_fixture->m_count; i++) {
+            b2Vec2 current_vertex = ground_fixture->m_vertices[i];
+            float distance = b2Distance(current_vertex, b2MousePosWorld);
+            if (distance < closest_vertex_distance) {
+                closest_vertex = current_vertex;
+                closest_vertex_distance = distance;
+            }
         }
-    }
-    if (closest_vertex_distance <= VERTEX_EDITOR_DISTANCE * zoomFactor) {
-        vertex_editor_rect.setPosition(world_to_screenf(closest_vertex));
-        window->draw(vertex_editor_rect);
+        if (closest_vertex_distance <= VERTEX_EDITOR_DISTANCE * zoomFactor) {
+            vertex_editor_rect.setPosition(world_to_screenf(closest_vertex));
+            window->draw(vertex_editor_rect);
+        }
     }
 
     if (paused) {
