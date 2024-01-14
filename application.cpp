@@ -298,7 +298,7 @@ GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std:
     bodyDef.position = pos;
     b2Body* body = world->CreateBody(&bodyDef);
     std::vector<GameObject*> wheel_objects(wheels.size());
-    std::vector<b2WheelJoint*> wheel_joints(wheels.size());
+    std::vector<b2RevoluteJoint*> wheel_joints(wheels.size());
     for (int i = 0; i < lengths.size(); i++) {
         b2Vec2 vertices[3];
         vertices[0] = b2Vec2(0.0f, 0.0f);
@@ -308,32 +308,20 @@ GameObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std:
         triangle.Set(vertices, 3);
         b2Fixture* fixture = body->CreateFixture(&triangle, 1.0f);
         if (wheels[i] > 0.0f) {
-            b2Vec2 wheel_axis = vertices[1];
-            wheel_axis.Normalize();
-            float wheel_offset = 3.0f;
-            b2Vec2 anchor_pos = vertices[1] + wheel_offset * wheel_axis;
-            GameObject* wheel = create_ball(pos + anchor_pos, wheels[i], sf::Color::Yellow, sf::Color(64, 64, 0));
+            b2Vec2 anchor_pos = vertices[1];
+            b2Vec2 anchor_pos_world = pos + anchor_pos;
+            GameObject* wheel = create_ball(anchor_pos_world, wheels[i], sf::Color::Yellow, sf::Color(64, 64, 0));
             wheel->SetType(b2_dynamicBody);
             wheel->SetDensity(1.0f);
             wheel->SetFriction(0.3f);
             wheel->SetRestitution(0.5f);
             wheel_objects[i] = wheel;
-            b2WheelJointDef wheel_joint_def;
-            wheel_joint_def.bodyA = body;
-            wheel_joint_def.bodyB = wheel->rigid_body;
-            wheel_joint_def.collideConnected = false;
-            wheel_joint_def.localAnchorA = anchor_pos;
-            wheel_joint_def.localAnchorB = b2Vec2(0.0f, 0.0f);
-            wheel_joint_def.localAxisA = wheel_axis;
-            wheel_joint_def.lowerTranslation = -wheel_offset;
-            wheel_joint_def.upperTranslation = 0.0f;
-            wheel_joint_def.enableLimit = true;
+            b2RevoluteJointDef wheel_joint_def;
+            wheel_joint_def.Initialize(body, wheel->rigid_body, anchor_pos_world);
             wheel_joint_def.maxMotorTorque = 30.0f;
             wheel_joint_def.motorSpeed = -10.0f;
             wheel_joint_def.enableMotor = true;
-            wheel_joint_def.stiffness = 100.0f;
-            wheel_joint_def.damping = 5.0f;
-            b2WheelJoint* wheel_joint = (b2WheelJoint*)world->CreateJoint(&wheel_joint_def);
+            b2RevoluteJoint* wheel_joint = (b2RevoluteJoint*)world->CreateJoint(&wheel_joint_def);
             wheel_joints[i] = wheel_joint;
         }
         shape->setPoint(i, sf::Vector2f(vertices[1].x, vertices[1].y));

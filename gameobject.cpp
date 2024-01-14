@@ -63,7 +63,7 @@ CarObject::CarObject(
 	std::unique_ptr<sf::Drawable> drawable,
 	b2Body* rigid_body,
 	std::vector<GameObject*> wheels,
-	std::vector<b2WheelJoint*> wheel_joints
+	std::vector<b2RevoluteJoint*> wheel_joints
 ) {
 	this->transformable = dynamic_cast<sf::Transformable*>(drawable.get());
 	assert(this->transformable != nullptr);
