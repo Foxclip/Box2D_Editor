@@ -3,6 +3,8 @@
 #include <numbers>
 #include <iostream>
 
+std::vector<Tool> tools;
+
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
 const auto to2i = utils::to2i;
@@ -30,6 +32,19 @@ void Application::init() {
     paused_rect.setFillColor(sf::Color(0, 0, 0, 128));
     paused_rect.setOrigin(0.0f, 0.0f);
     paused_rect.setPosition(0.0f, 0.0f);
+    tools = {
+        Tool("drag"),
+        Tool("edit"),
+    };
+    tool_rect.setSize(sf::Vector2f(TOOL_RECT_SIZE, TOOL_RECT_SIZE));
+    tool_rect.setFillColor(sf::Color::Yellow);
+    int tools_width = TOOL_RECT_SIZE * tools.size();
+    int padding_width = TOOLBOX_PADDING * (tools.size() + 1);
+    int toolbox_width = tools_width + padding_width;
+    int toolbox_height = TOOLBOX_PADDING * 2 + TOOL_RECT_SIZE;
+    toolbox_rect.setSize(sf::Vector2f(toolbox_width, toolbox_height));
+    toolbox_rect.setFillColor(sf::Color::Red);
+    toolbox_rect.setOrigin(sf::Vector2f(toolbox_width / 2, 0.0f));
     init_objects();
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -208,6 +223,12 @@ void Application::process_world() {
 
 void Application::render() {
     window->clear();
+    render_world();
+    render_ui();
+    window->display();
+}
+
+void Application::render_world() {
     world_view.setCenter(viewCenterX, viewCenterY);
     world_view.setSize(window->getSize().x * zoomFactor, -1.0f * window->getSize().y * zoomFactor);
     window->setView(world_view);
@@ -226,7 +247,9 @@ void Application::render() {
         line_primitive[1].color = sf::Color::Yellow;
         window->draw(line_primitive);
     }
+}
 
+void Application::render_ui() {
     ui_view.setCenter(window->getSize().x / 2.0f, window->getSize().y / 2.0f);
     ui_view.setSize(window->getSize().x, window->getSize().y);
     window->setView(ui_view);
@@ -247,6 +270,18 @@ void Application::render() {
         }
     }
 
+    toolbox_rect.setPosition(window->getSize().x / 2, 0.0f);
+    window->draw(toolbox_rect);
+    sf::FloatRect toolbox_bounds = toolbox_rect.getGlobalBounds();
+    sf::Vector2f toolbox_corner = sf::Vector2f(toolbox_bounds.left, toolbox_bounds.top);
+    for (int i = 0; i < tools.size(); i++) {
+        int x = i * (TOOLBOX_PADDING + TOOL_RECT_SIZE) + TOOLBOX_PADDING;
+        int y = TOOLBOX_PADDING;
+        sf::Vector2f pos = toolbox_corner + sf::Vector2f(x, y);
+        tool_rect.setPosition(pos);
+        window->draw(tool_rect);
+    }
+
     if (paused) {
         text.setFont(ui_font);
         text.setString("PAUSED");
@@ -260,8 +295,6 @@ void Application::render() {
         window->draw(paused_rect);
         window->draw(text);
     }
-
-    window->display();
 }
 
 void Application::maximize_window() {
@@ -435,4 +468,8 @@ GroundObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertice
 bool QueryCallback::ReportFixture(b2Fixture* fixture) {
     fixtures.push_back(fixture);
     return true;
+}
+
+Tool::Tool(std::string name) {
+    this->name = name;
 }
