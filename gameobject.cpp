@@ -4,6 +4,8 @@
 
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
+const auto to2i = utils::to2i;
+const auto to2f = utils::to2f;
 
 GameObject::GameObject() { }
 

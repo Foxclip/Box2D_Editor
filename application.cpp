@@ -5,6 +5,8 @@
 
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
+const auto to2i = utils::to2i;
+const auto to2f = utils::to2f;
 
 void Application::init() {
     sf::ContextSettings cs;
@@ -15,14 +17,16 @@ void Application::init() {
     if (!ui_font.loadFromFile(ui_font_filename)) {
         throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
     }
+    assert(VERTEX_SIZE % 2 == 1);
     vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
     vertex_rect.setFillColor(sf::Color::Red);
-    vertex_rect.setOrigin(vertex_rect.getSize() / 2.0f);
-    vertex_editor_rect.setSize(sf::Vector2f(VERTEX_EDITOR_DISTANCE * 2, VERTEX_EDITOR_DISTANCE * 2));
+    vertex_rect.setOrigin(0.0f, 0.0f);
+    int vertex_distance = VERTEX_EDITOR_DISTANCE * 2 + 1;
+    vertex_editor_rect.setSize(sf::Vector2f(vertex_distance, vertex_distance));
     vertex_editor_rect.setFillColor(sf::Color::Transparent);
-    vertex_editor_rect.setOutlineThickness(1.0f);
+    vertex_editor_rect.setOutlineThickness(-1.0f);
     vertex_editor_rect.setOutlineColor(sf::Color::Yellow);
-    vertex_editor_rect.setOrigin(vertex_editor_rect.getSize() / 2.0f);
+    vertex_editor_rect.setOrigin(0.0f, 0.0f);
     paused_rect.setFillColor(sf::Color(0, 0, 0, 128));
     paused_rect.setOrigin(0.0f, 0.0f);
     paused_rect.setPosition(0.0f, 0.0f);
@@ -131,7 +135,7 @@ void Application::process_mouse_event(sf::Event event) {
             case sf::Mouse::Left:
                 if (vertex_editor_mode) {
                     int index;
-                    b2Vec2 position;
+                    sf::Vector2i position;
                     if (mouse_get_ground_vertex(index, position)) {
                         grabbed_vertex = index;
                     }
@@ -230,13 +234,15 @@ void Application::render() {
     if (vertex_editor_mode) {
         b2ChainShape* chain = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
         for (int i = 0; i < chain->m_count; i++) {
-            vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]));
+            int vertex_size = VERTEX_SIZE / 2;
+            vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]) - sf::Vector2f(vertex_size, vertex_size));
             window->draw(vertex_rect);
         }
         int index;
-        b2Vec2 position;
+        sf::Vector2i position;
         if (mouse_get_ground_vertex(index, position)) {
-            vertex_editor_rect.setPosition(world_to_screenf(position));
+            int vertex_distance = VERTEX_EDITOR_DISTANCE;
+            vertex_editor_rect.setPosition(to2f(position) - sf::Vector2f(vertex_distance, vertex_distance));
             window->draw(vertex_editor_rect);
         }
     }
@@ -301,21 +307,21 @@ b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
     return nullptr;
 }
 
-bool Application::mouse_get_ground_vertex(int& p_index, b2Vec2& p_position) {
+bool Application::mouse_get_ground_vertex(int& p_index, sf::Vector2i& p_position) {
     b2ChainShape* chain = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
     int closest_vertex_i = 0;
-    b2Vec2 closest_vertex_pos = chain->m_vertices[0];
-    float closest_vertex_dist = b2Distance(closest_vertex_pos, b2MousePosWorld);
+    sf::Vector2i closest_vertex_pos = world_to_screen(chain->m_vertices[0]);
+    int closest_vertex_offset = utils::get_max_offset(closest_vertex_pos, mousePos);
     for (int i = 1; i < chain->m_count; i++) {
-        b2Vec2 current_vertex = chain->m_vertices[i];
-        float distance = b2Distance(current_vertex, b2MousePosWorld);
-        if (distance < closest_vertex_dist) {
+        sf::Vector2i vertex_pos = world_to_screen(chain->m_vertices[i]);
+        float offset = utils::get_max_offset(vertex_pos, mousePos);
+        if (offset < closest_vertex_offset) {
             closest_vertex_i = i;
-            closest_vertex_pos = current_vertex;
-            closest_vertex_dist = distance;
+            closest_vertex_pos = vertex_pos;
+            closest_vertex_offset = offset;
         }
     }
-    if (closest_vertex_dist <= VERTEX_EDITOR_DISTANCE * zoomFactor) {
+    if (closest_vertex_offset <= VERTEX_EDITOR_DISTANCE) {
         p_index = closest_vertex_i;
         p_position = closest_vertex_pos;
         return true;
