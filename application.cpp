@@ -12,6 +12,9 @@ void Application::init() {
     if (!ui_font.loadFromFile(ui_font_filename)) {
         throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
     }
+    vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
+    vertex_rect.setFillColor(sf::Color::Red);
+    vertex_rect.setOrigin(vertex_rect.getSize() / 2.0f);
     vertex_editor_rect.setSize(sf::Vector2f(VERTEX_EDITOR_DISTANCE * 2, VERTEX_EDITOR_DISTANCE * 2));
     vertex_editor_rect.setFillColor(sf::Color::Transparent);
     vertex_editor_rect.setOutlineThickness(1.0f);
@@ -223,6 +226,11 @@ void Application::render() {
     window->setView(ui_view);
 
     if (vertex_editor_mode) {
+        b2ChainShape* chain = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
+        for (int i = 0; i < chain->m_count; i++) {
+            vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]));
+            window->draw(vertex_rect);
+        }
         int index;
         b2Vec2 position;
         if (mouse_get_ground_vertex(index, position)) {
@@ -294,12 +302,12 @@ b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
 }
 
 bool Application::mouse_get_ground_vertex(int& p_index, b2Vec2& p_position) {
-    b2ChainShape* ground_fixture = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
+    b2ChainShape* chain = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
     int closest_vertex_i = 0;
-    b2Vec2 closest_vertex_pos = ground_fixture->m_vertices[0];
+    b2Vec2 closest_vertex_pos = chain->m_vertices[0];
     float closest_vertex_dist = b2Distance(closest_vertex_pos, b2MousePosWorld);
-    for (int i = 1; i < ground_fixture->m_count; i++) {
-        b2Vec2 current_vertex = ground_fixture->m_vertices[i];
+    for (int i = 1; i < chain->m_count; i++) {
+        b2Vec2 current_vertex = chain->m_vertices[i];
         float distance = b2Distance(current_vertex, b2MousePosWorld);
         if (distance < closest_vertex_dist) {
             closest_vertex_i = i;
@@ -313,6 +321,14 @@ bool Application::mouse_get_ground_vertex(int& p_index, b2Vec2& p_position) {
         return true;
     }
     return false;
+}
+
+b2Vec2 Application::tob2(sf::Vector2f vec) {
+    return b2Vec2(vec.x, vec.y);
+}
+
+sf::Vector2f Application::tosf(b2Vec2 vec) {
+    return sf::Vector2f(vec.x, vec.y);
 }
 
 GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {

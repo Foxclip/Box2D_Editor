@@ -14,5 +14,8 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
+    //TODO: use tob2 and tosf
+    //TODO: fix distance calculation in vertex highlight (take into account square shape)
+
     return 0;
 }

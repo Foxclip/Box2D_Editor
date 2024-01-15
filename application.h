@@ -23,6 +23,7 @@ private:
 	const int ANTIALIASING = 0;
 	const float MOUSE_SCROLL_ZOOM = 1.2f;
 	const int FPS = 60;
+	const int VERTEX_SIZE = 10;
 	const int VERTEX_EDITOR_DISTANCE = 10;
 	std::unique_ptr<sf::RenderWindow> window;
 	sf::View world_view;
@@ -33,6 +34,7 @@ private:
 	float zoomFactor = 0.03f;
 	float viewCenterX = 0, viewCenterY = 5.0f;
 	sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
+	sf::RectangleShape vertex_rect = sf::RectangleShape();
 	sf::RectangleShape vertex_editor_rect = sf::RectangleShape();
 	sf::RectangleShape paused_rect = sf::RectangleShape();
 	sf::Font ui_font;
@@ -70,6 +72,8 @@ private:
 	sf::Vector2f world_to_screenf(b2Vec2 world_pos);
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
 	bool mouse_get_ground_vertex(int& index, b2Vec2& position);
+	b2Vec2 tob2(sf::Vector2f vec);
+	sf::Vector2f tosf(b2Vec2 vec);
 
 	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
