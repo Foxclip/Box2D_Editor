@@ -72,8 +72,6 @@ private:
 	sf::Vector2f world_to_screenf(b2Vec2 world_pos);
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
 	bool mouse_get_ground_vertex(int& index, b2Vec2& position);
-	b2Vec2 tob2(sf::Vector2f vec);
-	sf::Vector2f tosf(b2Vec2 vec);
 
 	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);

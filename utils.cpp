@@ -23,4 +23,12 @@ namespace utils {
 		return std::make_pair(x, y);
 	}
 
+	b2Vec2 tob2(sf::Vector2f vec) {
+		return b2Vec2(vec.x, vec.y);
+	}
+
+	sf::Vector2f tosf(b2Vec2 vec) {
+		return sf::Vector2f(vec.x, vec.y);
+	}
+
 }

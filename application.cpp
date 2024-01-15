@@ -3,6 +3,9 @@
 #include <numbers>
 #include <iostream>
 
+const auto tob2 = utils::tob2;
+const auto tosf = utils::tosf;
+
 void Application::init() {
     sf::ContextSettings cs;
     cs.antialiasingLevel = ANTIALIASING;
@@ -122,7 +125,7 @@ void Application::process_keyboard_event(sf::Event event) {
 void Application::process_mouse_event(sf::Event event) {
     mousePos = sf::Mouse::getPosition(*window);
     sfMousePosWorld = sf_screen_to_world(mousePos);
-    b2MousePosWorld = b2Vec2(sfMousePosWorld.x, sfMousePosWorld.y);
+    b2MousePosWorld = tob2(sfMousePosWorld);
     if (event.type == sf::Event::MouseButtonPressed) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
@@ -212,9 +215,8 @@ void Application::render() {
     }
 
     if (mouse_joint) {
-        b2Vec2 b2_grabbed_point = mouse_joint->GetAnchorB();
-        sf::Vector2f sf_grabbed_point = sf::Vector2f(b2_grabbed_point.x, b2_grabbed_point.y);
-        line_primitive[0].position = sf_grabbed_point;
+        sf::Vector2f grabbed_point = tosf(mouse_joint->GetAnchorB());
+        line_primitive[0].position = grabbed_point;
         line_primitive[0].color = sf::Color::Yellow;
         line_primitive[1].position = sfMousePosWorld;
         line_primitive[1].color = sf::Color::Yellow;
@@ -262,20 +264,18 @@ void Application::maximize_window() {
 }
 
 b2Vec2 Application::b2_screen_to_world(sf::Vector2i screen_pos) {
-    sf::Vector2f sfml_pos = window->mapPixelToCoords(screen_pos, world_view);
-    b2Vec2 b2_pos = b2Vec2(sfml_pos.x, sfml_pos.y);
-    return b2_pos;
+    sf::Vector2f pos = window->mapPixelToCoords(screen_pos, world_view);
+    return tob2(pos);
 }
 
 sf::Vector2f Application::sf_screen_to_world(sf::Vector2i screen_pos) {
-    sf::Vector2f sfml_pos = window->mapPixelToCoords(screen_pos, world_view);
-    return sfml_pos;
+    sf::Vector2f pos = window->mapPixelToCoords(screen_pos, world_view);
+    return pos;
 }
 
 sf::Vector2i Application::world_to_screen(b2Vec2 world_pos) {
-    sf::Vector2f sfml_pos = sf::Vector2f(world_pos.x, world_pos.y);
-    sf::Vector2i screen_pos = window->mapCoordsToPixel(sfml_pos, world_view);
-    return screen_pos;
+    sf::Vector2i pos = window->mapCoordsToPixel(tosf(world_pos), world_view);
+    return pos;
 }
 
 sf::Vector2f Application::world_to_screenf(b2Vec2 world_pos) {
@@ -323,14 +323,6 @@ bool Application::mouse_get_ground_vertex(int& p_index, b2Vec2& p_position) {
     return false;
 }
 
-b2Vec2 Application::tob2(sf::Vector2f vec) {
-    return b2Vec2(vec.x, vec.y);
-}
-
-sf::Vector2f Application::tosf(b2Vec2 vec) {
-    return sf::Vector2f(vec.x, vec.y);
-}
-
 GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
     b2BodyDef bodyDef;
     bodyDef.position = pos;
@@ -339,7 +331,7 @@ GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Co
     b2PolygonShape box_shape;
     box_shape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
     b2Fixture* fixture = body->CreateFixture(&box_shape, 1.0f);
-    std::unique_ptr<sf::Shape> shape = std::make_unique<sf::RectangleShape>(sf::Vector2f(size.x, size.y));
+    std::unique_ptr<sf::Shape> shape = std::make_unique<sf::RectangleShape>(tosf(size));
     shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
     shape->setFillColor(color);
     std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body);
@@ -404,7 +396,7 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
             b2RevoluteJoint* wheel_joint = (b2RevoluteJoint*)world->CreateJoint(&wheel_joint_def);
             wheel_joints[i] = wheel_joint;
         }
-        shape->setPoint(i, sf::Vector2f(vertices[1].x, vertices[1].y));
+        shape->setPoint(i, tosf(vertices[1]));
     }
 
     shape->setFillColor(color);
@@ -424,7 +416,7 @@ GroundObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertice
     b2Fixture* fixture = body->CreateFixture(&chain, 1.0f);
     sf::VertexArray drawable_vertices(sf::LinesStrip, vertices.size());
     for (int i = 0; i < vertices.size(); i++) {
-        drawable_vertices[i].position = sf::Vector2f(vertices[i].x, vertices[i].y);
+        drawable_vertices[i].position = tosf(vertices[i]);
     }
     std::unique_ptr<LineStripShape> line_strip = std::make_unique<LineStripShape>(drawable_vertices);
     line_strip->setLineColor(color);

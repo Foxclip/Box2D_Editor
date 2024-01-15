@@ -2,6 +2,9 @@
 #include "gameobject.h"
 #include "utils.h"
 
+const auto tob2 = utils::tob2;
+const auto tosf = utils::tosf;
+
 GameObject::GameObject() { }
 
 GameObject::GameObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body) {
@@ -18,7 +21,7 @@ void GameObject::UpdateVisual() {
 		this->position = position;
 		this->angle = angle;
 	}
-	transformable->setPosition(sf::Vector2f(position.x, position.y));
+	transformable->setPosition(tosf(position));
 	transformable->setRotation(utils::to_degrees(angle));
 }
 
@@ -120,7 +123,7 @@ void GroundObject::move_vertex(int index, b2Vec2 new_pos) {
 	new_chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
 	b2Fixture* new_fixture = rigid_body->CreateFixture(&new_chain, 1.0f);
 	LineStripShape* visual = static_cast<LineStripShape*>(drawable.get());
-	visual->varray[index].position = sf::Vector2f(new_pos.x, new_pos.y);
+	visual->varray[index].position = tosf(new_pos);
 }
 
 GroundObject::GroundObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body) {
