@@ -65,10 +65,10 @@ void Application::init_ui() {
         paused_rect.setPosition(0.0f, 0.0f);
     }
     {
-        int tools_width = TOOL_RECT_SIZE * tools.size();
+        int tools_width = TOOL_RECT_WIDTH * tools.size();
         int padding_width = TOOLBOX_PADDING * (tools.size() + 1);
         int toolbox_width = tools_width + padding_width;
-        int toolbox_height = TOOLBOX_PADDING * 2 + TOOL_RECT_SIZE;
+        int toolbox_height = TOOLBOX_PADDING * 2 + TOOL_RECT_HEIGHT;
         toolbox_rect.setSize(sf::Vector2f(toolbox_width, toolbox_height));
         toolbox_rect.setFillColor(sf::Color::Red);
         toolbox_rect.setOrigin(sf::Vector2f(toolbox_width / 2, 0.0f));
@@ -368,7 +368,7 @@ void Application::render_ui() {
     for (int i = 0; i < tools.size(); i++) {
         Tool* tool = tools[i].get();
         sf::RectangleShape& tool_rect = tool->shape;
-        int x = i * (TOOLBOX_PADDING + TOOL_RECT_SIZE) + TOOLBOX_PADDING;
+        int x = i * (TOOLBOX_PADDING + TOOL_RECT_WIDTH) + TOOLBOX_PADDING;
         int y = TOOLBOX_PADDING;
         sf::Vector2f pos = toolbox_corner + sf::Vector2f(x, y);
         tool_rect.setPosition(pos);
@@ -589,7 +589,7 @@ bool QueryCallback::ReportFixture(b2Fixture* fixture) {
 
 Tool::Tool(std::string name) {
     this->name = name;
-    shape.setSize(sf::Vector2f(TOOL_RECT_SIZE, TOOL_RECT_SIZE));
+    shape.setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
     shape.setFillColor(sf::Color(128, 128, 128));
     shape.setOutlineColor(sf::Color::Yellow);
 }

@@ -11,7 +11,8 @@ const float MOUSE_SCROLL_ZOOM = 1.2f;
 const int FPS = 60;
 const int VERTEX_SIZE = 9;
 const int VERTEX_EDITOR_DISTANCE = 10;
-const int TOOL_RECT_SIZE = 40;
+const int TOOL_RECT_WIDTH = 60;
+const int TOOL_RECT_HEIGHT = 40;
 const int TOOLBOX_PADDING = 10;
 
 class QueryCallback : public b2QueryCallback {
