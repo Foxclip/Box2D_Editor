@@ -85,6 +85,7 @@ private:
 	void render_ui();
 	void maximize_window();
 	Tool* create_tool(std::string name);
+	Tool* try_select_tool(int index);
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2i world_to_screen(b2Vec2 world_pos);

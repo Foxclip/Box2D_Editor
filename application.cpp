@@ -152,6 +152,16 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::R: resetView(); break;
             case sf::Keyboard::Space: paused = !paused; break;
             case sf::Keyboard::LControl: vertex_editor_mode = true; break;
+            case sf::Keyboard::Num1: try_select_tool(0); break;
+            case sf::Keyboard::Num2: try_select_tool(1); break;
+            case sf::Keyboard::Num3: try_select_tool(2); break;
+            case sf::Keyboard::Num4: try_select_tool(3); break;
+            case sf::Keyboard::Num5: try_select_tool(4); break;
+            case sf::Keyboard::Num6: try_select_tool(5); break;
+            case sf::Keyboard::Num7: try_select_tool(6); break;
+            case sf::Keyboard::Num8: try_select_tool(7); break;
+            case sf::Keyboard::Num9: try_select_tool(8); break;
+            case sf::Keyboard::Num0: try_select_tool(9); break;
         }
     }
     if (event.type == sf::Event::KeyReleased) {
@@ -341,6 +351,14 @@ Tool* Application::create_tool(std::string name) {
     Tool* ptr = uptr.get();
     tools.push_back(std::move(uptr));
     return ptr;
+}
+
+Tool* Application::try_select_tool(int index) {
+    if (tools.size() > index) {
+        selected_tool = tools[index].get();
+        return selected_tool;
+    }
+    return nullptr;
 }
 
 b2Vec2 Application::b2_screen_to_world(sf::Vector2i screen_pos) {
