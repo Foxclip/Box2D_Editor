@@ -27,25 +27,86 @@ void GameObject::UpdateVisual() {
 	transformable->setRotation(utils::to_degrees(angle));
 }
 
-void GameObject::SetType(b2BodyType type) {
-	rigid_body->SetType(type);
+void GameObject::SetEnabled(bool enabled, bool include_children) {
+	rigid_body->SetEnabled(enabled);
+	if (include_children) {
+		for (int i = 0; i < children.size(); i++) {
+			children[i]->SetEnabled(enabled, true);
+		}
+	}
 }
 
-void GameObject::SetDensity(float density) {
+void GameObject::SetPosition(const b2Vec2& pos, bool move_children = false) {
+	b2Vec2 offset = pos - rigid_body->GetPosition();
+	rigid_body->SetTransform(pos, rigid_body->GetAngle());
+	if (move_children) {
+		for (int i = 0; i < children.size(); i++) {
+			children[i]->SetPosition(children[i]->rigid_body->GetPosition() + offset, true);
+		}
+	}
+}
+
+void GameObject::SetAngle(float angle) {
+	rigid_body->SetTransform(rigid_body->GetPosition(), angle);
+}
+
+void GameObject::SetLinearVelocity(const b2Vec2& velocity, bool include_children) {
+	rigid_body->SetLinearVelocity(velocity);
+	if (include_children) {
+		for (int i = 0; i < children.size(); i++) {
+			children[i]->SetLinearVelocity(velocity, true);
+		}
+	}
+}
+
+void GameObject::SetAngularVelocity(float velocity, bool include_children) {
+	rigid_body->SetAngularVelocity(velocity);
+	if (include_children) {
+		for (int i = 0; i < children.size(); i++) {
+			children[i]->SetAngularVelocity(velocity, true);
+		}
+	}
+}
+
+void GameObject::SetType(b2BodyType type, bool include_children) {
+	rigid_body->SetType(type);
+	if (include_children) {
+		for (int i = 0; i < children.size(); i++) {
+			children[i]->SetType(type, true);
+		}
+	}
+}
+
+void GameObject::SetDensity(float density, bool include_children) {
 	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
 		fixture->SetDensity(density);
 	}
-}
-
-void GameObject::SetFriction(float friction) {
-	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
-		fixture->SetFriction(friction);
+	if (include_children) {
+		for (int i = 0; i < children.size(); i++) {
+			children[i]->SetDensity(density, true);
+		}
 	}
 }
 
-void GameObject::SetRestitution(float restitution) {
+void GameObject::SetFriction(float friction, bool include_children) {
+	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+		fixture->SetFriction(friction);
+	}
+	if (include_children) {
+		for (int i = 0; i < children.size(); i++) {
+			children[i]->SetFriction(friction, true);
+		}
+	}
+}
+
+void GameObject::SetRestitution(float restitution, bool include_children) {
 	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
 		fixture->SetRestitution(restitution);
+	}
+	if (include_children) {
+		for (int i = 0; i < children.size(); i++) {
+			children[i]->SetRestitution(restitution, true);
+		}
 	}
 }
 
@@ -74,7 +135,7 @@ CarObject::CarObject(
 	assert(this->transformable != nullptr);
 	this->drawable = std::move(drawable);
 	this->rigid_body = rigid_body;
-	this->wheels = wheels;
+	this->children = wheels;
 	this->wheel_joints = wheel_joints;
 }
 

@@ -30,14 +30,20 @@ public:
 	std::unique_ptr<sf::Drawable> drawable;
 	sf::Transformable* transformable = nullptr;
 	b2Body* rigid_body = nullptr;
+	std::vector<GameObject*> children;
 
 	GameObject();
 	GameObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body);
 	void UpdateVisual();
-	void SetType(b2BodyType type);
-	void SetDensity(float density);
-	void SetFriction(float friction);
-	void SetRestitution(float restitution);
+	void SetEnabled(bool enabled, bool include_children);
+	void SetPosition(const b2Vec2& pos, bool move_children);
+	void SetAngle(float angle);
+	void SetLinearVelocity(const b2Vec2& velocity, bool include_children);
+	void SetAngularVelocity(float velocity, bool include_children);
+	void SetType(b2BodyType type, bool include_children);
+	void SetDensity(float density, bool include_children);
+	void SetFriction(float friction, bool include_children);
+	void SetRestitution(float restitution, bool include_children);
 
 private:
 
@@ -51,7 +57,6 @@ public:
 		std::vector<GameObject*> wheels,
 		std::vector<b2RevoluteJoint*> wheel_joints
 	);
-	std::vector<GameObject*> wheels;
 	std::vector<b2RevoluteJoint*> wheel_joints;
 private:
 };

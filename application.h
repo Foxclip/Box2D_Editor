@@ -54,7 +54,7 @@ private:
 	sf::Text paused_text;
 	sf::Text tool_text;
 	int grabbed_vertex = -1;
-	b2Body* moving_body = nullptr;
+	GameObject* moving_object = nullptr;
 	bool moving_body_was_enabled;
 	b2Vec2 moving_body_offset;
 	Tool* selected_tool = nullptr;

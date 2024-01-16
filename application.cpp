@@ -103,10 +103,10 @@ void Application::init_objects() {
     //std::vector<GameObject*> boxes = { box0 };
     for (int i = 0; i < dynamic_objects.size(); i++) {
         GameObject* box = dynamic_objects[i];
-        box->SetType(b2_dynamicBody);
-        box->SetDensity(1.0f);
-        box->SetFriction(0.3f);
-        box->SetRestitution(0.5f);
+        box->SetType(b2_dynamicBody, false);
+        box->SetDensity(1.0f, false);
+        box->SetFriction(0.3f, false);
+        box->SetRestitution(0.5f, false);
     }
     //b2DistanceJointDef distance_joint_def;
     //distance_joint_def.Initialize(box1->rigid_body, box2->rigid_body, box1->rigid_body->GetWorldCenter(), box2->rigid_body->GetWorldCenter());
@@ -115,10 +115,10 @@ void Application::init_objects() {
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
     std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
     GameObject* car = create_car(b2Vec2(0.0f, 10.0f), lengths, wheels, sf::Color::Red);
-    car->SetType(b2_dynamicBody);
-    car->SetDensity(1.0f);
-    car->SetFriction(0.3f);
-    car->SetRestitution(0.5f);
+    car->SetType(b2_dynamicBody, false);
+    car->SetDensity(1.0f, false);
+    car->SetFriction(0.3f, false);
+    car->SetRestitution(0.5f, false);
 }
 
 void Application::main_loop() {
@@ -188,10 +188,11 @@ void Application::process_mouse_event(sf::Event event) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
                 grabbed_vertex = -1;
-                if (moving_body) {
-                    moving_body->SetEnabled(moving_body_was_enabled);
+                if (moving_object) {
+                    //TODO: remember state for all children
+                    moving_object->SetEnabled(moving_body_was_enabled, true);
                 }
-                moving_body = nullptr;
+                moving_object = nullptr;
                 if (mouse_joint) {
                     world->DestroyJoint(mouse_joint);
                     mouse_joint = nullptr;
@@ -217,8 +218,8 @@ void Application::process_mouse() {
         if (grabbed_vertex != -1) {
             ground->move_vertex(grabbed_vertex, b2MousePosWorld);
         }
-        if (moving_body) {
-            moving_body->SetTransform(b2MousePosWorld - moving_body_offset, moving_body->GetAngle());
+        if (moving_object) {
+            moving_object->SetPosition(b2MousePosWorld - moving_body_offset, true);
         }
         if (mouse_joint) {
             mouse_joint->SetTarget(b2MousePosWorld);
@@ -257,12 +258,13 @@ void Application::process_left_click() {
         b2Fixture* fixture = get_fixture_at(mousePos);
         if (fixture) {
             b2Body* body = fixture->GetBody();
+            GameObject* gameobject = reinterpret_cast<GameObject*>(body->GetUserData().pointer);
             moving_body_was_enabled = body->IsEnabled();
             moving_body_offset = b2MousePosWorld - body->GetPosition();
-            body->SetEnabled(false);
-            body->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-            body->SetAngularVelocity(0.0f);
-            moving_body = body;
+            gameobject->SetEnabled(false, true);
+            gameobject->SetLinearVelocity(b2Vec2(0.0f, 0.0f), true);
+            gameobject->SetAngularVelocity(0.0f, true);
+            moving_object = gameobject;
         }
     } else if (selected_tool->name == "edit") {
         int index;
@@ -455,6 +457,7 @@ GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Co
     shape->setFillColor(color);
     std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body);
     GameObject* ptr = uptr.get();
+    body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
     return ptr;
 }
@@ -471,6 +474,7 @@ GameObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, 
     circle_notch_shape->setNotchColor(notch_color);
     std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(circle_notch_shape), body);
     GameObject* ptr = uptr.get();
+    body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
     return ptr;
 }
@@ -488,8 +492,8 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
     b2BodyDef bodyDef;
     bodyDef.position = pos;
     b2Body* body = world->CreateBody(&bodyDef);
-    std::vector<GameObject*> wheel_objects(wheels.size());
-    std::vector<b2RevoluteJoint*> wheel_joints(wheels.size());
+    std::vector<GameObject*> wheel_objects;
+    std::vector<b2RevoluteJoint*> wheel_joints;
     for (int i = 0; i < lengths.size(); i++) {
         b2Vec2 vertices[3];
         vertices[0] = b2Vec2(0.0f, 0.0f);
@@ -502,18 +506,18 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
             b2Vec2 anchor_pos = vertices[1];
             b2Vec2 anchor_pos_world = pos + anchor_pos;
             GameObject* wheel = create_ball(anchor_pos_world, wheels[i], sf::Color::Yellow, sf::Color(64, 64, 0));
-            wheel->SetType(b2_dynamicBody);
-            wheel->SetDensity(1.0f);
-            wheel->SetFriction(0.3f);
-            wheel->SetRestitution(0.5f);
-            wheel_objects[i] = wheel;
+            wheel->SetType(b2_dynamicBody, false);
+            wheel->SetDensity(1.0f, false);
+            wheel->SetFriction(0.3f, false);
+            wheel->SetRestitution(0.5f, false);
+            wheel_objects.push_back(wheel);
             b2RevoluteJointDef wheel_joint_def;
             wheel_joint_def.Initialize(body, wheel->rigid_body, anchor_pos_world);
             wheel_joint_def.maxMotorTorque = 30.0f;
             wheel_joint_def.motorSpeed = -10.0f;
             wheel_joint_def.enableMotor = true;
             b2RevoluteJoint* wheel_joint = (b2RevoluteJoint*)world->CreateJoint(&wheel_joint_def);
-            wheel_joints[i] = wheel_joint;
+            wheel_joints.push_back(wheel_joint);
         }
         shape->setPoint(i, tosf(vertices[1]));
     }
@@ -522,6 +526,7 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
     std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(std::move(shape), body, wheel_objects, wheel_joints);
     uptr->position = pos;
     CarObject* ptr = uptr.get();
+    body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
     return ptr;
 }
@@ -541,6 +546,7 @@ GroundObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertice
     line_strip->setLineColor(color);
     std::unique_ptr<GroundObject> uptr = std::make_unique<GroundObject>(std::move(line_strip), body);
     GroundObject* ptr = uptr.get();
+    body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
     return ptr;
 }
