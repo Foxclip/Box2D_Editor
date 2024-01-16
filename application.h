@@ -57,6 +57,8 @@ private:
 	GameObject* moving_object = nullptr;
 	bool moving_body_was_enabled;
 	b2Vec2 moving_body_offset;
+	GameObject* rotating_object = nullptr;
+	float rotate_angle_offset;
 	Tool* selected_tool = nullptr;
 
 	const int32 VELOCITY_ITERATIONS = 6;

@@ -37,7 +37,7 @@ public:
 	void UpdateVisual();
 	void SetEnabled(bool enabled, bool include_children);
 	void SetPosition(const b2Vec2& pos, bool move_children);
-	void SetAngle(float angle);
+	void SetAngle(float angle, bool rotate_children);
 	void SetLinearVelocity(const b2Vec2& velocity, bool include_children);
 	void SetAngularVelocity(float velocity, bool include_children);
 	void SetType(b2BodyType type, bool include_children);

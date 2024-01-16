@@ -17,6 +17,7 @@ void Application::init() {
     window->setVerticalSyncEnabled(true);
     selected_tool = create_tool("drag");
     create_tool("move");
+    create_tool("rotate");
     create_tool("edit");
     init_ui();
     init_objects();
@@ -193,6 +194,10 @@ void Application::process_mouse_event(sf::Event event) {
                     moving_object->SetEnabled(moving_body_was_enabled, true);
                 }
                 moving_object = nullptr;
+                if (rotating_object) {
+                    rotating_object->SetEnabled(moving_body_was_enabled, true);
+                }
+                rotating_object = nullptr;
                 if (mouse_joint) {
                     world->DestroyJoint(mouse_joint);
                     mouse_joint = nullptr;
@@ -220,6 +225,11 @@ void Application::process_mouse() {
         }
         if (moving_object) {
             moving_object->SetPosition(b2MousePosWorld - moving_body_offset, true);
+        }
+        if (rotating_object) {
+            b2Vec2 mouse_vector = b2MousePosWorld - rotating_object->rigid_body->GetPosition();
+            float angle = atan2(mouse_vector.y, mouse_vector.x);
+            rotating_object->SetAngle(angle - rotate_angle_offset, true);
         }
         if (mouse_joint) {
             mouse_joint->SetTarget(b2MousePosWorld);
@@ -266,6 +276,19 @@ void Application::process_left_click() {
             gameobject->SetAngularVelocity(0.0f, true);
             moving_object = gameobject;
         }
+    } else if (selected_tool->name == "rotate") {
+        b2Fixture* fixture = get_fixture_at(mousePos);
+        if (fixture) {
+            b2Body* body = fixture->GetBody();
+            GameObject* gameobject = reinterpret_cast<GameObject*>(body->GetUserData().pointer);
+            moving_body_was_enabled = body->IsEnabled();
+            b2Vec2 mouse_vector = b2MousePosWorld - body->GetPosition();
+            float mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
+            rotate_angle_offset = mouse_angle - body->GetAngle();
+            gameobject->SetEnabled(false, true);
+            gameobject->SetAngularVelocity(0.0f, true);
+            rotating_object = gameobject;
+        }
     } else if (selected_tool->name == "edit") {
         int index;
         sf::Vector2i position;
@@ -302,6 +325,14 @@ void Application::render_world() {
     if (mouse_joint) {
         sf::Vector2f grabbed_point = tosf(mouse_joint->GetAnchorB());
         line_primitive[0].position = grabbed_point;
+        line_primitive[0].color = sf::Color::Yellow;
+        line_primitive[1].position = sfMousePosWorld;
+        line_primitive[1].color = sf::Color::Yellow;
+        window->draw(line_primitive);
+    }
+
+    if (rotating_object) {
+        line_primitive[0].position = tosf(rotating_object->rigid_body->GetPosition());
         line_primitive[0].color = sf::Color::Yellow;
         line_primitive[1].position = sfMousePosWorld;
         line_primitive[1].color = sf::Color::Yellow;
