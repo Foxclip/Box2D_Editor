@@ -70,7 +70,7 @@ void Application::init_ui() {
         toolbox_rect.setFillColor(sf::Color::Red);
         toolbox_rect.setOrigin(sf::Vector2f(toolbox_width / 2, 0.0f));
         tool_text.setFont(ui_font);
-        tool_text.setCharacterSize(12);
+        tool_text.setCharacterSize(16);
         tool_text.setFillColor(sf::Color::Black);
     }
 }
@@ -320,7 +320,7 @@ void Application::render_ui() {
         }
         tool_text.setString(tools[i]->name);
         tool_text.setPosition(tool_rect.getPosition() + tool_rect.getSize() / 2.0f);
-        utils::set_origin_to_center(tool_text);
+        utils::set_origin_to_center_normal(tool_text);
         window->draw(tool_rect);
         window->draw(tool_text);
     }
