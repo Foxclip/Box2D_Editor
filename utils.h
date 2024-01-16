@@ -15,5 +15,7 @@ namespace utils {
 	sf::Vector2f to2f(const sf::Vector2i& vec);
 	int get_max_offset(const sf::Vector2i& v1, const sf::Vector2i& v2);
 	void set_origin_to_center(sf::Text& text);
+	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point);
+	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point);
 
 }

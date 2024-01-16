@@ -4,6 +4,16 @@
 #include <Windows.h>
 #include <winuser.h>
 
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
+const int ANTIALIASING = 0;
+const float MOUSE_SCROLL_ZOOM = 1.2f;
+const int FPS = 60;
+const int VERTEX_SIZE = 9;
+const int VERTEX_EDITOR_DISTANCE = 10;
+const int TOOL_RECT_SIZE = 40;
+const int TOOLBOX_PADDING = 10;
+
 class QueryCallback : public b2QueryCallback {
 public:
 	std::vector<b2Fixture*> fixtures;
@@ -14,10 +24,11 @@ class Tool {
 public:
 	Tool(std::string name);
 	std::string name;
+	sf::RectangleShape shape;
 private:
 };
 
-extern std::vector<Tool> tools;
+extern std::vector<std::unique_ptr<Tool>> tools;
 
 class Application {
 
@@ -26,16 +37,6 @@ public:
 	void start();
 
 private:
-
-	const int WINDOW_WIDTH = 800;
-	const int WINDOW_HEIGHT = 600;
-	const int ANTIALIASING = 0;
-	const float MOUSE_SCROLL_ZOOM = 1.2f;
-	const int FPS = 60;
-	const int VERTEX_SIZE = 9;
-	const int VERTEX_EDITOR_DISTANCE = 10;
-	const int TOOL_RECT_SIZE = 40;
-	const int TOOLBOX_PADDING = 10;
 	std::unique_ptr<sf::RenderWindow> window;
 	sf::View world_view;
 	sf::View ui_view;
@@ -48,13 +49,13 @@ private:
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape vertex_editor_rect;
 	sf::RectangleShape paused_rect;
-	sf::RectangleShape tool_rect;
 	sf::RectangleShape toolbox_rect;
 	sf::Font ui_font;
 	sf::Text paused_text;
 	sf::Text tool_text;
 	bool vertex_editor_mode = false;
 	int grabbed_vertex = -1;
+	Tool* selected_tool = nullptr;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;
@@ -83,6 +84,7 @@ private:
 	void render_world();
 	void render_ui();
 	void maximize_window();
+	Tool* create_tool(std::string name);
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2i world_to_screen(b2Vec2 world_pos);

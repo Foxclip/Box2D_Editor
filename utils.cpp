@@ -50,4 +50,17 @@ namespace utils {
 		text.setOrigin(text_bounds.width / 2.0f, text_bounds.height / 2.0f);
 	}
 
+	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point) {
+		return !(
+			point.x < rect.left
+			|| point.x > rect.left + rect.width
+			|| point.y < rect.top
+			|| point.y > rect.top + rect.height
+		);
+	}
+
+	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point) {
+		return contains_point(shape.getGlobalBounds(), point);
+	}
+
 }

@@ -3,10 +3,7 @@
 #include <numbers>
 #include <iostream>
 
-std::vector<Tool> tools = {
-    Tool("drag"),
-    Tool("edit"),
-};
+std::vector<std::unique_ptr<Tool>> tools;
 
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
@@ -18,6 +15,8 @@ void Application::init() {
     cs.antialiasingLevel = ANTIALIASING;
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs);
     window->setVerticalSyncEnabled(true);
+    create_tool("drag");
+    create_tool("edit");
     init_ui();
     init_objects();
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -63,8 +62,6 @@ void Application::init_ui() {
         paused_rect.setPosition(0.0f, 0.0f);
     }
     {
-        tool_rect.setSize(sf::Vector2f(TOOL_RECT_SIZE, TOOL_RECT_SIZE));
-        tool_rect.setFillColor(sf::Color::Yellow);
         int tools_width = TOOL_RECT_SIZE * tools.size();
         int padding_width = TOOLBOX_PADDING * (tools.size() + 1);
         int toolbox_width = tools_width + padding_width;
@@ -171,6 +168,13 @@ void Application::process_mouse_event(sf::Event event) {
     if (event.type == sf::Event::MouseButtonPressed) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
+                for (int tool_i = 0; tool_i < tools.size(); tool_i++) {
+                    Tool* tool = tools[tool_i].get();
+                    if (utils::contains_point(tool->shape, to2f(mousePos))) {
+                        selected_tool = tool;
+                        break;
+                    }
+                }
                 if (vertex_editor_mode) {
                     int index;
                     sf::Vector2i position;
@@ -294,15 +298,27 @@ void Application::render_ui() {
     }
 
     toolbox_rect.setPosition(window->getSize().x / 2, 0.0f);
-    window->draw(toolbox_rect);
+    //window->draw(toolbox_rect);
     sf::FloatRect toolbox_bounds = toolbox_rect.getGlobalBounds();
     sf::Vector2f toolbox_corner = sf::Vector2f(toolbox_bounds.left, toolbox_bounds.top);
     for (int i = 0; i < tools.size(); i++) {
+        Tool* tool = tools[i].get();
+        sf::RectangleShape& tool_rect = tool->shape;
         int x = i * (TOOLBOX_PADDING + TOOL_RECT_SIZE) + TOOLBOX_PADDING;
         int y = TOOLBOX_PADDING;
         sf::Vector2f pos = toolbox_corner + sf::Vector2f(x, y);
         tool_rect.setPosition(pos);
-        tool_text.setString(tools[i].name);
+        if (utils::contains_point(tool_rect, to2f(mousePos))) {
+            tool_rect.setOutlineThickness(1.0f);
+        } else {
+            tool_rect.setOutlineThickness(0.0f);
+        }
+        if (tool == selected_tool) {
+            tool_rect.setFillColor(sf::Color::Yellow);
+        } else {
+            tool_rect.setFillColor(sf::Color(128, 128, 128));
+        }
+        tool_text.setString(tools[i]->name);
         tool_text.setPosition(tool_rect.getPosition() + tool_rect.getSize() / 2.0f);
         utils::set_origin_to_center(tool_text);
         window->draw(tool_rect);
@@ -318,6 +334,13 @@ void Application::render_ui() {
 void Application::maximize_window() {
     sf::WindowHandle windowHandle = window->getSystemHandle();
     ShowWindow(windowHandle, SW_MAXIMIZE);
+}
+
+Tool* Application::create_tool(std::string name) {
+    std::unique_ptr<Tool> uptr = std::make_unique<Tool>(name);
+    Tool* ptr = uptr.get();
+    tools.push_back(std::move(uptr));
+    return ptr;
 }
 
 b2Vec2 Application::b2_screen_to_world(sf::Vector2i screen_pos) {
@@ -490,4 +513,7 @@ bool QueryCallback::ReportFixture(b2Fixture* fixture) {
 
 Tool::Tool(std::string name) {
     this->name = name;
+    shape.setSize(sf::Vector2f(TOOL_RECT_SIZE, TOOL_RECT_SIZE));
+    shape.setFillColor(sf::Color(128, 128, 128));
+    shape.setOutlineColor(sf::Color::Yellow);
 }
