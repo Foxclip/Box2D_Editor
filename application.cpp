@@ -3,7 +3,10 @@
 #include <numbers>
 #include <iostream>
 
-std::vector<Tool> tools;
+std::vector<Tool> tools = {
+    Tool("drag"),
+    Tool("edit"),
+};
 
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
@@ -15,36 +18,7 @@ void Application::init() {
     cs.antialiasingLevel = ANTIALIASING;
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs);
     window->setVerticalSyncEnabled(true);
-    std::string ui_font_filename = "STAN0757.TTF";
-    if (!ui_font.loadFromFile(ui_font_filename)) {
-        throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
-    }
-    assert(VERTEX_SIZE % 2 == 1);
-    vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
-    vertex_rect.setFillColor(sf::Color::Red);
-    vertex_rect.setOrigin(0.0f, 0.0f);
-    int vertex_distance = VERTEX_EDITOR_DISTANCE * 2 + 1;
-    vertex_editor_rect.setSize(sf::Vector2f(vertex_distance, vertex_distance));
-    vertex_editor_rect.setFillColor(sf::Color::Transparent);
-    vertex_editor_rect.setOutlineThickness(-1.0f);
-    vertex_editor_rect.setOutlineColor(sf::Color::Yellow);
-    vertex_editor_rect.setOrigin(0.0f, 0.0f);
-    paused_rect.setFillColor(sf::Color(0, 0, 0, 128));
-    paused_rect.setOrigin(0.0f, 0.0f);
-    paused_rect.setPosition(0.0f, 0.0f);
-    tools = {
-        Tool("drag"),
-        Tool("edit"),
-    };
-    tool_rect.setSize(sf::Vector2f(TOOL_RECT_SIZE, TOOL_RECT_SIZE));
-    tool_rect.setFillColor(sf::Color::Yellow);
-    int tools_width = TOOL_RECT_SIZE * tools.size();
-    int padding_width = TOOLBOX_PADDING * (tools.size() + 1);
-    int toolbox_width = tools_width + padding_width;
-    int toolbox_height = TOOLBOX_PADDING * 2 + TOOL_RECT_SIZE;
-    toolbox_rect.setSize(sf::Vector2f(toolbox_width, toolbox_height));
-    toolbox_rect.setFillColor(sf::Color::Red);
-    toolbox_rect.setOrigin(sf::Vector2f(toolbox_width / 2, 0.0f));
+    init_ui();
     init_objects();
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -53,6 +27,55 @@ void Application::init() {
 
 void Application::start() {
     main_loop();
+}
+
+void Application::init_ui() {
+    std::string ui_font_filename = "STAN0757.TTF";
+    if (!ui_font.loadFromFile(ui_font_filename)) {
+        throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
+    }
+    {
+        assert(VERTEX_SIZE % 2 == 1);
+        vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
+        vertex_rect.setFillColor(sf::Color::Red);
+        vertex_rect.setOrigin(0.0f, 0.0f);
+    }
+    {
+        int vertex_distance = VERTEX_EDITOR_DISTANCE * 2 + 1;
+        vertex_editor_rect.setSize(sf::Vector2f(vertex_distance, vertex_distance));
+        vertex_editor_rect.setFillColor(sf::Color::Transparent);
+        vertex_editor_rect.setOutlineThickness(-1.0f);
+        vertex_editor_rect.setOutlineColor(sf::Color::Yellow);
+        vertex_editor_rect.setOrigin(0.0f, 0.0f);
+    }
+    {
+        paused_text.setFont(ui_font);
+        paused_text.setString("PAUSED");
+        paused_text.setCharacterSize(24);
+        paused_text.setFillColor(sf::Color::Yellow);
+        sf::FloatRect text_bounds = paused_text.getLocalBounds();
+        paused_text.setOrigin(text_bounds.left, text_bounds.top);
+        const int rect_padding = 10;
+        paused_text.setPosition(rect_padding, rect_padding);
+        paused_rect.setSize(sf::Vector2f(text_bounds.width + rect_padding * 2, text_bounds.height + rect_padding * 2));
+        paused_rect.setFillColor(sf::Color(0, 0, 0, 128));
+        paused_rect.setOrigin(0.0f, 0.0f);
+        paused_rect.setPosition(0.0f, 0.0f);
+    }
+    {
+        tool_rect.setSize(sf::Vector2f(TOOL_RECT_SIZE, TOOL_RECT_SIZE));
+        tool_rect.setFillColor(sf::Color::Yellow);
+        int tools_width = TOOL_RECT_SIZE * tools.size();
+        int padding_width = TOOLBOX_PADDING * (tools.size() + 1);
+        int toolbox_width = tools_width + padding_width;
+        int toolbox_height = TOOLBOX_PADDING * 2 + TOOL_RECT_SIZE;
+        toolbox_rect.setSize(sf::Vector2f(toolbox_width, toolbox_height));
+        toolbox_rect.setFillColor(sf::Color::Red);
+        toolbox_rect.setOrigin(sf::Vector2f(toolbox_width / 2, 0.0f));
+        tool_text.setFont(ui_font);
+        tool_text.setCharacterSize(12);
+        tool_text.setFillColor(sf::Color::Black);
+    }
 }
 
 void Application::init_objects() {
@@ -279,21 +302,16 @@ void Application::render_ui() {
         int y = TOOLBOX_PADDING;
         sf::Vector2f pos = toolbox_corner + sf::Vector2f(x, y);
         tool_rect.setPosition(pos);
+        tool_text.setString(tools[i].name);
+        tool_text.setPosition(tool_rect.getPosition() + tool_rect.getSize() / 2.0f);
+        utils::set_origin_to_center(tool_text);
         window->draw(tool_rect);
+        window->draw(tool_text);
     }
 
     if (paused) {
-        text.setFont(ui_font);
-        text.setString("PAUSED");
-        text.setCharacterSize(24);
-        text.setFillColor(sf::Color::Yellow);
-        sf::FloatRect text_bounds = text.getLocalBounds();
-        text.setOrigin(text_bounds.left, text_bounds.top);
-        const int rect_padding = 10;
-        text.setPosition(rect_padding, rect_padding);
-        paused_rect.setSize(sf::Vector2f(text_bounds.width + rect_padding * 2, text_bounds.height + rect_padding * 2));
         window->draw(paused_rect);
-        window->draw(text);
+        window->draw(paused_text);
     }
 }
 

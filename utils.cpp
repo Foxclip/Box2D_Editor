@@ -45,4 +45,9 @@ namespace utils {
 		return std::max(offset_x, offset_y);
 	}
 
+	void set_origin_to_center(sf::Text& text) {
+		sf::FloatRect text_bounds = text.getLocalBounds();
+		text.setOrigin(text_bounds.width / 2.0f, text_bounds.height / 2.0f);
+	}
+
 }

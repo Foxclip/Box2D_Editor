@@ -13,8 +13,8 @@ public:
 class Tool {
 public:
 	Tool(std::string name);
-private:
 	std::string name;
+private:
 };
 
 extern std::vector<Tool> tools;
@@ -45,13 +45,14 @@ private:
 	float zoomFactor = 0.03f;
 	float viewCenterX = 0, viewCenterY = 5.0f;
 	sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
-	sf::RectangleShape vertex_rect = sf::RectangleShape();
-	sf::RectangleShape vertex_editor_rect = sf::RectangleShape();
-	sf::RectangleShape paused_rect = sf::RectangleShape();
-	sf::RectangleShape tool_rect = sf::RectangleShape();
-	sf::RectangleShape toolbox_rect = sf::RectangleShape();
+	sf::RectangleShape vertex_rect;
+	sf::RectangleShape vertex_editor_rect;
+	sf::RectangleShape paused_rect;
+	sf::RectangleShape tool_rect;
+	sf::RectangleShape toolbox_rect;
 	sf::Font ui_font;
-	sf::Text text;
+	sf::Text paused_text;
+	sf::Text tool_text;
 	bool vertex_editor_mode = false;
 	int grabbed_vertex = -1;
 
@@ -68,6 +69,7 @@ private:
 
 	std::vector<std::unique_ptr<GameObject>> game_objects;
 
+	void init_ui();
 	void init_objects();
 	void main_loop();
 	void resetView();
