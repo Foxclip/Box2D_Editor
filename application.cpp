@@ -15,13 +15,14 @@ void Application::init() {
     cs.antialiasingLevel = ANTIALIASING;
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs);
     window->setVerticalSyncEnabled(true);
-    create_tool("drag");
+    selected_tool = create_tool("drag");
     create_tool("edit");
     init_ui();
     init_objects();
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
+    assert(selected_tool);
 }
 
 void Application::start() {
@@ -151,7 +152,6 @@ void Application::process_keyboard_event(sf::Event event) {
         switch (event.key.code) {
             case sf::Keyboard::R: resetView(); break;
             case sf::Keyboard::Space: paused = !paused; break;
-            case sf::Keyboard::LControl: vertex_editor_mode = true; break;
             case sf::Keyboard::Num1: try_select_tool(0); break;
             case sf::Keyboard::Num2: try_select_tool(1); break;
             case sf::Keyboard::Num3: try_select_tool(2); break;
@@ -165,9 +165,7 @@ void Application::process_keyboard_event(sf::Event event) {
         }
     }
     if (event.type == sf::Event::KeyReleased) {
-        switch (event.key.code) {
-            case sf::Keyboard::LControl: vertex_editor_mode = false; break;
-        }
+        switch (event.key.code) { }
     }
 }
 
@@ -178,33 +176,7 @@ void Application::process_mouse_event(sf::Event event) {
     if (event.type == sf::Event::MouseButtonPressed) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
-                for (int tool_i = 0; tool_i < tools.size(); tool_i++) {
-                    Tool* tool = tools[tool_i].get();
-                    if (utils::contains_point(tool->shape, to2f(mousePos))) {
-                        selected_tool = tool;
-                        break;
-                    }
-                }
-                if (vertex_editor_mode) {
-                    int index;
-                    sf::Vector2i position;
-                    if (mouse_get_ground_vertex(index, position)) {
-                        grabbed_vertex = index;
-                    }
-                } else {
-                    b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
-                    if (grabbed_fixture) {
-                        b2Body* grabbed_body = grabbed_fixture->GetBody();
-                        b2MouseJointDef mouse_joint_def;
-                        mouse_joint_def.bodyA = mouse_body;
-                        mouse_joint_def.bodyB = grabbed_body;
-                        mouse_joint_def.damping = 1.0f;
-                        mouse_joint_def.maxForce = 5000.0f * grabbed_body->GetMass();
-                        mouse_joint_def.stiffness = 50.0f;
-                        mouse_joint_def.target = b2MousePosWorld;
-                        mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
-                    }
-                }
+                process_left_click();
                 break;
             case sf::Mouse::Right:
                 mousePrevPos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
@@ -252,6 +224,36 @@ void Application::process_mouse() {
     mousePrevPos = mousePos;
 }
 
+void Application::process_left_click() {
+    for (int tool_i = 0; tool_i < tools.size(); tool_i++) {
+        Tool* tool = tools[tool_i].get();
+        if (utils::contains_point(tool->shape, to2f(mousePos))) {
+            selected_tool = tool;
+            return;
+        }
+    }
+    if (selected_tool->name == "drag") {
+        b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
+        if (grabbed_fixture) {
+            b2Body* grabbed_body = grabbed_fixture->GetBody();
+            b2MouseJointDef mouse_joint_def;
+            mouse_joint_def.bodyA = mouse_body;
+            mouse_joint_def.bodyB = grabbed_body;
+            mouse_joint_def.damping = 1.0f;
+            mouse_joint_def.maxForce = 5000.0f * grabbed_body->GetMass();
+            mouse_joint_def.stiffness = 50.0f;
+            mouse_joint_def.target = b2MousePosWorld;
+            mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
+        }
+    } else if (selected_tool->name == "edit") {
+        int index;
+        sf::Vector2i position;
+        if (mouse_get_ground_vertex(index, position)) {
+            grabbed_vertex = index;
+        }
+    }
+}
+
 void Application::process_world() {
     if (!paused) {
         world->Step(timeStep, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
@@ -291,7 +293,7 @@ void Application::render_ui() {
     ui_view.setSize(window->getSize().x, window->getSize().y);
     window->setView(ui_view);
 
-    if (vertex_editor_mode) {
+    if (selected_tool->name == "edit") {
         b2ChainShape* chain = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
         for (int i = 0; i < chain->m_count; i++) {
             int vertex_size = VERTEX_SIZE / 2;

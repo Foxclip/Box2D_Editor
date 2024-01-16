@@ -53,7 +53,6 @@ private:
 	sf::Font ui_font;
 	sf::Text paused_text;
 	sf::Text tool_text;
-	bool vertex_editor_mode = false;
 	int grabbed_vertex = -1;
 	Tool* selected_tool = nullptr;
 
@@ -79,6 +78,7 @@ private:
 	void process_mouse_event(sf::Event event);
 	void process_keyboard();
 	void process_mouse();
+	void process_left_click();
 	void process_world();
 	void render();
 	void render_world();
