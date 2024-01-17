@@ -198,7 +198,7 @@ GroundObject::GroundObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid
 	this->rigid_body = rigid_body;
 }
 
-void GroundObject::move_vertex(int index, b2Vec2 new_pos) {
+void GroundObject::move_vertex(int index, const b2Vec2& new_pos) {
 	std::vector<b2Vec2> vertices = get_vertices();
 	vertices[index] = new_pos;
 	set_vertices(vertices);
@@ -213,6 +213,12 @@ void GroundObject::try_delete_vertex(int index) {
 		return;
 	}
 	vertices.erase(vertices.begin() + index);
+	set_vertices(vertices);
+}
+
+void GroundObject::add_vertex(int index, const b2Vec2& pos) {
+	std::vector<b2Vec2> vertices = get_vertices();
+	vertices.insert(vertices.begin() + index, pos);
 	set_vertices(vertices);
 }
 

@@ -284,6 +284,13 @@ void Application::process_left_click() {
         }
     } else if (selected_tool->name == "edit") {
         edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
+        if (edit_tool.highlighted_vertex == -1) {
+            if (edit_tool.highlighted_edge != -1) {
+                ground->add_vertex(edit_tool.highlighted_edge + 1, b2MousePosWorld);
+            } else {
+                ground->add_vertex(0, b2MousePosWorld);
+            }
+        }
     }
 }
 
