@@ -347,12 +347,24 @@ void Application::render_ui() {
             edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
             window->draw(edit_tool.edge_highlight);
             sf::Vector2f ghost_vertex_pos = world_to_screenf(utils::line_project(b2MousePosWorld, v1, v2));
+            edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
+            window->draw(edit_tool.vertex_rect);
+        } else if (edit_tool.highlighted_vertex == -1) {
+            line_primitive[0].position = world_to_screenf(get_ground_shape()->m_vertices[0]);
+            line_primitive[0].color = sf::Color(255, 255, 255, 128);
+            line_primitive[1].position = to2f(mousePos);
+            line_primitive[1].color = sf::Color(255, 255, 255, 128);
+            window->draw(line_primitive);
+            sf::Vector2f ghost_vertex_pos = to2f(mousePos);
+            edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
+            edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
             window->draw(edit_tool.vertex_rect);
         }
         b2ChainShape* chain = get_ground_shape();
         for (int i = 0; i < chain->m_count; i++) {
             edit_tool.vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]));
+            edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0));
             window->draw(edit_tool.vertex_rect);
         }
         if (edit_tool.highlighted_vertex != -1) {
