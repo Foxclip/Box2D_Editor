@@ -354,15 +354,13 @@ void Application::render_ui() {
         int y = TOOLBOX_PADDING;
         sf::Vector2f pos = toolbox_corner + sf::Vector2f(x, y);
         tool_rect.setPosition(pos);
+        tool_rect.setOutlineThickness(0.0f);
         if (utils::contains_point(tool_rect, to2f(mousePos))) {
             tool_rect.setOutlineThickness(1.0f);
-        } else {
-            tool_rect.setOutlineThickness(0.0f);
         }
+        tool_rect.setFillColor(sf::Color(128, 128, 128));
         if (tool == selected_tool) {
             tool_rect.setFillColor(sf::Color::Yellow);
-        } else {
-            tool_rect.setFillColor(sf::Color(128, 128, 128));
         }
         tool_text.setString(tools[i]->name);
         tool_text.setPosition(tool_rect.getPosition() + tool_rect.getSize() / 2.0f);
@@ -408,7 +406,7 @@ sf::Vector2i Application::world_to_screen(b2Vec2 world_pos) {
 
 sf::Vector2f Application::world_to_screenf(b2Vec2 world_pos) {
     sf::Vector2i vec2i = world_to_screen(world_pos);
-    return sf::Vector2f(vec2i.x, vec2i.y);
+    return to2f(vec2i);
 }
 
 b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {

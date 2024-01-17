@@ -41,7 +41,7 @@ class MoveTool : public Tool {
 public:
 	MoveTool();
 	GameObject* object = nullptr;
-	bool object_was_enabled;
+	bool object_was_enabled = false;
 	b2Vec2 offset;
 private:
 };
@@ -50,7 +50,7 @@ class RotateTool : public Tool {
 public:
 	RotateTool();
 	GameObject* object = nullptr;
-	bool object_was_enabled;
+	bool object_was_enabled = false;
 	float angle_offset;
 private:
 };
