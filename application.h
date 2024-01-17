@@ -23,13 +23,44 @@ public:
 
 class Tool {
 public:
-	Tool(std::string name);
+	Tool();
 	std::string name;
 	sf::RectangleShape shape;
 private:
 };
 
-extern std::vector<std::unique_ptr<Tool>> tools;
+class DragTool : public Tool {
+public:
+	DragTool();
+	b2Body* mouse_body = nullptr;
+	b2MouseJoint* mouse_joint = nullptr;
+private:
+};
+
+class MoveTool : public Tool {
+public:
+	MoveTool();
+	GameObject* object = nullptr;
+	bool object_was_enabled;
+	b2Vec2 offset;
+private:
+};
+
+class RotateTool : public Tool {
+public:
+	RotateTool();
+	GameObject* object = nullptr;
+	bool object_was_enabled;
+	float angle_offset;
+private:
+};
+
+class EditTool : public Tool {
+public:
+	EditTool();
+	int grabbed_vertex = -1;
+private:
+};
 
 class Application {
 
@@ -54,12 +85,11 @@ private:
 	sf::Font ui_font;
 	sf::Text paused_text;
 	sf::Text tool_text;
-	int grabbed_vertex = -1;
-	GameObject* moving_object = nullptr;
-	bool moving_body_was_enabled;
-	b2Vec2 moving_body_offset;
-	GameObject* rotating_object = nullptr;
-	float rotate_angle_offset;
+	DragTool drag_tool;
+	MoveTool move_tool;
+	RotateTool rotate_tool;
+	EditTool edit_tool;
+	std::vector<Tool*> tools;
 	Tool* selected_tool = nullptr;
 
 	const int32 VELOCITY_ITERATIONS = 6;
@@ -67,8 +97,6 @@ private:
 	const float MOUSE_FORCE_SCALE = 50.0f;
 	std::unique_ptr<b2World> world;
 	float timeStep = 1.0f / FPS;
-	b2Body* mouse_body = nullptr;
-	b2MouseJoint* mouse_joint = nullptr;
 	bool paused = true;
 	GroundObject* ground = nullptr;
 	b2Vec2 b2MousePosWorld;
@@ -90,7 +118,6 @@ private:
 	void render_world();
 	void render_ui();
 	void maximize_window();
-	Tool* create_tool(std::string name);
 	Tool* try_select_tool(int index);
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);

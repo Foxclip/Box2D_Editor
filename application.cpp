@@ -15,10 +15,8 @@ void Application::init() {
     cs.antialiasingLevel = ANTIALIASING;
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs);
     window->setVerticalSyncEnabled(true);
-    selected_tool = create_tool("drag");
-    create_tool("move");
-    create_tool("rotate");
-    create_tool("edit");
+    tools = { &drag_tool, &move_tool, &rotate_tool, &edit_tool };
+    selected_tool = &drag_tool;
     init_ui();
     init_objects();
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -83,7 +81,7 @@ void Application::init_objects() {
     world = std::make_unique<b2World>(gravity);
 
     b2BodyDef mouse_body_def;
-    mouse_body = world->CreateBody(&mouse_body_def);
+    drag_tool.mouse_body = world->CreateBody(&mouse_body_def);
 
     std::vector<b2Vec2> ground_vertices = {
         b2Vec2(25.0f, 8.0f),
@@ -188,19 +186,19 @@ void Application::process_mouse_event(sf::Event event) {
     if (event.type == sf::Event::MouseButtonReleased) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
-                grabbed_vertex = -1;
-                if (moving_object) {
+                edit_tool.grabbed_vertex = -1;
+                if (move_tool.object) {
                     //TODO: remember state for all children
-                    moving_object->SetEnabled(moving_body_was_enabled, true);
+                    move_tool.object->SetEnabled(move_tool.object_was_enabled, true);
                 }
-                moving_object = nullptr;
-                if (rotating_object) {
-                    rotating_object->SetEnabled(moving_body_was_enabled, true);
+                move_tool.object = nullptr;
+                if (rotate_tool.object) {
+                    rotate_tool.object->SetEnabled(rotate_tool.object_was_enabled, true);
                 }
-                rotating_object = nullptr;
-                if (mouse_joint) {
-                    world->DestroyJoint(mouse_joint);
-                    mouse_joint = nullptr;
+                rotate_tool.object = nullptr;
+                if (drag_tool.mouse_joint) {
+                    world->DestroyJoint(drag_tool.mouse_joint);
+                    drag_tool.mouse_joint = nullptr;
                 }
                 break;
         }
@@ -220,19 +218,19 @@ void Application::process_keyboard() {
 
 void Application::process_mouse() {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        if (grabbed_vertex != -1) {
-            ground->move_vertex(grabbed_vertex, b2MousePosWorld);
+        if (edit_tool.grabbed_vertex != -1) {
+            ground->move_vertex(edit_tool.grabbed_vertex, b2MousePosWorld);
         }
-        if (moving_object) {
-            moving_object->SetPosition(b2MousePosWorld - moving_body_offset, true);
+        if (move_tool.object) {
+            move_tool.object->SetPosition(b2MousePosWorld - move_tool.offset, true);
         }
-        if (rotating_object) {
-            b2Vec2 mouse_vector = b2MousePosWorld - rotating_object->rigid_body->GetPosition();
+        if (rotate_tool.object) {
+            b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.object->rigid_body->GetPosition();
             float angle = atan2(mouse_vector.y, mouse_vector.x);
-            rotating_object->SetAngle(angle - rotate_angle_offset, true);
+            rotate_tool.object->SetAngle(angle - rotate_tool.angle_offset, true);
         }
-        if (mouse_joint) {
-            mouse_joint->SetTarget(b2MousePosWorld);
+        if (drag_tool.mouse_joint) {
+            drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
         }
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
@@ -245,7 +243,7 @@ void Application::process_mouse() {
 
 void Application::process_left_click() {
     for (int tool_i = 0; tool_i < tools.size(); tool_i++) {
-        Tool* tool = tools[tool_i].get();
+        Tool* tool = tools[tool_i];
         if (utils::contains_point(tool->shape, to2f(mousePos))) {
             selected_tool = tool;
             return;
@@ -256,44 +254,44 @@ void Application::process_left_click() {
         if (grabbed_fixture) {
             b2Body* grabbed_body = grabbed_fixture->GetBody();
             b2MouseJointDef mouse_joint_def;
-            mouse_joint_def.bodyA = mouse_body;
+            mouse_joint_def.bodyA = drag_tool.mouse_body;
             mouse_joint_def.bodyB = grabbed_body;
             mouse_joint_def.damping = 1.0f;
             mouse_joint_def.maxForce = 5000.0f * grabbed_body->GetMass();
             mouse_joint_def.stiffness = 50.0f;
             mouse_joint_def.target = b2MousePosWorld;
-            mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
+            drag_tool.mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
         }
     } else if (selected_tool->name == "move") {
         b2Fixture* fixture = get_fixture_at(mousePos);
         if (fixture) {
             b2Body* body = fixture->GetBody();
             GameObject* gameobject = reinterpret_cast<GameObject*>(body->GetUserData().pointer);
-            moving_body_was_enabled = body->IsEnabled();
-            moving_body_offset = b2MousePosWorld - body->GetPosition();
+            move_tool.object_was_enabled = body->IsEnabled();
+            move_tool.offset = b2MousePosWorld - body->GetPosition();
             gameobject->SetEnabled(false, true);
             gameobject->SetLinearVelocity(b2Vec2(0.0f, 0.0f), true);
             gameobject->SetAngularVelocity(0.0f, true);
-            moving_object = gameobject;
+            move_tool.object = gameobject;
         }
     } else if (selected_tool->name == "rotate") {
         b2Fixture* fixture = get_fixture_at(mousePos);
         if (fixture) {
             b2Body* body = fixture->GetBody();
             GameObject* gameobject = reinterpret_cast<GameObject*>(body->GetUserData().pointer);
-            moving_body_was_enabled = body->IsEnabled();
+            rotate_tool.object_was_enabled = body->IsEnabled();
             b2Vec2 mouse_vector = b2MousePosWorld - body->GetPosition();
             float mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
-            rotate_angle_offset = mouse_angle - body->GetAngle();
+            rotate_tool.angle_offset = mouse_angle - body->GetAngle();
             gameobject->SetEnabled(false, true);
             gameobject->SetAngularVelocity(0.0f, true);
-            rotating_object = gameobject;
+            rotate_tool.object = gameobject;
         }
     } else if (selected_tool->name == "edit") {
         int index;
         sf::Vector2i position;
         if (mouse_get_ground_vertex(index, position)) {
-            grabbed_vertex = index;
+            edit_tool.grabbed_vertex = index;
         }
     }
 }
@@ -322,8 +320,8 @@ void Application::render_world() {
         window->draw(*object->drawable.get());
     }
 
-    if (mouse_joint) {
-        sf::Vector2f grabbed_point = tosf(mouse_joint->GetAnchorB());
+    if (drag_tool.mouse_joint) {
+        sf::Vector2f grabbed_point = tosf(drag_tool.mouse_joint->GetAnchorB());
         line_primitive[0].position = grabbed_point;
         line_primitive[0].color = sf::Color::Yellow;
         line_primitive[1].position = sfMousePosWorld;
@@ -331,8 +329,8 @@ void Application::render_world() {
         window->draw(line_primitive);
     }
 
-    if (rotating_object) {
-        line_primitive[0].position = tosf(rotating_object->rigid_body->GetPosition());
+    if (rotate_tool.object) {
+        line_primitive[0].position = tosf(rotate_tool.object->rigid_body->GetPosition());
         line_primitive[0].color = sf::Color::Yellow;
         line_primitive[1].position = sfMousePosWorld;
         line_primitive[1].color = sf::Color::Yellow;
@@ -366,7 +364,7 @@ void Application::render_ui() {
     sf::FloatRect toolbox_bounds = toolbox_rect.getGlobalBounds();
     sf::Vector2f toolbox_corner = sf::Vector2f(toolbox_bounds.left, toolbox_bounds.top);
     for (int i = 0; i < tools.size(); i++) {
-        Tool* tool = tools[i].get();
+        Tool* tool = tools[i];
         sf::RectangleShape& tool_rect = tool->shape;
         int x = i * (TOOLBOX_PADDING + TOOL_RECT_WIDTH) + TOOLBOX_PADDING;
         int y = TOOLBOX_PADDING;
@@ -400,17 +398,9 @@ void Application::maximize_window() {
     ShowWindow(windowHandle, SW_MAXIMIZE);
 }
 
-Tool* Application::create_tool(std::string name) {
-    std::unique_ptr<Tool> uptr = std::make_unique<Tool>(name);
-    Tool* ptr = uptr.get();
-    tools.push_back(std::move(uptr));
-    return ptr;
-}
-
 Tool* Application::try_select_tool(int index) {
     if (tools.size() > index) {
-        selected_tool = tools[index].get();
-        return selected_tool;
+        return tools[index];
     }
     return nullptr;
 }
@@ -587,9 +577,24 @@ bool QueryCallback::ReportFixture(b2Fixture* fixture) {
     return true;
 }
 
-Tool::Tool(std::string name) {
-    this->name = name;
+Tool::Tool() {
     shape.setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
     shape.setFillColor(sf::Color(128, 128, 128));
     shape.setOutlineColor(sf::Color::Yellow);
+}
+
+DragTool::DragTool() : Tool() {
+    name = "drag";
+}
+
+MoveTool::MoveTool() : Tool() {
+    name = "move";
+}
+
+RotateTool::RotateTool() : Tool(){
+    name = "rotate";
+}
+
+EditTool::EditTool() : Tool(){
+    name = "edit";
 }
