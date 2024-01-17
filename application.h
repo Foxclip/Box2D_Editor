@@ -65,6 +65,7 @@ public:
 	sf::RectangleShape vertex_highlight_rect;
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
+	bool create_mode = false;
 private:
 };
 
