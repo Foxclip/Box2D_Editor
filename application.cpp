@@ -35,20 +35,6 @@ void Application::init_ui() {
         throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
     }
     {
-        assert(VERTEX_SIZE % 2 == 1);
-        vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
-        vertex_rect.setFillColor(sf::Color::Red);
-        vertex_rect.setOrigin(0.0f, 0.0f);
-    }
-    {
-        int vertex_distance = VERTEX_EDITOR_DISTANCE * 2 + 1;
-        vertex_editor_rect.setSize(sf::Vector2f(vertex_distance, vertex_distance));
-        vertex_editor_rect.setFillColor(sf::Color::Transparent);
-        vertex_editor_rect.setOutlineThickness(-1.0f);
-        vertex_editor_rect.setOutlineColor(sf::Color::Yellow);
-        vertex_editor_rect.setOrigin(0.0f, 0.0f);
-    }
-    {
         paused_text.setFont(ui_font);
         paused_text.setString("PAUSED");
         paused_text.setCharacterSize(24);
@@ -217,6 +203,9 @@ void Application::process_keyboard() {
 }
 
 void Application::process_mouse() {
+    if (selected_tool == &edit_tool) {
+        edit_tool.highlighted_vertex = mouse_get_ground_vertex();
+    }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         if (edit_tool.grabbed_vertex != -1) {
             ground->move_vertex(edit_tool.grabbed_vertex, b2MousePosWorld);
@@ -288,11 +277,7 @@ void Application::process_left_click() {
             rotate_tool.object = gameobject;
         }
     } else if (selected_tool->name == "edit") {
-        int index;
-        sf::Vector2i position;
-        if (mouse_get_ground_vertex(index, position)) {
-            edit_tool.grabbed_vertex = index;
-        }
+        edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
     }
 }
 
@@ -347,15 +332,13 @@ void Application::render_ui() {
         b2ChainShape* chain = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
         for (int i = 0; i < chain->m_count; i++) {
             int vertex_size = VERTEX_SIZE / 2;
-            vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]) - sf::Vector2f(vertex_size, vertex_size));
-            window->draw(vertex_rect);
+            edit_tool.vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]) - sf::Vector2f(vertex_size, vertex_size));
+            window->draw(edit_tool.vertex_rect);
         }
-        int index;
-        sf::Vector2i position;
-        if (mouse_get_ground_vertex(index, position)) {
-            int vertex_distance = VERTEX_EDITOR_DISTANCE;
-            vertex_editor_rect.setPosition(to2f(position) - sf::Vector2f(vertex_distance, vertex_distance));
-            window->draw(vertex_editor_rect);
+        if (edit_tool.highlighted_vertex != -1) {
+            sf::Vector2f vertex_pos = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_vertex]);
+            edit_tool.vertex_highlight_rect.setPosition(vertex_pos - sf::Vector2f(VERTEX_EDITOR_DISTANCE, VERTEX_EDITOR_DISTANCE));
+            window->draw(edit_tool.vertex_highlight_rect);
         }
     }
 
@@ -443,8 +426,12 @@ b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
     return nullptr;
 }
 
-bool Application::mouse_get_ground_vertex(int& p_index, sf::Vector2i& p_position) {
-    b2ChainShape* chain = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
+b2ChainShape* Application::get_ground_shape() {
+    return static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
+}
+
+int Application::mouse_get_ground_vertex() {
+    b2ChainShape* chain = get_ground_shape();
     int closest_vertex_i = 0;
     sf::Vector2i closest_vertex_pos = world_to_screen(chain->m_vertices[0]);
     int closest_vertex_offset = utils::get_max_offset(closest_vertex_pos, mousePos);
@@ -458,11 +445,9 @@ bool Application::mouse_get_ground_vertex(int& p_index, sf::Vector2i& p_position
         }
     }
     if (closest_vertex_offset <= VERTEX_EDITOR_DISTANCE) {
-        p_index = closest_vertex_i;
-        p_position = closest_vertex_pos;
-        return true;
+        return closest_vertex_i;
     }
-    return false;
+    return -1;
 }
 
 GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
@@ -597,4 +582,15 @@ RotateTool::RotateTool() : Tool(){
 
 EditTool::EditTool() : Tool(){
     name = "edit";
+    assert(VERTEX_SIZE % 2 == 1);
+    vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
+    vertex_rect.setFillColor(sf::Color::Red);
+    vertex_rect.setOrigin(0.0f, 0.0f);
+    int vertex_distance = VERTEX_EDITOR_DISTANCE * 2 + 1;
+    vertex_highlight_rect.setSize(sf::Vector2f(vertex_distance, vertex_distance));
+    vertex_highlight_rect.setFillColor(sf::Color::Transparent);
+    vertex_highlight_rect.setOutlineThickness(-1.0f);
+    vertex_highlight_rect.setOutlineColor(sf::Color::Yellow);
+    vertex_highlight_rect.setOrigin(0.0f, 0.0f);
 }
+

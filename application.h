@@ -59,6 +59,9 @@ class EditTool : public Tool {
 public:
 	EditTool();
 	int grabbed_vertex = -1;
+	int highlighted_vertex = -1;
+	sf::RectangleShape vertex_highlight_rect;
+	sf::RectangleShape vertex_rect;
 private:
 };
 
@@ -78,8 +81,6 @@ private:
 	float zoomFactor = 0.03f;
 	float viewCenterX = 0, viewCenterY = 5.0f;
 	sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
-	sf::RectangleShape vertex_rect;
-	sf::RectangleShape vertex_editor_rect;
 	sf::RectangleShape paused_rect;
 	sf::RectangleShape toolbox_rect;
 	sf::Font ui_font;
@@ -124,7 +125,8 @@ private:
 	sf::Vector2i world_to_screen(b2Vec2 world_pos);
 	sf::Vector2f world_to_screenf(b2Vec2 world_pos);
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
-	bool mouse_get_ground_vertex(int& index, sf::Vector2i& position);
+	b2ChainShape* get_ground_shape();
+	int mouse_get_ground_vertex();
 
 	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
