@@ -18,5 +18,11 @@ namespace utils {
 	void set_origin_to_center_bounds(sf::Text& text);
 	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point);
 	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point);
-
+	b2Vec2 rot90CCW(const b2Vec2& vec);
+	b2Vec2 rot90CW(const b2Vec2& vec);
+	std::vector<b2Vec2> get_rect(const b2Vec2& p1, const b2Vec2& p2, float offset);
+	float get_line_D(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2);
+	float distance_to_line(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2);
+	bool left_side(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2);
+	bool contains_point(const std::vector<b2Vec2>& polygon, const b2Vec2& point);
 }

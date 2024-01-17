@@ -69,4 +69,36 @@ namespace utils {
 		return contains_point(shape.getGlobalBounds(), point);
 	}
 
+	b2Vec2 rot90CCW(const b2Vec2& vec) {
+		return b2Vec2(-vec.y, vec.x);
+	}
+
+	b2Vec2 rot90CW(const b2Vec2& vec) {
+		return b2Vec2(vec.y, -vec.x);
+	}
+
+	float get_line_D(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2) {
+		float D =  (p2.x - p1.x) * (p0.y - p1.y) - (p2.y - p1.y) * (p0.x - p1.x);
+		return D;
+	}
+
+	bool left_side(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2) {
+		return get_line_D(p0, p1, p2) > 0;
+	}
+
+	float distance_to_line(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2) {
+		return abs(get_line_D(p0, p1, p2)) / (p2 - p1).Length();
+	}
+
+	bool contains_point(const std::vector<b2Vec2>& polygon, const b2Vec2& point) {
+		for (int i = 0; i < polygon.size(); i++) {
+			b2Vec2 p1 = polygon[i];
+			b2Vec2 p2 = polygon[(i + 1) % polygon.size()];
+			if (!left_side(p1, p2, point)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }

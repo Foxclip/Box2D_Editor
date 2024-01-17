@@ -206,6 +206,11 @@ void Application::process_keyboard() {
 void Application::process_mouse() {
     if (selected_tool == &edit_tool) {
         edit_tool.highlighted_vertex = mouse_get_ground_vertex();
+        if (edit_tool.highlighted_vertex == -1) {
+            edit_tool.highlighted_edge = mouse_get_ground_edge();
+        } else {
+            edit_tool.highlighted_edge = -1;
+        }
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         if (edit_tool.grabbed_vertex != -1) {
@@ -341,6 +346,15 @@ void Application::render_ui() {
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos - sf::Vector2f(VERTEX_EDITOR_DISTANCE, VERTEX_EDITOR_DISTANCE));
             window->draw(edit_tool.vertex_highlight_rect);
         }
+        if (edit_tool.highlighted_edge != -1) {
+            sf::Vector2f v1 = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_edge]);
+            sf::Vector2f v2 = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_edge + 1]);
+            line_primitive[0].position = v1;
+            line_primitive[0].color = sf::Color::Yellow;
+            line_primitive[1].position = v2;
+            line_primitive[1].color = sf::Color::Yellow;
+            window->draw(line_primitive);
+        }
     }
 
     toolbox_rect.setPosition(window->getSize().x / 2, 0.0f);
@@ -447,6 +461,33 @@ int Application::mouse_get_ground_vertex() {
     }
     if (closest_vertex_offset <= VERTEX_EDITOR_DISTANCE) {
         return closest_vertex_i;
+    }
+    return -1;
+}
+
+int Application::mouse_get_ground_edge() {
+    b2ChainShape* chain = get_ground_shape();
+    for (int i = 0; i < chain->m_count - 1; i++) {
+        b2Vec2 p1 = chain->m_vertices[i];
+        b2Vec2 p2 = chain->m_vertices[i + 1];
+        b2Vec2 dir = p2 - p1;
+        b2Vec2 side1_dir = utils::rot90CW(dir);
+        b2Vec2 side2_dir = utils::rot90CCW(dir);
+        b2Vec2 side1_p = p1 + side1_dir;
+        b2Vec2 side2_p = p2 + side2_dir;
+        bool inside = 
+            utils::left_side(b2MousePosWorld, p1, side1_p)
+            && utils::left_side(b2MousePosWorld, p2, side2_p);
+        if (!inside) {
+            continue;
+        }
+        b2Vec2 b2_mouse_pos = tob2(to2f(mousePos));
+        b2Vec2 b2_p1 = tob2(world_to_screenf(p1));
+        b2Vec2 b2_p2 = tob2(world_to_screenf(p2));
+        float dist = utils::distance_to_line(b2_mouse_pos, b2_p1, b2_p2);
+        if (dist <= EDGE_EDITOR_DISTANCE) {
+            return i;
+        }
     }
     return -1;
 }

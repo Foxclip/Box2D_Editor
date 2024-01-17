@@ -11,6 +11,7 @@ const float MOUSE_SCROLL_ZOOM = 1.2f;
 const int FPS = 60;
 const int VERTEX_SIZE = 9;
 const int VERTEX_EDITOR_DISTANCE = 10;
+const int EDGE_EDITOR_DISTANCE = 10;
 const int TOOL_RECT_WIDTH = 60;
 const int TOOL_RECT_HEIGHT = 40;
 const int TOOLBOX_PADDING = 10;
@@ -60,6 +61,7 @@ public:
 	EditTool();
 	int grabbed_vertex = -1;
 	int highlighted_vertex = -1;
+	int highlighted_edge = -1;
 	sf::RectangleShape vertex_highlight_rect;
 	sf::RectangleShape vertex_rect;
 private:
@@ -127,6 +129,7 @@ private:
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
 	b2ChainShape* get_ground_shape();
 	int mouse_get_ground_vertex();
+	int mouse_get_ground_edge();
 
 	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
