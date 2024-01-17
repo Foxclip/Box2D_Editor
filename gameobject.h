@@ -65,5 +65,9 @@ class GroundObject : public GameObject {
 public:
 	GroundObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body);
 	void move_vertex(int index, b2Vec2 new_pos);
+	void try_delete_vertex(int index);
+private:
+	std::vector<b2Vec2> get_vertices();
+	void set_vertices(const std::vector<b2Vec2>& vertices);
 };
 

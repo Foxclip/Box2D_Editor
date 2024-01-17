@@ -148,6 +148,7 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::Num8: try_select_tool(7); break;
             case sf::Keyboard::Num9: try_select_tool(8); break;
             case sf::Keyboard::Num0: try_select_tool(9); break;
+            case sf::Keyboard::X: ground->try_delete_vertex(edit_tool.highlighted_vertex); break;
         }
     }
     if (event.type == sf::Event::KeyReleased) {
@@ -383,7 +384,9 @@ void Application::maximize_window() {
 
 Tool* Application::try_select_tool(int index) {
     if (tools.size() > index) {
-        return tools[index];
+        Tool* tool = tools[index];
+        selected_tool = tool;
+        return tool;
     }
     return nullptr;
 }

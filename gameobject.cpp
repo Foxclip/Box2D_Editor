@@ -191,23 +191,48 @@ void CircleNotchShape::draw(sf::RenderTarget& target, sf::RenderStates states) c
 	target.draw(varray_notch, states);
 }
 
-void GroundObject::move_vertex(int index, b2Vec2 new_pos) {
-	b2Fixture* old_fixture = rigid_body->GetFixtureList();
-	b2ChainShape* old_chain = static_cast<b2ChainShape*>(old_fixture->GetShape());
-	std::vector<b2Vec2> vertices;
-	vertices.assign(old_chain->m_vertices, old_chain->m_vertices + old_chain->m_count);
-	vertices[index] = new_pos;
-	rigid_body->DestroyFixture(old_fixture);
-	b2ChainShape new_chain; 
-	new_chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
-	b2Fixture* new_fixture = rigid_body->CreateFixture(&new_chain, 1.0f);
-	LineStripShape* visual = static_cast<LineStripShape*>(drawable.get());
-	visual->varray[index].position = tosf(new_pos);
-}
-
 GroundObject::GroundObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body) {
 	this->transformable = dynamic_cast<sf::Transformable*>(drawable.get());
 	assert(this->transformable != nullptr);
 	this->drawable = std::move(drawable);
 	this->rigid_body = rigid_body;
+}
+
+void GroundObject::move_vertex(int index, b2Vec2 new_pos) {
+	std::vector<b2Vec2> vertices = get_vertices();
+	vertices[index] = new_pos;
+	set_vertices(vertices);
+}
+
+void GroundObject::try_delete_vertex(int index) {
+	if (index < 0) {
+		return;
+	}
+	std::vector<b2Vec2> vertices = get_vertices();
+	if (vertices.size() <= 2) {
+		return;
+	}
+	vertices.erase(vertices.begin() + index);
+	set_vertices(vertices);
+}
+
+std::vector<b2Vec2> GroundObject::get_vertices() {
+	b2Fixture* fixture = rigid_body->GetFixtureList();
+	b2ChainShape* chain = static_cast<b2ChainShape*>(fixture->GetShape());
+	std::vector<b2Vec2> vertices;
+	vertices.assign(chain->m_vertices, chain->m_vertices + chain->m_count);
+	return vertices;
+}
+
+void GroundObject::set_vertices(const std::vector<b2Vec2>& vertices) {
+	b2Fixture* old_fixture = rigid_body->GetFixtureList();
+	rigid_body->DestroyFixture(old_fixture);
+	b2ChainShape new_chain;
+	new_chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
+	b2Fixture* new_fixture = rigid_body->CreateFixture(&new_chain, 1.0f);
+	LineStripShape* visual = static_cast<LineStripShape*>(drawable.get());
+	visual->varray = sf::VertexArray(sf::LinesStrip, vertices.size());
+	for (int i = 0; i < vertices.size(); i++) {
+		visual->varray[i].position = tosf(vertices[i]);
+	}
 }
