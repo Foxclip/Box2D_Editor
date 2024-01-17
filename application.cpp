@@ -347,19 +347,17 @@ void Application::render_ui() {
             edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
             window->draw(edit_tool.edge_highlight);
             sf::Vector2f ghost_vertex_pos = world_to_screenf(utils::line_project(b2MousePosWorld, v1, v2));
-            int vertex_size = VERTEX_SIZE / 2;
-            edit_tool.vertex_rect.setPosition(ghost_vertex_pos - sf::Vector2f(vertex_size, vertex_size));
+            edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
             window->draw(edit_tool.vertex_rect);
         }
         b2ChainShape* chain = get_ground_shape();
         for (int i = 0; i < chain->m_count; i++) {
-            int vertex_size = VERTEX_SIZE / 2;
-            edit_tool.vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]) - sf::Vector2f(vertex_size, vertex_size));
+            edit_tool.vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]));
             window->draw(edit_tool.vertex_rect);
         }
         if (edit_tool.highlighted_vertex != -1) {
             sf::Vector2f vertex_pos = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_vertex]);
-            edit_tool.vertex_highlight_rect.setPosition(vertex_pos - sf::Vector2f(VERTEX_EDITOR_DISTANCE, VERTEX_EDITOR_DISTANCE));
+            edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
             window->draw(edit_tool.vertex_highlight_rect);
         }
     }
@@ -634,13 +632,13 @@ EditTool::EditTool() : Tool(){
     assert(VERTEX_SIZE % 2 == 1);
     vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
     vertex_rect.setFillColor(sf::Color::Red);
-    vertex_rect.setOrigin(0.0f, 0.0f);
+    vertex_rect.setOrigin(vertex_rect.getSize() / 2.0f);
     int vertex_distance = VERTEX_EDITOR_DISTANCE * 2 + 1;
     vertex_highlight_rect.setSize(sf::Vector2f(vertex_distance, vertex_distance));
     vertex_highlight_rect.setFillColor(sf::Color::Transparent);
     vertex_highlight_rect.setOutlineThickness(-1.0f);
     vertex_highlight_rect.setOutlineColor(sf::Color::Yellow);
-    vertex_highlight_rect.setOrigin(0.0f, 0.0f);
+    vertex_highlight_rect.setOrigin(vertex_highlight_rect.getSize() / 2.0f);
     edge_highlight.setFillColor(sf::Color::Yellow);
     edge_highlight.setOrigin(sf::Vector2f(0.0f, 1.5f));
 }
