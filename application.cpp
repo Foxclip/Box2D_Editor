@@ -336,14 +336,20 @@ void Application::render_ui() {
 
     if (selected_tool->name == "edit") {
         if (edit_tool.highlighted_edge != -1) {
-            sf::Vector2f v1 = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_edge]);
-            sf::Vector2f v2 = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_edge + 1]);
-            sf::Vector2f vec = v2 - v1;
+            b2Vec2 v1 = get_ground_shape()->m_vertices[edit_tool.highlighted_edge];
+            b2Vec2 v2 = get_ground_shape()->m_vertices[edit_tool.highlighted_edge + 1];
+            sf::Vector2f v1_screen = world_to_screenf(v1);
+            sf::Vector2f v2_screen = world_to_screenf(v2);
+            sf::Vector2f vec = v2_screen - v1_screen;
             float angle = atan2(vec.y, vec.x);
-            edit_tool.edge_highlight.setPosition(v1);
+            edit_tool.edge_highlight.setPosition(v1_screen);
             edit_tool.edge_highlight.setRotation(utils::to_degrees(angle));
             edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
             window->draw(edit_tool.edge_highlight);
+            sf::Vector2f ghost_vertex_pos = world_to_screenf(utils::line_project(b2MousePosWorld, v1, v2));
+            int vertex_size = VERTEX_SIZE / 2;
+            edit_tool.vertex_rect.setPosition(ghost_vertex_pos - sf::Vector2f(vertex_size, vertex_size));
+            window->draw(edit_tool.vertex_rect);
         }
         b2ChainShape* chain = get_ground_shape();
         for (int i = 0; i < chain->m_count; i++) {

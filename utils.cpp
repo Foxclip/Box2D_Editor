@@ -90,6 +90,12 @@ namespace utils {
 		return abs(get_line_D(p0, p1, p2)) / (p2 - p1).Length();
 	}
 
+	b2Vec2 line_project(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2) {
+		b2Vec2 A = p0 - p1;
+		b2Vec2 B = p2 - p1;
+		return p1 + dot(A, B) / dot(B, B) * B;
+	}
+
 	bool contains_point(const std::vector<b2Vec2>& polygon, const b2Vec2& point) {
 		for (int i = 0; i < polygon.size(); i++) {
 			b2Vec2 p1 = polygon[i];
@@ -103,6 +109,10 @@ namespace utils {
 
 	float get_length(const sf::Vector2f& vec) {
 		return sqrt(vec.x * vec.x + vec.y * vec.y);
+	}
+
+	float dot(const b2Vec2& v1, const b2Vec2& v2) {
+		return v1.x * v2.x + v1.y * v2.y;
 	}
 
 }

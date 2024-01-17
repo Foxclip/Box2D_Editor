@@ -24,6 +24,8 @@ namespace utils {
 	float get_line_D(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2);
 	float distance_to_line(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2);
 	bool left_side(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2);
+	b2Vec2 line_project(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2);
 	bool contains_point(const std::vector<b2Vec2>& polygon, const b2Vec2& point);
 	float get_length(const sf::Vector2f& vec);
+	float dot(const b2Vec2& v1, const b2Vec2& v2);
 }
