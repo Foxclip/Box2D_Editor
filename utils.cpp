@@ -101,4 +101,8 @@ namespace utils {
 		return true;
 	}
 
+	float get_length(const sf::Vector2f& vec) {
+		return sqrt(vec.x * vec.x + vec.y * vec.y);
+	}
+
 }

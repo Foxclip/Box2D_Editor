@@ -335,7 +335,17 @@ void Application::render_ui() {
     window->setView(ui_view);
 
     if (selected_tool->name == "edit") {
-        b2ChainShape* chain = static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
+        if (edit_tool.highlighted_edge != -1) {
+            sf::Vector2f v1 = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_edge]);
+            sf::Vector2f v2 = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_edge + 1]);
+            sf::Vector2f vec = v2 - v1;
+            float angle = atan2(vec.y, vec.x);
+            edit_tool.edge_highlight.setPosition(v1);
+            edit_tool.edge_highlight.setRotation(utils::to_degrees(angle));
+            edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
+            window->draw(edit_tool.edge_highlight);
+        }
+        b2ChainShape* chain = get_ground_shape();
         for (int i = 0; i < chain->m_count; i++) {
             int vertex_size = VERTEX_SIZE / 2;
             edit_tool.vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]) - sf::Vector2f(vertex_size, vertex_size));
@@ -345,15 +355,6 @@ void Application::render_ui() {
             sf::Vector2f vertex_pos = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_vertex]);
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos - sf::Vector2f(VERTEX_EDITOR_DISTANCE, VERTEX_EDITOR_DISTANCE));
             window->draw(edit_tool.vertex_highlight_rect);
-        }
-        if (edit_tool.highlighted_edge != -1) {
-            sf::Vector2f v1 = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_edge]);
-            sf::Vector2f v2 = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_edge + 1]);
-            line_primitive[0].position = v1;
-            line_primitive[0].color = sf::Color::Yellow;
-            line_primitive[1].position = v2;
-            line_primitive[1].color = sf::Color::Yellow;
-            window->draw(line_primitive);
         }
     }
 
@@ -634,5 +635,7 @@ EditTool::EditTool() : Tool(){
     vertex_highlight_rect.setOutlineThickness(-1.0f);
     vertex_highlight_rect.setOutlineColor(sf::Color::Yellow);
     vertex_highlight_rect.setOrigin(0.0f, 0.0f);
+    edge_highlight.setFillColor(sf::Color::Yellow);
+    edge_highlight.setOrigin(sf::Vector2f(0.0f, 1.5f));
 }
 

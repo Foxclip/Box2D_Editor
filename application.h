@@ -64,6 +64,7 @@ public:
 	int highlighted_edge = -1;
 	sf::RectangleShape vertex_highlight_rect;
 	sf::RectangleShape vertex_rect;
+	sf::RectangleShape edge_highlight;
 private:
 };
 
