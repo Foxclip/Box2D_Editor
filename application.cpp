@@ -347,6 +347,7 @@ void Application::render_ui() {
     if (selected_tool->name == "edit") {
         if (edit_tool.create_mode) {
             if (edit_tool.highlighted_edge != -1) {
+                // edge highlight
                 b2Vec2 v1 = get_ground_shape()->m_vertices[edit_tool.highlighted_edge];
                 b2Vec2 v2 = get_ground_shape()->m_vertices[edit_tool.highlighted_edge + 1];
                 sf::Vector2f v1_screen = world_to_screenf(v1);
@@ -357,28 +358,41 @@ void Application::render_ui() {
                 edit_tool.edge_highlight.setRotation(utils::to_degrees(angle));
                 edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
                 window->draw(edit_tool.edge_highlight);
+                // ghost vertex on the edge
                 sf::Vector2f ghost_vertex_pos = world_to_screenf(utils::line_project(b2MousePosWorld, v1, v2));
                 edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
                 edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
                 window->draw(edit_tool.vertex_rect);
             } else if (edit_tool.highlighted_vertex == -1) {
-                line_primitive[0].position = world_to_screenf(get_ground_shape()->m_vertices[0]);
-                line_primitive[0].color = sf::Color(255, 255, 255, 128);
-                line_primitive[1].position = to2f(mousePos);
-                line_primitive[1].color = sf::Color(255, 255, 255, 128);
-                window->draw(line_primitive);
+                // ghost edge
+                sf::Vector2i v1 = world_to_screen(get_ground_shape()->m_vertices[0]);
+                sf::Vector2i v2 = mousePos;
+                draw_line(to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
+                // ghost edge normal
+                sf::Vector2f norm_v1, norm_v2;
+                get_screen_normal(v1, v2, norm_v1, norm_v2);
+                draw_line(norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
+                // ghost vertex
                 sf::Vector2f ghost_vertex_pos = to2f(mousePos);
                 edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
                 edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
                 window->draw(edit_tool.vertex_rect);
             }
         }
+        // ground vertices
         b2ChainShape* chain = get_ground_shape();
         for (int i = 0; i < chain->m_count; i++) {
             edit_tool.vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]));
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0));
             window->draw(edit_tool.vertex_rect);
         }
+        // ground edge normals
+        for (int i = 0; i < chain->m_count - 1; i++) {
+            sf::Vector2f norm_v1, norm_v2;
+            get_screen_normal(chain->m_vertices[i], chain->m_vertices[i + 1], norm_v1, norm_v2);
+            draw_line(norm_v1, norm_v2, sf::Color(0, 255, 255));
+        }
+        // highlighted vertex
         if (edit_tool.highlighted_vertex != -1) {
             sf::Vector2f vertex_pos = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_vertex]);
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
@@ -452,6 +466,11 @@ sf::Vector2f Application::world_to_screenf(b2Vec2 world_pos) {
     return to2f(vec2i);
 }
 
+sf::Vector2f Application::world_dir_to_screenf(b2Vec2 world_dir) {
+    //TODO: calculate new direction using an actual sf::View
+    return sf::Vector2f(world_dir.x, -world_dir.y);
+}
+
 b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
     b2Vec2 world_pos = b2_screen_to_world(screen_pos);
     b2Vec2 world_pos_next = b2_screen_to_world(screen_pos + sf::Vector2i(1, 1));
@@ -519,6 +538,32 @@ int Application::mouse_get_ground_edge() {
         }
     }
     return -1;
+}
+
+void Application::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) {
+    b2Vec2 midpoint = 0.5f * (v1 + v2);
+    norm_v1 = world_to_screenf(midpoint);
+    sf::Vector2f edge_dir = utils::normalize(world_dir_to_screenf(v2 - v1));
+    sf::Vector2f norm_dir = utils::rot90CCW(edge_dir);
+    norm_v2 = norm_v1 + norm_dir * (float)NORMAL_LENGTH;
+}
+
+void Application::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) {
+    sf::Vector2f v1f = to2f(v1);
+    sf::Vector2f v2f = to2f(v2);
+    sf::Vector2f midpoint = (v1f + v2f) / 2.0f;
+    norm_v1 = midpoint;
+    sf::Vector2f edge_dir = utils::normalize(v2f - v1f);
+    sf::Vector2f norm_dir = utils::rot90CW(edge_dir);
+    norm_v2 = norm_v1 + norm_dir * (float)NORMAL_LENGTH;
+}
+
+void Application::draw_line(const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color) {
+    line_primitive[0].position = v1;
+    line_primitive[0].color = color;
+    line_primitive[1].position = v2;
+    line_primitive[1].color = color;
+    window->draw(line_primitive);
 }
 
 GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {

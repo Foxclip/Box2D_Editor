@@ -12,6 +12,7 @@ const int FPS = 60;
 const int VERTEX_SIZE = 9;
 const int VERTEX_EDITOR_DISTANCE = 10;
 const int EDGE_EDITOR_DISTANCE = 10;
+const int NORMAL_LENGTH = 30;
 const int TOOL_RECT_WIDTH = 60;
 const int TOOL_RECT_HEIGHT = 40;
 const int TOOLBOX_PADDING = 10;
@@ -128,10 +129,14 @@ private:
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2i world_to_screen(b2Vec2 world_pos);
 	sf::Vector2f world_to_screenf(b2Vec2 world_pos);
+	sf::Vector2f world_dir_to_screenf(b2Vec2 world_dir);
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
 	b2ChainShape* get_ground_shape();
 	int mouse_get_ground_vertex();
 	int mouse_get_ground_edge();
+	void get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
+	void get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
+	void draw_line(const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color);
 
 	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);

@@ -18,14 +18,67 @@ namespace utils {
 	void set_origin_to_center_bounds(sf::Text& text);
 	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point);
 	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point);
-	b2Vec2 rot90CCW(const b2Vec2& vec);
-	b2Vec2 rot90CW(const b2Vec2& vec);
-	std::vector<b2Vec2> get_rect(const b2Vec2& p1, const b2Vec2& p2, float offset);
-	float get_line_D(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2);
-	float distance_to_line(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2);
-	bool left_side(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2);
-	b2Vec2 line_project(const b2Vec2& p0, const b2Vec2& p1, const b2Vec2& p2);
-	bool contains_point(const std::vector<b2Vec2>& polygon, const b2Vec2& point);
-	float get_length(const sf::Vector2f& vec);
-	float dot(const b2Vec2& v1, const b2Vec2& v2);
+
+	template <typename T>
+	T rot90CCW(const T& vec) {
+		return T(-vec.y, vec.x);
+	}
+
+	template <typename T>
+	T rot90CW(const T& vec) {
+		return T(vec.y, -vec.x);
+	}
+
+	template <typename T>
+	float dot(const T& v1, const T& v2) {
+		return v1.x * v2.x + v1.y * v2.y;
+	}
+
+	template <typename T>
+	T normalize(const T& vec) {
+		float length = sqrt(vec.x * vec.x + vec.y * vec.y);
+		float inv_length = 1.0f / length;
+		return inv_length * vec;
+	}
+
+	template <typename T>
+	float get_line_D(const T& p0, const T& p1, const T& p2) {
+		float D = (p2.x - p1.x) * (p0.y - p1.y) - (p2.y - p1.y) * (p0.x - p1.x);
+		return D;
+	}
+
+	template <typename T>
+	bool left_side(const T& p0, const T& p1, const T& p2) {
+		return get_line_D(p0, p1, p2) > 0;
+	}
+
+	template <typename T>
+	float distance_to_line(const T& p0, const T& p1, const T& p2) {
+		return abs(get_line_D(p0, p1, p2)) / (p2 - p1).Length();
+	}
+
+	template <typename T>
+	T line_project(const T& p0, const T& p1, const T& p2) {
+		T A = p0 - p1;
+		T B = p2 - p1;
+		return p1 + dot(A, B) / dot(B, B) * B;
+	}
+
+	template <typename T>
+	bool contains_point(const std::vector<T>& polygon, const T& point) {
+		for (int i = 0; i < polygon.size(); i++) {
+			T p1 = polygon[i];
+			T p2 = polygon[(i + 1) % polygon.size()];
+			if (!left_side(p1, p2, point)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	template <typename T>
+	float get_length(const T& vec) {
+		return sqrt(vec.x * vec.x + vec.y * vec.y);
+	}
+
 }
