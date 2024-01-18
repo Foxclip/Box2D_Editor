@@ -14,8 +14,6 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
-    //TODO: hold shift for edge edit, hold ctrl for creating edge vertices
-    //TODO: replace get_screen_normal with one function
     //TODO: move tool-related constants to tool classes
     //TODO: edit mode box selection
     //TODO: save/load levels to file

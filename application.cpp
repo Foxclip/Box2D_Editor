@@ -507,7 +507,7 @@ int Application::mouse_get_ground_vertex() {
             closest_vertex_offset = offset;
         }
     }
-    if (closest_vertex_offset <= VERTEX_EDITOR_DISTANCE) {
+    if (closest_vertex_offset <= EditTool::VERTEX_HIGHLIGHT_DISTANCE) {
         return closest_vertex_i;
     }
     return -1;
@@ -533,7 +533,7 @@ int Application::mouse_get_ground_edge() {
         b2Vec2 b2_p1 = tob2(world_to_screenf(p1));
         b2Vec2 b2_p2 = tob2(world_to_screenf(p2));
         float dist = utils::distance_to_line(b2_mouse_pos, b2_p1, b2_p2);
-        if (dist <= EDGE_EDITOR_DISTANCE) {
+        if (dist <= EditTool::EDGE_HIGHLIGHT_DISTANCE) {
             return i;
         }
     }
@@ -560,7 +560,7 @@ void Application::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vect
     norm_v1 = world_to_screenf(midpoint);
     sf::Vector2f edge_dir = utils::normalize(world_dir_to_screenf(v2 - v1));
     sf::Vector2f norm_dir = utils::rot90CCW(edge_dir);
-    norm_v2 = norm_v1 + norm_dir * (float)NORMAL_LENGTH;
+    norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
 }
 
 void Application::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) {
@@ -570,7 +570,7 @@ void Application::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& 
     norm_v1 = midpoint;
     sf::Vector2f edge_dir = utils::normalize(v2f - v1f);
     sf::Vector2f norm_dir = utils::rot90CW(edge_dir);
-    norm_v2 = norm_v1 + norm_dir * (float)NORMAL_LENGTH;
+    norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
 }
 
 void Application::draw_line(const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color) {
@@ -717,7 +717,7 @@ EditTool::EditTool() : Tool(){
     vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
     vertex_rect.setFillColor(sf::Color::Red);
     vertex_rect.setOrigin(vertex_rect.getSize() / 2.0f);
-    int vertex_distance = VERTEX_EDITOR_DISTANCE * 2 + 1;
+    int vertex_distance = VERTEX_HIGHLIGHT_DISTANCE * 2 + 1;
     vertex_highlight_rect.setSize(sf::Vector2f(vertex_distance, vertex_distance));
     vertex_highlight_rect.setFillColor(sf::Color::Transparent);
     vertex_highlight_rect.setOutlineThickness(-1.0f);

@@ -9,10 +9,6 @@ const int WINDOW_HEIGHT = 600;
 const int ANTIALIASING = 0;
 const float MOUSE_SCROLL_ZOOM = 1.2f;
 const int FPS = 60;
-const int VERTEX_SIZE = 9;
-const int VERTEX_EDITOR_DISTANCE = 10;
-const int EDGE_EDITOR_DISTANCE = 10;
-const int NORMAL_LENGTH = 30;
 const int TOOL_RECT_WIDTH = 60;
 const int TOOL_RECT_HEIGHT = 40;
 const int TOOLBOX_PADDING = 10;
@@ -59,6 +55,10 @@ private:
 
 class EditTool : public Tool {
 public:
+	static const int VERTEX_SIZE = 9;
+	static const int VERTEX_HIGHLIGHT_DISTANCE = 10;
+	static const int EDGE_HIGHLIGHT_DISTANCE = 10;
+	static const int NORMAL_LENGTH = 30;
 	enum EditToolMode {
 		ADD,
 		INSERT,
