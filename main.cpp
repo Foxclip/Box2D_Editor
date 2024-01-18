@@ -14,7 +14,6 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
-    //TODO: move tool-related constants to tool classes
     //TODO: edit mode box selection
     //TODO: save/load levels to file
     //TODO: create/delete objects in the scene
