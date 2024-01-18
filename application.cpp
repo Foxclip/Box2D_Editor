@@ -149,12 +149,14 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::Num9: try_select_tool(8); break;
             case sf::Keyboard::Num0: try_select_tool(9); break;
             case sf::Keyboard::X: ground->try_delete_vertex(edit_tool.highlighted_vertex); break;
-            case sf::Keyboard::LControl: edit_tool.create_mode = true;
+            case sf::Keyboard::LControl: edit_tool.mode = EditTool::ADD; break;
+            case sf::Keyboard::LShift: edit_tool.mode = EditTool::INSERT; break;
         }
     }
     if (event.type == sf::Event::KeyReleased) {
         switch (event.key.code) {
-            case sf::Keyboard::LControl: edit_tool.create_mode = false;
+            case sf::Keyboard::LControl: edit_tool.mode = EditTool::MOVE; break;
+            case sf::Keyboard::LShift: edit_tool.mode = EditTool::MOVE; break;
         }
     }
 }
@@ -209,12 +211,10 @@ void Application::process_keyboard() {
 
 void Application::process_mouse() {
     if (selected_tool == &edit_tool) {
-        edit_tool.highlighted_vertex = mouse_get_ground_vertex();
-        edit_tool.edge_vertex = mouse_get_edge_vertex();
-        if (edit_tool.highlighted_vertex == -1) {
-            edit_tool.highlighted_edge = mouse_get_ground_edge();
-        } else {
-            edit_tool.highlighted_edge = -1;
+        switch (edit_tool.mode) {
+            case EditTool::ADD: edit_tool.edge_vertex = mouse_get_edge_vertex(); break;
+            case EditTool::INSERT: edit_tool.highlighted_edge = mouse_get_ground_edge(); break;
+            case EditTool::MOVE: edit_tool.highlighted_vertex = mouse_get_ground_vertex(); break;
         }
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
@@ -288,17 +288,16 @@ void Application::process_left_click() {
             rotate_tool.object = gameobject;
         }
     } else if (selected_tool->name == "edit") {
-        edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
-        if (edit_tool.highlighted_vertex == -1 && edit_tool.create_mode) {
-            if (edit_tool.highlighted_edge != -1) {
-                ground->add_vertex(edit_tool.highlighted_edge + 1, b2MousePosWorld);
-            } else {
-                if (edit_tool.edge_vertex == 0) {
-                    ground->add_vertex(0, b2MousePosWorld);
-                } else if (edit_tool.edge_vertex > 0) {
-                    ground->add_vertex(edit_tool.edge_vertex + 1, b2MousePosWorld);
-                }
+        if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
+            if (edit_tool.edge_vertex == 0) {
+                ground->add_vertex(0, b2MousePosWorld);
+            } else if (edit_tool.edge_vertex > 0) {
+                ground->add_vertex(edit_tool.edge_vertex + 1, b2MousePosWorld);
             }
+        } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
+            ground->add_vertex(edit_tool.highlighted_edge + 1, b2MousePosWorld);
+        } else if (edit_tool.mode == EditTool::MOVE) {
+            edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
         }
     }
 }
@@ -344,45 +343,41 @@ void Application::render_ui() {
     window->setView(ui_view);
 
     if (selected_tool->name == "edit") {
-        if (edit_tool.create_mode) {
-            if (edit_tool.highlighted_edge != -1) {
-                // edge highlight
-                b2Vec2 v1 = get_ground_shape()->m_vertices[edit_tool.highlighted_edge];
-                b2Vec2 v2 = get_ground_shape()->m_vertices[edit_tool.highlighted_edge + 1];
-                sf::Vector2f v1_screen = world_to_screenf(v1);
-                sf::Vector2f v2_screen = world_to_screenf(v2);
-                sf::Vector2f vec = v2_screen - v1_screen;
-                float angle = atan2(vec.y, vec.x);
-                edit_tool.edge_highlight.setPosition(v1_screen);
-                edit_tool.edge_highlight.setRotation(utils::to_degrees(angle));
-                edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
-                window->draw(edit_tool.edge_highlight);
-                // ghost vertex on the edge
-                sf::Vector2f ghost_vertex_pos = world_to_screenf(utils::line_project(b2MousePosWorld, v1, v2));
-                edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
-                edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
-                window->draw(edit_tool.vertex_rect);
-            } else if (edit_tool.highlighted_vertex == -1) {
-                if (edit_tool.edge_vertex != -1) {
-                    // ghost edge
-                    sf::Vector2i v1 = world_to_screen(get_ground_shape()->m_vertices[edit_tool.edge_vertex]);
-                    sf::Vector2i v2 = mousePos;
-                    draw_line(to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
-                    // ghost edge normal
-                    sf::Vector2f norm_v1, norm_v2;
-                    if (edit_tool.edge_vertex == 0) {
-                        get_screen_normal(v1, v2, norm_v1, norm_v2);
-                    } else {
-                        get_screen_normal(v2, v1, norm_v1, norm_v2);
-                    }
-                    draw_line(norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
-                    // ghost vertex
-                    sf::Vector2f ghost_vertex_pos = to2f(mousePos);
-                    edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
-                    edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
-                    window->draw(edit_tool.vertex_rect);
-                }
+        if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
+            // ghost edge
+            sf::Vector2i v1 = world_to_screen(get_ground_shape()->m_vertices[edit_tool.edge_vertex]);
+            sf::Vector2i v2 = mousePos;
+            draw_line(to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
+            // ghost edge normal
+            sf::Vector2f norm_v1, norm_v2;
+            if (edit_tool.edge_vertex == 0) {
+                get_screen_normal(v1, v2, norm_v1, norm_v2);
+            } else {
+                get_screen_normal(v2, v1, norm_v1, norm_v2);
             }
+            draw_line(norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
+            // ghost vertex
+            sf::Vector2f ghost_vertex_pos = to2f(mousePos);
+            edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
+            edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
+            window->draw(edit_tool.vertex_rect);
+        } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
+            // edge highlight
+            b2Vec2 v1 = get_ground_shape()->m_vertices[edit_tool.highlighted_edge];
+            b2Vec2 v2 = get_ground_shape()->m_vertices[edit_tool.highlighted_edge + 1];
+            sf::Vector2f v1_screen = world_to_screenf(v1);
+            sf::Vector2f v2_screen = world_to_screenf(v2);
+            sf::Vector2f vec = v2_screen - v1_screen;
+            float angle = atan2(vec.y, vec.x);
+            edit_tool.edge_highlight.setPosition(v1_screen);
+            edit_tool.edge_highlight.setRotation(utils::to_degrees(angle));
+            edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
+            window->draw(edit_tool.edge_highlight);
+            // ghost vertex on the edge
+            sf::Vector2f ghost_vertex_pos = world_to_screenf(utils::line_project(b2MousePosWorld, v1, v2));
+            edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
+            edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
+            window->draw(edit_tool.vertex_rect);
         }
         // ground vertices
         b2ChainShape* chain = get_ground_shape();
@@ -397,8 +392,8 @@ void Application::render_ui() {
             get_screen_normal(chain->m_vertices[i], chain->m_vertices[i + 1], norm_v1, norm_v2);
             draw_line(norm_v1, norm_v2, sf::Color(0, 255, 255));
         }
-        // highlighted vertex
-        if (edit_tool.highlighted_vertex != -1) {
+        if (edit_tool.mode == EditTool::MOVE && edit_tool.highlighted_vertex != -1) {
+            // highlighted vertex
             sf::Vector2f vertex_pos = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_vertex]);
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
             window->draw(edit_tool.vertex_highlight_rect);

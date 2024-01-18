@@ -59,6 +59,11 @@ private:
 
 class EditTool : public Tool {
 public:
+	enum EditToolMode {
+		ADD,
+		INSERT,
+		MOVE,
+	};
 	EditTool();
 	int grabbed_vertex = -1;
 	int highlighted_vertex = -1;
@@ -67,7 +72,7 @@ public:
 	sf::RectangleShape vertex_highlight_rect;
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
-	bool create_mode = false;
+	EditToolMode mode = MOVE;
 private:
 };
 
