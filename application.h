@@ -44,7 +44,7 @@ public:
 	MoveTool();
 	GameObject* object = nullptr;
 	bool object_was_enabled = false;
-	b2Vec2 offset;
+	b2Vec2 offset = b2Vec2();
 private:
 };
 
@@ -53,7 +53,7 @@ public:
 	RotateTool();
 	GameObject* object = nullptr;
 	bool object_was_enabled = false;
-	float angle_offset;
+	float angle_offset = 0.0f;
 private:
 };
 

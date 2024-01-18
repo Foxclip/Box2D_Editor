@@ -323,19 +323,12 @@ void Application::render_world() {
 
     if (drag_tool.mouse_joint) {
         sf::Vector2f grabbed_point = tosf(drag_tool.mouse_joint->GetAnchorB());
-        line_primitive[0].position = grabbed_point;
-        line_primitive[0].color = sf::Color::Yellow;
-        line_primitive[1].position = sfMousePosWorld;
-        line_primitive[1].color = sf::Color::Yellow;
-        window->draw(line_primitive);
+        draw_line(grabbed_point, sfMousePosWorld, sf::Color::Yellow);
     }
 
     if (rotate_tool.object) {
-        line_primitive[0].position = tosf(rotate_tool.object->rigid_body->GetPosition());
-        line_primitive[0].color = sf::Color::Yellow;
-        line_primitive[1].position = sfMousePosWorld;
-        line_primitive[1].color = sf::Color::Yellow;
-        window->draw(line_primitive);
+        sf::Vector2f body_origin = tosf(rotate_tool.object->rigid_body->GetPosition());
+        draw_line(body_origin, sfMousePosWorld, sf::Color::Yellow);
     }
 }
 
