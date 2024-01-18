@@ -161,6 +161,7 @@ void Application::process_keyboard_event(sf::Event event) {
 
 void Application::process_mouse_event(sf::Event event) {
     mousePos = sf::Mouse::getPosition(*window);
+    mousePosf = to2f(mousePos);
     sfMousePosWorld = sf_screen_to_world(mousePos);
     b2MousePosWorld = tob2(sfMousePosWorld);
     if (event.type == sf::Event::MouseButtonPressed) {
@@ -209,6 +210,7 @@ void Application::process_keyboard() {
 void Application::process_mouse() {
     if (selected_tool == &edit_tool) {
         edit_tool.highlighted_vertex = mouse_get_ground_vertex();
+        edit_tool.edge_vertex = mouse_get_edge_vertex();
         if (edit_tool.highlighted_vertex == -1) {
             edit_tool.highlighted_edge = mouse_get_ground_edge();
         } else {
@@ -291,7 +293,11 @@ void Application::process_left_click() {
             if (edit_tool.highlighted_edge != -1) {
                 ground->add_vertex(edit_tool.highlighted_edge + 1, b2MousePosWorld);
             } else {
-                ground->add_vertex(0, b2MousePosWorld);
+                if (edit_tool.edge_vertex == 0) {
+                    ground->add_vertex(0, b2MousePosWorld);
+                } else if (edit_tool.edge_vertex > 0) {
+                    ground->add_vertex(edit_tool.edge_vertex + 1, b2MousePosWorld);
+                }
             }
         }
     }
@@ -357,19 +363,25 @@ void Application::render_ui() {
                 edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
                 window->draw(edit_tool.vertex_rect);
             } else if (edit_tool.highlighted_vertex == -1) {
-                // ghost edge
-                sf::Vector2i v1 = world_to_screen(get_ground_shape()->m_vertices[0]);
-                sf::Vector2i v2 = mousePos;
-                draw_line(to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
-                // ghost edge normal
-                sf::Vector2f norm_v1, norm_v2;
-                get_screen_normal(v1, v2, norm_v1, norm_v2);
-                draw_line(norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
-                // ghost vertex
-                sf::Vector2f ghost_vertex_pos = to2f(mousePos);
-                edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
-                edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
-                window->draw(edit_tool.vertex_rect);
+                if (edit_tool.edge_vertex != -1) {
+                    // ghost edge
+                    sf::Vector2i v1 = world_to_screen(get_ground_shape()->m_vertices[edit_tool.edge_vertex]);
+                    sf::Vector2i v2 = mousePos;
+                    draw_line(to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
+                    // ghost edge normal
+                    sf::Vector2f norm_v1, norm_v2;
+                    if (edit_tool.edge_vertex == 0) {
+                        get_screen_normal(v1, v2, norm_v1, norm_v2);
+                    } else {
+                        get_screen_normal(v2, v1, norm_v1, norm_v2);
+                    }
+                    draw_line(norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
+                    // ghost vertex
+                    sf::Vector2f ghost_vertex_pos = to2f(mousePos);
+                    edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
+                    edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
+                    window->draw(edit_tool.vertex_rect);
+                }
             }
         }
         // ground vertices
@@ -531,6 +543,21 @@ int Application::mouse_get_ground_edge() {
         }
     }
     return -1;
+}
+
+int Application::mouse_get_edge_vertex() {
+    b2ChainShape* chain = get_ground_shape();
+    int v_start_i = 0;
+    int v_end_i = chain->m_count - 1;
+    sf::Vector2f v_start = world_to_screenf(chain->m_vertices[v_start_i]);
+    sf::Vector2f v_end = world_to_screenf(chain->m_vertices[v_end_i]);
+    float v_start_dist = utils::get_length(mousePosf - v_start);
+    float v_end_dist = utils::get_length(mousePosf - v_end);
+    if (v_start_dist <= v_end_dist) {
+        return v_start_i;
+    } else {
+        return v_end_i;
+    }
 }
 
 void Application::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) {

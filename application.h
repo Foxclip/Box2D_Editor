@@ -63,6 +63,7 @@ public:
 	int grabbed_vertex = -1;
 	int highlighted_vertex = -1;
 	int highlighted_edge = -1;
+	int edge_vertex = -1;
 	sf::RectangleShape vertex_highlight_rect;
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
@@ -81,6 +82,7 @@ private:
 	sf::View world_view;
 	sf::View ui_view;
 	sf::Vector2i mousePos;
+	sf::Vector2f mousePosf;
 	sf::Vector2f sfMousePosWorld;
 	sf::Vector2i mousePrevPos;
 	float zoomFactor = 0.03f;
@@ -134,6 +136,7 @@ private:
 	b2ChainShape* get_ground_shape();
 	int mouse_get_ground_vertex();
 	int mouse_get_ground_edge();
+	int mouse_get_edge_vertex();
 	void get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void draw_line(const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color);
