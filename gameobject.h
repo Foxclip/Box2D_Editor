@@ -30,9 +30,10 @@ public:
 
 	GameObject();
 	virtual sf::Drawable* getDrawable() = 0;
+	virtual sf::Transformable* getTransformable() = 0;
 	void updateVisual();
-	virtual void setVisualPosition(const sf::Vector2f& pos) = 0;
-	virtual void setVisualRotation(float angle) = 0;
+	virtual void setVisualPosition(const sf::Vector2f& pos);
+	virtual void setVisualRotation(float angle);
 	void setEnabled(bool enabled, bool include_children);
 	void setPosition(const b2Vec2& pos, bool move_children);
 	void setAngle(float angle, bool rotate_children);
@@ -47,33 +48,25 @@ private:
 
 };
 
-class ShapeObject : public GameObject {
+class BoxObject : public GameObject {
 public:
-	ShapeObject();
-	ShapeObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body);
-	void setVisualPosition(const sf::Vector2f& pos);
-	void setVisualRotation(float angle);
+	BoxObject(std::unique_ptr<sf::RectangleShape> shape, b2Body* rigid_body);
 	sf::Drawable* getDrawable();
-protected:
-	std::unique_ptr<sf::Shape> shape;
-};
-
-class BoxObject : public ShapeObject {
-public:
-	BoxObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body);
+	sf::Transformable* getTransformable();
+private:
+	std::unique_ptr<sf::RectangleShape> rect_shape;
 };
 
 class BallObject : public GameObject {
 public:
 	BallObject(std::unique_ptr<CircleNotchShape> shape, b2Body* rigid_body);
-	void setVisualPosition(const sf::Vector2f& pos);
-	void setVisualRotation(float angle);
 	sf::Drawable* getDrawable();
+	sf::Transformable* getTransformable();
 private:
 	std::unique_ptr<CircleNotchShape> circle_notch_shape;
 };
 
-class CarObject : public ShapeObject {
+class CarObject : public GameObject {
 public:
 	CarObject(
 		std::unique_ptr<sf::ConvexShape> shape,
@@ -81,8 +74,11 @@ public:
 		std::vector<GameObject*> wheels,
 		std::vector<b2RevoluteJoint*> wheel_joints
 	);
-	std::vector<b2RevoluteJoint*> wheel_joints;
+	sf::Drawable* getDrawable();
+	sf::Transformable* getTransformable();
 private:
+	std::unique_ptr<sf::ConvexShape> convex_shape;
+	std::vector<b2RevoluteJoint*> wheel_joints;
 };
 
 class GroundObject : public GameObject {
@@ -91,9 +87,8 @@ public:
 	void moveVertex(int index, const b2Vec2& new_pos);
 	void tryDeleteVertex(int index);
 	void addVertex(int index, const b2Vec2& pos);
-	void setVisualPosition(const sf::Vector2f& pos);
-	void setVisualRotation(float angle);
 	sf::Drawable* getDrawable();
+	sf::Transformable* getTransformable();
 private:
 	std::unique_ptr<LineStripShape> line_strip_shape;
 	std::vector<b2Vec2> getVertices();

@@ -84,8 +84,6 @@ void Application::init_objects() {
     GameObject* box2 = create_box(b2Vec2(0.2f, 3.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
     GameObject* ball = create_ball(b2Vec2(0.0f, 5.0f), 0.5f, sf::Color::Green, sf::Color(0, 64, 0));
     std::vector<GameObject*> dynamic_objects = { box0, box1, box2, ball };
-    //std::vector<GameObject*> boxes = { box1, box2 };
-    //std::vector<GameObject*> boxes = { box0 };
     for (int i = 0; i < dynamic_objects.size(); i++) {
         GameObject* box = dynamic_objects[i];
         box->setType(b2_dynamicBody, false);
@@ -93,9 +91,6 @@ void Application::init_objects() {
         box->setFriction(0.3f, false);
         box->setRestitution(0.5f, false);
     }
-    //b2DistanceJointDef distance_joint_def;
-    //distance_joint_def.Initialize(box1->rigid_body, box2->rigid_body, box1->rigid_body->GetWorldCenter(), box2->rigid_body->GetWorldCenter());
-    //b2DistanceJoint* distance_joint = (b2DistanceJoint*)world->CreateJoint(&distance_joint_def);
 
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
     std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
@@ -589,7 +584,7 @@ BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Col
     b2PolygonShape box_shape;
     box_shape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
     b2Fixture* fixture = body->CreateFixture(&box_shape, 1.0f);
-    std::unique_ptr<sf::Shape> shape = std::make_unique<sf::RectangleShape>(tosf(size));
+    std::unique_ptr<sf::RectangleShape> shape = std::make_unique<sf::RectangleShape>(tosf(size));
     shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
     shape->setFillColor(color);
     std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(std::move(shape), body);

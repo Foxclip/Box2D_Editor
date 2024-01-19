@@ -16,6 +16,14 @@ void GameObject::updateVisual() {
 	setVisualRotation(utils::to_degrees(angle));
 }
 
+void GameObject::setVisualPosition(const sf::Vector2f& pos) {
+	getTransformable()->setPosition(pos);
+}
+
+void GameObject::setVisualRotation(float angle) {
+	getTransformable()->setRotation(angle);
+}
+
 void GameObject::setEnabled(bool enabled, bool include_children) {
 	rigid_body->SetEnabled(enabled);
 	if (include_children) {
@@ -115,42 +123,29 @@ void GameObject::setRestitution(float restitution, bool include_children) {
 	}
 }
 
-ShapeObject::ShapeObject() { }
-
-ShapeObject::ShapeObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body) {
-	this->shape = std::move(shape);
+BoxObject::BoxObject(std::unique_ptr<sf::RectangleShape> shape, b2Body* rigid_body) {
+	this->rect_shape = std::move(shape);
 	this->rigid_body = rigid_body;
 }
 
-void ShapeObject::setVisualPosition(const sf::Vector2f& pos) {
-	shape->setPosition(pos);
+sf::Drawable* BoxObject::getDrawable() {
+	return rect_shape.get();
 }
 
-void ShapeObject::setVisualRotation(float angle) {
-	shape->setRotation(angle);
+sf::Transformable* BoxObject::getTransformable() {
+	return rect_shape.get();
 }
-
-sf::Drawable* ShapeObject::getDrawable() {
-	return shape.get();
-}
-
-BoxObject::BoxObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body)
-	: ShapeObject(std::move(shape), rigid_body) { }
 
 BallObject::BallObject(std::unique_ptr<CircleNotchShape> shape, b2Body* rigid_body) {
 	this->circle_notch_shape = std::move(shape);
 	this->rigid_body = rigid_body;
 }
 
-void BallObject::setVisualPosition(const sf::Vector2f& pos) {
-	circle_notch_shape->setPosition(pos);
-}
-
-void BallObject::setVisualRotation(float angle) {
-	circle_notch_shape->setRotation(angle);
-}
-
 sf::Drawable* BallObject::getDrawable() {
+	return circle_notch_shape.get();
+}
+
+sf::Transformable* BallObject::getTransformable() {
 	return circle_notch_shape.get();
 }
 
@@ -175,10 +170,18 @@ CarObject::CarObject(
 	std::vector<GameObject*> wheels,
 	std::vector<b2RevoluteJoint*> wheel_joints
 ) {
-	this->shape = std::move(shape);
+	this->convex_shape = std::move(shape);
 	this->rigid_body = rigid_body;
 	this->children = wheels;
 	this->wheel_joints = wheel_joints;
+}
+
+sf::Drawable* CarObject::getDrawable() {
+	return convex_shape.get();
+}
+
+sf::Transformable* CarObject::getTransformable() {
+	return convex_shape.get();
 }
 
 CircleNotchShape::CircleNotchShape(float radius, int point_count, int notch_segment_count) {
@@ -250,12 +253,8 @@ sf::Drawable* GroundObject::getDrawable() {
 	return line_strip_shape.get();
 }
 
-void GroundObject::setVisualPosition(const sf::Vector2f& pos) {
-	line_strip_shape->setPosition(pos);
-}
-
-void GroundObject::setVisualRotation(float angle) {
-	line_strip_shape->setRotation(angle);
+sf::Transformable* GroundObject::getTransformable() {
+	return line_strip_shape.get();
 }
 
 std::vector<b2Vec2> GroundObject::getVertices() {
