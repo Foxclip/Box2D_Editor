@@ -88,10 +88,10 @@ void Application::init_objects() {
     //std::vector<GameObject*> boxes = { box0 };
     for (int i = 0; i < dynamic_objects.size(); i++) {
         GameObject* box = dynamic_objects[i];
-        box->SetType(b2_dynamicBody, false);
-        box->SetDensity(1.0f, false);
-        box->SetFriction(0.3f, false);
-        box->SetRestitution(0.5f, false);
+        box->setType(b2_dynamicBody, false);
+        box->setDensity(1.0f, false);
+        box->setFriction(0.3f, false);
+        box->setRestitution(0.5f, false);
     }
     //b2DistanceJointDef distance_joint_def;
     //distance_joint_def.Initialize(box1->rigid_body, box2->rigid_body, box1->rigid_body->GetWorldCenter(), box2->rigid_body->GetWorldCenter());
@@ -100,10 +100,10 @@ void Application::init_objects() {
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
     std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
     GameObject* car = create_car(b2Vec2(0.0f, 10.0f), lengths, wheels, sf::Color::Red);
-    car->SetType(b2_dynamicBody, false);
-    car->SetDensity(1.0f, false);
-    car->SetFriction(0.3f, false);
-    car->SetRestitution(0.5f, false);
+    car->setType(b2_dynamicBody, false);
+    car->setDensity(1.0f, false);
+    car->setFriction(0.3f, false);
+    car->setRestitution(0.5f, false);
 }
 
 void Application::main_loop() {
@@ -148,7 +148,7 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::Num8: try_select_tool(7); break;
             case sf::Keyboard::Num9: try_select_tool(8); break;
             case sf::Keyboard::Num0: try_select_tool(9); break;
-            case sf::Keyboard::X: ground->try_delete_vertex(edit_tool.highlighted_vertex); break;
+            case sf::Keyboard::X: ground->tryDeleteVertex(edit_tool.highlighted_vertex); break;
             case sf::Keyboard::LShift: edit_tool.mode = EditTool::ADD; break;
             case sf::Keyboard::LControl: edit_tool.mode = EditTool::INSERT; break;
         }
@@ -182,11 +182,11 @@ void Application::process_mouse_event(sf::Event event) {
                 edit_tool.grabbed_vertex = -1;
                 if (move_tool.object) {
                     //TODO: remember state for all children
-                    move_tool.object->SetEnabled(move_tool.object_was_enabled, true);
+                    move_tool.object->setEnabled(move_tool.object_was_enabled, true);
                 }
                 move_tool.object = nullptr;
                 if (rotate_tool.object) {
-                    rotate_tool.object->SetEnabled(rotate_tool.object_was_enabled, true);
+                    rotate_tool.object->setEnabled(rotate_tool.object_was_enabled, true);
                 }
                 rotate_tool.object = nullptr;
                 if (drag_tool.mouse_joint) {
@@ -219,15 +219,15 @@ void Application::process_mouse() {
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         if (edit_tool.grabbed_vertex != -1) {
-            ground->move_vertex(edit_tool.grabbed_vertex, b2MousePosWorld);
+            ground->moveVertex(edit_tool.grabbed_vertex, b2MousePosWorld);
         }
         if (move_tool.object) {
-            move_tool.object->SetPosition(b2MousePosWorld - move_tool.offset, true);
+            move_tool.object->setPosition(b2MousePosWorld - move_tool.offset, true);
         }
         if (rotate_tool.object) {
             b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.object->rigid_body->GetPosition();
             float angle = atan2(mouse_vector.y, mouse_vector.x);
-            rotate_tool.object->SetAngle(angle - rotate_tool.angle_offset, true);
+            rotate_tool.object->setAngle(angle - rotate_tool.angle_offset, true);
         }
         if (drag_tool.mouse_joint) {
             drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
@@ -269,9 +269,9 @@ void Application::process_left_click() {
             GameObject* gameobject = reinterpret_cast<GameObject*>(body->GetUserData().pointer);
             move_tool.object_was_enabled = body->IsEnabled();
             move_tool.offset = b2MousePosWorld - body->GetPosition();
-            gameobject->SetEnabled(false, true);
-            gameobject->SetLinearVelocity(b2Vec2(0.0f, 0.0f), true);
-            gameobject->SetAngularVelocity(0.0f, true);
+            gameobject->setEnabled(false, true);
+            gameobject->setLinearVelocity(b2Vec2(0.0f, 0.0f), true);
+            gameobject->setAngularVelocity(0.0f, true);
             move_tool.object = gameobject;
         }
     } else if (selected_tool->name == "rotate") {
@@ -283,19 +283,19 @@ void Application::process_left_click() {
             b2Vec2 mouse_vector = b2MousePosWorld - body->GetPosition();
             float mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
             rotate_tool.angle_offset = mouse_angle - body->GetAngle();
-            gameobject->SetEnabled(false, true);
-            gameobject->SetAngularVelocity(0.0f, true);
+            gameobject->setEnabled(false, true);
+            gameobject->setAngularVelocity(0.0f, true);
             rotate_tool.object = gameobject;
         }
     } else if (selected_tool->name == "edit") {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             if (edit_tool.edge_vertex == 0) {
-                ground->add_vertex(0, b2MousePosWorld);
+                ground->addVertex(0, b2MousePosWorld);
             } else if (edit_tool.edge_vertex > 0) {
-                ground->add_vertex(edit_tool.edge_vertex + 1, b2MousePosWorld);
+                ground->addVertex(edit_tool.edge_vertex + 1, b2MousePosWorld);
             }
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
-            ground->add_vertex(edit_tool.highlighted_edge + 1, b2MousePosWorld);
+            ground->addVertex(edit_tool.highlighted_edge + 1, b2MousePosWorld);
         } else if (edit_tool.mode == EditTool::MOVE) {
             edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
         }
@@ -322,8 +322,8 @@ void Application::render_world() {
 
     for (int i = 0; i < game_objects.size(); i++) {
         GameObject* object = game_objects[i].get();
-        object->UpdateVisual();
-        window->draw(*object->GetDrawable());
+        object->updateVisual();
+        window->draw(*object->getDrawable());
     }
 
     if (drag_tool.mouse_joint) {
@@ -643,10 +643,10 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
             b2Vec2 anchor_pos = vertices[1];
             b2Vec2 anchor_pos_world = pos + anchor_pos;
             GameObject* wheel = create_ball(anchor_pos_world, wheels[i], sf::Color::Yellow, sf::Color(64, 64, 0));
-            wheel->SetType(b2_dynamicBody, false);
-            wheel->SetDensity(1.0f, false);
-            wheel->SetFriction(0.3f, false);
-            wheel->SetRestitution(0.5f, false);
+            wheel->setType(b2_dynamicBody, false);
+            wheel->setDensity(1.0f, false);
+            wheel->setFriction(0.3f, false);
+            wheel->setRestitution(0.5f, false);
             wheel_objects.push_back(wheel);
             b2RevoluteJointDef wheel_joint_def;
             wheel_joint_def.Initialize(body, wheel->rigid_body, anchor_pos_world);

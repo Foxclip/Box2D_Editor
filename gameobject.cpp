@@ -9,33 +9,33 @@ const auto to2f = utils::to2f;
 
 GameObject::GameObject() { }
 
-void GameObject::UpdateVisual() {
+void GameObject::updateVisual() {
 	b2Vec2 position = rigid_body->GetPosition();
 	float angle = rigid_body->GetAngle();
-	SetVisualPosition(tosf(position));
-	SetVisualRotation(utils::to_degrees(angle));
+	setVisualPosition(tosf(position));
+	setVisualRotation(utils::to_degrees(angle));
 }
 
-void GameObject::SetEnabled(bool enabled, bool include_children) {
+void GameObject::setEnabled(bool enabled, bool include_children) {
 	rigid_body->SetEnabled(enabled);
 	if (include_children) {
 		for (int i = 0; i < children.size(); i++) {
-			children[i]->SetEnabled(enabled, true);
+			children[i]->setEnabled(enabled, true);
 		}
 	}
 }
 
-void GameObject::SetPosition(const b2Vec2& pos, bool move_children) {
+void GameObject::setPosition(const b2Vec2& pos, bool move_children) {
 	b2Vec2 offset = pos - rigid_body->GetPosition();
 	rigid_body->SetTransform(pos, rigid_body->GetAngle());
 	if (move_children) {
 		for (int i = 0; i < children.size(); i++) {
-			children[i]->SetPosition(children[i]->rigid_body->GetPosition() + offset, true);
+			children[i]->setPosition(children[i]->rigid_body->GetPosition() + offset, true);
 		}
 	}
 }
 
-void GameObject::SetAngle(float angle, bool rotate_children) {
+void GameObject::setAngle(float angle, bool rotate_children) {
 	float angle_offset = angle - rigid_body->GetAngle();
 	rigid_body->SetTransform(rigid_body->GetPosition(), angle);
 	if (rotate_children) {
@@ -49,68 +49,68 @@ void GameObject::SetAngle(float angle, bool rotate_children) {
 			float new_y = sin(new_child_angle) * radius;
 			b2Vec2 new_rel_pos = b2Vec2(new_x, new_y);
 			b2Vec2 new_pos = rigid_body->GetPosition() + new_rel_pos;
-			children[i]->SetPosition(new_pos, true);
-			children[i]->SetAngle(children[i]->rigid_body->GetAngle() + angle_offset, true);
+			children[i]->setPosition(new_pos, true);
+			children[i]->setAngle(children[i]->rigid_body->GetAngle() + angle_offset, true);
 		}
 	}
 }
 
-void GameObject::SetLinearVelocity(const b2Vec2& velocity, bool include_children) {
+void GameObject::setLinearVelocity(const b2Vec2& velocity, bool include_children) {
 	rigid_body->SetLinearVelocity(velocity);
 	if (include_children) {
 		for (int i = 0; i < children.size(); i++) {
-			children[i]->SetLinearVelocity(velocity, true);
+			children[i]->setLinearVelocity(velocity, true);
 		}
 	}
 }
 
-void GameObject::SetAngularVelocity(float velocity, bool include_children) {
+void GameObject::setAngularVelocity(float velocity, bool include_children) {
 	rigid_body->SetAngularVelocity(velocity);
 	if (include_children) {
 		for (int i = 0; i < children.size(); i++) {
-			children[i]->SetAngularVelocity(velocity, true);
+			children[i]->setAngularVelocity(velocity, true);
 		}
 	}
 }
 
-void GameObject::SetType(b2BodyType type, bool include_children) {
+void GameObject::setType(b2BodyType type, bool include_children) {
 	rigid_body->SetType(type);
 	if (include_children) {
 		for (int i = 0; i < children.size(); i++) {
-			children[i]->SetType(type, true);
+			children[i]->setType(type, true);
 		}
 	}
 }
 
-void GameObject::SetDensity(float density, bool include_children) {
+void GameObject::setDensity(float density, bool include_children) {
 	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
 		fixture->SetDensity(density);
 	}
 	if (include_children) {
 		for (int i = 0; i < children.size(); i++) {
-			children[i]->SetDensity(density, true);
+			children[i]->setDensity(density, true);
 		}
 	}
 }
 
-void GameObject::SetFriction(float friction, bool include_children) {
+void GameObject::setFriction(float friction, bool include_children) {
 	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
 		fixture->SetFriction(friction);
 	}
 	if (include_children) {
 		for (int i = 0; i < children.size(); i++) {
-			children[i]->SetFriction(friction, true);
+			children[i]->setFriction(friction, true);
 		}
 	}
 }
 
-void GameObject::SetRestitution(float restitution, bool include_children) {
+void GameObject::setRestitution(float restitution, bool include_children) {
 	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
 		fixture->SetRestitution(restitution);
 	}
 	if (include_children) {
 		for (int i = 0; i < children.size(); i++) {
-			children[i]->SetRestitution(restitution, true);
+			children[i]->setRestitution(restitution, true);
 		}
 	}
 }
@@ -122,15 +122,15 @@ ShapeObject::ShapeObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body) {
 	this->rigid_body = rigid_body;
 }
 
-void ShapeObject::SetVisualPosition(const sf::Vector2f& pos) {
+void ShapeObject::setVisualPosition(const sf::Vector2f& pos) {
 	shape->setPosition(pos);
 }
 
-void ShapeObject::SetVisualRotation(float angle) {
+void ShapeObject::setVisualRotation(float angle) {
 	shape->setRotation(angle);
 }
 
-sf::Drawable* ShapeObject::GetDrawable() {
+sf::Drawable* ShapeObject::getDrawable() {
 	return shape.get();
 }
 
@@ -142,15 +142,15 @@ BallObject::BallObject(std::unique_ptr<CircleNotchShape> shape, b2Body* rigid_bo
 	this->rigid_body = rigid_body;
 }
 
-void BallObject::SetVisualPosition(const sf::Vector2f& pos) {
+void BallObject::setVisualPosition(const sf::Vector2f& pos) {
 	circle_notch_shape->setPosition(pos);
 }
 
-void BallObject::SetVisualRotation(float angle) {
+void BallObject::setVisualRotation(float angle) {
 	circle_notch_shape->setRotation(angle);
 }
 
-sf::Drawable* BallObject::GetDrawable() {
+sf::Drawable* BallObject::getDrawable() {
 	return circle_notch_shape.get();
 }
 
@@ -222,43 +222,43 @@ GroundObject::GroundObject(std::unique_ptr<LineStripShape> shape, b2Body* rigid_
 	this->rigid_body = rigid_body;
 }
 
-void GroundObject::move_vertex(int index, const b2Vec2& new_pos) {
-	std::vector<b2Vec2> vertices = get_vertices();
+void GroundObject::moveVertex(int index, const b2Vec2& new_pos) {
+	std::vector<b2Vec2> vertices = getVertices();
 	vertices[index] = new_pos;
-	set_vertices(vertices);
+	setVertices(vertices);
 }
 
-void GroundObject::try_delete_vertex(int index) {
+void GroundObject::tryDeleteVertex(int index) {
 	if (index < 0) {
 		return;
 	}
-	std::vector<b2Vec2> vertices = get_vertices();
+	std::vector<b2Vec2> vertices = getVertices();
 	if (vertices.size() <= 2) {
 		return;
 	}
 	vertices.erase(vertices.begin() + index);
-	set_vertices(vertices);
+	setVertices(vertices);
 }
 
-void GroundObject::add_vertex(int index, const b2Vec2& pos) {
-	std::vector<b2Vec2> vertices = get_vertices();
+void GroundObject::addVertex(int index, const b2Vec2& pos) {
+	std::vector<b2Vec2> vertices = getVertices();
 	vertices.insert(vertices.begin() + index, pos);
-	set_vertices(vertices);
+	setVertices(vertices);
 }
 
-sf::Drawable* GroundObject::GetDrawable() {
+sf::Drawable* GroundObject::getDrawable() {
 	return line_strip_shape.get();
 }
 
-void GroundObject::SetVisualPosition(const sf::Vector2f& pos) {
+void GroundObject::setVisualPosition(const sf::Vector2f& pos) {
 	line_strip_shape->setPosition(pos);
 }
 
-void GroundObject::SetVisualRotation(float angle) {
+void GroundObject::setVisualRotation(float angle) {
 	line_strip_shape->setRotation(angle);
 }
 
-std::vector<b2Vec2> GroundObject::get_vertices() {
+std::vector<b2Vec2> GroundObject::getVertices() {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
 	b2ChainShape* chain = static_cast<b2ChainShape*>(fixture->GetShape());
 	std::vector<b2Vec2> vertices;
@@ -266,7 +266,7 @@ std::vector<b2Vec2> GroundObject::get_vertices() {
 	return vertices;
 }
 
-void GroundObject::set_vertices(const std::vector<b2Vec2>& vertices) {
+void GroundObject::setVertices(const std::vector<b2Vec2>& vertices) {
 	b2Fixture* old_fixture = rigid_body->GetFixtureList();
 	rigid_body->DestroyFixture(old_fixture);
 	b2ChainShape new_chain;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gameobject.h"
+#include "gameobject.h" // keep above windows imports
 #include <Windows.h>
 #include <winuser.h>
 

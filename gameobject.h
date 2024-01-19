@@ -29,19 +29,19 @@ public:
 	std::vector<GameObject*> children;
 
 	GameObject();
-	virtual sf::Drawable* GetDrawable() = 0;
-	void UpdateVisual();
-	virtual void SetVisualPosition(const sf::Vector2f& pos) = 0;
-	virtual void SetVisualRotation(float angle) = 0;
-	void SetEnabled(bool enabled, bool include_children);
-	void SetPosition(const b2Vec2& pos, bool move_children);
-	void SetAngle(float angle, bool rotate_children);
-	void SetLinearVelocity(const b2Vec2& velocity, bool include_children);
-	void SetAngularVelocity(float velocity, bool include_children);
-	void SetType(b2BodyType type, bool include_children);
-	void SetDensity(float density, bool include_children);
-	void SetFriction(float friction, bool include_children);
-	void SetRestitution(float restitution, bool include_children);
+	virtual sf::Drawable* getDrawable() = 0;
+	void updateVisual();
+	virtual void setVisualPosition(const sf::Vector2f& pos) = 0;
+	virtual void setVisualRotation(float angle) = 0;
+	void setEnabled(bool enabled, bool include_children);
+	void setPosition(const b2Vec2& pos, bool move_children);
+	void setAngle(float angle, bool rotate_children);
+	void setLinearVelocity(const b2Vec2& velocity, bool include_children);
+	void setAngularVelocity(float velocity, bool include_children);
+	void setType(b2BodyType type, bool include_children);
+	void setDensity(float density, bool include_children);
+	void setFriction(float friction, bool include_children);
+	void setRestitution(float restitution, bool include_children);
 
 private:
 
@@ -51,9 +51,9 @@ class ShapeObject : public GameObject {
 public:
 	ShapeObject();
 	ShapeObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body);
-	void SetVisualPosition(const sf::Vector2f& pos);
-	void SetVisualRotation(float angle);
-	sf::Drawable* GetDrawable();
+	void setVisualPosition(const sf::Vector2f& pos);
+	void setVisualRotation(float angle);
+	sf::Drawable* getDrawable();
 protected:
 	std::unique_ptr<sf::Shape> shape;
 };
@@ -66,9 +66,9 @@ public:
 class BallObject : public GameObject {
 public:
 	BallObject(std::unique_ptr<CircleNotchShape> shape, b2Body* rigid_body);
-	void SetVisualPosition(const sf::Vector2f& pos);
-	void SetVisualRotation(float angle);
-	sf::Drawable* GetDrawable();
+	void setVisualPosition(const sf::Vector2f& pos);
+	void setVisualRotation(float angle);
+	sf::Drawable* getDrawable();
 private:
 	std::unique_ptr<CircleNotchShape> circle_notch_shape;
 };
@@ -88,15 +88,15 @@ private:
 class GroundObject : public GameObject {
 public:
 	GroundObject(std::unique_ptr<LineStripShape> shape, b2Body* rigid_body);
-	void move_vertex(int index, const b2Vec2& new_pos);
-	void try_delete_vertex(int index);
-	void add_vertex(int index, const b2Vec2& pos);
-	void SetVisualPosition(const sf::Vector2f& pos);
-	void SetVisualRotation(float angle);
-	sf::Drawable* GetDrawable();
+	void moveVertex(int index, const b2Vec2& new_pos);
+	void tryDeleteVertex(int index);
+	void addVertex(int index, const b2Vec2& pos);
+	void setVisualPosition(const sf::Vector2f& pos);
+	void setVisualRotation(float angle);
+	sf::Drawable* getDrawable();
 private:
 	std::unique_ptr<LineStripShape> line_strip_shape;
-	std::vector<b2Vec2> get_vertices();
-	void set_vertices(const std::vector<b2Vec2>& vertices);
+	std::vector<b2Vec2> getVertices();
+	void setVertices(const std::vector<b2Vec2>& vertices);
 };
 

@@ -14,8 +14,8 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
-    //TODO: edit mode box selection
     //TODO: save/load levels to file
+    //TODO: edit mode box selection
     //TODO: create/delete objects in the scene
 
     return 0;
