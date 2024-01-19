@@ -77,4 +77,15 @@ namespace utils {
 		}
 	}
 
+	void str_to_file(std::string str, std::string path) {
+		std::ofstream ofstream(path);
+		if (ofstream.is_open()) {
+			ofstream << str;
+		} else {
+			std::string p(path);
+			p.resize(FILENAME_MAX);
+			throw std::runtime_error("File write error: " + p);
+		}
+	}
+
 }

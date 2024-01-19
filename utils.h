@@ -3,6 +3,8 @@
 #include <utility>
 #include <SFML/Graphics.hpp>
 #include "box2d/box2d.h"
+#include <fstream>
+#include <filesystem>
 
 namespace utils {
 
@@ -19,6 +21,7 @@ namespace utils {
 	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point);
 	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point);
 	std::string body_type_to_str(b2BodyType type);
+	void str_to_file(std::string str, std::string path);
 
 	template <typename T>
 	T rot90CCW(const T& vec) {

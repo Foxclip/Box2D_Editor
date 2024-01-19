@@ -22,9 +22,6 @@ void Application::init() {
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
-
-    std::cout << serialize() << "\n";
-
     assert(selected_tool);
 }
 
@@ -149,6 +146,11 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::X: ground->tryDeleteVertex(edit_tool.highlighted_vertex); break;
             case sf::Keyboard::LShift: edit_tool.mode = EditTool::ADD; break;
             case sf::Keyboard::LControl: edit_tool.mode = EditTool::INSERT; break;
+            case sf::Keyboard::S:
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
+                    save();
+                }
+                break;
         }
     }
     if (event.type == sf::Event::KeyReleased) {
@@ -448,6 +450,11 @@ std::string Application::serialize() {
         }
     }
     return str;
+}
+
+void Application::save() {
+    std::string str = serialize();
+    utils::str_to_file(str, "level.txt");
 }
 
 Tool* Application::try_select_tool(int index) {
