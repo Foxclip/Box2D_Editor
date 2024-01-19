@@ -25,16 +25,15 @@ private:
 
 class GameObject {
 public:
-	b2Vec2 position = b2Vec2(0.0f, 0.0f);
-	float angle = 0.0f;
-	std::unique_ptr<sf::Drawable> drawable;
-	sf::Transformable* transformable = nullptr;
 	b2Body* rigid_body = nullptr;
 	std::vector<GameObject*> children;
 
 	GameObject();
-	GameObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body);
+	virtual sf::Drawable* GetDrawable() = 0;
+	virtual std::string Serialize();
 	void UpdateVisual();
+	virtual void SetVisualPosition(const sf::Vector2f& pos) = 0;
+	virtual void SetVisualRotation(float angle) = 0;
 	void SetEnabled(bool enabled, bool include_children);
 	void SetPosition(const b2Vec2& pos, bool move_children);
 	void SetAngle(float angle, bool rotate_children);
@@ -49,10 +48,25 @@ private:
 
 };
 
-class CarObject : public GameObject {
+class SimpleObject : public GameObject {
+public:
+	SimpleObject();
+	SimpleObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body);
+	void SetVisualPosition(const sf::Vector2f& pos);
+	void SetVisualRotation(float angle);
+	sf::Drawable* GetDrawable();
+protected:
+	std::unique_ptr<sf::Shape> shape;
+};
+
+class BoxObject : public SimpleObject { };
+
+class BallObject : public SimpleObject { };
+
+class CarObject : public SimpleObject {
 public:
 	CarObject(
-		std::unique_ptr<sf::Drawable> drawable,
+		std::unique_ptr<sf::ConvexShape> shape,
 		b2Body* rigid_body,
 		std::vector<GameObject*> wheels,
 		std::vector<b2RevoluteJoint*> wheel_joints
@@ -63,11 +77,13 @@ private:
 
 class GroundObject : public GameObject {
 public:
-	GroundObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body);
+	GroundObject(std::unique_ptr<LineStripShape> shape, b2Body* rigid_body);
 	void move_vertex(int index, const b2Vec2& new_pos);
 	void try_delete_vertex(int index);
 	void add_vertex(int index, const b2Vec2& pos);
+	sf::Drawable* GetDrawable();
 private:
+	std::unique_ptr<LineStripShape> line_strip_shape;
 	std::vector<b2Vec2> get_vertices();
 	void set_vertices(const std::vector<b2Vec2>& vertices);
 };

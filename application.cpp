@@ -323,7 +323,7 @@ void Application::render_world() {
     for (int i = 0; i < game_objects.size(); i++) {
         GameObject* object = game_objects[i].get();
         object->UpdateVisual();
-        window->draw(*object->drawable.get());
+        window->draw(*object->GetDrawable());
     }
 
     if (drag_tool.mouse_joint) {
@@ -435,6 +435,15 @@ void Application::render_ui() {
 void Application::maximize_window() {
     sf::WindowHandle windowHandle = window->getSystemHandle();
     ShowWindow(windowHandle, SW_MAXIMIZE);
+}
+
+std::string Application::serialize() {
+    std::string result;
+    for (int i = 0; i < game_objects.size(); i++) {
+        result += game_objects[i]->Serialize();
+        result += "\n";
+    }
+    return result;
 }
 
 Tool* Application::try_select_tool(int index) {
@@ -581,7 +590,7 @@ void Application::draw_line(const sf::Vector2f& v1, const sf::Vector2f& v2, cons
     window->draw(line_primitive);
 }
 
-GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
+BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
     b2BodyDef bodyDef;
     bodyDef.position = pos;
     bodyDef.angle = angle;
@@ -592,14 +601,14 @@ GameObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Co
     std::unique_ptr<sf::Shape> shape = std::make_unique<sf::RectangleShape>(tosf(size));
     shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
     shape->setFillColor(color);
-    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(shape), body);
-    GameObject* ptr = uptr.get();
+    std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(std::move(shape), body);
+    BoxObject* ptr = uptr.get();
     body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
     return ptr;
 }
 
-GameObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color) {
+BallObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color) {
     b2BodyDef bodyDef;
     bodyDef.position = pos;
     b2Body* body = world->CreateBody(&bodyDef);
@@ -609,8 +618,8 @@ GameObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, 
     std::unique_ptr<CircleNotchShape> circle_notch_shape = std::make_unique<CircleNotchShape>(radius, 30, 4);
     circle_notch_shape->setCircleColor(color);
     circle_notch_shape->setNotchColor(notch_color);
-    std::unique_ptr<GameObject> uptr = std::make_unique<GameObject>(std::move(circle_notch_shape), body);
-    GameObject* ptr = uptr.get();
+    std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(std::move(circle_notch_shape), body);
+    BallObject* ptr = uptr.get();
     body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
     return ptr;
@@ -661,7 +670,6 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
 
     shape->setFillColor(color);
     std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(std::move(shape), body, wheel_objects, wheel_joints);
-    uptr->position = pos;
     CarObject* ptr = uptr.get();
     body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));

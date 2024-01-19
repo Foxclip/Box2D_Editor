@@ -14,8 +14,9 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
-    //TODO: edit mode box selection
     //TODO: save/load levels to file
+    //TODO: name class members with CamelCase names
+    //TODO: edit mode box selection
     //TODO: create/delete objects in the scene
 
     return 0;

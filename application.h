@@ -1,8 +1,9 @@
 #pragma once
 
-#include "gameobject.h"
+#include <filesystem>
 #include <Windows.h>
 #include <winuser.h>
+#include "gameobject.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -131,6 +132,7 @@ private:
 	void render_world();
 	void render_ui();
 	void maximize_window();
+	std::string serialize();
 	Tool* try_select_tool(int index);
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);
@@ -146,8 +148,8 @@ private:
 	void get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void draw_line(const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color);
 
-	GameObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
-	GameObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
+	BoxObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
+	BallObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
 	CarObject* create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
 	GroundObject* create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color);
 

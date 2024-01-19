@@ -9,22 +9,11 @@ const auto to2f = utils::to2f;
 
 GameObject::GameObject() { }
 
-GameObject::GameObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body) {
-	this->transformable = dynamic_cast<sf::Transformable*>(drawable.get());
-	assert(this->transformable != nullptr);
-	this->drawable = std::move(drawable);
-	this->rigid_body = rigid_body;
-}
-
 void GameObject::UpdateVisual() {
-	if (rigid_body != nullptr) {
-		b2Vec2 position = rigid_body->GetPosition();
-		float angle = rigid_body->GetAngle();
-		this->position = position;
-		this->angle = angle;
-	}
-	transformable->setPosition(tosf(position));
-	transformable->setRotation(utils::to_degrees(angle));
+	b2Vec2 position = rigid_body->GetPosition();
+	float angle = rigid_body->GetAngle();
+	SetVisualPosition(tosf(position));
+	SetVisualRotation(utils::to_degrees(angle));
 }
 
 void GameObject::SetEnabled(bool enabled, bool include_children) {
@@ -126,6 +115,36 @@ void GameObject::SetRestitution(float restitution, bool include_children) {
 	}
 }
 
+std::string GameObject::Serialize() {
+	std::string result;
+	//result += "color" + col
+	//result += "position " + utils::vec_to_str(body->GetPosition());
+	//result += "angle " + utils::vec_to_str(body->GetAngle());
+	//for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+
+	//}
+	return result;
+}
+
+SimpleObject::SimpleObject() { }
+
+SimpleObject::SimpleObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body) {
+	this->shape = std::move(shape);
+	this->rigid_body = rigid_body;
+}
+
+void SimpleObject::SetVisualPosition(const sf::Vector2f& pos) {
+	shape->setPosition(pos);
+}
+
+void SimpleObject::SetVisualRotation(float angle) {
+	shape->setRotation(angle);
+}
+
+sf::Drawable* SimpleObject::GetDrawable() {
+	return shape.get();
+}
+
 LineStripShape::LineStripShape(sf::VertexArray& varray) {
 	this->varray = varray;
 }
@@ -142,14 +161,12 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 }
 
 CarObject::CarObject(
-	std::unique_ptr<sf::Drawable> drawable,
+	std::unique_ptr<sf::ConvexShape> shape,
 	b2Body* rigid_body,
 	std::vector<GameObject*> wheels,
 	std::vector<b2RevoluteJoint*> wheel_joints
 ) {
-	this->transformable = dynamic_cast<sf::Transformable*>(drawable.get());
-	assert(this->transformable != nullptr);
-	this->drawable = std::move(drawable);
+	this->shape = std::move(shape);
 	this->rigid_body = rigid_body;
 	this->children = wheels;
 	this->wheel_joints = wheel_joints;
@@ -191,10 +208,8 @@ void CircleNotchShape::draw(sf::RenderTarget& target, sf::RenderStates states) c
 	target.draw(varray_notch, states);
 }
 
-GroundObject::GroundObject(std::unique_ptr<sf::Drawable> drawable, b2Body* rigid_body) {
-	this->transformable = dynamic_cast<sf::Transformable*>(drawable.get());
-	assert(this->transformable != nullptr);
-	this->drawable = std::move(drawable);
+GroundObject::GroundObject(std::unique_ptr<LineStripShape> shape, b2Body* rigid_body) {
+	this->line_strip_shape = std::move(shape);
 	this->rigid_body = rigid_body;
 }
 
@@ -222,6 +237,10 @@ void GroundObject::add_vertex(int index, const b2Vec2& pos) {
 	set_vertices(vertices);
 }
 
+sf::Drawable* GroundObject::GetDrawable() {
+	return line_strip_shape.get();
+}
+
 std::vector<b2Vec2> GroundObject::get_vertices() {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
 	b2ChainShape* chain = static_cast<b2ChainShape*>(fixture->GetShape());
@@ -236,9 +255,8 @@ void GroundObject::set_vertices(const std::vector<b2Vec2>& vertices) {
 	b2ChainShape new_chain;
 	new_chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
 	b2Fixture* new_fixture = rigid_body->CreateFixture(&new_chain, 1.0f);
-	LineStripShape* visual = static_cast<LineStripShape*>(drawable.get());
-	visual->varray = sf::VertexArray(sf::LinesStrip, vertices.size());
+	line_strip_shape->varray = sf::VertexArray(sf::LinesStrip, vertices.size());
 	for (int i = 0; i < vertices.size(); i++) {
-		visual->varray[i].position = tosf(vertices[i]);
+		line_strip_shape->varray[i].position = tosf(vertices[i]);
 	}
 }
