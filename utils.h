@@ -81,9 +81,4 @@ namespace utils {
 		return sqrt(vec.x * vec.x + vec.y * vec.y);
 	}
 
-	template <typename T>
-	std::string vec_to_str(const T& vec) {
-		return std::to_string(vec.x) + " " + std::to_string(vec.y);
-	}
-
 }

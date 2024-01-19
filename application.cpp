@@ -437,15 +437,6 @@ void Application::maximize_window() {
     ShowWindow(windowHandle, SW_MAXIMIZE);
 }
 
-std::string Application::serialize() {
-    std::string result;
-    for (int i = 0; i < game_objects.size(); i++) {
-        result += game_objects[i]->Serialize();
-        result += "\n";
-    }
-    return result;
-}
-
 Tool* Application::try_select_tool(int index) {
     if (tools.size() > index) {
         Tool* tool = tools[index];

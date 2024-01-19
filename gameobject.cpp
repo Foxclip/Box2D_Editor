@@ -115,34 +115,43 @@ void GameObject::SetRestitution(float restitution, bool include_children) {
 	}
 }
 
-std::string GameObject::Serialize() {
-	std::string result;
-	//result += "color" + col
-	//result += "position " + utils::vec_to_str(body->GetPosition());
-	//result += "angle " + utils::vec_to_str(body->GetAngle());
-	//for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+ShapeObject::ShapeObject() { }
 
-	//}
-	return result;
-}
-
-SimpleObject::SimpleObject() { }
-
-SimpleObject::SimpleObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body) {
+ShapeObject::ShapeObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body) {
 	this->shape = std::move(shape);
 	this->rigid_body = rigid_body;
 }
 
-void SimpleObject::SetVisualPosition(const sf::Vector2f& pos) {
+void ShapeObject::SetVisualPosition(const sf::Vector2f& pos) {
 	shape->setPosition(pos);
 }
 
-void SimpleObject::SetVisualRotation(float angle) {
+void ShapeObject::SetVisualRotation(float angle) {
 	shape->setRotation(angle);
 }
 
-sf::Drawable* SimpleObject::GetDrawable() {
+sf::Drawable* ShapeObject::GetDrawable() {
 	return shape.get();
+}
+
+BoxObject::BoxObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body)
+	: ShapeObject(std::move(shape), rigid_body) { }
+
+BallObject::BallObject(std::unique_ptr<CircleNotchShape> shape, b2Body* rigid_body) {
+	this->circle_notch_shape = std::move(shape);
+	this->rigid_body = rigid_body;
+}
+
+void BallObject::SetVisualPosition(const sf::Vector2f& pos) {
+	circle_notch_shape->setPosition(pos);
+}
+
+void BallObject::SetVisualRotation(float angle) {
+	circle_notch_shape->setRotation(angle);
+}
+
+sf::Drawable* BallObject::GetDrawable() {
+	return circle_notch_shape.get();
 }
 
 LineStripShape::LineStripShape(sf::VertexArray& varray) {
@@ -239,6 +248,14 @@ void GroundObject::add_vertex(int index, const b2Vec2& pos) {
 
 sf::Drawable* GroundObject::GetDrawable() {
 	return line_strip_shape.get();
+}
+
+void GroundObject::SetVisualPosition(const sf::Vector2f& pos) {
+	line_strip_shape->setPosition(pos);
+}
+
+void GroundObject::SetVisualRotation(float angle) {
+	line_strip_shape->setRotation(angle);
 }
 
 std::vector<b2Vec2> GroundObject::get_vertices() {

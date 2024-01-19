@@ -30,7 +30,6 @@ public:
 
 	GameObject();
 	virtual sf::Drawable* GetDrawable() = 0;
-	virtual std::string Serialize();
 	void UpdateVisual();
 	virtual void SetVisualPosition(const sf::Vector2f& pos) = 0;
 	virtual void SetVisualRotation(float angle) = 0;
@@ -48,10 +47,10 @@ private:
 
 };
 
-class SimpleObject : public GameObject {
+class ShapeObject : public GameObject {
 public:
-	SimpleObject();
-	SimpleObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body);
+	ShapeObject();
+	ShapeObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body);
 	void SetVisualPosition(const sf::Vector2f& pos);
 	void SetVisualRotation(float angle);
 	sf::Drawable* GetDrawable();
@@ -59,11 +58,22 @@ protected:
 	std::unique_ptr<sf::Shape> shape;
 };
 
-class BoxObject : public SimpleObject { };
+class BoxObject : public ShapeObject {
+public:
+	BoxObject(std::unique_ptr<sf::Shape> shape, b2Body* rigid_body);
+};
 
-class BallObject : public SimpleObject { };
+class BallObject : public GameObject {
+public:
+	BallObject(std::unique_ptr<CircleNotchShape> shape, b2Body* rigid_body);
+	void SetVisualPosition(const sf::Vector2f& pos);
+	void SetVisualRotation(float angle);
+	sf::Drawable* GetDrawable();
+private:
+	std::unique_ptr<CircleNotchShape> circle_notch_shape;
+};
 
-class CarObject : public SimpleObject {
+class CarObject : public ShapeObject {
 public:
 	CarObject(
 		std::unique_ptr<sf::ConvexShape> shape,
@@ -81,6 +91,8 @@ public:
 	void move_vertex(int index, const b2Vec2& new_pos);
 	void try_delete_vertex(int index);
 	void add_vertex(int index, const b2Vec2& pos);
+	void SetVisualPosition(const sf::Vector2f& pos);
+	void SetVisualRotation(float angle);
 	sf::Drawable* GetDrawable();
 private:
 	std::unique_ptr<LineStripShape> line_strip_shape;

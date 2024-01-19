@@ -1,9 +1,8 @@
 #pragma once
 
-#include <filesystem>
+#include "gameobject.h"
 #include <Windows.h>
 #include <winuser.h>
-#include "gameobject.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -132,7 +131,6 @@ private:
 	void render_world();
 	void render_ui();
 	void maximize_window();
-	std::string serialize();
 	Tool* try_select_tool(int index);
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);
