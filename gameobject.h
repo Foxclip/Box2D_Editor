@@ -27,13 +27,14 @@ class GameObject {
 public:
 	b2Body* rigid_body = nullptr;
 	std::vector<GameObject*> children;
+	GameObject* parent = nullptr;
 
 	GameObject();
 	virtual sf::Drawable* getDrawable() = 0;
 	virtual sf::Transformable* getTransformable() = 0;
 	void updateVisual();
-	virtual void setVisualPosition(const sf::Vector2f& pos);
-	virtual void setVisualRotation(float angle);
+	void setVisualPosition(const sf::Vector2f& pos);
+	void setVisualRotation(float angle);
 	void setEnabled(bool enabled, bool include_children);
 	void setPosition(const b2Vec2& pos, bool move_children);
 	void setAngle(float angle, bool rotate_children);
@@ -43,6 +44,7 @@ public:
 	void setDensity(float density, bool include_children);
 	void setFriction(float friction, bool include_children);
 	void setRestitution(float restitution, bool include_children);
+	virtual std::string serialize() = 0;
 
 private:
 
@@ -53,6 +55,8 @@ public:
 	BoxObject(std::unique_ptr<sf::RectangleShape> shape, b2Body* rigid_body);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
+	std::string serialize();
+	b2Vec2 size = b2Vec2();
 private:
 	std::unique_ptr<sf::RectangleShape> rect_shape;
 };
@@ -62,6 +66,8 @@ public:
 	BallObject(std::unique_ptr<CircleNotchShape> shape, b2Body* rigid_body);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
+	std::string serialize();
+	float radius = 0.0f;
 private:
 	std::unique_ptr<CircleNotchShape> circle_notch_shape;
 };
@@ -76,6 +82,9 @@ public:
 	);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
+	std::string serialize();
+	std::vector<float> lengths;
+	std::vector<float> wheels;
 private:
 	std::unique_ptr<sf::ConvexShape> convex_shape;
 	std::vector<b2RevoluteJoint*> wheel_joints;
@@ -89,6 +98,8 @@ public:
 	void addVertex(int index, const b2Vec2& pos);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
+	b2ChainShape* getShape();
+	std::string serialize();
 private:
 	std::unique_ptr<LineStripShape> line_strip_shape;
 	std::vector<b2Vec2> getVertices();

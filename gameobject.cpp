@@ -136,6 +136,20 @@ sf::Transformable* BoxObject::getTransformable() {
 	return rect_shape.get();
 }
 
+std::string BoxObject::serialize() {
+	std::string str;
+	b2Fixture* fixture = rigid_body->GetFixtureList();
+	str += "object box\n";
+	str += "    type " + utils::body_type_to_str(rigid_body->GetType()) + "\n";
+	str += "    size " + utils::vec_to_str(size) + "\n";
+	str += "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
+	str += "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
+	str += "    density " + std::to_string(fixture->GetDensity()) + "\n";
+	str += "    friction " + std::to_string(fixture->GetFriction()) + "\n";
+	str += "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
+	return str;
+}
+
 BallObject::BallObject(std::unique_ptr<CircleNotchShape> shape, b2Body* rigid_body) {
 	this->circle_notch_shape = std::move(shape);
 	this->rigid_body = rigid_body;
@@ -147,6 +161,20 @@ sf::Drawable* BallObject::getDrawable() {
 
 sf::Transformable* BallObject::getTransformable() {
 	return circle_notch_shape.get();
+}
+
+std::string BallObject::serialize() {
+	std::string str;
+	b2Fixture* fixture = rigid_body->GetFixtureList();
+	str += "object ball\n";
+	str += "    type " + utils::body_type_to_str(rigid_body->GetType()) + "\n";
+	str += "    radius " + std::to_string(radius) + "\n";
+	str += "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
+	str += "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
+	str += "    density " + std::to_string(fixture->GetDensity()) + "\n";
+	str += "    friction " + std::to_string(fixture->GetFriction()) + "\n";
+	str += "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
+	return str;
 }
 
 LineStripShape::LineStripShape(sf::VertexArray& varray) {
@@ -172,6 +200,9 @@ CarObject::CarObject(
 ) {
 	this->convex_shape = std::move(shape);
 	this->rigid_body = rigid_body;
+	for (int i = 0; i < wheels.size(); i++) {
+		wheels[i]->parent = this;
+	}
 	this->children = wheels;
 	this->wheel_joints = wheel_joints;
 }
@@ -182,6 +213,10 @@ sf::Drawable* CarObject::getDrawable() {
 
 sf::Transformable* CarObject::getTransformable() {
 	return convex_shape.get();
+}
+
+std::string CarObject::serialize() {
+	return std::string();
 }
 
 CircleNotchShape::CircleNotchShape(float radius, int point_count, int notch_segment_count) {
@@ -255,6 +290,28 @@ sf::Drawable* GroundObject::getDrawable() {
 
 sf::Transformable* GroundObject::getTransformable() {
 	return line_strip_shape.get();
+}
+
+b2ChainShape* GroundObject::getShape() {
+	return static_cast<b2ChainShape*>(rigid_body->GetFixtureList()->GetShape());
+}
+
+std::string GroundObject::serialize() {
+	std::string str;
+	b2Fixture* fixture = rigid_body->GetFixtureList();
+	str += "object ground\n";
+	str += "    vertices ";
+	b2ChainShape* chain = getShape();
+	for (int i = 0; i < chain->m_count; i++) {
+		str += utils::vec_to_str(chain->m_vertices[i]);
+		if (i < chain->m_count - 1) {
+			str += " ";
+		}
+	}
+	str += "\n";
+	str += "    friction " + std::to_string(fixture->GetFriction()) + "\n";
+	str += "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
+	return str;
 }
 
 std::vector<b2Vec2> GroundObject::getVertices() {

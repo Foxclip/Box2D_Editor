@@ -18,6 +18,7 @@ namespace utils {
 	void set_origin_to_center_bounds(sf::Text& text);
 	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point);
 	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point);
+	std::string body_type_to_str(b2BodyType type);
 
 	template <typename T>
 	T rot90CCW(const T& vec) {
@@ -79,6 +80,11 @@ namespace utils {
 	template <typename T>
 	float get_length(const T& vec) {
 		return sqrt(vec.x * vec.x + vec.y * vec.y);
+	}
+
+	template <typename T>
+	std::string vec_to_str(const T& vec) {
+		return std::to_string(vec.x) + " " + std::to_string(vec.y);
 	}
 
 }

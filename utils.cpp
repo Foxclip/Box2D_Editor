@@ -69,4 +69,12 @@ namespace utils {
 		return contains_point(shape.getGlobalBounds(), point);
 	}
 
+	std::string body_type_to_str(b2BodyType type) {
+		switch (type) {
+			case b2_staticBody: return "static";
+			case b2_kinematicBody: return "kinematic";
+			case b2_dynamicBody: return "dynamic";
+		}
+	}
+
 }

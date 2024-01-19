@@ -22,6 +22,9 @@ void Application::init() {
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
+
+    std::cout << serialize() << "\n";
+
     assert(selected_tool);
 }
 
@@ -340,7 +343,7 @@ void Application::render_ui() {
     if (selected_tool->name == "edit") {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             // ghost edge
-            sf::Vector2i v1 = world_to_screen(get_ground_shape()->m_vertices[edit_tool.edge_vertex]);
+            sf::Vector2i v1 = world_to_screen(ground->getShape()->m_vertices[edit_tool.edge_vertex]);
             sf::Vector2i v2 = mousePos;
             draw_line(to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
             // ghost edge normal
@@ -358,8 +361,8 @@ void Application::render_ui() {
             window->draw(edit_tool.vertex_rect);
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
             // edge highlight
-            b2Vec2 v1 = get_ground_shape()->m_vertices[edit_tool.highlighted_edge];
-            b2Vec2 v2 = get_ground_shape()->m_vertices[edit_tool.highlighted_edge + 1];
+            b2Vec2 v1 = ground->getShape()->m_vertices[edit_tool.highlighted_edge];
+            b2Vec2 v2 = ground->getShape()->m_vertices[edit_tool.highlighted_edge + 1];
             sf::Vector2f v1_screen = world_to_screenf(v1);
             sf::Vector2f v2_screen = world_to_screenf(v2);
             sf::Vector2f vec = v2_screen - v1_screen;
@@ -375,7 +378,7 @@ void Application::render_ui() {
             window->draw(edit_tool.vertex_rect);
         }
         // ground vertices
-        b2ChainShape* chain = get_ground_shape();
+        b2ChainShape* chain = ground->getShape();
         for (int i = 0; i < chain->m_count; i++) {
             edit_tool.vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]));
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0));
@@ -389,7 +392,7 @@ void Application::render_ui() {
         }
         if (edit_tool.mode == EditTool::MOVE && edit_tool.highlighted_vertex != -1) {
             // highlighted vertex
-            sf::Vector2f vertex_pos = world_to_screenf(get_ground_shape()->m_vertices[edit_tool.highlighted_vertex]);
+            sf::Vector2f vertex_pos = world_to_screenf(ground->getShape()->m_vertices[edit_tool.highlighted_vertex]);
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
             window->draw(edit_tool.vertex_highlight_rect);
         }
@@ -430,6 +433,21 @@ void Application::render_ui() {
 void Application::maximize_window() {
     sf::WindowHandle windowHandle = window->getSystemHandle();
     ShowWindow(windowHandle, SW_MAXIMIZE);
+}
+
+std::string Application::serialize() {
+    std::string str;
+    for (int i = 0; i < game_objects.size(); i++) {
+        GameObject* gameobject = game_objects[i].get();
+        if (gameobject->parent) {
+            continue;
+        }
+        str += game_objects[i]->serialize();
+        if (i < game_objects.size() - 1) {
+            str += "\n";
+        }
+    }
+    return str;
 }
 
 Tool* Application::try_select_tool(int index) {
@@ -484,12 +502,8 @@ b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
     return nullptr;
 }
 
-b2ChainShape* Application::get_ground_shape() {
-    return static_cast<b2ChainShape*>(ground->rigid_body->GetFixtureList()->GetShape());
-}
-
 int Application::mouse_get_ground_vertex() {
-    b2ChainShape* chain = get_ground_shape();
+    b2ChainShape* chain = ground->getShape();
     int closest_vertex_i = 0;
     sf::Vector2i closest_vertex_pos = world_to_screen(chain->m_vertices[0]);
     int closest_vertex_offset = utils::get_max_offset(closest_vertex_pos, mousePos);
@@ -509,7 +523,7 @@ int Application::mouse_get_ground_vertex() {
 }
 
 int Application::mouse_get_ground_edge() {
-    b2ChainShape* chain = get_ground_shape();
+    b2ChainShape* chain = ground->getShape();
     for (int i = 0; i < chain->m_count - 1; i++) {
         b2Vec2 p1 = chain->m_vertices[i];
         b2Vec2 p2 = chain->m_vertices[i + 1];
@@ -536,7 +550,7 @@ int Application::mouse_get_ground_edge() {
 }
 
 int Application::mouse_get_edge_vertex() {
-    b2ChainShape* chain = get_ground_shape();
+    b2ChainShape* chain = ground->getShape();
     int v_start_i = 0;
     int v_end_i = chain->m_count - 1;
     sf::Vector2f v_start = world_to_screenf(chain->m_vertices[v_start_i]);
@@ -588,6 +602,7 @@ BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Col
     shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
     shape->setFillColor(color);
     std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(std::move(shape), body);
+    uptr->size = size;
     BoxObject* ptr = uptr.get();
     body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
@@ -605,6 +620,7 @@ BallObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, 
     circle_notch_shape->setCircleColor(color);
     circle_notch_shape->setNotchColor(notch_color);
     std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(std::move(circle_notch_shape), body);
+    uptr->radius = radius;
     BallObject* ptr = uptr.get();
     body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
@@ -656,6 +672,8 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
 
     shape->setFillColor(color);
     std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(std::move(shape), body, wheel_objects, wheel_joints);
+    uptr->lengths = lengths;
+    uptr->wheels = wheels;
     CarObject* ptr = uptr.get();
     body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
