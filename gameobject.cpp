@@ -195,7 +195,7 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokensPointer& tp, b2World* wo
 				friction = tp.getf();
 			} else if (pname == "restitution") {
 				restitution = tp.getf();
-			} else if (pname == "object") {
+			} else if (TokensPointer::isEntityName(pname)) {
 				tp.move(-1);
 				break;
 			} else {
@@ -288,7 +288,7 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokensPointer& tp, b2World* 
 				friction = tp.getf();
 			} else if (pname == "restitution") {
 				restitution = tp.getf();
-			} else if (pname == "object") {
+			} else if (TokensPointer::isEntityName(pname)) {
 				tp.move(-1);
 				break;
 			} else {
@@ -483,7 +483,7 @@ std::unique_ptr<GroundObject> GroundObject::deserialize(TokensPointer& tp, b2Wor
 				friction = tp.getf();
 			} else if (pname == "restitution") {
 				restitution = tp.getf();
-			} else if (pname == "object") {
+			} else if (TokensPointer::isEntityName(pname)) {
 				tp.move(-1);
 				break;
 			} else {

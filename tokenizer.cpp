@@ -112,6 +112,10 @@ int TokensPointer::getLine(int offset) {
 	return peek(offset).line;
 }
 
+bool TokensPointer::isEntityName(std::string str) {
+	return str == "camera" || str == "object";
+}
+
 bool TokensPointer::isValidPos(int position) {
 	return position >= 0 && position < tokens->size();
 }

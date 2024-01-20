@@ -22,7 +22,7 @@ void Application::init() {
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
-    //load("level.txt");
+    load("level.txt");
     assert(selected_tool);
 }
 
@@ -440,6 +440,10 @@ void Application::maximize_window() {
 
 std::string Application::serialize() {
     std::string str;
+    str += "camera\n";
+    str += "    center " + std::to_string(viewCenterX) + " " + std::to_string(viewCenterY) + "\n";
+    str += "    zoom " + std::to_string(zoomFactor) + "\n";
+    str += "\n";
     for (int i = 0; i < game_objects.size(); i++) {
         GameObject* gameobject = game_objects[i].get();
         if (gameobject->parent) {
@@ -453,13 +457,37 @@ std::string Application::serialize() {
     return str;
 }
 
-void Application::deserialize(std::string str) {
+void Application::deserialize(std::string str, bool set_camera) {
     std::vector<WordToken> tokens = utils::tokenize(str);
     TokensPointer tp(&tokens);
     try {
         while (tp.valid_range()) {
             std::string entity = tp.gets();
-            if (entity == "object") {
+            if (entity == "camera") {
+                struct CameraParams {
+                    float x = 0.0f, y = 0.0f, zoom = 30.0f;
+                };
+                CameraParams params;
+                while (tp.valid_range()) {
+                    std::string pname = tp.gets();
+                    if (pname == "center") {
+                        params.x = tp.getf();
+                        params.y = tp.getf();
+                    } else if (pname == "zoom") {
+                        params.zoom = tp.getf();
+                    } else if (TokensPointer::isEntityName(pname)) {
+                        tp.move(-1);
+                        break;
+                    } else {
+                        throw std::runtime_error("Unknown camera parameter: " + pname);
+                    }
+                }
+                if (set_camera) {
+                    viewCenterX = params.x;
+                    viewCenterY = params.y;
+                    zoomFactor = params.zoom;
+                }
+            } else if (entity == "object") {
                 std::unique_ptr<GameObject> gameobject;
                 std::string type = tp.gets();
                 if (type == "box") {
@@ -493,7 +521,7 @@ void Application::load(std::string filename) {
     try {
         game_objects.clear();
         std::string str = utils::file_to_str(filename);
-        deserialize(str);
+        deserialize(str, true);
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": " + filename + ": " + std::string(exc.what()));
     }

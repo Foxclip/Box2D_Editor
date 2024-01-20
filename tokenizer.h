@@ -29,6 +29,7 @@ public:
 	bool fail();
 	void reset();
 	int getLine(int offset = 0);
+	static bool isEntityName(std::string str);
 private:
 	std::vector<WordToken>* tokens;
 	int pos;

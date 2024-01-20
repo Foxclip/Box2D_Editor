@@ -132,7 +132,7 @@ private:
 	void render_ui();
 	void maximize_window();
 	std::string serialize();
-	void deserialize(std::string str);
+	void deserialize(std::string str, bool set_camera);
 	void save(std::string filename);
 	void load(std::string filename);
 	Tool* try_select_tool(int index);
