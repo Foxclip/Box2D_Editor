@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SFML/Graphics.hpp>
+#include "box2d/box2d.h"
 #include <string>
 #include <vector>
 
@@ -17,6 +19,8 @@ public:
 	std::string gets();
 	int geti();
 	float getf();
+	sf::Color getColor();
+	b2Vec2 getb2Vec2();
 	WordToken peek(int offset);
 	void move(int offset);
 	bool eof();

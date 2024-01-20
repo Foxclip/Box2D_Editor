@@ -64,13 +64,15 @@ private:
 
 class BallObject : public GameObject {
 public:
-	BallObject(std::unique_ptr<CircleNotchShape> shape, b2Body* rigid_body);
+	BallObject(b2World* world, b2Vec2 pos, float angle, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	std::string serialize();
+	static std::unique_ptr<GameObject> deserialize(TokensPointer& tp, b2World* world);
 	float radius = 0.0f;
 private:
 	std::unique_ptr<CircleNotchShape> circle_notch_shape;
+	sf::Color notch_color;
 };
 
 class CarObject : public GameObject {

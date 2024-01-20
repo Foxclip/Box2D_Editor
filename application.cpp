@@ -464,9 +464,9 @@ void Application::deserialize(std::string str) {
                     std::unique_ptr<GameObject> gameobject;
                     std::string type = tp.gets();
                     if (type == "box") {
-                         gameobject = BoxObject::deserialize(tp, world.get());
+                        gameobject = BoxObject::deserialize(tp, world.get());
                     } else if (type == "ball") {
-                        throw std::runtime_error("Type is not supported yet: " + type);
+                        gameobject = BallObject::deserialize(tp, world.get());
                     } else if (type == "car") {
                         throw std::runtime_error("Type is not supported yet: " + type);
                     } else if (type == "ground") {
@@ -646,19 +646,8 @@ BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Col
 }
 
 BallObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color) {
-    b2BodyDef bodyDef;
-    bodyDef.position = pos;
-    b2Body* body = world->CreateBody(&bodyDef);
-    b2CircleShape circle_shape;
-    circle_shape.m_radius = radius;
-    b2Fixture* fixture = body->CreateFixture(&circle_shape, 1.0f);
-    std::unique_ptr<CircleNotchShape> circle_notch_shape = std::make_unique<CircleNotchShape>(radius, 30, 4);
-    circle_notch_shape->setCircleColor(color);
-    circle_notch_shape->setNotchColor(notch_color);
-    std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(std::move(circle_notch_shape), body);
-    uptr->radius = radius;
+    std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(world.get(), pos, 0.0f, radius, color, notch_color);
     BallObject* ptr = uptr.get();
-    body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
     return ptr;
 }

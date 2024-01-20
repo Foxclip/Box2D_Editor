@@ -176,21 +176,17 @@ std::unique_ptr<GameObject> BoxObject::deserialize(TokensPointer& tp, b2World* w
 		b2Vec2 size = b2Vec2(1.0f, 1.0f);
 		sf::Color color = sf::Color::White;
 		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
-		b2BodyType type = b2_staticBody;;
+		b2BodyType type = b2_staticBody;
 		while(tp.valid()) {
 			std::string pname = tp.gets();
 			if (pname == "type") {
 				type = utils::str_to_body_type(tp.gets());
 			} else if (pname == "size") {
-				size.x = tp.getf();
-				size.y = tp.getf();
+				size = tp.getb2Vec2();
 			} else if (pname == "color") {
-				color.r = tp.geti();
-				color.g = tp.geti();
-				color.b = tp.geti();
+				color = tp.getColor();
 			} else if (pname == "position") {
-				position.x = tp.getf();
-				position.y = tp.getf();
+				position = tp.getb2Vec2();
 			} else if (pname == "rotation") {
 				angle = tp.getf();
 			} else if (pname == "density") {
@@ -217,9 +213,21 @@ std::unique_ptr<GameObject> BoxObject::deserialize(TokensPointer& tp, b2World* w
 	}
 }
 
-BallObject::BallObject(std::unique_ptr<CircleNotchShape> shape, b2Body* rigid_body) {
-	this->circle_notch_shape = std::move(shape);
-	this->rigid_body = rigid_body;
+BallObject::BallObject(b2World* world, b2Vec2 pos, float angle, float radius, sf::Color color, sf::Color notch_color) {
+	b2BodyDef bodyDef;
+	bodyDef.position = pos;
+	bodyDef.angle = angle;
+	rigid_body = world->CreateBody(&bodyDef);
+	b2CircleShape circle_shape;
+	circle_shape.m_radius = radius;
+	b2Fixture* fixture = rigid_body->CreateFixture(&circle_shape, 1.0f);
+	circle_notch_shape = std::make_unique<CircleNotchShape>(radius, 30, 4);
+	circle_notch_shape->setCircleColor(color);
+	circle_notch_shape->setNotchColor(notch_color);
+	this->radius = radius;
+	this->color = color;
+	this->notch_color = notch_color;
+	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
 sf::Drawable* BallObject::getDrawable() {
@@ -237,12 +245,65 @@ std::string BallObject::serialize() {
 	str += "    type " + utils::body_type_to_str(rigid_body->GetType()) + "\n";
 	str += "    radius " + std::to_string(radius) + "\n";
 	str += "    color " + utils::color_to_str(color) + "\n";
+	str += "    notch_color " + utils::color_to_str(notch_color) + "\n";
 	str += "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
 	str += "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
 	str += "    density " + std::to_string(fixture->GetDensity()) + "\n";
 	str += "    friction " + std::to_string(fixture->GetFriction()) + "\n";
 	str += "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
 	return str;
+}
+
+std::unique_ptr<GameObject> BallObject::deserialize(TokensPointer& tp, b2World* world) {
+	try {
+		b2Vec2 position = b2Vec2(0.0f, 0.0f);
+		float angle = 0.0f;
+		float radius = 1.0f;
+		sf::Color color = sf::Color::White;
+		sf::Color notch_color = sf::Color(128, 128, 128);
+		bool notch_color_set = false;
+		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
+		b2BodyType type = b2_staticBody;
+		while (tp.valid()) {
+			std::string pname = tp.gets();
+			if (pname == "type") {
+				type = utils::str_to_body_type(tp.gets());
+			} else if (pname == "radius") {
+				radius = tp.getf();
+			} else if (pname == "color") {
+				color = tp.getColor();
+				if (!notch_color_set) {
+					notch_color = color;
+				}
+			} else if (pname == "notch_color") {
+				notch_color = tp.getColor();
+				notch_color_set = true;
+			} else if (pname == "position") {
+				position = tp.getb2Vec2();
+			} else if (pname == "rotation") {
+				angle = tp.getf();
+			} else if (pname == "density") {
+				density = tp.getf();
+			} else if (pname == "friction") {
+				friction = tp.getf();
+			} else if (pname == "restitution") {
+				restitution = tp.getf();
+			} else if (pname == "object") {
+				tp.move(-1);
+				break;
+			} else {
+				throw std::runtime_error("Unknown BallObject parameter name: " + pname);
+			}
+		}
+		std::unique_ptr<BallObject> ball = std::make_unique<BallObject>(world, position, angle, radius, color, notch_color);
+		ball->setType(type, false);
+		ball->setDensity(density, false);
+		ball->setFriction(friction, false);
+		ball->setRestitution(restitution, false);
+		return ball;
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+	}
 }
 
 LineStripShape::LineStripShape(sf::VertexArray& varray) {
