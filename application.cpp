@@ -454,36 +454,32 @@ std::string Application::serialize() {
 }
 
 void Application::deserialize(std::string str) {
+    std::vector<WordToken> tokens = utils::tokenize(str);
+    TokensPointer tp(&tokens);
     try {
-        std::vector<WordToken> tokens = utils::tokenize(str);
-        TokensPointer tp(&tokens);
         while (tp.valid()) {
-            try {
-                std::string entity = tp.gets();
-                if (entity == "object") {
-                    std::unique_ptr<GameObject> gameobject;
-                    std::string type = tp.gets();
-                    if (type == "box") {
-                        gameobject = BoxObject::deserialize(tp, world.get());
-                    } else if (type == "ball") {
-                        gameobject = BallObject::deserialize(tp, world.get());
-                    } else if (type == "car") {
-                        throw std::runtime_error("Type is not supported yet: " + type);
-                    } else if (type == "ground") {
-                        throw std::runtime_error("Type is not supported yet: " + type);
-                    } else {
-                        throw std::runtime_error("Unknown object type: " + type);
-                    }
-                    game_objects.push_back(std::move(gameobject));
+            std::string entity = tp.gets();
+            if (entity == "object") {
+                std::unique_ptr<GameObject> gameobject;
+                std::string type = tp.gets();
+                if (type == "box") {
+                    gameobject = BoxObject::deserialize(tp, world.get());
+                } else if (type == "ball") {
+                    gameobject = BallObject::deserialize(tp, world.get());
+                } else if (type == "car") {
+                    throw std::runtime_error("Type is not supported yet: " + type);
+                } else if (type == "ground") {
+                    throw std::runtime_error("Type is not supported yet: " + type);
                 } else {
-                    throw std::runtime_error("Unknown entity type: " + entity);
+                    throw std::runtime_error("Unknown object type: " + type);
                 }
-            } catch (std::exception exc) {
-                throw std::runtime_error("Line " + std::to_string(tp.getLine(-1)) + ": " + exc.what());
+                game_objects.push_back(std::move(gameobject));
+            } else {
+                throw std::runtime_error("Unknown entity type: " + entity);
             }
         }
     } catch (std::exception exc) {
-        throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+        throw std::runtime_error("Line " + std::to_string(tp.getLine(-1)) + ": " + exc.what());
     }
 }
 
@@ -493,9 +489,13 @@ void Application::save(std::string filename) {
 }
 
 void Application::load(std::string filename) {
-    game_objects.clear();
-    std::string str = utils::file_to_str(filename);
-    deserialize(str);
+    try {
+        game_objects.clear();
+        std::string str = utils::file_to_str(filename);
+        deserialize(str);
+    } catch (std::exception exc) {
+        throw std::runtime_error(__FUNCTION__": " + filename + ": " + std::string(exc.what()));
+    }
 }
 
 Tool* Application::try_select_tool(int index) {
