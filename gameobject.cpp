@@ -169,7 +169,7 @@ std::string BoxObject::serialize() {
 	return str;
 }
 
-std::unique_ptr<GameObject> BoxObject::deserialize(TokensPointer& tp, b2World* world) {
+std::unique_ptr<BoxObject> BoxObject::deserialize(TokensPointer& tp, b2World* world) {
 	try {
 		b2Vec2 position = b2Vec2(0.0f, 0.0f);
 		float angle = 0.0f;
@@ -177,7 +177,7 @@ std::unique_ptr<GameObject> BoxObject::deserialize(TokensPointer& tp, b2World* w
 		sf::Color color = sf::Color::White;
 		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
 		b2BodyType type = b2_staticBody;
-		while(tp.valid()) {
+		while(tp.valid_range()) {
 			std::string pname = tp.gets();
 			if (pname == "type") {
 				type = utils::str_to_body_type(tp.gets());
@@ -254,7 +254,7 @@ std::string BallObject::serialize() {
 	return str;
 }
 
-std::unique_ptr<GameObject> BallObject::deserialize(TokensPointer& tp, b2World* world) {
+std::unique_ptr<BallObject> BallObject::deserialize(TokensPointer& tp, b2World* world) {
 	try {
 		b2Vec2 position = b2Vec2(0.0f, 0.0f);
 		float angle = 0.0f;
@@ -264,7 +264,7 @@ std::unique_ptr<GameObject> BallObject::deserialize(TokensPointer& tp, b2World* 
 		bool notch_color_set = false;
 		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
 		b2BodyType type = b2_staticBody;
-		while (tp.valid()) {
+		while (tp.valid_range()) {
 			std::string pname = tp.gets();
 			if (pname == "type") {
 				type = utils::str_to_body_type(tp.gets());
@@ -384,9 +384,21 @@ void CircleNotchShape::draw(sf::RenderTarget& target, sf::RenderStates states) c
 	target.draw(varray_notch, states);
 }
 
-GroundObject::GroundObject(std::unique_ptr<LineStripShape> shape, b2Body* rigid_body) {
-	this->line_strip_shape = std::move(shape);
-	this->rigid_body = rigid_body;
+GroundObject::GroundObject(b2World* world, b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color) {
+	b2BodyDef bodyDef;
+	bodyDef.position = pos;
+	rigid_body = world->CreateBody(&bodyDef);
+	b2ChainShape chain;
+	chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
+	b2Fixture* fixture = rigid_body->CreateFixture(&chain, 1.0f);
+	sf::VertexArray drawable_vertices(sf::LinesStrip, vertices.size());
+	for (int i = 0; i < vertices.size(); i++) {
+		drawable_vertices[i].position = tosf(vertices[i]);
+	}
+	line_strip_shape = std::make_unique<LineStripShape>(drawable_vertices);
+	line_strip_shape->setLineColor(color);
+	this->color = color;
+	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
 void GroundObject::moveVertex(int index, const b2Vec2& new_pos) {
@@ -439,9 +451,53 @@ std::string GroundObject::serialize() {
 	}
 	str += "\n";
 	str += "    color " + utils::color_to_str(color) + "\n";
+	str += "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
 	str += "    friction " + std::to_string(fixture->GetFriction()) + "\n";
 	str += "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
 	return str;
+}
+
+std::unique_ptr<GroundObject> GroundObject::deserialize(TokensPointer& tp, b2World* world) {
+	try {
+		b2Vec2 position = b2Vec2(0.0f, 0.0f);
+		float angle = 0.0f;
+		std::vector<b2Vec2> vertices;
+		sf::Color color = sf::Color::White;
+		float friction = 0.0f, restitution = 0.0f;
+		while (tp.valid_range()) {
+			std::string pname = tp.gets();
+			if (pname == "vertices") {
+				while (!tp.fail()) {
+					b2Vec2 vertex = tp.getb2Vec2();
+					if (!tp.fail()) {
+						vertices.push_back(vertex);
+					}
+				}
+				tp.reset();
+				tp.move(-1);
+			} else if (pname == "color") {
+				color = tp.getColor();
+			} else if (pname == "position") {
+				position = tp.getb2Vec2();
+			} else if (pname == "friction") {
+				friction = tp.getf();
+			} else if (pname == "restitution") {
+				restitution = tp.getf();
+			} else if (pname == "object") {
+				tp.move(-1);
+				break;
+			} else {
+				throw std::runtime_error("Unknown GroundObject parameter name: " + pname);
+			}
+		}
+		std::unique_ptr<GroundObject> ground = std::make_unique<GroundObject>(world, position, vertices, color);
+		ground->setDensity(1.0f, false);
+		ground->setFriction(friction, false);
+		ground->setRestitution(restitution, false);
+		return ground;
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+	}
 }
 
 std::vector<b2Vec2> GroundObject::getVertices() {

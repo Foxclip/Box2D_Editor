@@ -457,7 +457,7 @@ void Application::deserialize(std::string str) {
     std::vector<WordToken> tokens = utils::tokenize(str);
     TokensPointer tp(&tokens);
     try {
-        while (tp.valid()) {
+        while (tp.valid_range()) {
             std::string entity = tp.gets();
             if (entity == "object") {
                 std::unique_ptr<GameObject> gameobject;
@@ -469,7 +469,8 @@ void Application::deserialize(std::string str) {
                 } else if (type == "car") {
                     throw std::runtime_error("Type is not supported yet: " + type);
                 } else if (type == "ground") {
-                    throw std::runtime_error("Type is not supported yet: " + type);
+                    gameobject = GroundObject::deserialize(tp, world.get());
+                    ground = static_cast<GroundObject*>(gameobject.get());
                 } else {
                     throw std::runtime_error("Unknown object type: " + type);
                 }
@@ -706,21 +707,8 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
 }
 
 GroundObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color) {
-    b2BodyDef bodyDef;
-    bodyDef.position = pos;
-    b2Body* body = world->CreateBody(&bodyDef);
-    b2ChainShape chain;
-    chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
-    b2Fixture* fixture = body->CreateFixture(&chain, 1.0f);
-    sf::VertexArray drawable_vertices(sf::LinesStrip, vertices.size());
-    for (int i = 0; i < vertices.size(); i++) {
-        drawable_vertices[i].position = tosf(vertices[i]);
-    }
-    std::unique_ptr<LineStripShape> line_strip = std::make_unique<LineStripShape>(drawable_vertices);
-    line_strip->setLineColor(color);
-    std::unique_ptr<GroundObject> uptr = std::make_unique<GroundObject>(std::move(line_strip), body);
+    std::unique_ptr<GroundObject> uptr = std::make_unique<GroundObject>(world.get(), pos, vertices, color);
     GroundObject* ptr = uptr.get();
-    body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
     return ptr;
 }

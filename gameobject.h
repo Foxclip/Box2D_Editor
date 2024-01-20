@@ -56,7 +56,7 @@ public:
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	std::string serialize();
-	static std::unique_ptr<GameObject> deserialize(TokensPointer& tp, b2World* world);
+	static std::unique_ptr<BoxObject> deserialize(TokensPointer& tp, b2World* world);
 	b2Vec2 size = b2Vec2();
 private:
 	std::unique_ptr<sf::RectangleShape> rect_shape;
@@ -68,7 +68,7 @@ public:
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	std::string serialize();
-	static std::unique_ptr<GameObject> deserialize(TokensPointer& tp, b2World* world);
+	static std::unique_ptr<BallObject> deserialize(TokensPointer& tp, b2World* world);
 	float radius = 0.0f;
 private:
 	std::unique_ptr<CircleNotchShape> circle_notch_shape;
@@ -95,7 +95,7 @@ private:
 
 class GroundObject : public GameObject {
 public:
-	GroundObject(std::unique_ptr<LineStripShape> shape, b2Body* rigid_body);
+	GroundObject(b2World* world, b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color);
 	void moveVertex(int index, const b2Vec2& new_pos);
 	void tryDeleteVertex(int index);
 	void addVertex(int index, const b2Vec2& pos);
@@ -103,6 +103,7 @@ public:
 	sf::Transformable* getTransformable();
 	b2ChainShape* getShape();
 	std::string serialize();
+	static std::unique_ptr<GroundObject> deserialize(TokensPointer& tp, b2World* world);
 private:
 	std::unique_ptr<LineStripShape> line_strip_shape;
 	std::vector<b2Vec2> getVertices();

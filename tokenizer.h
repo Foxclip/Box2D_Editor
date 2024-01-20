@@ -7,6 +7,7 @@
 
 class WordToken {
 public:
+	WordToken();
 	WordToken(std::string str, int line);
 	std::string str;
 	int line;
@@ -24,9 +25,14 @@ public:
 	WordToken peek(int offset);
 	void move(int offset);
 	bool eof();
-	bool valid();
+	bool valid_range();
+	bool fail();
+	void reset();
 	int getLine(int offset = 0);
 private:
 	std::vector<WordToken>* tokens;
 	int pos;
+	bool fail_state = false;
+
+	bool isValidPos(int pos);
 };
