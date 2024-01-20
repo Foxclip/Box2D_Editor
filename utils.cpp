@@ -2,6 +2,7 @@
 #include <numbers>
 #include <utility>
 #include <cmath>
+#include "tokenizer.h"
 
 namespace utils {
 
@@ -77,6 +78,22 @@ namespace utils {
 		}
 	}
 
+	b2BodyType str_to_body_type(std::string str) {
+		try {
+			if (str == "static") {
+				return b2_staticBody;
+			} else if (str == "kinematic") {
+				return b2_kinematicBody;
+			} else if (str == "dynamic") {
+				return b2_dynamicBody;
+			} else {
+				throw std::runtime_error("Unknown body type: " + str);
+			}
+		} catch (std::exception exc) {
+			throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+		}
+	}
+
 	void str_to_file(std::string str, std::string path) {
 		std::ofstream ofstream(path);
 		if (ofstream.is_open()) {
@@ -86,6 +103,38 @@ namespace utils {
 			p.resize(FILENAME_MAX);
 			throw std::runtime_error("File write error: " + p);
 		}
+	}
+
+	std::string file_to_str(std::filesystem::path path) {
+		if (!std::filesystem::exists(path)) {
+			throw std::format("File not found: {}", path.string());
+		}
+		std::ifstream t(path);
+		std::stringstream buffer;
+		buffer << t.rdbuf();
+		return buffer.str();
+	}
+
+	std::vector<WordToken> tokenize(std::string str) {
+		std::vector<WordToken> results;
+		std::string current_word;
+		str += EOF;
+		int current_line = 1;
+		for (int i = 0; i < str.size(); i++) {
+			char c = str[i];
+			if (isspace(c) || c == EOF) {
+				if (current_word.size() > 0) {
+					results.push_back(WordToken(current_word, current_line));
+				}
+				current_word = "";
+			} else {
+				current_word += c;
+			}
+			if (c == '\n') {
+				current_line++;
+			}
+		}
+		return results;
 	}
 
 }

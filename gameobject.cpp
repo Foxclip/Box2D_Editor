@@ -9,6 +9,13 @@ const auto to2f = utils::to2f;
 
 GameObject::GameObject() { }
 
+GameObject::~GameObject() {
+	if (rigid_body) {
+		rigid_body->GetWorld()->DestroyBody(rigid_body);
+		rigid_body = nullptr;
+	}
+}
+
 void GameObject::updateVisual() {
 	b2Vec2 position = rigid_body->GetPosition();
 	float angle = rigid_body->GetAngle();
@@ -123,9 +130,19 @@ void GameObject::setRestitution(float restitution, bool include_children) {
 	}
 }
 
-BoxObject::BoxObject(std::unique_ptr<sf::RectangleShape> shape, b2Body* rigid_body) {
-	this->rect_shape = std::move(shape);
-	this->rigid_body = rigid_body;
+BoxObject::BoxObject(b2World* world, b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
+	b2BodyDef bodyDef;
+	bodyDef.position = pos;
+	bodyDef.angle = angle;
+	rigid_body = world->CreateBody(&bodyDef);
+	b2PolygonShape box_shape;
+	box_shape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
+	b2Fixture* fixture = rigid_body->CreateFixture(&box_shape, 1.0f);
+	rect_shape = std::make_unique<sf::RectangleShape>(tosf(size));
+	rect_shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
+	rect_shape->setFillColor(color);
+	this->size = size;
+	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
 sf::Drawable* BoxObject::getDrawable() {
@@ -148,6 +165,49 @@ std::string BoxObject::serialize() {
 	str += "    friction " + std::to_string(fixture->GetFriction()) + "\n";
 	str += "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
 	return str;
+}
+
+std::unique_ptr<GameObject> BoxObject::deserialize(TokensPointer& tp, b2World* world) {
+	try {
+		b2Vec2 position = b2Vec2(0.0f, 0.0f);
+		float angle = 0.0f;
+		b2Vec2 size = b2Vec2(1.0f, 1.0f);
+		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
+		b2BodyType type = b2_staticBody;;
+		while(tp.valid()) {
+			std::string pname = tp.gets();
+			if (pname == "type") {
+				type = utils::str_to_body_type(tp.gets());
+			} else if (pname == "size") {
+				size.x = tp.getf();
+				size.y = tp.getf();
+			} else if (pname == "position") {
+				position.x = tp.getf();
+				position.y = tp.getf();
+			} else if (pname == "rotation") {
+				angle = tp.getf();
+			} else if (pname == "density") {
+				density = tp.getf();
+			} else if (pname == "friction") {
+				friction = tp.getf();
+			} else if (pname == "restitution") {
+				restitution = tp.getf();
+			} else if (pname == "object") {
+				tp.move(-1);
+				break;
+			} else {
+				throw std::runtime_error("Unknown BoxObject parameter name: " + pname);
+			}
+		}
+		std::unique_ptr<BoxObject> box = std::make_unique<BoxObject>(world, position, angle, size, sf::Color::White);
+		box->setType(type, false);
+		box->setDensity(density, false);
+		box->setFriction(friction, false);
+		box->setRestitution(restitution, false);
+		return box;
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+	}
 }
 
 BallObject::BallObject(std::unique_ptr<CircleNotchShape> shape, b2Body* rigid_body) {
@@ -333,3 +393,4 @@ void GroundObject::setVertices(const std::vector<b2Vec2>& vertices) {
 		line_strip_shape->varray[i].position = tosf(vertices[i]);
 	}
 }
+

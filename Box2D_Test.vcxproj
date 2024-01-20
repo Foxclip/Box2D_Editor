@@ -138,11 +138,13 @@
     <ClCompile Include="application.cpp" />
     <ClCompile Include="gameobject.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="tokenizer.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="gameobject.h" />
+    <ClInclude Include="tokenizer.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

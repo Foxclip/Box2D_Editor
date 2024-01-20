@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "box2d/box2d.h"
+#include "tokenizer.h"
 
 class LineStripShape : public sf::Drawable, public sf::Transformable {
 public:
@@ -30,6 +31,7 @@ public:
 	GameObject* parent = nullptr;
 
 	GameObject();
+	~GameObject();
 	virtual sf::Drawable* getDrawable() = 0;
 	virtual sf::Transformable* getTransformable() = 0;
 	void updateVisual();
@@ -45,17 +47,15 @@ public:
 	void setFriction(float friction, bool include_children);
 	void setRestitution(float restitution, bool include_children);
 	virtual std::string serialize() = 0;
-
-private:
-
 };
 
 class BoxObject : public GameObject {
 public:
-	BoxObject(std::unique_ptr<sf::RectangleShape> shape, b2Body* rigid_body);
+	BoxObject(b2World* world, b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	std::string serialize();
+	static std::unique_ptr<GameObject> deserialize(TokensPointer& tp, b2World* world);
 	b2Vec2 size = b2Vec2();
 private:
 	std::unique_ptr<sf::RectangleShape> rect_shape;

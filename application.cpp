@@ -22,6 +22,7 @@ void Application::init() {
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
+    load("level.txt");
     assert(selected_tool);
 }
 
@@ -148,7 +149,7 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::LControl: edit_tool.mode = EditTool::INSERT; break;
             case sf::Keyboard::S:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
-                    save();
+                    save("level.txt");
                 }
                 break;
         }
@@ -452,9 +453,49 @@ std::string Application::serialize() {
     return str;
 }
 
-void Application::save() {
+void Application::deserialize(std::string str) {
+    try {
+        std::vector<WordToken> tokens = utils::tokenize(str);
+        TokensPointer tp(&tokens);
+        while (tp.valid()) {
+            try {
+                std::string entity = tp.gets();
+                if (entity == "object") {
+                    std::unique_ptr<GameObject> gameobject;
+                    std::string type = tp.gets();
+                    if (type == "box") {
+                         gameobject = BoxObject::deserialize(tp, world.get());
+                    } else if (type == "ball") {
+                        throw std::runtime_error("Type is not supported yet: " + type);
+                    } else if (type == "car") {
+                        throw std::runtime_error("Type is not supported yet: " + type);
+                    } else if (type == "ground") {
+                        throw std::runtime_error("Type is not supported yet: " + type);
+                    } else {
+                        throw std::runtime_error("Unknown object type: " + type);
+                    }
+                    game_objects.push_back(std::move(gameobject));
+                } else {
+                    throw std::runtime_error("Unknown entity type: " + entity);
+                }
+            } catch (std::exception exc) {
+                throw std::runtime_error("Line " + std::to_string(tp.getLine(-1)) + ": " + exc.what());
+            }
+        }
+    } catch (std::exception exc) {
+        throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+    }
+}
+
+void Application::save(std::string filename) {
     std::string str = serialize();
-    utils::str_to_file(str, "level.txt");
+    utils::str_to_file(str, filename);
+}
+
+void Application::load(std::string filename) {
+    game_objects.clear();
+    std::string str = utils::file_to_str(filename);
+    deserialize(str);
 }
 
 Tool* Application::try_select_tool(int index) {
@@ -598,20 +639,8 @@ void Application::draw_line(const sf::Vector2f& v1, const sf::Vector2f& v2, cons
 }
 
 BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
-    b2BodyDef bodyDef;
-    bodyDef.position = pos;
-    bodyDef.angle = angle;
-    b2Body* body = world->CreateBody(&bodyDef);
-    b2PolygonShape box_shape;
-    box_shape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
-    b2Fixture* fixture = body->CreateFixture(&box_shape, 1.0f);
-    std::unique_ptr<sf::RectangleShape> shape = std::make_unique<sf::RectangleShape>(tosf(size));
-    shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
-    shape->setFillColor(color);
-    std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(std::move(shape), body);
-    uptr->size = size;
+    std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(world.get(), pos, angle, size, color);
     BoxObject* ptr = uptr.get();
-    body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
     return ptr;
 }

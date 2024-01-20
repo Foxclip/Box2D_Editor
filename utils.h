@@ -5,6 +5,8 @@
 #include "box2d/box2d.h"
 #include <fstream>
 #include <filesystem>
+#include <vector>
+#include "tokenizer.h"
 
 namespace utils {
 
@@ -21,7 +23,10 @@ namespace utils {
 	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point);
 	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point);
 	std::string body_type_to_str(b2BodyType type);
+	b2BodyType str_to_body_type(std::string str);
 	void str_to_file(std::string str, std::string path);
+	std::string file_to_str(std::filesystem::path path);
+	std::vector<WordToken> tokenize(std::string str);
 
 	template <typename T>
 	T rot90CCW(const T& vec) {
