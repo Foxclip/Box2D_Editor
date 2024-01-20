@@ -27,6 +27,7 @@ namespace utils {
 	void str_to_file(std::string str, std::string path);
 	std::string file_to_str(std::filesystem::path path);
 	std::vector<WordToken> tokenize(std::string str);
+	std::string color_to_str(sf::Color color);
 
 	template <typename T>
 	T rot90CCW(const T& vec) {

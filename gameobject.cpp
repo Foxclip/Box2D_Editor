@@ -142,6 +142,7 @@ BoxObject::BoxObject(b2World* world, b2Vec2 pos, float angle, b2Vec2 size, sf::C
 	rect_shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
 	rect_shape->setFillColor(color);
 	this->size = size;
+	this->color = color;
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
@@ -159,6 +160,7 @@ std::string BoxObject::serialize() {
 	str += "object box\n";
 	str += "    type " + utils::body_type_to_str(rigid_body->GetType()) + "\n";
 	str += "    size " + utils::vec_to_str(size) + "\n";
+	str += "    color " + utils::color_to_str(color) + "\n";
 	str += "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
 	str += "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
 	str += "    density " + std::to_string(fixture->GetDensity()) + "\n";
@@ -172,6 +174,7 @@ std::unique_ptr<GameObject> BoxObject::deserialize(TokensPointer& tp, b2World* w
 		b2Vec2 position = b2Vec2(0.0f, 0.0f);
 		float angle = 0.0f;
 		b2Vec2 size = b2Vec2(1.0f, 1.0f);
+		sf::Color color = sf::Color::White;
 		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
 		b2BodyType type = b2_staticBody;;
 		while(tp.valid()) {
@@ -181,6 +184,10 @@ std::unique_ptr<GameObject> BoxObject::deserialize(TokensPointer& tp, b2World* w
 			} else if (pname == "size") {
 				size.x = tp.getf();
 				size.y = tp.getf();
+			} else if (pname == "color") {
+				color.r = tp.geti();
+				color.g = tp.geti();
+				color.b = tp.geti();
 			} else if (pname == "position") {
 				position.x = tp.getf();
 				position.y = tp.getf();
@@ -199,7 +206,7 @@ std::unique_ptr<GameObject> BoxObject::deserialize(TokensPointer& tp, b2World* w
 				throw std::runtime_error("Unknown BoxObject parameter name: " + pname);
 			}
 		}
-		std::unique_ptr<BoxObject> box = std::make_unique<BoxObject>(world, position, angle, size, sf::Color::White);
+		std::unique_ptr<BoxObject> box = std::make_unique<BoxObject>(world, position, angle, size, color);
 		box->setType(type, false);
 		box->setDensity(density, false);
 		box->setFriction(friction, false);
@@ -229,6 +236,7 @@ std::string BallObject::serialize() {
 	str += "object ball\n";
 	str += "    type " + utils::body_type_to_str(rigid_body->GetType()) + "\n";
 	str += "    radius " + std::to_string(radius) + "\n";
+	str += "    color " + utils::color_to_str(color) + "\n";
 	str += "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
 	str += "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
 	str += "    density " + std::to_string(fixture->GetDensity()) + "\n";
@@ -369,6 +377,7 @@ std::string GroundObject::serialize() {
 		}
 	}
 	str += "\n";
+	str += "    color " + utils::color_to_str(color) + "\n";
 	str += "    friction " + std::to_string(fixture->GetFriction()) + "\n";
 	str += "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
 	return str;

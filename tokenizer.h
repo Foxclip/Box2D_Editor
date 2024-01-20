@@ -15,6 +15,7 @@ public:
 	TokensPointer(std::vector<WordToken>* tokens, int pos = 0);
 	WordToken get();
 	std::string gets();
+	int geti();
 	float getf();
 	WordToken peek(int offset);
 	void move(int offset);

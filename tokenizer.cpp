@@ -20,6 +20,10 @@ std::string TokensPointer::gets() {
 	return get().str;
 }
 
+int TokensPointer::geti() {
+	return std::stoi(gets());
+}
+
 float TokensPointer::getf() {
 	return std::stof(gets());
 }

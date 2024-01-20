@@ -29,6 +29,7 @@ public:
 	b2Body* rigid_body = nullptr;
 	std::vector<GameObject*> children;
 	GameObject* parent = nullptr;
+	sf::Color color;
 
 	GameObject();
 	~GameObject();

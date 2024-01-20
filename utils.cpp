@@ -137,4 +137,8 @@ namespace utils {
 		return results;
 	}
 
+	std::string color_to_str(sf::Color color) {
+		return std::to_string(color.r) + " " + std::to_string(color.g) + " " + std::to_string(color.b);
+	}
+
 }
