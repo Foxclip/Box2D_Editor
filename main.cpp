@@ -14,7 +14,7 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
-    //TODO: save/load levels to file
+    //TODO: save/load camera position and zoom
     //TODO: edit mode box selection
     //TODO: create/delete objects in the scene
 

@@ -22,7 +22,7 @@ void Application::init() {
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
-    load("level.txt");
+    //load("level.txt");
     assert(selected_tool);
 }
 
@@ -199,7 +199,7 @@ void Application::process_mouse_event(sf::Event event) {
     }
     if (event.type == sf::Event::MouseWheelScrolled) {
         if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
-            zoomFactor *= pow(MOUSE_SCROLL_ZOOM, -event.mouseWheelScroll.delta);
+            zoomFactor *= pow(MOUSE_SCROLL_ZOOM, event.mouseWheelScroll.delta);
         }
     }
 }
@@ -236,8 +236,8 @@ void Application::process_mouse() {
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
         sf::Vector2i mouseDelta = mousePrevPos - mousePos;
-        viewCenterX += mouseDelta.x * zoomFactor;
-        viewCenterY += -mouseDelta.y * zoomFactor;
+        viewCenterX += mouseDelta.x / zoomFactor;
+        viewCenterY += -mouseDelta.y / zoomFactor;
     }
     mousePrevPos = mousePos;
 }
@@ -318,7 +318,7 @@ void Application::render() {
 
 void Application::render_world() {
     world_view.setCenter(viewCenterX, viewCenterY);
-    world_view.setSize(window->getSize().x * zoomFactor, -1.0f * window->getSize().y * zoomFactor);
+    world_view.setSize(window->getSize().x / zoomFactor, -1.0f * window->getSize().y / zoomFactor);
     window->setView(world_view);
 
     for (int i = 0; i < game_objects.size(); i++) {
