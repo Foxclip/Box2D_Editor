@@ -22,7 +22,7 @@ void Application::init() {
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
-    //load("level.txt");
+    load("level.txt");
     assert(selected_tool);
 }
 
@@ -490,7 +490,7 @@ void Application::deserialize(std::string str, bool set_camera) {
                 } else if (type == "ball") {
                     gameobject = BallObject::deserialize(tp, world.get());
                 } else if (type == "car") {
-                    throw std::runtime_error("Type is not supported yet: " + type);
+                    gameobject = CarObject::deserialize(tp, world.get());
                 } else if (type == "ground") {
                     gameobject = GroundObject::deserialize(tp, world.get());
                     ground = static_cast<GroundObject*>(gameobject.get());
@@ -677,7 +677,7 @@ BallObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, 
 }
 
 CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
-    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), pos, lengths, wheels, color);
+    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), pos, 0.0f, lengths, wheels, color);
     CarObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;

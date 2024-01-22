@@ -48,7 +48,7 @@ public:
 	void setDensity(float density, bool include_children);
 	void setFriction(float friction, bool include_children);
 	void setRestitution(float restitution, bool include_children);
-	virtual std::string serialize() = 0;
+	virtual std::string serialize(int indent_level = 0) = 0;
 };
 
 class BoxObject : public GameObject {
@@ -56,7 +56,7 @@ public:
 	BoxObject(b2World* world, b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
-	std::string serialize();
+	std::string serialize(int indent_level = 0);
 	static std::unique_ptr<BoxObject> deserialize(TokensPointer& tp, b2World* world);
 	b2Vec2 size = b2Vec2();
 private:
@@ -68,7 +68,7 @@ public:
 	BallObject(b2World* world, b2Vec2 pos, float angle, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
-	std::string serialize();
+	std::string serialize(int indent_level = 0);
 	static std::unique_ptr<BallObject> deserialize(TokensPointer& tp, b2World* world);
 	float radius = 0.0f;
 private:
@@ -78,10 +78,11 @@ private:
 
 class CarObject : public GameObject {
 public:
-	CarObject(b2World* world, b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
+	CarObject(b2World* world, b2Vec2 pos, float angle, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
-	std::string serialize();
+	std::string serialize(int indent_level = 0);
+	static std::unique_ptr<CarObject> deserialize(TokensPointer& tp, b2World* world);
 	std::vector<float> lengths;
 	std::vector<float> wheels;
 private:
@@ -98,7 +99,7 @@ public:
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	b2ChainShape* getShape();
-	std::string serialize();
+	std::string serialize(int indent_level = 0);
 	static std::unique_ptr<GroundObject> deserialize(TokensPointer& tp, b2World* world);
 private:
 	std::unique_ptr<LineStripShape> line_strip_shape;

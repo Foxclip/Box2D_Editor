@@ -62,6 +62,19 @@ float TokensPointer::getf() {
 	return result;
 }
 
+std::vector<float> TokensPointer::getfArr() {
+	std::vector<float> result;
+	while (!fail()) {
+		float f = getf();
+		if (!fail()) {
+			result.push_back(f);
+		}
+	}
+	reset();
+	move(-1);
+	return result;
+}
+
 sf::Color TokensPointer::getColor() {
 	if (fail_state) {
 		return sf::Color();

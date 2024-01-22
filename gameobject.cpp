@@ -163,18 +163,22 @@ sf::Transformable* BoxObject::getTransformable() {
 	return rect_shape.get();
 }
 
-std::string BoxObject::serialize() {
+std::string BoxObject::serialize(int indent_level) {
 	std::string str;
 	b2Fixture* fixture = rigid_body->GetFixtureList();
-	str += "object box\n";
-	str += "    type " + utils::body_type_to_str(rigid_body->GetType()) + "\n";
-	str += "    size " + utils::vec_to_str(size) + "\n";
-	str += "    color " + utils::color_to_str(color) + "\n";
-	str += "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
-	str += "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
-	str += "    density " + std::to_string(fixture->GetDensity()) + "\n";
-	str += "    friction " + std::to_string(fixture->GetFriction()) + "\n";
-	str += "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
+	std::string indent_str;
+	for (int i = 0; i < indent_level; i++) {
+		indent_str += "    ";
+	}
+	str += indent_str + "object box\n";
+	str += indent_str + "    type " + utils::body_type_to_str(rigid_body->GetType()) + "\n";
+	str += indent_str + "    size " + utils::vec_to_str(size) + "\n";
+	str += indent_str + "    color " + utils::color_to_str(color) + "\n";
+	str += indent_str + "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
+	str += indent_str + "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
+	str += indent_str + "    density " + std::to_string(fixture->GetDensity()) + "\n";
+	str += indent_str + "    friction " + std::to_string(fixture->GetFriction()) + "\n";
+	str += indent_str + "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
 	return str;
 }
 
@@ -247,19 +251,23 @@ sf::Transformable* BallObject::getTransformable() {
 	return circle_notch_shape.get();
 }
 
-std::string BallObject::serialize() {
+std::string BallObject::serialize(int indent_level) {
 	std::string str;
 	b2Fixture* fixture = rigid_body->GetFixtureList();
-	str += "object ball\n";
-	str += "    type " + utils::body_type_to_str(rigid_body->GetType()) + "\n";
-	str += "    radius " + std::to_string(radius) + "\n";
-	str += "    color " + utils::color_to_str(color) + "\n";
-	str += "    notch_color " + utils::color_to_str(notch_color) + "\n";
-	str += "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
-	str += "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
-	str += "    density " + std::to_string(fixture->GetDensity()) + "\n";
-	str += "    friction " + std::to_string(fixture->GetFriction()) + "\n";
-	str += "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
+	std::string indent_str;
+	for (int i = 0; i < indent_level; i++) {
+		indent_str += "    ";
+	}
+	str += indent_str + "object ball\n";
+	str += indent_str + "    type " + utils::body_type_to_str(rigid_body->GetType()) + "\n";
+	str += indent_str + "    radius " + std::to_string(radius) + "\n";
+	str += indent_str + "    color " + utils::color_to_str(color) + "\n";
+	str += indent_str + "    notch_color " + utils::color_to_str(notch_color) + "\n";
+	str += indent_str + "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
+	str += indent_str + "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
+	str += indent_str + "    density " + std::to_string(fixture->GetDensity()) + "\n";
+	str += indent_str + "    friction " + std::to_string(fixture->GetFriction()) + "\n";
+	str += indent_str + "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
 	return str;
 }
 
@@ -330,7 +338,7 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 	target.draw(varray, states);
 }
 
-CarObject::CarObject(b2World* world, b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
+CarObject::CarObject(b2World* world, b2Vec2 pos, float angle, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
 	convex_shape = std::make_unique<sf::ConvexShape>(lengths.size());
 	float pi = std::numbers::pi;
 	auto get_pos = [&](int i) {
@@ -342,6 +350,7 @@ CarObject::CarObject(b2World* world, b2Vec2 pos, std::vector<float> lengths, std
 	};
 	b2BodyDef bodyDef;
 	bodyDef.position = pos;
+	bodyDef.angle = angle;
 	rigid_body = world->CreateBody(&bodyDef);
 	for (int i = 0; i < lengths.size(); i++) {
 		b2Vec2 vertices[3];
@@ -377,6 +386,7 @@ CarObject::CarObject(b2World* world, b2Vec2 pos, std::vector<float> lengths, std
 	convex_shape->setFillColor(color);
 	this->lengths = lengths;
 	this->wheels = wheels;
+	this->color = color;
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
@@ -388,8 +398,67 @@ sf::Transformable* CarObject::getTransformable() {
 	return convex_shape.get();
 }
 
-std::string CarObject::serialize() {
-	return std::string();
+std::string CarObject::serialize(int indent_level) {
+	std::string str;
+	b2Fixture* fixture = rigid_body->GetFixtureList();
+	std::string indent_str;
+	for (int i = 0; i < indent_level; i++) {
+		indent_str += "    ";
+	}
+	str += indent_str + "object car\n";
+	str += indent_str + "    lengths " + utils::farr_to_str(lengths) + "\n";
+	str += indent_str + "    wheels " + utils::farr_to_str(wheels) + "\n";
+	str += indent_str + "    color " + utils::color_to_str(color) + "\n";
+	str += indent_str + "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
+	str += indent_str + "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
+	str += indent_str + "    density " + std::to_string(fixture->GetDensity()) + "\n";
+	str += indent_str + "    friction " + std::to_string(fixture->GetFriction()) + "\n";
+	str += indent_str + "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
+	return str;
+}
+
+std::unique_ptr<CarObject> CarObject::deserialize(TokensPointer& tp, b2World* world) {
+	try {
+		b2Vec2 position = b2Vec2(0.0f, 0.0f);
+		float angle = 0.0f;
+		std::vector<float> lengths;
+		std::vector<float> wheels;
+		sf::Color color = sf::Color::White;
+		float density = 0.0f, friction = 0.0f, restitution = 0.0f;
+		while (tp.valid_range()) {
+			std::string pname = tp.gets();
+			if (pname == "lengths") {
+				lengths = tp.getfArr();
+			} else if (pname == "wheels") {
+				wheels = tp.getfArr();
+			} else if (pname == "color") {
+				color = tp.getColor();
+			} else if (pname == "position") {
+				position = tp.getb2Vec2();
+			} else if (pname == "rotation") {
+				angle = tp.getf();
+			} else if (pname == "density") {
+				density = tp.getf();
+			} else if (pname == "friction") {
+				friction = tp.getf();
+			} else if (pname == "restitution") {
+				restitution = tp.getf();
+			} else if (TokensPointer::isEntityName(pname)) {
+				tp.move(-1);
+				break;
+			} else {
+				throw std::runtime_error("Unknown CarObject parameter name: " + pname);
+			}
+		}
+		std::unique_ptr<CarObject> car = std::make_unique<CarObject>(world, position, angle, lengths, wheels, color);
+		car->setType(b2_dynamicBody, false);
+		car->setDensity(density, false);
+		car->setFriction(friction, false);
+		car->setRestitution(restitution, false);
+		return car;
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+	}
 }
 
 CircleNotchShape::CircleNotchShape(float radius, int point_count, int notch_segment_count) {
@@ -481,11 +550,15 @@ b2ChainShape* GroundObject::getShape() {
 	return static_cast<b2ChainShape*>(rigid_body->GetFixtureList()->GetShape());
 }
 
-std::string GroundObject::serialize() {
+std::string GroundObject::serialize(int indent_level) {
 	std::string str;
 	b2Fixture* fixture = rigid_body->GetFixtureList();
-	str += "object ground\n";
-	str += "    vertices ";
+	std::string indent_str;
+	for (int i = 0; i < indent_level; i++) {
+		indent_str += "    ";
+	}
+	str += indent_str + "object ground\n";
+	str += indent_str + "    vertices ";
 	b2ChainShape* chain = getShape();
 	for (int i = 0; i < chain->m_count; i++) {
 		str += utils::vec_to_str(chain->m_vertices[i]);
@@ -493,11 +566,11 @@ std::string GroundObject::serialize() {
 			str += " ";
 		}
 	}
-	str += "\n";
-	str += "    color " + utils::color_to_str(color) + "\n";
-	str += "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
-	str += "    friction " + std::to_string(fixture->GetFriction()) + "\n";
-	str += "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
+	str += indent_str + "\n";
+	str += indent_str + "    color " + utils::color_to_str(color) + "\n";
+	str += indent_str + "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
+	str += indent_str + "    friction " + std::to_string(fixture->GetFriction()) + "\n";
+	str += indent_str + "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
 	return str;
 }
 

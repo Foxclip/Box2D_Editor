@@ -10,7 +10,7 @@ public:
 	WordToken();
 	WordToken(std::string str, int line);
 	std::string str;
-	int line;
+	int line = 0;
 };
 
 class TokensPointer {
@@ -20,6 +20,7 @@ public:
 	std::string gets();
 	int geti();
 	float getf();
+	std::vector<float> getfArr();
 	sf::Color getColor();
 	b2Vec2 getb2Vec2();
 	WordToken peek(int offset);

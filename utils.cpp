@@ -146,4 +146,15 @@ namespace utils {
 		;
 	}
 
+	std::string farr_to_str(std::vector<float>& vec) {
+		std::string str;
+		for (int i = 0; i < vec.size(); i++) {
+			str += std::to_string(vec[i]);
+			if (i < vec.size() - 1) {
+				str += " ";
+			}
+		}
+		return str;
+	}
+
 }
