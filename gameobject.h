@@ -27,7 +27,7 @@ private:
 class GameObject {
 public:
 	b2Body* rigid_body = nullptr;
-	std::vector<GameObject*> children;
+	std::vector<std::unique_ptr<GameObject>> children;
 	GameObject* parent = nullptr;
 	sf::Color color;
 
@@ -36,6 +36,7 @@ public:
 	virtual sf::Drawable* getDrawable() = 0;
 	virtual sf::Transformable* getTransformable() = 0;
 	void updateVisual();
+	void render(sf::RenderTarget* target);
 	void setVisualPosition(const sf::Vector2f& pos);
 	void setVisualRotation(float angle);
 	void setEnabled(bool enabled, bool include_children);
@@ -79,8 +80,7 @@ class CarObject : public GameObject {
 public:
 	CarObject(
 		std::unique_ptr<sf::ConvexShape> shape,
-		b2Body* rigid_body,
-		std::vector<GameObject*> wheels,
+		b2Body* rigid_body, std::vector<std::unique_ptr<GameObject>> wheels,
 		std::vector<b2RevoluteJoint*> wheel_joints
 	);
 	sf::Drawable* getDrawable();

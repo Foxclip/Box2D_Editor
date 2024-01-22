@@ -23,6 +23,14 @@ void GameObject::updateVisual() {
 	setVisualRotation(utils::to_degrees(angle));
 }
 
+void GameObject::render(sf::RenderTarget* target) {
+	for (int i = 0; i < children.size(); i++) {
+		children[i]->render(target);
+	}
+	updateVisual();
+	target->draw(*getDrawable());
+}
+
 void GameObject::setVisualPosition(const sf::Vector2f& pos) {
 	getTransformable()->setPosition(pos);
 }
@@ -323,8 +331,7 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 
 CarObject::CarObject(
 	std::unique_ptr<sf::ConvexShape> shape,
-	b2Body* rigid_body,
-	std::vector<GameObject*> wheels,
+	b2Body* rigid_body, std::vector<std::unique_ptr<GameObject>> wheels,
 	std::vector<b2RevoluteJoint*> wheel_joints
 ) {
 	this->convex_shape = std::move(shape);
@@ -332,7 +339,7 @@ CarObject::CarObject(
 	for (int i = 0; i < wheels.size(); i++) {
 		wheels[i]->parent = this;
 	}
-	this->children = wheels;
+	this->children = std::move(wheels);
 	this->wheel_joints = wheel_joints;
 }
 

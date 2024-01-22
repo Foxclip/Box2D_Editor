@@ -22,7 +22,7 @@ void Application::init() {
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
-    load("level.txt");
+    //load("level.txt");
     assert(selected_tool);
 }
 
@@ -322,9 +322,7 @@ void Application::render_world() {
     window->setView(world_view);
 
     for (int i = 0; i < game_objects.size(); i++) {
-        GameObject* object = game_objects[i].get();
-        object->updateVisual();
-        window->draw(*object->getDrawable());
+        game_objects[i]->render(window.get());
     }
 
     if (drag_tool.mouse_joint) {
@@ -446,9 +444,6 @@ std::string Application::serialize() {
     str += "\n";
     for (int i = 0; i < game_objects.size(); i++) {
         GameObject* gameobject = game_objects[i].get();
-        if (gameobject->parent) {
-            continue;
-        }
         str += game_objects[i]->serialize();
         if (i < game_objects.size() - 1) {
             str += "\n";
@@ -694,7 +689,7 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
     b2BodyDef bodyDef;
     bodyDef.position = pos;
     b2Body* body = world->CreateBody(&bodyDef);
-    std::vector<GameObject*> wheel_objects;
+    std::vector<std::unique_ptr<GameObject>> wheel_objects;
     std::vector<b2RevoluteJoint*> wheel_joints;
     for (int i = 0; i < lengths.size(); i++) {
         b2Vec2 vertices[3];
@@ -707,14 +702,17 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
         if (wheels[i] > 0.0f) {
             b2Vec2 anchor_pos = vertices[1];
             b2Vec2 anchor_pos_world = pos + anchor_pos;
-            GameObject* wheel = create_ball(anchor_pos_world, wheels[i], sf::Color::Yellow, sf::Color(64, 64, 0));
-            wheel->setType(b2_dynamicBody, false);
-            wheel->setDensity(1.0f, false);
-            wheel->setFriction(0.3f, false);
-            wheel->setRestitution(0.5f, false);
-            wheel_objects.push_back(wheel);
+            std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
+                world.get(), anchor_pos_world, 0.0f, wheels[i], sf::Color::Yellow, sf::Color(64, 64, 0)
+            );
+            BallObject* wheel_ptr = wheel.get();
+            wheel_ptr->setType(b2_dynamicBody, false);
+            wheel_ptr->setDensity(1.0f, false);
+            wheel_ptr->setFriction(0.3f, false);
+            wheel_ptr->setRestitution(0.5f, false);
+            wheel_objects.push_back(std::move(wheel));
             b2RevoluteJointDef wheel_joint_def;
-            wheel_joint_def.Initialize(body, wheel->rigid_body, anchor_pos_world);
+            wheel_joint_def.Initialize(body, wheel_ptr->rigid_body, anchor_pos_world);
             wheel_joint_def.maxMotorTorque = 30.0f;
             wheel_joint_def.motorSpeed = -10.0f;
             wheel_joint_def.enableMotor = true;
@@ -725,7 +723,7 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
     }
 
     shape->setFillColor(color);
-    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(std::move(shape), body, wheel_objects, wheel_joints);
+    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(std::move(shape), body, std::move(wheel_objects), wheel_joints);
     uptr->lengths = lengths;
     uptr->wheels = wheels;
     CarObject* ptr = uptr.get();

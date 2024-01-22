@@ -14,9 +14,10 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
-    //TODO: save/load camera position and zoom
-    //TODO: edit mode box selection
-    //TODO: create/delete objects in the scene
+    // TODO: serialize cars
+    // TODO: ctrl-z
+    // TODO: edit mode box selection
+    // TODO: create/delete objects in the scene
 
     return 0;
 }
