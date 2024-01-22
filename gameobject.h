@@ -78,11 +78,7 @@ private:
 
 class CarObject : public GameObject {
 public:
-	CarObject(
-		std::unique_ptr<sf::ConvexShape> shape,
-		b2Body* rigid_body, std::vector<std::unique_ptr<GameObject>> wheels,
-		std::vector<b2RevoluteJoint*> wheel_joints
-	);
+	CarObject(b2World* world, b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	std::string serialize();

@@ -677,57 +677,8 @@ BallObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, 
 }
 
 CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
-    std::unique_ptr<sf::ConvexShape> shape = std::make_unique<sf::ConvexShape>(lengths.size());
-    float pi = std::numbers::pi;
-    auto get_pos = [&](int i) {
-        float angle = (float)i / lengths.size() * 2 * pi;
-        b2Vec2 vector = b2Vec2(std::cos(angle), std::sin(angle));
-        int index = i < lengths.size() ? i : i % lengths.size();
-        b2Vec2 pos = lengths[index] * vector;
-        return pos;
-    };
-    b2BodyDef bodyDef;
-    bodyDef.position = pos;
-    b2Body* body = world->CreateBody(&bodyDef);
-    std::vector<std::unique_ptr<GameObject>> wheel_objects;
-    std::vector<b2RevoluteJoint*> wheel_joints;
-    for (int i = 0; i < lengths.size(); i++) {
-        b2Vec2 vertices[3];
-        vertices[0] = b2Vec2(0.0f, 0.0f);
-        vertices[1] = get_pos(i);
-        vertices[2] = get_pos(i + 1);
-        b2PolygonShape triangle;
-        triangle.Set(vertices, 3);
-        b2Fixture* fixture = body->CreateFixture(&triangle, 1.0f);
-        if (wheels[i] > 0.0f) {
-            b2Vec2 anchor_pos = vertices[1];
-            b2Vec2 anchor_pos_world = pos + anchor_pos;
-            std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
-                world.get(), anchor_pos_world, 0.0f, wheels[i], sf::Color::Yellow, sf::Color(64, 64, 0)
-            );
-            BallObject* wheel_ptr = wheel.get();
-            wheel_ptr->setType(b2_dynamicBody, false);
-            wheel_ptr->setDensity(1.0f, false);
-            wheel_ptr->setFriction(0.3f, false);
-            wheel_ptr->setRestitution(0.5f, false);
-            wheel_objects.push_back(std::move(wheel));
-            b2RevoluteJointDef wheel_joint_def;
-            wheel_joint_def.Initialize(body, wheel_ptr->rigid_body, anchor_pos_world);
-            wheel_joint_def.maxMotorTorque = 30.0f;
-            wheel_joint_def.motorSpeed = -10.0f;
-            wheel_joint_def.enableMotor = true;
-            b2RevoluteJoint* wheel_joint = (b2RevoluteJoint*)world->CreateJoint(&wheel_joint_def);
-            wheel_joints.push_back(wheel_joint);
-        }
-        shape->setPoint(i, tosf(vertices[1]));
-    }
-
-    shape->setFillColor(color);
-    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(std::move(shape), body, std::move(wheel_objects), wheel_joints);
-    uptr->lengths = lengths;
-    uptr->wheels = wheels;
+    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), pos, lengths, wheels, color);
     CarObject* ptr = uptr.get();
-    body->GetUserData().pointer = reinterpret_cast<uintptr_t>(ptr);
     game_objects.push_back(std::move(uptr));
     return ptr;
 }
