@@ -91,7 +91,7 @@ private:
 	sf::Vector2f sfMousePosWorld;
 	sf::Vector2i mousePrevPos;
 	float zoomFactor = 30.0f;
-	float viewCenterX = 0, viewCenterY = 5.0f;
+	float viewCenterX = 0.0f, viewCenterY = 5.0f;
 	sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
 	sf::RectangleShape paused_rect;
 	sf::RectangleShape toolbox_rect;

@@ -235,6 +235,11 @@ TokenWriter& TokenWriter::writeInt(int value) {
 	return *this;
 }
 
+TokenWriter& TokenWriter::writeInt(float value) {
+	assert(false && "Use writeFloat for writing floats");
+	return *this;
+}
+
 TokenWriter& TokenWriter::writeFloat(float value) {
 	// TODO: custom convert with 17 floating point digits
 	writeString(std::to_string(value));

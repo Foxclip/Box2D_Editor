@@ -14,7 +14,6 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: serializer: closing tags (/object)
     // TODO: serializeBody and serializeFixture
     // TODO: serialize floats with 17 digits
     // TODO: serialize linear and angular velocities

@@ -52,6 +52,7 @@ public:
 	TokenWriter& writeString(std::string value);
 	TokenWriter& writeNewLine();
 	TokenWriter& writeInt(int value);
+	TokenWriter& writeInt(float value);
 	TokenWriter& writeFloat(float value);
 	TokenWriter& writeBool(bool value);
 	TokenWriter& writeFloatArr(std::vector<float> value);
