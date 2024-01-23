@@ -438,15 +438,18 @@ void Application::maximize_window() {
 
 std::string Application::serialize() {
     std::string str;
-    str += "camera\n";
-    str += "    center " + std::to_string(viewCenterX) + " " + std::to_string(viewCenterY) + "\n";
-    str += "    zoom " + std::to_string(zoomFactor) + "\n";
-    str += "\n";
+    TokenWriter tw(&str);
+    tw.writeString("camera").writeNewLine();
+    tw.addIndentLevel();
+    tw.writeString("center").writeInt(viewCenterX).writeInt(viewCenterY).writeNewLine();
+    tw.writeString("zoom").writeFloat(zoomFactor).writeNewLine();
+    tw.writeNewLine();
+    tw.addIndentLevel(-1);
     for (int i = 0; i < game_objects.size(); i++) {
         GameObject* gameobject = game_objects[i].get();
-        str += game_objects[i]->serialize();
+        game_objects[i]->serialize(tw);
         if (i < game_objects.size() - 1) {
-            str += "\n";
+            tw.writeNewLine();
         }
     }
     return str;
@@ -455,20 +458,20 @@ std::string Application::serialize() {
 void Application::deserialize(std::string str, bool set_camera) {
     TokenReader tr(str);
     try {
-        while (tr.valid_range()) {
-            std::string entity = tr.gets();
+        while (tr.validRange()) {
+            std::string entity = tr.readString();
             if (entity == "camera") {
                 struct CameraParams {
                     float x = 0.0f, y = 0.0f, zoom = 30.0f;
                 };
                 CameraParams params;
-                while (tr.valid_range()) {
-                    std::string pname = tr.gets();
+                while (tr.validRange()) {
+                    std::string pname = tr.readString();
                     if (pname == "center") {
-                        params.x = tr.getf();
-                        params.y = tr.getf();
+                        params.x = tr.readFloat();
+                        params.y = tr.readFloat();
                     } else if (pname == "zoom") {
-                        params.zoom = tr.getf();
+                        params.zoom = tr.readFloat();
                     } else if (TokenReader::isEntityName(pname)) {
                         tr.move(-1);
                         break;
@@ -483,7 +486,7 @@ void Application::deserialize(std::string str, bool set_camera) {
                 }
             } else if (entity == "object") {
                 std::unique_ptr<GameObject> gameobject;
-                std::string type = tr.gets();
+                std::string type = tr.readString();
                 if (type == "box") {
                     gameobject = BoxObject::deserialize(tr, world.get());
                 } else if (type == "ball") {

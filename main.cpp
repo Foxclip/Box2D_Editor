@@ -15,9 +15,9 @@ int main() {
     }
 
     // TODO: serializer: closing tags (/object)
-    // TODO: TokenWriter
     // TODO: serializeBody and serializeFixture
     // TODO: serialize floats with 17 digits
+    // TODO: serialize linear and angular velocities
     // TODO: ctrl-z
     // TODO: edit mode box selection
     // TODO: create/delete objects in the scene

@@ -139,10 +139,10 @@ void GameObject::setRestitution(float restitution, bool include_children) {
 	}
 }
 
-std::string GameObject::serializeJoint(b2Joint* p_joint, int indent_level) {
+void GameObject::serializeJoint(TokenWriter& tw, b2Joint* p_joint) {
 	try {
 		if (b2RevoluteJoint* joint = dynamic_cast<b2RevoluteJoint*>(p_joint)) {
-			return serializeRevoluteJoint(joint, indent_level);
+			serializeRevoluteJoint(tw, joint);
 		} else {
 			throw std::runtime_error("Unknown joint type");
 		}
@@ -151,24 +151,20 @@ std::string GameObject::serializeJoint(b2Joint* p_joint, int indent_level) {
 	}
 }
 
-std::string GameObject::serializeRevoluteJoint(b2RevoluteJoint* joint, int indent_level) {
-	std::string str;
-	std::string indent_str;
-	for (int i = 0; i < indent_level; i++) {
-		indent_str += "    ";
-	}
-	str += indent_str + "joint revolute\n";
-	str += indent_str + "    anchor_a " + utils::vec_to_str(joint->GetLocalAnchorA()) + "\n";
-	str += indent_str + "    anchor_b " + utils::vec_to_str(joint->GetLocalAnchorB()) + "\n";
-	str += indent_str + "    collide_connected " + utils::bool_to_str(joint->GetCollideConnected()) + "\n";
-	str += indent_str + "    angle_lower_limit " + std::to_string(joint->GetLowerLimit()) + "\n";
-	str += indent_str + "    angle_upper_limit " + std::to_string(joint->GetUpperLimit()) + "\n";
-	str += indent_str + "    angle_limit_enabled " + utils::bool_to_str(joint->IsLimitEnabled()) + "\n";
-	str += indent_str + "    motor_max_torque " + std::to_string(joint->GetMaxMotorTorque()) + "\n";
-	str += indent_str + "    motor_speed " + std::to_string(joint->GetMotorSpeed()) + "\n";
-	str += indent_str + "    motor_enabled " + utils::bool_to_str(joint->IsMotorEnabled()) + "\n";
-	str += indent_str + "/joint\n";
-	return str;
+void GameObject::serializeRevoluteJoint(TokenWriter& tw, b2RevoluteJoint* joint) {
+	tw.writeString("joint revolute").writeNewLine();
+	tw.addIndentLevel();
+	tw.writeb2Vec2Param("anchor_a", joint->GetLocalAnchorA());
+	tw.writeb2Vec2Param("anchor_b", joint->GetLocalAnchorB());
+	tw.writeBoolParam("collide_connected", joint->GetCollideConnected());
+	tw.writeFloatParam("angle_lower_limit", joint->GetLowerLimit());
+	tw.writeFloatParam("angle_upper_limit", joint->GetUpperLimit());
+	tw.writeBoolParam("angle_limit_enabled", joint->IsLimitEnabled());
+	tw.writeFloatParam("motor_max_torque", joint->GetMaxMotorTorque());
+	tw.writeFloatParam("motor_speed", joint->GetMotorSpeed());
+	tw.writeBoolParam("motor_enabled", joint->IsMotorEnabled());
+	tw.addIndentLevel(-1);
+	tw.writeString("/joint").writeNewLine();
 }
 
 b2RevoluteJointDef GameObject::deserializeRevoluteJoint(TokenReader& tr) {
@@ -176,26 +172,26 @@ b2RevoluteJointDef GameObject::deserializeRevoluteJoint(TokenReader& tr) {
 		b2RevoluteJointDef def;
 		def.bodyA = nullptr;
 		def.bodyB = nullptr;
-		while (tr.valid_range()) {
-			std::string pname = tr.gets();
+		while (tr.validRange()) {
+			std::string pname = tr.readString();
 			if (pname == "anchor_a") {
-				def.localAnchorA = tr.getb2Vec2();
+				def.localAnchorA = tr.readb2Vec2();
 			} else if (pname == "anchor_b") {
-				def.localAnchorB = tr.getb2Vec2();
+				def.localAnchorB = tr.readb2Vec2();
 			} else if (pname == "collide_connected") {
-				def.collideConnected = tr.getb();
+				def.collideConnected = tr.readBool();
 			} else if (pname == "angle_lower_limit") {
-				def.lowerAngle = tr.getf();
+				def.lowerAngle = tr.readFloat();
 			} else if (pname == "angle_upper_limit") {
-				def.upperAngle = tr.getf();
+				def.upperAngle = tr.readFloat();
 			} else if (pname == "angle_limit_enabled") {
-				def.enableLimit = tr.getb();
+				def.enableLimit = tr.readBool();
 			} else if (pname == "motor_max_torque") {
-				def.maxMotorTorque = tr.getf();
+				def.maxMotorTorque = tr.readFloat();
 			} else if (pname == "motor_speed") {
-				def.motorSpeed = tr.getf();
+				def.motorSpeed = tr.readFloat();
 			} else if (pname == "motor_enabled") {
-				def.enableMotor = tr.getb();
+				def.enableMotor = tr.readBool();
 			} else if (pname == "/joint") {
 				break;
 			} else {
@@ -232,23 +228,19 @@ sf::Transformable* BoxObject::getTransformable() {
 	return rect_shape.get();
 }
 
-std::string BoxObject::serialize(int indent_level) {
-	std::string str;
+void BoxObject::serialize(TokenWriter& tw) {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
-	std::string indent_str;
-	for (int i = 0; i < indent_level; i++) {
-		indent_str += "    ";
-	}
-	str += indent_str + "object box\n";
-	str += indent_str + "    type " + utils::body_type_to_str(rigid_body->GetType()) + "\n";
-	str += indent_str + "    size " + utils::vec_to_str(size) + "\n";
-	str += indent_str + "    color " + utils::color_to_str(color) + "\n";
-	str += indent_str + "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
-	str += indent_str + "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
-	str += indent_str + "    density " + std::to_string(fixture->GetDensity()) + "\n";
-	str += indent_str + "    friction " + std::to_string(fixture->GetFriction()) + "\n";
-	str += indent_str + "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
-	return str;
+	tw.writeString("object box").writeNewLine();
+	tw.addIndentLevel();
+	tw.writeStringParam("type", utils::body_type_to_str(rigid_body->GetType()));
+	tw.writeb2Vec2Param("size", size);
+	tw.writeColorParam("color", color);
+	tw.writeb2Vec2Param("position", rigid_body->GetPosition());
+	tw.writeFloatParam("rotation", rigid_body->GetAngle());
+	tw.writeFloatParam("density", fixture->GetDensity());
+	tw.writeFloatParam("friction", fixture->GetFriction());
+	tw.writeFloatParam("restitution", fixture->GetRestitution());
+	tw.addIndentLevel(-1);
 }
 
 std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* world) {
@@ -259,24 +251,24 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* worl
 		sf::Color color = sf::Color::White;
 		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
 		b2BodyType type = b2_staticBody;
-		while(tr.valid_range()) {
-			std::string pname = tr.gets();
+		while(tr.validRange()) {
+			std::string pname = tr.readString();
 			if (pname == "type") {
-				type = utils::str_to_body_type(tr.gets());
+				type = utils::str_to_body_type(tr.readString());
 			} else if (pname == "size") {
-				size = tr.getb2Vec2();
+				size = tr.readb2Vec2();
 			} else if (pname == "color") {
-				color = tr.getColor();
+				color = tr.readColor();
 			} else if (pname == "position") {
-				position = tr.getb2Vec2();
+				position = tr.readb2Vec2();
 			} else if (pname == "rotation") {
-				angle = tr.getf();
+				angle = tr.readFloat();
 			} else if (pname == "density") {
-				density = tr.getf();
+				density = tr.readFloat();
 			} else if (pname == "friction") {
-				friction = tr.getf();
+				friction = tr.readFloat();
 			} else if (pname == "restitution") {
-				restitution = tr.getf();
+				restitution = tr.readFloat();
 			} else if (TokenReader::isEntityName(pname)) {
 				tr.move(-1);
 				break;
@@ -320,24 +312,20 @@ sf::Transformable* BallObject::getTransformable() {
 	return circle_notch_shape.get();
 }
 
-std::string BallObject::serialize(int indent_level) {
-	std::string str;
+void BallObject::serialize(TokenWriter& tw) {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
-	std::string indent_str;
-	for (int i = 0; i < indent_level; i++) {
-		indent_str += "    ";
-	}
-	str += indent_str + "object ball\n";
-	str += indent_str + "    type " + utils::body_type_to_str(rigid_body->GetType()) + "\n";
-	str += indent_str + "    radius " + std::to_string(radius) + "\n";
-	str += indent_str + "    color " + utils::color_to_str(color) + "\n";
-	str += indent_str + "    notch_color " + utils::color_to_str(notch_color) + "\n";
-	str += indent_str + "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
-	str += indent_str + "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
-	str += indent_str + "    density " + std::to_string(fixture->GetDensity()) + "\n";
-	str += indent_str + "    friction " + std::to_string(fixture->GetFriction()) + "\n";
-	str += indent_str + "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
-	return str;
+	tw.writeString("object ball").writeNewLine();
+	tw.addIndentLevel();
+	tw.writeStringParam("type", utils::body_type_to_str(rigid_body->GetType()));
+	tw.writeFloatParam("radius", radius);
+	tw.writeColorParam("color", color);
+	tw.writeColorParam("notch_color", notch_color);
+	tw.writeb2Vec2Param("position", rigid_body->GetPosition());
+	tw.writeFloatParam("rotation", rigid_body->GetAngle());
+	tw.writeFloatParam("density", fixture->GetDensity());
+	tw.writeFloatParam("friction", fixture->GetFriction());
+	tw.writeFloatParam("restitution", fixture->GetRestitution());
+	tw.addIndentLevel(-1);
 }
 
 std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* world) {
@@ -350,30 +338,30 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* wo
 		bool notch_color_set = false;
 		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
 		b2BodyType type = b2_staticBody;
-		while (tr.valid_range()) {
-			std::string pname = tr.gets();
+		while (tr.validRange()) {
+			std::string pname = tr.readString();
 			if (pname == "type") {
-				type = utils::str_to_body_type(tr.gets());
+				type = utils::str_to_body_type(tr.readString());
 			} else if (pname == "radius") {
-				radius = tr.getf();
+				radius = tr.readFloat();
 			} else if (pname == "color") {
-				color = tr.getColor();
+				color = tr.readColor();
 				if (!notch_color_set) {
 					notch_color = color;
 				}
 			} else if (pname == "notch_color") {
-				notch_color = tr.getColor();
+				notch_color = tr.readColor();
 				notch_color_set = true;
 			} else if (pname == "position") {
-				position = tr.getb2Vec2();
+				position = tr.readb2Vec2();
 			} else if (pname == "rotation") {
-				angle = tr.getf();
+				angle = tr.readFloat();
 			} else if (pname == "density") {
-				density = tr.getf();
+				density = tr.readFloat();
 			} else if (pname == "friction") {
-				friction = tr.getf();
+				friction = tr.readFloat();
 			} else if (pname == "restitution") {
-				restitution = tr.getf();
+				restitution = tr.readFloat();
 			} else if (TokenReader::isEntityName(pname)) {
 				tr.move(-1);
 				break;
@@ -500,28 +488,26 @@ sf::Transformable* CarObject::getTransformable() {
 	return convex_shape.get();
 }
 
-std::string CarObject::serialize(int indent_level) {
-	std::string str;
+void CarObject::serialize(TokenWriter& tw) {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
-	std::string indent_str;
-	for (int i = 0; i < indent_level; i++) {
-		indent_str += "    ";
-	}
-	str += indent_str + "object car\n";
-	str += indent_str + "    lengths " + utils::farr_to_str(lengths) + "\n";
-	str += indent_str + "    wheels\n";
+	tw.writeString("object car").writeNewLine();
+	tw.addIndentLevel();
+	tw.writeFloatArrParam("lengths", lengths);
+	tw.writeString("wheels").writeNewLine();
+	tw.addIndentLevel();
 	for (int i = 0; i < children.size(); i++) {
-		str += children[i]->serialize(indent_level + 2);
-		str += serializeJoint(wheel_joints[i], indent_level + 2);
+		children[i]->serialize(tw);
+		serializeJoint(tw, wheel_joints[i]);
 	}
-	str += indent_str + "    /wheels\n";
-	str += indent_str + "    color " + utils::color_to_str(color) + "\n";
-	str += indent_str + "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
-	str += indent_str + "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
-	str += indent_str + "    density " + std::to_string(fixture->GetDensity()) + "\n";
-	str += indent_str + "    friction " + std::to_string(fixture->GetFriction()) + "\n";
-	str += indent_str + "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
-	return str;
+	tw.addIndentLevel(-1);
+	tw.writeString("/wheels").writeNewLine();
+	tw.writeColorParam("color", color);
+	tw.writeb2Vec2Param("position", rigid_body->GetPosition());
+	tw.writeFloatParam("rotation", rigid_body->GetAngle());
+	tw.writeFloatParam("density", fixture->GetDensity());
+	tw.writeFloatParam("friction", fixture->GetFriction());
+	tw.writeFloatParam("restitution", fixture->GetRestitution());
+	tw.addIndentLevel(-1);
 }
 
 std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* world) {
@@ -533,13 +519,13 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 		std::vector<float> lengths;
 		std::vector<std::unique_ptr<BallObject>> wheels;
 		std::vector<b2RevoluteJointDef> joint_defs;
-		while (tr.valid_range()) {
-			std::string pname = tr.gets();
+		while (tr.validRange()) {
+			std::string pname = tr.readString();
 			if (pname == "lengths") {
-				lengths = tr.getfArr();
+				lengths = tr.readFloatArr();
 			} else if (pname == "wheels") {
-				while (tr.valid_range()) {
-					std::string str = tr.gets();
+				while (tr.validRange()) {
+					std::string str = tr.readString();
 					if (str == "object") {
 					} else if (str == "/wheels") {
 						break;
@@ -555,17 +541,17 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 					joint_defs.push_back(def);
 				}
 			} else if (pname == "color") {
-				color = tr.getColor();
+				color = tr.readColor();
 			} else if (pname == "position") {
-				position = tr.getb2Vec2();
+				position = tr.readb2Vec2();
 			} else if (pname == "rotation") {
-				angle = tr.getf();
+				angle = tr.readFloat();
 			} else if (pname == "density") {
-				density = tr.getf();
+				density = tr.readFloat();
 			} else if (pname == "friction") {
-				friction = tr.getf();
+				friction = tr.readFloat();
 			} else if (pname == "restitution") {
-				restitution = tr.getf();
+				restitution = tr.readFloat();
 			} else if (TokenReader::isEntityName(pname)) {
 				tr.move(-1);
 				break;
@@ -673,28 +659,21 @@ b2ChainShape* GroundObject::getShape() {
 	return static_cast<b2ChainShape*>(rigid_body->GetFixtureList()->GetShape());
 }
 
-std::string GroundObject::serialize(int indent_level) {
-	std::string str;
+void GroundObject::serialize(TokenWriter& tw) {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
-	std::string indent_str;
-	for (int i = 0; i < indent_level; i++) {
-		indent_str += "    ";
-	}
-	str += indent_str + "object ground\n";
-	str += indent_str + "    vertices ";
+	tw.writeString("object ground").writeNewLine();
+	tw.addIndentLevel();
+	tw.writeString("vertices");
 	b2ChainShape* chain = getShape();
 	for (int i = 0; i < chain->m_count; i++) {
-		str += utils::vec_to_str(chain->m_vertices[i]);
-		if (i < chain->m_count - 1) {
-			str += " ";
-		}
+		tw.writeb2Vec2(chain->m_vertices[i]);
 	}
-	str += indent_str + "\n";
-	str += indent_str + "    color " + utils::color_to_str(color) + "\n";
-	str += indent_str + "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
-	str += indent_str + "    friction " + std::to_string(fixture->GetFriction()) + "\n";
-	str += indent_str + "    restitution " + std::to_string(fixture->GetRestitution()) + "\n";
-	return str;
+	tw.writeNewLine();
+	tw.writeColorParam("color", color);
+	tw.writeb2Vec2Param("position", rigid_body->GetPosition());
+	tw.writeFloatParam("friction", fixture->GetFriction());
+	tw.writeFloatParam("restitution", fixture->GetRestitution());
+	tw.addIndentLevel(-1);
 }
 
 std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World* world) {
@@ -704,11 +683,12 @@ std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World
 		std::vector<b2Vec2> vertices;
 		sf::Color color = sf::Color::White;
 		float friction = 0.0f, restitution = 0.0f;
-		while (tr.valid_range()) {
-			std::string pname = tr.gets();
+		while (tr.validRange()) {
+			std::string pname = tr.readString();
 			if (pname == "vertices") {
+				// TODO: replace with readFloatArr
 				while (!tr.fail()) {
-					b2Vec2 vertex = tr.getb2Vec2();
+					b2Vec2 vertex = tr.readb2Vec2();
 					if (!tr.fail()) {
 						vertices.push_back(vertex);
 					}
@@ -716,13 +696,13 @@ std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World
 				tr.reset();
 				tr.move(-1);
 			} else if (pname == "color") {
-				color = tr.getColor();
+				color = tr.readColor();
 			} else if (pname == "position") {
-				position = tr.getb2Vec2();
+				position = tr.readb2Vec2();
 			} else if (pname == "friction") {
-				friction = tr.getf();
+				friction = tr.readFloat();
 			} else if (pname == "restitution") {
-				restitution = tr.getf();
+				restitution = tr.readFloat();
 			} else if (TokenReader::isEntityName(pname)) {
 				tr.move(-1);
 				break;

@@ -18,18 +18,18 @@ public:
 	TokenReader(std::string& str);
 	TokenReader(std::vector<WordToken>* tokens, int pos = 0);
 	WordToken get();
-	std::string gets();
 	void eat(std::string expected);
-	int geti();
-	float getf();
-	bool getb();
-	std::vector<float> getfArr();
-	sf::Color getColor();
-	b2Vec2 getb2Vec2();
+	std::string readString();
+	int readInt();
+	float readFloat();
+	bool readBool();
+	std::vector<float> readFloatArr();
+	sf::Color readColor();
+	b2Vec2 readb2Vec2();
 	WordToken peek(int offset = 0);
 	void move(int offset);
 	bool eof();
-	bool valid_range();
+	bool validRange();
 	bool fail();
 	void reset();
 	int getLine(int offset = 0);
@@ -42,4 +42,38 @@ private:
 
 	std::vector<WordToken> tokenize(std::string str);
 	bool isValidPos(int pos);
+};
+
+class TokenWriter {
+public:
+	TokenWriter(int indent_level = 0);
+	TokenWriter(TokenWriter& parent);
+	TokenWriter(std::string* target, int indent_level = 0);
+	TokenWriter& writeString(std::string value);
+	TokenWriter& writeNewLine();
+	TokenWriter& writeInt(int value);
+	TokenWriter& writeFloat(float value);
+	TokenWriter& writeBool(bool value);
+	TokenWriter& writeFloatArr(std::vector<float> value);
+	TokenWriter& writeColor(sf::Color value);
+	TokenWriter& writeb2Vec2(b2Vec2 value);
+	void writeStringParam(std::string name, std::string value);
+	void writeIntParam(std::string name, int value);
+	void writeFloatParam(std::string name, float value);
+	void writeBoolParam(std::string name, bool value);
+	void writeFloatArrParam(std::string name, std::vector<float> value);
+	void writeColorParam(std::string name, sf::Color value);
+	void writeb2Vec2Param(std::string name, b2Vec2 value);
+	int getIndentLevel();
+	void setIndentLevel(int indentLevel);
+	void addIndentLevel(int add = 1);
+	std::string toStr();
+private:
+	std::string* target;
+	std::string internal_str;
+	int indent_level = 0;
+	std::string indent_str;
+	bool new_line = true;
+
+	void updateIndentStr();
 };

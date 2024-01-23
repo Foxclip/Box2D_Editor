@@ -30,7 +30,7 @@ WordToken TokenReader::get() {
 	}
 }
 
-std::string TokenReader::gets() {
+std::string TokenReader::readString() {
 	if (fail_state) {
 		return "";
 	}
@@ -39,7 +39,7 @@ std::string TokenReader::gets() {
 
 void TokenReader::eat(std::string expected) {
 	try {
-		std::string str = gets();
+		std::string str = readString();
 		if (str != expected) {
 			throw std::runtime_error("Expected: \"" + expected + "\", got: \"" + str + "\"");
 		}
@@ -48,11 +48,11 @@ void TokenReader::eat(std::string expected) {
 	}
 }
 
-int TokenReader::geti() {
+int TokenReader::readInt() {
 	if (fail_state) {
 		return 0;
 	}
-	std::string str = gets();
+	std::string str = readString();
 	const char* start = str.c_str();
 	char* end;
 	int result = std::strtol(start, &end, 10);
@@ -63,11 +63,11 @@ int TokenReader::geti() {
 	return result;
 }
 
-float TokenReader::getf() {
+float TokenReader::readFloat() {
 	if (fail_state) {
 		return 0.0f;
 	}
-	std::string str = gets();
+	std::string str = readString();
 	const char* start = str.c_str();
 	char* end;
 	float result = std::strtof(start, &end);
@@ -78,11 +78,11 @@ float TokenReader::getf() {
 	return result;
 }
 
-bool TokenReader::getb() {
+bool TokenReader::readBool() {
 	if (fail_state) {
 		return false;
 	}
-	std::string str = gets();
+	std::string str = readString();
 	if (str == "true") {
 		return true;
 	} else if (str == "false") {
@@ -93,10 +93,10 @@ bool TokenReader::getb() {
 	}
 }
 
-std::vector<float> TokenReader::getfArr() {
+std::vector<float> TokenReader::readFloatArr() {
 	std::vector<float> result;
 	while (!fail()) {
-		float f = getf();
+		float f = readFloat();
 		if (!fail()) {
 			result.push_back(f);
 		}
@@ -106,25 +106,25 @@ std::vector<float> TokenReader::getfArr() {
 	return result;
 }
 
-sf::Color TokenReader::getColor() {
+sf::Color TokenReader::readColor() {
 	if (fail_state) {
 		return sf::Color();
 	}
 	sf::Color color;
-	color.r = geti();
-	color.g = geti();
-	color.b = geti();
-	color.a = geti();
+	color.r = readInt();
+	color.g = readInt();
+	color.b = readInt();
+	color.a = readInt();
 	return color;
 }
 
-b2Vec2 TokenReader::getb2Vec2() {
+b2Vec2 TokenReader::readb2Vec2() {
 	if (fail_state) {
 		return b2Vec2(0.0f, 0.0f);
 	}
 	b2Vec2 vec;
-	vec.x = getf();
-	vec.y = getf();
+	vec.x = readFloat();
+	vec.y = readFloat();
 	return vec;
 }
 
@@ -140,7 +140,7 @@ bool TokenReader::eof() {
 	return pos == tokens->size() - 1;
 }
 
-bool TokenReader::valid_range() {
+bool TokenReader::validRange() {
 	return isValidPos(pos);
 }
 
@@ -184,4 +184,129 @@ std::vector<WordToken> TokenReader::tokenize(std::string str) {
 
 bool TokenReader::isValidPos(int position) {
 	return position >= 0 && position < tokens->size();
+}
+
+TokenWriter::TokenWriter(int indent_level) {
+	this->target = &internal_str;
+	this->indent_level = indent_level;
+	updateIndentStr();
+}
+
+TokenWriter::TokenWriter(TokenWriter& parent) {
+	this->target = &internal_str;
+	this->indent_level = parent.getIndentLevel();
+	updateIndentStr();
+}
+
+TokenWriter::TokenWriter(std::string* target, int indent_level) {
+	this->target = target;
+	this->indent_level = indent_level;
+	updateIndentStr();
+}
+
+TokenWriter& TokenWriter::writeString(std::string value) {
+	if (new_line) {
+		target->append(indent_str);
+	} else {
+		target->append(" ");
+	}
+	target->append(value);
+	new_line = false;
+	return *this;
+}
+
+TokenWriter& TokenWriter::writeNewLine() {
+	target->append("\n");
+	new_line = true;
+	return *this;
+}
+
+TokenWriter& TokenWriter::writeInt(int value) {
+	writeString(std::to_string(value));
+	return *this;
+}
+
+TokenWriter& TokenWriter::writeFloat(float value) {
+	// TODO: custom convert with 17 floating point digits
+	writeString(std::to_string(value));
+	return *this;
+}
+
+TokenWriter& TokenWriter::writeBool(bool value) {
+	writeString(value ? "true" : "false");
+	return *this;
+}
+
+TokenWriter& TokenWriter::writeFloatArr(std::vector<float> value) {
+	for (int i = 0; i < value.size(); i++) {
+		writeFloat(value[i]);
+	}
+	return *this;
+}
+
+TokenWriter& TokenWriter::writeColor(sf::Color value) {
+	writeInt(value.r);
+	writeInt(value.g);
+	writeInt(value.b);
+	writeInt(value.a);
+	return *this;
+}
+
+TokenWriter& TokenWriter::writeb2Vec2(b2Vec2 value) {
+	writeFloat(value.x);
+	writeFloat(value.y);
+	return *this;
+}
+
+void TokenWriter::writeStringParam(std::string name, std::string value) {
+	writeString(name).writeString(value).writeNewLine();
+}
+
+void TokenWriter::writeIntParam(std::string name, int value) {
+	writeString(name).writeInt(value).writeNewLine();
+}
+
+void TokenWriter::writeFloatParam(std::string name, float value) {
+	writeString(name).writeFloat(value).writeNewLine();
+}
+
+void TokenWriter::writeBoolParam(std::string name, bool value) {
+	writeString(name).writeBool(value).writeNewLine();
+}
+
+void TokenWriter::writeFloatArrParam(std::string name, std::vector<float> value) {
+	writeString(name).writeFloatArr(value).writeNewLine();
+}
+
+void TokenWriter::writeColorParam(std::string name, sf::Color value) {
+	writeString(name).writeColor(value).writeNewLine();
+}
+
+void TokenWriter::writeb2Vec2Param(std::string name, b2Vec2 value) {
+	writeString(name).writeb2Vec2(value).writeNewLine();
+}
+
+int TokenWriter::getIndentLevel() {
+	return indent_level;
+}
+
+void TokenWriter::setIndentLevel(int indentLevel) {
+	this->indent_level = indentLevel;
+	updateIndentStr();
+}
+
+void TokenWriter::addIndentLevel(int add) {
+	indent_level += add;
+	updateIndentStr();
+}
+
+std::string TokenWriter::toStr() {
+	return std::string(*target);
+}
+
+void TokenWriter::updateIndentStr() {
+	indent_str = "";
+	for (int i = 0; i < indent_level; i++) {
+		indent_str += "    ";
+	}
 }
