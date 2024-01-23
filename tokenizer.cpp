@@ -128,6 +128,19 @@ b2Vec2 TokenReader::readb2Vec2() {
 	return vec;
 }
 
+std::vector<b2Vec2> TokenReader::readb2Vec2Arr() {
+	std::vector<b2Vec2> result;
+	while (!fail()) {
+		b2Vec2 vec = readb2Vec2();
+		if (!fail()) {
+			result.push_back(vec);
+		}
+	}
+	reset();
+	move(-1);
+	return result;
+}
+
 WordToken TokenReader::peek(int offset) {
 	return tokens->at(pos + offset);
 }
@@ -154,10 +167,6 @@ void TokenReader::reset() {
 
 int TokenReader::getLine(int offset) {
 	return peek(offset).line;
-}
-
-bool TokenReader::isEntityName(std::string str) {
-	return str == "camera" || str == "object" || str == "joint";
 }
 
 std::vector<WordToken> TokenReader::tokenize(std::string str) {

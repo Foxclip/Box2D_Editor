@@ -26,6 +26,7 @@ public:
 	std::vector<float> readFloatArr();
 	sf::Color readColor();
 	b2Vec2 readb2Vec2();
+	std::vector<b2Vec2> readb2Vec2Arr();
 	WordToken peek(int offset = 0);
 	void move(int offset);
 	bool eof();
@@ -33,7 +34,6 @@ public:
 	bool fail();
 	void reset();
 	int getLine(int offset = 0);
-	static bool isEntityName(std::string str);
 private:
 	std::vector<WordToken> internal_tokens;
 	std::vector<WordToken>* tokens;

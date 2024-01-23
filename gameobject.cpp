@@ -164,7 +164,7 @@ void GameObject::serializeRevoluteJoint(TokenWriter& tw, b2RevoluteJoint* joint)
 	tw.writeFloatParam("motor_speed", joint->GetMotorSpeed());
 	tw.writeBoolParam("motor_enabled", joint->IsMotorEnabled());
 	tw.addIndentLevel(-1);
-	tw.writeString("/joint").writeNewLine();
+	tw.writeString("/joint");
 }
 
 b2RevoluteJointDef GameObject::deserializeRevoluteJoint(TokenReader& tr) {
@@ -241,6 +241,7 @@ void BoxObject::serialize(TokenWriter& tw) {
 	tw.writeFloatParam("friction", fixture->GetFriction());
 	tw.writeFloatParam("restitution", fixture->GetRestitution());
 	tw.addIndentLevel(-1);
+	tw.writeString("/object");
 }
 
 std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* world) {
@@ -269,8 +270,7 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* worl
 				friction = tr.readFloat();
 			} else if (pname == "restitution") {
 				restitution = tr.readFloat();
-			} else if (TokenReader::isEntityName(pname)) {
-				tr.move(-1);
+			} else if (pname == "/object") {
 				break;
 			} else {
 				throw std::runtime_error("Unknown BoxObject parameter name: " + pname);
@@ -326,6 +326,7 @@ void BallObject::serialize(TokenWriter& tw) {
 	tw.writeFloatParam("friction", fixture->GetFriction());
 	tw.writeFloatParam("restitution", fixture->GetRestitution());
 	tw.addIndentLevel(-1);
+	tw.writeString("/object");
 }
 
 std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* world) {
@@ -362,8 +363,7 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* wo
 				friction = tr.readFloat();
 			} else if (pname == "restitution") {
 				restitution = tr.readFloat();
-			} else if (TokenReader::isEntityName(pname)) {
-				tr.move(-1);
+			} else if (pname == "/object") {
 				break;
 			} else {
 				throw std::runtime_error("Unknown BallObject parameter name: " + pname);
@@ -497,7 +497,9 @@ void CarObject::serialize(TokenWriter& tw) {
 	tw.addIndentLevel();
 	for (int i = 0; i < children.size(); i++) {
 		children[i]->serialize(tw);
+		tw.writeNewLine();
 		serializeJoint(tw, wheel_joints[i]);
+		tw.writeNewLine();
 	}
 	tw.addIndentLevel(-1);
 	tw.writeString("/wheels").writeNewLine();
@@ -508,6 +510,7 @@ void CarObject::serialize(TokenWriter& tw) {
 	tw.writeFloatParam("friction", fixture->GetFriction());
 	tw.writeFloatParam("restitution", fixture->GetRestitution());
 	tw.addIndentLevel(-1);
+	tw.writeString("/object");
 }
 
 std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* world) {
@@ -552,8 +555,7 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 				friction = tr.readFloat();
 			} else if (pname == "restitution") {
 				restitution = tr.readFloat();
-			} else if (TokenReader::isEntityName(pname)) {
-				tr.move(-1);
+			} else if (pname == "/object") {
 				break;
 			} else {
 				throw std::runtime_error("Unknown CarObject parameter name: " + pname);
@@ -674,6 +676,7 @@ void GroundObject::serialize(TokenWriter& tw) {
 	tw.writeFloatParam("friction", fixture->GetFriction());
 	tw.writeFloatParam("restitution", fixture->GetRestitution());
 	tw.addIndentLevel(-1);
+	tw.writeString("/object");
 }
 
 std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World* world) {
@@ -686,15 +689,7 @@ std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
 			if (pname == "vertices") {
-				// TODO: replace with readFloatArr
-				while (!tr.fail()) {
-					b2Vec2 vertex = tr.readb2Vec2();
-					if (!tr.fail()) {
-						vertices.push_back(vertex);
-					}
-				}
-				tr.reset();
-				tr.move(-1);
+				vertices = tr.readb2Vec2Arr();
 			} else if (pname == "color") {
 				color = tr.readColor();
 			} else if (pname == "position") {
@@ -703,8 +698,7 @@ std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World
 				friction = tr.readFloat();
 			} else if (pname == "restitution") {
 				restitution = tr.readFloat();
-			} else if (TokenReader::isEntityName(pname)) {
-				tr.move(-1);
+			} else if (pname == "/object") {
 				break;
 			} else {
 				throw std::runtime_error("Unknown GroundObject parameter name: " + pname);

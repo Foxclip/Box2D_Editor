@@ -443,13 +443,14 @@ std::string Application::serialize() {
     tw.addIndentLevel();
     tw.writeString("center").writeInt(viewCenterX).writeInt(viewCenterY).writeNewLine();
     tw.writeString("zoom").writeFloat(zoomFactor).writeNewLine();
-    tw.writeNewLine();
     tw.addIndentLevel(-1);
+    tw.writeString("/camera").writeNewLine();
+    tw.writeNewLine();
     for (int i = 0; i < game_objects.size(); i++) {
         GameObject* gameobject = game_objects[i].get();
         game_objects[i]->serialize(tw);
         if (i < game_objects.size() - 1) {
-            tw.writeNewLine();
+            tw.writeNewLine().writeNewLine();
         }
     }
     return str;
@@ -472,8 +473,7 @@ void Application::deserialize(std::string str, bool set_camera) {
                         params.y = tr.readFloat();
                     } else if (pname == "zoom") {
                         params.zoom = tr.readFloat();
-                    } else if (TokenReader::isEntityName(pname)) {
-                        tr.move(-1);
+                    } else if (pname == "/camera") {
                         break;
                     } else {
                         throw std::runtime_error("Unknown camera parameter: " + pname);
