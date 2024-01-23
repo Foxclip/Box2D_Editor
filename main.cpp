@@ -14,7 +14,9 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: serialize car wheels as subobjects
+    // TODO: serializer: closing tags (/object)
+    // TODO: TokenWriter
+    // TODO: serializeBody and serializeFixture
     // TODO: serialize floats with 17 digits
     // TODO: ctrl-z
     // TODO: edit mode box selection

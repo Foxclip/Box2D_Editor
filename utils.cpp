@@ -115,28 +115,6 @@ namespace utils {
 		return buffer.str();
 	}
 
-	std::vector<WordToken> tokenize(std::string str) {
-		std::vector<WordToken> results;
-		std::string current_word;
-		str += EOF;
-		int current_line = 1;
-		for (int i = 0; i < str.size(); i++) {
-			char c = str[i];
-			if (isspace(c) || c == EOF) {
-				if (current_word.size() > 0) {
-					results.push_back(WordToken(current_word, current_line));
-				}
-				current_word = "";
-			} else {
-				current_word += c;
-			}
-			if (c == '\n') {
-				current_line++;
-			}
-		}
-		return results;
-	}
-
 	std::string color_to_str(sf::Color color) {
 		return
 			std::to_string(color.r)
@@ -155,6 +133,18 @@ namespace utils {
 			}
 		}
 		return str;
+	}
+
+	std::string bool_to_str(bool value) {
+		return value ? "true" : "false";
+	}
+
+	b2Vec2 get_pos(const std::vector<float>& lengths, int i) {
+		float angle = (float)i / lengths.size() * 2 * b2_pi;
+		b2Vec2 vector = b2Vec2(std::cos(angle), std::sin(angle));
+		int index = i < lengths.size() ? i : i % lengths.size();
+		b2Vec2 pos = lengths[index] * vector;
+		return pos;
 	}
 
 }

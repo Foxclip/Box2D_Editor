@@ -26,9 +26,10 @@ namespace utils {
 	b2BodyType str_to_body_type(std::string str);
 	void str_to_file(std::string str, std::string path);
 	std::string file_to_str(std::filesystem::path path);
-	std::vector<WordToken> tokenize(std::string str);
 	std::string color_to_str(sf::Color color);
 	std::string farr_to_str(std::vector<float>& vec);
+	std::string bool_to_str(bool value);
+	b2Vec2 get_pos(const std::vector<float>& lengths, int i);
 
 	template <typename T>
 	T rot90CCW(const T& vec) {

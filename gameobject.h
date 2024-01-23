@@ -49,6 +49,9 @@ public:
 	void setFriction(float friction, bool include_children);
 	void setRestitution(float restitution, bool include_children);
 	virtual std::string serialize(int indent_level = 0) = 0;
+	static std::string serializeJoint(b2Joint* p_joint, int indent_level = 0);
+	static std::string serializeRevoluteJoint(b2RevoluteJoint* joint, int indent_level = 0);
+	static b2RevoluteJointDef deserializeRevoluteJoint(TokenReader& tr);
 };
 
 class BoxObject : public GameObject {
@@ -57,7 +60,7 @@ public:
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	std::string serialize(int indent_level = 0);
-	static std::unique_ptr<BoxObject> deserialize(TokensPointer& tp, b2World* world);
+	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, b2World* world);
 	b2Vec2 size = b2Vec2();
 private:
 	std::unique_ptr<sf::RectangleShape> rect_shape;
@@ -69,7 +72,7 @@ public:
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	std::string serialize(int indent_level = 0);
-	static std::unique_ptr<BallObject> deserialize(TokensPointer& tp, b2World* world);
+	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, b2World* world);
 	float radius = 0.0f;
 private:
 	std::unique_ptr<CircleNotchShape> circle_notch_shape;
@@ -79,12 +82,20 @@ private:
 class CarObject : public GameObject {
 public:
 	CarObject(b2World* world, b2Vec2 pos, float angle, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
+	CarObject(
+		b2World* world,
+		b2Vec2 pos,
+		float angle,
+		std::vector<float> lengths,
+		std::vector<std::unique_ptr<BallObject>> wheels,
+		std::vector<b2RevoluteJointDef> joint_defs,
+		sf::Color color
+	);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	std::string serialize(int indent_level = 0);
-	static std::unique_ptr<CarObject> deserialize(TokensPointer& tp, b2World* world);
+	static std::unique_ptr<CarObject> deserialize(TokenReader& tr, b2World* world);
 	std::vector<float> lengths;
-	std::vector<float> wheels;
 private:
 	std::unique_ptr<sf::ConvexShape> convex_shape;
 	std::vector<b2RevoluteJoint*> wheel_joints;
@@ -100,7 +111,7 @@ public:
 	sf::Transformable* getTransformable();
 	b2ChainShape* getShape();
 	std::string serialize(int indent_level = 0);
-	static std::unique_ptr<GroundObject> deserialize(TokensPointer& tp, b2World* world);
+	static std::unique_ptr<GroundObject> deserialize(TokenReader& tr, b2World* world);
 private:
 	std::unique_ptr<LineStripShape> line_strip_shape;
 	std::vector<b2Vec2> getVertices();

@@ -139,6 +139,75 @@ void GameObject::setRestitution(float restitution, bool include_children) {
 	}
 }
 
+std::string GameObject::serializeJoint(b2Joint* p_joint, int indent_level) {
+	try {
+		if (b2RevoluteJoint* joint = dynamic_cast<b2RevoluteJoint*>(p_joint)) {
+			return serializeRevoluteJoint(joint, indent_level);
+		} else {
+			throw std::runtime_error("Unknown joint type");
+		}
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+	}
+}
+
+std::string GameObject::serializeRevoluteJoint(b2RevoluteJoint* joint, int indent_level) {
+	std::string str;
+	std::string indent_str;
+	for (int i = 0; i < indent_level; i++) {
+		indent_str += "    ";
+	}
+	str += indent_str + "joint revolute\n";
+	str += indent_str + "    anchor_a " + utils::vec_to_str(joint->GetLocalAnchorA()) + "\n";
+	str += indent_str + "    anchor_b " + utils::vec_to_str(joint->GetLocalAnchorB()) + "\n";
+	str += indent_str + "    collide_connected " + utils::bool_to_str(joint->GetCollideConnected()) + "\n";
+	str += indent_str + "    angle_lower_limit " + std::to_string(joint->GetLowerLimit()) + "\n";
+	str += indent_str + "    angle_upper_limit " + std::to_string(joint->GetUpperLimit()) + "\n";
+	str += indent_str + "    angle_limit_enabled " + utils::bool_to_str(joint->IsLimitEnabled()) + "\n";
+	str += indent_str + "    motor_max_torque " + std::to_string(joint->GetMaxMotorTorque()) + "\n";
+	str += indent_str + "    motor_speed " + std::to_string(joint->GetMotorSpeed()) + "\n";
+	str += indent_str + "    motor_enabled " + utils::bool_to_str(joint->IsMotorEnabled()) + "\n";
+	str += indent_str + "/joint\n";
+	return str;
+}
+
+b2RevoluteJointDef GameObject::deserializeRevoluteJoint(TokenReader& tr) {
+	try {
+		b2RevoluteJointDef def;
+		def.bodyA = nullptr;
+		def.bodyB = nullptr;
+		while (tr.valid_range()) {
+			std::string pname = tr.gets();
+			if (pname == "anchor_a") {
+				def.localAnchorA = tr.getb2Vec2();
+			} else if (pname == "anchor_b") {
+				def.localAnchorB = tr.getb2Vec2();
+			} else if (pname == "collide_connected") {
+				def.collideConnected = tr.getb();
+			} else if (pname == "angle_lower_limit") {
+				def.lowerAngle = tr.getf();
+			} else if (pname == "angle_upper_limit") {
+				def.upperAngle = tr.getf();
+			} else if (pname == "angle_limit_enabled") {
+				def.enableLimit = tr.getb();
+			} else if (pname == "motor_max_torque") {
+				def.maxMotorTorque = tr.getf();
+			} else if (pname == "motor_speed") {
+				def.motorSpeed = tr.getf();
+			} else if (pname == "motor_enabled") {
+				def.enableMotor = tr.getb();
+			} else if (pname == "/joint") {
+				break;
+			} else {
+				throw std::runtime_error("Unknown RevoluteJoint parameter name: " + pname);
+			}
+		}
+		return def;
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+	}
+}
+
 BoxObject::BoxObject(b2World* world, b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
 	b2BodyDef bodyDef;
 	bodyDef.position = pos;
@@ -182,7 +251,7 @@ std::string BoxObject::serialize(int indent_level) {
 	return str;
 }
 
-std::unique_ptr<BoxObject> BoxObject::deserialize(TokensPointer& tp, b2World* world) {
+std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
 		b2Vec2 position = b2Vec2(0.0f, 0.0f);
 		float angle = 0.0f;
@@ -190,26 +259,26 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokensPointer& tp, b2World* wo
 		sf::Color color = sf::Color::White;
 		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
 		b2BodyType type = b2_staticBody;
-		while(tp.valid_range()) {
-			std::string pname = tp.gets();
+		while(tr.valid_range()) {
+			std::string pname = tr.gets();
 			if (pname == "type") {
-				type = utils::str_to_body_type(tp.gets());
+				type = utils::str_to_body_type(tr.gets());
 			} else if (pname == "size") {
-				size = tp.getb2Vec2();
+				size = tr.getb2Vec2();
 			} else if (pname == "color") {
-				color = tp.getColor();
+				color = tr.getColor();
 			} else if (pname == "position") {
-				position = tp.getb2Vec2();
+				position = tr.getb2Vec2();
 			} else if (pname == "rotation") {
-				angle = tp.getf();
+				angle = tr.getf();
 			} else if (pname == "density") {
-				density = tp.getf();
+				density = tr.getf();
 			} else if (pname == "friction") {
-				friction = tp.getf();
+				friction = tr.getf();
 			} else if (pname == "restitution") {
-				restitution = tp.getf();
-			} else if (TokensPointer::isEntityName(pname)) {
-				tp.move(-1);
+				restitution = tr.getf();
+			} else if (TokenReader::isEntityName(pname)) {
+				tr.move(-1);
 				break;
 			} else {
 				throw std::runtime_error("Unknown BoxObject parameter name: " + pname);
@@ -271,7 +340,7 @@ std::string BallObject::serialize(int indent_level) {
 	return str;
 }
 
-std::unique_ptr<BallObject> BallObject::deserialize(TokensPointer& tp, b2World* world) {
+std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
 		b2Vec2 position = b2Vec2(0.0f, 0.0f);
 		float angle = 0.0f;
@@ -281,32 +350,32 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokensPointer& tp, b2World* 
 		bool notch_color_set = false;
 		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
 		b2BodyType type = b2_staticBody;
-		while (tp.valid_range()) {
-			std::string pname = tp.gets();
+		while (tr.valid_range()) {
+			std::string pname = tr.gets();
 			if (pname == "type") {
-				type = utils::str_to_body_type(tp.gets());
+				type = utils::str_to_body_type(tr.gets());
 			} else if (pname == "radius") {
-				radius = tp.getf();
+				radius = tr.getf();
 			} else if (pname == "color") {
-				color = tp.getColor();
+				color = tr.getColor();
 				if (!notch_color_set) {
 					notch_color = color;
 				}
 			} else if (pname == "notch_color") {
-				notch_color = tp.getColor();
+				notch_color = tr.getColor();
 				notch_color_set = true;
 			} else if (pname == "position") {
-				position = tp.getb2Vec2();
+				position = tr.getb2Vec2();
 			} else if (pname == "rotation") {
-				angle = tp.getf();
+				angle = tr.getf();
 			} else if (pname == "density") {
-				density = tp.getf();
+				density = tr.getf();
 			} else if (pname == "friction") {
-				friction = tp.getf();
+				friction = tr.getf();
 			} else if (pname == "restitution") {
-				restitution = tp.getf();
-			} else if (TokensPointer::isEntityName(pname)) {
-				tp.move(-1);
+				restitution = tr.getf();
+			} else if (TokenReader::isEntityName(pname)) {
+				tr.move(-1);
 				break;
 			} else {
 				throw std::runtime_error("Unknown BallObject parameter name: " + pname);
@@ -341,13 +410,6 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 CarObject::CarObject(b2World* world, b2Vec2 pos, float angle, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
 	convex_shape = std::make_unique<sf::ConvexShape>(lengths.size());
 	float pi = std::numbers::pi;
-	auto get_pos = [&](int i) {
-		float angle = (float)i / lengths.size() * 2 * pi;
-		b2Vec2 vector = b2Vec2(std::cos(angle), std::sin(angle));
-		int index = i < lengths.size() ? i : i % lengths.size();
-		b2Vec2 pos = lengths[index] * vector;
-		return pos;
-	};
 	b2BodyDef bodyDef;
 	bodyDef.position = pos;
 	bodyDef.angle = angle;
@@ -355,8 +417,8 @@ CarObject::CarObject(b2World* world, b2Vec2 pos, float angle, std::vector<float>
 	for (int i = 0; i < lengths.size(); i++) {
 		b2Vec2 vertices[3];
 		vertices[0] = b2Vec2(0.0f, 0.0f);
-		vertices[1] = get_pos(i);
-		vertices[2] = get_pos(i + 1);
+		vertices[1] = utils::get_pos(lengths, i);
+		vertices[2] = utils::get_pos(lengths, i + 1);
 		b2PolygonShape triangle;
 		triangle.Set(vertices, 3);
 		b2Fixture* fixture = rigid_body->CreateFixture(&triangle, 1.0f);
@@ -385,7 +447,47 @@ CarObject::CarObject(b2World* world, b2Vec2 pos, float angle, std::vector<float>
 
 	convex_shape->setFillColor(color);
 	this->lengths = lengths;
-	this->wheels = wheels;
+	this->color = color;
+	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+}
+
+CarObject::CarObject(
+	b2World* world,
+	b2Vec2 pos,
+	float angle,
+	std::vector<float> lengths,
+	std::vector<std::unique_ptr<BallObject>> wheels,
+	std::vector<b2RevoluteJointDef> joint_defs,
+	sf::Color color
+) {
+	convex_shape = std::make_unique<sf::ConvexShape>(lengths.size());
+	b2BodyDef bodyDef;
+	bodyDef.position = pos;
+	bodyDef.angle = angle;
+	rigid_body = world->CreateBody(&bodyDef);
+	for (int i = 0; i < lengths.size(); i++) {
+		b2Vec2 vertices[3];
+		vertices[0] = b2Vec2(0.0f, 0.0f);
+		vertices[1] = utils::get_pos(lengths, i);
+		vertices[2] = utils::get_pos(lengths, i + 1);
+		b2PolygonShape triangle;
+		triangle.Set(vertices, 3);
+		b2Fixture* fixture = rigid_body->CreateFixture(&triangle, 1.0f);
+		convex_shape->setPoint(i, tosf(vertices[1]));
+	}
+
+	convex_shape->setFillColor(color);
+	this->lengths = lengths;
+	for (int i = 0; i < joint_defs.size(); i++) {
+		b2RevoluteJointDef def = joint_defs[i];
+		def.bodyA = rigid_body;
+		def.bodyB = wheels[i]->rigid_body;
+		b2RevoluteJoint* joint = static_cast<b2RevoluteJoint*>(world->CreateJoint(&def));
+		wheel_joints.push_back(joint);
+	}
+	for (int i = 0; i < wheels.size(); i++) {
+		children.push_back(std::move(wheels[i]));
+	}
 	this->color = color;
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
@@ -407,7 +509,12 @@ std::string CarObject::serialize(int indent_level) {
 	}
 	str += indent_str + "object car\n";
 	str += indent_str + "    lengths " + utils::farr_to_str(lengths) + "\n";
-	str += indent_str + "    wheels " + utils::farr_to_str(wheels) + "\n";
+	str += indent_str + "    wheels\n";
+	for (int i = 0; i < children.size(); i++) {
+		str += children[i]->serialize(indent_level + 2);
+		str += serializeJoint(wheel_joints[i], indent_level + 2);
+	}
+	str += indent_str + "    /wheels\n";
 	str += indent_str + "    color " + utils::color_to_str(color) + "\n";
 	str += indent_str + "    position " + utils::vec_to_str(rigid_body->GetPosition()) + "\n";
 	str += indent_str + "    rotation " + std::to_string(rigid_body->GetAngle()) + "\n";
@@ -417,40 +524,56 @@ std::string CarObject::serialize(int indent_level) {
 	return str;
 }
 
-std::unique_ptr<CarObject> CarObject::deserialize(TokensPointer& tp, b2World* world) {
+std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
 		b2Vec2 position = b2Vec2(0.0f, 0.0f);
 		float angle = 0.0f;
-		std::vector<float> lengths;
-		std::vector<float> wheels;
 		sf::Color color = sf::Color::White;
 		float density = 0.0f, friction = 0.0f, restitution = 0.0f;
-		while (tp.valid_range()) {
-			std::string pname = tp.gets();
+		std::vector<float> lengths;
+		std::vector<std::unique_ptr<BallObject>> wheels;
+		std::vector<b2RevoluteJointDef> joint_defs;
+		while (tr.valid_range()) {
+			std::string pname = tr.gets();
 			if (pname == "lengths") {
-				lengths = tp.getfArr();
+				lengths = tr.getfArr();
 			} else if (pname == "wheels") {
-				wheels = tp.getfArr();
+				while (tr.valid_range()) {
+					std::string str = tr.gets();
+					if (str == "object") {
+					} else if (str == "/wheels") {
+						break;
+					} else {
+						throw std::runtime_error("Expected wheel, got: \"" + str + "\"");
+					}
+					tr.eat("ball");
+					std::unique_ptr<BallObject> wheel = BallObject::deserialize(tr, world);
+					wheels.push_back(std::move(wheel));
+					tr.eat("joint");
+					tr.eat("revolute");
+					b2RevoluteJointDef def = deserializeRevoluteJoint(tr);
+					joint_defs.push_back(def);
+				}
 			} else if (pname == "color") {
-				color = tp.getColor();
+				color = tr.getColor();
 			} else if (pname == "position") {
-				position = tp.getb2Vec2();
+				position = tr.getb2Vec2();
 			} else if (pname == "rotation") {
-				angle = tp.getf();
+				angle = tr.getf();
 			} else if (pname == "density") {
-				density = tp.getf();
+				density = tr.getf();
 			} else if (pname == "friction") {
-				friction = tp.getf();
+				friction = tr.getf();
 			} else if (pname == "restitution") {
-				restitution = tp.getf();
-			} else if (TokensPointer::isEntityName(pname)) {
-				tp.move(-1);
+				restitution = tr.getf();
+			} else if (TokenReader::isEntityName(pname)) {
+				tr.move(-1);
 				break;
 			} else {
 				throw std::runtime_error("Unknown CarObject parameter name: " + pname);
 			}
 		}
-		std::unique_ptr<CarObject> car = std::make_unique<CarObject>(world, position, angle, lengths, wheels, color);
+		std::unique_ptr<CarObject> car = std::make_unique<CarObject>(world, position, angle, lengths, std::move(wheels), joint_defs, color);
 		car->setType(b2_dynamicBody, false);
 		car->setDensity(density, false);
 		car->setFriction(friction, false);
@@ -574,34 +697,34 @@ std::string GroundObject::serialize(int indent_level) {
 	return str;
 }
 
-std::unique_ptr<GroundObject> GroundObject::deserialize(TokensPointer& tp, b2World* world) {
+std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
 		b2Vec2 position = b2Vec2(0.0f, 0.0f);
 		float angle = 0.0f;
 		std::vector<b2Vec2> vertices;
 		sf::Color color = sf::Color::White;
 		float friction = 0.0f, restitution = 0.0f;
-		while (tp.valid_range()) {
-			std::string pname = tp.gets();
+		while (tr.valid_range()) {
+			std::string pname = tr.gets();
 			if (pname == "vertices") {
-				while (!tp.fail()) {
-					b2Vec2 vertex = tp.getb2Vec2();
-					if (!tp.fail()) {
+				while (!tr.fail()) {
+					b2Vec2 vertex = tr.getb2Vec2();
+					if (!tr.fail()) {
 						vertices.push_back(vertex);
 					}
 				}
-				tp.reset();
-				tp.move(-1);
+				tr.reset();
+				tr.move(-1);
 			} else if (pname == "color") {
-				color = tp.getColor();
+				color = tr.getColor();
 			} else if (pname == "position") {
-				position = tp.getb2Vec2();
+				position = tr.getb2Vec2();
 			} else if (pname == "friction") {
-				friction = tp.getf();
+				friction = tr.getf();
 			} else if (pname == "restitution") {
-				restitution = tp.getf();
-			} else if (TokensPointer::isEntityName(pname)) {
-				tp.move(-1);
+				restitution = tr.getf();
+			} else if (TokenReader::isEntityName(pname)) {
+				tr.move(-1);
 				break;
 			} else {
 				throw std::runtime_error("Unknown GroundObject parameter name: " + pname);

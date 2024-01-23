@@ -453,25 +453,24 @@ std::string Application::serialize() {
 }
 
 void Application::deserialize(std::string str, bool set_camera) {
-    std::vector<WordToken> tokens = utils::tokenize(str);
-    TokensPointer tp(&tokens);
+    TokenReader tr(str);
     try {
-        while (tp.valid_range()) {
-            std::string entity = tp.gets();
+        while (tr.valid_range()) {
+            std::string entity = tr.gets();
             if (entity == "camera") {
                 struct CameraParams {
                     float x = 0.0f, y = 0.0f, zoom = 30.0f;
                 };
                 CameraParams params;
-                while (tp.valid_range()) {
-                    std::string pname = tp.gets();
+                while (tr.valid_range()) {
+                    std::string pname = tr.gets();
                     if (pname == "center") {
-                        params.x = tp.getf();
-                        params.y = tp.getf();
+                        params.x = tr.getf();
+                        params.y = tr.getf();
                     } else if (pname == "zoom") {
-                        params.zoom = tp.getf();
-                    } else if (TokensPointer::isEntityName(pname)) {
-                        tp.move(-1);
+                        params.zoom = tr.getf();
+                    } else if (TokenReader::isEntityName(pname)) {
+                        tr.move(-1);
                         break;
                     } else {
                         throw std::runtime_error("Unknown camera parameter: " + pname);
@@ -484,15 +483,15 @@ void Application::deserialize(std::string str, bool set_camera) {
                 }
             } else if (entity == "object") {
                 std::unique_ptr<GameObject> gameobject;
-                std::string type = tp.gets();
+                std::string type = tr.gets();
                 if (type == "box") {
-                    gameobject = BoxObject::deserialize(tp, world.get());
+                    gameobject = BoxObject::deserialize(tr, world.get());
                 } else if (type == "ball") {
-                    gameobject = BallObject::deserialize(tp, world.get());
+                    gameobject = BallObject::deserialize(tr, world.get());
                 } else if (type == "car") {
-                    gameobject = CarObject::deserialize(tp, world.get());
+                    gameobject = CarObject::deserialize(tr, world.get());
                 } else if (type == "ground") {
-                    gameobject = GroundObject::deserialize(tp, world.get());
+                    gameobject = GroundObject::deserialize(tr, world.get());
                     ground = static_cast<GroundObject*>(gameobject.get());
                 } else {
                     throw std::runtime_error("Unknown object type: " + type);
@@ -503,7 +502,7 @@ void Application::deserialize(std::string str, bool set_camera) {
             }
         }
     } catch (std::exception exc) {
-        throw std::runtime_error("Line " + std::to_string(tp.getLine(-1)) + ": " + exc.what());
+        throw std::runtime_error("Line " + std::to_string(tr.getLine(-1)) + ": " + exc.what());
     }
 }
 

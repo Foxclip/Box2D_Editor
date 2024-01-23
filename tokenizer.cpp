@@ -7,12 +7,17 @@ WordToken::WordToken(std::string str, int line) {
 	this->line = line;
 }
 
-TokensPointer::TokensPointer(std::vector<WordToken>* tokens, int pos) {
+TokenReader::TokenReader(std::string& str) {
+	internal_tokens = tokenize(str);
+	tokens = &internal_tokens;
+}
+
+TokenReader::TokenReader(std::vector<WordToken>* tokens, int pos) {
 	this->tokens = tokens;
 	this->pos = pos;
 }
 
-WordToken TokensPointer::get() {
+WordToken TokenReader::get() {
 	if (fail_state) {
 		return WordToken("", peek(tokens->size() - 1).line);
 	}
@@ -25,14 +30,25 @@ WordToken TokensPointer::get() {
 	}
 }
 
-std::string TokensPointer::gets() {
+std::string TokenReader::gets() {
 	if (fail_state) {
 		return "";
 	}
 	return get().str;
 }
 
-int TokensPointer::geti() {
+void TokenReader::eat(std::string expected) {
+	try {
+		std::string str = gets();
+		if (str != expected) {
+			throw std::runtime_error("Expected: \"" + expected + "\", got: \"" + str + "\"");
+		}
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+	}
+}
+
+int TokenReader::geti() {
 	if (fail_state) {
 		return 0;
 	}
@@ -47,7 +63,7 @@ int TokensPointer::geti() {
 	return result;
 }
 
-float TokensPointer::getf() {
+float TokenReader::getf() {
 	if (fail_state) {
 		return 0.0f;
 	}
@@ -62,7 +78,22 @@ float TokensPointer::getf() {
 	return result;
 }
 
-std::vector<float> TokensPointer::getfArr() {
+bool TokenReader::getb() {
+	if (fail_state) {
+		return false;
+	}
+	std::string str = gets();
+	if (str == "true") {
+		return true;
+	} else if (str == "false") {
+		return false;
+	} else {
+		fail_state = true;
+		return false;
+	}
+}
+
+std::vector<float> TokenReader::getfArr() {
 	std::vector<float> result;
 	while (!fail()) {
 		float f = getf();
@@ -75,7 +106,7 @@ std::vector<float> TokensPointer::getfArr() {
 	return result;
 }
 
-sf::Color TokensPointer::getColor() {
+sf::Color TokenReader::getColor() {
 	if (fail_state) {
 		return sf::Color();
 	}
@@ -87,7 +118,7 @@ sf::Color TokensPointer::getColor() {
 	return color;
 }
 
-b2Vec2 TokensPointer::getb2Vec2() {
+b2Vec2 TokenReader::getb2Vec2() {
 	if (fail_state) {
 		return b2Vec2(0.0f, 0.0f);
 	}
@@ -97,38 +128,60 @@ b2Vec2 TokensPointer::getb2Vec2() {
 	return vec;
 }
 
-WordToken TokensPointer::peek(int offset) {
+WordToken TokenReader::peek(int offset) {
 	return tokens->at(pos + offset);
 }
 
-void TokensPointer::move(int offset) {
+void TokenReader::move(int offset) {
 	pos += offset;
 }
 
-bool TokensPointer::eof() {
+bool TokenReader::eof() {
 	return pos == tokens->size() - 1;
 }
 
-bool TokensPointer::valid_range() {
+bool TokenReader::valid_range() {
 	return isValidPos(pos);
 }
 
-bool TokensPointer::fail() {
+bool TokenReader::fail() {
 	return fail_state;
 }
 
-void TokensPointer::reset() {
+void TokenReader::reset() {
 	fail_state = false;
 }
 
-int TokensPointer::getLine(int offset) {
+int TokenReader::getLine(int offset) {
 	return peek(offset).line;
 }
 
-bool TokensPointer::isEntityName(std::string str) {
-	return str == "camera" || str == "object";
+bool TokenReader::isEntityName(std::string str) {
+	return str == "camera" || str == "object" || str == "joint";
 }
 
-bool TokensPointer::isValidPos(int position) {
+std::vector<WordToken> TokenReader::tokenize(std::string str) {
+	std::vector<WordToken> results;
+	std::string current_word;
+	str += EOF;
+	int current_line = 1;
+	for (int i = 0; i < str.size(); i++) {
+		char c = str[i];
+		if (isspace(c) || c == EOF) {
+			if (current_word.size() > 0) {
+				results.push_back(WordToken(current_word, current_line));
+			}
+			current_word = "";
+		} else {
+			current_word += c;
+		}
+		if (c == '\n') {
+			current_line++;
+		}
+	}
+	return results;
+}
+
+bool TokenReader::isValidPos(int position) {
 	return position >= 0 && position < tokens->size();
 }
