@@ -14,8 +14,6 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: serialize floats with 17 digits
-    // TODO: serialize linear and angular velocities
     // TODO: ctrl-z
     // TODO: move mouseBody with the mouse
     // TODO: edit mode box selection

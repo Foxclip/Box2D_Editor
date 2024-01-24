@@ -665,28 +665,40 @@ void Application::draw_line(const sf::Vector2f& v1, const sf::Vector2f& v2, cons
 }
 
 BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
-    std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(world.get(), pos, angle, size, color);
+    b2BodyDef def;
+    def.type = b2_dynamicBody;
+    def.position = pos;
+    def.angle = angle;
+    std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(world.get(), def, size, color);
     BoxObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;
 }
 
 BallObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color) {
-    std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(world.get(), pos, 0.0f, radius, color, notch_color);
+    b2BodyDef def;
+    def.type = b2_dynamicBody;
+    def.position = pos;
+    std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(world.get(), def, radius, color, notch_color);
     BallObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;
 }
 
 CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
-    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), pos, 0.0f, lengths, wheels, color);
+    b2BodyDef def;
+    def.type = b2_dynamicBody;
+    def.position = pos;
+    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), def, lengths, wheels, color);
     CarObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;
 }
 
 GroundObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color) {
-    std::unique_ptr<GroundObject> uptr = std::make_unique<GroundObject>(world.get(), pos, vertices, color);
+    b2BodyDef def;
+    def.position = pos;
+    std::unique_ptr<GroundObject> uptr = std::make_unique<GroundObject>(world.get(), def, vertices, color);
     GroundObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;

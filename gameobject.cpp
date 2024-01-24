@@ -145,6 +145,8 @@ void GameObject::serializeBody(TokenWriter& tw, b2Body* body) {
 	tw.writeStringParam("type", utils::body_type_to_str(body->GetType()));
 	tw.writeb2Vec2Param("position", body->GetPosition());
 	tw.writeFloatParam("angle", body->GetAngle());
+	tw.writeb2Vec2Param("linear_velocity", body->GetLinearVelocity());
+	tw.writeFloatParam("angular_velocity", body->GetAngularVelocity());
 	tw.writeString("fixtures").writeNewLine();
 	tw.addIndentLevel(1);
 	for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
@@ -168,6 +170,10 @@ BodyDef GameObject::deserializeBody(TokenReader& tr) {
 				result.body_def.position = tr.readb2Vec2();
 			} else if (pname == "angle") {
 				result.body_def.angle = tr.readFloat();
+			} else if (pname == "linear_velocity") {
+				result.body_def.linearVelocity = tr.readb2Vec2();
+			} else if (pname == "angular_velocity") {
+				result.body_def.angularVelocity = tr.readFloat();
 			} else if (pname == "fixtures") {
 				while (tr.validRange()) {
 					std::string str = tr.readString();
@@ -290,11 +296,8 @@ b2RevoluteJointDef GameObject::deserializeRevoluteJoint(TokenReader& tr) {
 	}
 }
 
-BoxObject::BoxObject(b2World* world, b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
-	b2BodyDef bodyDef;
-	bodyDef.position = pos;
-	bodyDef.angle = angle;
-	rigid_body = world->CreateBody(&bodyDef);
+BoxObject::BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color) {
+	rigid_body = world->CreateBody(&def);
 	b2PolygonShape box_shape;
 	box_shape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
 	b2Fixture* fixture = rigid_body->CreateFixture(&box_shape, 1.0f);
@@ -347,8 +350,7 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* worl
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<BoxObject> box = std::make_unique<BoxObject>(world, bdef.position, bdef.angle, size, color);
-		box->setType(bdef.type, false);
+		std::unique_ptr<BoxObject> box = std::make_unique<BoxObject>(world, bdef, size, color);
 		box->setDensity(fdef.density, false);
 		box->setFriction(fdef.friction, false);
 		box->setRestitution(fdef.restitution, false);
@@ -358,11 +360,8 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* worl
 	}
 }
 
-BallObject::BallObject(b2World* world, b2Vec2 pos, float angle, float radius, sf::Color color, sf::Color notch_color) {
-	b2BodyDef bodyDef;
-	bodyDef.position = pos;
-	bodyDef.angle = angle;
-	rigid_body = world->CreateBody(&bodyDef);
+BallObject::BallObject(b2World* world, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color) {
+	rigid_body = world->CreateBody(&def);
 	b2CircleShape circle_shape;
 	circle_shape.m_radius = radius;
 	b2Fixture* fixture = rigid_body->CreateFixture(&circle_shape, 1.0f);
@@ -425,8 +424,7 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* wo
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<BallObject> ball = std::make_unique<BallObject>(world, bdef.position, bdef.angle, radius, color, notch_color);
-		ball->setType(bdef.type, false);
+		std::unique_ptr<BallObject> ball = std::make_unique<BallObject>(world, bdef, radius, color, notch_color);
 		ball->setDensity(fdef.density, false);
 		ball->setFriction(fdef.friction, false);
 		ball->setRestitution(fdef.restitution, false);
@@ -451,13 +449,10 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 	target.draw(varray, states);
 }
 
-CarObject::CarObject(b2World* world, b2Vec2 pos, float angle, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
+CarObject::CarObject(b2World* world, b2BodyDef def, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
 	convex_shape = std::make_unique<sf::ConvexShape>(lengths.size());
 	float pi = std::numbers::pi;
-	b2BodyDef bodyDef;
-	bodyDef.position = pos;
-	bodyDef.angle = angle;
-	rigid_body = world->CreateBody(&bodyDef);
+	rigid_body = world->CreateBody(&def);
 	for (int i = 0; i < lengths.size(); i++) {
 		b2Vec2 vertices[3];
 		vertices[0] = b2Vec2(0.0f, 0.0f);
@@ -468,9 +463,12 @@ CarObject::CarObject(b2World* world, b2Vec2 pos, float angle, std::vector<float>
 		b2Fixture* fixture = rigid_body->CreateFixture(&triangle, 1.0f);
 		if (wheels[i] > 0.0f) {
 			b2Vec2 anchor_pos = vertices[1];
-			b2Vec2 anchor_pos_world = pos + anchor_pos;
+			b2Vec2 anchor_pos_world = def.position + anchor_pos;
+			b2BodyDef wheel_body_def;
+			wheel_body_def.type = b2_dynamicBody;
+			wheel_body_def.position = anchor_pos_world;
 			std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
-				world, anchor_pos_world, 0.0f, wheels[i], sf::Color::Yellow, sf::Color(64, 64, 0)
+				world, wheel_body_def, wheels[i], sf::Color::Yellow, sf::Color(64, 64, 0)
 			);
 			BallObject* wheel_ptr = wheel.get();
 			wheel_ptr->setType(b2_dynamicBody, false);
@@ -497,18 +495,14 @@ CarObject::CarObject(b2World* world, b2Vec2 pos, float angle, std::vector<float>
 
 CarObject::CarObject(
 	b2World* world,
-	b2Vec2 pos,
-	float angle,
+	b2BodyDef def,
 	std::vector<float> lengths,
 	std::vector<std::unique_ptr<BallObject>> wheels,
 	std::vector<b2RevoluteJointDef> joint_defs,
 	sf::Color color
 ) {
 	convex_shape = std::make_unique<sf::ConvexShape>(lengths.size());
-	b2BodyDef bodyDef;
-	bodyDef.position = pos;
-	bodyDef.angle = angle;
-	rigid_body = world->CreateBody(&bodyDef);
+	rigid_body = world->CreateBody(&def);
 	for (int i = 0; i < lengths.size(); i++) {
 		b2Vec2 vertices[3];
 		vertices[0] = b2Vec2(0.0f, 0.0f);
@@ -606,8 +600,7 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<CarObject> car = std::make_unique<CarObject>(world, bdef.position, bdef.angle, lengths, std::move(wheels), joint_defs, color);
-		car->setType(bdef.type, false);
+		std::unique_ptr<CarObject> car = std::make_unique<CarObject>(world, bdef, lengths, std::move(wheels), joint_defs, color);
 		car->setDensity(fdef.density, false);
 		car->setFriction(fdef.friction, false);
 		car->setRestitution(fdef.restitution, false);
@@ -653,10 +646,8 @@ void CircleNotchShape::draw(sf::RenderTarget& target, sf::RenderStates states) c
 	target.draw(varray_notch, states);
 }
 
-GroundObject::GroundObject(b2World* world, b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color) {
-	b2BodyDef bodyDef;
-	bodyDef.position = pos;
-	rigid_body = world->CreateBody(&bodyDef);
+GroundObject::GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> vertices, sf::Color color) {
+	rigid_body = world->CreateBody(&def);
 	b2ChainShape chain;
 	chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
 	b2Fixture* fixture = rigid_body->CreateFixture(&chain, 1.0f);
@@ -744,7 +735,7 @@ std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<GroundObject> ground = std::make_unique<GroundObject>(world, bdef.position, vertices, color);
+		std::unique_ptr<GroundObject> ground = std::make_unique<GroundObject>(world, bdef, vertices, color);
 		ground->setDensity(fdef.density, false);
 		ground->setFriction(fdef.friction, false);
 		ground->setRestitution(fdef.restitution, false);

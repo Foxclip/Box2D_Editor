@@ -65,7 +65,7 @@ public:
 
 class BoxObject : public GameObject {
 public:
-	BoxObject(b2World* world, b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
+	BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	void serialize(TokenWriter& tw);
@@ -77,7 +77,7 @@ private:
 
 class BallObject : public GameObject {
 public:
-	BallObject(b2World* world, b2Vec2 pos, float angle, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
+	BallObject(b2World* world, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	void serialize(TokenWriter& tw);
@@ -90,11 +90,10 @@ private:
 
 class CarObject : public GameObject {
 public:
-	CarObject(b2World* world, b2Vec2 pos, float angle, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
+	CarObject(b2World* world, b2BodyDef def, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
 	CarObject(
 		b2World* world,
-		b2Vec2 pos,
-		float angle,
+		b2BodyDef def,
 		std::vector<float> lengths,
 		std::vector<std::unique_ptr<BallObject>> wheels,
 		std::vector<b2RevoluteJointDef> joint_defs,
@@ -112,7 +111,7 @@ private:
 
 class GroundObject : public GameObject {
 public:
-	GroundObject(b2World* world, b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color);
+	GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> vertices, sf::Color color);
 	void moveVertex(int index, const b2Vec2& new_pos);
 	void tryDeleteVertex(int index);
 	void addVertex(int index, const b2Vec2& pos);
