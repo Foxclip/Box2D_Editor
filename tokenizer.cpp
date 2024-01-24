@@ -95,6 +95,9 @@ bool TokenReader::readBool() {
 
 std::vector<float> TokenReader::readFloatArr() {
 	std::vector<float> result;
+	if (fail_state) {
+		return result;
+	}
 	while (!fail()) {
 		float f = readFloat();
 		if (!fail()) {
@@ -130,6 +133,9 @@ b2Vec2 TokenReader::readb2Vec2() {
 
 std::vector<b2Vec2> TokenReader::readb2Vec2Arr() {
 	std::vector<b2Vec2> result;
+	if (fail_state) {
+		return result;
+	}
 	while (!fail()) {
 		b2Vec2 vec = readb2Vec2();
 		if (!fail()) {
