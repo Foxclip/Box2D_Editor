@@ -153,7 +153,7 @@ void GameObject::serializeJoint(TokenWriter& tw, b2Joint* p_joint) {
 
 void GameObject::serializeRevoluteJoint(TokenWriter& tw, b2RevoluteJoint* joint) {
 	tw.writeString("joint revolute").writeNewLine();
-	tw.addIndentLevel();
+	tw.addIndentLevel(1);
 	tw.writeb2Vec2Param("anchor_a", joint->GetLocalAnchorA());
 	tw.writeb2Vec2Param("anchor_b", joint->GetLocalAnchorB());
 	tw.writeBoolParam("collide_connected", joint->GetCollideConnected());
@@ -231,7 +231,7 @@ sf::Transformable* BoxObject::getTransformable() {
 void BoxObject::serialize(TokenWriter& tw) {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
 	tw.writeString("object box").writeNewLine();
-	tw.addIndentLevel();
+	tw.addIndentLevel(1);
 	tw.writeStringParam("type", utils::body_type_to_str(rigid_body->GetType()));
 	tw.writeb2Vec2Param("size", size);
 	tw.writeColorParam("color", color);
@@ -315,7 +315,7 @@ sf::Transformable* BallObject::getTransformable() {
 void BallObject::serialize(TokenWriter& tw) {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
 	tw.writeString("object ball").writeNewLine();
-	tw.addIndentLevel();
+	tw.addIndentLevel(1);
 	tw.writeStringParam("type", utils::body_type_to_str(rigid_body->GetType()));
 	tw.writeFloatParam("radius", radius);
 	tw.writeColorParam("color", color);
@@ -491,10 +491,10 @@ sf::Transformable* CarObject::getTransformable() {
 void CarObject::serialize(TokenWriter& tw) {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
 	tw.writeString("object car").writeNewLine();
-	tw.addIndentLevel();
+	tw.addIndentLevel(1);
 	tw.writeFloatArrParam("lengths", lengths);
 	tw.writeString("wheels").writeNewLine();
-	tw.addIndentLevel();
+	tw.addIndentLevel(1);
 	for (int i = 0; i < children.size(); i++) {
 		children[i]->serialize(tw);
 		tw.writeNewLine();
@@ -664,7 +664,7 @@ b2ChainShape* GroundObject::getShape() {
 void GroundObject::serialize(TokenWriter& tw) {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
 	tw.writeString("object ground").writeNewLine();
-	tw.addIndentLevel();
+	tw.addIndentLevel(1);
 	tw.writeString("vertices");
 	b2ChainShape* chain = getShape();
 	for (int i = 0; i < chain->m_count; i++) {

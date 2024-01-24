@@ -440,7 +440,7 @@ std::string Application::serialize() {
     std::string str;
     TokenWriter tw(&str);
     tw.writeString("camera").writeNewLine();
-    tw.addIndentLevel();
+    tw.addIndentLevel(1);
     tw.writeString("center").writeFloat(viewCenterX).writeFloat(viewCenterY).writeNewLine();
     tw.writeString("zoom").writeFloat(zoomFactor).writeNewLine();
     tw.addIndentLevel(-1);

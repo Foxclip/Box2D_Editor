@@ -67,7 +67,7 @@ public:
 	void writeb2Vec2Param(std::string name, b2Vec2 value);
 	int getIndentLevel();
 	void setIndentLevel(int indentLevel);
-	void addIndentLevel(int add = 1);
+	void addIndentLevel(int add);
 	std::string toStr();
 private:
 	std::string* target;
