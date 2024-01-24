@@ -24,6 +24,11 @@ private:
 	sf::VertexArray varray_notch;
 };
 
+struct BodyDef {
+	b2BodyDef body_def;
+	std::vector<b2FixtureDef> fixture_defs;
+};
+
 class GameObject {
 public:
 	b2Body* rigid_body = nullptr;
@@ -49,6 +54,10 @@ public:
 	void setFriction(float friction, bool include_children);
 	void setRestitution(float restitution, bool include_children);
 	virtual void serialize(TokenWriter& tw) = 0;
+	static void serializeBody(TokenWriter& tw, b2Body* body);
+	static BodyDef deserializeBody(TokenReader& tr);
+	static void serializeFixture(TokenWriter& tw, b2Fixture* fixture);
+	static b2FixtureDef deserializeFixture(TokenReader& tr);
 	static void serializeJoint(TokenWriter& tw, b2Joint* p_joint);
 	static void serializeRevoluteJoint(TokenWriter& p_tw, b2RevoluteJoint* joint);
 	static b2RevoluteJointDef deserializeRevoluteJoint(TokenReader& tr);

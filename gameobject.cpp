@@ -139,6 +139,92 @@ void GameObject::setRestitution(float restitution, bool include_children) {
 	}
 }
 
+void GameObject::serializeBody(TokenWriter& tw, b2Body* body) {
+	tw.writeString("body").writeNewLine();
+	tw.addIndentLevel(1);
+	tw.writeStringParam("type", utils::body_type_to_str(body->GetType()));
+	tw.writeb2Vec2Param("position", body->GetPosition());
+	tw.writeFloatParam("angle", body->GetAngle());
+	tw.writeString("fixtures").writeNewLine();
+	tw.addIndentLevel(1);
+	for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+		serializeFixture(tw, fixture);
+		tw.writeNewLine();
+	}
+	tw.addIndentLevel(-1);
+	tw.writeString("/fixtures").writeNewLine();
+	tw.addIndentLevel(-1);
+	tw.writeString("/body");
+}
+
+BodyDef GameObject::deserializeBody(TokenReader& tr) {
+	try {
+		BodyDef result;
+		while (tr.validRange()) {
+			std::string pname = tr.readString();
+			if (pname == "type") {
+				result.body_def.type = utils::str_to_body_type(tr.readString());
+			} else if (pname == "position") {
+				result.body_def.position = tr.readb2Vec2();
+			} else if (pname == "angle") {
+				result.body_def.angle = tr.readFloat();
+			} else if (pname == "fixtures") {
+				while (tr.validRange()) {
+					std::string str = tr.readString();
+					if (str == "/fixtures") {
+						break;
+					} else if (str == "fixture") {
+						b2FixtureDef fixture_def = deserializeFixture(tr);
+						result.fixture_defs.push_back(fixture_def);
+					} else {
+						throw std::runtime_error("Expected fixture, got: \"" + str + "\"");
+					}
+				}
+			} else if (pname == "/body") {
+				break;
+			} else {
+				throw std::runtime_error("Unknown b2Body parameter name: " + pname);
+			}
+		}
+		return result;
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+	}
+}
+
+void GameObject::serializeFixture(TokenWriter& tw, b2Fixture* fixture) {
+	tw.writeString("fixture").writeNewLine();
+	tw.addIndentLevel(1);
+	tw.writeFloatParam("density", fixture->GetDensity());
+	tw.writeFloatParam("friction", fixture->GetFriction());
+	tw.writeFloatParam("restitution", fixture->GetRestitution());
+	tw.addIndentLevel(-1);
+	tw.writeString("/fixture");
+}
+
+b2FixtureDef GameObject::deserializeFixture(TokenReader& tr) {
+	try {
+		b2FixtureDef def;
+		while (tr.validRange()) {
+			std::string pname = tr.readString();
+			if (pname == "density") {
+				def.density = tr.readFloat();
+			} else if (pname == "friction") {
+				def.friction = tr.readFloat();
+			} else if (pname == "restitution") {
+				def.restitution = tr.readFloat();
+			} else if (pname == "/fixture") {
+				break;
+			} else {
+				throw std::runtime_error("Unknown fixture parameter name: " + pname);
+			}
+		}
+		return def;
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+	}
+}
+
 void GameObject::serializeJoint(TokenWriter& tw, b2Joint* p_joint) {
 	try {
 		if (b2RevoluteJoint* joint = dynamic_cast<b2RevoluteJoint*>(p_joint)) {
@@ -232,55 +318,40 @@ void BoxObject::serialize(TokenWriter& tw) {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
 	tw.writeString("object box").writeNewLine();
 	tw.addIndentLevel(1);
-	tw.writeStringParam("type", utils::body_type_to_str(rigid_body->GetType()));
 	tw.writeb2Vec2Param("size", size);
 	tw.writeColorParam("color", color);
-	tw.writeb2Vec2Param("position", rigid_body->GetPosition());
-	tw.writeFloatParam("rotation", rigid_body->GetAngle());
-	tw.writeFloatParam("density", fixture->GetDensity());
-	tw.writeFloatParam("friction", fixture->GetFriction());
-	tw.writeFloatParam("restitution", fixture->GetRestitution());
+	serializeBody(tw, rigid_body);
+	tw.writeNewLine();
 	tw.addIndentLevel(-1);
 	tw.writeString("/object");
 }
 
 std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
-		b2Vec2 position = b2Vec2(0.0f, 0.0f);
-		float angle = 0.0f;
 		b2Vec2 size = b2Vec2(1.0f, 1.0f);
 		sf::Color color = sf::Color::White;
-		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
-		b2BodyType type = b2_staticBody;
+		BodyDef body_def;
 		while(tr.validRange()) {
 			std::string pname = tr.readString();
-			if (pname == "type") {
-				type = utils::str_to_body_type(tr.readString());
-			} else if (pname == "size") {
+			if (pname == "size") {
 				size = tr.readb2Vec2();
 			} else if (pname == "color") {
 				color = tr.readColor();
-			} else if (pname == "position") {
-				position = tr.readb2Vec2();
-			} else if (pname == "rotation") {
-				angle = tr.readFloat();
-			} else if (pname == "density") {
-				density = tr.readFloat();
-			} else if (pname == "friction") {
-				friction = tr.readFloat();
-			} else if (pname == "restitution") {
-				restitution = tr.readFloat();
+			} else if (pname == "body") {
+				body_def = deserializeBody(tr);
 			} else if (pname == "/object") {
 				break;
 			} else {
 				throw std::runtime_error("Unknown BoxObject parameter name: " + pname);
 			}
 		}
-		std::unique_ptr<BoxObject> box = std::make_unique<BoxObject>(world, position, angle, size, color);
-		box->setType(type, false);
-		box->setDensity(density, false);
-		box->setFriction(friction, false);
-		box->setRestitution(restitution, false);
+		b2BodyDef bdef = body_def.body_def;
+		b2FixtureDef fdef = body_def.fixture_defs.front();
+		std::unique_ptr<BoxObject> box = std::make_unique<BoxObject>(world, bdef.position, bdef.angle, size, color);
+		box->setType(bdef.type, false);
+		box->setDensity(fdef.density, false);
+		box->setFriction(fdef.friction, false);
+		box->setRestitution(fdef.restitution, false);
 		return box;
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
@@ -316,34 +387,25 @@ void BallObject::serialize(TokenWriter& tw) {
 	b2Fixture* fixture = rigid_body->GetFixtureList();
 	tw.writeString("object ball").writeNewLine();
 	tw.addIndentLevel(1);
-	tw.writeStringParam("type", utils::body_type_to_str(rigid_body->GetType()));
 	tw.writeFloatParam("radius", radius);
 	tw.writeColorParam("color", color);
 	tw.writeColorParam("notch_color", notch_color);
-	tw.writeb2Vec2Param("position", rigid_body->GetPosition());
-	tw.writeFloatParam("rotation", rigid_body->GetAngle());
-	tw.writeFloatParam("density", fixture->GetDensity());
-	tw.writeFloatParam("friction", fixture->GetFriction());
-	tw.writeFloatParam("restitution", fixture->GetRestitution());
+	serializeBody(tw, rigid_body);
+	tw.writeNewLine();
 	tw.addIndentLevel(-1);
 	tw.writeString("/object");
 }
 
 std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
-		b2Vec2 position = b2Vec2(0.0f, 0.0f);
-		float angle = 0.0f;
 		float radius = 1.0f;
 		sf::Color color = sf::Color::White;
 		sf::Color notch_color = sf::Color(128, 128, 128);
 		bool notch_color_set = false;
-		float density = 1.0f, friction = 0.0f, restitution = 0.0f;
-		b2BodyType type = b2_staticBody;
+		BodyDef body_def;
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
-			if (pname == "type") {
-				type = utils::str_to_body_type(tr.readString());
-			} else if (pname == "radius") {
+			if (pname == "radius") {
 				radius = tr.readFloat();
 			} else if (pname == "color") {
 				color = tr.readColor();
@@ -353,27 +415,21 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* wo
 			} else if (pname == "notch_color") {
 				notch_color = tr.readColor();
 				notch_color_set = true;
-			} else if (pname == "position") {
-				position = tr.readb2Vec2();
-			} else if (pname == "rotation") {
-				angle = tr.readFloat();
-			} else if (pname == "density") {
-				density = tr.readFloat();
-			} else if (pname == "friction") {
-				friction = tr.readFloat();
-			} else if (pname == "restitution") {
-				restitution = tr.readFloat();
+			} else if (pname == "body") {
+				body_def = deserializeBody(tr);
 			} else if (pname == "/object") {
 				break;
 			} else {
 				throw std::runtime_error("Unknown BallObject parameter name: " + pname);
 			}
 		}
-		std::unique_ptr<BallObject> ball = std::make_unique<BallObject>(world, position, angle, radius, color, notch_color);
-		ball->setType(type, false);
-		ball->setDensity(density, false);
-		ball->setFriction(friction, false);
-		ball->setRestitution(restitution, false);
+		b2BodyDef bdef = body_def.body_def;
+		b2FixtureDef fdef = body_def.fixture_defs.front();
+		std::unique_ptr<BallObject> ball = std::make_unique<BallObject>(world, bdef.position, bdef.angle, radius, color, notch_color);
+		ball->setType(bdef.type, false);
+		ball->setDensity(fdef.density, false);
+		ball->setFriction(fdef.friction, false);
+		ball->setRestitution(fdef.restitution, false);
 		return ball;
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
@@ -493,6 +549,9 @@ void CarObject::serialize(TokenWriter& tw) {
 	tw.writeString("object car").writeNewLine();
 	tw.addIndentLevel(1);
 	tw.writeFloatArrParam("lengths", lengths);
+	tw.writeColorParam("color", color);
+	serializeBody(tw, rigid_body);
+	tw.writeNewLine();
 	tw.writeString("wheels").writeNewLine();
 	tw.addIndentLevel(1);
 	for (int i = 0; i < children.size(); i++) {
@@ -503,29 +562,25 @@ void CarObject::serialize(TokenWriter& tw) {
 	}
 	tw.addIndentLevel(-1);
 	tw.writeString("/wheels").writeNewLine();
-	tw.writeColorParam("color", color);
-	tw.writeb2Vec2Param("position", rigid_body->GetPosition());
-	tw.writeFloatParam("rotation", rigid_body->GetAngle());
-	tw.writeFloatParam("density", fixture->GetDensity());
-	tw.writeFloatParam("friction", fixture->GetFriction());
-	tw.writeFloatParam("restitution", fixture->GetRestitution());
 	tw.addIndentLevel(-1);
 	tw.writeString("/object");
 }
 
 std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
-		b2Vec2 position = b2Vec2(0.0f, 0.0f);
-		float angle = 0.0f;
 		sf::Color color = sf::Color::White;
-		float density = 0.0f, friction = 0.0f, restitution = 0.0f;
 		std::vector<float> lengths;
+		BodyDef body_def;
 		std::vector<std::unique_ptr<BallObject>> wheels;
 		std::vector<b2RevoluteJointDef> joint_defs;
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
 			if (pname == "lengths") {
 				lengths = tr.readFloatArr();
+			} else if (pname == "color") {
+				color = tr.readColor();
+			} else if (pname == "body") {
+				body_def = deserializeBody(tr);
 			} else if (pname == "wheels") {
 				while (tr.validRange()) {
 					std::string str = tr.readString();
@@ -543,29 +598,19 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 					b2RevoluteJointDef def = deserializeRevoluteJoint(tr);
 					joint_defs.push_back(def);
 				}
-			} else if (pname == "color") {
-				color = tr.readColor();
-			} else if (pname == "position") {
-				position = tr.readb2Vec2();
-			} else if (pname == "rotation") {
-				angle = tr.readFloat();
-			} else if (pname == "density") {
-				density = tr.readFloat();
-			} else if (pname == "friction") {
-				friction = tr.readFloat();
-			} else if (pname == "restitution") {
-				restitution = tr.readFloat();
 			} else if (pname == "/object") {
 				break;
 			} else {
 				throw std::runtime_error("Unknown CarObject parameter name: " + pname);
 			}
 		}
-		std::unique_ptr<CarObject> car = std::make_unique<CarObject>(world, position, angle, lengths, std::move(wheels), joint_defs, color);
-		car->setType(b2_dynamicBody, false);
-		car->setDensity(density, false);
-		car->setFriction(friction, false);
-		car->setRestitution(restitution, false);
+		b2BodyDef bdef = body_def.body_def;
+		b2FixtureDef fdef = body_def.fixture_defs.front();
+		std::unique_ptr<CarObject> car = std::make_unique<CarObject>(world, bdef.position, bdef.angle, lengths, std::move(wheels), joint_defs, color);
+		car->setType(bdef.type, false);
+		car->setDensity(fdef.density, false);
+		car->setFriction(fdef.friction, false);
+		car->setRestitution(fdef.restitution, false);
 		return car;
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
@@ -672,42 +717,37 @@ void GroundObject::serialize(TokenWriter& tw) {
 	}
 	tw.writeNewLine();
 	tw.writeColorParam("color", color);
-	tw.writeb2Vec2Param("position", rigid_body->GetPosition());
-	tw.writeFloatParam("friction", fixture->GetFriction());
-	tw.writeFloatParam("restitution", fixture->GetRestitution());
+	serializeBody(tw, rigid_body);
+	tw.writeNewLine();
 	tw.addIndentLevel(-1);
 	tw.writeString("/object");
 }
 
 std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
-		b2Vec2 position = b2Vec2(0.0f, 0.0f);
-		float angle = 0.0f;
 		std::vector<b2Vec2> vertices;
 		sf::Color color = sf::Color::White;
-		float friction = 0.0f, restitution = 0.0f;
+		BodyDef body_def;
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
 			if (pname == "vertices") {
 				vertices = tr.readb2Vec2Arr();
 			} else if (pname == "color") {
 				color = tr.readColor();
-			} else if (pname == "position") {
-				position = tr.readb2Vec2();
-			} else if (pname == "friction") {
-				friction = tr.readFloat();
-			} else if (pname == "restitution") {
-				restitution = tr.readFloat();
+			} else if (pname == "body") {
+				body_def = deserializeBody(tr);
 			} else if (pname == "/object") {
 				break;
 			} else {
 				throw std::runtime_error("Unknown GroundObject parameter name: " + pname);
 			}
 		}
-		std::unique_ptr<GroundObject> ground = std::make_unique<GroundObject>(world, position, vertices, color);
-		ground->setDensity(1.0f, false);
-		ground->setFriction(friction, false);
-		ground->setRestitution(restitution, false);
+		b2BodyDef bdef = body_def.body_def;
+		b2FixtureDef fdef = body_def.fixture_defs.front();
+		std::unique_ptr<GroundObject> ground = std::make_unique<GroundObject>(world, bdef.position, vertices, color);
+		ground->setDensity(fdef.density, false);
+		ground->setFriction(fdef.friction, false);
+		ground->setRestitution(fdef.restitution, false);
 		return ground;
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
