@@ -247,8 +247,9 @@ TokenWriter& TokenWriter::writeInt(float value) {
 }
 
 TokenWriter& TokenWriter::writeFloat(float value) {
-	// TODO: custom convert with 17 floating point digits
-	writeString(std::to_string(value));
+	std::stringstream ss;
+	ss << std::setprecision(17) << value;
+	writeString(ss.str());
 	return *this;
 }
 

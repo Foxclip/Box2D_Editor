@@ -4,6 +4,8 @@
 #include "box2d/box2d.h"
 #include <string>
 #include <vector>
+#include <sstream>
+#include <iomanip>
 
 class WordToken {
 public:
