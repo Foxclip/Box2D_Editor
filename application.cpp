@@ -23,6 +23,10 @@ void Application::init() {
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
     load("level.txt");
+    auto getter = [&]() { return serialize(); };
+    auto setter = [&](std::string str) { deserialize(str, false); };
+    history = History(getter, setter);
+    history.save();
     assert(selected_tool);
 }
 
@@ -127,6 +131,10 @@ void Application::process_input() {
     }
     process_keyboard();
     process_mouse();
+    if (commit_action) {
+        history.save();
+        commit_action = false;
+    }
 }
 
 void Application::process_keyboard_event(sf::Event event) {
@@ -150,6 +158,15 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::S:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
                     save("level.txt");
+                }
+                break;
+            case sf::Keyboard::Z:
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                        history.redo();
+                    } else {
+                        history.undo();
+                    }
                 }
                 break;
         }
@@ -180,19 +197,24 @@ void Application::process_mouse_event(sf::Event event) {
     if (event.type == sf::Event::MouseButtonReleased) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
-                edit_tool.grabbed_vertex = -1;
-                if (move_tool.object) {
-                    //TODO: remember state for all children
-                    move_tool.object->setEnabled(move_tool.object_was_enabled, true);
-                }
-                move_tool.object = nullptr;
-                if (rotate_tool.object) {
-                    rotate_tool.object->setEnabled(rotate_tool.object_was_enabled, true);
-                }
-                rotate_tool.object = nullptr;
                 if (drag_tool.mouse_joint) {
                     world->DestroyJoint(drag_tool.mouse_joint);
                     drag_tool.mouse_joint = nullptr;
+                }
+                if (move_tool.object) {
+                    //TODO: remember state for all children
+                    move_tool.object->setEnabled(move_tool.object_was_enabled, true);
+                    move_tool.object = nullptr;
+                    commit_action = true;
+                }
+                if (rotate_tool.object) {
+                    rotate_tool.object->setEnabled(rotate_tool.object_was_enabled, true);
+                    rotate_tool.object = nullptr;
+                    commit_action = true;
+                }
+                if (edit_tool.grabbed_vertex != -1) {
+                    edit_tool.grabbed_vertex = -1;
+                    commit_action = true;
                 }
                 break;
         }
@@ -295,8 +317,10 @@ void Application::process_left_click() {
             } else if (edit_tool.edge_vertex > 0) {
                 ground->addVertex(edit_tool.edge_vertex + 1, b2MousePosWorld);
             }
+            commit_action = true;
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
             ground->addVertex(edit_tool.highlighted_edge + 1, b2MousePosWorld);
+            commit_action = true;
         } else if (edit_tool.mode == EditTool::MOVE) {
             edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
         }
@@ -456,6 +480,7 @@ std::string Application::serialize() {
 }
 
 void Application::deserialize(std::string str, bool set_camera) {
+    game_objects.clear();
     TokenReader tr(str);
     try {
         while (tr.validRange()) {
@@ -515,7 +540,6 @@ void Application::save(std::string filename) {
 
 void Application::load(std::string filename) {
     try {
-        game_objects.clear();
         std::string str = utils::file_to_str(filename);
         deserialize(str, true);
     } catch (std::exception exc) {
@@ -742,3 +766,48 @@ EditTool::EditTool() : Tool(){
     edge_highlight.setOrigin(sf::Vector2f(0.0f, 1.5f));
 }
 
+History::History() { }
+
+History::History(std::function<std::string(void)> get, std::function<void(std::string)> set) {
+    this->get = get;
+    this->set = set;
+    current = -1;
+}
+
+void History::save() {
+    if (current < history.size()) {
+        history.erase(history.begin() + current + 1, history.end());
+    }
+    std::string state = get();
+    history.push_back(state);
+    current++;
+    std::cout << "Save\n";
+}
+
+void History::undo() {
+    if (current > 0) {
+        current--;
+        std::string state = history[current];
+        set(state);
+        std::cout << "Undo\n";
+    } else {
+        std::cout << "Can't undo\n";
+    }
+}
+
+void History::redo() {
+    if (current < history.size() - 1) {
+        current++;
+        std::string state = history[current];
+        set(state);
+        std::cout << "Redo\n";
+    } else {
+        std::cout << "Can't redo\n";
+    }
+}
+
+void History::clear() {
+    if (history.size() > 1) {
+        history.erase(history.begin() + 1, history.end());
+    }
+}

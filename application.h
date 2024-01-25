@@ -3,6 +3,7 @@
 #include "gameobject.h" // keep above windows imports
 #include <Windows.h>
 #include <winuser.h>
+#include <functional>
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -76,6 +77,21 @@ public:
 private:
 };
 
+class History {
+public:
+	History();
+	History(std::function<std::string(void)> get, std::function<void(std::string)> set);
+	void save();
+	void undo();
+	void redo();
+	void clear();
+private:
+	std::function<std::string(void)> get;
+	std::function<void(std::string)> set;
+	std::vector<std::string> history;
+	int current = 0;
+};
+
 class Application {
 
 public:
@@ -115,6 +131,8 @@ private:
 	b2Vec2 b2MousePosWorld;
 
 	std::vector<std::unique_ptr<GameObject>> game_objects;
+	History history;
+	bool commit_action = false;
 
 	void init_ui();
 	void init_objects();
