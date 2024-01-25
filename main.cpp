@@ -14,6 +14,7 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
+    // TODO: createShape in CarObject constructor
     // TODO: ctrl-z
     // TODO: move mouseBody with the mouse
     // TODO: edit mode box selection

@@ -248,7 +248,7 @@ TokenWriter& TokenWriter::writeInt(float value) {
 
 TokenWriter& TokenWriter::writeFloat(float value) {
 	std::stringstream ss;
-	ss << std::setprecision(17) << value;
+	ss << std::setprecision(9) << value;
 	writeString(ss.str());
 	return *this;
 }
