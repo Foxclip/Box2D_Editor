@@ -439,18 +439,17 @@ void Application::maximize_window() {
 std::string Application::serialize() {
     std::string str;
     TokenWriter tw(&str);
-    tw.writeString("camera").writeNewLine();
+    tw << "camera\n";
     tw.addIndentLevel(1);
-    tw.writeString("center").writeFloat(viewCenterX).writeFloat(viewCenterY).writeNewLine();
-    tw.writeString("zoom").writeFloat(zoomFactor).writeNewLine();
+    tw << "center" << viewCenterX << viewCenterY << "\n";
+    tw << "zoom" << zoomFactor << "\n";
     tw.addIndentLevel(-1);
-    tw.writeString("/camera").writeNewLine();
-    tw.writeNewLine();
+    tw << "/camera" << "\n\n";
     for (int i = 0; i < game_objects.size(); i++) {
         GameObject* gameobject = game_objects[i].get();
         game_objects[i]->serialize(tw);
         if (i < game_objects.size() - 1) {
-            tw.writeNewLine().writeNewLine();
+            tw << "\n\n";
         }
     }
     return str;

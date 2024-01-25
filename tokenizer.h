@@ -51,15 +51,14 @@ public:
 	TokenWriter(int indent_level = 0);
 	TokenWriter(TokenWriter& parent);
 	TokenWriter(std::string* target, int indent_level = 0);
-	TokenWriter& writeString(std::string value);
-	TokenWriter& writeNewLine();
-	TokenWriter& writeInt(int value);
-	TokenWriter& writeInt(float value);
-	TokenWriter& writeFloat(float value);
-	TokenWriter& writeBool(bool value);
-	TokenWriter& writeFloatArr(std::vector<float> value);
-	TokenWriter& writeColor(sf::Color value);
-	TokenWriter& writeb2Vec2(b2Vec2 value);
+	TokenWriter& operator<<(const char* value);
+	TokenWriter& operator<<(std::string value);
+	TokenWriter& operator<<(int value);
+	TokenWriter& operator<<(float value);
+	TokenWriter& operator<<(bool value);
+	TokenWriter& operator<<(std::vector<float> value);
+	TokenWriter& operator<<(sf::Color value);
+	TokenWriter& operator<<(b2Vec2 value);
 	void writeStringParam(std::string name, std::string value);
 	void writeIntParam(std::string name, int value);
 	void writeFloatParam(std::string name, float value);
@@ -71,6 +70,7 @@ public:
 	void setIndentLevel(int indentLevel);
 	void addIndentLevel(int add);
 	std::string toStr();
+
 private:
 	std::string* target;
 	std::string internal_str;
@@ -79,4 +79,15 @@ private:
 	bool new_line = true;
 
 	void updateIndentStr();
+	void writeLine(std::string str);
+	void writeNewLine();
+	TokenWriter& writeString(std::string value);
+	TokenWriter& writeInt(int value);
+	TokenWriter& writeInt(float value);
+	TokenWriter& writeFloat(float value);
+	TokenWriter& writeBool(bool value);
+	TokenWriter& writeFloatArr(std::vector<float> value);
+	TokenWriter& writeColor(sf::Color value);
+	TokenWriter& writeb2Vec2(b2Vec2 value);
+	std::vector<std::string> splitString(std::string str);
 };

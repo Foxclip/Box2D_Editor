@@ -139,24 +139,24 @@ void GameObject::setRestitution(float restitution, bool include_children) {
 	}
 }
 
-void GameObject::serializeBody(TokenWriter& tw, b2Body* body) {
-	tw.writeString("body").writeNewLine();
+TokenWriter& GameObject::serializeBody(TokenWriter& tw, b2Body* body) {
+	tw << "body" << "\n";
 	tw.addIndentLevel(1);
 	tw.writeStringParam("type", utils::body_type_to_str(body->GetType()));
 	tw.writeb2Vec2Param("position", body->GetPosition());
 	tw.writeFloatParam("angle", body->GetAngle());
 	tw.writeb2Vec2Param("linear_velocity", body->GetLinearVelocity());
 	tw.writeFloatParam("angular_velocity", body->GetAngularVelocity());
-	tw.writeString("fixtures").writeNewLine();
+	tw << "fixtures" << "\n";
 	tw.addIndentLevel(1);
 	for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
-		serializeFixture(tw, fixture);
-		tw.writeNewLine();
+		serializeFixture(tw, fixture) << "\n";
 	}
 	tw.addIndentLevel(-1);
-	tw.writeString("/fixtures").writeNewLine();
+	tw << "/fixtures" << "\n";
 	tw.addIndentLevel(-1);
-	tw.writeString("/body");
+	tw << "/body";
+	return tw;
 }
 
 BodyDef GameObject::deserializeBody(TokenReader& tr) {
@@ -198,14 +198,15 @@ BodyDef GameObject::deserializeBody(TokenReader& tr) {
 	}
 }
 
-void GameObject::serializeFixture(TokenWriter& tw, b2Fixture* fixture) {
-	tw.writeString("fixture").writeNewLine();
+TokenWriter& GameObject::serializeFixture(TokenWriter& tw, b2Fixture* fixture) {
+	tw << "fixture" << "\n";
 	tw.addIndentLevel(1);
 	tw.writeFloatParam("density", fixture->GetDensity());
 	tw.writeFloatParam("friction", fixture->GetFriction());
 	tw.writeFloatParam("restitution", fixture->GetRestitution());
 	tw.addIndentLevel(-1);
-	tw.writeString("/fixture");
+	tw << "/fixture";
+	return tw;
 }
 
 b2FixtureDef GameObject::deserializeFixture(TokenReader& tr) {
@@ -231,10 +232,10 @@ b2FixtureDef GameObject::deserializeFixture(TokenReader& tr) {
 	}
 }
 
-void GameObject::serializeJoint(TokenWriter& tw, b2Joint* p_joint) {
+TokenWriter& GameObject::serializeJoint(TokenWriter& tw, b2Joint* p_joint) {
 	try {
 		if (b2RevoluteJoint* joint = dynamic_cast<b2RevoluteJoint*>(p_joint)) {
-			serializeRevoluteJoint(tw, joint);
+			return serializeRevoluteJoint(tw, joint);
 		} else {
 			throw std::runtime_error("Unknown joint type");
 		}
@@ -243,8 +244,8 @@ void GameObject::serializeJoint(TokenWriter& tw, b2Joint* p_joint) {
 	}
 }
 
-void GameObject::serializeRevoluteJoint(TokenWriter& tw, b2RevoluteJoint* joint) {
-	tw.writeString("joint revolute").writeNewLine();
+TokenWriter& GameObject::serializeRevoluteJoint(TokenWriter& tw, b2RevoluteJoint* joint) {
+	tw << "joint revolute" << "\n";
 	tw.addIndentLevel(1);
 	tw.writeb2Vec2Param("anchor_a", joint->GetLocalAnchorA());
 	tw.writeb2Vec2Param("anchor_b", joint->GetLocalAnchorB());
@@ -256,7 +257,8 @@ void GameObject::serializeRevoluteJoint(TokenWriter& tw, b2RevoluteJoint* joint)
 	tw.writeFloatParam("motor_speed", joint->GetMotorSpeed());
 	tw.writeBoolParam("motor_enabled", joint->IsMotorEnabled());
 	tw.addIndentLevel(-1);
-	tw.writeString("/joint");
+	tw << "/joint";
+	return tw;
 }
 
 b2RevoluteJointDef GameObject::deserializeRevoluteJoint(TokenReader& tr) {
@@ -317,16 +319,15 @@ sf::Transformable* BoxObject::getTransformable() {
 	return rect_shape.get();
 }
 
-void BoxObject::serialize(TokenWriter& tw) {
-	b2Fixture* fixture = rigid_body->GetFixtureList();
-	tw.writeString("object box").writeNewLine();
+TokenWriter& BoxObject::serialize(TokenWriter& tw) {
+	tw << "object box" << "\n";
 	tw.addIndentLevel(1);
 	tw.writeb2Vec2Param("size", size);
 	tw.writeColorParam("color", color);
-	serializeBody(tw, rigid_body);
-	tw.writeNewLine();
+	serializeBody(tw, rigid_body) << "\n";
 	tw.addIndentLevel(-1);
-	tw.writeString("/object");
+	tw << "/object";
+	return tw;
 }
 
 std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* world) {
@@ -382,17 +383,16 @@ sf::Transformable* BallObject::getTransformable() {
 	return circle_notch_shape.get();
 }
 
-void BallObject::serialize(TokenWriter& tw) {
-	b2Fixture* fixture = rigid_body->GetFixtureList();
-	tw.writeString("object ball").writeNewLine();
+TokenWriter& BallObject::serialize(TokenWriter& tw) {
+	tw << "object ball" << "\n";
 	tw.addIndentLevel(1);
 	tw.writeFloatParam("radius", radius);
 	tw.writeColorParam("color", color);
 	tw.writeColorParam("notch_color", notch_color);
-	serializeBody(tw, rigid_body);
-	tw.writeNewLine();
+	serializeBody(tw, rigid_body) << "\n";
 	tw.addIndentLevel(-1);
-	tw.writeString("/object");
+	tw << "/object";
+	return tw;
 }
 
 std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* world) {
@@ -498,26 +498,23 @@ sf::Transformable* CarObject::getTransformable() {
 	return convex_shape.get();
 }
 
-void CarObject::serialize(TokenWriter& tw) {
-	b2Fixture* fixture = rigid_body->GetFixtureList();
-	tw.writeString("object car").writeNewLine();
+TokenWriter& CarObject::serialize(TokenWriter& tw) {
+	tw << "object car" << "\n";
 	tw.addIndentLevel(1);
 	tw.writeFloatArrParam("lengths", lengths);
 	tw.writeColorParam("color", color);
-	serializeBody(tw, rigid_body);
-	tw.writeNewLine();
-	tw.writeString("wheels").writeNewLine();
+	serializeBody(tw, rigid_body) << "\n";
+	tw << "wheels" << "\n";
 	tw.addIndentLevel(1);
 	for (int i = 0; i < children.size(); i++) {
-		children[i]->serialize(tw);
-		tw.writeNewLine();
-		serializeJoint(tw, wheel_joints[i]);
-		tw.writeNewLine();
+		children[i]->serialize(tw) << "\n";
+		serializeJoint(tw, wheel_joints[i]) << "\n";
 	}
 	tw.addIndentLevel(-1);
-	tw.writeString("/wheels").writeNewLine();
+	tw << "/wheels" << "\n";
 	tw.addIndentLevel(-1);
-	tw.writeString("/object");
+	tw << "/object";
+	return tw;
 }
 
 std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* world) {
@@ -694,21 +691,20 @@ b2ChainShape* GroundObject::getShape() {
 	return static_cast<b2ChainShape*>(rigid_body->GetFixtureList()->GetShape());
 }
 
-void GroundObject::serialize(TokenWriter& tw) {
-	b2Fixture* fixture = rigid_body->GetFixtureList();
-	tw.writeString("object ground").writeNewLine();
+TokenWriter& GroundObject::serialize(TokenWriter& tw) {
+	tw << "object ground" << "\n";
 	tw.addIndentLevel(1);
-	tw.writeString("vertices");
+	tw << "vertices";
 	b2ChainShape* chain = getShape();
 	for (int i = 0; i < chain->m_count; i++) {
-		tw.writeb2Vec2(chain->m_vertices[i]);
+		tw << chain->m_vertices[i];
 	}
-	tw.writeNewLine();
+	tw << "\n";
 	tw.writeColorParam("color", color);
-	serializeBody(tw, rigid_body);
-	tw.writeNewLine();
+	serializeBody(tw, rigid_body) << "\n";
 	tw.addIndentLevel(-1);
-	tw.writeString("/object");
+	tw << "/object";
+	return tw;
 }
 
 std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World* world) {

@@ -220,19 +220,15 @@ TokenWriter::TokenWriter(std::string* target, int indent_level) {
 }
 
 TokenWriter& TokenWriter::writeString(std::string value) {
-	if (new_line) {
-		target->append(indent_str);
-	} else {
-		target->append(" ");
+	std::vector<std::string> lines = splitString(value);
+	for (int i = 0; i < lines.size(); i++) {
+		std::string str = lines[i];
+		if (str == "\n") {
+			writeNewLine();
+		} else {
+			writeLine(str);
+		}
 	}
-	target->append(value);
-	new_line = false;
-	return *this;
-}
-
-TokenWriter& TokenWriter::writeNewLine() {
-	target->append("\n");
-	new_line = true;
 	return *this;
 }
 
@@ -325,9 +321,77 @@ std::string TokenWriter::toStr() {
 	return std::string(*target);
 }
 
+TokenWriter& TokenWriter::operator<<(const char* value) {
+	return writeString(std::string(value));
+}
+
+TokenWriter& TokenWriter::operator<<(std::string value) {
+	return writeString(value);
+}
+
+TokenWriter& TokenWriter::operator<<(int value) {
+	return writeInt(value);
+}
+
+TokenWriter& TokenWriter::operator<<(float value) {
+	return writeFloat(value);
+}
+
+TokenWriter& TokenWriter::operator<<(bool value) {
+	return writeBool(value);
+}
+
+TokenWriter& TokenWriter::operator<<(std::vector<float> value) {
+	return writeFloatArr(value);
+}
+
+TokenWriter& TokenWriter::operator<<(sf::Color value) {
+	return writeColor(value);
+}
+
+TokenWriter& TokenWriter::operator<<(b2Vec2 value) {
+	return writeb2Vec2(value);
+}
+
 void TokenWriter::updateIndentStr() {
 	indent_str = "";
 	for (int i = 0; i < indent_level; i++) {
 		indent_str += "    ";
 	}
+}
+
+void TokenWriter::writeLine(std::string str) {
+	if (new_line) {
+		target->append(indent_str);
+	} else {
+		target->append(" ");
+	}
+	target->append(str);
+	new_line = false;
+}
+
+void TokenWriter::writeNewLine() {
+	target->append("\n");
+	new_line = true;
+}
+
+std::vector<std::string> TokenWriter::splitString(std::string str) {
+	std::vector<std::string> results;
+	std::string current_word;
+	str += EOF;
+	for (int i = 0; i < str.size(); i++) {
+		char c = str[i];
+		if (c == '\n' || c == EOF) {
+			if (current_word.size() > 0) {
+				results.push_back(current_word);
+			}
+			if (c == '\n') {
+				results.push_back("\n");
+			}
+			current_word = "";
+		} else {
+			current_word += c;
+		}
+	}
+	return results;
 }

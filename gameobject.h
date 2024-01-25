@@ -53,13 +53,13 @@ public:
 	void setDensity(float density, bool include_children);
 	void setFriction(float friction, bool include_children);
 	void setRestitution(float restitution, bool include_children);
-	virtual void serialize(TokenWriter& tw) = 0;
-	static void serializeBody(TokenWriter& tw, b2Body* body);
+	virtual TokenWriter& serialize(TokenWriter& tw) = 0;
+	static TokenWriter& serializeBody(TokenWriter& tw, b2Body* body);
+	static TokenWriter& serializeFixture(TokenWriter& tw, b2Fixture* fixture);
+	static TokenWriter& serializeJoint(TokenWriter& tw, b2Joint* p_joint);
+	static TokenWriter& serializeRevoluteJoint(TokenWriter& p_tw, b2RevoluteJoint* joint);
 	static BodyDef deserializeBody(TokenReader& tr);
-	static void serializeFixture(TokenWriter& tw, b2Fixture* fixture);
 	static b2FixtureDef deserializeFixture(TokenReader& tr);
-	static void serializeJoint(TokenWriter& tw, b2Joint* p_joint);
-	static void serializeRevoluteJoint(TokenWriter& p_tw, b2RevoluteJoint* joint);
 	static b2RevoluteJointDef deserializeRevoluteJoint(TokenReader& tr);
 };
 
@@ -68,7 +68,7 @@ public:
 	BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
-	void serialize(TokenWriter& tw);
+	TokenWriter& serialize(TokenWriter& tw);
 	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, b2World* world);
 	b2Vec2 size = b2Vec2();
 private:
@@ -80,7 +80,7 @@ public:
 	BallObject(b2World* world, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
-	void serialize(TokenWriter& tw);
+	TokenWriter& serialize(TokenWriter& tw);
 	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, b2World* world);
 	float radius = 0.0f;
 private:
@@ -101,7 +101,7 @@ public:
 	);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
-	void serialize(TokenWriter& tw);
+	TokenWriter& serialize(TokenWriter& tw);
 	static std::unique_ptr<CarObject> deserialize(TokenReader& tr, b2World* world);
 	std::vector<float> lengths;
 private:
@@ -120,7 +120,7 @@ public:
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	b2ChainShape* getShape();
-	void serialize(TokenWriter& tw);
+	TokenWriter& serialize(TokenWriter& tw);
 	static std::unique_ptr<GroundObject> deserialize(TokenReader& tr, b2World* world);
 private:
 	std::unique_ptr<LineStripShape> line_strip_shape;
