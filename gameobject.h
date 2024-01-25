@@ -107,6 +107,8 @@ public:
 private:
 	std::unique_ptr<sf::ConvexShape> convex_shape;
 	std::vector<b2RevoluteJoint*> wheel_joints;
+	void create_shape(std::vector<float> lengths);
+	void create_wheel(b2Vec2 wheel_pos, float radius);
 };
 
 class GroundObject : public GameObject {

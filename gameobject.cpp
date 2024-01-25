@@ -450,43 +450,14 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 }
 
 CarObject::CarObject(b2World* world, b2BodyDef def, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
-	convex_shape = std::make_unique<sf::ConvexShape>(lengths.size());
-	float pi = std::numbers::pi;
 	rigid_body = world->CreateBody(&def);
-	for (int i = 0; i < lengths.size(); i++) {
-		b2Vec2 vertices[3];
-		vertices[0] = b2Vec2(0.0f, 0.0f);
-		vertices[1] = utils::get_pos(lengths, i);
-		vertices[2] = utils::get_pos(lengths, i + 1);
-		b2PolygonShape triangle;
-		triangle.Set(vertices, 3);
-		b2Fixture* fixture = rigid_body->CreateFixture(&triangle, 1.0f);
+	create_shape(lengths);
+	for (int i = 0; i < wheels.size(); i++) {
 		if (wheels[i] > 0.0f) {
-			b2Vec2 anchor_pos = vertices[1];
-			b2Vec2 anchor_pos_world = def.position + anchor_pos;
-			b2BodyDef wheel_body_def;
-			wheel_body_def.type = b2_dynamicBody;
-			wheel_body_def.position = anchor_pos_world;
-			std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
-				world, wheel_body_def, wheels[i], sf::Color::Yellow, sf::Color(64, 64, 0)
-			);
-			BallObject* wheel_ptr = wheel.get();
-			wheel_ptr->setType(b2_dynamicBody, false);
-			wheel_ptr->setDensity(1.0f, false);
-			wheel_ptr->setFriction(0.3f, false);
-			wheel_ptr->setRestitution(0.5f, false);
-			children.push_back(std::move(wheel));
-			b2RevoluteJointDef wheel_joint_def;
-			wheel_joint_def.Initialize(rigid_body, wheel_ptr->rigid_body, anchor_pos_world);
-			wheel_joint_def.maxMotorTorque = 30.0f;
-			wheel_joint_def.motorSpeed = -10.0f;
-			wheel_joint_def.enableMotor = true;
-			b2RevoluteJoint* wheel_joint = (b2RevoluteJoint*)world->CreateJoint(&wheel_joint_def);
-			wheel_joints.push_back(wheel_joint);
+			b2Vec2 wheel_pos = utils::get_pos(lengths, i);
+			create_wheel(wheel_pos, wheels[i]);
 		}
-		convex_shape->setPoint(i, tosf(vertices[1]));
 	}
-
 	convex_shape->setFillColor(color);
 	this->lengths = lengths;
 	this->color = color;
@@ -501,21 +472,8 @@ CarObject::CarObject(
 	std::vector<b2RevoluteJointDef> joint_defs,
 	sf::Color color
 ) {
-	convex_shape = std::make_unique<sf::ConvexShape>(lengths.size());
 	rigid_body = world->CreateBody(&def);
-	for (int i = 0; i < lengths.size(); i++) {
-		b2Vec2 vertices[3];
-		vertices[0] = b2Vec2(0.0f, 0.0f);
-		vertices[1] = utils::get_pos(lengths, i);
-		vertices[2] = utils::get_pos(lengths, i + 1);
-		b2PolygonShape triangle;
-		triangle.Set(vertices, 3);
-		b2Fixture* fixture = rigid_body->CreateFixture(&triangle, 1.0f);
-		convex_shape->setPoint(i, tosf(vertices[1]));
-	}
-
-	convex_shape->setFillColor(color);
-	this->lengths = lengths;
+	create_shape(lengths);
 	for (int i = 0; i < joint_defs.size(); i++) {
 		b2RevoluteJointDef def = joint_defs[i];
 		def.bodyA = rigid_body;
@@ -526,6 +484,8 @@ CarObject::CarObject(
 	for (int i = 0; i < wheels.size(); i++) {
 		children.push_back(std::move(wheels[i]));
 	}
+	convex_shape->setFillColor(color);
+	this->lengths = lengths;
 	this->color = color;
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
@@ -608,6 +568,43 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
 	}
+}
+
+void CarObject::create_shape(std::vector<float> lengths) {
+	convex_shape = std::make_unique<sf::ConvexShape>(lengths.size());
+	for (int i = 0; i < lengths.size(); i++) {
+		b2Vec2 vertices[3];
+		vertices[0] = b2Vec2(0.0f, 0.0f);
+		vertices[1] = utils::get_pos(lengths, i);
+		vertices[2] = utils::get_pos(lengths, i + 1);
+		b2PolygonShape triangle;
+		triangle.Set(vertices, 3);
+		b2Fixture* fixture = rigid_body->CreateFixture(&triangle, 1.0f);
+		convex_shape->setPoint(i, tosf(vertices[1]));
+	}
+}
+
+void CarObject::create_wheel(b2Vec2 wheel_pos, float radius) {
+	b2Vec2 anchor_pos = wheel_pos;
+	b2Vec2 anchor_pos_world = rigid_body->GetPosition() + anchor_pos;
+	b2BodyDef wheel_body_def;
+	wheel_body_def.type = b2_dynamicBody;
+	wheel_body_def.position = anchor_pos_world;
+	std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
+		rigid_body->GetWorld(), wheel_body_def, radius, sf::Color::Yellow, sf::Color(64, 64, 0)
+	);
+	BallObject* wheel_ptr = wheel.get();
+	wheel_ptr->setDensity(1.0f, false);
+	wheel_ptr->setFriction(0.3f, false);
+	wheel_ptr->setRestitution(0.5f, false);
+	children.push_back(std::move(wheel));
+	b2RevoluteJointDef wheel_joint_def;
+	wheel_joint_def.Initialize(rigid_body, wheel_ptr->rigid_body, anchor_pos_world);
+	wheel_joint_def.maxMotorTorque = 30.0f;
+	wheel_joint_def.motorSpeed = -10.0f;
+	wheel_joint_def.enableMotor = true;
+	b2RevoluteJoint* wheel_joint = (b2RevoluteJoint*)rigid_body->GetWorld()->CreateJoint(&wheel_joint_def);
+	wheel_joints.push_back(wheel_joint);
 }
 
 CircleNotchShape::CircleNotchShape(float radius, int point_count, int notch_segment_count) {
