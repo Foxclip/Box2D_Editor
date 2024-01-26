@@ -6,6 +6,7 @@
 
 class LineStripShape : public sf::Drawable, public sf::Transformable {
 public:
+	explicit LineStripShape();
 	explicit LineStripShape(sf::VertexArray& varray);
 	void setLineColor(sf::Color color);
 	sf::VertexArray varray;
@@ -111,21 +112,38 @@ private:
 	void create_wheel(b2Vec2 wheel_pos, float radius);
 };
 
+class GroundVertex {
+public:
+	b2Vec2 pos = b2Vec2(0.0f, 0.0f);
+	bool selected = false;
+
+	GroundVertex(b2Vec2 pos);
+
+private:
+};
+
 class GroundObject : public GameObject {
 public:
-	GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> vertices, sf::Color color);
-	void moveVertex(int index, const b2Vec2& new_pos);
+	GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
 	void moveVertices(const std::vector<int>& index_list, const b2Vec2& offset);
+	void moveSelected(const b2Vec2& offset);
+	int getVertexCount();
+	b2Vec2 getVertexPos(int index);
+	void setVertexPos(int index, const b2Vec2& new_pos);
 	bool tryDeleteVertex(int index);
 	void addVertex(int index, const b2Vec2& pos);
+	void selectVertex(int index);
+	bool isVertexSelected(int index);
+	void clearVertexSelection();
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
-	b2ChainShape* getShape();
 	TokenWriter& serialize(TokenWriter& tw);
 	static std::unique_ptr<GroundObject> deserialize(TokenReader& tr, b2World* world);
 private:
+	std::vector<GroundVertex> vertices;
 	std::unique_ptr<LineStripShape> line_strip_shape;
-	std::vector<b2Vec2> getVertices();
-	void setVertices(const std::vector<b2Vec2>& vertices);
+	b2ChainShape* getShape();
+	std::vector<b2Vec2> getPositions();
+	void syncVertices();
 };
 

@@ -434,6 +434,8 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* wo
 	}
 }
 
+LineStripShape::LineStripShape() { }
+
 LineStripShape::LineStripShape(sf::VertexArray& varray) {
 	this->varray = varray;
 }
@@ -640,53 +642,79 @@ void CircleNotchShape::draw(sf::RenderTarget& target, sf::RenderStates states) c
 	target.draw(varray_notch, states);
 }
 
-GroundObject::GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> vertices, sf::Color color) {
+GroundObject::GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color) {
 	rigid_body = world->CreateBody(&def);
-	b2ChainShape chain;
-	chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
-	b2Fixture* fixture = rigid_body->CreateFixture(&chain, 1.0f);
-	sf::VertexArray drawable_vertices(sf::LinesStrip, vertices.size());
-	for (int i = 0; i < vertices.size(); i++) {
-		drawable_vertices[i].position = tosf(vertices[i]);
+	sf::VertexArray drawable_vertices(sf::LinesStrip, p_vertices.size());
+	for (int i = 0; i < p_vertices.size(); i++) {
+		drawable_vertices[i].position = tosf(p_vertices[i]);
+		GroundVertex gv(p_vertices[i]);
+		vertices.push_back(gv);
 	}
 	line_strip_shape = std::make_unique<LineStripShape>(drawable_vertices);
+	syncVertices();
 	line_strip_shape->setLineColor(color);
 	this->color = color;
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
-void GroundObject::moveVertex(int index, const b2Vec2& new_pos) {
-	std::vector<b2Vec2> vertices = getVertices();
-	vertices[index] = new_pos;
-	setVertices(vertices);
-}
-
 void GroundObject::moveVertices(const std::vector<int>& index_list, const b2Vec2& offset) {
-	std::vector<b2Vec2> vertices = getVertices();
 	for (int i = 0; i < index_list.size(); i++) {
 		int index = index_list[i];
-		vertices[index] += offset;
+		vertices[index].pos += offset;
 	}
-	setVertices(vertices);
+	syncVertices();
+}
+
+void GroundObject::moveSelected(const b2Vec2& offset) {
+	for (int i = 0; i < vertices.size(); i++) {
+		if (vertices[i].selected) {
+			vertices[i].pos += offset;
+		}
+	}
+}
+
+int GroundObject::getVertexCount() {
+	return vertices.size();
+}
+
+b2Vec2 GroundObject::getVertexPos(int index) {
+	return vertices[index].pos;
+}
+
+void GroundObject::setVertexPos(int index, const b2Vec2& new_pos) {
+	vertices[index].pos = new_pos;
+	syncVertices();
 }
 
 bool GroundObject::tryDeleteVertex(int index) {
 	if (index < 0) {
 		return false;
 	}
-	std::vector<b2Vec2> vertices = getVertices();
 	if (vertices.size() <= 2) {
 		return false;
 	}
 	vertices.erase(vertices.begin() + index);
-	setVertices(vertices);
+	syncVertices();
 	return true;
 }
 
 void GroundObject::addVertex(int index, const b2Vec2& pos) {
-	std::vector<b2Vec2> vertices = getVertices();
 	vertices.insert(vertices.begin() + index, pos);
-	setVertices(vertices);
+	syncVertices();
+}
+
+void GroundObject::selectVertex(int index) {
+	vertices[index].selected = true;
+}
+
+bool GroundObject::isVertexSelected(int index) {
+	return vertices[index].selected;
+}
+
+void GroundObject::clearVertexSelection() {
+	for (int i = 0; i < vertices.size(); i++) {
+		vertices[i].selected = false;
+	}
 }
 
 sf::Drawable* GroundObject::getDrawable() {
@@ -695,10 +723,6 @@ sf::Drawable* GroundObject::getDrawable() {
 
 sf::Transformable* GroundObject::getTransformable() {
 	return line_strip_shape.get();
-}
-
-b2ChainShape* GroundObject::getShape() {
-	return static_cast<b2ChainShape*>(rigid_body->GetFixtureList()->GetShape());
 }
 
 TokenWriter& GroundObject::serialize(TokenWriter& tw) {
@@ -748,23 +772,34 @@ std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World
 	}
 }
 
-std::vector<b2Vec2> GroundObject::getVertices() {
-	b2Fixture* fixture = rigid_body->GetFixtureList();
-	b2ChainShape* chain = static_cast<b2ChainShape*>(fixture->GetShape());
-	std::vector<b2Vec2> vertices;
-	vertices.assign(chain->m_vertices, chain->m_vertices + chain->m_count);
-	return vertices;
+b2ChainShape* GroundObject::getShape() {
+	return static_cast<b2ChainShape*>(rigid_body->GetFixtureList()->GetShape());
 }
 
-void GroundObject::setVertices(const std::vector<b2Vec2>& vertices) {
-	b2Fixture* old_fixture = rigid_body->GetFixtureList();
-	rigid_body->DestroyFixture(old_fixture);
-	b2ChainShape new_chain;
-	new_chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
-	b2Fixture* new_fixture = rigid_body->CreateFixture(&new_chain, 1.0f);
-	line_strip_shape->varray = sf::VertexArray(sf::LinesStrip, vertices.size());
+std::vector<b2Vec2> GroundObject::getPositions() {
+	std::vector<b2Vec2> b2vertices(vertices.size());
 	for (int i = 0; i < vertices.size(); i++) {
-		line_strip_shape->varray[i].position = tosf(vertices[i]);
+		b2vertices[i] = vertices[i].pos;
+	}
+	return b2vertices;
+}
+
+void GroundObject::syncVertices() {
+	std::vector<b2Vec2> b2vertices = getPositions();
+	b2Fixture* old_fixture = rigid_body->GetFixtureList();
+	if (old_fixture) {
+		rigid_body->DestroyFixture(old_fixture);
+	}
+	b2ChainShape new_chain;
+	new_chain.CreateChain(b2vertices.data(), b2vertices.size(), b2vertices.front(), b2vertices.back());
+	b2Fixture* new_fixture = rigid_body->CreateFixture(&new_chain, 1.0f);
+	line_strip_shape->varray = sf::VertexArray(sf::LinesStrip, b2vertices.size());
+	for (int i = 0; i < b2vertices.size(); i++) {
+		line_strip_shape->varray[i].position = tosf(b2vertices[i]);
 	}
 }
 
+GroundVertex::GroundVertex(b2Vec2 pos) {
+	this->pos = pos;
+	this->selected = false;
+}
