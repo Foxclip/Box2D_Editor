@@ -77,18 +77,34 @@ public:
 private:
 };
 
+class HistoryEntry {
+public:
+	enum Type {
+		BASE,
+		NORMAL,
+		QUICKLOAD,
+	};
+	std::string str;
+	Type type;
+	static std::string typeToStr(Type type);
+
+	HistoryEntry(std::string str, Type type);
+};
+
 class History {
 public:
 	History();
 	History(std::function<std::string(void)> get, std::function<void(std::string)> set);
-	void save();
+	void save(HistoryEntry::Type type);
 	void undo();
 	void redo();
 	void clear();
+	HistoryEntry& getCurrent();
+
 private:
 	std::function<std::string(void)> get;
 	std::function<void(std::string)> set;
-	std::vector<std::string> history;
+	std::vector<HistoryEntry> history;
 	int current = 0;
 };
 
@@ -133,6 +149,8 @@ private:
 	std::vector<std::unique_ptr<GameObject>> game_objects;
 	History history;
 	bool commit_action = false;
+	std::string quicksave_str;
+	bool quickload_planned = false;
 
 	void init_ui();
 	void init_objects();
@@ -153,6 +171,8 @@ private:
 	void deserialize(std::string str, bool set_camera);
 	void save(std::string filename);
 	void load(std::string filename);
+	void quicksave();
+	void quickload();
 	Tool* try_select_tool(int index);
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);

@@ -26,7 +26,7 @@ void Application::init() {
     auto getter = [&]() { return serialize(); };
     auto setter = [&](std::string str) { deserialize(str, false); };
     history = History(getter, setter);
-    history.save();
+    history.save(HistoryEntry::BASE);
     assert(selected_tool);
 }
 
@@ -132,8 +132,12 @@ void Application::process_input() {
     process_keyboard();
     process_mouse();
     if (commit_action) {
-        history.save();
+        history.save(HistoryEntry::NORMAL);
         commit_action = false;
+    }
+    if (quickload_planned) {
+        quickload();
+        quickload_planned = false;
     }
 }
 
@@ -172,6 +176,12 @@ void Application::process_keyboard_event(sf::Event event) {
                         history.undo();
                     }
                 }
+                break;
+            case sf::Keyboard::Q:
+                quicksave();
+                break;
+            case sf::Keyboard::W:
+                quickload_planned = true;
                 break;
         }
     }
@@ -551,6 +561,23 @@ void Application::load(std::string filename) {
     }
 }
 
+void Application::quicksave() {
+    quicksave_str = serialize();
+    std::cout << "Quicksave\n";
+}
+
+void Application::quickload() {
+    if (quicksave_str.size() > 0) {
+        deserialize(quicksave_str, true);
+        std::cout << "Quickload\n";
+        if (history.getCurrent().type != HistoryEntry::QUICKLOAD) {
+            history.save(HistoryEntry::QUICKLOAD);
+        }
+    } else {
+        std::cout << "Can't quickload\n";
+    }
+}
+
 Tool* Application::try_select_tool(int index) {
     if (tools.size() > index) {
         Tool* tool = tools[index];
@@ -778,22 +805,23 @@ History::History(std::function<std::string(void)> get, std::function<void(std::s
     current = -1;
 }
 
-void History::save() {
+void History::save(HistoryEntry::Type type) {
     if (current < history.size()) {
         history.erase(history.begin() + current + 1, history.end());
     }
     std::string state = get();
-    history.push_back(state);
+    HistoryEntry entry(state, type);
+    history.push_back(entry);
     current++;
-    std::cout << "Save\n";
+    std::cout << "Save " << HistoryEntry::typeToStr(type) << ", current: " << current << ", size : " << history.size() << "\n";
 }
 
 void History::undo() {
     if (current > 0) {
         current--;
-        std::string state = history[current];
+        std::string state = history[current].str;
         set(state);
-        std::cout << "Undo\n";
+        std::cout << "Undo, current: " << current << ", size: " << history.size() << "\n";
     } else {
         std::cout << "Can't undo\n";
     }
@@ -802,9 +830,9 @@ void History::undo() {
 void History::redo() {
     if (current < history.size() - 1) {
         current++;
-        std::string state = history[current];
+        std::string state = history[current].str;
         set(state);
-        std::cout << "Redo\n";
+        std::cout << "Redo, current: " << current << ", size: " << history.size() << "\n";
     } else {
         std::cout << "Can't redo\n";
     }
@@ -814,4 +842,21 @@ void History::clear() {
     if (history.size() > 1) {
         history.erase(history.begin() + 1, history.end());
     }
+}
+
+HistoryEntry& History::getCurrent() {
+    return history[current];
+}
+
+std::string HistoryEntry::typeToStr(Type type) {
+    switch (type) {
+        case HistoryEntry::BASE: return "base"; break;
+        case HistoryEntry::NORMAL: return "normal"; break;
+        case HistoryEntry::QUICKLOAD: return "quickload"; break;
+    }
+}
+
+HistoryEntry::HistoryEntry(std::string str, Type type) {
+    this->str = str;
+    this->type = type;
 }

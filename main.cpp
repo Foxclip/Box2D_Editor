@@ -14,10 +14,10 @@ int main() {
         std::cout << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: ctrl-z
-    // TODO: move mouseBody with the mouse
     // TODO: edit mode box selection
     // TODO: create/delete objects in the scene
+    // TODO: evolving cars
+    // TODO: edit and simulate modes
 
     return 0;
 }
