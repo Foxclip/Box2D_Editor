@@ -6,6 +6,7 @@
 #include <vector>
 #include <sstream>
 #include <iomanip>
+#include "utils.h"
 
 class WordToken {
 public:
@@ -89,5 +90,4 @@ private:
 	TokenWriter& writeFloatArr(std::vector<float> value);
 	TokenWriter& writeColor(sf::Color value);
 	TokenWriter& writeb2Vec2(b2Vec2 value);
-	std::vector<std::string> splitString(std::string str);
 };

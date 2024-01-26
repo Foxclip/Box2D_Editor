@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <iostream>
 #include "application.h"
+#include "logger.h"
 
 int main() {
     
@@ -9,11 +10,12 @@ int main() {
         app.init();
         app.start();
     } catch (std::string msg) {
-        std::cout << "ERROR: " << msg << "\n";
+        logger << "ERROR: " << msg << "\n";
     } catch (std::exception exc) {
-        std::cout << "ERROR: " << exc.what() << "\n";
+        logger << "ERROR: " << exc.what() << "\n";
     }
 
+    // TODO: logger with time
     // TODO: edit mode box selection
     // TODO: create/delete objects in the scene
     // TODO: evolving cars

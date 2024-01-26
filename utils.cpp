@@ -147,4 +147,37 @@ namespace utils {
 		return pos;
 	}
 
+	std::vector<std::string> splitString(std::string str) {
+		std::vector<std::string> results;
+		std::string current_word;
+		str += EOF;
+		for (int i = 0; i < str.size(); i++) {
+			char c = str[i];
+			if (c == '\n' || c == EOF) {
+				if (current_word.size() > 0) {
+					results.push_back(current_word);
+				}
+				if (c == '\n') {
+					results.push_back("\n");
+				}
+				current_word = "";
+			} else {
+				current_word += c;
+			}
+		}
+		return results;
+	}
+
+	std::string current_time() {
+		time_t t;
+		std::time(&t);
+		tm l;
+		localtime_s(&l, &t);
+		std::stringstream ss;
+		ss << std::setw(2) << std::setfill('0') << l.tm_hour;
+		ss << ":" << std::setw(2) << std::setfill('0') << l.tm_min;
+		ss << ":" << std::setw(2) << std::setfill('0') << l.tm_sec;
+		return ss.str();
+	}
+
 }

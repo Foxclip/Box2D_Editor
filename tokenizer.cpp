@@ -220,7 +220,7 @@ TokenWriter::TokenWriter(std::string* target, int indent_level) {
 }
 
 TokenWriter& TokenWriter::writeString(std::string value) {
-	std::vector<std::string> lines = splitString(value);
+	std::vector<std::string> lines = utils::splitString(value);
 	for (int i = 0; i < lines.size(); i++) {
 		std::string str = lines[i];
 		if (str == "\n") {
@@ -375,23 +375,3 @@ void TokenWriter::writeNewLine() {
 	new_line = true;
 }
 
-std::vector<std::string> TokenWriter::splitString(std::string str) {
-	std::vector<std::string> results;
-	std::string current_word;
-	str += EOF;
-	for (int i = 0; i < str.size(); i++) {
-		char c = str[i];
-		if (c == '\n' || c == EOF) {
-			if (current_word.size() > 0) {
-				results.push_back(current_word);
-			}
-			if (c == '\n') {
-				results.push_back("\n");
-			}
-			current_word = "";
-		} else {
-			current_word += c;
-		}
-	}
-	return results;
-}

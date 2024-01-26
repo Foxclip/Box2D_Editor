@@ -30,6 +30,8 @@ namespace utils {
 	std::string farr_to_str(std::vector<float>& vec);
 	std::string bool_to_str(bool value);
 	b2Vec2 get_pos(const std::vector<float>& lengths, int i);
+	std::vector<std::string> splitString(std::string str);
+	std::string current_time();
 
 	template <typename T>
 	T rot90CCW(const T& vec) {

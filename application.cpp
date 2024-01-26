@@ -2,6 +2,7 @@
 #include "utils.h"
 #include <numbers>
 #include <iostream>
+#include "logger.h"
 
 std::vector<std::unique_ptr<Tool>> tools;
 
@@ -563,18 +564,18 @@ void Application::load(std::string filename) {
 
 void Application::quicksave() {
     quicksave_str = serialize();
-    std::cout << "Quicksave\n";
+    logger << "Quicksave\n";
 }
 
 void Application::quickload() {
     if (quicksave_str.size() > 0) {
         deserialize(quicksave_str, true);
-        std::cout << "Quickload\n";
+        logger << "Quickload\n";
         if (history.getCurrent().type != HistoryEntry::QUICKLOAD) {
             history.save(HistoryEntry::QUICKLOAD);
         }
     } else {
-        std::cout << "Can't quickload\n";
+        logger << "Can't quickload\n";
     }
 }
 
@@ -813,7 +814,7 @@ void History::save(HistoryEntry::Type type) {
     HistoryEntry entry(state, type);
     history.push_back(entry);
     current++;
-    std::cout << "Save " << HistoryEntry::typeToStr(type) << ", current: " << current << ", size : " << history.size() << "\n";
+    logger << "Save " << HistoryEntry::typeToStr(type) << ", current: " << current << ", size : " << history.size() << "\n";
 }
 
 void History::undo() {
@@ -821,9 +822,9 @@ void History::undo() {
         current--;
         std::string state = history[current].str;
         set(state);
-        std::cout << "Undo, current: " << current << ", size: " << history.size() << "\n";
+        logger << "Undo, current: " << current << ", size: " << history.size() << "\n";
     } else {
-        std::cout << "Can't undo\n";
+        logger << "Can't undo\n";
     }
 }
 
@@ -832,9 +833,9 @@ void History::redo() {
         current++;
         std::string state = history[current].str;
         set(state);
-        std::cout << "Redo, current: " << current << ", size: " << history.size() << "\n";
+        logger << "Redo, current: " << current << ", size: " << history.size() << "\n";
     } else {
-        std::cout << "Can't redo\n";
+        logger << "Can't redo\n";
     }
 }
 
