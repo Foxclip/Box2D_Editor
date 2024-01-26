@@ -269,8 +269,8 @@ void Application::process_mouse() {
         }
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        if (edit_tool.grabbed_vertex != -1) {
-            ground->moveVertex(edit_tool.grabbed_vertex, b2MousePosWorld);
+        if (drag_tool.mouse_joint) {
+            drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
         }
         if (move_tool.object) {
             move_tool.object->setPosition(b2MousePosWorld - move_tool.offset, true);
@@ -280,8 +280,12 @@ void Application::process_mouse() {
             float angle = atan2(mouse_vector.y, mouse_vector.x);
             rotate_tool.object->setAngle(angle - rotate_tool.angle_offset, true);
         }
-        if (drag_tool.mouse_joint) {
-            drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
+        if (edit_tool.grabbed_vertex != -1) {
+            ground->moveVertex(edit_tool.grabbed_vertex, b2MousePosWorld);
+        }
+        if (edit_tool.selection) {
+            std::vector<int> vertices = get_vertices_in_rect();
+            edit_tool.setSelectedVertices(vertices);
         }
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
@@ -347,6 +351,7 @@ void Application::process_left_click() {
                 edit_tool.mode = EditTool::SELECT;
                 edit_tool.selection = true;
                 edit_tool.select_origin = sfMousePosWorld;
+                edit_tool.clearSelectedVertices();
             }
         } else if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             if (edit_tool.edge_vertex == 0) {
@@ -441,7 +446,9 @@ void Application::render_ui() {
         b2ChainShape* chain = ground->getShape();
         for (int i = 0; i < chain->m_count; i++) {
             edit_tool.vertex_rect.setPosition(world_to_screenf(chain->m_vertices[i]));
-            edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0));
+            bool selected = edit_tool.isSelected(i);
+            sf::Color vertex_color = selected ? sf::Color(255, 255, 0) : sf::Color(255, 0, 0);
+            edit_tool.vertex_rect.setFillColor(vertex_color);
             window->draw(edit_tool.vertex_rect);
         }
         // ground edge normals
@@ -723,6 +730,26 @@ int Application::mouse_get_edge_vertex() {
     }
 }
 
+std::vector<int> Application::get_vertices_in_rect() {
+    std::vector<int> result;
+    b2ChainShape* chain = ground->getShape();
+    sf::Vector2f mpos = sfMousePosWorld;
+    sf::Vector2f origin = edit_tool.select_origin;
+    float left = std::min(mpos.x, origin.x);
+    float top = std::min(mpos.y, origin.y);
+    float right = std::max(mpos.x, origin.x);
+    float bottom = std::max(mpos.y, origin.y);
+    float width = right - left;
+    float height = bottom - top;
+    sf::FloatRect rect(left, top, width, height);
+    for (int i = 0; i < chain->m_count; i++) {
+        if (utils::contains_point(rect, tosf(chain->m_vertices[i]))) {
+            result.push_back(i);
+        }
+    }
+    return result;
+}
+
 void Application::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) {
     b2Vec2 midpoint = 0.5f * (v1 + v2);
     norm_v1 = world_to_screenf(midpoint);
@@ -840,6 +867,32 @@ std::string EditTool::modeToStr(EditToolMode mode) {
         case EditTool::MOVE: return "MOVE";
         default: return "Unknown";
     }
+}
+
+std::vector<int> EditTool::getSelectedVertices() {
+    return selected_vertices;
+}
+
+std::set<int> EditTool::getSelectedVerticesSet() {
+    return selected_vertices_set;
+}
+
+void EditTool::setSelectedVertices(std::vector<int> vertices) {
+    selected_vertices = vertices;
+    selected_vertices_set = std::set(vertices.begin(), vertices.end());
+}
+
+void EditTool::clearSelectedVertices() {
+    selected_vertices = std::vector<int>();
+    selected_vertices_set = std::set<int>();
+}
+
+bool EditTool::isSelected(int i) {
+    auto it = selected_vertices_set.find(i);
+    if (it != selected_vertices_set.end()) {
+        return true;
+    }
+    return false;
 }
 
 History::History() { }

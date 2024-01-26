@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <winuser.h>
 #include <functional>
+#include <set>
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -89,8 +90,16 @@ public:
 
 	EditTool();
 	static std::string modeToStr(EditToolMode mode);
+	std::vector<int> getSelectedVertices();
+	std::set<int> getSelectedVerticesSet();
+	void setSelectedVertices(std::vector<int> vertices);
+	void clearSelectedVertices();
+	bool isSelected(int i);
 
 private:
+	std::vector<int> selected_vertices;
+	std::set<int> selected_vertices_set;
+
 };
 
 class HistoryEntry {
@@ -200,6 +209,7 @@ private:
 	int mouse_get_ground_vertex();
 	int mouse_get_ground_edge();
 	int mouse_get_edge_vertex();
+	std::vector<int> get_vertices_in_rect();
 	void get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void draw_line(const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color);

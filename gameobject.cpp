@@ -661,6 +661,15 @@ void GroundObject::moveVertex(int index, const b2Vec2& new_pos) {
 	setVertices(vertices);
 }
 
+void GroundObject::moveVertices(const std::vector<int>& index_list, const b2Vec2& offset) {
+	std::vector<b2Vec2> vertices = getVertices();
+	for (int i = 0; i < index_list.size(); i++) {
+		int index = index_list[i];
+		vertices[index] += offset;
+	}
+	setVertices(vertices);
+}
+
 bool GroundObject::tryDeleteVertex(int index) {
 	if (index < 0) {
 		return false;

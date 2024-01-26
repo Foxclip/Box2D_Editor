@@ -58,11 +58,11 @@ namespace utils {
 	}
 
 	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point) {
-		return !(
-			point.x < rect.left
-			|| point.x > rect.left + rect.width
-			|| point.y < rect.top
-			|| point.y > rect.top + rect.height
+		return (
+			point.x >= rect.left
+			&& point.x <= rect.left + rect.width
+			&& point.y >= rect.top
+			&& point.y <= rect.top + rect.height
 		);
 	}
 
