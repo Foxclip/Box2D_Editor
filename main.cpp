@@ -15,7 +15,10 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: edit mode box selection
+    // TODO: add to selection with Shift key, select all with A key, deselect with Alt-A key
+    // TODO: add vertices with Ctrl key, insert with Alt key
+    // TODO: less bright colors (no pure colors like (255, 0, 0))
+    // TODO: recreate b2World on deserialization
     // TODO: create/delete objects in the scene
     // TODO: evolving cars
     // TODO: edit and simulate modes

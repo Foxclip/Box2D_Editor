@@ -115,6 +115,7 @@ private:
 class GroundVertex {
 public:
 	b2Vec2 pos = b2Vec2(0.0f, 0.0f);
+	b2Vec2 orig_pos = b2Vec2(0.0f, 0.0f);
 	bool selected = false;
 
 	GroundVertex(b2Vec2 pos);
@@ -126,8 +127,10 @@ class GroundObject : public GameObject {
 public:
 	GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
 	void moveVertices(const std::vector<int>& index_list, const b2Vec2& offset);
-	void moveSelected(const b2Vec2& offset);
+	void offsetSelected(const b2Vec2& offset);
+	void saveOffsets();
 	int getVertexCount();
+	const GroundVertex& getVertex(int index);
 	b2Vec2 getVertexPos(int index);
 	void setVertexPos(int index, const b2Vec2& new_pos);
 	bool tryDeleteVertex(int index);
@@ -144,6 +147,7 @@ private:
 	std::unique_ptr<LineStripShape> line_strip_shape;
 	b2ChainShape* getShape();
 	std::vector<b2Vec2> getPositions();
+	void vertexSet(int index, const b2Vec2& new_pos);
 	void syncVertices();
 };
 

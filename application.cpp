@@ -237,6 +237,7 @@ void Application::process_mouse_event(sf::Event event) {
                 }
                 if (edit_tool.grabbed_vertex != -1) {
                     edit_tool.grabbed_vertex = -1;
+                    ground->saveOffsets();
                     commit_action = true;
                     edit_tool.mode = EditTool::HOVER;
                 }
@@ -281,7 +282,10 @@ void Application::process_mouse() {
             rotate_tool.object->setAngle(angle - rotate_tool.angle_offset, true);
         }
         if (edit_tool.grabbed_vertex != -1) {
-            ground->setVertexPos(edit_tool.grabbed_vertex, b2MousePosWorld);
+            int index = edit_tool.grabbed_vertex;
+            const GroundVertex& vertex = ground->getVertex(index);
+            b2Vec2 offset = b2MousePosWorld - vertex.orig_pos;
+            ground->offsetSelected(offset);
         }
         if (edit_tool.selection) {
             select_vertices_in_rect();
@@ -346,6 +350,7 @@ void Application::process_left_click() {
             if (edit_tool.highlighted_vertex != -1) {
                 edit_tool.mode = EditTool::MOVE;
                 edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
+                ground->selectVertex(edit_tool.grabbed_vertex);
             } else {
                 edit_tool.mode = EditTool::SELECT;
                 edit_tool.selection = true;

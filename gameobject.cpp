@@ -660,16 +660,25 @@ GroundObject::GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_
 void GroundObject::moveVertices(const std::vector<int>& index_list, const b2Vec2& offset) {
 	for (int i = 0; i < index_list.size(); i++) {
 		int index = index_list[i];
-		vertices[index].pos += offset;
+		GroundVertex vertex = vertices[index];
+		vertex.pos += offset;
+		vertex.orig_pos = vertex.pos;
 	}
 	syncVertices();
 }
 
-void GroundObject::moveSelected(const b2Vec2& offset) {
+void GroundObject::offsetSelected(const b2Vec2& offset) {
 	for (int i = 0; i < vertices.size(); i++) {
 		if (vertices[i].selected) {
-			vertices[i].pos += offset;
+			vertices[i].pos = vertices[i].orig_pos + offset;
 		}
+	}
+	syncVertices();
+}
+
+void GroundObject::saveOffsets() {
+	for (int i = 0; i < vertices.size(); i++) {
+		vertices[i].orig_pos = vertices[i].pos;
 	}
 }
 
@@ -677,12 +686,16 @@ int GroundObject::getVertexCount() {
 	return vertices.size();
 }
 
+const GroundVertex& GroundObject::getVertex(int index) {
+	return vertices[index];
+}
+
 b2Vec2 GroundObject::getVertexPos(int index) {
 	return vertices[index].pos;
 }
 
 void GroundObject::setVertexPos(int index, const b2Vec2& new_pos) {
-	vertices[index].pos = new_pos;
+	vertexSet(index, new_pos);
 	syncVertices();
 }
 
@@ -784,6 +797,12 @@ std::vector<b2Vec2> GroundObject::getPositions() {
 	return b2vertices;
 }
 
+void GroundObject::vertexSet(int index, const b2Vec2& new_pos) {
+	GroundVertex vertex = vertices[index];
+	vertex.pos = new_pos;
+	vertex.orig_pos = vertex.pos;
+}
+
 void GroundObject::syncVertices() {
 	std::vector<b2Vec2> b2vertices = getPositions();
 	b2Fixture* old_fixture = rigid_body->GetFixtureList();
@@ -801,5 +820,6 @@ void GroundObject::syncVertices() {
 
 GroundVertex::GroundVertex(b2Vec2 pos) {
 	this->pos = pos;
+	this->orig_pos = pos;
 	this->selected = false;
 }
