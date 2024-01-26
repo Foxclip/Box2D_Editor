@@ -661,16 +661,17 @@ void GroundObject::moveVertex(int index, const b2Vec2& new_pos) {
 	setVertices(vertices);
 }
 
-void GroundObject::tryDeleteVertex(int index) {
+bool GroundObject::tryDeleteVertex(int index) {
 	if (index < 0) {
-		return;
+		return false;
 	}
 	std::vector<b2Vec2> vertices = getVertices();
 	if (vertices.size() <= 2) {
-		return;
+		return false;
 	}
 	vertices.erase(vertices.begin() + index);
 	setVertices(vertices);
+	return true;
 }
 
 void GroundObject::addVertex(int index, const b2Vec2& pos) {

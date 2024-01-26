@@ -115,7 +115,7 @@ class GroundObject : public GameObject {
 public:
 	GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> vertices, sf::Color color);
 	void moveVertex(int index, const b2Vec2& new_pos);
-	void tryDeleteVertex(int index);
+	bool tryDeleteVertex(int index);
 	void addVertex(int index, const b2Vec2& pos);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();

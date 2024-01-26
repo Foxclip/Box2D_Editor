@@ -152,7 +152,11 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::Num8: try_select_tool(7); break;
             case sf::Keyboard::Num9: try_select_tool(8); break;
             case sf::Keyboard::Num0: try_select_tool(9); break;
-            case sf::Keyboard::X: ground->tryDeleteVertex(edit_tool.highlighted_vertex); break;
+            case sf::Keyboard::X:
+                if (ground->tryDeleteVertex(edit_tool.highlighted_vertex)) {
+                    commit_action = true;
+                }
+                break;
             case sf::Keyboard::LShift: edit_tool.mode = EditTool::ADD; break;
             case sf::Keyboard::LControl: edit_tool.mode = EditTool::INSERT; break;
             case sf::Keyboard::S:
