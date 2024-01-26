@@ -15,7 +15,6 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: logger with time
     // TODO: edit mode box selection
     // TODO: create/delete objects in the scene
     // TODO: evolving cars

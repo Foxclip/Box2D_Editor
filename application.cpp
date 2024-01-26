@@ -188,8 +188,16 @@ void Application::process_keyboard_event(sf::Event event) {
     }
     if (event.type == sf::Event::KeyReleased) {
         switch (event.key.code) {
-            case sf::Keyboard::LShift: edit_tool.mode = EditTool::MOVE; break;
-            case sf::Keyboard::LControl: edit_tool.mode = EditTool::MOVE; break;
+            case sf::Keyboard::LShift:
+                if (edit_tool.mode == EditTool::ADD) {
+                    edit_tool.mode = EditTool::HOVER;
+                }
+                break;
+            case sf::Keyboard::LControl:
+                if (edit_tool.mode == EditTool::INSERT) {
+                    edit_tool.mode = EditTool::HOVER;
+                }
+                break;
         }
     }
 }
@@ -230,6 +238,11 @@ void Application::process_mouse_event(sf::Event event) {
                 if (edit_tool.grabbed_vertex != -1) {
                     edit_tool.grabbed_vertex = -1;
                     commit_action = true;
+                    edit_tool.mode = EditTool::HOVER;
+                }
+                if (edit_tool.selection) {
+                    edit_tool.selection = false;
+                    edit_tool.mode = EditTool::HOVER;
                 }
                 break;
         }
@@ -250,9 +263,9 @@ void Application::process_keyboard() {
 void Application::process_mouse() {
     if (selected_tool == &edit_tool) {
         switch (edit_tool.mode) {
+            case EditTool::HOVER: edit_tool.highlighted_vertex = mouse_get_ground_vertex(); break;
             case EditTool::ADD: edit_tool.edge_vertex = mouse_get_edge_vertex(); break;
             case EditTool::INSERT: edit_tool.highlighted_edge = mouse_get_ground_edge(); break;
-            case EditTool::MOVE: edit_tool.highlighted_vertex = mouse_get_ground_vertex(); break;
         }
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
@@ -326,7 +339,16 @@ void Application::process_left_click() {
             rotate_tool.object = gameobject;
         }
     } else if (selected_tool->name == "edit") {
-        if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
+        if (edit_tool.mode == EditTool::HOVER) {
+            if (edit_tool.highlighted_vertex != -1) {
+                edit_tool.mode = EditTool::MOVE;
+                edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
+            } else {
+                edit_tool.mode = EditTool::SELECT;
+                edit_tool.selection = true;
+                edit_tool.select_origin = sfMousePosWorld;
+            }
+        } else if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             if (edit_tool.edge_vertex == 0) {
                 ground->addVertex(0, b2MousePosWorld);
             } else if (edit_tool.edge_vertex > 0) {
@@ -336,8 +358,6 @@ void Application::process_left_click() {
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
             ground->addVertex(edit_tool.highlighted_edge + 1, b2MousePosWorld);
             commit_action = true;
-        } else if (edit_tool.mode == EditTool::MOVE) {
-            edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
         }
     }
 }
@@ -430,11 +450,16 @@ void Application::render_ui() {
             get_screen_normal(chain->m_vertices[i], chain->m_vertices[i + 1], norm_v1, norm_v2);
             draw_line(norm_v1, norm_v2, sf::Color(0, 255, 255));
         }
-        if (edit_tool.mode == EditTool::MOVE && edit_tool.highlighted_vertex != -1) {
+        if ((edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) || edit_tool.mode == EditTool::MOVE) {
             // highlighted vertex
             sf::Vector2f vertex_pos = world_to_screenf(ground->getShape()->m_vertices[edit_tool.highlighted_vertex]);
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
             window->draw(edit_tool.vertex_highlight_rect);
+        } else if (edit_tool.mode == EditTool::SELECT && edit_tool.selection) {
+            //selection box
+            edit_tool.select_rect.setPosition(world_to_screenf(edit_tool.select_origin));
+            edit_tool.select_rect.setSize(mousePosf - world_to_screenf(edit_tool.select_origin));
+            window->draw(edit_tool.select_rect);
         }
     }
 
@@ -601,6 +626,11 @@ sf::Vector2f Application::sf_screen_to_world(sf::Vector2i screen_pos) {
 sf::Vector2i Application::world_to_screen(b2Vec2 world_pos) {
     sf::Vector2i pos = window->mapCoordsToPixel(tosf(world_pos), world_view);
     return pos;
+}
+
+sf::Vector2f Application::world_to_screenf(sf::Vector2f world_pos) {
+    sf::Vector2i pos = window->mapCoordsToPixel(world_pos, world_view);
+    return to2f(pos);
 }
 
 sf::Vector2f Application::world_to_screenf(b2Vec2 world_pos) {
@@ -796,6 +826,20 @@ EditTool::EditTool() : Tool(){
     vertex_highlight_rect.setOrigin(vertex_highlight_rect.getSize() / 2.0f);
     edge_highlight.setFillColor(sf::Color::Yellow);
     edge_highlight.setOrigin(sf::Vector2f(0.0f, 1.5f));
+    select_rect.setFillColor(sf::Color::Transparent);
+    select_rect.setOutlineThickness(-1.0f);
+    select_rect.setOutlineColor(sf::Color::Yellow);
+}
+
+std::string EditTool::modeToStr(EditToolMode mode) {
+    switch (mode) {
+        case EditTool::HOVER: return "HOVER";
+        case EditTool::SELECT: return "SELECT";
+        case EditTool::ADD: return "ADD";
+        case EditTool::INSERT: return "INSERT";
+        case EditTool::MOVE: return "MOVE";
+        default: return "Unknown";
+    }
 }
 
 History::History() { }

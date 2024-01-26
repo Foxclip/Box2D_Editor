@@ -22,35 +22,43 @@ public:
 
 class Tool {
 public:
-	Tool();
 	std::string name;
 	sf::RectangleShape shape;
+
+	Tool();
+
 private:
 };
 
 class DragTool : public Tool {
 public:
-	DragTool();
 	b2Body* mouse_body = nullptr;
 	b2MouseJoint* mouse_joint = nullptr;
+
+	DragTool();
+
 private:
 };
 
 class MoveTool : public Tool {
 public:
-	MoveTool();
 	GameObject* object = nullptr;
 	bool object_was_enabled = false;
 	b2Vec2 offset = b2Vec2();
+
+	MoveTool();
+
 private:
 };
 
 class RotateTool : public Tool {
 public:
-	RotateTool();
 	GameObject* object = nullptr;
 	bool object_was_enabled = false;
 	float angle_offset = 0.0f;
+
+	RotateTool();
+
 private:
 };
 
@@ -61,19 +69,27 @@ public:
 	static const int EDGE_HIGHLIGHT_DISTANCE = 10;
 	static const int NORMAL_LENGTH = 30;
 	enum EditToolMode {
+		HOVER,
+		SELECT,
 		ADD,
 		INSERT,
 		MOVE,
 	};
-	EditTool();
 	int grabbed_vertex = -1;
 	int highlighted_vertex = -1;
 	int highlighted_edge = -1;
 	int edge_vertex = -1;
+	bool selection = false;
+	sf::Vector2f select_origin;
 	sf::RectangleShape vertex_highlight_rect;
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
-	EditToolMode mode = MOVE;
+	sf::RectangleShape select_rect;
+	EditToolMode mode = HOVER;
+
+	EditTool();
+	static std::string modeToStr(EditToolMode mode);
+
 private:
 };
 
@@ -177,6 +193,7 @@ private:
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2i world_to_screen(b2Vec2 world_pos);
+	sf::Vector2f world_to_screenf(sf::Vector2f world_pos);
 	sf::Vector2f world_to_screenf(b2Vec2 world_pos);
 	sf::Vector2f world_dir_to_screenf(b2Vec2 world_dir);
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
