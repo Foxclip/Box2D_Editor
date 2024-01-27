@@ -162,8 +162,8 @@ void Application::process_keyboard_event(sf::Event event) {
                     commit_action = true;
                 }
                 break;
-            case sf::Keyboard::LShift: edit_tool.mode = EditTool::ADD; break;
-            case sf::Keyboard::LControl: edit_tool.mode = EditTool::INSERT; break;
+            case sf::Keyboard::LControl: edit_tool.mode = EditTool::ADD; break;
+            case sf::Keyboard::LAlt: edit_tool.mode = EditTool::INSERT; break;
             case sf::Keyboard::S:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
                     save("level.txt");
@@ -188,12 +188,12 @@ void Application::process_keyboard_event(sf::Event event) {
     }
     if (event.type == sf::Event::KeyReleased) {
         switch (event.key.code) {
-            case sf::Keyboard::LShift:
+            case sf::Keyboard::LControl:
                 if (edit_tool.mode == EditTool::ADD) {
                     edit_tool.mode = EditTool::HOVER;
                 }
                 break;
-            case sf::Keyboard::LControl:
+            case sf::Keyboard::LAlt:
                 if (edit_tool.mode == EditTool::INSERT) {
                     edit_tool.mode = EditTool::HOVER;
                 }
@@ -355,7 +355,9 @@ void Application::process_left_click() {
                 edit_tool.mode = EditTool::SELECT;
                 edit_tool.selection = true;
                 edit_tool.select_origin = sfMousePosWorld;
-                ground->clearVertexSelection();
+                if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                    ground->clearVertexSelection();
+                }
             }
         } else if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             if (edit_tool.edge_vertex == 0) {
