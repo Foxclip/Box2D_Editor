@@ -137,7 +137,8 @@ public:
 	void addVertex(int index, const b2Vec2& pos);
 	void selectVertex(int index);
 	bool isVertexSelected(int index);
-	void clearVertexSelection();
+	void selectAllVertices();
+	void deselectAllVertices();
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	TokenWriter& serialize(TokenWriter& tw);

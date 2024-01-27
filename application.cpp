@@ -184,6 +184,15 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::W:
                 quickload_planned = true;
                 break;
+            case sf::Keyboard::A:
+                if (selected_tool == &edit_tool) {
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
+                        ground->deselectAllVertices();
+                    } else {
+                        ground->selectAllVertices();
+                    }
+                }
+                break;
         }
     }
     if (event.type == sf::Event::KeyReleased) {
@@ -356,7 +365,7 @@ void Application::process_left_click() {
                 edit_tool.selection = true;
                 edit_tool.select_origin = sfMousePosWorld;
                 if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
-                    ground->clearVertexSelection();
+                    ground->deselectAllVertices();
                 }
             }
         } else if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {

@@ -724,7 +724,13 @@ bool GroundObject::isVertexSelected(int index) {
 	return vertices[index].selected;
 }
 
-void GroundObject::clearVertexSelection() {
+void GroundObject::selectAllVertices() {
+	for (int i = 0; i < vertices.size(); i++) {
+		vertices[i].selected = true;
+	}
+}
+
+void GroundObject::deselectAllVertices() {
 	for (int i = 0; i < vertices.size(); i++) {
 		vertices[i].selected = false;
 	}
