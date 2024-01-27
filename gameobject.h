@@ -127,7 +127,8 @@ class GroundObject : public GameObject {
 public:
 	GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
 	void moveVertices(const std::vector<int>& index_list, const b2Vec2& offset);
-	void offsetSelected(const b2Vec2& offset);
+	void offsetVertex(int index, const b2Vec2& offset, bool sync = true);
+	void offsetSelected(const b2Vec2& offset, bool sync = true);
 	void saveOffsets();
 	int getVertexCount();
 	const GroundVertex& getVertex(int index);
@@ -139,6 +140,7 @@ public:
 	bool isVertexSelected(int index);
 	void selectAllVertices();
 	void deselectAllVertices();
+	void syncVertices();
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	TokenWriter& serialize(TokenWriter& tw);
@@ -149,6 +151,5 @@ private:
 	b2ChainShape* getShape();
 	std::vector<b2Vec2> getPositions();
 	void vertexSet(int index, const b2Vec2& new_pos);
-	void syncVertices();
 };
 

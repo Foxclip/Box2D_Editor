@@ -667,13 +667,22 @@ void GroundObject::moveVertices(const std::vector<int>& index_list, const b2Vec2
 	syncVertices();
 }
 
-void GroundObject::offsetSelected(const b2Vec2& offset) {
+void GroundObject::offsetVertex(int index, const b2Vec2& offset, bool sync) {
+	vertices[index].pos = vertices[index].orig_pos + offset;
+	if (sync) {
+		syncVertices();
+	}
+}
+
+void GroundObject::offsetSelected(const b2Vec2& offset, bool sync) {
 	for (int i = 0; i < vertices.size(); i++) {
 		if (vertices[i].selected) {
 			vertices[i].pos = vertices[i].orig_pos + offset;
 		}
 	}
-	syncVertices();
+	if (sync) {
+		syncVertices();
+	}
 }
 
 void GroundObject::saveOffsets() {

@@ -294,7 +294,9 @@ void Application::process_mouse() {
             int index = edit_tool.grabbed_vertex;
             const GroundVertex& vertex = ground->getVertex(index);
             b2Vec2 offset = b2MousePosWorld - vertex.orig_pos;
-            ground->offsetSelected(offset);
+            ground->offsetVertex(index, offset, false);
+            ground->offsetSelected(offset, false);
+            ground->syncVertices();
         }
         if (edit_tool.selection) {
             select_vertices_in_rect();
@@ -359,7 +361,9 @@ void Application::process_left_click() {
             if (edit_tool.highlighted_vertex != -1) {
                 edit_tool.mode = EditTool::MOVE;
                 edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
-                ground->selectVertex(edit_tool.grabbed_vertex);
+                if (!ground->isVertexSelected(edit_tool.grabbed_vertex)) {
+                    ground->deselectAllVertices();
+                }
             } else {
                 edit_tool.mode = EditTool::SELECT;
                 edit_tool.selection = true;
