@@ -361,8 +361,12 @@ void Application::process_left_click() {
             if (edit_tool.highlighted_vertex != -1) {
                 edit_tool.mode = EditTool::MOVE;
                 edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
-                if (!ground->isVertexSelected(edit_tool.grabbed_vertex)) {
+                bool selected = ground->isVertexSelected(edit_tool.grabbed_vertex);
+                bool shift = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
+                if (!selected && !shift) {
                     ground->deselectAllVertices();
+                } else if (shift) {
+                    ground->selectVertex(edit_tool.grabbed_vertex);
                 }
             } else {
                 edit_tool.mode = EditTool::SELECT;
