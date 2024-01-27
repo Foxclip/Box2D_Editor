@@ -136,9 +136,9 @@ void Application::process_input() {
         history.save(HistoryEntry::NORMAL);
         commit_action = false;
     }
-    if (quickload_planned) {
+    if (quickload_requested) {
         quickload();
-        quickload_planned = false;
+        quickload_requested = false;
     }
 }
 
@@ -182,7 +182,7 @@ void Application::process_keyboard_event(sf::Event event) {
                 quicksave();
                 break;
             case sf::Keyboard::W:
-                quickload_planned = true;
+                quickload_requested = true;
                 break;
             case sf::Keyboard::A:
                 if (selected_tool == &edit_tool) {

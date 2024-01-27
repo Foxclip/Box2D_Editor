@@ -166,7 +166,7 @@ private:
 	History history;
 	bool commit_action = false;
 	std::string quicksave_str;
-	bool quickload_planned = false;
+	bool quickload_requested = false;
 
 	void init_ui();
 	void init_objects();
