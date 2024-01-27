@@ -83,12 +83,12 @@ void Application::init_objects() {
         b2Vec2(-15.0f, 2.0f),
         b2Vec2(-25.0f, 8.0f),
     };
-    ground = create_ground(b2Vec2(0.0f, 0.0f), ground_vertices, sf::Color::White);
+    ground = create_ground(b2Vec2(0.0f, 0.0f), ground_vertices, sf::Color(200, 200, 200));
 
-    GameObject* box0 = create_box(b2Vec2(0.0f, 1.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
-    GameObject* box1 = create_box(b2Vec2(0.1f, 2.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
-    GameObject* box2 = create_box(b2Vec2(0.2f, 3.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green);
-    GameObject* ball = create_ball(b2Vec2(0.0f, 5.0f), 0.5f, sf::Color::Green, sf::Color(0, 64, 0));
+    GameObject* box0 = create_box(b2Vec2(0.0f, 1.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color(50, 200, 50));
+    GameObject* box1 = create_box(b2Vec2(0.1f, 2.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color(50, 200, 50));
+    GameObject* box2 = create_box(b2Vec2(0.2f, 3.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color(50, 200, 50));
+    GameObject* ball = create_ball(b2Vec2(0.0f, 5.0f), 0.5f, sf::Color(50, 200, 50), sf::Color(10, 64, 10));
     std::vector<GameObject*> dynamic_objects = { box0, box1, box2, ball };
     for (int i = 0; i < dynamic_objects.size(); i++) {
         GameObject* box = dynamic_objects[i];
@@ -100,7 +100,7 @@ void Application::init_objects() {
 
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
     std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
-    GameObject* car = create_car(b2Vec2(0.0f, 10.0f), lengths, wheels, sf::Color::Red);
+    GameObject* car = create_car(b2Vec2(0.0f, 10.0f), lengths, wheels, sf::Color(200, 50, 50));
     car->setType(b2_dynamicBody, false);
     car->setDensity(1.0f, false);
     car->setFriction(0.3f, false);
@@ -398,7 +398,7 @@ void Application::process_world() {
 }
 
 void Application::render() {
-    window->clear();
+    window->clear(sf::Color(25, 25, 25));
     render_world();
     render_ui();
     window->display();

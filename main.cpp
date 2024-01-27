@@ -15,7 +15,6 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: less bright colors (no pure colors like (255, 0, 0))
     // TODO: recreate b2World on deserialization
     // TODO: create/delete objects in the scene
     // TODO: evolving cars
