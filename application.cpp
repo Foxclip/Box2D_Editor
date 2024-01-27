@@ -293,7 +293,7 @@ void Application::process_mouse() {
         if (edit_tool.grabbed_vertex != -1) {
             int index = edit_tool.grabbed_vertex;
             const GroundVertex& vertex = ground->getVertex(index);
-            b2Vec2 offset = b2MousePosWorld - vertex.orig_pos;
+            b2Vec2 offset = b2MousePosWorld + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
             ground->offsetVertex(index, offset, false);
             ground->offsetSelected(offset, false);
             ground->syncVertices();
@@ -361,9 +361,10 @@ void Application::process_left_click() {
             if (edit_tool.highlighted_vertex != -1) {
                 edit_tool.mode = EditTool::MOVE;
                 edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
-                bool selected = ground->isVertexSelected(edit_tool.grabbed_vertex);
+                const GroundVertex& vertex = ground->getVertex(edit_tool.grabbed_vertex);
+                edit_tool.grabbed_vertex_offset = vertex.pos - b2MousePosWorld;
                 bool shift = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
-                if (!selected && !shift) {
+                if (!vertex.selected && !shift) {
                     ground->deselectAllVertices();
                 } else if (shift) {
                     ground->selectVertex(edit_tool.grabbed_vertex);

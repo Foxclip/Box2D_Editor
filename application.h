@@ -82,6 +82,7 @@ public:
 	int edge_vertex = -1;
 	bool selection = false;
 	sf::Vector2f select_origin;
+	b2Vec2 grabbed_vertex_offset;
 	sf::RectangleShape vertex_highlight_rect;
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
