@@ -17,6 +17,7 @@ void Application::init() {
     window->setVerticalSyncEnabled(true);
     tools = { &drag_tool, &move_tool, &rotate_tool, &edit_tool };
     selected_tool = &drag_tool;
+    init_world();
     init_ui();
     init_objects();
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -32,6 +33,13 @@ void Application::init() {
 
 void Application::start() {
     main_loop();
+}
+
+void Application::init_world() {
+    b2Vec2 gravity(0.0f, -9.8f);
+    world = std::make_unique<b2World>(gravity);
+    b2BodyDef mouse_body_def;
+    drag_tool.mouse_body = world->CreateBody(&mouse_body_def);
 }
 
 void Application::init_ui() {
@@ -68,12 +76,6 @@ void Application::init_ui() {
 }
 
 void Application::init_objects() {
-    b2Vec2 gravity(0.0f, -9.8f);
-    world = std::make_unique<b2World>(gravity);
-
-    b2BodyDef mouse_body_def;
-    drag_tool.mouse_body = world->CreateBody(&mouse_body_def);
-
     std::vector<b2Vec2> ground_vertices = {
         b2Vec2(25.0f, 8.0f),
         b2Vec2(15.0f, 2.0f),
@@ -565,6 +567,7 @@ std::string Application::serialize() {
 
 void Application::deserialize(std::string str, bool set_camera) {
     game_objects.clear();
+    init_world();
     TokenReader tr(str);
     try {
         while (tr.validRange()) {
