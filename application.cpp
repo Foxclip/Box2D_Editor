@@ -2,7 +2,6 @@
 #include "utils.h"
 #include <numbers>
 #include <iostream>
-#include "logger.h"
 
 std::vector<std::unique_ptr<Tool>> tools;
 
@@ -272,34 +271,49 @@ void Application::process_keyboard() {
 
 void Application::process_mouse() {
     if (selected_tool == &edit_tool) {
-        switch (edit_tool.mode) {
-            case EditTool::HOVER: edit_tool.highlighted_vertex = mouse_get_ground_vertex(); break;
-            case EditTool::ADD: edit_tool.edge_vertex = mouse_get_edge_vertex(); break;
-            case EditTool::INSERT: edit_tool.highlighted_edge = mouse_get_ground_edge(); break;
+        if (edit_tool.mode == EditTool::HOVER) {
+            edit_tool.highlighted_vertex = mouse_get_ground_vertex();
+        } else if (edit_tool.mode == EditTool::ADD) {
+            edit_tool.edge_vertex = mouse_get_edge_vertex();
+        } else if (edit_tool.mode == EditTool::INSERT) {
+            edit_tool.highlighted_edge = mouse_get_ground_edge();
+            if (edit_tool.highlighted_edge != -1) {
+                b2Vec2 v1 = ground->getVertexPos(edit_tool.highlighted_edge);
+                b2Vec2 v2 = ground->getVertexPos(edit_tool.highlighted_edge + 1);
+                edit_tool.insertVertexPos = utils::line_project(b2MousePosWorld, v1, v2);
+            }
         }
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        if (drag_tool.mouse_joint) {
-            drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
-        }
-        if (move_tool.object) {
-            move_tool.object->setPosition(b2MousePosWorld - move_tool.offset, true);
-        }
-        if (rotate_tool.object) {
-            b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.object->rigid_body->GetPosition();
-            float angle = atan2(mouse_vector.y, mouse_vector.x);
-            rotate_tool.object->setAngle(angle - rotate_tool.angle_offset, true);
-        }
-        if (edit_tool.grabbed_vertex != -1) {
-            int index = edit_tool.grabbed_vertex;
-            const GroundVertex& vertex = ground->getVertex(index);
-            b2Vec2 offset = b2MousePosWorld + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
-            ground->offsetVertex(index, offset, false);
-            ground->offsetSelected(offset, false);
-            ground->syncVertices();
-        }
-        if (edit_tool.selection) {
-            select_vertices_in_rect();
+        if (selected_tool == &drag_tool) {
+            if (drag_tool.mouse_joint) {
+                drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
+            }
+        } else if (selected_tool == &move_tool) {
+            if (move_tool.object) {
+                move_tool.object->setPosition(b2MousePosWorld - move_tool.offset, true);
+            }
+        } else if (selected_tool == &rotate_tool) {
+            if (rotate_tool.object) {
+                b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.object->rigid_body->GetPosition();
+                float angle = atan2(mouse_vector.y, mouse_vector.x);
+                rotate_tool.object->setAngle(angle - rotate_tool.angle_offset, true);
+            }
+        } else if (selected_tool == &edit_tool) {
+            if (edit_tool.mode == EditTool::SELECT) {
+                if (edit_tool.selection) {
+                    select_vertices_in_rect();
+                }
+            } else if (edit_tool.mode == EditTool::MOVE) {
+                if (edit_tool.grabbed_vertex != -1) {
+                    int index = edit_tool.grabbed_vertex;
+                    const GroundVertex& vertex = ground->getVertex(index);
+                    b2Vec2 offset = b2MousePosWorld + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
+                    ground->offsetVertex(index, offset, false);
+                    ground->offsetSelected(offset, false);
+                    ground->syncVertices();
+                }
+            }
         }
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
@@ -318,7 +332,7 @@ void Application::process_left_click() {
             return;
         }
     }
-    if (selected_tool->name == "drag") {
+    if (selected_tool == &drag_tool) {
         b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
         if (grabbed_fixture) {
             b2Body* grabbed_body = grabbed_fixture->GetBody();
@@ -331,7 +345,7 @@ void Application::process_left_click() {
             mouse_joint_def.target = b2MousePosWorld;
             drag_tool.mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
         }
-    } else if (selected_tool->name == "move") {
+    } else if (selected_tool == &move_tool) {
         b2Fixture* fixture = get_fixture_at(mousePos);
         if (fixture) {
             b2Body* body = fixture->GetBody();
@@ -343,7 +357,7 @@ void Application::process_left_click() {
             gameobject->setAngularVelocity(0.0f, true);
             move_tool.object = gameobject;
         }
-    } else if (selected_tool->name == "rotate") {
+    } else if (selected_tool == &rotate_tool) {
         b2Fixture* fixture = get_fixture_at(mousePos);
         if (fixture) {
             b2Body* body = fixture->GetBody();
@@ -356,7 +370,7 @@ void Application::process_left_click() {
             gameobject->setAngularVelocity(0.0f, true);
             rotate_tool.object = gameobject;
         }
-    } else if (selected_tool->name == "edit") {
+    } else if (selected_tool == &edit_tool) {
         if (edit_tool.mode == EditTool::HOVER) {
             if (edit_tool.highlighted_vertex != -1) {
                 edit_tool.mode = EditTool::MOVE;
@@ -385,7 +399,7 @@ void Application::process_left_click() {
             }
             commit_action = true;
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
-            ground->addVertex(edit_tool.highlighted_edge + 1, b2MousePosWorld);
+            ground->addVertex(edit_tool.highlighted_edge + 1, edit_tool.insertVertexPos);
             commit_action = true;
         }
     }
@@ -461,7 +475,7 @@ void Application::render_ui() {
             edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
             window->draw(edit_tool.edge_highlight);
             // ghost vertex on the edge
-            sf::Vector2f ghost_vertex_pos = world_to_screenf(utils::line_project(b2MousePosWorld, v1, v2));
+            sf::Vector2f ghost_vertex_pos = world_to_screenf(edit_tool.insertVertexPos);
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
             window->draw(edit_tool.vertex_rect);
@@ -480,7 +494,7 @@ void Application::render_ui() {
             get_screen_normal(ground->getVertexPos(i), ground->getVertexPos(i + 1), norm_v1, norm_v2);
             draw_line(norm_v1, norm_v2, sf::Color(0, 255, 255));
         }
-        if ((edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) || edit_tool.mode == EditTool::MOVE) {
+        if (edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) {
             // highlighted vertex
             sf::Vector2f vertex_pos = world_to_screenf(ground->getVertexPos(edit_tool.highlighted_vertex));
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
@@ -949,4 +963,8 @@ std::string HistoryEntry::typeToStr(Type type) {
 HistoryEntry::HistoryEntry(std::string str, Type type) {
     this->str = str;
     this->type = type;
+}
+
+Logger& operator<<(Logger& lg, const b2Vec2& value) {
+    return lg << "(" << value.x << " " << value.y << ")";
 }

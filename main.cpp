@@ -15,6 +15,9 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
+    // TODO: save levels to git
+    // TODO: rename project to EvolvingCars
+    // TODO: move tokenizer and looger b2vec2 and other custom << operators to Application class
     // TODO: recreate b2World on deserialization
     // TODO: create/delete objects in the scene
     // TODO: evolving cars

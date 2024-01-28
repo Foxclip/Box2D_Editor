@@ -5,6 +5,9 @@
 #include <winuser.h>
 #include <functional>
 #include <set>
+#include "logger.h"
+
+Logger& operator<<(Logger& lg, const b2Vec2& value);
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -83,6 +86,7 @@ public:
 	bool selection = false;
 	sf::Vector2f select_origin;
 	b2Vec2 grabbed_vertex_offset;
+	b2Vec2 insertVertexPos;
 	sf::RectangleShape vertex_highlight_rect;
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
