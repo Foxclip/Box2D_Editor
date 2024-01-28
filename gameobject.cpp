@@ -830,6 +830,7 @@ void GroundObject::syncVertices() {
 	line_strip_shape->varray = sf::VertexArray(sf::LinesStrip, b2vertices.size());
 	for (int i = 0; i < b2vertices.size(); i++) {
 		line_strip_shape->varray[i].position = tosf(b2vertices[i]);
+		line_strip_shape->varray[i].color = color;
 	}
 }
 
