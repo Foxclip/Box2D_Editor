@@ -17,6 +17,7 @@ void Application::init() {
     window->setVerticalSyncEnabled(true);
     tools = { &drag_tool, &move_tool, &rotate_tool, &edit_tool };
     selected_tool = &drag_tool;
+    init_tools();
     init_world();
     init_ui();
     init_objects();
@@ -33,6 +34,13 @@ void Application::init() {
 
 void Application::start() {
     main_loop();
+}
+
+void Application::init_tools() {
+    drag_tool = DragTool();
+    move_tool = MoveTool();
+    rotate_tool = RotateTool();
+    edit_tool = EditTool();
 }
 
 void Application::init_world() {
@@ -567,6 +575,7 @@ std::string Application::serialize() {
 
 void Application::deserialize(std::string str, bool set_camera) {
     game_objects.clear();
+    init_tools();
     init_world();
     TokenReader tr(str);
     try {

@@ -173,6 +173,7 @@ private:
 	std::string quicksave_str;
 	bool quickload_requested = false;
 
+	void init_tools();
 	void init_world();
 	void init_ui();
 	void init_objects();
