@@ -6,6 +6,7 @@
 #include <functional>
 #include <set>
 #include "logger.h"
+#include "tools.h"
 
 Logger& operator<<(Logger& lg, const b2Vec2& value);
 
@@ -14,88 +15,11 @@ const int WINDOW_HEIGHT = 600;
 const int ANTIALIASING = 0;
 const float MOUSE_SCROLL_ZOOM = 1.2f;
 const int FPS = 60;
-const int TOOL_RECT_WIDTH = 60;
-const int TOOL_RECT_HEIGHT = 40;
-const int TOOLBOX_PADDING = 10;
 
 class QueryCallback : public b2QueryCallback {
 public:
 	std::vector<b2Fixture*> fixtures;
 	bool ReportFixture(b2Fixture* fixture);
-};
-
-class Tool {
-public:
-	std::string name;
-	sf::RectangleShape shape;
-
-	Tool();
-
-private:
-};
-
-class DragTool : public Tool {
-public:
-	b2Body* mouse_body = nullptr;
-	b2MouseJoint* mouse_joint = nullptr;
-
-	DragTool();
-
-private:
-};
-
-class MoveTool : public Tool {
-public:
-	GameObject* object = nullptr;
-	bool object_was_enabled = false;
-	b2Vec2 offset = b2Vec2();
-
-	MoveTool();
-
-private:
-};
-
-class RotateTool : public Tool {
-public:
-	GameObject* object = nullptr;
-	bool object_was_enabled = false;
-	float angle_offset = 0.0f;
-
-	RotateTool();
-
-private:
-};
-
-class EditTool : public Tool {
-public:
-	static const int VERTEX_SIZE = 9;
-	static const int VERTEX_HIGHLIGHT_DISTANCE = 10;
-	static const int EDGE_HIGHLIGHT_DISTANCE = 10;
-	static const int NORMAL_LENGTH = 30;
-	enum EditToolMode {
-		HOVER,
-		SELECT,
-		ADD,
-		INSERT,
-		MOVE,
-	};
-	int grabbed_vertex = -1;
-	int highlighted_vertex = -1;
-	int highlighted_edge = -1;
-	int edge_vertex = -1;
-	bool selection = false;
-	sf::Vector2f select_origin;
-	b2Vec2 grabbed_vertex_offset;
-	b2Vec2 insertVertexPos;
-	sf::RectangleShape vertex_highlight_rect;
-	sf::RectangleShape vertex_rect;
-	sf::RectangleShape edge_highlight;
-	sf::RectangleShape select_rect;
-	EditToolMode mode = HOVER;
-
-	EditTool();
-	static std::string modeToStr(EditToolMode mode);
-
 };
 
 class HistoryEntry {
@@ -151,11 +75,6 @@ private:
 	sf::Font ui_font;
 	sf::Text paused_text;
 	sf::Text tool_text;
-	DragTool drag_tool;
-	MoveTool move_tool;
-	RotateTool rotate_tool;
-	EditTool edit_tool;
-	std::vector<Tool*> tools;
 	Tool* selected_tool = nullptr;
 
 	const int32 VELOCITY_ITERATIONS = 6;

@@ -3,8 +3,6 @@
 #include <numbers>
 #include <iostream>
 
-std::vector<std::unique_ptr<Tool>> tools;
-
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
 const auto to2i = utils::to2i;
@@ -15,7 +13,6 @@ void Application::init() {
     cs.antialiasingLevel = ANTIALIASING;
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs);
     window->setVerticalSyncEnabled(true);
-    tools = { &drag_tool, &move_tool, &rotate_tool, &edit_tool };
     selected_tool = &drag_tool;
     init_tools();
     init_world();
@@ -863,54 +860,6 @@ GroundObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertice
 bool QueryCallback::ReportFixture(b2Fixture* fixture) {
     fixtures.push_back(fixture);
     return true;
-}
-
-Tool::Tool() {
-    shape.setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
-    shape.setFillColor(sf::Color(128, 128, 128));
-    shape.setOutlineColor(sf::Color::Yellow);
-}
-
-DragTool::DragTool() : Tool() {
-    name = "drag";
-}
-
-MoveTool::MoveTool() : Tool() {
-    name = "move";
-}
-
-RotateTool::RotateTool() : Tool(){
-    name = "rotate";
-}
-
-EditTool::EditTool() : Tool(){
-    name = "edit";
-    assert(VERTEX_SIZE % 2 == 1);
-    vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
-    vertex_rect.setFillColor(sf::Color::Red);
-    vertex_rect.setOrigin(vertex_rect.getSize() / 2.0f);
-    int vertex_distance = VERTEX_HIGHLIGHT_DISTANCE * 2 + 1;
-    vertex_highlight_rect.setSize(sf::Vector2f(vertex_distance, vertex_distance));
-    vertex_highlight_rect.setFillColor(sf::Color::Transparent);
-    vertex_highlight_rect.setOutlineThickness(-1.0f);
-    vertex_highlight_rect.setOutlineColor(sf::Color::Yellow);
-    vertex_highlight_rect.setOrigin(vertex_highlight_rect.getSize() / 2.0f);
-    edge_highlight.setFillColor(sf::Color::Yellow);
-    edge_highlight.setOrigin(sf::Vector2f(0.0f, 1.5f));
-    select_rect.setFillColor(sf::Color::Transparent);
-    select_rect.setOutlineThickness(-1.0f);
-    select_rect.setOutlineColor(sf::Color::Yellow);
-}
-
-std::string EditTool::modeToStr(EditToolMode mode) {
-    switch (mode) {
-        case EditTool::HOVER: return "HOVER";
-        case EditTool::SELECT: return "SELECT";
-        case EditTool::ADD: return "ADD";
-        case EditTool::INSERT: return "INSERT";
-        case EditTool::MOVE: return "MOVE";
-        default: return "Unknown";
-    }
 }
 
 History::History() { }
