@@ -12,6 +12,10 @@ Logger& operator<<(Logger& lg, const b2Vec2& value) {
     return lg << "(" << value.x << " " << value.y << ")";
 }
 
+Logger& operator<<(Logger& lg, const sf::Vector2f& value) {
+    return lg << "(" << value.x << " " << value.y << ")";
+}
+
 bool QueryCallback::ReportFixture(b2Fixture* fixture) {
     fixtures.push_back(fixture);
     return true;
@@ -66,11 +70,10 @@ void Application::init_ui() {
         paused_text.setString("PAUSED");
         paused_text.setCharacterSize(24);
         paused_text.setFillColor(sf::Color::Yellow);
-        sf::FloatRect text_bounds = paused_text.getLocalBounds();
-        paused_text.setOrigin(text_bounds.left, text_bounds.top);
+        paused_text.setOrigin(Widget::TOP_LEFT);
         const int rect_padding = 10;
         paused_text.setPosition(rect_padding, rect_padding);
-        paused_rect.setSize(sf::Vector2f(text_bounds.width + rect_padding * 2, text_bounds.height + rect_padding * 2));
+        paused_rect.setSize(sf::Vector2f(paused_text.getWidth() + rect_padding * 2, paused_text.getHeight() + rect_padding * 2));
         paused_rect.setFillColor(sf::Color(0, 0, 0, 128));
         paused_rect.setOrigin(0.0f, 0.0f);
         paused_rect.setPosition(0.0f, 0.0f);
@@ -550,8 +553,8 @@ void Application::render_ui() {
     }
 
     if (paused) {
-        window->draw(paused_rect);
-        window->draw(paused_text);
+        paused_rect.render();
+        paused_text.render();
     }
 }
 

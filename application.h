@@ -8,6 +8,7 @@
 #include "logger.h"
 #include "tools.h"
 #include "history.h"
+#include "widget.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -16,6 +17,7 @@ const float MOUSE_SCROLL_ZOOM = 1.2f;
 const int FPS = 60;
 
 Logger& operator<<(Logger& lg, const b2Vec2& value);
+Logger& operator<<(Logger& lg, const sf::Vector2f& value);
 
 class QueryCallback : public b2QueryCallback {
 public:
@@ -30,7 +32,6 @@ public:
 	void start();
 
 private:
-	std::unique_ptr<sf::RenderWindow> window;
 	sf::View world_view;
 	sf::View ui_view;
 	sf::Vector2i mousePos;
@@ -40,9 +41,9 @@ private:
 	float zoomFactor = 30.0f;
 	float viewCenterX = 0.0f, viewCenterY = 5.0f;
 	sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
-	sf::RectangleShape paused_rect;
 	sf::Font ui_font;
-	sf::Text paused_text;
+	TextWidget paused_text;
+	RectangleWidget paused_rect;
 	Tool* selected_tool = nullptr;
 
 	const int32 VELOCITY_ITERATIONS = 6;
