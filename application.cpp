@@ -66,17 +66,18 @@ void Application::init_ui() {
         throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
     }
     {
-        paused_text.setFont(ui_font);
-        paused_text.setString("PAUSED");
-        paused_text.setCharacterSize(24);
-        paused_text.setFillColor(sf::Color::Yellow);
-        paused_text.setOrigin(Widget::TOP_LEFT);
-        const int rect_padding = 10;
-        paused_text.setPosition(rect_padding, rect_padding);
-        paused_rect.setSize(sf::Vector2f(paused_text.getWidth() + rect_padding * 2, paused_text.getHeight() + rect_padding * 2));
-        paused_rect.setFillColor(sf::Color(0, 0, 0, 128));
-        paused_rect.setOrigin(0.0f, 0.0f);
-        paused_rect.setPosition(0.0f, 0.0f);
+        std::unique_ptr<TextWidget> paused_text = std::make_unique<TextWidget>();
+        paused_text->setFont(ui_font);
+        paused_text->setString("PAUSED");
+        paused_text->setCharacterSize(24);
+        paused_text->setFillColor(sf::Color::Yellow);
+        paused_text->setOrigin(Widget::TOP_LEFT);
+
+        paused_rect = std::make_unique<ContainerWidget>();
+        paused_rect->setFillColor(sf::Color(0, 0, 0, 128));
+        paused_rect->setOrigin(Widget::TOP_LEFT);
+        paused_rect->addChild(std::move(paused_text));
+        paused_rect->setPadding(10.0f);
     }
     {
         int tools_width = TOOL_RECT_WIDTH * tools.size();
@@ -553,8 +554,8 @@ void Application::render_ui() {
     }
 
     if (paused) {
-        paused_rect.render();
-        paused_text.render();
+        paused_rect->update();
+        paused_rect->render();
     }
 }
 

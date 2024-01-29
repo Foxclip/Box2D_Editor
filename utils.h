@@ -32,6 +32,7 @@ namespace utils {
 	b2Vec2 get_pos(const std::vector<float>& lengths, int i);
 	std::vector<std::string> splitString(std::string str);
 	std::string current_time();
+	void extend_bounds(sf::FloatRect& rect1, const sf::FloatRect& rect2);
 
 	template <typename T>
 	T rot90CCW(const T& vec) {

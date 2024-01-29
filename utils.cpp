@@ -180,4 +180,23 @@ namespace utils {
 		return ss.str();
 	}
 
+	void extend_bounds(sf::FloatRect& rect1, const sf::FloatRect& rect2) {
+		float rect1_right = rect1.left + rect1.width;
+		float rect2_right = rect2.left + rect2.width;
+		float rect1_bottom = rect1.top + rect1.height;
+		float rect2_bottom = rect2.top + rect2.height;
+		if (rect2.left < rect1.left) {
+			rect1.left = rect2.left;
+		}
+		if (rect2.top < rect1.top) {
+			rect1.top = rect2.top;
+		}
+		if (rect2_right > rect1_right) {
+			rect1.width += rect2_right - rect1_right;
+		}
+		if (rect2_bottom > rect1_bottom) {
+			rect1.height += rect2_bottom - rect1_bottom;
+		}
+	}
+
 }

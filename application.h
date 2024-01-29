@@ -42,8 +42,7 @@ private:
 	float viewCenterX = 0.0f, viewCenterY = 5.0f;
 	sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
 	sf::Font ui_font;
-	TextWidget paused_text;
-	RectangleWidget paused_rect;
+	std::unique_ptr<ContainerWidget> paused_rect;
 	Tool* selected_tool = nullptr;
 
 	const int32 VELOCITY_ITERATIONS = 6;

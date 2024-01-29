@@ -69,16 +69,45 @@ void Widget::setPosition(const sf::Vector2f& position) {
 	getTransformable()->setPosition(position);
 }
 
+void Widget::setAdjustedPosition(float x, float y) {
+	sf::FloatRect bounds = getLocalBounds();
+	getTransformable()->setPosition(x - bounds.left, y - bounds.top);
+}
+
+void Widget::setAdjustedPosition(const sf::Vector2f& position) {
+	sf::FloatRect bounds = getLocalBounds();
+	getTransformable()->setPosition(position - bounds.getPosition());
+}
+
 void Widget::setRotation(float angle) {
 	getTransformable()->setRotation(angle);
 }
 
 void Widget::render() {
-	window->draw(*getDrawable());
+	render(*window);
 }
 
 void Widget::render(sf::RenderTarget& target) {
-	target.draw(*getDrawable());
+	target.draw(*getDrawable(), getParentTransform());
+	for (int i = 0; i < children.size(); i++) {
+		children[i]->render(target);
+	}
+}
+
+void Widget::addChild(std::unique_ptr<Widget> child) {
+	child->parent = this;
+	children.push_back(std::move(child));
+}
+
+sf::Transform Widget::getTransform() {
+	return getTransformable()->getTransform();
+}
+
+sf::Transform Widget::getParentTransform() {
+	if (parent) {
+		return parent->getTransform();
+	}
+	return sf::Transform::Identity;
 }
 
 RectangleWidget::RectangleWidget() { }
@@ -137,4 +166,31 @@ sf::Drawable* TextWidget::getDrawable() {
 
 sf::Transformable* TextWidget::getTransformable() {
 	return &text;
+}
+
+ContainerWidget::ContainerWidget() : RectangleWidget() { }
+
+void ContainerWidget::setHorizontal(bool value) {
+	this->horizontal = value;
+}
+
+void ContainerWidget::setPadding(float padding) {
+	this->padding = padding;
+}
+
+void ContainerWidget::update() {
+	sf::FloatRect container_bounds = sf::FloatRect();
+	float next_x = padding, next_y = padding;
+	for (int i = 0; i < children.size(); i++) {
+		Widget* child = children[i].get();
+		child->setAdjustedPosition(next_x, next_y);
+		sf::FloatRect child_bounds = sf::FloatRect(next_x, next_y, child->getWidth(), child->getHeight());
+		utils::extend_bounds(container_bounds, child_bounds);
+		if (horizontal) {
+			next_x += child->getWidth() + padding;
+		} else {
+			next_y += child->getHeight() + padding;
+		}
+	}
+	setSize(sf::Vector2f(container_bounds.width + padding, container_bounds.height + padding));
 }

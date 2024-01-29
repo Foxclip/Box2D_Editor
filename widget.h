@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <functional>
 #include "utils.h"
+#include "logger.h"
 
 extern std::unique_ptr<sf::RenderWindow> window;
 
@@ -37,11 +38,18 @@ public:
 	virtual void setFillColor(const sf::Color& color) = 0;
 	void setPosition(float x, float y);
 	void setPosition(const sf::Vector2f& position);
+	void setAdjustedPosition(float x, float y);
+	void setAdjustedPosition(const sf::Vector2f& position);
 	void setRotation(float angle);
 	void render();
-	void render(sf::RenderTarget& target);
+	virtual void render(sf::RenderTarget& target);
+	void addChild(std::unique_ptr<Widget> child);
 
 protected:
+	Widget* parent = nullptr;
+	std::vector<std::unique_ptr<Widget>> children;
+	sf::Transform getTransform();
+	sf::Transform getParentTransform();
 	virtual sf::Drawable* getDrawable() = 0;
 	virtual sf::Transformable* getTransformable() = 0;
 
@@ -58,15 +66,25 @@ public:
 	void setSize(const sf::Vector2f& size);
 
 protected:
+	sf::RectangleShape rect;
+
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 
 private:
-	sf::RectangleShape rect;
 
 };
 
-class ButtonPanelWidget : public RectangleWidget {
+class ContainerWidget : public RectangleWidget {
+public:
+	ContainerWidget();
+	void setHorizontal(bool value);
+	void setPadding(float padding);
+	void update();
+
+private:
+	bool horizontal = true;
+	float padding = 0.0f;
 
 };
 
