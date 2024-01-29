@@ -7,8 +7,7 @@
 #include <set>
 #include "logger.h"
 #include "tools.h"
-
-Logger& operator<<(Logger& lg, const b2Vec2& value);
+#include "history.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -16,41 +15,12 @@ const int ANTIALIASING = 0;
 const float MOUSE_SCROLL_ZOOM = 1.2f;
 const int FPS = 60;
 
+Logger& operator<<(Logger& lg, const b2Vec2& value);
+
 class QueryCallback : public b2QueryCallback {
 public:
 	std::vector<b2Fixture*> fixtures;
 	bool ReportFixture(b2Fixture* fixture);
-};
-
-class HistoryEntry {
-public:
-	enum Type {
-		BASE,
-		NORMAL,
-		QUICKLOAD,
-	};
-	std::string str;
-	Type type;
-	static std::string typeToStr(Type type);
-
-	HistoryEntry(std::string str, Type type);
-};
-
-class History {
-public:
-	History();
-	History(std::function<std::string(void)> get, std::function<void(std::string)> set);
-	void save(HistoryEntry::Type type);
-	void undo();
-	void redo();
-	void clear();
-	HistoryEntry& getCurrent();
-
-private:
-	std::function<std::string(void)> get;
-	std::function<void(std::string)> set;
-	std::vector<HistoryEntry> history;
-	int current = 0;
 };
 
 class Application {

@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="application.cpp" />
     <ClCompile Include="gameobject.cpp" />
+    <ClCompile Include="history.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tokenizer.cpp" />
@@ -146,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="gameobject.h" />
+    <ClInclude Include="history.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="tokenizer.h" />
     <ClInclude Include="tools.h" />
