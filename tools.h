@@ -5,6 +5,9 @@
 const int TOOL_RECT_WIDTH = 60;
 const int TOOL_RECT_HEIGHT = 40;
 const int TOOLBOX_PADDING = 10;
+const int CREATE_RECT_WIDTH = 40;
+const int CREATE_RECT_HEIGHT = 40;
+const int CREATE_PANEL_PADDING = 10;
 
 class Tool {
 public:
@@ -18,6 +21,12 @@ private:
 
 class CreateTool : public Tool {
 public:
+	enum ObjectType {
+		BOX,
+		BALL,
+	};
+	sf::RectangleShape object_type_rect;
+
 	CreateTool();
 };
 
@@ -66,6 +75,7 @@ public:
 		INSERT,
 		MOVE,
 	};
+	EditToolMode mode = HOVER;
 	int grabbed_vertex = -1;
 	int highlighted_vertex = -1;
 	int highlighted_edge = -1;
@@ -78,7 +88,6 @@ public:
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
 	sf::RectangleShape select_rect;
-	EditToolMode mode = HOVER;
 
 	EditTool();
 	static std::string modeToStr(EditToolMode mode);
@@ -91,3 +100,6 @@ extern MoveTool move_tool;
 extern RotateTool rotate_tool;
 extern EditTool edit_tool;
 extern std::vector<Tool*> tools;
+
+extern sf::RectangleShape toolbox_rect;
+extern sf::Text tool_text;

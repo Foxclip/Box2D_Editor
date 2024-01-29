@@ -7,6 +7,9 @@ RotateTool rotate_tool;
 EditTool edit_tool;
 std::vector<Tool*> tools = { &create_tool, &drag_tool, &move_tool, &rotate_tool, &edit_tool };
 
+sf::RectangleShape toolbox_rect;
+sf::Text tool_text;
+
 Tool::Tool() {
     shape.setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
     shape.setFillColor(sf::Color(128, 128, 128));
@@ -15,6 +18,8 @@ Tool::Tool() {
 
 CreateTool::CreateTool() : Tool() {
     name = "create";
+    object_type_rect.setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
+    object_type_rect.setFillColor(sf::Color(50, 50, 255));
 }
 
 DragTool::DragTool() : Tool() {
@@ -50,11 +55,11 @@ EditTool::EditTool() : Tool() {
 
 std::string EditTool::modeToStr(EditToolMode mode) {
     switch (mode) {
-    case EditTool::HOVER: return "HOVER";
-    case EditTool::SELECT: return "SELECT";
-    case EditTool::ADD: return "ADD";
-    case EditTool::INSERT: return "INSERT";
-    case EditTool::MOVE: return "MOVE";
-    default: return "Unknown";
+        case EditTool::HOVER: return "HOVER";
+        case EditTool::SELECT: return "SELECT";
+        case EditTool::ADD: return "ADD";
+        case EditTool::INSERT: return "INSERT";
+        case EditTool::MOVE: return "MOVE";
+        default: return "Unknown";
     }
 }
