@@ -25,9 +25,10 @@ public:
 	std::function<void(void)> OnMouseEnter = []() { };
 	std::function<void(void)> OnMouseExit = []() { };
 
+	static bool click_blocked;
 	bool isMouseOver();
 	void updateMouseState();
-	bool processClick(const sf::Vector2f& pos, bool include_children);
+	void processClick(const sf::Vector2f& pos);
 	std::vector<Widget*> getChildren();
 	virtual sf::FloatRect getLocalBounds() = 0;
 	virtual sf::FloatRect getGlobalBounds() = 0;
@@ -49,6 +50,7 @@ public:
 	void setAdjustedPosition(const sf::Vector2f& position);
 	void setRotation(float angle);
 	void setVisible(bool value);
+	void setClickThrough(bool value);
 	void render();
 	virtual void render(sf::RenderTarget& target);
 	void addChild(std::unique_ptr<Widget> child);
@@ -59,6 +61,7 @@ protected:
 	Anchor origin_anchor = CUSTOM;
 	Anchor parent_anchor = CUSTOM;
 	bool visible = true;
+	bool click_through = true;
 	bool mouseIn = false;
 	sf::Transform getTransform();
 	sf::Transform getParentTransform();

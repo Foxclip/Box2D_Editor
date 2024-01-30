@@ -1,6 +1,7 @@
 #include "widget.h"
 
 std::unique_ptr<sf::RenderWindow> window;
+bool Widget::click_blocked = false;
 
 bool Widget::isMouseOver() {
 	return mouseIn;
@@ -20,23 +21,19 @@ void Widget::updateMouseState() {
 	}
 }
 
-bool Widget::processClick(const sf::Vector2f& pos, bool include_children) {
+void Widget::processClick(const sf::Vector2f& pos) {
 	if (!visible) {
-		return false;
+		return;
 	}
-	bool clicked = false;
 	if (mouseIn) {
-		clicked = true;
+		if (!click_through) {
+			click_blocked = true;
+		}
 		OnClick(pos);
 	}
-	if (include_children) {
-		for (size_t i = 0; i < children.size(); i++) {
-			if (children[i]->processClick(pos, true)) {
-				clicked = true;
-			}
-		}
+	for (size_t i = 0; i < children.size(); i++) {
+		children[i]->processClick(pos);
 	}
-	return clicked;
 }
 
 std::vector<Widget*> Widget::getChildren() {
@@ -132,6 +129,10 @@ void Widget::setRotation(float angle) {
 
 void Widget::setVisible(bool value) {
 	this->visible = value;
+}
+
+void Widget::setClickThrough(bool value) {
+	this->click_through = value;
 }
 
 void Widget::update() {

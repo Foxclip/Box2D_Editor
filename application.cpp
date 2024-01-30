@@ -79,6 +79,7 @@ void Application::init_ui() {
         toolbox_widget->setOrigin(Widget::TOP_CENTER);
         toolbox_widget->setParentAnchor(Widget::TOP_CENTER);
         toolbox_widget->setPadding(TOOLBOX_PADDING);
+        toolbox_widget->setClickThrough(false);
         for (size_t i = 0; i < tools.size(); i++) {
             std::unique_ptr<RectangleWidget> tool_widget_uptr = std::make_unique<RectangleWidget>();
             RectangleWidget* tool_widget = tool_widget_uptr.get();
@@ -181,6 +182,7 @@ void Application::resetView() {
 void Application::process_widgets() {
     root_widget.setSize(sf::Vector2f(window->getSize().x, window->getSize().y));
     root_widget.updateMouseState();
+    Widget::click_blocked = false;
 }
 
 void Application::process_input() {
@@ -388,16 +390,8 @@ void Application::process_mouse() {
 }
 
 void Application::process_left_click() {
-    bool ui_clicked = false;
-    root_widget.processClick(mousePosf, false);
-    std::vector<Widget*> ui_widgets = root_widget.getChildren();
-    for (size_t i = 0; i < ui_widgets.size(); i++) {
-        Widget* ui_widget = ui_widgets[i];
-        if (ui_widget->processClick(mousePosf, true)) {
-            ui_clicked = true;
-        }
-    }
-    if (ui_clicked) {
+    root_widget.processClick(mousePosf);
+    if (Widget::click_blocked) {
         return;
     }
     if (selected_tool == &drag_tool) {
