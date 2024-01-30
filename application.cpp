@@ -433,7 +433,22 @@ void Application::process_left_click() {
     if (Widget::click_blocked) {
         return;
     }
-    if (selected_tool == &drag_tool) {
+    if (selected_tool == &create_tool) {
+        switch (create_tool.type) {
+            case CreateTool::BOX:
+                create_box(
+                    b2MousePosWorld, 0.0f, NEW_BOX_SIZE, NEW_BOX_COLOR
+                );
+                commit_action = true;
+                break;
+            case CreateTool::BALL:
+                create_ball(
+                    b2MousePosWorld, NEW_BALL_RADIUS, NEW_BALL_COLOR, NEW_BALL_NOTCH_COLOR
+                );
+                commit_action = true;
+                break;
+        }
+    } else if (selected_tool == &drag_tool) {
         b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
         if (grabbed_fixture) {
             b2Body* grabbed_body = grabbed_fixture->GetBody();

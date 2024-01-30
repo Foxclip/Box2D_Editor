@@ -9,9 +9,7 @@ std::vector<Tool*> tools = { &create_tool, &drag_tool, &move_tool, &rotate_tool,
 
 Tool::Tool() { }
 
-void CreateTool::reset() {
-    type = static_cast<ObjectType>(0);
-}
+void CreateTool::reset() { }
 
 CreateTool::CreateTool() : Tool() {
     this->widget = widget;

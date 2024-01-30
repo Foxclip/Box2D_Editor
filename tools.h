@@ -10,6 +10,11 @@ const int TOOL_TEXT_SIZE = 16;
 const int CREATE_RECT_WIDTH = 40;
 const int CREATE_RECT_HEIGHT = 40;
 const int CREATE_PANEL_PADDING = 10;
+const b2Vec2 NEW_BOX_SIZE = b2Vec2(1.0f, 1.0f);
+const sf::Color NEW_BOX_COLOR = sf::Color(50, 200, 50);
+const float NEW_BALL_RADIUS = 0.5f;
+const sf::Color NEW_BALL_COLOR = sf::Color(50, 200, 50);
+const sf::Color NEW_BALL_NOTCH_COLOR = sf::Color(10, 64, 10);
 
 class Tool {
 public:
