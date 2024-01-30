@@ -22,8 +22,8 @@ public:
 		BOTTOM_RIGHT,
 	};
 	std::function<void(sf::Vector2f pos)> OnClick = [](sf::Vector2f) { };
-	std::function<void(void)> OnMouseEnter = []() {};
-	std::function<void(void)> OnMouseExit = []() {};
+	std::function<void(void)> OnMouseEnter = []() { };
+	std::function<void(void)> OnMouseExit = []() { };
 
 	bool isMouseOver();
 	void updateMouseState();

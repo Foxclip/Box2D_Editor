@@ -26,11 +26,11 @@ void Application::init() {
     cs.antialiasingLevel = ANTIALIASING;
     window = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs);
     window->setVerticalSyncEnabled(true);
-    selected_tool = &drag_tool;
     init_tools();
     init_world();
     init_ui();
     init_objects();
+    try_select_tool(0);
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
@@ -39,7 +39,11 @@ void Application::init() {
     auto setter = [&](std::string str) { deserialize(str, false); };
     history = History(getter, setter);
     history.save(HistoryEntry::BASE);
+    assert(tools.size() > 0);
     assert(selected_tool);
+    for (size_t i = 0; i < tools.size(); i++) {
+        assert(tools[i]->widget);
+    }
 }
 
 void Application::start() {
@@ -47,11 +51,11 @@ void Application::start() {
 }
 
 void Application::init_tools() {
-    create_tool = CreateTool();
-    drag_tool = DragTool();
-    move_tool = MoveTool();
-    rotate_tool = RotateTool();
-    edit_tool = EditTool();
+    create_tool = CreateTool(create_tool.widget);
+    drag_tool = DragTool(drag_tool.widget);
+    move_tool = MoveTool(move_tool.widget);
+    rotate_tool = RotateTool(rotate_tool.widget);
+    edit_tool = EditTool(edit_tool.widget);
 }
 
 void Application::init_world() {
@@ -82,7 +86,7 @@ void Application::init_ui() {
             tool_widget->setFillColor(sf::Color(128, 128, 128));
             tool_widget->setOutlineColor(sf::Color::Yellow);
             tool_widget->OnClick = [=](sf::Vector2f pos) {
-                selected_tool = tools[i];
+                try_select_tool(i);
             };
             tool_widget->OnMouseEnter = [=]() {
                 tool_widget->setOutlineThickness(-1.0f);
@@ -679,6 +683,10 @@ Tool* Application::try_select_tool(int index) {
     if (tools.size() > index) {
         Tool* tool = tools[index];
         selected_tool = tool;
+        for (size_t i = 0; i < tools.size(); i++) {
+            tools[i]->widget->setFillColor(sf::Color(128, 128, 128));
+        }
+        tool->widget->setFillColor(sf::Color::Yellow);
         return tool;
     }
     return nullptr;

@@ -9,25 +9,40 @@ std::vector<Tool*> tools = { &create_tool, &drag_tool, &move_tool, &rotate_tool,
 
 Tool::Tool() { }
 
-CreateTool::CreateTool() : Tool() {
+CreateTool::CreateTool() { }
+
+CreateTool::CreateTool(Widget* widget) : Tool() {
+    this->widget = widget;
     name = "create";
     object_type_rect.setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
     object_type_rect.setFillColor(sf::Color(50, 50, 255));
 }
 
-DragTool::DragTool() : Tool() {
+DragTool::DragTool() { }
+
+DragTool::DragTool(Widget* widget) : Tool() {
+    this->widget = widget;
     name = "drag";
 }
 
-MoveTool::MoveTool() : Tool() {
+MoveTool::MoveTool() { }
+
+MoveTool::MoveTool(Widget* widget) : Tool() {
+    this->widget = widget;
     name = "move";
 }
 
-RotateTool::RotateTool() : Tool() {
+RotateTool::RotateTool() { }
+
+RotateTool::RotateTool(Widget* widget) : Tool() {
+    this->widget = widget;
     name = "rotate";
 }
 
-EditTool::EditTool() : Tool() {
+EditTool::EditTool() { }
+
+EditTool::EditTool(Widget* widget) : Tool() {
+    this->widget = widget;
     name = "edit";
     assert(VERTEX_SIZE % 2 == 1);
     vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));

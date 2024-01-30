@@ -30,6 +30,7 @@ public:
 	sf::RectangleShape object_type_rect;
 
 	CreateTool();
+	CreateTool(Widget* widget);
 };
 
 class DragTool : public Tool {
@@ -38,6 +39,7 @@ public:
 	b2MouseJoint* mouse_joint = nullptr;
 
 	DragTool();
+	DragTool(Widget* widget);
 
 private:
 };
@@ -49,6 +51,7 @@ public:
 	b2Vec2 offset = b2Vec2();
 
 	MoveTool();
+	MoveTool(Widget* widget);
 
 private:
 };
@@ -60,6 +63,7 @@ public:
 	float angle_offset = 0.0f;
 
 	RotateTool();
+	RotateTool(Widget* widget);
 
 private:
 };
@@ -92,6 +96,7 @@ public:
 	sf::RectangleShape select_rect;
 
 	EditTool();
+	EditTool(Widget* widget);
 	static std::string modeToStr(EditToolMode mode);
 
 };
