@@ -36,6 +36,7 @@ public:
 	void setOrigin(Anchor anchor);
 	void setOrigin(float x, float y);
 	void setOrigin(const sf::Vector2f& origin);
+	void setParentAnchor(Anchor anchor);
 	virtual void setFillColor(const sf::Color& color) = 0;
 	void setPosition(float x, float y);
 	void setPosition(const sf::Vector2f& position);
@@ -49,11 +50,13 @@ public:
 protected:
 	Widget* parent = nullptr;
 	std::vector<std::unique_ptr<Widget>> children;
-	Anchor anchor = CUSTOM;
+	Anchor origin_anchor = CUSTOM;
+	Anchor parent_anchor = CUSTOM;
 	sf::Transform getTransform();
 	sf::Transform getParentTransform();
 	virtual sf::Drawable& getDrawable() = 0;
 	virtual sf::Transformable& getTransformable() = 0;
+	virtual void update();
 
 private:
 
@@ -92,6 +95,8 @@ public:
 	ContainerWidget();
 	void setHorizontal(bool value);
 	void setPadding(float padding);
+
+protected:
 	void update();
 
 private:

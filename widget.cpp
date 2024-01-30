@@ -51,17 +51,21 @@ void Widget::setOrigin(Anchor anchor) {
 		case Widget::BOTTOM_CENTER: setOrigin(getWidth() / 2.0f, getHeight()); break;
 		case Widget::BOTTOM_RIGHT: setOrigin(getWidth(), getHeight()); break;
 	}
-	this->anchor = anchor;
+	this->origin_anchor = anchor;
 }
 
 void Widget::setOrigin(float x, float y) {
 	getTransformable().setOrigin(x, y);
-	this->anchor = CUSTOM;
+	this->origin_anchor = CUSTOM;
 }
 
 void Widget::setOrigin(const sf::Vector2f& origin) {
 	getTransformable().setOrigin(origin);
-	this->anchor = CUSTOM;
+	this->origin_anchor = CUSTOM;
+}
+
+void Widget::setParentAnchor(Anchor anchor) {
+	this->parent_anchor = anchor;
 }
 
 void Widget::setPosition(float x, float y) {
@@ -86,11 +90,34 @@ void Widget::setRotation(float angle) {
 	getTransformable().setRotation(angle);
 }
 
+void Widget::update() {
+	float parent_width, parent_height;
+	if (parent) {
+		parent_width = parent->getWidth();
+		parent_height = parent->getHeight();
+	} else {
+		parent_width = window->getSize().x;
+		parent_height = window->getSize().y;
+	}
+	switch (parent_anchor) {
+		case Widget::TOP_LEFT: setPosition(0.0f, 0.0f); break;
+		case Widget::TOP_CENTER: setPosition(parent_width / 2.0f, 0.0f); break;
+		case Widget::TOP_RIGHT: setPosition(parent_width, 0.0f); break;
+		case Widget::LEFT_CENTER: setPosition(0.0f, parent_height / 2.0f); break;
+		case Widget::CENTER: setPosition(parent_width / 2.0f, parent_height / 2.0f); break;
+		case Widget::RIGHT_CENTER: setPosition(parent_width, parent_height / 2.0f); break;
+		case Widget::BOTTOM_LEFT: setPosition(0.0f, parent_height); break;
+		case Widget::BOTTOM_CENTER: setPosition(parent_width / 2.0f, parent_height); break;
+		case Widget::BOTTOM_RIGHT: setPosition(parent_width, parent_height); break;
+	}
+}
+
 void Widget::render() {
 	render(*window);
 }
 
 void Widget::render(sf::RenderTarget& target) {
+	update();
 	target.draw(getDrawable(), getParentTransform());
 	for (int i = 0; i < children.size(); i++) {
 		children[i]->render(target);
@@ -103,7 +130,8 @@ void Widget::addChild(std::unique_ptr<Widget> child) {
 }
 
 sf::Transform Widget::getTransform() {
-	return getTransformable().getTransform();
+	// TODO: cache transform
+	return getParentTransform() * getTransformable().getTransform();
 }
 
 sf::Transform Widget::getParentTransform() {
@@ -137,7 +165,7 @@ RectangleWidget::RectangleWidget() { }
 
 void RectangleWidget::setSize(const sf::Vector2f& size) {
 	rect.setSize(size);
-	setOrigin(anchor);
+	setOrigin(origin_anchor);
 }
 
 sf::Drawable& RectangleWidget::getDrawable() {
@@ -201,6 +229,7 @@ void ContainerWidget::setPadding(float padding) {
 }
 
 void ContainerWidget::update() {
+	Widget::update();
 	sf::FloatRect container_bounds = sf::FloatRect();
 	float next_x = padding, next_y = padding;
 	for (int i = 0; i < children.size(); i++) {

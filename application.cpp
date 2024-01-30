@@ -81,8 +81,9 @@ void Application::init_ui() {
     }
     {
         toolbox_widget = std::make_unique<ContainerWidget>();
-        toolbox_widget->setFillColor(sf::Color::Red);
+        toolbox_widget->setFillColor(sf::Color(255, 0, 0));
         toolbox_widget->setOrigin(Widget::TOP_CENTER);
+        toolbox_widget->setParentAnchor(Widget::TOP_CENTER);
         toolbox_widget->setPadding(TOOLBOX_PADDING);
         for (int i = 0; i < tools.size(); i++) {
             std::unique_ptr<RectangleWidget> tool_widget = std::make_unique<RectangleWidget>();
@@ -93,8 +94,10 @@ void Application::init_ui() {
                 std::unique_ptr<TextWidget> text_widget = std::make_unique<TextWidget>();
                 text_widget->setFont(ui_font);
                 text_widget->setCharacterSize(TOOL_TEXT_SIZE);
+                text_widget->setString(tools[i]->name);
                 text_widget->setFillColor(sf::Color::Black);
                 text_widget->setOriginToTextCenter();
+                text_widget->setParentAnchor(Widget::CENTER);
                 tool_widget->addChild(std::move(text_widget));
             }
             tools[i]->widget = tool_widget.get();
@@ -537,12 +540,9 @@ void Application::render_ui() {
         }
     }
 
-    toolbox_widget->setPosition(window->getSize().x / 2, 0.0f);
-    toolbox_widget->update();
     toolbox_widget->render();
 
     if (paused) {
-        paused_rect->update();
         paused_rect->render();
     }
 }
