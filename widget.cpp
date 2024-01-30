@@ -90,6 +90,10 @@ void Widget::setRotation(float angle) {
 	getTransformable().setRotation(angle);
 }
 
+void Widget::setVisible(bool value) {
+	this->visible = value;
+}
+
 void Widget::update() {
 	float parent_width, parent_height;
 	if (parent) {
@@ -117,6 +121,9 @@ void Widget::render() {
 }
 
 void Widget::render(sf::RenderTarget& target) {
+	if (!visible) {
+		return;
+	}
 	update();
 	target.draw(getDrawable(), getParentTransform());
 	for (int i = 0; i < children.size(); i++) {

@@ -190,7 +190,7 @@ void Application::process_keyboard_event(sf::Event event) {
     if (event.type == sf::Event::KeyPressed) {
         switch (event.key.code) {
             case sf::Keyboard::R: resetView(); break;
-            case sf::Keyboard::Space: paused = !paused; break;
+            case sf::Keyboard::Space: toggle_pause(); break;
             case sf::Keyboard::Num1: try_select_tool(0); break;
             case sf::Keyboard::Num2: try_select_tool(1); break;
             case sf::Keyboard::Num3: try_select_tool(2); break;
@@ -674,6 +674,11 @@ Tool* Application::try_select_tool(int index) {
         return tool;
     }
     return nullptr;
+}
+
+void Application::toggle_pause() {
+    paused = !paused;
+    paused_rect_widget->setVisible(paused);
 }
 
 b2Vec2 Application::b2_screen_to_world(sf::Vector2i screen_pos) {

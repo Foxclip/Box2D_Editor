@@ -43,6 +43,7 @@ public:
 	void setAdjustedPosition(float x, float y);
 	void setAdjustedPosition(const sf::Vector2f& position);
 	void setRotation(float angle);
+	void setVisible(bool value);
 	void render();
 	virtual void render(sf::RenderTarget& target);
 	void addChild(std::unique_ptr<Widget> child);
@@ -52,6 +53,7 @@ protected:
 	std::vector<std::unique_ptr<Widget>> children;
 	Anchor origin_anchor = CUSTOM;
 	Anchor parent_anchor = CUSTOM;
+	bool visible = true;
 	sf::Transform getTransform();
 	sf::Transform getParentTransform();
 	virtual sf::Drawable& getDrawable() = 0;
