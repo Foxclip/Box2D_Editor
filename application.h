@@ -45,6 +45,7 @@ private:
 	RectangleWidget root_widget;
 	ContainerWidget* paused_rect_widget;
 	ContainerWidget* toolbox_widget;
+	ContainerWidget* create_panel_widget;
 	Tool* selected_tool = nullptr;
 
 	const int32 VELOCITY_ITERATIONS = 6;
@@ -87,6 +88,7 @@ private:
 	void quicksave();
 	void quickload();
 	Tool* try_select_tool(int index);
+	void select_create_type(int type);
 	void toggle_pause();
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);

@@ -26,11 +26,14 @@ public:
 	enum ObjectType {
 		BOX,
 		BALL,
+		mode_count,
 	};
-	sf::RectangleShape object_type_rect;
+	ObjectType type = BOX;
+	std::vector<Widget*> create_buttons;
 
 	CreateTool();
 	CreateTool(Widget* widget);
+	static std::string create_type_name(ObjectType type);
 };
 
 class DragTool : public Tool {

@@ -112,6 +112,46 @@ void Application::init_ui() {
         root_widget.addChild(std::move(toolbox_widget_uptr));
     }
     {
+        std::unique_ptr<ContainerWidget> create_panel_widget_uptr = std::make_unique<ContainerWidget>();
+        create_panel_widget = create_panel_widget_uptr.get();
+        create_panel_widget->setFillColor(sf::Color(255, 0, 0, 0));
+        create_panel_widget->setOrigin(Widget::LEFT_CENTER);
+        create_panel_widget->setParentAnchor(Widget::LEFT_CENTER);
+        create_panel_widget->setHorizontal(false);
+        create_panel_widget->setPadding(CREATE_PANEL_PADDING);
+        create_panel_widget->setClickThrough(false);
+        for (int i = 0; i < CreateTool::mode_count; i++) {
+            std::unique_ptr<RectangleWidget> button_widget_uptr = std::make_unique<RectangleWidget>();
+            RectangleWidget* button_widget = button_widget_uptr.get();
+            button_widget->setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
+            button_widget->setFillColor(sf::Color(128, 128, 128));
+            button_widget->setOutlineColor(sf::Color::Yellow);
+            button_widget->OnClick = [=](sf::Vector2f pos) {
+                select_create_type(i);
+            };
+            button_widget->OnMouseEnter = [=]() {
+                button_widget->setOutlineThickness(-1.0f);
+            };
+            button_widget->OnMouseExit = [=]() {
+                button_widget->setOutlineThickness(0.0f);
+            };
+            {
+                std::unique_ptr<TextWidget> text_widget_uptr = std::make_unique<TextWidget>();
+                TextWidget* text_widget = text_widget_uptr.get();
+                text_widget->setFont(ui_font);
+                text_widget->setCharacterSize(TOOL_TEXT_SIZE);
+                text_widget->setString(CreateTool::create_type_name(static_cast<CreateTool::ObjectType>(i)));
+                text_widget->setFillColor(sf::Color::Black);
+                text_widget->setOriginToTextCenter();
+                text_widget->setParentAnchor(Widget::CENTER);
+                button_widget->addChild(std::move(text_widget_uptr));
+            }
+            create_tool.create_buttons.push_back(button_widget);
+            create_panel_widget->addChild(std::move(button_widget_uptr));
+        }
+        root_widget.addChild(std::move(create_panel_widget_uptr));
+    }
+    {
         std::unique_ptr<ContainerWidget> paused_rect_uptr = std::make_unique<ContainerWidget>();
         paused_rect_widget = paused_rect_uptr.get();
         paused_rect_widget->setFillColor(sf::Color(0, 0, 0, 128));
@@ -695,6 +735,14 @@ Tool* Application::try_select_tool(int index) {
         return tool;
     }
     return nullptr;
+}
+
+void Application::select_create_type(int type) {
+    create_tool.type = static_cast<CreateTool::ObjectType>(type);
+    for (size_t j = 0; j < create_tool.create_buttons.size(); j++) {
+        create_tool.create_buttons[j]->setFillColor(sf::Color(128, 128, 128));
+    }
+    create_tool.create_buttons[type]->setFillColor(sf::Color(128, 128, 255));
 }
 
 void Application::toggle_pause() {

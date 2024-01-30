@@ -14,8 +14,13 @@ CreateTool::CreateTool() { }
 CreateTool::CreateTool(Widget* widget) : Tool() {
     this->widget = widget;
     name = "create";
-    object_type_rect.setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
-    object_type_rect.setFillColor(sf::Color(50, 50, 255));
+}
+
+std::string CreateTool::create_type_name(ObjectType type) {
+    switch (type) {
+        case CreateTool::BOX: return "box"; break;
+        case CreateTool::BALL: return "ball"; break;
+    }
 }
 
 DragTool::DragTool() { }
