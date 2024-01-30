@@ -22,8 +22,11 @@ public:
 		BOTTOM_RIGHT,
 	};
 	std::function<void(sf::Vector2f pos)> OnClick = [](sf::Vector2f) { };
+	std::function<void(void)> OnMouseEnter = []() {};
+	std::function<void(void)> OnMouseExit = []() {};
 
 	bool isMouseOver();
+	void updateMouseState();
 	virtual sf::FloatRect getLocalBounds() = 0;
 	virtual sf::FloatRect getGlobalBounds() = 0;
 	float getWidth();
@@ -54,6 +57,7 @@ protected:
 	Anchor origin_anchor = CUSTOM;
 	Anchor parent_anchor = CUSTOM;
 	bool visible = true;
+	bool mouseIn = false;
 	sf::Transform getTransform();
 	sf::Transform getParentTransform();
 	virtual sf::Drawable& getDrawable() = 0;

@@ -68,6 +68,7 @@ private:
 	void init_objects();
 	void main_loop();
 	void resetView();
+	void process_widgets();
 	void process_input();
 	void process_keyboard_event(sf::Event event);
 	void process_mouse_event(sf::Event event);

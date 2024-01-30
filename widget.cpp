@@ -3,8 +3,21 @@
 std::unique_ptr<sf::RenderWindow> window;
 
 bool Widget::isMouseOver() {
-	sf::FloatRect bounds = getLocalBounds();
-	return utils::contains_point(bounds, utils::to2f(sf::Mouse::getPosition(*window)));
+	return mouseIn;
+}
+
+void Widget::updateMouseState() {
+	sf::FloatRect bounds = getGlobalBounds();
+	bool is_over = utils::contains_point(bounds, utils::to2f(sf::Mouse::getPosition(*window)));
+	if (is_over && !mouseIn) {
+		OnMouseEnter();
+	} else if (!is_over && mouseIn) {
+		OnMouseExit();
+	}
+	mouseIn = is_over;
+	for (std::size_t i = 0; i < children.size(); i++) {
+		children[i]->updateMouseState();
+	}
 }
 
 float Widget::getWidth() {
@@ -153,7 +166,8 @@ sf::FloatRect ShapeWidget::getLocalBounds() {
 }
 
 sf::FloatRect ShapeWidget::getGlobalBounds() {
-	return getShape().getGlobalBounds();
+	// cache this
+	return getParentTransform().transformRect(getShape().getGlobalBounds());
 }
 
 void ShapeWidget::setFillColor(const sf::Color& color) {
@@ -192,7 +206,8 @@ sf::FloatRect TextWidget::getLocalBounds() {
 }
 
 sf::FloatRect TextWidget::getGlobalBounds() {
-	return text.getGlobalBounds();
+	// cache this
+	return getParentTransform().transformRect(text.getGlobalBounds());
 }
 
 void TextWidget::setFont(const sf::Font& font) {

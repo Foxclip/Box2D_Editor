@@ -71,7 +71,7 @@ void Application::init_ui() {
     {
         std::unique_ptr<ContainerWidget> toolbox_widget_uptr = std::make_unique<ContainerWidget>();
         toolbox_widget = toolbox_widget_uptr.get();
-        toolbox_widget->setFillColor(sf::Color(255, 0, 0));
+        toolbox_widget->setFillColor(sf::Color(255, 0, 0, 0));
         toolbox_widget->setOrigin(Widget::TOP_CENTER);
         toolbox_widget->setParentAnchor(Widget::TOP_CENTER);
         toolbox_widget->setPadding(TOOLBOX_PADDING);
@@ -81,6 +81,12 @@ void Application::init_ui() {
             tool_widget->setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
             tool_widget->setFillColor(sf::Color(128, 128, 128));
             tool_widget->setOutlineColor(sf::Color::Yellow);
+            tool_widget->OnMouseEnter = [=]() {
+                tool_widget->setOutlineThickness(-1.0f);
+            };
+            tool_widget->OnMouseExit = [=]() {
+                tool_widget->setOutlineThickness(0.0f);
+            };
             {
                 std::unique_ptr<TextWidget> text_widget_uptr = std::make_unique<TextWidget>();
                 TextWidget* text_widget = text_widget_uptr.get();
@@ -152,6 +158,7 @@ void Application::init_objects() {
 
 void Application::main_loop() {
     while (window->isOpen()) {
+        process_widgets();
         process_input();
         process_world();
         render();
@@ -164,8 +171,12 @@ void Application::resetView() {
     zoomFactor = 1.0f;
 }
 
-void Application::process_input() {
+void Application::process_widgets() {
     root_widget.setSize(sf::Vector2f(window->getSize().x, window->getSize().y));
+    root_widget.updateMouseState();
+}
+
+void Application::process_input() {
     sf::Event event;
     while (window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
