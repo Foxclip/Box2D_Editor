@@ -27,7 +27,8 @@ public:
 
 	bool isMouseOver();
 	void updateMouseState();
-	void processClick(const sf::Vector2f& pos);
+	bool processClick(const sf::Vector2f& pos, bool include_children);
+	std::vector<Widget*> getChildren();
 	virtual sf::FloatRect getLocalBounds() = 0;
 	virtual sf::FloatRect getGlobalBounds() = 0;
 	float getWidth();

@@ -20,16 +20,31 @@ void Widget::updateMouseState() {
 	}
 }
 
-void Widget::processClick(const sf::Vector2f& pos) {
+bool Widget::processClick(const sf::Vector2f& pos, bool include_children) {
 	if (!visible) {
-		return;
+		return false;
 	}
+	bool clicked = false;
 	if (mouseIn) {
+		clicked = true;
 		OnClick(pos);
 	}
-	for (size_t i = 0; i < children.size(); i++) {
-		children[i]->processClick(pos);
+	if (include_children) {
+		for (size_t i = 0; i < children.size(); i++) {
+			if (children[i]->processClick(pos, true)) {
+				clicked = true;
+			}
+		}
 	}
+	return clicked;
+}
+
+std::vector<Widget*> Widget::getChildren() {
+	std::vector<Widget*> result;
+	for (size_t i = 0; i < children.size(); i++) {
+		result.push_back(children[i].get());
+	}
+	return result;
 }
 
 float Widget::getWidth() {

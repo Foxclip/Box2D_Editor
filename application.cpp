@@ -388,7 +388,18 @@ void Application::process_mouse() {
 }
 
 void Application::process_left_click() {
-    root_widget.processClick(mousePosf);
+    bool ui_clicked = false;
+    root_widget.processClick(mousePosf, false);
+    std::vector<Widget*> ui_widgets = root_widget.getChildren();
+    for (size_t i = 0; i < ui_widgets.size(); i++) {
+        Widget* ui_widget = ui_widgets[i];
+        if (ui_widget->processClick(mousePosf, true)) {
+            ui_clicked = true;
+        }
+    }
+    if (ui_clicked) {
+        return;
+    }
     if (selected_tool == &drag_tool) {
         b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
         if (grabbed_fixture) {
