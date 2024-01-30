@@ -66,43 +66,54 @@ void Application::init_ui() {
     if (!ui_font.loadFromFile(ui_font_filename)) {
         throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
     }
+    root_widget.setSize(sf::Vector2f(window->getSize().x, window->getSize().y));
+    root_widget.setFillColor(sf::Color::Transparent);
     {
-        std::unique_ptr<TextWidget> paused_text = std::make_unique<TextWidget>();
-        paused_text->setFont(ui_font);
-        paused_text->setString("PAUSED");
-        paused_text->setCharacterSize(24);
-        paused_text->setFillColor(sf::Color::Yellow);
-        paused_text->setOrigin(Widget::TOP_LEFT);
-        paused_rect = std::make_unique<ContainerWidget>();
-        paused_rect->setFillColor(sf::Color(0, 0, 0, 128));
-        paused_rect->setOrigin(Widget::TOP_LEFT);
-        paused_rect->setPadding(10.0f);
-        paused_rect->addChild(std::move(paused_text));
-    }
-    {
-        toolbox_widget = std::make_unique<ContainerWidget>();
+        std::unique_ptr<ContainerWidget> toolbox_widget_uptr = std::make_unique<ContainerWidget>();
+        toolbox_widget = toolbox_widget_uptr.get();
         toolbox_widget->setFillColor(sf::Color(255, 0, 0));
         toolbox_widget->setOrigin(Widget::TOP_CENTER);
         toolbox_widget->setParentAnchor(Widget::TOP_CENTER);
         toolbox_widget->setPadding(TOOLBOX_PADDING);
         for (int i = 0; i < tools.size(); i++) {
-            std::unique_ptr<RectangleWidget> tool_widget = std::make_unique<RectangleWidget>();
+            std::unique_ptr<RectangleWidget> tool_widget_uptr = std::make_unique<RectangleWidget>();
+            RectangleWidget* tool_widget = tool_widget_uptr.get();
             tool_widget->setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
             tool_widget->setFillColor(sf::Color(128, 128, 128));
             tool_widget->setOutlineColor(sf::Color::Yellow);
             {
-                std::unique_ptr<TextWidget> text_widget = std::make_unique<TextWidget>();
+                std::unique_ptr<TextWidget> text_widget_uptr = std::make_unique<TextWidget>();
+                TextWidget* text_widget = text_widget_uptr.get();
                 text_widget->setFont(ui_font);
                 text_widget->setCharacterSize(TOOL_TEXT_SIZE);
                 text_widget->setString(tools[i]->name);
                 text_widget->setFillColor(sf::Color::Black);
                 text_widget->setOriginToTextCenter();
                 text_widget->setParentAnchor(Widget::CENTER);
-                tool_widget->addChild(std::move(text_widget));
+                tool_widget->addChild(std::move(text_widget_uptr));
             }
-            tools[i]->widget = tool_widget.get();
-            toolbox_widget->addChild(std::move(tool_widget));
+            tools[i]->widget = tool_widget;
+            toolbox_widget->addChild(std::move(tool_widget_uptr));
         }
+        root_widget.addChild(std::move(toolbox_widget_uptr));
+    }
+    {
+        std::unique_ptr<ContainerWidget> paused_rect_uptr = std::make_unique<ContainerWidget>();
+        paused_rect_widget = paused_rect_uptr.get();
+        paused_rect_widget->setFillColor(sf::Color(0, 0, 0, 128));
+        paused_rect_widget->setOrigin(Widget::TOP_LEFT);
+        paused_rect_widget->setPadding(10.0f);
+        {
+            std::unique_ptr<TextWidget> paused_text_uptr = std::make_unique<TextWidget>();
+            TextWidget* paused_text_widget = paused_text_uptr.get();
+            paused_text_widget->setFont(ui_font);
+            paused_text_widget->setString("PAUSED");
+            paused_text_widget->setCharacterSize(24);
+            paused_text_widget->setFillColor(sf::Color::Yellow);
+            paused_text_widget->setOrigin(Widget::TOP_LEFT);
+            paused_rect_widget->addChild(std::move(paused_text_uptr));
+        }
+        root_widget.addChild(std::move(paused_rect_uptr));
     }
 }
 
@@ -154,6 +165,7 @@ void Application::resetView() {
 }
 
 void Application::process_input() {
+    root_widget.setSize(sf::Vector2f(window->getSize().x, window->getSize().y));
     sf::Event event;
     while (window->pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
@@ -540,11 +552,8 @@ void Application::render_ui() {
         }
     }
 
-    toolbox_widget->render();
+    root_widget.render();
 
-    if (paused) {
-        paused_rect->render();
-    }
 }
 
 void Application::maximize_window() {
