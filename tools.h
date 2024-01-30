@@ -1,10 +1,12 @@
 #pragma once
 
 #include "gameobject.h"
+#include "widget.h"
 
 const int TOOL_RECT_WIDTH = 60;
 const int TOOL_RECT_HEIGHT = 40;
 const int TOOLBOX_PADDING = 10;
+const int TOOL_TEXT_SIZE = 16;
 const int CREATE_RECT_WIDTH = 40;
 const int CREATE_RECT_HEIGHT = 40;
 const int CREATE_PANEL_PADDING = 10;
@@ -12,7 +14,7 @@ const int CREATE_PANEL_PADDING = 10;
 class Tool {
 public:
 	std::string name;
-	sf::RectangleShape shape;
+	Widget* widget = nullptr;
 
 	Tool();
 
@@ -101,5 +103,3 @@ extern RotateTool rotate_tool;
 extern EditTool edit_tool;
 extern std::vector<Tool*> tools;
 
-extern sf::RectangleShape toolbox_rect;
-extern sf::Text tool_text;

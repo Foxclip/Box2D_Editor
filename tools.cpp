@@ -7,14 +7,7 @@ RotateTool rotate_tool;
 EditTool edit_tool;
 std::vector<Tool*> tools = { &create_tool, &drag_tool, &move_tool, &rotate_tool, &edit_tool };
 
-sf::RectangleShape toolbox_rect;
-sf::Text tool_text;
-
-Tool::Tool() {
-    shape.setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
-    shape.setFillColor(sf::Color(128, 128, 128));
-    shape.setOutlineColor(sf::Color::Yellow);
-}
+Tool::Tool() { }
 
 CreateTool::CreateTool() : Tool() {
     name = "create";

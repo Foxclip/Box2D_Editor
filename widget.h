@@ -10,6 +10,7 @@ extern std::unique_ptr<sf::RenderWindow> window;
 class Widget {
 public:
 	enum Anchor {
+		CUSTOM,
 		TOP_LEFT,
 		TOP_CENTER,
 		TOP_RIGHT,
@@ -48,28 +49,39 @@ public:
 protected:
 	Widget* parent = nullptr;
 	std::vector<std::unique_ptr<Widget>> children;
+	Anchor anchor = CUSTOM;
 	sf::Transform getTransform();
 	sf::Transform getParentTransform();
-	virtual sf::Drawable* getDrawable() = 0;
-	virtual sf::Transformable* getTransformable() = 0;
+	virtual sf::Drawable& getDrawable() = 0;
+	virtual sf::Transformable& getTransformable() = 0;
 
 private:
 
 };
 
-class RectangleWidget : public Widget {
+class ShapeWidget : public Widget {
 public:
-	RectangleWidget();
 	sf::FloatRect getLocalBounds();
 	sf::FloatRect getGlobalBounds();
 	void setFillColor(const sf::Color& color);
+	void setOutlineColor(const sf::Color& color);
+	void setOutlineThickness(float thickness);
+
+protected:
+	virtual sf::Shape& getShape() = 0;
+};
+
+class RectangleWidget : public ShapeWidget {
+public:
+	RectangleWidget();
 	void setSize(const sf::Vector2f& size);
 
 protected:
 	sf::RectangleShape rect;
 
-	sf::Drawable* getDrawable();
-	sf::Transformable* getTransformable();
+	sf::Drawable& getDrawable();
+	sf::Transformable& getTransformable();
+	sf::Shape& getShape();
 
 private:
 
@@ -100,10 +112,11 @@ public:
 	void setString(const std::string& string);
 	void setCharacterSize(unsigned int size);
 	void setFillColor(const sf::Color& color);
+	void setOriginToTextCenter();
 
 protected:
-	sf::Drawable* getDrawable();
-	sf::Transformable* getTransformable();
+	sf::Drawable& getDrawable();
+	sf::Transformable& getTransformable();
 
 private:
 	sf::Text text;

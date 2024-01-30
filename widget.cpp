@@ -16,7 +16,7 @@ float Widget::getHeight() {
 }
 
 const sf::Vector2f& Widget::getPosition() {
-	return getTransformable()->getPosition();
+	return getTransformable().getPosition();
 }
 
 const sf::Vector2f Widget::getTopLeft() {
@@ -51,36 +51,39 @@ void Widget::setOrigin(Anchor anchor) {
 		case Widget::BOTTOM_CENTER: setOrigin(getWidth() / 2.0f, getHeight()); break;
 		case Widget::BOTTOM_RIGHT: setOrigin(getWidth(), getHeight()); break;
 	}
+	this->anchor = anchor;
 }
 
 void Widget::setOrigin(float x, float y) {
-	getTransformable()->setOrigin(x, y);
+	getTransformable().setOrigin(x, y);
+	this->anchor = CUSTOM;
 }
 
 void Widget::setOrigin(const sf::Vector2f& origin) {
-	getTransformable()->setOrigin(origin);
+	getTransformable().setOrigin(origin);
+	this->anchor = CUSTOM;
 }
 
 void Widget::setPosition(float x, float y) {
-	getTransformable()->setPosition(x, y);
+	getTransformable().setPosition(x, y);
 }
 
 void Widget::setPosition(const sf::Vector2f& position) {
-	getTransformable()->setPosition(position);
+	getTransformable().setPosition(position);
 }
 
 void Widget::setAdjustedPosition(float x, float y) {
 	sf::FloatRect bounds = getLocalBounds();
-	getTransformable()->setPosition(x - bounds.left, y - bounds.top);
+	getTransformable().setPosition(x - bounds.left, y - bounds.top);
 }
 
 void Widget::setAdjustedPosition(const sf::Vector2f& position) {
 	sf::FloatRect bounds = getLocalBounds();
-	getTransformable()->setPosition(position - bounds.getPosition());
+	getTransformable().setPosition(position - bounds.getPosition());
 }
 
 void Widget::setRotation(float angle) {
-	getTransformable()->setRotation(angle);
+	getTransformable().setRotation(angle);
 }
 
 void Widget::render() {
@@ -88,7 +91,7 @@ void Widget::render() {
 }
 
 void Widget::render(sf::RenderTarget& target) {
-	target.draw(*getDrawable(), getParentTransform());
+	target.draw(getDrawable(), getParentTransform());
 	for (int i = 0; i < children.size(); i++) {
 		children[i]->render(target);
 	}
@@ -100,7 +103,7 @@ void Widget::addChild(std::unique_ptr<Widget> child) {
 }
 
 sf::Transform Widget::getTransform() {
-	return getTransformable()->getTransform();
+	return getTransformable().getTransform();
 }
 
 sf::Transform Widget::getParentTransform() {
@@ -110,30 +113,43 @@ sf::Transform Widget::getParentTransform() {
 	return sf::Transform::Identity;
 }
 
+sf::FloatRect ShapeWidget::getLocalBounds() {
+	return getShape().getLocalBounds();
+}
+
+sf::FloatRect ShapeWidget::getGlobalBounds() {
+	return getShape().getGlobalBounds();
+}
+
+void ShapeWidget::setFillColor(const sf::Color& color) {
+	getShape().setFillColor(color);
+}
+
+void ShapeWidget::setOutlineColor(const sf::Color& color) {
+	getShape().setOutlineColor(color);
+}
+
+void ShapeWidget::setOutlineThickness(float thickness) {
+	getShape().setOutlineThickness(thickness);
+}
+
 RectangleWidget::RectangleWidget() { }
-
-sf::FloatRect RectangleWidget::getLocalBounds() {
-	return rect.getLocalBounds();
-}
-
-sf::FloatRect RectangleWidget::getGlobalBounds() {
-	return rect.getGlobalBounds();
-}
-
-void RectangleWidget::setFillColor(const sf::Color& color) {
-	rect.setFillColor(color);
-}
 
 void RectangleWidget::setSize(const sf::Vector2f& size) {
 	rect.setSize(size);
+	setOrigin(anchor);
 }
 
-sf::Drawable* RectangleWidget::getDrawable() {
-	return &rect;
+sf::Drawable& RectangleWidget::getDrawable() {
+	return rect;
 }
 
-sf::Transformable* RectangleWidget::getTransformable() {
-	return &rect;
+sf::Transformable& RectangleWidget::getTransformable() {
+	return rect;
+}
+
+sf::Shape& RectangleWidget::getShape() {
+	return rect;
 }
 
 sf::FloatRect TextWidget::getLocalBounds() {
@@ -160,12 +176,18 @@ void TextWidget::setFillColor(const sf::Color& color) {
 	text.setFillColor(color);
 }
 
-sf::Drawable* TextWidget::getDrawable() {
-	return &text;
+void TextWidget::setOriginToTextCenter() {
+	float x = text.getLocalBounds().width / 2.0f;
+	float y = text.getCharacterSize() / 2.0f;
+	text.setOrigin(x, y);
 }
 
-sf::Transformable* TextWidget::getTransformable() {
-	return &text;
+sf::Drawable& TextWidget::getDrawable() {
+	return text;
+}
+
+sf::Transformable& TextWidget::getTransformable() {
+	return text;
 }
 
 ContainerWidget::ContainerWidget() : RectangleWidget() { }

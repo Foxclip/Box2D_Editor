@@ -43,6 +43,7 @@ private:
 	sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
 	sf::Font ui_font;
 	std::unique_ptr<ContainerWidget> paused_rect;
+	std::unique_ptr<ContainerWidget> toolbox_widget;
 	Tool* selected_tool = nullptr;
 
 	const int32 VELOCITY_ITERATIONS = 6;

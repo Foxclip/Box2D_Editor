@@ -47,6 +47,7 @@ void Application::start() {
 }
 
 void Application::init_tools() {
+    create_tool = CreateTool();
     drag_tool = DragTool();
     move_tool = MoveTool();
     rotate_tool = RotateTool();
@@ -72,24 +73,33 @@ void Application::init_ui() {
         paused_text->setCharacterSize(24);
         paused_text->setFillColor(sf::Color::Yellow);
         paused_text->setOrigin(Widget::TOP_LEFT);
-
         paused_rect = std::make_unique<ContainerWidget>();
         paused_rect->setFillColor(sf::Color(0, 0, 0, 128));
         paused_rect->setOrigin(Widget::TOP_LEFT);
-        paused_rect->addChild(std::move(paused_text));
         paused_rect->setPadding(10.0f);
+        paused_rect->addChild(std::move(paused_text));
     }
     {
-        int tools_width = TOOL_RECT_WIDTH * tools.size();
-        int padding_width = TOOLBOX_PADDING * (tools.size() + 1);
-        int toolbox_width = tools_width + padding_width;
-        int toolbox_height = TOOLBOX_PADDING * 2 + TOOL_RECT_HEIGHT;
-        toolbox_rect.setSize(sf::Vector2f(toolbox_width, toolbox_height));
-        toolbox_rect.setFillColor(sf::Color::Red);
-        toolbox_rect.setOrigin(sf::Vector2f(toolbox_width / 2, 0.0f));
-        tool_text.setFont(ui_font);
-        tool_text.setCharacterSize(16);
-        tool_text.setFillColor(sf::Color::Black);
+        toolbox_widget = std::make_unique<ContainerWidget>();
+        toolbox_widget->setFillColor(sf::Color::Red);
+        toolbox_widget->setOrigin(Widget::TOP_CENTER);
+        toolbox_widget->setPadding(TOOLBOX_PADDING);
+        for (int i = 0; i < tools.size(); i++) {
+            std::unique_ptr<RectangleWidget> tool_widget = std::make_unique<RectangleWidget>();
+            tool_widget->setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
+            tool_widget->setFillColor(sf::Color(128, 128, 128));
+            tool_widget->setOutlineColor(sf::Color::Yellow);
+            {
+                std::unique_ptr<TextWidget> text_widget = std::make_unique<TextWidget>();
+                text_widget->setFont(ui_font);
+                text_widget->setCharacterSize(TOOL_TEXT_SIZE);
+                text_widget->setFillColor(sf::Color::Black);
+                text_widget->setOriginToTextCenter();
+                tool_widget->addChild(std::move(text_widget));
+            }
+            tools[i]->widget = tool_widget.get();
+            toolbox_widget->addChild(std::move(tool_widget));
+        }
     }
 }
 
@@ -347,7 +357,7 @@ void Application::process_mouse() {
 void Application::process_left_click() {
     for (int tool_i = 0; tool_i < tools.size(); tool_i++) {
         Tool* tool = tools[tool_i];
-        if (utils::contains_point(tool->shape, to2f(mousePos))) {
+        if (tool->widget->isMouseOver()) {
             selected_tool = tool;
             return;
         }
@@ -527,31 +537,9 @@ void Application::render_ui() {
         }
     }
 
-    toolbox_rect.setPosition(window->getSize().x / 2, 0.0f);
-    //window->draw(toolbox_rect);
-    sf::FloatRect toolbox_bounds = toolbox_rect.getGlobalBounds();
-    sf::Vector2f toolbox_corner = sf::Vector2f(toolbox_bounds.left, toolbox_bounds.top);
-    for (int i = 0; i < tools.size(); i++) {
-        Tool* tool = tools[i];
-        sf::RectangleShape& tool_rect = tool->shape;
-        int x = i * (TOOLBOX_PADDING + TOOL_RECT_WIDTH) + TOOLBOX_PADDING;
-        int y = TOOLBOX_PADDING;
-        sf::Vector2f pos = toolbox_corner + sf::Vector2f(x, y);
-        tool_rect.setPosition(pos);
-        tool_rect.setOutlineThickness(0.0f);
-        if (utils::contains_point(tool_rect, to2f(mousePos))) {
-            tool_rect.setOutlineThickness(1.0f);
-        }
-        tool_rect.setFillColor(sf::Color(128, 128, 128));
-        if (tool == selected_tool) {
-            tool_rect.setFillColor(sf::Color::Yellow);
-        }
-        tool_text.setString(tools[i]->name);
-        tool_text.setPosition(tool_rect.getPosition() + tool_rect.getSize() / 2.0f);
-        utils::set_origin_to_center_normal(tool_text);
-        window->draw(tool_rect);
-        window->draw(tool_text);
-    }
+    toolbox_widget->setPosition(window->getSize().x / 2, 0.0f);
+    toolbox_widget->update();
+    toolbox_widget->render();
 
     if (paused) {
         paused_rect->update();
