@@ -124,7 +124,7 @@ void Application::init_ui() {
             RectangleWidget* button_widget = button_widget_uptr.get();
             button_widget->setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
             button_widget->setFillColor(sf::Color(128, 128, 128));
-            button_widget->setOutlineColor(sf::Color::Yellow);
+            button_widget->setOutlineColor(sf::Color(0, 175, 255));
             button_widget->OnClick = [=](sf::Vector2f pos) {
                 select_create_type(i);
             };
@@ -727,6 +727,7 @@ Tool* Application::try_select_tool(int index) {
     if (tools.size() > index) {
         Tool* tool = tools[index];
         selected_tool = tool;
+        create_panel_widget->setVisible(tool == &create_tool);
         for (size_t i = 0; i < tools.size(); i++) {
             tools[i]->widget->setFillColor(sf::Color(128, 128, 128));
         }
