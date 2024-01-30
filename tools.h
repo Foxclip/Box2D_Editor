@@ -17,6 +17,7 @@ public:
 	Widget* widget = nullptr;
 
 	Tool();
+	virtual void reset() = 0;
 
 private:
 };
@@ -32,7 +33,7 @@ public:
 	std::vector<Widget*> create_buttons;
 
 	CreateTool();
-	CreateTool(Widget* widget);
+	void reset();
 	static std::string create_type_name(ObjectType type);
 };
 
@@ -42,7 +43,7 @@ public:
 	b2MouseJoint* mouse_joint = nullptr;
 
 	DragTool();
-	DragTool(Widget* widget);
+	void reset();
 
 private:
 };
@@ -51,10 +52,10 @@ class MoveTool : public Tool {
 public:
 	GameObject* object = nullptr;
 	bool object_was_enabled = false;
-	b2Vec2 offset = b2Vec2();
+	b2Vec2 offset = b2Vec2(0.0f, 0.0f);
 
 	MoveTool();
-	MoveTool(Widget* widget);
+	void reset();
 
 private:
 };
@@ -66,7 +67,7 @@ public:
 	float angle_offset = 0.0f;
 
 	RotateTool();
-	RotateTool(Widget* widget);
+	void reset();
 
 private:
 };
@@ -90,16 +91,16 @@ public:
 	int highlighted_edge = -1;
 	int edge_vertex = -1;
 	bool selection = false;
-	sf::Vector2f select_origin;
-	b2Vec2 grabbed_vertex_offset;
-	b2Vec2 insertVertexPos;
+	sf::Vector2f select_origin = sf::Vector2f(0.0f, 0.0f);
+	b2Vec2 grabbed_vertex_offset = b2Vec2(0.0f, 0.0f);
+	b2Vec2 insertVertexPos = b2Vec2(0.0f, 0.0f);
 	sf::RectangleShape vertex_highlight_rect;
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
 	sf::RectangleShape select_rect;
 
 	EditTool();
-	EditTool(Widget* widget);
+	void reset();
 	static std::string modeToStr(EditToolMode mode);
 
 };

@@ -31,6 +31,7 @@ void Application::init() {
     init_ui();
     init_objects();
     try_select_tool(0);
+    select_create_type(0);
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
@@ -51,11 +52,9 @@ void Application::start() {
 }
 
 void Application::init_tools() {
-    create_tool = CreateTool(create_tool.widget);
-    drag_tool = DragTool(drag_tool.widget);
-    move_tool = MoveTool(move_tool.widget);
-    rotate_tool = RotateTool(rotate_tool.widget);
-    edit_tool = EditTool(edit_tool.widget);
+    for (size_t i = 0; i < tools.size(); i++) {
+        tools[i]->reset();
+    }
 }
 
 void Application::init_world() {
@@ -742,7 +741,7 @@ void Application::select_create_type(int type) {
     for (size_t j = 0; j < create_tool.create_buttons.size(); j++) {
         create_tool.create_buttons[j]->setFillColor(sf::Color(128, 128, 128));
     }
-    create_tool.create_buttons[type]->setFillColor(sf::Color(128, 128, 255));
+    create_tool.create_buttons[type]->setFillColor(sf::Color(0, 175, 255));
 }
 
 void Application::toggle_pause() {

@@ -9,9 +9,11 @@ std::vector<Tool*> tools = { &create_tool, &drag_tool, &move_tool, &rotate_tool,
 
 Tool::Tool() { }
 
-CreateTool::CreateTool() { }
+void CreateTool::reset() {
+    type = static_cast<ObjectType>(0);
+}
 
-CreateTool::CreateTool(Widget* widget) : Tool() {
+CreateTool::CreateTool() : Tool() {
     this->widget = widget;
     name = "create";
 }
@@ -23,30 +25,39 @@ std::string CreateTool::create_type_name(ObjectType type) {
     }
 }
 
-DragTool::DragTool() { }
-
-DragTool::DragTool(Widget* widget) : Tool() {
+DragTool::DragTool() : Tool() {
     this->widget = widget;
     name = "drag";
 }
 
-MoveTool::MoveTool() { }
+void DragTool::reset() {
+    mouse_body = nullptr;
+    mouse_joint = nullptr;
+}
 
-MoveTool::MoveTool(Widget* widget) : Tool() {
+MoveTool::MoveTool() : Tool() {
     this->widget = widget;
     name = "move";
 }
 
-RotateTool::RotateTool() { }
+void MoveTool::reset() {
+    object = nullptr;
+    object_was_enabled = false;
+    offset = b2Vec2(0.0f, 0.0f);
+}
 
-RotateTool::RotateTool(Widget* widget) : Tool() {
+RotateTool::RotateTool() : Tool() {
     this->widget = widget;
     name = "rotate";
 }
 
-EditTool::EditTool() { }
+void RotateTool::reset() {
+    object = nullptr;
+    object_was_enabled = false;
+    angle_offset = 0.0f;
+}
 
-EditTool::EditTool(Widget* widget) : Tool() {
+EditTool::EditTool() : Tool() {
     this->widget = widget;
     name = "edit";
     assert(VERTEX_SIZE % 2 == 1);
@@ -64,6 +75,18 @@ EditTool::EditTool(Widget* widget) : Tool() {
     select_rect.setFillColor(sf::Color::Transparent);
     select_rect.setOutlineThickness(-1.0f);
     select_rect.setOutlineColor(sf::Color::Yellow);
+}
+
+void EditTool::reset() {
+    mode = HOVER;
+    grabbed_vertex = -1;
+    highlighted_vertex = -1;
+    highlighted_edge = -1;
+    edge_vertex = -1;
+    selection = false;
+    select_origin = sf::Vector2f(0.0f, 0.0f);
+    grabbed_vertex_offset = b2Vec2(0.0f, 0.0f);
+    insertVertexPos = b2Vec2(0.0f, 0.0f);
 }
 
 std::string EditTool::modeToStr(EditToolMode mode) {
