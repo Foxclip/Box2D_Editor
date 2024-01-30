@@ -27,6 +27,7 @@ public:
 
 	bool isMouseOver();
 	void updateMouseState();
+	void processClick(const sf::Vector2f& pos);
 	virtual sf::FloatRect getLocalBounds() = 0;
 	virtual sf::FloatRect getGlobalBounds() = 0;
 	float getWidth();

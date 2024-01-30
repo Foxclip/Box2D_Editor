@@ -15,8 +15,20 @@ void Widget::updateMouseState() {
 		OnMouseExit();
 	}
 	mouseIn = is_over;
-	for (std::size_t i = 0; i < children.size(); i++) {
+	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->updateMouseState();
+	}
+}
+
+void Widget::processClick(const sf::Vector2f& pos) {
+	if (!visible) {
+		return;
+	}
+	if (mouseIn) {
+		OnClick(pos);
+	}
+	for (size_t i = 0; i < children.size(); i++) {
+		children[i]->processClick(pos);
 	}
 }
 

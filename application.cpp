@@ -75,12 +75,15 @@ void Application::init_ui() {
         toolbox_widget->setOrigin(Widget::TOP_CENTER);
         toolbox_widget->setParentAnchor(Widget::TOP_CENTER);
         toolbox_widget->setPadding(TOOLBOX_PADDING);
-        for (int i = 0; i < tools.size(); i++) {
+        for (size_t i = 0; i < tools.size(); i++) {
             std::unique_ptr<RectangleWidget> tool_widget_uptr = std::make_unique<RectangleWidget>();
             RectangleWidget* tool_widget = tool_widget_uptr.get();
             tool_widget->setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
             tool_widget->setFillColor(sf::Color(128, 128, 128));
             tool_widget->setOutlineColor(sf::Color::Yellow);
+            tool_widget->OnClick = [=](sf::Vector2f pos) {
+                selected_tool = tools[i];
+            };
             tool_widget->OnMouseEnter = [=]() {
                 tool_widget->setOutlineThickness(-1.0f);
             };
@@ -381,13 +384,7 @@ void Application::process_mouse() {
 }
 
 void Application::process_left_click() {
-    for (int tool_i = 0; tool_i < tools.size(); tool_i++) {
-        Tool* tool = tools[tool_i];
-        if (tool->widget->isMouseOver()) {
-            selected_tool = tool;
-            return;
-        }
-    }
+    root_widget.processClick(mousePosf);
     if (selected_tool == &drag_tool) {
         b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
         if (grabbed_fixture) {
