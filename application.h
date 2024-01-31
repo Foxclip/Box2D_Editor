@@ -44,8 +44,6 @@ private:
 	sf::Font ui_font;
 	ContainerWidget* paused_rect_widget;
 	ContainerWidget* toolbox_widget;
-	ContainerWidget* create_panel_widget;
-	ContainerWidget* edit_window_widget;
 	Tool* selected_tool = nullptr;
 
 	const int32 VELOCITY_ITERATIONS = 6;

@@ -112,7 +112,8 @@ void Application::init_ui() {
     }
     {
         std::unique_ptr<ContainerWidget> edit_window_widget_uptr = std::make_unique<ContainerWidget>();
-        edit_window_widget = edit_window_widget_uptr.get();
+        ContainerWidget* edit_window_widget = edit_window_widget_uptr.get();
+        edit_window_widget->setVisible(false);
         edit_window_widget->setSize(sf::Vector2f(100.0f, 200.0f));
         edit_window_widget->setFillColor(sf::Color(255, 0, 0));
         edit_window_widget->setOrigin(Widget::TOP_RIGHT);
@@ -121,11 +122,12 @@ void Application::init_ui() {
         edit_window_widget->setPadding(TOOLBOX_PADDING);
         edit_window_widget->setClickThrough(false);
         edit_window_widget->setAutoResize(false);
+        edit_tool.edit_window_widget = edit_window_widget;
         root_widget.addChild(std::move(edit_window_widget_uptr));
     }
     {
         std::unique_ptr<ContainerWidget> create_panel_widget_uptr = std::make_unique<ContainerWidget>();
-        create_panel_widget = create_panel_widget_uptr.get();
+        ContainerWidget* create_panel_widget = create_panel_widget_uptr.get();
         create_panel_widget->setFillColor(sf::Color(255, 0, 0, 0));
         create_panel_widget->setOrigin(Widget::CENTER_LEFT);
         create_panel_widget->setParentAnchor(Widget::CENTER_LEFT);
@@ -159,6 +161,7 @@ void Application::init_ui() {
                 button_widget->addChild(std::move(text_widget_uptr));
             }
             create_tool.create_buttons.push_back(button_widget);
+            create_tool.create_panel_widget = create_panel_widget;
             create_panel_widget->addChild(std::move(button_widget_uptr));
         }
         root_widget.addChild(std::move(create_panel_widget_uptr));
@@ -755,7 +758,8 @@ Tool* Application::try_select_tool(int index) {
     if (tools.size() > index) {
         Tool* tool = tools[index];
         selected_tool = tool;
-        create_panel_widget->setVisible(tool == &create_tool);
+        create_tool.create_panel_widget->setVisible(tool == &create_tool);
+        edit_tool.edit_window_widget->setVisible(tool == &edit_tool);
         for (size_t i = 0; i < tools.size(); i++) {
             tools[i]->widget->setFillColor(sf::Color(128, 128, 128));
         }

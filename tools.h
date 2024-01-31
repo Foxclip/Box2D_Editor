@@ -36,6 +36,7 @@ public:
 	};
 	ObjectType type = BOX;
 	std::vector<Widget*> create_buttons;
+	ContainerWidget* create_panel_widget;
 
 	CreateTool();
 	void reset();
@@ -103,6 +104,7 @@ public:
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
 	sf::RectangleShape select_rect;
+	ContainerWidget* edit_window_widget = nullptr;
 
 	EditTool();
 	void reset();
