@@ -5,7 +5,7 @@ DragTool drag_tool;
 MoveTool move_tool;
 RotateTool rotate_tool;
 EditTool edit_tool;
-std::vector<Tool*> tools = { &create_tool, &drag_tool, &move_tool, &rotate_tool, &edit_tool };
+std::vector<Tool*> tools = { &drag_tool, &move_tool, &rotate_tool, &edit_tool, &create_tool, };
 
 Tool::Tool() { }
 

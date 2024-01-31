@@ -16,6 +16,13 @@ const float NEW_BALL_RADIUS = 0.5f;
 const sf::Color NEW_BALL_COLOR = sf::Color(50, 200, 50);
 const sf::Color NEW_BALL_NOTCH_COLOR = sf::Color(10, 64, 10);
 
+// add new tool:
+//     create class inherited from Tool in tools.h
+//     add extern global variable at the end of tools.h
+//     define that variable in tools.cpp
+//     add it to tools vector in tools.cpp
+//     write reset method which resets all fields that need to be reset during scene deserialization
+
 class Tool {
 public:
 	std::string name;
@@ -25,22 +32,6 @@ public:
 	virtual void reset() = 0;
 
 private:
-};
-
-class CreateTool : public Tool {
-public:
-	enum ObjectType {
-		BOX,
-		BALL,
-		mode_count,
-	};
-	ObjectType type = BOX;
-	std::vector<Widget*> create_buttons;
-	ContainerWidget* create_panel_widget;
-
-	CreateTool();
-	void reset();
-	static std::string create_type_name(ObjectType type);
 };
 
 class DragTool : public Tool {
@@ -112,10 +103,26 @@ public:
 
 };
 
-extern CreateTool create_tool;
+class CreateTool : public Tool {
+public:
+	enum ObjectType {
+		BOX,
+		BALL,
+		mode_count,
+	};
+	ObjectType type = BOX;
+	std::vector<Widget*> create_buttons;
+	ContainerWidget* create_panel_widget = nullptr;
+
+	CreateTool();
+	void reset();
+	static std::string create_type_name(ObjectType type);
+};
+
 extern DragTool drag_tool;
 extern MoveTool move_tool;
 extern RotateTool rotate_tool;
 extern EditTool edit_tool;
+extern CreateTool create_tool;
 extern std::vector<Tool*> tools;
 
