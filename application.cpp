@@ -111,11 +111,24 @@ void Application::init_ui() {
         root_widget.addChild(std::move(toolbox_widget_uptr));
     }
     {
+        std::unique_ptr<ContainerWidget> edit_window_widget_uptr = std::make_unique<ContainerWidget>();
+        edit_window_widget = edit_window_widget_uptr.get();
+        edit_window_widget->setSize(sf::Vector2f(100.0f, 200.0f));
+        edit_window_widget->setFillColor(sf::Color(255, 0, 0));
+        edit_window_widget->setOrigin(Widget::TOP_RIGHT);
+        edit_window_widget->setParentAnchor(Widget::TOP_RIGHT);
+        edit_window_widget->setAnchorOffset(-20.0f, 20.0f);
+        edit_window_widget->setPadding(TOOLBOX_PADDING);
+        edit_window_widget->setClickThrough(false);
+        edit_window_widget->setAutoResize(false);
+        root_widget.addChild(std::move(edit_window_widget_uptr));
+    }
+    {
         std::unique_ptr<ContainerWidget> create_panel_widget_uptr = std::make_unique<ContainerWidget>();
         create_panel_widget = create_panel_widget_uptr.get();
         create_panel_widget->setFillColor(sf::Color(255, 0, 0, 0));
-        create_panel_widget->setOrigin(Widget::LEFT_CENTER);
-        create_panel_widget->setParentAnchor(Widget::LEFT_CENTER);
+        create_panel_widget->setOrigin(Widget::CENTER_LEFT);
+        create_panel_widget->setParentAnchor(Widget::CENTER_LEFT);
         create_panel_widget->setHorizontal(false);
         create_panel_widget->setPadding(CREATE_PANEL_PADDING);
         create_panel_widget->setClickThrough(false);

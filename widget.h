@@ -7,6 +7,15 @@
 
 extern std::unique_ptr<sf::RenderWindow> window;
 
+struct WidgetVisibility {
+	bool addedToRoot = false;
+	bool visibleSetting = false;
+	bool onScreen = false;
+	bool nonZeroSize = false;
+	bool opaque = false;
+	//bool notCovered = false;
+};
+
 class Widget {
 public:
 	enum Anchor {
@@ -14,9 +23,9 @@ public:
 		TOP_LEFT,
 		TOP_CENTER,
 		TOP_RIGHT,
-		LEFT_CENTER,
+		CENTER_LEFT,
 		CENTER,
-		RIGHT_CENTER,
+		CENTER_RIGHT,
 		BOTTOM_LEFT,
 		BOTTOM_CENTER,
 		BOTTOM_RIGHT,
@@ -26,6 +35,7 @@ public:
 	std::function<void(void)> OnMouseExit = []() { };
 
 	static bool click_blocked;
+	WidgetVisibility checkVisibility();
 	bool isMouseOver();
 	void updateMouseState();
 	void processClick(const sf::Vector2f& pos);
@@ -39,10 +49,13 @@ public:
 	const sf::Vector2f getTopRight();
 	const sf::Vector2f getBottomLeft();
 	const sf::Vector2f getBottomRight();
+	virtual const sf::Color& getFillColor() = 0;
 	void setOrigin(Anchor anchor);
 	void setOrigin(float x, float y);
 	void setOrigin(const sf::Vector2f& origin);
 	void setParentAnchor(Anchor anchor);
+	void setAnchorOffset(float x, float y);
+	void setAnchorOffset(const sf::Vector2f& offset);
 	virtual void setFillColor(const sf::Color& color) = 0;
 	void setPosition(float x, float y);
 	void setPosition(const sf::Vector2f& position);
@@ -60,6 +73,7 @@ protected:
 	std::vector<std::unique_ptr<Widget>> children;
 	Anchor origin_anchor = CUSTOM;
 	Anchor parent_anchor = CUSTOM;
+	sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);
 	bool visible = true;
 	bool click_through = true;
 	bool mouseIn = false;
@@ -68,6 +82,7 @@ protected:
 	virtual sf::Drawable& getDrawable() = 0;
 	virtual sf::Transformable& getTransformable() = 0;
 	virtual void update();
+	sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size);
 
 private:
 
@@ -77,6 +92,7 @@ class ShapeWidget : public Widget {
 public:
 	sf::FloatRect getLocalBounds();
 	sf::FloatRect getGlobalBounds();
+	const sf::Color& getFillColor();
 	void setFillColor(const sf::Color& color);
 	void setOutlineColor(const sf::Color& color);
 	void setOutlineThickness(float thickness);
@@ -104,6 +120,7 @@ private:
 class ContainerWidget : public RectangleWidget {
 public:
 	ContainerWidget();
+	void setAutoResize(bool value);
 	void setHorizontal(bool value);
 	void setPadding(float padding);
 
@@ -111,6 +128,7 @@ protected:
 	void update();
 
 private:
+	bool auto_resize = true;
 	bool horizontal = true;
 	float padding = 0.0f;
 
@@ -124,6 +142,7 @@ class TextWidget : public Widget {
 public:
 	sf::FloatRect getLocalBounds();
 	sf::FloatRect getGlobalBounds();
+	const sf::Color& getFillColor();
 	void setFont(const sf::Font& font);
 	void setString(const std::string& string);
 	void setCharacterSize(unsigned int size);
@@ -138,3 +157,5 @@ private:
 	sf::Text text;
 
 };
+
+extern RectangleWidget root_widget;

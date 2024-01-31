@@ -1,10 +1,29 @@
 #include "widget.h"
 
 std::unique_ptr<sf::RenderWindow> window;
+RectangleWidget root_widget;
 bool Widget::click_blocked = false;
 
 bool Widget::isMouseOver() {
 	return mouseIn;
+}
+
+WidgetVisibility Widget::checkVisibility() {
+	WidgetVisibility v;
+	sf::FloatRect global_bounds = getGlobalBounds();
+	Widget* current = this;
+	while (current) {
+		if (current == &root_widget) {
+			v.addedToRoot = true;
+			break;
+		}
+		current = parent;
+	}
+	v.visibleSetting = visible;
+	v.onScreen = root_widget.getGlobalBounds().intersects(global_bounds);
+	v.nonZeroSize = global_bounds.width > 0 && global_bounds.height > 0;
+	v.opaque = getFillColor().a > 0;
+	return v;
 }
 
 void Widget::updateMouseState() {
@@ -81,9 +100,9 @@ void Widget::setOrigin(Anchor anchor) {
 		case Widget::TOP_LEFT: setOrigin(0.0f, 0.0f); break;
 		case Widget::TOP_CENTER: setOrigin(getWidth() / 2.0f, 0.0f); break;
 		case Widget::TOP_RIGHT: setOrigin(getWidth(), 0.0f); break;
-		case Widget::LEFT_CENTER: setOrigin(0.0f, getHeight() / 2.0f); break;
+		case Widget::CENTER_LEFT: setOrigin(0.0f, getHeight() / 2.0f); break;
 		case Widget::CENTER: setOrigin(getWidth() / 2.0f, getHeight() / 2.0f); break;
-		case Widget::RIGHT_CENTER: setOrigin(getWidth(), getHeight() / 2.0f); break;
+		case Widget::CENTER_RIGHT: setOrigin(getWidth(), getHeight() / 2.0f); break;
 		case Widget::BOTTOM_LEFT: setOrigin(0.0f, getHeight()); break;
 		case Widget::BOTTOM_CENTER: setOrigin(getWidth() / 2.0f, getHeight()); break;
 		case Widget::BOTTOM_RIGHT: setOrigin(getWidth(), getHeight()); break;
@@ -103,6 +122,14 @@ void Widget::setOrigin(const sf::Vector2f& origin) {
 
 void Widget::setParentAnchor(Anchor anchor) {
 	this->parent_anchor = anchor;
+}
+
+void Widget::setAnchorOffset(float x, float y) {
+	this->anchor_offset = sf::Vector2f(x, y);
+}
+
+void Widget::setAnchorOffset(const sf::Vector2f& offset) {
+	this->anchor_offset = offset;
 }
 
 void Widget::setPosition(float x, float y) {
@@ -136,25 +163,30 @@ void Widget::setClickThrough(bool value) {
 }
 
 void Widget::update() {
-	float parent_width, parent_height;
+	sf::Vector2f parent_size;
 	if (parent) {
-		parent_width = parent->getWidth();
-		parent_height = parent->getHeight();
+		parent_size = parent->getLocalBounds().getSize();
 	} else {
-		parent_width = window->getSize().x;
-		parent_height = window->getSize().y;
+		parent_size = sf::Vector2f(window->getSize());
 	}
-	switch (parent_anchor) {
-		case Widget::TOP_LEFT: setPosition(0.0f, 0.0f); break;
-		case Widget::TOP_CENTER: setPosition(parent_width / 2.0f, 0.0f); break;
-		case Widget::TOP_RIGHT: setPosition(parent_width, 0.0f); break;
-		case Widget::LEFT_CENTER: setPosition(0.0f, parent_height / 2.0f); break;
-		case Widget::CENTER: setPosition(parent_width / 2.0f, parent_height / 2.0f); break;
-		case Widget::RIGHT_CENTER: setPosition(parent_width, parent_height / 2.0f); break;
-		case Widget::BOTTOM_LEFT: setPosition(0.0f, parent_height); break;
-		case Widget::BOTTOM_CENTER: setPosition(parent_width / 2.0f, parent_height); break;
-		case Widget::BOTTOM_RIGHT: setPosition(parent_width, parent_height); break;
+	sf::Vector2f anchored_pos = anchorToPos(parent_anchor, getPosition(), parent_size);
+	setPosition(anchored_pos + anchor_offset);
+}
+
+sf::Vector2f Widget::anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size) {
+	float x = orig.x, y = orig.y;
+	switch (p_anchor) {
+		case Widget::TOP_LEFT: x = 0.0f; y = 0.0f; break;
+		case Widget::TOP_CENTER: x = size.x / 2.0f; y = 0.0f; break;
+		case Widget::TOP_RIGHT: x = size.x; y = 0.0f; break;
+		case Widget::CENTER_LEFT: x = 0.0f; y = size.y / 2.0f; break;
+		case Widget::CENTER: x = size.x / 2.0f; y = size.y / 2.0f; break;
+		case Widget::CENTER_RIGHT: x = size.x; y = size.y / 2.0f; break;
+		case Widget::BOTTOM_LEFT: x = 0.0f; y = size.y; break;
+		case Widget::BOTTOM_CENTER: x = size.x / 2.0f; y = size.y; break;
+		case Widget::BOTTOM_RIGHT: x = size.x; y = size.y; break;
 	}
+	return sf::Vector2f(x, y);
 }
 
 void Widget::render() {
@@ -198,6 +230,10 @@ sf::FloatRect ShapeWidget::getGlobalBounds() {
 	return getParentTransform().transformRect(getShape().getGlobalBounds());
 }
 
+const sf::Color& ShapeWidget::getFillColor() {
+	return getShape().getFillColor();
+}
+
 void ShapeWidget::setFillColor(const sf::Color& color) {
 	getShape().setFillColor(color);
 }
@@ -238,6 +274,10 @@ sf::FloatRect TextWidget::getGlobalBounds() {
 	return getParentTransform().transformRect(text.getGlobalBounds());
 }
 
+const sf::Color& TextWidget::getFillColor() {
+	return text.getFillColor();
+}
+
 void TextWidget::setFont(const sf::Font& font) {
 	text.setFont(font);
 }
@@ -270,6 +310,10 @@ sf::Transformable& TextWidget::getTransformable() {
 
 ContainerWidget::ContainerWidget() : RectangleWidget() { }
 
+void ContainerWidget::setAutoResize(bool value) {
+	this->auto_resize = value;
+}
+
 void ContainerWidget::setHorizontal(bool value) {
 	this->horizontal = value;
 }
@@ -293,5 +337,7 @@ void ContainerWidget::update() {
 			next_y += child->getHeight() + padding;
 		}
 	}
-	setSize(sf::Vector2f(container_bounds.width + padding, container_bounds.height + padding));
+	if (auto_resize) {
+		setSize(sf::Vector2f(container_bounds.width + padding, container_bounds.height + padding));
+	}
 }
