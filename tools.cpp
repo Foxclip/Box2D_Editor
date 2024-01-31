@@ -1,18 +1,18 @@
 #include "tools.h"
 
+SelectTool select_tool;
 CreateTool create_tool;
 DragTool drag_tool;
 MoveTool move_tool;
 RotateTool rotate_tool;
 EditTool edit_tool;
-std::vector<Tool*> tools = { &drag_tool, &move_tool, &rotate_tool, &edit_tool, &create_tool, };
+std::vector<Tool*> tools = { &select_tool, &drag_tool, &move_tool, &rotate_tool, &edit_tool, &create_tool, };
 
 Tool::Tool() { }
 
 void CreateTool::reset() { }
 
 CreateTool::CreateTool() : Tool() {
-    this->widget = widget;
     name = "create";
 }
 
@@ -24,7 +24,6 @@ std::string CreateTool::create_type_name(ObjectType type) {
 }
 
 DragTool::DragTool() : Tool() {
-    this->widget = widget;
     name = "drag";
 }
 
@@ -34,7 +33,6 @@ void DragTool::reset() {
 }
 
 MoveTool::MoveTool() : Tool() {
-    this->widget = widget;
     name = "move";
 }
 
@@ -45,7 +43,6 @@ void MoveTool::reset() {
 }
 
 RotateTool::RotateTool() : Tool() {
-    this->widget = widget;
     name = "rotate";
 }
 
@@ -56,7 +53,6 @@ void RotateTool::reset() {
 }
 
 EditTool::EditTool() : Tool() {
-    this->widget = widget;
     name = "edit";
     assert(VERTEX_SIZE % 2 == 1);
     vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
@@ -96,4 +92,12 @@ std::string EditTool::modeToStr(EditToolMode mode) {
         case EditTool::MOVE: return "MOVE";
         default: return "Unknown";
     }
+}
+
+SelectTool::SelectTool() {
+    name = "select";
+}
+
+void SelectTool::reset() {
+    selected_object = nullptr;
 }

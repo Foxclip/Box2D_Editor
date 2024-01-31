@@ -21,6 +21,7 @@ const sf::Color NEW_BALL_NOTCH_COLOR = sf::Color(10, 64, 10);
 //     add extern global variable at the end of tools.h
 //     define that variable in tools.cpp
 //     add it to tools vector in tools.cpp
+//     set it's display name in the contructor
 //     write reset method which resets all fields that need to be reset during scene deserialization
 
 class Tool {
@@ -30,6 +31,16 @@ public:
 
 	Tool();
 	virtual void reset() = 0;
+
+private:
+};
+
+class SelectTool : public Tool {
+public:
+	GameObject* selected_object = nullptr;
+
+	SelectTool();
+	void reset();
 
 private:
 };
@@ -119,6 +130,7 @@ public:
 	static std::string create_type_name(ObjectType type);
 };
 
+extern SelectTool select_tool;
 extern DragTool drag_tool;
 extern MoveTool move_tool;
 extern RotateTool rotate_tool;
