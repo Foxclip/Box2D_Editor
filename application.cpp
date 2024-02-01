@@ -22,18 +22,23 @@ bool QueryCallback::ReportFixture(b2Fixture* fixture) {
 }
 
 void Application::init() {
-    sf::ContextSettings cs;
-    cs.antialiasingLevel = ANTIALIASING;
-    window = std::make_unique<sf::RenderWindow>(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs);
-    window->setVerticalSyncEnabled(true);
+    sf::ContextSettings cs_window;
+    cs_window.antialiasingLevel = ANTIALIASING;
+    window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs_window);
+    window.setVerticalSyncEnabled(true);
+    sf::ContextSettings cs_world;
+    world_texture.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_world);
+    sf::ContextSettings cs_ui;
+    ui_texture.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_ui);
+    window_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
+    world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
+    ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     init_tools();
     init_world();
     init_ui();
     init_objects();
-    try_select_tool(0);
+    try_select_tool(0); // should be after init_tools and init_ui
     select_create_type(0);
-    world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
-    ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     maximize_window();
     load("level.txt");
     auto getter = [&]() { return serialize(); };
@@ -69,7 +74,7 @@ void Application::init_ui() {
     if (!ui_font.loadFromFile(ui_font_filename)) {
         throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
     }
-    root_widget.setSize(sf::Vector2f(window->getSize().x, window->getSize().y));
+    root_widget.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
     root_widget.setFillColor(sf::Color::Transparent);
     {
         std::unique_ptr<ContainerWidget> toolbox_widget_uptr = std::make_unique<ContainerWidget>();
@@ -220,7 +225,7 @@ void Application::init_objects() {
 }
 
 void Application::main_loop() {
-    while (window->isOpen()) {
+    while (window.isOpen()) {
         process_widgets();
         process_input();
         process_world();
@@ -235,16 +240,21 @@ void Application::resetView() {
 }
 
 void Application::process_widgets() {
-    root_widget.setSize(sf::Vector2f(window->getSize().x, window->getSize().y));
+    root_widget.setSize(sf::Vector2f(ui_texture.getSize().x, ui_texture.getSize().y));
     root_widget.updateMouseState();
     Widget::click_blocked = false;
 }
 
 void Application::process_input() {
     sf::Event event;
-    while (window->pollEvent(event)) {
+    while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
-            window->close();
+            window.close();
+        } else if (event.type == sf::Event::Resized) {
+            sf::ContextSettings cs_world;
+            world_texture.create(event.size.width, event.size.height, cs_world);
+            sf::ContextSettings cs_ui;
+            ui_texture.create(event.size.width, event.size.height, cs_ui);
         }
         process_keyboard_event(event);
         process_mouse_event(event);
@@ -331,7 +341,7 @@ void Application::process_keyboard_event(sf::Event event) {
 }
 
 void Application::process_mouse_event(sf::Event event) {
-    mousePos = sf::Mouse::getPosition(*window);
+    mousePos = sf::Mouse::getPosition(window);
     mousePosf = to2f(mousePos);
     sfMousePosWorld = sf_screen_to_world(mousePos);
     b2MousePosWorld = tob2(sfMousePosWorld);
@@ -385,7 +395,7 @@ void Application::process_mouse_event(sf::Event event) {
 
 void Application::process_keyboard() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-        window->close();
+        window.close();
     }
 }
 
@@ -544,43 +554,52 @@ void Application::process_world() {
 }
 
 void Application::render() {
-    window->clear(sf::Color(25, 25, 25));
+    window.clear(sf::Color(0, 0, 0));
+    window_view.setCenter(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
+    window_view.setSize(window.getSize().x, window.getSize().y);
+    window.setView(window_view);
     render_world();
     render_ui();
-    window->display();
+    window.display();
 }
 
 void Application::render_world() {
+    world_texture.clear(sf::Color(25, 25, 25));
     world_view.setCenter(viewCenterX, viewCenterY);
-    world_view.setSize(window->getSize().x / zoomFactor, -1.0f * window->getSize().y / zoomFactor);
-    window->setView(world_view);
+    world_view.setSize(world_texture.getSize().x / zoomFactor, -1.0f * world_texture.getSize().y / zoomFactor);
+    world_texture.setView(world_view);
 
     for (int i = 0; i < game_objects.size(); i++) {
-        game_objects[i]->render(window.get());
+        game_objects[i]->render(world_texture);
     }
 
     if (drag_tool.mouse_joint) {
         sf::Vector2f grabbed_point = tosf(drag_tool.mouse_joint->GetAnchorB());
-        draw_line(grabbed_point, sfMousePosWorld, sf::Color::Yellow);
+        draw_line(world_texture, grabbed_point, sfMousePosWorld, sf::Color::Yellow);
     }
 
     if (rotate_tool.object) {
         sf::Vector2f body_origin = tosf(rotate_tool.object->rigid_body->GetPosition());
-        draw_line(body_origin, sfMousePosWorld, sf::Color::Yellow);
+        draw_line(world_texture, body_origin, sfMousePosWorld, sf::Color::Yellow);
     }
+
+    world_texture.display();
+    sf::Sprite world_sprite(world_texture.getTexture());
+    window.draw(world_sprite);
 }
 
 void Application::render_ui() {
-    ui_view.setCenter(window->getSize().x / 2.0f, window->getSize().y / 2.0f);
-    ui_view.setSize(window->getSize().x, window->getSize().y);
-    window->setView(ui_view);
+    ui_texture.clear(sf::Color(0, 0, 0, 0));
+    ui_view.setCenter(ui_texture.getSize().x / 2.0f, ui_texture.getSize().y / 2.0f);
+    ui_view.setSize(ui_texture.getSize().x, ui_texture.getSize().y);
+    ui_texture.setView(ui_view);
 
     if (selected_tool->name == "edit") {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             // ghost edge
             sf::Vector2i v1 = world_to_screen(ground->getVertexPos(edit_tool.edge_vertex));
             sf::Vector2i v2 = mousePos;
-            draw_line(to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
+            draw_line(ui_texture, to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
             // ghost edge normal
             sf::Vector2f norm_v1, norm_v2;
             if (edit_tool.edge_vertex == 0) {
@@ -588,12 +607,12 @@ void Application::render_ui() {
             } else {
                 get_screen_normal(v2, v1, norm_v1, norm_v2);
             }
-            draw_line(norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
+            draw_line(ui_texture, norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
             // ghost vertex
             sf::Vector2f ghost_vertex_pos = to2f(mousePos);
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
-            window->draw(edit_tool.vertex_rect);
+            ui_texture.draw(edit_tool.vertex_rect);
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
             // edge highlight
             b2Vec2 v1 = ground->getVertexPos(edit_tool.highlighted_edge);
@@ -605,12 +624,12 @@ void Application::render_ui() {
             edit_tool.edge_highlight.setPosition(v1_screen);
             edit_tool.edge_highlight.setRotation(utils::to_degrees(angle));
             edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
-            window->draw(edit_tool.edge_highlight);
+            ui_texture.draw(edit_tool.edge_highlight);
             // ghost vertex on the edge
             sf::Vector2f ghost_vertex_pos = world_to_screenf(edit_tool.insertVertexPos);
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
-            window->draw(edit_tool.vertex_rect);
+            ui_texture.draw(edit_tool.vertex_rect);
         }
         // ground vertices
         for (int i = 0; i < ground->getVertexCount(); i++) {
@@ -618,33 +637,36 @@ void Application::render_ui() {
             bool selected = ground->isVertexSelected(i);
             sf::Color vertex_color = selected ? sf::Color(255, 255, 0) : sf::Color(255, 0, 0);
             edit_tool.vertex_rect.setFillColor(vertex_color);
-            window->draw(edit_tool.vertex_rect);
+            ui_texture.draw(edit_tool.vertex_rect);
         }
         // ground edge normals
         for (int i = 0; i < ground->getVertexCount() - 1; i++) {
             sf::Vector2f norm_v1, norm_v2;
             get_screen_normal(ground->getVertexPos(i), ground->getVertexPos(i + 1), norm_v1, norm_v2);
-            draw_line(norm_v1, norm_v2, sf::Color(0, 255, 255));
+            draw_line(ui_texture, norm_v1, norm_v2, sf::Color(0, 255, 255));
         }
         if (edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) {
             // highlighted vertex
             sf::Vector2f vertex_pos = world_to_screenf(ground->getVertexPos(edit_tool.highlighted_vertex));
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
-            window->draw(edit_tool.vertex_highlight_rect);
+            ui_texture.draw(edit_tool.vertex_highlight_rect);
         } else if (edit_tool.mode == EditTool::SELECT && edit_tool.selection) {
             //selection box
             edit_tool.select_rect.setPosition(world_to_screenf(edit_tool.select_origin));
             edit_tool.select_rect.setSize(mousePosf - world_to_screenf(edit_tool.select_origin));
-            window->draw(edit_tool.select_rect);
+            ui_texture.draw(edit_tool.select_rect);
         }
     }
 
     root_widget.render();
 
+    ui_texture.display();
+    sf::Sprite ui_sprite(ui_texture.getTexture());
+    window.draw(ui_sprite);
 }
 
 void Application::maximize_window() {
-    sf::WindowHandle windowHandle = window->getSystemHandle();
+    sf::WindowHandle windowHandle = window.getSystemHandle();
     ShowWindow(windowHandle, SW_MAXIMIZE);
 }
 
@@ -783,22 +805,22 @@ void Application::toggle_pause() {
 }
 
 b2Vec2 Application::b2_screen_to_world(sf::Vector2i screen_pos) {
-    sf::Vector2f pos = window->mapPixelToCoords(screen_pos, world_view);
+    sf::Vector2f pos = world_texture.mapPixelToCoords(screen_pos, world_view);
     return tob2(pos);
 }
 
 sf::Vector2f Application::sf_screen_to_world(sf::Vector2i screen_pos) {
-    sf::Vector2f pos = window->mapPixelToCoords(screen_pos, world_view);
+    sf::Vector2f pos = world_texture.mapPixelToCoords(screen_pos, world_view);
     return pos;
 }
 
 sf::Vector2i Application::world_to_screen(b2Vec2 world_pos) {
-    sf::Vector2i pos = window->mapCoordsToPixel(tosf(world_pos), world_view);
+    sf::Vector2i pos = world_texture.mapCoordsToPixel(tosf(world_pos), world_view);
     return pos;
 }
 
 sf::Vector2f Application::world_to_screenf(sf::Vector2f world_pos) {
-    sf::Vector2i pos = window->mapCoordsToPixel(world_pos, world_view);
+    sf::Vector2i pos = world_texture.mapCoordsToPixel(world_pos, world_view);
     return to2f(pos);
 }
 
@@ -925,12 +947,12 @@ void Application::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& 
     norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
 }
 
-void Application::draw_line(const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color) {
+void Application::draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color) {
     line_primitive[0].position = v1;
     line_primitive[0].color = color;
     line_primitive[1].position = v2;
     line_primitive[1].color = color;
-    window->draw(line_primitive);
+    target.draw(line_primitive);
 }
 
 BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {

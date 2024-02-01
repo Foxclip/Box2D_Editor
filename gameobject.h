@@ -42,7 +42,7 @@ public:
 	virtual sf::Drawable* getDrawable() = 0;
 	virtual sf::Transformable* getTransformable() = 0;
 	void updateVisual();
-	void render(sf::RenderTarget* target);
+	void render(sf::RenderTarget& target);
 	void setVisualPosition(const sf::Vector2f& pos);
 	void setVisualRotation(float angle);
 	void setEnabled(bool enabled, bool include_children);

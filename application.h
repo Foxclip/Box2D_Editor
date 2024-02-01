@@ -32,6 +32,7 @@ public:
 	void start();
 
 private:
+	sf::View window_view;
 	sf::View world_view;
 	sf::View ui_view;
 	sf::Vector2i mousePos;
@@ -45,6 +46,7 @@ private:
 	ContainerWidget* paused_rect_widget;
 	ContainerWidget* toolbox_widget;
 	Tool* selected_tool = nullptr;
+	sf::RenderTexture render_texture;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;
@@ -101,7 +103,7 @@ private:
 	void select_vertices_in_rect();
 	void get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
-	void draw_line(const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color);
+	void draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color);
 
 	BoxObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	BallObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);

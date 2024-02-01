@@ -1,6 +1,5 @@
 #include "widget.h"
 
-std::unique_ptr<sf::RenderWindow> window;
 RectangleWidget root_widget;
 bool Widget::click_blocked = false;
 
@@ -28,7 +27,7 @@ WidgetVisibility Widget::checkVisibility() {
 
 void Widget::updateMouseState() {
 	sf::FloatRect bounds = getGlobalBounds();
-	bool is_over = utils::contains_point(bounds, utils::to2f(sf::Mouse::getPosition(*window)));
+	bool is_over = utils::contains_point(bounds, utils::to2f(sf::Mouse::getPosition(window)));
 	if (is_over && !mouseIn) {
 		OnMouseEnter();
 	} else if (!is_over && mouseIn) {
@@ -167,7 +166,7 @@ void Widget::update() {
 	if (parent) {
 		parent_size = parent->getLocalBounds().getSize();
 	} else {
-		parent_size = sf::Vector2f(window->getSize());
+		parent_size = sf::Vector2f(window.getSize());
 	}
 	sf::Vector2f anchored_pos = anchorToPos(parent_anchor, getPosition(), parent_size);
 	setPosition(anchored_pos + anchor_offset);
@@ -190,7 +189,7 @@ sf::Vector2f Widget::anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, cons
 }
 
 void Widget::render() {
-	render(*window);
+	render(ui_texture);
 }
 
 void Widget::render(sf::RenderTarget& target) {

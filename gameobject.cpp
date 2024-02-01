@@ -23,12 +23,12 @@ void GameObject::updateVisual() {
 	setVisualRotation(utils::to_degrees(angle));
 }
 
-void GameObject::render(sf::RenderTarget* target) {
+void GameObject::render(sf::RenderTarget& target) {
 	for (int i = 0; i < children.size(); i++) {
 		children[i]->render(target);
 	}
 	updateVisual();
-	target->draw(*getDrawable());
+	target.draw(*getDrawable());
 }
 
 void GameObject::setVisualPosition(const sf::Vector2f& pos) {

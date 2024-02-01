@@ -4,8 +4,7 @@
 #include <functional>
 #include "utils.h"
 #include "logger.h"
-
-extern std::unique_ptr<sf::RenderWindow> window;
+#include "global.h"
 
 struct WidgetVisibility {
 	bool addedToRoot = false;
