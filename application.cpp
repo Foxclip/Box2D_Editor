@@ -576,16 +576,6 @@ void Application::render_world() {
         game_objects[i]->render(world_texture);
     }
 
-    if (drag_tool.mouse_joint) {
-        sf::Vector2f grabbed_point = tosf(drag_tool.mouse_joint->GetAnchorB());
-        draw_line(world_texture, grabbed_point, sfMousePosWorld, sf::Color::Yellow);
-    }
-
-    if (rotate_tool.object) {
-        sf::Vector2f body_origin = tosf(rotate_tool.object->rigid_body->GetPosition());
-        draw_line(world_texture, body_origin, sfMousePosWorld, sf::Color::Yellow);
-    }
-
     world_texture.display();
     sf::Sprite world_sprite(world_texture.getTexture());
     desat_shader.setUniform("texture", sf::Shader::CurrentTexture);
@@ -600,13 +590,24 @@ void Application::render_ui() {
     ui_view.setCenter(ui_texture.getSize().x / 2.0f, ui_texture.getSize().y / 2.0f);
     ui_view.setSize(ui_texture.getSize().x, ui_texture.getSize().y);
     ui_texture.setView(ui_view);
+    sf::RenderTarget& target = ui_texture;
 
-    if (selected_tool->name == "edit") {
+    if (selected_tool == &drag_tool) {
+        if (drag_tool.mouse_joint) {
+            sf::Vector2f grabbed_point = world_to_screenf(drag_tool.mouse_joint->GetAnchorB());
+            draw_line(target, grabbed_point, mousePosf, sf::Color::Yellow);
+        }
+    } else if (selected_tool == &rotate_tool) {
+        if (rotate_tool.object) {
+            sf::Vector2f body_origin = world_to_screenf(rotate_tool.object->rigid_body->GetPosition());
+            draw_line(target, body_origin, mousePosf, sf::Color::Yellow);
+        }
+    } else if (selected_tool == &edit_tool) {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             // ghost edge
             sf::Vector2i v1 = world_to_screen(ground->getVertexPos(edit_tool.edge_vertex));
             sf::Vector2i v2 = mousePos;
-            draw_line(ui_texture, to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
+            draw_line(target, to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
             // ghost edge normal
             sf::Vector2f norm_v1, norm_v2;
             if (edit_tool.edge_vertex == 0) {
@@ -614,12 +615,12 @@ void Application::render_ui() {
             } else {
                 get_screen_normal(v2, v1, norm_v1, norm_v2);
             }
-            draw_line(ui_texture, norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
+            draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
             // ghost vertex
             sf::Vector2f ghost_vertex_pos = to2f(mousePos);
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
-            ui_texture.draw(edit_tool.vertex_rect);
+            target.draw(edit_tool.vertex_rect);
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
             // edge highlight
             b2Vec2 v1 = ground->getVertexPos(edit_tool.highlighted_edge);
@@ -631,12 +632,12 @@ void Application::render_ui() {
             edit_tool.edge_highlight.setPosition(v1_screen);
             edit_tool.edge_highlight.setRotation(utils::to_degrees(angle));
             edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
-            ui_texture.draw(edit_tool.edge_highlight);
+            target.draw(edit_tool.edge_highlight);
             // ghost vertex on the edge
             sf::Vector2f ghost_vertex_pos = world_to_screenf(edit_tool.insertVertexPos);
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
-            ui_texture.draw(edit_tool.vertex_rect);
+            target.draw(edit_tool.vertex_rect);
         }
         // ground vertices
         for (int i = 0; i < ground->getVertexCount(); i++) {
@@ -644,24 +645,24 @@ void Application::render_ui() {
             bool selected = ground->isVertexSelected(i);
             sf::Color vertex_color = selected ? sf::Color(255, 255, 0) : sf::Color(255, 0, 0);
             edit_tool.vertex_rect.setFillColor(vertex_color);
-            ui_texture.draw(edit_tool.vertex_rect);
+            target.draw(edit_tool.vertex_rect);
         }
         // ground edge normals
         for (int i = 0; i < ground->getVertexCount() - 1; i++) {
             sf::Vector2f norm_v1, norm_v2;
             get_screen_normal(ground->getVertexPos(i), ground->getVertexPos(i + 1), norm_v1, norm_v2);
-            draw_line(ui_texture, norm_v1, norm_v2, sf::Color(0, 255, 255));
+            draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255));
         }
         if (edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) {
             // highlighted vertex
             sf::Vector2f vertex_pos = world_to_screenf(ground->getVertexPos(edit_tool.highlighted_vertex));
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
-            ui_texture.draw(edit_tool.vertex_highlight_rect);
+            target.draw(edit_tool.vertex_highlight_rect);
         } else if (edit_tool.mode == EditTool::SELECT && edit_tool.selection) {
             //selection box
             edit_tool.select_rect.setPosition(world_to_screenf(edit_tool.select_origin));
             edit_tool.select_rect.setSize(mousePosf - world_to_screenf(edit_tool.select_origin));
-            ui_texture.draw(edit_tool.select_rect);
+            target.draw(edit_tool.select_rect);
         }
     }
 
