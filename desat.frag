@@ -1,4 +1,7 @@
 uniform sampler2D texture;
+uniform float saturation;
+uniform float vcenter;
+uniform float vpercent;
 
 // All components are in the range [0…1], including hue.
     vec3 rgb2hsv(vec3 c)
@@ -29,10 +32,7 @@ void main()
 {
     vec4 tex_color = texture2D(texture, gl_TexCoord[0].xy);
     vec3 hsv = rgb2hsv(vec3(tex_color));
-    float saturation = 0.75;
     hsv.y = hsv.y * saturation;
-    float vcenter = 0.25;
-    float vpercent = 0.6;
     hsv.z = ((hsv.z - vcenter) * vpercent) + vcenter;
     vec3 rgb = hsv2rgb(hsv);
     vec4 color = vec4(rgb, tex_color.a);

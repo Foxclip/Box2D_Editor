@@ -33,7 +33,7 @@ void Application::init() {
     window_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
-    if (!shader.loadFromFile("shader.frag", sf::Shader::Fragment)) {
+    if (!desat_shader.loadFromFile("desat.frag", sf::Shader::Fragment)) {
         throw std::runtime_error("Shader loading error");
     }
     init_tools();
@@ -588,8 +588,11 @@ void Application::render_world() {
 
     world_texture.display();
     sf::Sprite world_sprite(world_texture.getTexture());
-    shader.setUniform("texture", sf::Shader::CurrentTexture);
-    window.draw(world_sprite, &shader);
+    desat_shader.setUniform("texture", sf::Shader::CurrentTexture);
+    desat_shader.setUniform("saturation", WORLD_SATURATION);
+    desat_shader.setUniform("vcenter", WORLD_COLOR_SCALE_CENTER);
+    desat_shader.setUniform("vpercent", WORLD_COLOR_SCALE_PERCENT);
+    window.draw(world_sprite, &desat_shader);
 }
 
 void Application::render_ui() {

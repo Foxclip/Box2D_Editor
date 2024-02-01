@@ -15,6 +15,9 @@ const int WINDOW_HEIGHT = 600;
 const int ANTIALIASING = 0;
 const float MOUSE_SCROLL_ZOOM = 1.2f;
 const int FPS = 60;
+const float WORLD_SATURATION = 0.75f;
+const float WORLD_COLOR_SCALE_CENTER = 0.25f;
+const float WORLD_COLOR_SCALE_PERCENT = 0.6f;
 
 Logger& operator<<(Logger& lg, const b2Vec2& value);
 Logger& operator<<(Logger& lg, const sf::Vector2f& value);
@@ -35,7 +38,7 @@ private:
 	sf::View window_view;
 	sf::View world_view;
 	sf::View ui_view;
-	sf::Shader shader;
+	sf::Shader desat_shader;
 	sf::Vector2i mousePos;
 	sf::Vector2f mousePosf;
 	sf::Vector2f sfMousePosWorld;
