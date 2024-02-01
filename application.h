@@ -35,6 +35,7 @@ private:
 	sf::View window_view;
 	sf::View world_view;
 	sf::View ui_view;
+	sf::Shader shader;
 	sf::Vector2i mousePos;
 	sf::Vector2f mousePosf;
 	sf::Vector2f sfMousePosWorld;

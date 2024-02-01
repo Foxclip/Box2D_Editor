@@ -590,7 +590,7 @@ void CarObject::create_wheel(b2Vec2 wheel_pos, float radius) {
 	wheel_body_def.type = b2_dynamicBody;
 	wheel_body_def.position = anchor_pos_world;
 	std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
-		rigid_body->GetWorld(), wheel_body_def, radius, sf::Color(200, 200, 50), sf::Color(64, 64, 10)
+		rigid_body->GetWorld(), wheel_body_def, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
 	);
 	BallObject* wheel_ptr = wheel.get();
 	wheel_ptr->setDensity(1.0f, false);

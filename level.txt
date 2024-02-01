@@ -5,7 +5,7 @@ camera
 
 object ground
     vertices 25 8 16.1333332 1.51666605 9.13333225 -2.01666498 3.23333097 -3.95000005 -5.93333292 -5.58333302 -19.3000011 -7.91666698
-    color 200 200 200 255
+    color 255 255 255 255
     body
         type static
         position 0 0
@@ -24,7 +24,7 @@ object ground
 
 object box
     size 1 1
-    color 50 200 50 255
+    color 0 255 0 255
     body
         type dynamic
         position -0.708761394 -4.12524891
@@ -43,7 +43,7 @@ object box
 
 object box
     size 1 1
-    color 50 200 50 255
+    color 0 255 0 255
     body
         type dynamic
         position 1.29806697 -3.76952529
@@ -62,7 +62,7 @@ object box
 
 object box
     size 1 1
-    color 50 200 50 255
+    color 0 255 0 255
     body
         type dynamic
         position 0.295923263 -3.94809031
@@ -81,8 +81,8 @@ object box
 
 object ball
     radius 0.5
-    color 50 200 50 255
-    notch_color 10 64 10 255
+    color 0 255 0 255
+    notch_color 0 64 0 255
     body
         type dynamic
         position 2.29286265 -3.60202599
@@ -101,7 +101,7 @@ object ball
 
 object car
     lengths 5 1 5 1 5 1
-    color 200 50 50 255
+    color 255 0 0 255
     body
         type dynamic
         position -0.882866383 15.2863264
@@ -144,7 +144,7 @@ object car
     wheels
         object ball
             radius 1
-            color 200 200 50 255
+            color 255 255 0 255
             notch_color 64 64 0 255
             body
                 type dynamic
@@ -174,7 +174,7 @@ object car
         /joint
         object ball
             radius 1
-            color 200 200 50 255
+            color 255 255 0 255
             notch_color 64 64 0 255
             body
                 type dynamic
@@ -204,7 +204,7 @@ object car
         /joint
         object ball
             radius 1
-            color 200 200 50 255
+            color 255 255 0 255
             notch_color 64 64 0 255
             body
                 type dynamic

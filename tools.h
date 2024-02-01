@@ -11,10 +11,10 @@ const int CREATE_RECT_WIDTH = 40;
 const int CREATE_RECT_HEIGHT = 40;
 const int CREATE_PANEL_PADDING = 10;
 const b2Vec2 NEW_BOX_SIZE = b2Vec2(1.0f, 1.0f);
-const sf::Color NEW_BOX_COLOR = sf::Color(50, 200, 50);
+const sf::Color NEW_BOX_COLOR = sf::Color(0, 255, 0);
 const float NEW_BALL_RADIUS = 0.5f;
-const sf::Color NEW_BALL_COLOR = sf::Color(50, 200, 50);
-const sf::Color NEW_BALL_NOTCH_COLOR = sf::Color(10, 64, 10);
+const sf::Color NEW_BALL_COLOR = sf::Color(0, 255, 0);
+const sf::Color NEW_BALL_NOTCH_COLOR = sf::Color(0, 64, 0);
 
 // add new tool:
 //     create class inherited from Tool in tools.h
