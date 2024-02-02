@@ -38,6 +38,9 @@ void Application::init() {
     if (!desat_shader.loadFromFile("desat.frag", sf::Shader::Fragment)) {
         throw std::runtime_error("Shader loading error");
     }
+    if (!selection_shader.loadFromFile("selection.frag", sf::Shader::Fragment)) {
+        throw std::runtime_error("Shader loading error");
+    }
     init_tools();
     init_world();
     init_ui();
@@ -594,7 +597,9 @@ void Application::render_world() {
 
     selection_mask.display();
     sf::Sprite selection_sprite(selection_mask.getTexture());
-    window.draw(selection_sprite);
+    selection_shader.setUniform("selection_mask", sf::Shader::CurrentTexture);
+    selection_shader.setUniform("offset", SELECTION_OUTLINE_THICKNESS);
+    window.draw(selection_sprite, &selection_shader);
 }
 
 void Application::render_ui() {
