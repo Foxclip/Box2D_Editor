@@ -1,4 +1,5 @@
 uniform sampler2D selection_mask;
+uniform vec3 outline_color;
 uniform int offset;
 
 ivec2 toPixel(vec2 coords) {
@@ -36,7 +37,7 @@ void main() {
                 vec2 coords_here = toCoords(ivec2(x, y));
                 vec4 mask_here = texture2D(selection_mask, coords_here);
                 if (mask_here == vec4(1.0, 1.0, 1.0, 1.0)) {
-                    color = vec4(1.0, 1.0, 0.0, 1.0);
+                    color = vec4(outline_color, 1.0);
                     exit = true;
                     break;
                 }

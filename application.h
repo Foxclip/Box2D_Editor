@@ -18,7 +18,10 @@ const int FPS = 60;
 const float WORLD_SATURATION = 0.75f;
 const float WORLD_COLOR_SCALE_CENTER = 0.25f;
 const float WORLD_COLOR_SCALE_PERCENT = 0.6f;
+const sf::Glsl::Vec3 SELECTION_OUTLINE_COLOR = sf::Glsl::Vec3(1.0f, 1.0f, 0.0f);
+const sf::Glsl::Vec3 HOVER_OUTLINE_COLOR = sf::Glsl::Vec3(1.0f, 1.0f, 0.0f);
 const int SELECTION_OUTLINE_THICKNESS = 3;
+const int HOVER_OUTLINE_THICKNESS = 1;
 
 Logger& operator<<(Logger& lg, const b2Vec2& value);
 Logger& operator<<(Logger& lg, const sf::Vector2f& value);
@@ -109,6 +112,7 @@ private:
 	void get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color);
+	GameObject* get_gameobject(b2Body* body);
 
 	BoxObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	BallObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);

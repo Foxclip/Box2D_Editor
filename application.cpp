@@ -410,7 +410,16 @@ void Application::process_keyboard() {
 }
 
 void Application::process_mouse() {
-    if (selected_tool == &edit_tool) {
+    if (selected_tool == &select_tool) {
+        b2Fixture* fixture = get_fixture_at(mousePos);
+        if (fixture) {
+            b2Body* body = fixture->GetBody();
+            GameObject* gameobject = get_gameobject(body);
+            select_tool.hover_object = gameobject;
+        } else {
+            select_tool.hover_object = nullptr;
+        }
+    } else if (selected_tool == &edit_tool) {
         if (edit_tool.mode == EditTool::HOVER) {
             edit_tool.highlighted_vertex = mouse_get_ground_vertex();
         } else if (edit_tool.mode == EditTool::ADD) {
@@ -501,7 +510,7 @@ void Application::process_left_click() {
         b2Fixture* fixture = get_fixture_at(mousePos);
         if (fixture) {
             b2Body* body = fixture->GetBody();
-            GameObject* gameobject = reinterpret_cast<GameObject*>(body->GetUserData().pointer);
+            GameObject* gameobject = get_gameobject(body);
             move_tool.object_was_enabled = body->IsEnabled();
             move_tool.offset = b2MousePosWorld - body->GetPosition();
             gameobject->setEnabled(false, true);
@@ -513,7 +522,7 @@ void Application::process_left_click() {
         b2Fixture* fixture = get_fixture_at(mousePos);
         if (fixture) {
             b2Body* body = fixture->GetBody();
-            GameObject* gameobject = reinterpret_cast<GameObject*>(body->GetUserData().pointer);
+            GameObject* gameobject = get_gameobject(body);
             rotate_tool.object_was_enabled = body->IsEnabled();
             b2Vec2 mouse_vector = b2MousePosWorld - body->GetPosition();
             float mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
@@ -583,8 +592,11 @@ void Application::render_world() {
     selection_mask.setView(world_view);
 
     for (int i = 0; i < game_objects.size(); i++) {
-        game_objects[i]->render(world_texture);
-        game_objects[i]->renderMask(selection_mask);
+        GameObject* gameobject = game_objects[i].get();
+        gameobject->render(world_texture);
+        if (gameobject == select_tool.hover_object) {
+            gameobject->renderMask(selection_mask);
+        }
     }
 
     world_texture.display();
@@ -598,6 +610,7 @@ void Application::render_world() {
     selection_mask.display();
     sf::Sprite selection_sprite(selection_mask.getTexture());
     selection_shader.setUniform("selection_mask", sf::Shader::CurrentTexture);
+    selection_shader.setUniform("outline_color", SELECTION_OUTLINE_COLOR);
     selection_shader.setUniform("offset", SELECTION_OUTLINE_THICKNESS);
     window.draw(selection_sprite, &selection_shader);
 }
@@ -978,6 +991,11 @@ void Application::draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, co
     line_primitive[1].position = v2;
     line_primitive[1].color = color;
     target.draw(line_primitive);
+}
+
+GameObject* Application::get_gameobject(b2Body* body) {
+    GameObject* gameobject = reinterpret_cast<GameObject*>(body->GetUserData().pointer);
+    return gameobject;
 }
 
 BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {

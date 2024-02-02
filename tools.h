@@ -37,6 +37,7 @@ private:
 
 class SelectTool : public Tool {
 public:
+	GameObject* hover_object = nullptr;
 	GameObject* selected_object = nullptr;
 
 	SelectTool();
