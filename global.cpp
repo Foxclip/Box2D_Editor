@@ -3,3 +3,4 @@
 sf::RenderWindow window;
 sf::RenderTexture world_texture;
 sf::RenderTexture ui_texture;
+sf::RenderTexture selection_mask;

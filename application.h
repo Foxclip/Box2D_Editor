@@ -50,7 +50,6 @@ private:
 	ContainerWidget* paused_rect_widget;
 	ContainerWidget* toolbox_widget;
 	Tool* selected_tool = nullptr;
-	sf::RenderTexture render_texture;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;

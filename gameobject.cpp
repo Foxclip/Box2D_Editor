@@ -31,6 +31,14 @@ void GameObject::render(sf::RenderTarget& target) {
 	target.draw(*getDrawable());
 }
 
+void GameObject::renderMask(sf::RenderTarget& mask) {
+	for (int i = 0; i < children.size(); i++) {
+		children[i]->renderMask(mask);
+	}
+	updateVisual();
+	drawMask(mask);
+}
+
 void GameObject::setVisualPosition(const sf::Vector2f& pos) {
 	sf::Transformable* tr = getTransformable();
 	tr->setPosition(pos);
@@ -319,6 +327,13 @@ sf::Transformable* BoxObject::getTransformable() {
 	return rect_shape.get();
 }
 
+void BoxObject::drawMask(sf::RenderTarget& mask) {
+	sf::Color orig_color = rect_shape->getFillColor();
+	rect_shape->setFillColor(sf::Color::White);
+	mask.draw(*rect_shape);
+	rect_shape->setFillColor(orig_color);
+}
+
 TokenWriter& BoxObject::serialize(TokenWriter& tw) {
 	tw << "object box" << "\n";
 	tw.addIndentLevel(1);
@@ -383,6 +398,10 @@ sf::Transformable* BallObject::getTransformable() {
 	return circle_notch_shape.get();
 }
 
+void BallObject::drawMask(sf::RenderTarget& mask) {
+	circle_notch_shape->drawMask(mask);
+}
+
 TokenWriter& BallObject::serialize(TokenWriter& tw) {
 	tw << "object ball" << "\n";
 	tw.addIndentLevel(1);
@@ -444,6 +463,15 @@ void LineStripShape::setLineColor(sf::Color color) {
 	for (int i = 0; i < varray.getVertexCount(); i++) {
 		varray[i].color = color;
 	}
+	line_color = color;
+}
+
+void LineStripShape::drawMask(sf::RenderTarget& mask, sf::RenderStates states) {
+	states.transform *= getTransform();
+	sf::Color orig_color = line_color;
+	setLineColor(sf::Color::White);
+	mask.draw(varray, states);
+	setLineColor(orig_color);
 }
 
 void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -498,6 +526,13 @@ sf::Drawable* CarObject::getDrawable() {
 
 sf::Transformable* CarObject::getTransformable() {
 	return convex_shape.get();
+}
+
+void CarObject::drawMask(sf::RenderTarget& mask) {
+	sf::Color orig_color = convex_shape->getFillColor();
+	convex_shape->setFillColor(sf::Color::White);
+	mask.draw(*convex_shape);
+	convex_shape->setFillColor(orig_color);
 }
 
 TokenWriter& CarObject::serialize(TokenWriter& tw) {
@@ -624,22 +659,40 @@ CircleNotchShape::CircleNotchShape(float radius, int point_count, int notch_segm
 	}
 }
 
-void CircleNotchShape::setCircleColor(sf::Color color) {
+const sf::Color& CircleNotchShape::getCircleColor() const {
+	return circle_color;
+}
+
+const sf::Color& CircleNotchShape::getNotchColor() const {
+	return notch_color;
+}
+
+void CircleNotchShape::setCircleColor(const sf::Color& color) {
 	for (int i = 0; i < varray_circle.getVertexCount(); i++) {
 		varray_circle[i].color = color;
 	}
+	circle_color = color;
 }
 
-void CircleNotchShape::setNotchColor(sf::Color color) {
+void CircleNotchShape::setNotchColor(const sf::Color& color) {
 	for (int i = 0; i < varray_notch.getVertexCount(); i++) {
 		varray_notch[i].color = color;
 	}
+	notch_color = color;
 }
 
 void CircleNotchShape::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	target.draw(varray_circle, states);
 	target.draw(varray_notch, states);
+}
+
+void CircleNotchShape::drawMask(sf::RenderTarget& mask, sf::RenderStates states) {
+	states.transform *= getTransform();
+	sf::Color orig_color = circle_color;
+	setCircleColor(sf::Color::White);
+	mask.draw(varray_circle, states);
+	setCircleColor(orig_color);
 }
 
 GroundObject::GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color) {
@@ -751,6 +804,10 @@ sf::Drawable* GroundObject::getDrawable() {
 
 sf::Transformable* GroundObject::getTransformable() {
 	return line_strip_shape.get();
+}
+
+void GroundObject::drawMask(sf::RenderTarget& mask) {
+	line_strip_shape->drawMask(mask);
 }
 
 TokenWriter& GroundObject::serialize(TokenWriter& tw) {

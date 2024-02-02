@@ -10,19 +10,26 @@ public:
 	explicit LineStripShape(sf::VertexArray& varray);
 	void setLineColor(sf::Color color);
 	sf::VertexArray varray;
+	void drawMask(sf::RenderTarget& mask, sf::RenderStates states = sf::RenderStates::Default);
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	sf::Color line_color;
 };
 
 class CircleNotchShape : public sf::Drawable, public sf::Transformable {
 public:
 	explicit CircleNotchShape(float radius, int point_count, int notch_segment_count);
-	void setCircleColor(sf::Color color);
-	void setNotchColor(sf::Color color);
+	const sf::Color& getCircleColor() const;
+	const sf::Color& getNotchColor() const;
+	void setCircleColor(const sf::Color& color);
+	void setNotchColor(const sf::Color& color);
+	void drawMask(sf::RenderTarget& mask, sf::RenderStates states = sf::RenderStates::Default);
 private:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	sf::VertexArray varray_circle;
 	sf::VertexArray varray_notch;
+	sf::Color circle_color;
+	sf::Color notch_color;
 };
 
 struct BodyDef {
@@ -43,6 +50,7 @@ public:
 	virtual sf::Transformable* getTransformable() = 0;
 	void updateVisual();
 	void render(sf::RenderTarget& target);
+	void renderMask(sf::RenderTarget& mask);
 	void setVisualPosition(const sf::Vector2f& pos);
 	void setVisualRotation(float angle);
 	void setEnabled(bool enabled, bool include_children);
@@ -62,6 +70,10 @@ public:
 	static BodyDef deserializeBody(TokenReader& tr);
 	static b2FixtureDef deserializeFixture(TokenReader& tr);
 	static b2RevoluteJointDef deserializeRevoluteJoint(TokenReader& tr);
+
+protected:
+	virtual void drawMask(sf::RenderTarget& mask) = 0;
+
 };
 
 class BoxObject : public GameObject {
@@ -69,6 +81,7 @@ public:
 	BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
+	void drawMask(sf::RenderTarget& mask);
 	TokenWriter& serialize(TokenWriter& tw);
 	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, b2World* world);
 	b2Vec2 size = b2Vec2();
@@ -81,6 +94,7 @@ public:
 	BallObject(b2World* world, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
+	void drawMask(sf::RenderTarget& mask);
 	TokenWriter& serialize(TokenWriter& tw);
 	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, b2World* world);
 	float radius = 0.0f;
@@ -102,6 +116,7 @@ public:
 	);
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
+	void drawMask(sf::RenderTarget& mask);
 	TokenWriter& serialize(TokenWriter& tw);
 	static std::unique_ptr<CarObject> deserialize(TokenReader& tr, b2World* world);
 	std::vector<float> lengths;
@@ -143,6 +158,7 @@ public:
 	void syncVertices();
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
+	void drawMask(sf::RenderTarget& mask);
 	TokenWriter& serialize(TokenWriter& tw);
 	static std::unique_ptr<GroundObject> deserialize(TokenReader& tr, b2World* world);
 private:

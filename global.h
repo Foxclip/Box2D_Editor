@@ -5,3 +5,4 @@
 extern sf::RenderWindow window;
 extern sf::RenderTexture world_texture;
 extern sf::RenderTexture ui_texture;
+extern sf::RenderTexture selection_mask;

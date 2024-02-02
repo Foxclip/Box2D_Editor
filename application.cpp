@@ -30,6 +30,8 @@ void Application::init() {
     world_texture.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_world);
     sf::ContextSettings cs_ui;
     ui_texture.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_ui);
+    sf::ContextSettings cs_mask;
+    selection_mask.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_mask);
     window_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -258,6 +260,8 @@ void Application::process_input() {
             world_texture.create(event.size.width, event.size.height, cs_world);
             sf::ContextSettings cs_ui;
             ui_texture.create(event.size.width, event.size.height, cs_ui);
+            sf::ContextSettings cs_mask;
+            selection_mask.create(event.size.width, event.size.height, cs_mask);
         }
         process_keyboard_event(event);
         process_mouse_event(event);
@@ -572,8 +576,12 @@ void Application::render_world() {
     world_view.setSize(world_texture.getSize().x / zoomFactor, -1.0f * world_texture.getSize().y / zoomFactor);
     world_texture.setView(world_view);
 
+    selection_mask.clear();
+    selection_mask.setView(world_view);
+
     for (int i = 0; i < game_objects.size(); i++) {
         game_objects[i]->render(world_texture);
+        game_objects[i]->renderMask(selection_mask);
     }
 
     world_texture.display();
@@ -583,6 +591,10 @@ void Application::render_world() {
     desat_shader.setUniform("vcenter", WORLD_COLOR_SCALE_CENTER);
     desat_shader.setUniform("vpercent", WORLD_COLOR_SCALE_PERCENT);
     window.draw(world_sprite, &desat_shader);
+
+    selection_mask.display();
+    sf::Sprite selection_sprite(selection_mask.getTexture());
+    window.draw(selection_sprite);
 }
 
 void Application::render_ui() {
