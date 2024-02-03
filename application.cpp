@@ -480,15 +480,12 @@ void Application::process_left_click() {
         return;
     }
     if (selected_tool == &select_tool) {
-        GameObject* old_object = select_tool.selected_object;
-        GameObject* new_object = get_object_at(mousePos);
-        if (old_object) {
-            old_object->selected = false;
+        GameObject* object = get_object_at(mousePos);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+            select_tool.toggleSelect(object);
+        } else {
+            select_tool.selectSingleObject(object);
         }
-        if (new_object) {
-            new_object->selected = true;
-        }
-        select_tool.selected_object = new_object;
     } else if (selected_tool == &create_tool) {
         switch (create_tool.type) {
             case CreateTool::BOX:
@@ -600,15 +597,15 @@ void Application::render_world() {
     selection_mask.clear();
     selection_mask.setView(world_view);
 
-    for (int i = 0; i < game_objects.size(); i++) {
+    for (size_t i = 0; i < game_objects.size(); i++) {
         GameObject* gameobject = game_objects[i].get();
         gameobject->render(world_texture);
     }
     if (select_tool.hover_object) {
         select_tool.hover_object->renderMask(selection_mask, false);
     }
-    if (select_tool.selected_object) {
-        select_tool.selected_object->renderMask(selection_mask, false);
+    for (size_t i = 0; i < select_tool.selected_objects.size(); i++) {
+        select_tool.selected_objects[i]->renderMask(selection_mask, false);
     }
 
     world_texture.display();

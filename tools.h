@@ -38,9 +38,13 @@ private:
 class SelectTool : public Tool {
 public:
 	GameObject* hover_object = nullptr;
-	GameObject* selected_object = nullptr;
+	std::vector<GameObject*> selected_objects;
 
 	SelectTool();
+	void selectSingleObject(GameObject* object);
+	void addToSelection(GameObject* object);
+	void toggleSelect(GameObject* object);
+	void clearSelected();
 	void reset();
 
 private:

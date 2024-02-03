@@ -101,4 +101,9 @@ namespace utils {
 		return std::to_string(vec.x) + " " + std::to_string(vec.y);
 	}
 
+	template <typename T, typename U>
+	void remove_by_value(T& vec, const U& val) {
+		vec.erase(std::remove(vec.begin(), vec.end(), val), vec.end());
+	}
+
 }

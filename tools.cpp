@@ -99,5 +99,38 @@ SelectTool::SelectTool() {
 }
 
 void SelectTool::reset() {
-    selected_object = nullptr;
+    clearSelected();
+}
+
+void SelectTool::clearSelected() {
+    for (size_t i = 0; i < selected_objects.size(); i++) {
+        if (selected_objects[i]) {
+            selected_objects[i]->selected = false;
+        }
+    }
+    selected_objects = std::vector<GameObject*>();
+}
+
+void SelectTool::selectSingleObject(GameObject* object) {
+    clearSelected();
+    addToSelection(object);
+}
+
+void SelectTool::addToSelection(GameObject* object) {
+    if (object) {
+        object->selected = true;
+        selected_objects.push_back(object);
+    }
+}
+
+void SelectTool::toggleSelect(GameObject* object) {
+    if (object) {
+        if (object->selected) {
+            object->selected = false;
+            utils::remove_by_value(selected_objects, object);
+        } else {
+            object->selected = true;
+            selected_objects.push_back(object);
+        }
+    }
 }
