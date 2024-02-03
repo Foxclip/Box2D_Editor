@@ -508,10 +508,9 @@ void Application::process_left_click() {
             drag_tool.mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
         }
     } else if (selected_tool == &move_tool) {
-        b2Fixture* fixture = get_fixture_at(mousePos);
-        if (fixture) {
-            b2Body* body = fixture->GetBody();
-            GameObject* gameobject = get_gameobject(body);
+        GameObject* gameobject = get_object_at(mousePos);
+        if (gameobject) {
+            b2Body* body = gameobject->rigid_body;
             move_tool.object_was_enabled = body->IsEnabled();
             move_tool.offset = b2MousePosWorld - body->GetPosition();
             gameobject->setEnabled(false, true);
@@ -520,10 +519,9 @@ void Application::process_left_click() {
             move_tool.object = gameobject;
         }
     } else if (selected_tool == &rotate_tool) {
-        b2Fixture* fixture = get_fixture_at(mousePos);
-        if (fixture) {
-            b2Body* body = fixture->GetBody();
-            GameObject* gameobject = get_gameobject(body);
+        GameObject* gameobject = get_object_at(mousePos);
+        if (gameobject) {
+            b2Body* body = gameobject->rigid_body;
             rotate_tool.object_was_enabled = body->IsEnabled();
             b2Vec2 mouse_vector = b2MousePosWorld - body->GetPosition();
             float mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
