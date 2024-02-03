@@ -16,6 +16,16 @@ const float NEW_BALL_RADIUS = 0.5f;
 const sf::Color NEW_BALL_COLOR = sf::Color(0, 255, 0);
 const sf::Color NEW_BALL_NOTCH_COLOR = sf::Color(0, 64, 0);
 
+class RectangleSelect {
+public:
+	bool active = false;
+	sf::Vector2f select_origin = sf::Vector2f(0.0f, 0.0f);
+	sf::RectangleShape select_rect;
+
+	RectangleSelect();
+	void reset();
+};
+
 // add new tool:
 //     create class inherited from Tool in tools.h
 //     add extern global variable at the end of tools.h
@@ -39,6 +49,7 @@ class SelectTool : public Tool {
 public:
 	GameObject* hover_object = nullptr;
 	std::vector<GameObject*> selected_objects;
+	RectangleSelect rectangle_select;
 
 	SelectTool();
 	void selectSingleObject(GameObject* object);
@@ -103,14 +114,12 @@ public:
 	int highlighted_vertex = -1;
 	int highlighted_edge = -1;
 	int edge_vertex = -1;
-	bool selection = false;
-	sf::Vector2f select_origin = sf::Vector2f(0.0f, 0.0f);
 	b2Vec2 grabbed_vertex_offset = b2Vec2(0.0f, 0.0f);
 	b2Vec2 insertVertexPos = b2Vec2(0.0f, 0.0f);
+	RectangleSelect rectangle_select;
 	sf::RectangleShape vertex_highlight_rect;
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
-	sf::RectangleShape select_rect;
 	ContainerWidget* edit_window_widget = nullptr;
 
 	EditTool();

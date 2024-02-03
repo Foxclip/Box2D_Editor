@@ -389,8 +389,8 @@ void Application::process_mouse_event(sf::Event event) {
                     commit_action = true;
                     edit_tool.mode = EditTool::HOVER;
                 }
-                if (edit_tool.selection) {
-                    edit_tool.selection = false;
+                if (edit_tool.rectangle_select.active) {
+                    edit_tool.rectangle_select.active = false;
                     edit_tool.mode = EditTool::HOVER;
                 }
                 break;
@@ -451,8 +451,8 @@ void Application::process_mouse() {
             }
         } else if (selected_tool == &edit_tool) {
             if (edit_tool.mode == EditTool::SELECT) {
-                if (edit_tool.selection) {
-                    select_vertices_in_rect();
+                if (edit_tool.rectangle_select.active) {
+                    select_vertices_in_rect(edit_tool.rectangle_select);
                 }
             } else if (edit_tool.mode == EditTool::MOVE) {
                 if (edit_tool.grabbed_vertex != -1) {
@@ -552,8 +552,8 @@ void Application::process_left_click() {
                 }
             } else {
                 edit_tool.mode = EditTool::SELECT;
-                edit_tool.selection = true;
-                edit_tool.select_origin = sfMousePosWorld;
+                edit_tool.rectangle_select.active = true;
+                edit_tool.rectangle_select.select_origin = sfMousePosWorld;
                 if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     ground->deselectAllVertices();
                 }
@@ -697,11 +697,12 @@ void Application::render_ui() {
             sf::Vector2f vertex_pos = world_to_screenf(ground->getVertexPos(edit_tool.highlighted_vertex));
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
             target.draw(edit_tool.vertex_highlight_rect);
-        } else if (edit_tool.mode == EditTool::SELECT && edit_tool.selection) {
+        } else if (edit_tool.mode == EditTool::SELECT && edit_tool.rectangle_select.active) {
             //selection box
-            edit_tool.select_rect.setPosition(world_to_screenf(edit_tool.select_origin));
-            edit_tool.select_rect.setSize(mousePosf - world_to_screenf(edit_tool.select_origin));
-            target.draw(edit_tool.select_rect);
+            sf::Vector2f pos = world_to_screenf(edit_tool.rectangle_select.select_origin);
+            edit_tool.rectangle_select.select_rect.setPosition(pos);
+            edit_tool.rectangle_select.select_rect.setSize(mousePosf - pos);
+            target.draw(edit_tool.rectangle_select.select_rect);
         }
     }
 
@@ -968,10 +969,10 @@ int Application::mouse_get_edge_vertex() {
     }
 }
 
-void Application::select_vertices_in_rect() {
+void Application::select_vertices_in_rect(const RectangleSelect& rectangle_select) {
     std::vector<int> result;
     sf::Vector2f mpos = sfMousePosWorld;
-    sf::Vector2f origin = edit_tool.select_origin;
+    sf::Vector2f origin = rectangle_select.select_origin;
     float left = std::min(mpos.x, origin.x);
     float top = std::min(mpos.y, origin.y);
     float right = std::max(mpos.x, origin.x);

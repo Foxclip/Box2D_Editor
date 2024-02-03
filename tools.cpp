@@ -66,9 +66,6 @@ EditTool::EditTool() : Tool() {
     vertex_highlight_rect.setOrigin(vertex_highlight_rect.getSize() / 2.0f);
     edge_highlight.setFillColor(sf::Color::Yellow);
     edge_highlight.setOrigin(sf::Vector2f(0.0f, 1.5f));
-    select_rect.setFillColor(sf::Color::Transparent);
-    select_rect.setOutlineThickness(-1.0f);
-    select_rect.setOutlineColor(sf::Color::Yellow);
 }
 
 void EditTool::reset() {
@@ -77,8 +74,7 @@ void EditTool::reset() {
     highlighted_vertex = -1;
     highlighted_edge = -1;
     edge_vertex = -1;
-    selection = false;
-    select_origin = sf::Vector2f(0.0f, 0.0f);
+    rectangle_select.reset();
     grabbed_vertex_offset = b2Vec2(0.0f, 0.0f);
     insertVertexPos = b2Vec2(0.0f, 0.0f);
 }
@@ -101,6 +97,7 @@ SelectTool::SelectTool() {
 void SelectTool::reset() {
     hover_object = nullptr;
     clearSelected();
+    rectangle_select.reset();
 }
 
 void SelectTool::clearSelected() {
@@ -134,4 +131,15 @@ void SelectTool::toggleSelect(GameObject* object) {
             selected_objects.push_back(object);
         }
     }
+}
+
+RectangleSelect::RectangleSelect() {
+    select_rect.setFillColor(sf::Color::Transparent);
+    select_rect.setOutlineThickness(-1.0f);
+    select_rect.setOutlineColor(sf::Color::Yellow);
+}
+
+void RectangleSelect::reset() {
+    active = false;
+    select_origin = sf::Vector2f(0.0f, 0.0f);
 }
