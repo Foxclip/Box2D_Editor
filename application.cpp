@@ -368,6 +368,9 @@ void Application::process_mouse_event(sf::Event event) {
     if (event.type == sf::Event::MouseButtonReleased) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
+                if (select_tool.rectangle_select.active) {
+                    select_tool.rectangle_select.active = false;
+                }
                 if (drag_tool.mouse_joint) {
                     world->DestroyJoint(drag_tool.mouse_joint);
                     drag_tool.mouse_joint = nullptr;
@@ -435,7 +438,11 @@ void Application::process_mouse() {
         }
     }
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        if (selected_tool == &drag_tool) {
+        if (selected_tool == &select_tool) {
+            if (select_tool.rectangle_select.active) {
+                select_objects_in_rect(select_tool.rectangle_select);
+            }
+        } else if (selected_tool == &drag_tool) {
             if (drag_tool.mouse_joint) {
                 drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
             }
@@ -486,6 +493,8 @@ void Application::process_left_click() {
         } else {
             select_tool.selectSingleObject(object);
         }
+        select_tool.rectangle_select.active = true;
+        select_tool.rectangle_select.select_origin = sfMousePosWorld;
     } else if (selected_tool == &create_tool) {
         switch (create_tool.type) {
             case CreateTool::BOX:
@@ -630,8 +639,11 @@ void Application::render_ui() {
     ui_view.setSize(ui_texture.getSize().x, ui_texture.getSize().y);
     ui_texture.setView(ui_view);
     sf::RenderTarget& target = ui_texture;
-
-    if (selected_tool == &drag_tool) {
+    if (selected_tool == &select_tool) {
+        if (select_tool.rectangle_select.active) {
+            render_rectangle_select(target, select_tool.rectangle_select);
+        }
+    } else if (selected_tool == &drag_tool) {
         if (drag_tool.mouse_joint) {
             sf::Vector2f grabbed_point = world_to_screenf(drag_tool.mouse_joint->GetAnchorB());
             draw_line(target, grabbed_point, mousePosf, sf::Color::Yellow);
@@ -699,10 +711,7 @@ void Application::render_ui() {
             target.draw(edit_tool.vertex_highlight_rect);
         } else if (edit_tool.mode == EditTool::SELECT && edit_tool.rectangle_select.active) {
             //selection box
-            sf::Vector2f pos = world_to_screenf(edit_tool.rectangle_select.select_origin);
-            edit_tool.rectangle_select.select_rect.setPosition(pos);
-            edit_tool.rectangle_select.select_rect.setSize(mousePosf - pos);
-            target.draw(edit_tool.rectangle_select.select_rect);
+            render_rectangle_select(target, edit_tool.rectangle_select);
         }
     }
 
@@ -985,6 +994,17 @@ void Application::select_vertices_in_rect(const RectangleSelect& rectangle_selec
             ground->selectVertex(i);
         }
     }
+}
+
+void Application::select_objects_in_rect(const RectangleSelect& rectangle_select) {
+
+}
+
+void Application::render_rectangle_select(sf::RenderTarget& target, RectangleSelect& rectangle_select) {
+    sf::Vector2f pos = world_to_screenf(rectangle_select.select_origin);
+    rectangle_select.select_rect.setPosition(pos);
+    rectangle_select.select_rect.setSize(mousePosf - pos);
+    target.draw(rectangle_select.select_rect);
 }
 
 void Application::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) {
