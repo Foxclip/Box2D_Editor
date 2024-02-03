@@ -479,7 +479,17 @@ void Application::process_left_click() {
     if (Widget::click_blocked) {
         return;
     }
-    if (selected_tool == &create_tool) {
+    if (selected_tool == &select_tool) {
+        GameObject* old_object = select_tool.selected_object;
+        GameObject* new_object = get_object_at(mousePos);
+        if (old_object) {
+            old_object->selected = false;
+        }
+        if (new_object) {
+            new_object->selected = true;
+        }
+        select_tool.selected_object = new_object;
+    } else if (selected_tool == &create_tool) {
         switch (create_tool.type) {
             case CreateTool::BOX:
                 create_box(
@@ -596,6 +606,9 @@ void Application::render_world() {
     }
     if (select_tool.hover_object) {
         select_tool.hover_object->renderMask(selection_mask, false);
+    }
+    if (select_tool.selected_object) {
+        select_tool.selected_object->renderMask(selection_mask, false);
     }
 
     world_texture.display();
