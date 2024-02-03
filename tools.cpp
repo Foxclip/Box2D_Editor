@@ -99,6 +99,7 @@ SelectTool::SelectTool() {
 }
 
 void SelectTool::reset() {
+    hover_object = nullptr;
     clearSelected();
 }
 

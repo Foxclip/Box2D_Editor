@@ -601,9 +601,9 @@ void Application::render_world() {
         GameObject* gameobject = game_objects[i].get();
         gameobject->render(world_texture);
     }
-    if (select_tool.hover_object) {
-        select_tool.hover_object->renderMask(selection_mask, false);
-    }
+    //if (select_tool.hover_object) {
+    //    select_tool.hover_object->renderMask(selection_mask, false);
+    //}
     for (size_t i = 0; i < select_tool.selected_objects.size(); i++) {
         select_tool.selected_objects[i]->renderMask(selection_mask, false);
     }
