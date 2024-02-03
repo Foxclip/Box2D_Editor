@@ -411,14 +411,15 @@ void Application::process_keyboard() {
 
 void Application::process_mouse() {
     if (selected_tool == &select_tool) {
-        b2Fixture* fixture = get_fixture_at(mousePos);
-        if (fixture) {
-            b2Body* body = fixture->GetBody();
-            GameObject* gameobject = get_gameobject(body);
-            select_tool.hover_object = gameobject;
-        } else {
-            select_tool.hover_object = nullptr;
+        GameObject* old_hover = select_tool.hover_object;
+        GameObject* new_hover = get_object_at(mousePos);
+        if (old_hover) {
+            old_hover->hover = false;
         }
+        if (new_hover) {
+            new_hover->hover = true;
+        }
+        select_tool.hover_object = new_hover;
     } else if (selected_tool == &edit_tool) {
         if (edit_tool.mode == EditTool::HOVER) {
             edit_tool.highlighted_vertex = mouse_get_ground_vertex();
@@ -594,9 +595,9 @@ void Application::render_world() {
     for (int i = 0; i < game_objects.size(); i++) {
         GameObject* gameobject = game_objects[i].get();
         gameobject->render(world_texture);
-        if (gameobject == select_tool.hover_object) {
-            gameobject->renderMask(selection_mask);
-        }
+    }
+    if (select_tool.hover_object) {
+        select_tool.hover_object->renderMask(selection_mask, false);
     }
 
     world_texture.display();
@@ -888,6 +889,16 @@ b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
         }
     }
     return nullptr;
+}
+
+GameObject* Application::get_object_at(sf::Vector2i screen_pos) {
+    GameObject* result = nullptr;
+    b2Fixture* fixture = get_fixture_at(mousePos);
+    if (fixture) {
+        b2Body* body = fixture->GetBody();
+        result = get_gameobject(body);
+    }
+    return result;
 }
 
 int Application::mouse_get_ground_vertex() {

@@ -105,6 +105,7 @@ private:
 	sf::Vector2f world_to_screenf(b2Vec2 world_pos);
 	sf::Vector2f world_dir_to_screenf(b2Vec2 world_dir);
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
+	GameObject* get_object_at(sf::Vector2i screen_pos);
 	int mouse_get_ground_vertex();
 	int mouse_get_ground_edge();
 	int mouse_get_edge_vertex();

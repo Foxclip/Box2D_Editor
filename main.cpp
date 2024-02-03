@@ -15,8 +15,8 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
+    // TODO: use get_object_at instead of get_fixture_at
     // TODO: select tool
-    // TODO: incapsulate game_objects list into a class with accessors
     // TODO: set whether object is static or dynamic in edit mode
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars

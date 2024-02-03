@@ -43,6 +43,8 @@ public:
 	std::vector<std::unique_ptr<GameObject>> children;
 	GameObject* parent = nullptr;
 	sf::Color color;
+	bool hover = false;
+	bool selected = false;
 
 	GameObject();
 	~GameObject();
@@ -50,7 +52,7 @@ public:
 	virtual sf::Transformable* getTransformable() = 0;
 	void updateVisual();
 	void render(sf::RenderTarget& target);
-	void renderMask(sf::RenderTarget& mask);
+	void renderMask(sf::RenderTarget& mask, bool include_children);
 	void setVisualPosition(const sf::Vector2f& pos);
 	void setVisualRotation(float angle);
 	void setEnabled(bool enabled, bool include_children);
@@ -168,4 +170,3 @@ private:
 	std::vector<b2Vec2> getPositions();
 	void vertexSet(int index, const b2Vec2& new_pos);
 };
-
