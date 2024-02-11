@@ -2,7 +2,7 @@
 
 WordToken::WordToken() { }
 
-WordToken::WordToken(std::string str, int line) {
+WordToken::WordToken(std::string str, size_t line) {
 	this->str = str;
 	this->line = line;
 }
@@ -12,7 +12,7 @@ TokenReader::TokenReader(std::string& str) {
 	tokens = &internal_tokens;
 }
 
-TokenReader::TokenReader(std::vector<WordToken>* tokens, int pos) {
+TokenReader::TokenReader(std::vector<WordToken>* tokens, ptrdiff_t pos) {
 	this->tokens = tokens;
 	this->pos = pos;
 }
@@ -147,11 +147,11 @@ std::vector<b2Vec2> TokenReader::readb2Vec2Arr() {
 	return result;
 }
 
-WordToken TokenReader::peek(int offset) {
+WordToken TokenReader::peek(ptrdiff_t offset) {
 	return tokens->at(pos + offset);
 }
 
-void TokenReader::move(int offset) {
+void TokenReader::move(ptrdiff_t offset) {
 	pos += offset;
 }
 
@@ -171,7 +171,7 @@ void TokenReader::reset() {
 	fail_state = false;
 }
 
-int TokenReader::getLine(int offset) {
+size_t TokenReader::getLine(ptrdiff_t offset) {
 	return peek(offset).line;
 }
 
@@ -179,8 +179,8 @@ std::vector<WordToken> TokenReader::tokenize(std::string str) {
 	std::vector<WordToken> results;
 	std::string current_word;
 	str += EOF;
-	int current_line = 1;
-	for (int i = 0; i < str.size(); i++) {
+	size_t current_line = 1;
+	for (size_t i = 0; i < str.size(); i++) {
 		char c = str[i];
 		if (isspace(c) || c == EOF) {
 			if (current_word.size() > 0) {
@@ -197,7 +197,7 @@ std::vector<WordToken> TokenReader::tokenize(std::string str) {
 	return results;
 }
 
-bool TokenReader::isValidPos(int position) {
+bool TokenReader::isValidPos(ptrdiff_t position) {
 	return position >= 0 && position < tokens->size();
 }
 
@@ -221,7 +221,7 @@ TokenWriter::TokenWriter(std::string* target, int indent_level) {
 
 TokenWriter& TokenWriter::writeString(std::string value) {
 	std::vector<std::string> lines = utils::splitString(value);
-	for (int i = 0; i < lines.size(); i++) {
+	for (size_t i = 0; i < lines.size(); i++) {
 		std::string str = lines[i];
 		if (str == "\n") {
 			writeNewLine();
@@ -255,7 +255,7 @@ TokenWriter& TokenWriter::writeBool(bool value) {
 }
 
 TokenWriter& TokenWriter::writeFloatArr(std::vector<float> value) {
-	for (int i = 0; i < value.size(); i++) {
+	for (size_t i = 0; i < value.size(); i++) {
 		writeFloat(value[i]);
 	}
 	return *this;

@@ -198,7 +198,7 @@ void Widget::render(sf::RenderTarget& target) {
 	}
 	update();
 	target.draw(getDrawable(), getParentTransform());
-	for (int i = 0; i < children.size(); i++) {
+	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->render(target);
 	}
 }
@@ -325,7 +325,7 @@ void ContainerWidget::update() {
 	Widget::update();
 	sf::FloatRect container_bounds = sf::FloatRect();
 	float next_x = padding, next_y = padding;
-	for (int i = 0; i < children.size(); i++) {
+	for (size_t i = 0; i < children.size(); i++) {
 		Widget* child = children[i].get();
 		child->setAdjustedPosition(next_x, next_y);
 		sf::FloatRect child_bounds = sf::FloatRect(next_x, next_y, child->getWidth(), child->getHeight());

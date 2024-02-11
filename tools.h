@@ -110,10 +110,10 @@ public:
 		MOVE,
 	};
 	EditToolMode mode = HOVER;
-	int grabbed_vertex = -1;
-	int highlighted_vertex = -1;
-	int highlighted_edge = -1;
-	int edge_vertex = -1;
+	ptrdiff_t grabbed_vertex = -1;
+	ptrdiff_t highlighted_vertex = -1;
+	ptrdiff_t highlighted_edge = -1;
+	ptrdiff_t edge_vertex = -1;
 	b2Vec2 grabbed_vertex_offset = b2Vec2(0.0f, 0.0f);
 	b2Vec2 insertVertexPos = b2Vec2(0.0f, 0.0f);
 	RectangleSelect rectangle_select;

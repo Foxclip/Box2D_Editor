@@ -11,15 +11,15 @@
 class WordToken {
 public:
 	WordToken();
-	WordToken(std::string str, int line);
+	WordToken(std::string str, size_t line);
 	std::string str;
-	int line = 0;
+	size_t line = 0;
 };
 
 class TokenReader {
 public:
 	TokenReader(std::string& str);
-	TokenReader(std::vector<WordToken>* tokens, int pos = 0);
+	TokenReader(std::vector<WordToken>* tokens, ptrdiff_t pos = 0);
 	WordToken get();
 	void eat(std::string expected);
 	std::string readString();
@@ -30,21 +30,21 @@ public:
 	sf::Color readColor();
 	b2Vec2 readb2Vec2();
 	std::vector<b2Vec2> readb2Vec2Arr();
-	WordToken peek(int offset = 0);
-	void move(int offset);
+	WordToken peek(ptrdiff_t offset = 0);
+	void move(ptrdiff_t offset);
 	bool eof();
 	bool validRange();
 	bool fail();
 	void reset();
-	int getLine(int offset = 0);
+	size_t getLine(ptrdiff_t offset = 0);
 private:
 	std::vector<WordToken> internal_tokens;
 	std::vector<WordToken>* tokens;
-	int pos = 0;
+	ptrdiff_t pos = 0;
 	bool fail_state = false;
 
 	std::vector<WordToken> tokenize(std::string str);
-	bool isValidPos(int pos);
+	bool isValidPos(ptrdiff_t pos);
 };
 
 class TokenWriter {

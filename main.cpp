@@ -15,7 +15,6 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: Fps counter from SFML_Toy
     // TODO: use size_t and ptrdiff instead of int
     // TODO: logger messages on screen
     // TODO: editing shapes

@@ -12,7 +12,7 @@ namespace utils {
 
 	float to_degrees(float angle);
 	float to_radians(float angle);
-	std::pair<float, float> getCircleVertex(int index, int point_count, float radius, float offset = 0.0f);
+	std::pair<float, float> getCircleVertex(ptrdiff_t index, size_t point_count, float radius, float offset = 0.0f);
 	b2Vec2 tob2(const sf::Vector2f& vec);
 	sf::Vector2f tosf(const b2Vec2& vec);
 	sf::Vector2i to2i(const sf::Vector2f& vec);
@@ -29,7 +29,7 @@ namespace utils {
 	std::string color_to_str(sf::Color color);
 	std::string farr_to_str(std::vector<float>& vec);
 	std::string bool_to_str(bool value);
-	b2Vec2 get_pos(const std::vector<float>& lengths, int i);
+	b2Vec2 get_pos(const std::vector<float>& lengths, ptrdiff_t i);
 	std::vector<std::string> splitString(std::string str);
 	std::string current_time();
 	void extend_bounds(sf::FloatRect& rect1, const sf::FloatRect& rect2);
@@ -81,7 +81,7 @@ namespace utils {
 
 	template <typename T>
 	bool contains_point(const std::vector<T>& polygon, const T& point) {
-		for (int i = 0; i < polygon.size(); i++) {
+		for (size_t i = 0; i < polygon.size(); i++) {
 			T p1 = polygon[i];
 			T p2 = polygon[(i + 1) % polygon.size()];
 			if (!left_side(p1, p2, point)) {
@@ -107,7 +107,7 @@ namespace utils {
 	}
 
 	template<typename T>
-	T calc_new_average(T avg, int n, T new_value) {
+	T calc_new_average(T avg, size_t n, T new_value) {
 		T weight = 1.0 / (n + 1);
 		T sum_weight = 1.0 - weight;
 		avg = sum_weight * avg + weight * new_value;
@@ -117,7 +117,7 @@ namespace utils {
 	template<typename T>
 	T average(const std::vector<T>& vec) {
 		T avg = 0.0;
-		for (int i = 0; i < vec.size(); i++) {
+		for (size_t i = 0; i < vec.size(); i++) {
 			avg = calc_new_average(avg, i, vec[i]);
 		}
 		return avg;

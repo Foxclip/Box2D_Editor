@@ -17,7 +17,7 @@ namespace utils {
 		return RAD_IN_DEG * angle;
 	}
 
-	std::pair<float, float> getCircleVertex(int index, int point_count, float radius, float offset) {
+	std::pair<float, float> getCircleVertex(ptrdiff_t index, size_t point_count, float radius, float offset) {
 		float angle = (float)index / point_count * 2 * std::numbers::pi + offset;
 		float x = std::cos(angle) * radius;
 		float y = std::sin(angle) * radius;
@@ -126,7 +126,7 @@ namespace utils {
 
 	std::string farr_to_str(std::vector<float>& vec) {
 		std::string str;
-		for (int i = 0; i < vec.size(); i++) {
+		for (size_t i = 0; i < vec.size(); i++) {
 			str += std::to_string(vec[i]);
 			if (i < vec.size() - 1) {
 				str += " ";
@@ -139,10 +139,10 @@ namespace utils {
 		return value ? "true" : "false";
 	}
 
-	b2Vec2 get_pos(const std::vector<float>& lengths, int i) {
+	b2Vec2 get_pos(const std::vector<float>& lengths, ptrdiff_t i) {
 		float angle = (float)i / lengths.size() * 2 * b2_pi;
 		b2Vec2 vector = b2Vec2(std::cos(angle), std::sin(angle));
-		int index = i < lengths.size() ? i : i % lengths.size();
+		size_t index = i < lengths.size() ? i : i % lengths.size();
 		b2Vec2 pos = lengths[index] * vector;
 		return pos;
 	}
@@ -151,7 +151,7 @@ namespace utils {
 		std::vector<std::string> results;
 		std::string current_word;
 		str += EOF;
-		for (int i = 0; i < str.size(); i++) {
+		for (size_t i = 0; i < str.size(); i++) {
 			char c = str[i];
 			if (c == '\n' || c == EOF) {
 				if (current_word.size() > 0) {

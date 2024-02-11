@@ -10,7 +10,8 @@ public:
 	Logger& operator<<(const char* value);
 	Logger& operator<<(std::string value);
 	Logger& operator<<(int value);
-	Logger& operator<<(std::size_t value);
+	Logger& operator<<(size_t value);
+	Logger& operator<<(ptrdiff_t value);
 	Logger& operator<<(float value);
 	Logger& operator<<(double value);
 	Logger& operator<<(bool value);
@@ -30,7 +31,8 @@ private:
 	Logger& writeInt(int value);
 	Logger& writeInt(float value);
 	Logger& writeInt(double value);
-	Logger& writeSizet(std::size_t value);
+	Logger& writeSizet(size_t value);
+	Logger& writePtrdifft(ptrdiff_t value);
 	Logger& writeFloat(float value);
 	Logger& writeDouble(double value);
 	Logger& writeBool(bool value);

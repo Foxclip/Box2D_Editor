@@ -31,6 +31,13 @@ Logger& Logger::operator<<(std::size_t value) {
 	return writeSizet(value);
 }
 
+Logger& Logger::operator<<(ptrdiff_t value) {
+	if (!logger.is_active) {
+		return *this;
+	}
+	return writePtrdifft(value);
+}
+
 Logger& Logger::operator<<(float value) {
 	if (!logger.is_active) {
 		return *this;
@@ -59,7 +66,7 @@ void Logger::addIndentLevel(ptrdiff_t level) {
 
 Logger& Logger::writeString(std::string value) {
 	std::vector<std::string> lines = utils::splitString(value);
-	for (int i = 0; i < lines.size(); i++) {
+	for (size_t i = 0; i < lines.size(); i++) {
 		std::string line = lines[i];
 		if (line == "\n") {
 			writeNewLine();
@@ -105,6 +112,10 @@ Logger& Logger::writeInt(double value) {
 }
 
 Logger& Logger::writeSizet(std::size_t value) {
+	return writeString(std::to_string(value));
+}
+
+Logger& Logger::writePtrdifft(ptrdiff_t value) {
 	return writeString(std::to_string(value));
 }
 

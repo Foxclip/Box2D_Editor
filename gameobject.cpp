@@ -24,7 +24,7 @@ void GameObject::updateVisual() {
 }
 
 void GameObject::render(sf::RenderTarget& target) {
-	for (int i = 0; i < children.size(); i++) {
+	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->render(target);
 	}
 	updateVisual();
@@ -33,7 +33,7 @@ void GameObject::render(sf::RenderTarget& target) {
 
 void GameObject::renderMask(sf::RenderTarget& mask, bool include_children) {
 	if (include_children) {
-		for (int i = 0; i < children.size(); i++) {
+		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->renderMask(mask, true);
 		}
 	}
@@ -53,7 +53,7 @@ void GameObject::setVisualRotation(float angle) {
 void GameObject::setEnabled(bool enabled, bool include_children) {
 	rigid_body->SetEnabled(enabled);
 	if (include_children) {
-		for (int i = 0; i < children.size(); i++) {
+		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->setEnabled(enabled, true);
 		}
 	}
@@ -63,7 +63,7 @@ void GameObject::setPosition(const b2Vec2& pos, bool move_children) {
 	b2Vec2 offset = pos - rigid_body->GetPosition();
 	rigid_body->SetTransform(pos, rigid_body->GetAngle());
 	if (move_children) {
-		for (int i = 0; i < children.size(); i++) {
+		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->setPosition(children[i]->rigid_body->GetPosition() + offset, true);
 		}
 	}
@@ -73,7 +73,7 @@ void GameObject::setAngle(float angle, bool rotate_children) {
 	float angle_offset = angle - rigid_body->GetAngle();
 	rigid_body->SetTransform(rigid_body->GetPosition(), angle);
 	if (rotate_children) {
-		for (int i = 0; i < children.size(); i++) {
+		for (size_t i = 0; i < children.size(); i++) {
 			b2Vec2 old_pos = children[i]->rigid_body->GetPosition();
 			b2Vec2 rel_pos = old_pos - rigid_body->GetPosition();
 			float old_child_angle = atan2(rel_pos.y, rel_pos.x);
@@ -92,7 +92,7 @@ void GameObject::setAngle(float angle, bool rotate_children) {
 void GameObject::setLinearVelocity(const b2Vec2& velocity, bool include_children) {
 	rigid_body->SetLinearVelocity(velocity);
 	if (include_children) {
-		for (int i = 0; i < children.size(); i++) {
+		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->setLinearVelocity(velocity, true);
 		}
 	}
@@ -101,7 +101,7 @@ void GameObject::setLinearVelocity(const b2Vec2& velocity, bool include_children
 void GameObject::setAngularVelocity(float velocity, bool include_children) {
 	rigid_body->SetAngularVelocity(velocity);
 	if (include_children) {
-		for (int i = 0; i < children.size(); i++) {
+		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->setAngularVelocity(velocity, true);
 		}
 	}
@@ -110,7 +110,7 @@ void GameObject::setAngularVelocity(float velocity, bool include_children) {
 void GameObject::setType(b2BodyType type, bool include_children) {
 	rigid_body->SetType(type);
 	if (include_children) {
-		for (int i = 0; i < children.size(); i++) {
+		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->setType(type, true);
 		}
 	}
@@ -121,7 +121,7 @@ void GameObject::setDensity(float density, bool include_children) {
 		fixture->SetDensity(density);
 	}
 	if (include_children) {
-		for (int i = 0; i < children.size(); i++) {
+		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->setDensity(density, true);
 		}
 	}
@@ -132,7 +132,7 @@ void GameObject::setFriction(float friction, bool include_children) {
 		fixture->SetFriction(friction);
 	}
 	if (include_children) {
-		for (int i = 0; i < children.size(); i++) {
+		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->setFriction(friction, true);
 		}
 	}
@@ -143,7 +143,7 @@ void GameObject::setRestitution(float restitution, bool include_children) {
 		fixture->SetRestitution(restitution);
 	}
 	if (include_children) {
-		for (int i = 0; i < children.size(); i++) {
+		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->setRestitution(restitution, true);
 		}
 	}
@@ -468,7 +468,7 @@ LineStripShape::LineStripShape(sf::VertexArray& varray) {
 }
 
 void LineStripShape::setLineColor(sf::Color color) {
-	for (int i = 0; i < varray.getVertexCount(); i++) {
+	for (size_t i = 0; i < varray.getVertexCount(); i++) {
 		varray[i].color = color;
 	}
 	line_color = color;
@@ -490,7 +490,7 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 CarObject::CarObject(b2World* world, b2BodyDef def, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
 	rigid_body = world->CreateBody(&def);
 	create_shape(lengths);
-	for (int i = 0; i < wheels.size(); i++) {
+	for (size_t i = 0; i < wheels.size(); i++) {
 		if (wheels[i] > 0.0f) {
 			b2Vec2 wheel_pos = utils::get_pos(lengths, i);
 			create_wheel(wheel_pos, wheels[i]);
@@ -512,14 +512,14 @@ CarObject::CarObject(
 ) {
 	rigid_body = world->CreateBody(&def);
 	create_shape(lengths);
-	for (int i = 0; i < joint_defs.size(); i++) {
+	for (size_t i = 0; i < joint_defs.size(); i++) {
 		b2RevoluteJointDef def = joint_defs[i];
 		def.bodyA = rigid_body;
 		def.bodyB = wheels[i]->rigid_body;
 		b2RevoluteJoint* joint = static_cast<b2RevoluteJoint*>(world->CreateJoint(&def));
 		wheel_joints.push_back(joint);
 	}
-	for (int i = 0; i < wheels.size(); i++) {
+	for (size_t i = 0; i < wheels.size(); i++) {
 		children.push_back(std::move(wheels[i]));
 	}
 	convex_shape->setFillColor(color);
@@ -553,7 +553,7 @@ TokenWriter& CarObject::serialize(TokenWriter& tw) {
 		tw << "wheels" << "\n";
 		{
 			TokenWriterIndent wheels_indent(tw);
-			for (int i = 0; i < children.size(); i++) {
+			for (size_t i = 0; i < children.size(); i++) {
 				children[i]->serialize(tw) << "\n";
 				serializeJoint(tw, wheel_joints[i]) << "\n";
 			}
@@ -616,7 +616,7 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 
 void CarObject::create_shape(std::vector<float> lengths) {
 	convex_shape = std::make_unique<sf::ConvexShape>(lengths.size());
-	for (int i = 0; i < lengths.size(); i++) {
+	for (size_t i = 0; i < lengths.size(); i++) {
 		b2Vec2 vertices[3];
 		vertices[0] = b2Vec2(0.0f, 0.0f);
 		vertices[1] = utils::get_pos(lengths, i);
@@ -651,19 +651,19 @@ void CarObject::create_wheel(b2Vec2 wheel_pos, float radius) {
 	wheel_joints.push_back(wheel_joint);
 }
 
-CircleNotchShape::CircleNotchShape(float radius, int point_count, int notch_segment_count) {
+CircleNotchShape::CircleNotchShape(float radius, size_t point_count, size_t notch_segment_count) {
 	varray_circle = sf::VertexArray(sf::TriangleFan, point_count + 1);
 	varray_notch = sf::VertexArray(sf::TriangleFan, notch_segment_count + 2);
 	float segment_angle = 2 * std::numbers::pi / (float)point_count;
 	float notch_angle = segment_angle * notch_segment_count;
 	float angle_offset = -notch_angle / 2.0f;
 	varray_circle[0] = sf::Vertex(sf::Vector2f(0.0f, 0.0f));
-	for (int i = 0; i < point_count; i++) {
+	for (size_t i = 0; i < point_count; i++) {
 		std::pair<float, float> pair = utils::getCircleVertex(i, point_count, radius, angle_offset);
 		varray_circle[i] = sf::Vertex(sf::Vector2f(pair.first, pair.second));
 	}
 	varray_notch[0] = sf::Vertex(sf::Vector2f(0.0f, 0.0f));
-	for (int i = 0; i < notch_segment_count + 1; i++) {
+	for (size_t i = 0; i < notch_segment_count + 1; i++) {
 		std::pair<float, float> pair = utils::getCircleVertex(i, point_count, radius, angle_offset);
 		varray_notch[i] = sf::Vertex(sf::Vector2f(pair.first, pair.second));
 	}
@@ -678,14 +678,14 @@ const sf::Color& CircleNotchShape::getNotchColor() const {
 }
 
 void CircleNotchShape::setCircleColor(const sf::Color& color) {
-	for (int i = 0; i < varray_circle.getVertexCount(); i++) {
+	for (size_t i = 0; i < varray_circle.getVertexCount(); i++) {
 		varray_circle[i].color = color;
 	}
 	circle_color = color;
 }
 
 void CircleNotchShape::setNotchColor(const sf::Color& color) {
-	for (int i = 0; i < varray_notch.getVertexCount(); i++) {
+	for (size_t i = 0; i < varray_notch.getVertexCount(); i++) {
 		varray_notch[i].color = color;
 	}
 	notch_color = color;
@@ -708,7 +708,7 @@ void CircleNotchShape::drawMask(sf::RenderTarget& mask, sf::RenderStates states)
 GroundObject::GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color) {
 	rigid_body = world->CreateBody(&def);
 	sf::VertexArray drawable_vertices(sf::LinesStrip, p_vertices.size());
-	for (int i = 0; i < p_vertices.size(); i++) {
+	for (size_t i = 0; i < p_vertices.size(); i++) {
 		drawable_vertices[i].position = tosf(p_vertices[i]);
 		GroundVertex gv(p_vertices[i]);
 		vertices.push_back(gv);
@@ -720,9 +720,9 @@ GroundObject::GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
-void GroundObject::moveVertices(const std::vector<int>& index_list, const b2Vec2& offset) {
-	for (int i = 0; i < index_list.size(); i++) {
-		int index = index_list[i];
+void GroundObject::moveVertices(const std::vector<size_t>& index_list, const b2Vec2& offset) {
+	for (size_t i = 0; i < index_list.size(); i++) {
+		size_t index = index_list[i];
 		GroundVertex vertex = vertices[index];
 		vertex.pos += offset;
 		vertex.orig_pos = vertex.pos;
@@ -730,7 +730,7 @@ void GroundObject::moveVertices(const std::vector<int>& index_list, const b2Vec2
 	syncVertices();
 }
 
-void GroundObject::offsetVertex(int index, const b2Vec2& offset, bool sync) {
+void GroundObject::offsetVertex(size_t index, const b2Vec2& offset, bool sync) {
 	vertices[index].pos = vertices[index].orig_pos + offset;
 	if (sync) {
 		syncVertices();
@@ -738,7 +738,7 @@ void GroundObject::offsetVertex(int index, const b2Vec2& offset, bool sync) {
 }
 
 void GroundObject::offsetSelected(const b2Vec2& offset, bool sync) {
-	for (int i = 0; i < vertices.size(); i++) {
+	for (size_t i = 0; i < vertices.size(); i++) {
 		if (vertices[i].selected) {
 			vertices[i].pos = vertices[i].orig_pos + offset;
 		}
@@ -749,29 +749,29 @@ void GroundObject::offsetSelected(const b2Vec2& offset, bool sync) {
 }
 
 void GroundObject::saveOffsets() {
-	for (int i = 0; i < vertices.size(); i++) {
+	for (size_t i = 0; i < vertices.size(); i++) {
 		vertices[i].orig_pos = vertices[i].pos;
 	}
 }
 
-int GroundObject::getVertexCount() {
+size_t GroundObject::getVertexCount() {
 	return vertices.size();
 }
 
-const GroundVertex& GroundObject::getVertex(int index) {
+const GroundVertex& GroundObject::getVertex(size_t index) {
 	return vertices[index];
 }
 
-b2Vec2 GroundObject::getVertexPos(int index) {
+b2Vec2 GroundObject::getVertexPos(size_t index) {
 	return vertices[index].pos;
 }
 
-void GroundObject::setVertexPos(int index, const b2Vec2& new_pos) {
+void GroundObject::setVertexPos(size_t index, const b2Vec2& new_pos) {
 	vertexSet(index, new_pos);
 	syncVertices();
 }
 
-bool GroundObject::tryDeleteVertex(int index) {
+bool GroundObject::tryDeleteVertex(ptrdiff_t index) {
 	if (index < 0) {
 		return false;
 	}
@@ -783,27 +783,27 @@ bool GroundObject::tryDeleteVertex(int index) {
 	return true;
 }
 
-void GroundObject::addVertex(int index, const b2Vec2& pos) {
+void GroundObject::addVertex(size_t index, const b2Vec2& pos) {
 	vertices.insert(vertices.begin() + index, pos);
 	syncVertices();
 }
 
-void GroundObject::selectVertex(int index) {
+void GroundObject::selectVertex(size_t index) {
 	vertices[index].selected = true;
 }
 
-bool GroundObject::isVertexSelected(int index) {
+bool GroundObject::isVertexSelected(size_t index) {
 	return vertices[index].selected;
 }
 
 void GroundObject::selectAllVertices() {
-	for (int i = 0; i < vertices.size(); i++) {
+	for (size_t i = 0; i < vertices.size(); i++) {
 		vertices[i].selected = true;
 	}
 }
 
 void GroundObject::deselectAllVertices() {
-	for (int i = 0; i < vertices.size(); i++) {
+	for (size_t i = 0; i < vertices.size(); i++) {
 		vertices[i].selected = false;
 	}
 }
@@ -826,7 +826,7 @@ TokenWriter& GroundObject::serialize(TokenWriter& tw) {
 		TokenWriterIndent ground_indent(tw);
 		tw << "vertices";
 		b2ChainShape* chain = getShape();
-		for (int i = 0; i < chain->m_count; i++) {
+		for (size_t i = 0; i < chain->m_count; i++) {
 			tw << chain->m_vertices[i];
 		}
 		tw << "\n";
@@ -874,13 +874,13 @@ b2ChainShape* GroundObject::getShape() {
 
 std::vector<b2Vec2> GroundObject::getPositions() {
 	std::vector<b2Vec2> b2vertices(vertices.size());
-	for (int i = 0; i < vertices.size(); i++) {
+	for (size_t i = 0; i < vertices.size(); i++) {
 		b2vertices[i] = vertices[i].pos;
 	}
 	return b2vertices;
 }
 
-void GroundObject::vertexSet(int index, const b2Vec2& new_pos) {
+void GroundObject::vertexSet(size_t index, const b2Vec2& new_pos) {
 	GroundVertex vertex = vertices[index];
 	vertex.pos = new_pos;
 	vertex.orig_pos = vertex.pos;
@@ -896,7 +896,7 @@ void GroundObject::syncVertices() {
 	new_chain.CreateChain(b2vertices.data(), b2vertices.size(), b2vertices.front(), b2vertices.back());
 	b2Fixture* new_fixture = rigid_body->CreateFixture(&new_chain, 1.0f);
 	line_strip_shape->varray = sf::VertexArray(sf::LinesStrip, b2vertices.size());
-	for (int i = 0; i < b2vertices.size(); i++) {
+	for (size_t i = 0; i < b2vertices.size(); i++) {
 		line_strip_shape->varray[i].position = tosf(b2vertices[i]);
 		line_strip_shape->varray[i].color = color;
 	}

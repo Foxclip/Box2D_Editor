@@ -489,7 +489,7 @@ void Application::process_mouse() {
                 }
             } else if (edit_tool.mode == EditTool::MOVE) {
                 if (edit_tool.grabbed_vertex != -1) {
-                    int index = edit_tool.grabbed_vertex;
+                    ptrdiff_t index = edit_tool.grabbed_vertex;
                     const GroundVertex& vertex = ground->getVertex(index);
                     b2Vec2 offset = b2MousePosWorld + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
                     ground->offsetVertex(index, offset, false);
@@ -717,7 +717,7 @@ void Application::render_ui() {
             target.draw(edit_tool.vertex_rect);
         }
         // ground vertices
-        for (int i = 0; i < ground->getVertexCount(); i++) {
+        for (size_t i = 0; i < ground->getVertexCount(); i++) {
             edit_tool.vertex_rect.setPosition(world_to_screenf(ground->getVertexPos(i)));
             bool selected = ground->isVertexSelected(i);
             sf::Color vertex_color = selected ? sf::Color(255, 255, 0) : sf::Color(255, 0, 0);
@@ -725,7 +725,7 @@ void Application::render_ui() {
             target.draw(edit_tool.vertex_rect);
         }
         // ground edge normals
-        for (int i = 0; i < ground->getVertexCount() - 1; i++) {
+        for (size_t i = 0; i < ground->getVertexCount() - 1; i++) {
             sf::Vector2f norm_v1, norm_v2;
             get_screen_normal(ground->getVertexPos(i), ground->getVertexPos(i + 1), norm_v1, norm_v2);
             draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255));
@@ -763,7 +763,7 @@ std::string Application::serialize() {
         tw << "zoom" << zoomFactor << "\n";
     }
     tw << "/camera" << "\n\n";
-    for (int i = 0; i < game_objects.size(); i++) {
+    for (size_t i = 0; i < game_objects.size(); i++) {
         GameObject* gameobject = game_objects[i].get();
         game_objects[i]->serialize(tw);
         if (i < game_objects.size() - 1) {
@@ -927,7 +927,7 @@ b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
     aabb.upperBound = world_pos;
     aabb.lowerBound = world_pos_next;
     world->QueryAABB(&callback, aabb);
-    for (int i = 0; i < callback.fixtures.size(); i++) {
+    for (size_t i = 0; i < callback.fixtures.size(); i++) {
         b2Fixture* fixture = callback.fixtures[i];
         if (fixture->TestPoint(midpoint)) {
             return fixture;
@@ -946,11 +946,11 @@ GameObject* Application::get_object_at(sf::Vector2i screen_pos) {
     return result;
 }
 
-int Application::mouse_get_ground_vertex() {
-    int closest_vertex_i = 0;
+ptrdiff_t Application::mouse_get_ground_vertex() {
+    ptrdiff_t closest_vertex_i = 0;
     sf::Vector2i closest_vertex_pos = world_to_screen(ground->getVertexPos(0));
     int closest_vertex_offset = utils::get_max_offset(closest_vertex_pos, mousePos);
-    for (int i = 1; i < ground->getVertexCount(); i++) {
+    for (size_t i = 1; i < ground->getVertexCount(); i++) {
         sf::Vector2i vertex_pos = world_to_screen(ground->getVertexPos(i));
         float offset = utils::get_max_offset(vertex_pos, mousePos);
         if (offset < closest_vertex_offset) {
@@ -965,8 +965,8 @@ int Application::mouse_get_ground_vertex() {
     return -1;
 }
 
-int Application::mouse_get_ground_edge() {
-    for (int i = 0; i < ground->getVertexCount() - 1; i++) {
+ptrdiff_t Application::mouse_get_ground_edge() {
+    for (size_t i = 0; i < ground->getVertexCount() - 1; i++) {
         b2Vec2 p1 = ground->getVertexPos(i);
         b2Vec2 p2 = ground->getVertexPos(i + 1);
         b2Vec2 dir = p2 - p1;
@@ -991,9 +991,9 @@ int Application::mouse_get_ground_edge() {
     return -1;
 }
 
-int Application::mouse_get_edge_vertex() {
-    int v_start_i = 0;
-    int v_end_i = ground->getVertexCount() - 1;
+ptrdiff_t Application::mouse_get_edge_vertex() {
+    ptrdiff_t v_start_i = 0;
+    ptrdiff_t v_end_i = ground->getVertexCount() - 1;
     sf::Vector2f v_start = world_to_screenf(ground->getVertexPos(v_start_i));
     sf::Vector2f v_end = world_to_screenf(ground->getVertexPos(v_end_i));
     float v_start_dist = utils::get_length(mousePosf - v_start);
@@ -1006,7 +1006,6 @@ int Application::mouse_get_edge_vertex() {
 }
 
 void Application::select_vertices_in_rect(const RectangleSelect& rectangle_select) {
-    std::vector<int> result;
     sf::Vector2f mpos = sfMousePosWorld;
     sf::Vector2f origin = rectangle_select.select_origin;
     float left = std::min(mpos.x, origin.x);
@@ -1016,7 +1015,7 @@ void Application::select_vertices_in_rect(const RectangleSelect& rectangle_selec
     float width = right - left;
     float height = bottom - top;
     sf::FloatRect rect(left, top, width, height);
-    for (int i = 0; i < ground->getVertexCount(); i++) {
+    for (size_t i = 0; i < ground->getVertexCount(); i++) {
         if (utils::contains_point(rect, tosf(ground->getVertexPos(i)))) {
             ground->selectVertex(i);
         }

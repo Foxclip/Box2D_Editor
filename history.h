@@ -32,5 +32,5 @@ private:
 	std::function<std::string(void)> get;
 	std::function<void(std::string)> set;
 	std::vector<HistoryEntry> history;
-	int current = 0;
+	ptrdiff_t current = 0;
 };

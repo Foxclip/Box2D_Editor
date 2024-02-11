@@ -18,7 +18,7 @@ private:
 
 class CircleNotchShape : public sf::Drawable, public sf::Transformable {
 public:
-	explicit CircleNotchShape(float radius, int point_count, int notch_segment_count);
+	explicit CircleNotchShape(float radius, size_t point_count, size_t notch_segment_count);
 	const sf::Color& getCircleColor() const;
 	const sf::Color& getNotchColor() const;
 	void setCircleColor(const sf::Color& color);
@@ -143,18 +143,18 @@ private:
 class GroundObject : public GameObject {
 public:
 	GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
-	void moveVertices(const std::vector<int>& index_list, const b2Vec2& offset);
-	void offsetVertex(int index, const b2Vec2& offset, bool sync = true);
+	void moveVertices(const std::vector<size_t>& index_list, const b2Vec2& offset);
+	void offsetVertex(size_t index, const b2Vec2& offset, bool sync = true);
 	void offsetSelected(const b2Vec2& offset, bool sync = true);
 	void saveOffsets();
-	int getVertexCount();
-	const GroundVertex& getVertex(int index);
-	b2Vec2 getVertexPos(int index);
-	void setVertexPos(int index, const b2Vec2& new_pos);
-	bool tryDeleteVertex(int index);
-	void addVertex(int index, const b2Vec2& pos);
-	void selectVertex(int index);
-	bool isVertexSelected(int index);
+	size_t getVertexCount();
+	const GroundVertex& getVertex(size_t index);
+	b2Vec2 getVertexPos(size_t index);
+	void setVertexPos(size_t index, const b2Vec2& new_pos);
+	bool tryDeleteVertex(ptrdiff_t index);
+	void addVertex(size_t index, const b2Vec2& pos);
+	void selectVertex(size_t index);
+	bool isVertexSelected(size_t index);
 	void selectAllVertices();
 	void deselectAllVertices();
 	void syncVertices();
@@ -168,5 +168,5 @@ private:
 	std::unique_ptr<LineStripShape> line_strip_shape;
 	b2ChainShape* getShape();
 	std::vector<b2Vec2> getPositions();
-	void vertexSet(int index, const b2Vec2& new_pos);
+	void vertexSet(size_t index, const b2Vec2& new_pos);
 };
