@@ -32,6 +32,21 @@ public:
 	bool ReportFixture(b2Fixture* fixture);
 };
 
+class FpsCounter {
+public:
+	void init();
+	void frameBegin();
+	int frameEnd();
+	int getFps();
+
+private:
+	std::chrono::steady_clock::time_point t1;
+	std::chrono::steady_clock::time_point t2;
+	std::vector<double> frame_times;
+	std::chrono::steady_clock::time_point last_fps_time;
+	int fps = 0;
+};
+
 class Application {
 
 public:
@@ -55,6 +70,10 @@ private:
 	ContainerWidget* paused_rect_widget;
 	ContainerWidget* toolbox_widget;
 	Tool* selected_tool = nullptr;
+	sf::Font fps_font;
+	FpsCounter fps_counter;
+	ContainerWidget* fps_widget;
+	TextWidget* fps_text_widget;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;

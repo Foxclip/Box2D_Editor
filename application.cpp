@@ -82,6 +82,10 @@ void Application::init_ui() {
     if (!ui_font.loadFromFile(ui_font_filename)) {
         throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
     }
+    std::string fps_font_filename = "fraps.ttf";;
+    if (!fps_font.loadFromFile(fps_font_filename)) {
+        throw std::runtime_error("Font loading error (" + fps_font_filename + ")");
+    }
     root_widget.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
     root_widget.setFillColor(sf::Color::Transparent);
     {
@@ -197,6 +201,24 @@ void Application::init_ui() {
         }
         root_widget.addChild(std::move(paused_rect_uptr));
     }
+    {
+        std::unique_ptr<ContainerWidget> fps_uptr = std::make_unique<ContainerWidget>();
+        fps_widget = fps_uptr.get();
+        fps_widget->setFillColor(sf::Color::Yellow);
+        fps_widget->setOrigin(Widget::TOP_LEFT);
+        fps_widget->setPosition(120.0f, 0.0f);
+        fps_widget->setPadding(0.0f);
+        {
+            std::unique_ptr<TextWidget> fps_text_uptr = std::make_unique<TextWidget>();
+            fps_text_widget = fps_text_uptr.get();
+            fps_text_widget->setFont(fps_font);
+            fps_text_widget->setCharacterSize(32);
+            fps_text_widget->setFillColor(sf::Color::Black);
+            fps_text_widget->setOrigin(Widget::TOP_LEFT);
+            fps_widget->addChild(std::move(fps_text_uptr));
+        }
+        root_widget.addChild(std::move(fps_uptr));
+    }
 }
 
 void Application::init_objects() {
@@ -233,11 +255,15 @@ void Application::init_objects() {
 }
 
 void Application::main_loop() {
+    fps_counter.init();
     while (window.isOpen()) {
+        fps_counter.frameBegin();
         process_widgets();
         process_input();
         process_world();
         render();
+        int fps = fps_counter.frameEnd();
+        fps_text_widget->setString(std::to_string(fps));
     }
 }
 
@@ -1079,3 +1105,30 @@ GroundObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertice
     return ptr;
 }
 
+void FpsCounter::init() {
+    last_fps_time = std::chrono::high_resolution_clock::now();
+}
+
+void FpsCounter::frameBegin() {
+    t1 = std::chrono::high_resolution_clock::now();
+}
+
+int FpsCounter::frameEnd() {
+    t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> frame_time = t2 - t1;
+    std::chrono::duration<double> fps_time = t2 - last_fps_time;
+    if (fps_time.count() >= 1.0) {
+        if (frame_times.size() > 0) {
+            double average_frame_time = utils::average(frame_times);
+            fps = 1.0 / average_frame_time;
+            frame_times.clear();
+        }
+        last_fps_time = t2;
+    }
+    frame_times.push_back(frame_time.count());
+    return fps;
+}
+
+int FpsCounter::getFps() {
+    return fps;
+}

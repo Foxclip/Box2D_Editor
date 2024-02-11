@@ -106,4 +106,21 @@ namespace utils {
 		vec.erase(std::remove(vec.begin(), vec.end(), val), vec.end());
 	}
 
+	template<typename T>
+	T calc_new_average(T avg, int n, T new_value) {
+		T weight = 1.0 / (n + 1);
+		T sum_weight = 1.0 - weight;
+		avg = sum_weight * avg + weight * new_value;
+		return avg;
+	}
+
+	template<typename T>
+	T average(const std::vector<T>& vec) {
+		T avg = 0.0;
+		for (int i = 0; i < vec.size(); i++) {
+			avg = calc_new_average(avg, i, vec[i]);
+		}
+		return avg;
+	}
+
 }
