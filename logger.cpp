@@ -88,7 +88,9 @@ Logger& Logger::writeToLineBuffer(std::string value) {
 
 Logger& Logger::writeNewLine() {
 	std::string current_time = utils::current_time();
-	total_buffer += "[" + current_time + "] " + line_buffer + "\n";
+	std::string line = "[" + current_time + "] " + line_buffer + "\n";
+	total_buffer += line;
+	OnLineWrite(line);
 	if (autoflush) {
 		flush();
 	}

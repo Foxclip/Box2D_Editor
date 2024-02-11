@@ -74,6 +74,8 @@ private:
 	FpsCounter fps_counter;
 	ContainerWidget* fps_widget;
 	TextWidget* fps_text_widget;
+	RectangleWidget* logger_widget;
+	TextWidget* logger_text_widget;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;

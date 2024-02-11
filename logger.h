@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <functional>
 #include "utils.h"
 
 class Logger {
@@ -15,6 +16,7 @@ public:
 	Logger& operator<<(float value);
 	Logger& operator<<(double value);
 	Logger& operator<<(bool value);
+	std::function<void(std::string line)> OnLineWrite = [](std::string line) { };
 
 private:
 	std::string line_buffer;

@@ -22,6 +22,7 @@ class History {
 public:
 	History();
 	History(std::function<std::string(void)> get, std::function<void(std::string)> set);
+	size_t size();
 	void save(HistoryEntry::Type type);
 	void undo();
 	void redo();

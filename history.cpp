@@ -8,6 +8,10 @@ History::History(std::function<std::string(void)> get, std::function<void(std::s
     current = -1;
 }
 
+size_t History::size() {
+    return history.size();
+}
+
 void History::save(HistoryEntry::Type type) {
     if (current < history.size()) {
         history.erase(history.begin() + current + 1, history.end());
@@ -53,9 +57,9 @@ HistoryEntry& History::getCurrent() {
 
 std::string HistoryEntry::typeToStr(Type type) {
     switch (type) {
-    case HistoryEntry::BASE: return "base"; break;
-    case HistoryEntry::NORMAL: return "normal"; break;
-    case HistoryEntry::QUICKLOAD: return "quickload"; break;
+        case HistoryEntry::BASE: return "base"; break;
+        case HistoryEntry::NORMAL: return "normal"; break;
+        case HistoryEntry::QUICKLOAD: return "quickload"; break;
     }
 }
 

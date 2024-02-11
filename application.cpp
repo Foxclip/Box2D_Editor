@@ -44,6 +44,9 @@ void Application::init() {
     init_tools();
     init_world();
     init_ui();
+    logger.OnLineWrite = [&](std::string line) { // should be after init_ui and preferably before any logging
+        logger_text_widget->setString(line);
+    };
     init_objects();
     try_select_tool(0); // should be after init_tools and init_ui
     select_create_type(0);
@@ -53,11 +56,13 @@ void Application::init() {
     auto setter = [&](std::string str) { deserialize(str, false); };
     history = History(getter, setter);
     history.save(HistoryEntry::BASE);
+
     assert(tools.size() > 0);
     assert(selected_tool);
     for (size_t i = 0; i < tools.size(); i++) {
         assert(tools[i]->widget);
     }
+    assert(history.size() == 1);
 }
 
 void Application::start() {
@@ -218,6 +223,25 @@ void Application::init_ui() {
             fps_widget->addChild(std::move(fps_text_uptr));
         }
         root_widget.addChild(std::move(fps_uptr));
+    }
+    {
+        std::unique_ptr<RectangleWidget> logger_uptr = std::make_unique<RectangleWidget>();
+        logger_widget = logger_uptr.get();
+        logger_widget->setFillColor(sf::Color(0, 0, 0));
+        logger_widget->setSize(sf::Vector2f(500.0f, 20.0f));
+        logger_widget->setOrigin(Widget::BOTTOM_LEFT);
+        logger_widget->setParentAnchor(Widget::BOTTOM_LEFT);
+        {
+            std::unique_ptr<TextWidget> logger_text_uptr = std::make_unique<TextWidget>();
+            logger_text_widget = logger_text_uptr.get();
+            logger_text_widget->setFont(ui_font);
+            logger_text_widget->setCharacterSize(15);
+            logger_text_widget->setFillColor(sf::Color::White);
+            logger_text_widget->setOrigin(Widget::TOP_LEFT);
+            logger_text_widget->setString("Logger message");
+            logger_widget->addChild(std::move(logger_text_uptr));
+        }
+        root_widget.addChild(std::move(logger_uptr));
     }
 }
 
@@ -832,12 +856,14 @@ void Application::deserialize(std::string str, bool set_camera) {
 void Application::save(std::string filename) {
     std::string str = serialize();
     utils::str_to_file(str, filename);
+    logger << "Saved to " << filename << "\n";
 }
 
 void Application::load(std::string filename) {
     try {
         std::string str = utils::file_to_str(filename);
         deserialize(str, true);
+        logger << "Loaded from " << filename << "\n";
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": " + filename + ": " + std::string(exc.what()));
     }
