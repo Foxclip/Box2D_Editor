@@ -15,8 +15,9 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: Tokenizer: indent with indent object
     // TODO: Fps counter from SFML_Toy
+    // TODO: use size_t and ptrdiff instead of int
+    // TODO: logger messages on screen
     // TODO: editing shapes
     // TODO: select tool rectangle select
     // TODO: set whether object is static or dynamic in edit mode

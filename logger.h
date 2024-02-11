@@ -54,7 +54,7 @@ protected:
 
 class LoggerIndent : public LoggerControl {
 public:
-	LoggerIndent(ptrdiff_t indent_level = 1);
+	LoggerIndent(ptrdiff_t indent = 1);
 	~LoggerIndent();
 	void close();
 

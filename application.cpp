@@ -731,10 +731,11 @@ std::string Application::serialize() {
     std::string str;
     TokenWriter tw(&str);
     tw << "camera\n";
-    tw.addIndentLevel(1);
-    tw << "center" << viewCenterX << viewCenterY << "\n";
-    tw << "zoom" << zoomFactor << "\n";
-    tw.addIndentLevel(-1);
+    {
+        TokenWriterIndent camera_indent(tw);
+        tw << "center" << viewCenterX << viewCenterY << "\n";
+        tw << "zoom" << zoomFactor << "\n";
+    }
     tw << "/camera" << "\n\n";
     for (int i = 0; i < game_objects.size(); i++) {
         GameObject* gameobject = game_objects[i].get();

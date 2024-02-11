@@ -151,20 +151,22 @@ void GameObject::setRestitution(float restitution, bool include_children) {
 
 TokenWriter& GameObject::serializeBody(TokenWriter& tw, b2Body* body) {
 	tw << "body" << "\n";
-	tw.addIndentLevel(1);
-	tw.writeStringParam("type", utils::body_type_to_str(body->GetType()));
-	tw.writeb2Vec2Param("position", body->GetPosition());
-	tw.writeFloatParam("angle", body->GetAngle());
-	tw.writeb2Vec2Param("linear_velocity", body->GetLinearVelocity());
-	tw.writeFloatParam("angular_velocity", body->GetAngularVelocity());
-	tw << "fixtures" << "\n";
-	tw.addIndentLevel(1);
-	for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
-		serializeFixture(tw, fixture) << "\n";
+	{
+		TokenWriterIndent body_indent(tw);
+		tw.writeStringParam("type", utils::body_type_to_str(body->GetType()));
+		tw.writeb2Vec2Param("position", body->GetPosition());
+		tw.writeFloatParam("angle", body->GetAngle());
+		tw.writeb2Vec2Param("linear_velocity", body->GetLinearVelocity());
+		tw.writeFloatParam("angular_velocity", body->GetAngularVelocity());
+		tw << "fixtures" << "\n";
+		{
+			TokenWriterIndent fixtures_indent(tw);
+			for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+				serializeFixture(tw, fixture) << "\n";
+			}
+		}
+		tw << "/fixtures" << "\n";
 	}
-	tw.addIndentLevel(-1);
-	tw << "/fixtures" << "\n";
-	tw.addIndentLevel(-1);
 	tw << "/body";
 	return tw;
 }
@@ -210,11 +212,12 @@ BodyDef GameObject::deserializeBody(TokenReader& tr) {
 
 TokenWriter& GameObject::serializeFixture(TokenWriter& tw, b2Fixture* fixture) {
 	tw << "fixture" << "\n";
-	tw.addIndentLevel(1);
-	tw.writeFloatParam("density", fixture->GetDensity());
-	tw.writeFloatParam("friction", fixture->GetFriction());
-	tw.writeFloatParam("restitution", fixture->GetRestitution());
-	tw.addIndentLevel(-1);
+	{
+		TokenWriterIndent fixture_indent(tw);
+		tw.writeFloatParam("density", fixture->GetDensity());
+		tw.writeFloatParam("friction", fixture->GetFriction());
+		tw.writeFloatParam("restitution", fixture->GetRestitution());
+	}
 	tw << "/fixture";
 	return tw;
 }
@@ -256,17 +259,18 @@ TokenWriter& GameObject::serializeJoint(TokenWriter& tw, b2Joint* p_joint) {
 
 TokenWriter& GameObject::serializeRevoluteJoint(TokenWriter& tw, b2RevoluteJoint* joint) {
 	tw << "joint revolute" << "\n";
-	tw.addIndentLevel(1);
-	tw.writeb2Vec2Param("anchor_a", joint->GetLocalAnchorA());
-	tw.writeb2Vec2Param("anchor_b", joint->GetLocalAnchorB());
-	tw.writeBoolParam("collide_connected", joint->GetCollideConnected());
-	tw.writeFloatParam("angle_lower_limit", joint->GetLowerLimit());
-	tw.writeFloatParam("angle_upper_limit", joint->GetUpperLimit());
-	tw.writeBoolParam("angle_limit_enabled", joint->IsLimitEnabled());
-	tw.writeFloatParam("motor_max_torque", joint->GetMaxMotorTorque());
-	tw.writeFloatParam("motor_speed", joint->GetMotorSpeed());
-	tw.writeBoolParam("motor_enabled", joint->IsMotorEnabled());
-	tw.addIndentLevel(-1);
+	{
+		TokenWriterIndent joint_indent(tw);
+		tw.writeb2Vec2Param("anchor_a", joint->GetLocalAnchorA());
+		tw.writeb2Vec2Param("anchor_b", joint->GetLocalAnchorB());
+		tw.writeBoolParam("collide_connected", joint->GetCollideConnected());
+		tw.writeFloatParam("angle_lower_limit", joint->GetLowerLimit());
+		tw.writeFloatParam("angle_upper_limit", joint->GetUpperLimit());
+		tw.writeBoolParam("angle_limit_enabled", joint->IsLimitEnabled());
+		tw.writeFloatParam("motor_max_torque", joint->GetMaxMotorTorque());
+		tw.writeFloatParam("motor_speed", joint->GetMotorSpeed());
+		tw.writeBoolParam("motor_enabled", joint->IsMotorEnabled());
+	}
 	tw << "/joint";
 	return tw;
 }
@@ -338,11 +342,12 @@ void BoxObject::drawMask(sf::RenderTarget& mask) {
 
 TokenWriter& BoxObject::serialize(TokenWriter& tw) {
 	tw << "object box" << "\n";
-	tw.addIndentLevel(1);
-	tw.writeb2Vec2Param("size", size);
-	tw.writeColorParam("color", color);
-	serializeBody(tw, rigid_body) << "\n";
-	tw.addIndentLevel(-1);
+	{
+		TokenWriterIndent box_indent(tw);
+		tw.writeb2Vec2Param("size", size);
+		tw.writeColorParam("color", color);
+		serializeBody(tw, rigid_body) << "\n";
+	}
 	tw << "/object";
 	return tw;
 }
@@ -406,12 +411,13 @@ void BallObject::drawMask(sf::RenderTarget& mask) {
 
 TokenWriter& BallObject::serialize(TokenWriter& tw) {
 	tw << "object ball" << "\n";
-	tw.addIndentLevel(1);
-	tw.writeFloatParam("radius", radius);
-	tw.writeColorParam("color", color);
-	tw.writeColorParam("notch_color", notch_color);
-	serializeBody(tw, rigid_body) << "\n";
-	tw.addIndentLevel(-1);
+	{
+		TokenWriterIndent ball_indent(tw);
+		tw.writeFloatParam("radius", radius);
+		tw.writeColorParam("color", color);
+		tw.writeColorParam("notch_color", notch_color);
+		serializeBody(tw, rigid_body) << "\n";
+	}
 	tw << "/object";
 	return tw;
 }
@@ -539,19 +545,21 @@ void CarObject::drawMask(sf::RenderTarget& mask) {
 
 TokenWriter& CarObject::serialize(TokenWriter& tw) {
 	tw << "object car" << "\n";
-	tw.addIndentLevel(1);
-	tw.writeFloatArrParam("lengths", lengths);
-	tw.writeColorParam("color", color);
-	serializeBody(tw, rigid_body) << "\n";
-	tw << "wheels" << "\n";
-	tw.addIndentLevel(1);
-	for (int i = 0; i < children.size(); i++) {
-		children[i]->serialize(tw) << "\n";
-		serializeJoint(tw, wheel_joints[i]) << "\n";
+	{
+		TokenWriterIndent car_indent(tw);
+		tw.writeFloatArrParam("lengths", lengths);
+		tw.writeColorParam("color", color);
+		serializeBody(tw, rigid_body) << "\n";
+		tw << "wheels" << "\n";
+		{
+			TokenWriterIndent wheels_indent(tw);
+			for (int i = 0; i < children.size(); i++) {
+				children[i]->serialize(tw) << "\n";
+				serializeJoint(tw, wheel_joints[i]) << "\n";
+			}
+		}
+		tw << "/wheels" << "\n";
 	}
-	tw.addIndentLevel(-1);
-	tw << "/wheels" << "\n";
-	tw.addIndentLevel(-1);
 	tw << "/object";
 	return tw;
 }
@@ -814,16 +822,17 @@ void GroundObject::drawMask(sf::RenderTarget& mask) {
 
 TokenWriter& GroundObject::serialize(TokenWriter& tw) {
 	tw << "object ground" << "\n";
-	tw.addIndentLevel(1);
-	tw << "vertices";
-	b2ChainShape* chain = getShape();
-	for (int i = 0; i < chain->m_count; i++) {
-		tw << chain->m_vertices[i];
+	{
+		TokenWriterIndent ground_indent(tw);
+		tw << "vertices";
+		b2ChainShape* chain = getShape();
+		for (int i = 0; i < chain->m_count; i++) {
+			tw << chain->m_vertices[i];
+		}
+		tw << "\n";
+		tw.writeColorParam("color", color);
+		serializeBody(tw, rigid_body) << "\n";
 	}
-	tw << "\n";
-	tw.writeColorParam("color", color);
-	serializeBody(tw, rigid_body) << "\n";
-	tw.addIndentLevel(-1);
 	tw << "/object";
 	return tw;
 }

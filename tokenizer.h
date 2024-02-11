@@ -68,8 +68,6 @@ public:
 	void writeColorParam(std::string name, sf::Color value);
 	void writeb2Vec2Param(std::string name, b2Vec2 value);
 	int getIndentLevel();
-	void setIndentLevel(int indentLevel);
-	void addIndentLevel(int add);
 	std::string toStr();
 
 private:
@@ -79,6 +77,7 @@ private:
 	std::string indent_str;
 	bool new_line = true;
 
+	void addIndentLevel(int add);
 	void updateIndentStr();
 	void writeLine(std::string str);
 	void writeNewLine();
@@ -90,4 +89,26 @@ private:
 	TokenWriter& writeFloatArr(std::vector<float> value);
 	TokenWriter& writeColor(sf::Color value);
 	TokenWriter& writeb2Vec2(b2Vec2 value);
+
+	friend class TokenWriterIndent;
+};
+
+class TokenWriterControl {
+public:
+	virtual void close() = 0;
+
+protected:
+	bool closed = false;
+};
+
+class TokenWriterIndent : public TokenWriterControl {
+public:
+	TokenWriterIndent(TokenWriter& tw, ptrdiff_t indent = 1);
+	~TokenWriterIndent();
+	void close();
+
+private:
+	TokenWriter& tw;
+	ptrdiff_t indent_level;
+
 };

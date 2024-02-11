@@ -307,11 +307,6 @@ int TokenWriter::getIndentLevel() {
 	return indent_level;
 }
 
-void TokenWriter::setIndentLevel(int indentLevel) {
-	this->indent_level = indentLevel;
-	updateIndentStr();
-}
-
 void TokenWriter::addIndentLevel(int add) {
 	indent_level += add;
 	updateIndentStr();
@@ -375,3 +370,19 @@ void TokenWriter::writeNewLine() {
 	new_line = true;
 }
 
+TokenWriterIndent::TokenWriterIndent(TokenWriter& tw, ptrdiff_t indent) : tw(tw) {
+	this->indent_level = indent;
+	tw.addIndentLevel(indent);
+}
+
+TokenWriterIndent::~TokenWriterIndent() {
+	close();
+}
+
+void TokenWriterIndent::close() {
+	if (closed) {
+		return;
+	}
+	tw.addIndentLevel(-indent_level);
+	closed = true;
+}
