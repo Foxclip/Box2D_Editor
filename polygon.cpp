@@ -369,7 +369,6 @@ std::vector<PolygonObject> PolygonObject::cutIntoConvex() {
 		return result;
 	}
 	std::vector<PolygonObject> child_polygons = cutWithBestCut();
-	result.insert(result.end(), child_polygons.begin(), child_polygons.end());
 	for (size_t i = 0; i < child_polygons.size(); i++) {
 		std::vector<PolygonObject> child_children = child_polygons[i].cutIntoConvex();
 		result.insert(result.end(), child_children.begin(), child_children.end());
