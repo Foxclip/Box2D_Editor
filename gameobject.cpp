@@ -492,11 +492,11 @@ CarObject::CarObject(b2World* world, b2BodyDef def, std::vector<float> lengths, 
 	create_shape(lengths);
 	for (size_t i = 0; i < wheels.size(); i++) {
 		if (wheels[i] > 0.0f) {
-			b2Vec2 wheel_pos = utils::get_pos(lengths, i);
+			b2Vec2 wheel_pos = utils::get_pos<b2Vec2>(lengths, i);
 			create_wheel(wheel_pos, wheels[i]);
 		}
 	}
-	convex_shape->setFillColor(color);
+	polygon->setFillColor(color);
 	this->lengths = lengths;
 	this->color = color;
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
@@ -522,25 +522,25 @@ CarObject::CarObject(
 	for (size_t i = 0; i < wheels.size(); i++) {
 		children.push_back(std::move(wheels[i]));
 	}
-	convex_shape->setFillColor(color);
+	polygon->setFillColor(color);
 	this->lengths = lengths;
 	this->color = color;
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
 sf::Drawable* CarObject::getDrawable() {
-	return convex_shape.get();
+	return polygon.get();
 }
 
 sf::Transformable* CarObject::getTransformable() {
-	return convex_shape.get();
+	return polygon.get();
 }
 
 void CarObject::drawMask(sf::RenderTarget& mask) {
-	sf::Color orig_color = convex_shape->getFillColor();
-	convex_shape->setFillColor(sf::Color::White);
-	mask.draw(*convex_shape);
-	convex_shape->setFillColor(orig_color);
+	sf::Color orig_color = polygon->getFillColor();
+	polygon->setFillColor(sf::Color::White);
+	mask.draw(*polygon);
+	polygon->setFillColor(orig_color);
 }
 
 TokenWriter& CarObject::serialize(TokenWriter& tw) {
@@ -615,16 +615,20 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 }
 
 void CarObject::create_shape(std::vector<float> lengths) {
-	convex_shape = std::make_unique<sf::ConvexShape>(lengths.size());
+	polygon = std::make_unique<PolygonObject>(lengths.size());
 	for (size_t i = 0; i < lengths.size(); i++) {
-		b2Vec2 vertices[3];
-		vertices[0] = b2Vec2(0.0f, 0.0f);
-		vertices[1] = utils::get_pos(lengths, i);
-		vertices[2] = utils::get_pos(lengths, i + 1);
-		b2PolygonShape triangle;
-		triangle.Set(vertices, 3);
-		b2Fixture* fixture = rigid_body->CreateFixture(&triangle, 1.0f);
-		convex_shape->setPoint(i, tosf(vertices[1]));
+		polygon->setPoint(i, utils::get_pos<sf::Vector2f>(lengths, i));
+	}
+	polygon->recut();
+	std::vector<PolygonObject> convex_polygons = polygon->getConvexPolygons();
+	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
+		std::vector<b2Vec2> b2points;
+		for (size_t vertex_i = 0; vertex_i < convex_polygons[polygon_i].getPointCount(); vertex_i++) {
+			b2points.push_back(tob2(convex_polygons[polygon_i].getPoint(vertex_i)));
+		}
+		b2PolygonShape b2polygon;
+		b2polygon.Set(b2points.data(), b2points.size());
+		b2Fixture* fixture = rigid_body->CreateFixture(&b2polygon, 1.0f);
 	}
 }
 

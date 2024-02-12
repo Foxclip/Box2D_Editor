@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "box2d/box2d.h"
 #include "tokenizer.h"
+#include "polygon.h"
 
 class LineStripShape : public sf::Drawable, public sf::Transformable {
 public:
@@ -123,7 +124,7 @@ public:
 	static std::unique_ptr<CarObject> deserialize(TokenReader& tr, b2World* world);
 	std::vector<float> lengths;
 private:
-	std::unique_ptr<sf::ConvexShape> convex_shape;
+	std::unique_ptr<PolygonObject> polygon;
 	std::vector<b2RevoluteJoint*> wheel_joints;
 	void create_shape(std::vector<float> lengths);
 	void create_wheel(b2Vec2 wheel_pos, float radius);

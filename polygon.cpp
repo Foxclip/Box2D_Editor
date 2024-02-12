@@ -103,9 +103,26 @@ sf::FloatRect PolygonObject::getGlobalBounds() const {
 	return result;
 }
 
+sf::Color PolygonObject::getFillColor() const {
+	return fill_color;
+}
+
+std::vector<PolygonObject> PolygonObject::getConvexPolygons() const {
+	return convex_polygons;
+}
+
+bool PolygonObject::isConvex() const {
+	for (size_t i = 0; i < getPointCount(); i++) {
+		if (!isConvexVertex(i)) {
+			return false;
+		}
+	}
+	return true;
+}
+
 void PolygonObject::setPoint(size_t index, const sf::Vector2f& point) {
 	assert(index < getPointCount());
-	setPotentialCutsValid(false);
+	setCutsValid(false);
 	varray[index].position = point;
 	if (index == 0) {
 		varray[varray.getVertexCount() - 1].position = point;
@@ -119,6 +136,19 @@ void PolygonObject::setLineColor(const sf::Color& color) {
 		varray[i].color = color;
 	}
 	line_color = color;
+}
+
+void PolygonObject::setFillColor(const sf::Color& color) {
+	fill_color = color;
+	if (is_convex) {
+		for (size_t i = 0; i < triangle_fan.getVertexCount(); i++) {
+			triangle_fan[i].color = color;
+		}
+	} else {
+		for (size_t i = 0; i < convex_polygons.size(); i++) {
+			convex_polygons[i].setFillColor(color);
+		}
+	}
 }
 
 void PolygonObject::drawIndices(sf::RenderTarget& target, const sf::Color& color) const {
@@ -233,7 +263,7 @@ void PolygonObject::calcPotentialCuts() {
 		}
 	}
 	potential_cuts = cuts;
-	setPotentialCutsValid(true);
+	setCutsValid(true);
 	createCutsVarray();
 }
 
@@ -307,7 +337,7 @@ std::vector<PolygonObject> PolygonObject::getCutPolygons(const CutInfo& cut) con
 
 std::vector<PolygonObject> PolygonObject::cutWithBestCut() {
 	std::vector<PolygonObject> result;
-	if (!potential_cuts_valid) {
+	if (!cuts_valid) {
 		calcPotentialCuts();
 	}
 	if (getPotentialCutsCount() == 0) {
@@ -318,6 +348,40 @@ std::vector<PolygonObject> PolygonObject::cutWithBestCut() {
 	result.push_back(new_polygons[0]);
 	result.push_back(new_polygons[1]);
 	return result;
+}
+
+std::vector<PolygonObject> PolygonObject::cutIntoConvex() {
+	std::vector<PolygonObject> result;
+	if (isConvex()) {
+		result.push_back(*this);
+		return result;
+	}
+	std::vector<PolygonObject> child_polygons = cutWithBestCut();
+	result.insert(result.end(), child_polygons.begin(), child_polygons.end());
+	for (size_t i = 0; i < child_polygons.size(); i++) {
+		std::vector<PolygonObject> child_children = child_polygons[i].cutIntoConvex();
+		result.insert(result.end(), child_children.begin(), child_children.end());
+	}
+	return result;
+}
+
+void PolygonObject::recut() {
+	convex_polygons = cutIntoConvex();
+	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
+		PolygonObject& polygon = convex_polygons[polygon_i];
+		polygon.triangle_fan = sf::VertexArray(sf::TriangleFan, polygon.getPointCount() + 2);
+		auto add_vertex = [&](sf::Vector2f pos) {
+			sf::Vertex vertex;
+			vertex.position = pos;
+			vertex.color = fill_color;
+			polygon.triangle_fan.append(vertex);
+		};
+		add_vertex(polygon.getLocalCenter());
+		for (size_t vertex_i = 0; vertex_i < polygon.getPointCount() + 1; vertex_i++) {
+			add_vertex(polygon.getPoint(polygon.indexLoop(vertex_i)));
+		}
+		polygon.is_convex = true;
+	}
 }
 
 PolygonObject PolygonObject::createRect(sf::Vector2f size) {
@@ -331,10 +395,17 @@ PolygonObject PolygonObject::createRect(sf::Vector2f size) {
 
 void PolygonObject::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
+	if (is_convex) {
+		target.draw(triangle_fan, states);
+	} else {
+		for (size_t i = 0; i < convex_polygons.size(); i++) {
+			target.draw(convex_polygons[i], states);
+		}
+	}
 	target.draw(varray, states);
 }
 
-bool PolygonObject::isConvexVertex(size_t index) {
+bool PolygonObject::isConvexVertex(size_t index) const {
 	assert(getPointCount() >= 3);
 	sf::Vector2f v1 = getPoint(indexLoop(index - 1));
 	sf::Vector2f v2 = getPoint(indexLoop(index));
@@ -342,7 +413,7 @@ bool PolygonObject::isConvexVertex(size_t index) {
 	return !utils::left_side(v2, v1, v3);
 }
 
-bool PolygonObject::intersectsEdge(const sf::Vector2f& v1, const sf::Vector2f& v2, size_t& intersect) {
+bool PolygonObject::intersectsEdge(const sf::Vector2f& v1, const sf::Vector2f& v2, size_t& intersect) const {
 	for (size_t i = 0; i < getPointCount(); i++) {
 		sf::Vector2f e1 = getPoint(i);
 		sf::Vector2f e2 = getPoint(indexLoop(i + 1));
@@ -355,12 +426,12 @@ bool PolygonObject::intersectsEdge(const sf::Vector2f& v1, const sf::Vector2f& v
 	return false;
 }
 
-size_t PolygonObject::indexLoop(ptrdiff_t index) {
+size_t PolygonObject::indexLoop(ptrdiff_t index) const {
 	return utils::neg_mod(index, (ptrdiff_t)getPointCount());
 }
 
 void PolygonObject::createCutsVarray() {
-	if (!potential_cuts_valid) {
+	if (!cuts_valid) {
 		return;
 	}
 	cuts_varray = sf::VertexArray(sf::Lines, potential_cuts.size() * 2);
@@ -382,11 +453,12 @@ void PolygonObject::createCutsVarray() {
 	}
 }
 
-void PolygonObject::setPotentialCutsValid(bool value) {
+void PolygonObject::setCutsValid(bool value) {
 	if (value) {
-		potential_cuts_valid = true;
+		cuts_valid = true;
 	} else {
-		potential_cuts_valid = false;
+		cuts_valid = false;
 		cuts_varray = sf::VertexArray();
+		convex_polygons = std::vector<PolygonObject>();
 	}
 }

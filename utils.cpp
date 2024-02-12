@@ -139,14 +139,6 @@ namespace utils {
 		return value ? "true" : "false";
 	}
 
-	b2Vec2 get_pos(const std::vector<float>& lengths, ptrdiff_t i) {
-		float angle = (float)i / lengths.size() * 2 * b2_pi;
-		b2Vec2 vector = b2Vec2(std::cos(angle), std::sin(angle));
-		size_t index = i < lengths.size() ? i : i % lengths.size();
-		b2Vec2 pos = lengths[index] * vector;
-		return pos;
-	}
-
 	std::vector<std::string> splitString(std::string str) {
 		std::vector<std::string> results;
 		std::string current_word;

@@ -50,8 +50,12 @@ public:
 	sf::Vector2f getGlobalCenter() const;
 	sf::FloatRect getLocalBounds() const;
 	sf::FloatRect getGlobalBounds() const;
+	sf::Color getFillColor() const;
+	std::vector<PolygonObject> getConvexPolygons() const;
+	bool isConvex() const;
 	void setPoint(size_t index, const sf::Vector2f& point);
 	void setLineColor(const sf::Color& color);
+	void setFillColor(const sf::Color& color);
 	void drawIndices(sf::RenderTarget& target, const sf::Color& color) const;
 	void calcPotentialCuts();
 	size_t getPotentialCutsCount() const;
@@ -59,17 +63,24 @@ public:
 	CutInfo getBestCut() const;
 	std::vector<PolygonObject> getCutPolygons(const CutInfo& cut) const;
 	std::vector<PolygonObject> cutWithBestCut();
+	std::vector<PolygonObject> cutIntoConvex();
+	void recut();
 	static PolygonObject createRect(sf::Vector2f size);
 private:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	bool isConvexVertex(size_t index);
-	bool intersectsEdge(const sf::Vector2f& v1, const sf::Vector2f& v2, size_t& intersect);
-	size_t indexLoop(ptrdiff_t index);
-	void createCutsVarray();
-	void setPotentialCutsValid(bool value);
 	sf::VertexArray varray;
+	sf::VertexArray triangle_fan;
+	std::vector<PolygonObject> convex_polygons;
 	sf::VertexArray cuts_varray;
 	sf::Color line_color;
+	sf::Color fill_color;
 	std::vector<CutInfo> potential_cuts;
-	bool potential_cuts_valid = false;
+	bool cuts_valid = false;
+	bool is_convex = false;
+
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	bool isConvexVertex(size_t index) const;
+	bool intersectsEdge(const sf::Vector2f& v1, const sf::Vector2f& v2, size_t& intersect) const;
+	size_t indexLoop(ptrdiff_t index) const;
+	void createCutsVarray();
+	void setCutsValid(bool value);
 };

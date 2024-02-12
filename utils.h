@@ -29,11 +29,19 @@ namespace utils {
 	std::string color_to_str(sf::Color color);
 	std::string farr_to_str(std::vector<float>& vec);
 	std::string bool_to_str(bool value);
-	b2Vec2 get_pos(const std::vector<float>& lengths, ptrdiff_t i);
 	std::vector<std::string> splitString(std::string str);
 	std::string current_time();
 	void extend_bounds(sf::FloatRect& rect1, const sf::FloatRect& rect2);
 	void extend_bounds(sf::FloatRect& rect, const sf::Vector2f point);
+
+	template <typename TVec2>
+	TVec2 get_pos(const std::vector<float>& lengths, ptrdiff_t i) {
+		float angle = (float)i / lengths.size() * 2 * b2_pi;
+		TVec2 vector = TVec2(std::cos(angle), std::sin(angle));
+		size_t index = i < lengths.size() ? i : i % lengths.size();
+		TVec2 pos = lengths[index] * vector;
+		return pos;
+	}
 
 	template <typename T>
 	T rot90CCW(const T& vec) {
