@@ -528,6 +528,10 @@ CarObject::CarObject(
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
+PolygonObject* CarObject::getPolygonObject() const {
+	return polygon.get();
+}
+
 sf::Drawable* CarObject::getDrawable() {
 	return polygon.get();
 }

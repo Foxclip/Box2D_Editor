@@ -95,8 +95,14 @@ void Application::init_ui() {
     if (!console_font.loadFromFile(console_font_filename)) {
         throw std::runtime_error("Font loading error (" + console_font_filename + ")");
     }
+
     root_widget.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
     root_widget.setFillColor(sf::Color::Transparent);
+
+    vertex_text.setFont(ui_font);
+    vertex_text.setCharacterSize(20);
+    vertex_text.setFillColor(sf::Color::White);
+
     {
         std::unique_ptr<ContainerWidget> toolbox_widget_uptr = std::make_unique<ContainerWidget>();
         toolbox_widget = toolbox_widget_uptr.get();
@@ -693,6 +699,13 @@ void Application::render_ui() {
     ui_view.setSize(ui_texture.getSize().x, ui_texture.getSize().y);
     ui_texture.setView(ui_view);
     sf::RenderTarget& target = ui_texture;
+
+    for (size_t i = 0; i < game_objects.size(); i++) {
+        if (CarObject* car_object = dynamic_cast<CarObject*>(game_objects[i].get())) {
+            car_object->getPolygonObject()->drawIndices(target, sf::Color::White, 20, true);
+        }
+    }
+
     if (selected_tool == &select_tool) {
         if (select_tool.rectangle_select.active) {
             render_rectangle_select(target, select_tool.rectangle_select);

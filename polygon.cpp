@@ -151,13 +151,25 @@ void PolygonObject::setFillColor(const sf::Color& color) {
 	}
 }
 
-void PolygonObject::drawIndices(sf::RenderTarget& target, const sf::Color& color) const {
+void PolygonObject::drawIndices(
+	sf::RenderTarget& target,
+	const sf::Color& color,
+	unsigned int size,
+	bool include_convex,
+	sf::Transform transform
+) const {
 	for (size_t i = 0; i < getPointCount(); i++) {
-		sf::Vector2f pos = getTransform().transformPoint(getPoint(i));
+		sf::Vector2f pos = transform * getTransform() * getPoint(i);
+		vertex_text.setCharacterSize(size);
 		vertex_text.setString(std::to_string(i));
 		vertex_text.setPosition(world_to_screenf(pos));
 		vertex_text.setFillColor(color);
 		target.draw(vertex_text);
+	}
+	if (include_convex && !is_convex) {
+		for (size_t i = 0; i < convex_polygons.size(); i++) {
+			convex_polygons[i].drawIndices(target, color, size * 0.75f, false, getTransform());
+		}
 	}
 }
 

@@ -1,10 +1,10 @@
 camera
-    center 10.3258629 6.60456991
-    zoom 25
+    center -12.6616573 -2.00634432
+    zoom 51.8400307
 /camera
 
 object ground
-    vertices 25 8 16.1333332 1.51666605 9.13333225 -2.01666498 3.23333097 -3.95000005 -5.93333292 -5.58333302 -19.3000011 -7.91666698
+    vertices 25 8 16.1333332 1.51666605 9.13333225 -2.01666498 3.23333097 -3.95000005 -5.93333292 -5.58333302 -19.3000011 -7.91666698 -23.2324848 2.52498007
     color 255 255 255 255
     body
         type static
@@ -27,10 +27,10 @@ object box
     color 0 255 0 255
     body
         type dynamic
-        position -0.708761394 -4.12524891
-        angle 1.74911582
-        linear_velocity -1.27553833 -0.227277741
-        angular_velocity -2.82684205e-08
+        position -17.0254803 -6.9933362
+        angle 3.31249738
+        linear_velocity 0 0
+        angular_velocity 0
         fixtures
             fixture
                 density 1
@@ -46,10 +46,10 @@ object box
     color 0 255 0 255
     body
         type dynamic
-        position 1.29806697 -3.76952529
-        angle 0.174501523
-        linear_velocity -1.27553833 -0.227277771
-        angular_velocity -1.43964103e-08
+        position -15.0191641 -6.64552355
+        angle 0.170697257
+        linear_velocity 0 0
+        angular_velocity 0
         fixtures
             fixture
                 density 1
@@ -65,10 +65,10 @@ object box
     color 0 255 0 255
     body
         type dynamic
-        position 0.295923263 -3.94809031
-        angle 0.177328914
-        linear_velocity -1.27553844 -0.227277771
-        angular_velocity 9.39683815e-08
+        position -16.0194607 -6.82008886
+        angle 0.170598239
+        linear_velocity 0 0
+        angular_velocity 0
         fixtures
             fixture
                 density 1
@@ -85,10 +85,10 @@ object ball
     notch_color 0 64 0 255
     body
         type dynamic
-        position 2.29286265 -3.60202599
-        angle 61.9054909
-        linear_velocity -1.27553868 -0.227277532
-        angular_velocity 2.59761047
+        position -14.0240555 -6.4830327
+        angle 93.9364243
+        linear_velocity 0 0
+        angular_velocity 0
         fixtures
             fixture
                 density 1
@@ -104,11 +104,16 @@ object car
     color 255 0 0 255
     body
         type dynamic
-        position -0.882866383 15.2863264
-        angle 10.6336279
-        linear_velocity -0.952171922 -3.16454983
-        angular_velocity 2.57934833
+        position -14.8124628 -3.57530951
+        angle 14.3099899
+        linear_velocity 1.78764292e-08 -5.49574786e-09
+        angular_velocity -5.10214582e-09
         fixtures
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
             fixture
                 density 1
                 friction 0.300000012
@@ -148,10 +153,10 @@ object car
             notch_color 64 64 0 255
             body
                 type dynamic
-                position -2.65334439 10.61028
-                angle -427.173218
-                linear_velocity 10.9016857 -8.24510098
-                angular_velocity -7.42066336
+                position -15.6722832 1.35020638
+                angle -542.153198
+                linear_velocity 4.21305124e-08 -3.50454998e-09
+                angular_velocity -10
                 fixtures
                     fixture
                         density 1
@@ -178,10 +183,10 @@ object car
             notch_color 64 64 0 255
             body
                 type dynamic
-                position 4.05196333 16.0912285
-                angle -81.6665344
-                linear_velocity -2.47922039 9.64141083
-                angular_velocity -7.42062235
+                position -18.6481762 -6.78269291
+                angle -80.0089493
+                linear_velocity 6.36293074e-10 1.16774421e-08
+                angular_velocity 1.08327534e-08
                 fixtures
                     fixture
                         density 1
@@ -208,10 +213,10 @@ object car
             notch_color 64 64 0 255
             body
                 type dynamic
-                position -4.04714823 19.1576881
-                angle -374.639221
-                linear_velocity -11.2791157 -10.8900633
-                angular_velocity -7.42064142
+                position -10.116931 -5.29344177
+                angle -377.259399
+                linear_velocity 8.23304713e-09 -3.18482982e-08
+                angular_velocity 0
                 fixtures
                     fixture
                         density 1

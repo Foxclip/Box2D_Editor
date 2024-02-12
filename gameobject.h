@@ -117,6 +117,7 @@ public:
 		std::vector<b2RevoluteJointDef> joint_defs,
 		sf::Color color
 	);
+	PolygonObject* getPolygonObject() const;
 	sf::Drawable* getDrawable();
 	sf::Transformable* getTransformable();
 	void drawMask(sf::RenderTarget& mask);
