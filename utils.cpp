@@ -199,4 +199,23 @@ namespace utils {
 		}
 	}
 
+	void extend_bounds(sf::FloatRect& rect, const sf::Vector2f point) {
+		float rect_right = rect.left + rect.width;
+		float rect_bottom = rect.top + rect.height;
+		if (point.x < rect.left) {
+			rect.width += rect.left - point.x;
+			rect.left = point.x;
+		}
+		if (point.y < rect.top) {
+			rect.height += rect.top - point.y;
+			rect.top = point.y;
+		}
+		if (point.x > rect_right) {
+			rect.width += point.x - rect_right;
+		}
+		if (point.y > rect_bottom) {
+			rect.height += point.y - rect_bottom;
+		}
+	}
+
 }

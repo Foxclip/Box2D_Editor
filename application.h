@@ -54,9 +54,6 @@ public:
 	void start();
 
 private:
-	sf::View window_view;
-	sf::View world_view;
-	sf::View ui_view;
 	sf::Shader desat_shader;
 	sf::Shader selection_shader;
 	sf::Vector2i mousePos;
@@ -65,7 +62,6 @@ private:
 	sf::Vector2i mousePrevPos;
 	float zoomFactor = 30.0f;
 	float viewCenterX = 0.0f, viewCenterY = 5.0f;
-	sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
 	sf::Font ui_font;
 	ContainerWidget* paused_rect_widget;
 	ContainerWidget* toolbox_widget;

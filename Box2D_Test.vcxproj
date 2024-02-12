@@ -141,6 +141,7 @@
     <ClCompile Include="history.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="polygon.cpp" />
     <ClCompile Include="tokenizer.cpp" />
     <ClCompile Include="tools.cpp" />
     <ClCompile Include="utils.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="global.h" />
     <ClInclude Include="history.h" />
     <ClInclude Include="logger.h" />
+    <ClInclude Include="polygon.h" />
     <ClInclude Include="tokenizer.h" />
     <ClInclude Include="tools.h" />
     <ClInclude Include="utils.h" />
