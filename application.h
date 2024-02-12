@@ -76,6 +76,7 @@ private:
 	TextWidget* fps_text_widget;
 	RectangleWidget* logger_widget;
 	TextWidget* logger_text_widget;
+	sf::Font console_font;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;

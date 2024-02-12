@@ -91,6 +91,10 @@ void Application::init_ui() {
     if (!fps_font.loadFromFile(fps_font_filename)) {
         throw std::runtime_error("Font loading error (" + fps_font_filename + ")");
     }
+    std::string console_font_filename = "courbd.ttf";
+    if (!console_font.loadFromFile(console_font_filename)) {
+        throw std::runtime_error("Font loading error (" + console_font_filename + ")");
+    }
     root_widget.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
     root_widget.setFillColor(sf::Color::Transparent);
     {
@@ -234,7 +238,7 @@ void Application::init_ui() {
         {
             std::unique_ptr<TextWidget> logger_text_uptr = std::make_unique<TextWidget>();
             logger_text_widget = logger_text_uptr.get();
-            logger_text_widget->setFont(ui_font);
+            logger_text_widget->setFont(console_font);
             logger_text_widget->setCharacterSize(15);
             logger_text_widget->setFillColor(sf::Color::White);
             logger_text_widget->setOrigin(Widget::TOP_LEFT);
