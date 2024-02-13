@@ -197,7 +197,7 @@ void Widget::render(sf::RenderTarget& target) {
 		return;
 	}
 	update();
-	target.draw(getDrawable(), getParentTransform());
+	target.draw(getDrawable(), getParentGlobalTransform());
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->render(target);
 	}
@@ -208,14 +208,14 @@ void Widget::addChild(std::unique_ptr<Widget> child) {
 	children.push_back(std::move(child));
 }
 
-sf::Transform Widget::getTransform() {
+sf::Transform Widget::getGlobalTransform() {
 	// TODO: cache transform
-	return getParentTransform() * getTransformable().getTransform();
+	return getParentGlobalTransform() * getTransformable().getTransform();
 }
 
-sf::Transform Widget::getParentTransform() {
+sf::Transform Widget::getParentGlobalTransform() {
 	if (parent) {
-		return parent->getTransform();
+		return parent->getGlobalTransform();
 	}
 	return sf::Transform::Identity;
 }
@@ -226,7 +226,7 @@ sf::FloatRect ShapeWidget::getLocalBounds() {
 
 sf::FloatRect ShapeWidget::getGlobalBounds() {
 	// cache this
-	return getParentTransform().transformRect(getShape().getGlobalBounds());
+	return getParentGlobalTransform().transformRect(getShape().getGlobalBounds());
 }
 
 const sf::Color& ShapeWidget::getFillColor() {
@@ -270,7 +270,7 @@ sf::FloatRect TextWidget::getLocalBounds() {
 
 sf::FloatRect TextWidget::getGlobalBounds() {
 	// cache this
-	return getParentTransform().transformRect(text.getGlobalBounds());
+	return getParentGlobalTransform().transformRect(text.getGlobalBounds());
 }
 
 const sf::Color& TextWidget::getFillColor() {

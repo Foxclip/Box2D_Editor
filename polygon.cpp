@@ -111,15 +111,15 @@ std::vector<PolygonObject> PolygonObject::getConvexPolygons() const {
 	return convex_polygons;
 }
 
-sf::Transform PolygonObject::getParentTransform() const {
+sf::Transform PolygonObject::getParentGlobalTransform() const {
 	if (parent) {
-		return parent->getTransform();
+		return parent->getGlobalTransform();
 	}
 	return sf::Transform::Identity;
 }
 
 sf::Transform PolygonObject::getGlobalTransform() const {
-	return getParentTransform() * getTransform();
+	return getParentGlobalTransform() * getTransform();
 }
 
 bool PolygonObject::isConvex() const {

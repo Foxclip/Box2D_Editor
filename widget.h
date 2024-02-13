@@ -76,8 +76,8 @@ protected:
 	bool visible = true;
 	bool click_through = true;
 	bool mouseIn = false;
-	sf::Transform getTransform();
-	sf::Transform getParentTransform();
+	sf::Transform getGlobalTransform();
+	sf::Transform getParentGlobalTransform();
 	virtual sf::Drawable& getDrawable() = 0;
 	virtual sf::Transformable& getTransformable() = 0;
 	virtual void update();

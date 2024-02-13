@@ -52,7 +52,7 @@ public:
 	sf::FloatRect getGlobalBounds() const;
 	sf::Color getFillColor() const;
 	std::vector<PolygonObject> getConvexPolygons() const;
-	sf::Transform getParentTransform() const;
+	sf::Transform getParentGlobalTransform() const;
 	sf::Transform getGlobalTransform() const;
 	bool isConvex() const;
 	void setPoint(size_t index, const sf::Vector2f& point);
