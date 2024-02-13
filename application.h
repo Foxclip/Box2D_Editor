@@ -52,6 +52,10 @@ class Application {
 public:
 	void init(std::string filename = "");
 	void start();
+	BoxObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
+	BallObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
+	CarObject* create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
+	GroundObject* create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color);
 
 private:
 	sf::Shader desat_shader;
@@ -97,7 +101,6 @@ private:
 	void init_tools();
 	void init_world();
 	void init_ui();
-	void init_objects();
 	void main_loop();
 	void resetView();
 	void process_widgets();
@@ -140,10 +143,5 @@ private:
 	void get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color);
 	GameObject* get_gameobject(b2Body* body);
-
-	BoxObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
-	BallObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
-	CarObject* create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
-	GroundObject* create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color);
 
 };
