@@ -626,9 +626,12 @@ void CarObject::create_shape(std::vector<float> lengths) {
 	polygon->recut();
 	std::vector<PolygonObject> convex_polygons = polygon->getConvexPolygons();
 	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
+		PolygonObject& polygon = convex_polygons[polygon_i];
 		std::vector<b2Vec2> b2points;
-		for (size_t vertex_i = 0; vertex_i < convex_polygons[polygon_i].getPointCount(); vertex_i++) {
-			b2points.push_back(tob2(convex_polygons[polygon_i].getPoint(vertex_i)));
+		for (size_t vertex_i = 0; vertex_i < polygon.getPointCount(); vertex_i++) {
+			sf::Vector2f point = polygon.getPoint(vertex_i);
+			point = point + polygon.getPosition();
+			b2points.push_back(tob2(point));
 		}
 		b2PolygonShape b2polygon;
 		b2polygon.Set(b2points.data(), b2points.size());

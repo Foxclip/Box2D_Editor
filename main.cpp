@@ -15,8 +15,7 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: add override keyword to overriden methods
-    // TODO: cut polygons with b2maxvertices, move polygon origins to their center
+    // TODO: cut polygons with b2maxvertices
     // TODO: editing shapes
     // TODO: select tool rectangle select
     // TODO: set whether object is static or dynamic in edit mode

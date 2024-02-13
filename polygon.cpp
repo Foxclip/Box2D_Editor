@@ -386,10 +386,20 @@ std::vector<PolygonObject> PolygonObject::cutIntoConvex() {
 	return result;
 }
 
+void PolygonObject::recenter() {
+	sf::Vector2f local_center = getLocalCenter();
+	for (size_t i = 0; i < getPointCount(); i++) {
+		sf::Vector2f new_pos = getPoint(i) - local_center;
+		setPoint(i, new_pos);
+	}
+	setPosition(local_center);
+}
+
 void PolygonObject::recut() {
 	convex_polygons = cutIntoConvex();
 	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
 		PolygonObject& polygon = convex_polygons[polygon_i];
+		polygon.recenter();
 		polygon.triangle_fan = sf::VertexArray(sf::TriangleFan, polygon.getPointCount() + 2);
 		auto add_vertex = [&](sf::Vector2f pos) {
 			sf::Vertex vertex;
@@ -397,7 +407,7 @@ void PolygonObject::recut() {
 			vertex.color = fill_color;
 			polygon.triangle_fan.append(vertex);
 		};
-		add_vertex(polygon.getLocalCenter());
+		add_vertex(sf::Vector2f());
 		for (size_t vertex_i = 0; vertex_i < polygon.getPointCount() + 1; vertex_i++) {
 			add_vertex(polygon.getPoint(polygon.indexLoop(vertex_i)));
 		}
