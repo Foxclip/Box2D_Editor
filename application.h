@@ -50,7 +50,7 @@ private:
 class Application {
 
 public:
-	void init();
+	void init(std::string filename = "");
 	void start();
 
 private:
@@ -86,6 +86,11 @@ private:
 	std::vector<std::unique_ptr<GameObject>> game_objects;
 	History history;
 	bool commit_action = false;
+	struct LoadRequest {
+		bool requested = false;
+		std::string filename;
+	};
+	LoadRequest load_request;
 	std::string quicksave_str;
 	bool quickload_requested = false;
 
@@ -109,8 +114,9 @@ private:
 	void maximize_window();
 	std::string serialize();
 	void deserialize(std::string str, bool set_camera);
-	void save(std::string filename);
+	void save_to_file(std::string filename);
 	void load(std::string filename);
+	void load_from_file(std::string filename);
 	void quicksave();
 	void quickload();
 	Tool* try_select_tool(int index);

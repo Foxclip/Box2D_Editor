@@ -21,7 +21,7 @@ bool QueryCallback::ReportFixture(b2Fixture* fixture) {
     return true;
 }
 
-void Application::init() {
+void Application::init(std::string filename) {
     sf::ContextSettings cs_window;
     cs_window.antialiasingLevel = ANTIALIASING;
     window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs_window);
@@ -47,14 +47,18 @@ void Application::init() {
     logger.OnLineWrite = [&](std::string line) { // should be after init_ui and preferably before any logging
         logger_text_widget->setString(line);
     };
-    init_objects();
     try_select_tool(0); // should be after init_tools and init_ui
     select_create_type(0);
     maximize_window();
-    load("level.txt");
     auto getter = [&]() { return serialize(); };
     auto setter = [&](std::string str) { deserialize(str, false); };
     history = History(getter, setter);
+
+    if (filename == "") {
+        init_objects();
+    } else {
+        load_from_file(filename);
+    }
     history.save(HistoryEntry::BASE);
 
     assert(tools.size() > 0);
@@ -63,6 +67,11 @@ void Application::init() {
         assert(tools[i]->widget);
     }
     assert(history.size() == 1);
+}
+
+void Application::load(std::string filename) {
+    load_request.requested = true;
+    load_request.filename = filename;
 }
 
 void Application::start() {
@@ -337,7 +346,15 @@ void Application::process_input() {
     }
     if (quickload_requested) {
         quickload();
+        if (history.getCurrent().type != HistoryEntry::QUICKLOAD) {
+            history.save(HistoryEntry::QUICKLOAD);
+        }
         quickload_requested = false;
+    }
+    if (load_request.requested) {
+        load_from_file(load_request.filename);
+        history.save(HistoryEntry::LOAD);
+        load_request.requested = false;
     }
 }
 
@@ -365,7 +382,7 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::LAlt: edit_tool.mode = EditTool::INSERT; break;
             case sf::Keyboard::S:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
-                    save("level.txt");
+                    save_to_file("level.txt");
                 }
                 break;
             case sf::Keyboard::Z:
@@ -870,13 +887,13 @@ void Application::deserialize(std::string str, bool set_camera) {
     }
 }
 
-void Application::save(std::string filename) {
+void Application::save_to_file(std::string filename) {
     std::string str = serialize();
     utils::str_to_file(str, filename);
     logger << "Saved to " << filename << "\n";
 }
 
-void Application::load(std::string filename) {
+void Application::load_from_file(std::string filename) {
     try {
         std::string str = utils::file_to_str(filename);
         deserialize(str, true);
@@ -895,9 +912,6 @@ void Application::quickload() {
     if (quicksave_str.size() > 0) {
         deserialize(quicksave_str, true);
         logger << "Quickload\n";
-        if (history.getCurrent().type != HistoryEntry::QUICKLOAD) {
-            history.save(HistoryEntry::QUICKLOAD);
-        }
     } else {
         logger << "Can't quickload\n";
     }

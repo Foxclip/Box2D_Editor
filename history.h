@@ -9,6 +9,7 @@ public:
 	enum Type {
 		BASE,
 		NORMAL,
+		LOAD,
 		QUICKLOAD,
 	};
 	std::string str;

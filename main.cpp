@@ -3,12 +3,17 @@
 #include "application.h"
 #include "logger.h"
 
+void execute_app() {
+    Application app;
+    app.init("level.txt");
+    //app.init();
+    app.start();
+}
+
 int main() {
     
     try {
-        Application app;
-        app.init();
-        app.start();
+        execute_app();
     } catch (std::string msg) {
         logger << "ERROR: " << msg << "\n";
     } catch (std::exception exc) {

@@ -57,9 +57,11 @@ HistoryEntry& History::getCurrent() {
 
 std::string HistoryEntry::typeToStr(Type type) {
     switch (type) {
-        case HistoryEntry::BASE: return "base"; break;
-        case HistoryEntry::NORMAL: return "normal"; break;
-        case HistoryEntry::QUICKLOAD: return "quickload"; break;
+        case HistoryEntry::BASE: return "base";
+        case HistoryEntry::NORMAL: return "normal";
+        case HistoryEntry::LOAD: return "load";
+        case HistoryEntry::QUICKLOAD: return "quickload";
+        default: return "Unknown";
     }
 }
 

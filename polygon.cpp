@@ -358,6 +358,8 @@ std::vector<PolygonObject> PolygonObject::getCutPolygons(const CutInfo& cut) con
 }
 
 std::vector<PolygonObject> PolygonObject::cutWithBestCut() {
+	logger << __FUNCTION__"\n";
+	LoggerIndent cut_indent;
 	std::vector<PolygonObject> result;
 	if (!cuts_valid) {
 		calcPotentialCuts();
@@ -373,6 +375,8 @@ std::vector<PolygonObject> PolygonObject::cutWithBestCut() {
 }
 
 std::vector<PolygonObject> PolygonObject::cutIntoConvex() {
+	logger << __FUNCTION__"\n";
+	LoggerIndent cut_indent;
 	std::vector<PolygonObject> result;
 	if (isConvex()) {
 		result.push_back(*this);
@@ -396,6 +400,9 @@ void PolygonObject::recenter() {
 }
 
 void PolygonObject::recut() {
+	LoggerDeactivate ld;
+	logger << __FUNCTION__"\n";
+	LoggerIndent recut_indent;
 	convex_polygons = cutIntoConvex();
 	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
 		PolygonObject& polygon = convex_polygons[polygon_i];
