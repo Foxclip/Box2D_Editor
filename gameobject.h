@@ -13,7 +13,7 @@ public:
 	sf::VertexArray varray;
 	void drawMask(sf::RenderTarget& mask, sf::RenderStates states = sf::RenderStates::Default);
 private:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 	sf::Color line_color;
 };
 
@@ -26,7 +26,7 @@ public:
 	void setNotchColor(const sf::Color& color);
 	void drawMask(sf::RenderTarget& mask, sf::RenderStates states = sf::RenderStates::Default);
 private:
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 	sf::VertexArray varray_circle;
 	sf::VertexArray varray_notch;
 	sf::Color circle_color;
@@ -82,10 +82,10 @@ protected:
 class BoxObject : public GameObject {
 public:
 	BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color);
-	sf::Drawable* getDrawable();
-	sf::Transformable* getTransformable();
-	void drawMask(sf::RenderTarget& mask);
-	TokenWriter& serialize(TokenWriter& tw);
+	sf::Drawable* getDrawable() override;
+	sf::Transformable* getTransformable() override;
+	void drawMask(sf::RenderTarget& mask) override;
+	TokenWriter& serialize(TokenWriter& tw) override;
 	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, b2World* world);
 	b2Vec2 size = b2Vec2();
 private:
@@ -95,10 +95,10 @@ private:
 class BallObject : public GameObject {
 public:
 	BallObject(b2World* world, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
-	sf::Drawable* getDrawable();
-	sf::Transformable* getTransformable();
-	void drawMask(sf::RenderTarget& mask);
-	TokenWriter& serialize(TokenWriter& tw);
+	sf::Drawable* getDrawable() override;
+	sf::Transformable* getTransformable() override;
+	void drawMask(sf::RenderTarget& mask) override;
+	TokenWriter& serialize(TokenWriter& tw) override;
 	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, b2World* world);
 	float radius = 0.0f;
 private:
@@ -118,10 +118,10 @@ public:
 		sf::Color color
 	);
 	PolygonObject* getPolygonObject() const;
-	sf::Drawable* getDrawable();
-	sf::Transformable* getTransformable();
-	void drawMask(sf::RenderTarget& mask);
-	TokenWriter& serialize(TokenWriter& tw);
+	sf::Drawable* getDrawable() override;
+	sf::Transformable* getTransformable() override;
+	void drawMask(sf::RenderTarget& mask) override;
+	TokenWriter& serialize(TokenWriter& tw) override;
 	static std::unique_ptr<CarObject> deserialize(TokenReader& tr, b2World* world);
 	std::vector<float> lengths;
 private:
@@ -160,10 +160,10 @@ public:
 	void selectAllVertices();
 	void deselectAllVertices();
 	void syncVertices();
-	sf::Drawable* getDrawable();
-	sf::Transformable* getTransformable();
-	void drawMask(sf::RenderTarget& mask);
-	TokenWriter& serialize(TokenWriter& tw);
+	sf::Drawable* getDrawable() override;
+	sf::Transformable* getTransformable() override;
+	void drawMask(sf::RenderTarget& mask) override;
+	TokenWriter& serialize(TokenWriter& tw) override;
 	static std::unique_ptr<GroundObject> deserialize(TokenReader& tr, b2World* world);
 private:
 	std::vector<GroundVertex> vertices;

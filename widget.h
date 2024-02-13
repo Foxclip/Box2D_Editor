@@ -89,10 +89,10 @@ private:
 
 class ShapeWidget : public Widget {
 public:
-	sf::FloatRect getLocalBounds();
-	sf::FloatRect getGlobalBounds();
-	const sf::Color& getFillColor();
-	void setFillColor(const sf::Color& color);
+	sf::FloatRect getLocalBounds() override;
+	sf::FloatRect getGlobalBounds() override;
+	const sf::Color& getFillColor() override;
+	void setFillColor(const sf::Color& color) override;
 	void setOutlineColor(const sf::Color& color);
 	void setOutlineThickness(float thickness);
 
@@ -108,9 +108,9 @@ public:
 protected:
 	sf::RectangleShape rect;
 
-	sf::Drawable& getDrawable();
-	sf::Transformable& getTransformable();
-	sf::Shape& getShape();
+	sf::Drawable& getDrawable() override;
+	sf::Transformable& getTransformable() override;
+	sf::Shape& getShape() override;
 
 private:
 
@@ -124,7 +124,7 @@ public:
 	void setPadding(float padding);
 
 protected:
-	void update();
+	void update() override;
 
 private:
 	bool auto_resize = true;
@@ -133,24 +133,20 @@ private:
 
 };
 
-class ButtonWidget : public RectangleWidget {
-
-};
-
 class TextWidget : public Widget {
 public:
-	sf::FloatRect getLocalBounds();
-	sf::FloatRect getGlobalBounds();
-	const sf::Color& getFillColor();
+	sf::FloatRect getLocalBounds() override;
+	sf::FloatRect getGlobalBounds() override;
+	const sf::Color& getFillColor() override;
 	void setFont(const sf::Font& font);
 	void setString(const std::string& string);
 	void setCharacterSize(unsigned int size);
-	void setFillColor(const sf::Color& color);
+	void setFillColor(const sf::Color& color) override;
 	void setOriginToTextCenter();
 
 protected:
-	sf::Drawable& getDrawable();
-	sf::Transformable& getTransformable();
+	sf::Drawable& getDrawable() override;
+	sf::Transformable& getTransformable() override;
 
 private:
 	sf::Text text;

@@ -105,7 +105,7 @@ class TokenWriterIndent : public TokenWriterControl {
 public:
 	TokenWriterIndent(TokenWriter& tw, ptrdiff_t indent = 1);
 	~TokenWriterIndent();
-	void close();
+	void close() override;
 
 private:
 	TokenWriter& tw;

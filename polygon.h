@@ -85,7 +85,7 @@ private:
 	bool cuts_valid = false;
 	bool is_convex = false;
 
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 	bool isConvexVertex(size_t index) const;
 	bool intersectsEdge(const sf::Vector2f& v1, const sf::Vector2f& v2, size_t& intersect) const;
 	size_t indexLoop(ptrdiff_t index) const;

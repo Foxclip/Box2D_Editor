@@ -60,7 +60,7 @@ class LoggerIndent : public LoggerControl {
 public:
 	LoggerIndent(ptrdiff_t indent = 1);
 	~LoggerIndent();
-	void close();
+	void close() override;
 
 private:
 	ptrdiff_t indent_level;
@@ -71,7 +71,7 @@ class LoggerLargeText : public LoggerControl {
 public:
 	LoggerLargeText();
 	~LoggerLargeText();
-	void close();
+	void close() override;
 
 private:
 	bool autoflush_was_enabled = true;
@@ -82,7 +82,7 @@ class LoggerDeactivate : public LoggerControl {
 public:
 	LoggerDeactivate();
 	~LoggerDeactivate();
-	void close();
+	void close() override;
 
 private:
 	bool logger_was_active = true;

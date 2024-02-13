@@ -56,7 +56,7 @@ public:
 	void addToSelection(GameObject* object);
 	void toggleSelect(GameObject* object);
 	void clearSelected();
-	void reset();
+	void reset() override;
 
 private:
 };
@@ -67,7 +67,7 @@ public:
 	b2MouseJoint* mouse_joint = nullptr;
 
 	DragTool();
-	void reset();
+	void reset() override;
 
 private:
 };
@@ -79,7 +79,7 @@ public:
 	b2Vec2 offset = b2Vec2(0.0f, 0.0f);
 
 	MoveTool();
-	void reset();
+	void reset() override;
 
 private:
 };
@@ -91,7 +91,7 @@ public:
 	float angle_offset = 0.0f;
 
 	RotateTool();
-	void reset();
+	void reset() override;
 
 private:
 };
@@ -123,7 +123,7 @@ public:
 	ContainerWidget* edit_window_widget = nullptr;
 
 	EditTool();
-	void reset();
+	void reset() override;
 	static std::string modeToStr(EditToolMode mode);
 
 };
@@ -140,7 +140,7 @@ public:
 	ContainerWidget* create_panel_widget = nullptr;
 
 	CreateTool();
-	void reset();
+	void reset() override;
 	static std::string create_type_name(ObjectType type);
 };
 
