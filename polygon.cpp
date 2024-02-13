@@ -111,6 +111,17 @@ std::vector<PolygonObject> PolygonObject::getConvexPolygons() const {
 	return convex_polygons;
 }
 
+sf::Transform PolygonObject::getParentTransform() const {
+	if (parent) {
+		return parent->getTransform();
+	}
+	return sf::Transform::Identity;
+}
+
+sf::Transform PolygonObject::getGlobalTransform() const {
+	return getParentTransform() * getTransform();
+}
+
 bool PolygonObject::isConvex() const {
 	for (size_t i = 0; i < getPointCount(); i++) {
 		if (!isConvexVertex(i)) {
@@ -155,11 +166,10 @@ void PolygonObject::drawIndices(
 	sf::RenderTarget& target,
 	const sf::Color& color,
 	unsigned int size,
-	bool include_convex,
-	sf::Transform transform
+	bool include_convex
 ) const {
 	for (size_t i = 0; i < getPointCount(); i++) {
-		sf::Vector2f pos = transform * getTransform() * getPoint(i);
+		sf::Vector2f pos = getGlobalTransform() * getPoint(i);
 		vertex_text.setCharacterSize(size);
 		vertex_text.setString(std::to_string(i));
 		vertex_text.setPosition(world_to_screenf(pos));
@@ -168,7 +178,7 @@ void PolygonObject::drawIndices(
 	}
 	if (include_convex && !is_convex) {
 		for (size_t i = 0; i < convex_polygons.size(); i++) {
-			convex_polygons[i].drawIndices(target, color, size * 0.75f, false, getTransform());
+			convex_polygons[i].drawIndices(target, color, size * 0.75f, false);
 		}
 	}
 }
@@ -392,6 +402,7 @@ void PolygonObject::recut() {
 			add_vertex(polygon.getPoint(polygon.indexLoop(vertex_i)));
 		}
 		polygon.is_convex = true;
+		polygon.parent = this;
 	}
 }
 
