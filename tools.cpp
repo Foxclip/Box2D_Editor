@@ -94,6 +94,32 @@ SelectTool::SelectTool() {
     name = "select";
 }
 
+void SelectTool::selectObject(GameObject* object) {
+    if (object) {
+        object->selected = true;
+        selected_objects.insert(object);
+    }
+}
+
+void SelectTool::deselectObject(GameObject* object) {
+    if (object) {
+        object->selected = false;
+        selected_objects.erase(object);
+    }
+}
+
+void SelectTool::toggleSelect(GameObject* object) {
+    if (object) {
+        if (object->selected) {
+            object->selected = false;
+            selected_objects.erase(object);
+        } else {
+            object->selected = true;
+            selected_objects.insert(object);
+        }
+    }
+}
+
 void SelectTool::reset() {
     hover_object = nullptr;
     clearSelected();
@@ -101,12 +127,19 @@ void SelectTool::reset() {
 }
 
 void SelectTool::clearSelected() {
-    for (auto obj : selected_objects) {
+    for (GameObject* obj : selected_objects) {
         if (obj) {
             obj->selected = false;
         }
     }
     selected_objects = std::set<GameObject*>();
+}
+
+void SelectTool::clearRectSelected() {
+    for (GameObject* obj : objects_in_rect) {
+        deselectObject(obj);
+    }
+    objects_in_rect = std::set<GameObject*>();
 }
 
 void SelectTool::selectSingleObject(GameObject* object) {
@@ -121,16 +154,15 @@ void SelectTool::addToSelection(GameObject* object) {
     }
 }
 
-void SelectTool::toggleSelect(GameObject* object) {
-    if (object) {
-        if (object->selected) {
-            object->selected = false;
-            selected_objects.erase(object);
-        } else {
-            object->selected = true;
-            selected_objects.insert(object);
-        }
+void SelectTool::addToRectSelection(GameObject* object) {
+    if (object && !object->selected) {
+        addToSelection(object);
+        objects_in_rect.insert(object);
     }
+}
+
+void SelectTool::applyRectSelection() {
+    objects_in_rect = std::set<GameObject*>();
 }
 
 RectangleSelect::RectangleSelect() {

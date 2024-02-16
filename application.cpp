@@ -412,6 +412,7 @@ void Application::process_mouse_event(sf::Event event) {
             case sf::Mouse::Left:
                 if (select_tool.rectangle_select.active) {
                     select_tool.rectangle_select.active = false;
+                    select_tool.applyRectSelection();
                 }
                 if (drag_tool.mouse_joint) {
                     world->DestroyJoint(drag_tool.mouse_joint);
@@ -1045,6 +1046,7 @@ void Application::select_vertices_in_rect(const RectangleSelect& rectangle_selec
 }
 
 void Application::select_objects_in_rect(const RectangleSelect& rectangle_select) {
+    select_tool.clearRectSelected();
     b2AABB aabb;
     float lower_x = std::min(rectangle_select.select_origin.x, sfMousePosWorld.x);
     float lower_y = std::min(rectangle_select.select_origin.y, sfMousePosWorld.y);
@@ -1057,7 +1059,7 @@ void Application::select_objects_in_rect(const RectangleSelect& rectangle_select
     for (size_t i = 0; i < callback.fixtures.size(); i++) {
         if (utils::rect_fixture_intersect(aabb.lowerBound, aabb.upperBound, callback.fixtures[i])) {
             GameObject* gameobject = get_gameobject(callback.fixtures[i]->GetBody());
-            select_tool.addToSelection(gameobject);
+            select_tool.addToRectSelection(gameobject);
         }
     }
     

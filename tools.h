@@ -51,12 +51,18 @@ public:
 	GameObject* hover_object = nullptr;
 	std::set<GameObject*> selected_objects;
 	RectangleSelect rectangle_select;
+	std::set<GameObject*> objects_in_rect;
 
 	SelectTool();
+	void selectObject(GameObject* object);
+	void deselectObject(GameObject* object);
+	void toggleSelect(GameObject* object);
 	void selectSingleObject(GameObject* object);
 	void addToSelection(GameObject* object);
-	void toggleSelect(GameObject* object);
+	void addToRectSelection(GameObject* object);
+	void applyRectSelection();
 	void clearSelected();
+	void clearRectSelected();
 	void reset() override;
 
 private:
