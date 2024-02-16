@@ -33,6 +33,8 @@ namespace utils {
 	std::string current_time();
 	void extend_bounds(sf::FloatRect& rect1, const sf::FloatRect& rect2);
 	void extend_bounds(sf::FloatRect& rect, const sf::Vector2f point);
+	bool rect_fixture_intersect(const b2Vec2& lower_bound, const b2Vec2& upper_bound, const b2Fixture* fixture);
+	float sgn(float value);
 
 	template <typename TVec2>
 	TVec2 get_pos(const std::vector<float>& lengths, ptrdiff_t i) {
@@ -119,6 +121,74 @@ namespace utils {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	template <typename TVec2>
+	int line_circle_intersect(const TVec2& v1, const TVec2& v2, const TVec2& center, float radius, float epsilon, TVec2& intersection1, TVec2& intersection2) {
+		TVec2 l1 = v1 - center;
+		TVec2 l2 = v2 - center;
+		float dx = l2.x - l1.x;
+		float dy = l2.y - l1.y;
+		float dr = length(l2 - l1);
+		float D = cross2d(l1, l2);
+		float discr = (radius * radius) * (dr * dr) - (D * D);
+		if (discr < 0) {
+			return 0;
+		} else if (discr >= -epsilon && discr <= epsilon) {
+			float x = D * dy / (dr * dr);
+			float y = -D * dx / (dr * dr);
+			intersection1 = TVec2(x, y) + center;
+			return 1;
+		} else {
+			float x1 = (D * dy - sgn(dy) * dx * sqrt(discr)) / (dr * dr);
+			float y1 = (-D * dx - abs(dy) * sqrt(discr)) / (dr * dr);
+			float x2 = (D * dy + sgn(dy) * dx * sqrt(discr)) / (dr * dr);
+			float y2 = (-D * dx + abs(dy) * sqrt(discr)) / (dr * dr);
+			intersection1 = TVec2(x1, y1) + center;
+			intersection2 = TVec2(x2, y2) + center;
+			return 2;
+		}
+	}
+
+	template <typename TVec2>
+	int segment_circle_intersect(const TVec2& v1, const TVec2& v2, const TVec2& center, float radius, float epsilon1, float epsilon2, TVec2& intersection1, TVec2& intersection2) {
+		TVec2 i1, i2;
+		int line_intersect = line_circle_intersect(v1, v2, center, radius, epsilon1, i1, i2);
+		if (line_intersect == 0) {
+			return 0;
+		} else if (line_intersect == 1) {
+			TVec2 B = v2 - v1;
+			TVec2 A = i1 - v1;
+			float t = dot(A, B) / dot(B, B);
+			bool ti = t >= 0.0f + epsilon2 && t <= 1.0f - epsilon2;
+			if (!ti) {
+				return 0;
+			} else {
+				intersection1 = i1;
+				return 1;
+			}
+		} else {
+			TVec2 B = v2 - v1;
+			TVec2 A1 = i1 - v1;
+			float t1 = dot(A1, B) / dot(B, B);
+			TVec2 A2 = i2 - v1;
+			float t2 = dot(A2, B) / dot(B, B);
+			bool t1i = t1 >= 0.0f + epsilon2 && t1 <= 1.0f - epsilon2;
+			bool t2i = t2 >= 0.0f + epsilon2 && t2 <= 1.0f - epsilon2;
+			if (!t1i && !t2i) {
+				return 0;
+			} else if (t1i && !t2i) {
+				intersection1 = i1;
+				return 1;
+			} else if (!t1i && t2i) {
+				intersection1 = i2;
+				return 1;
+			} else {
+				intersection1 = i1;
+				intersection2 = i2;
+				return 2;
+			}
 		}
 	}
 

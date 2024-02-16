@@ -54,8 +54,9 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: cut polygons with b2maxvertices
+    // TODO: selecting objects with rectangle select
     // TODO: editing shapes
+    // TODO: cut polygons with b2maxvertices
     // TODO: select tool rectangle select
     // TODO: set whether object is static or dynamic in edit mode
     // TODO: evolving cars

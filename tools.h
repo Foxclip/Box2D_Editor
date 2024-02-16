@@ -2,6 +2,7 @@
 
 #include "gameobject.h"
 #include "widget.h"
+#include <set>
 
 const int TOOL_RECT_WIDTH = 60;
 const int TOOL_RECT_HEIGHT = 40;
@@ -48,7 +49,7 @@ private:
 class SelectTool : public Tool {
 public:
 	GameObject* hover_object = nullptr;
-	std::vector<GameObject*> selected_objects;
+	std::set<GameObject*> selected_objects;
 	RectangleSelect rectangle_select;
 
 	SelectTool();

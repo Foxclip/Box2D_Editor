@@ -3,6 +3,7 @@
 #include <utility>
 #include <cmath>
 #include "tokenizer.h"
+#include <iostream>
 
 namespace utils {
 
@@ -207,6 +208,43 @@ namespace utils {
 		}
 		if (point.y > rect_bottom) {
 			rect.height += point.y - rect_bottom;
+		}
+	}
+
+	float sgn(float value) {
+		if (value >= 0.0f) {
+			return 1.0f;
+		} else {
+			return -1.0f;
+		}
+	}
+
+	bool rect_fixture_intersect(const b2Vec2& lower_bound, const b2Vec2& upper_bound, const b2Fixture* fixture) {
+		b2Vec2 bottom_left = b2Vec2(std::min(lower_bound.x, upper_bound.x), std::min(lower_bound.y, upper_bound.y));
+		b2Vec2 bottom_right = b2Vec2(std::max(lower_bound.x, upper_bound.x), std::min(lower_bound.y, upper_bound.y));
+		b2Vec2 top_left = b2Vec2(std::min(lower_bound.x, upper_bound.x), std::max(lower_bound.y, upper_bound.y));
+		b2Vec2 top_right = b2Vec2(std::max(lower_bound.x, upper_bound.x), std::max(lower_bound.y, upper_bound.y));
+		const b2Shape* shape = fixture->GetShape();
+		const b2Body* body = fixture->GetBody();
+		if (const b2CircleShape* circle_shape = dynamic_cast<const b2CircleShape*>(shape)) {
+			b2Vec2 i1, i2;
+			b2Vec2 shape_pos = body->GetPosition() + circle_shape->m_p;
+			float radius = circle_shape->m_radius;
+			if (top_left.x <= shape_pos.x) {
+				std::cout << "";
+			}
+			//int top = segment_circle_intersect(top_right, top_left, shape_pos, radius, 0.0f, 0.0f, i1, i2);
+			//int left = segment_circle_intersect(top_left, bottom_left, shape_pos, radius, 0.0f, 0.0f, i1, i2);
+			//int bottom = segment_circle_intersect(bottom_left, bottom_right, shape_pos, radius, 0.0f, 0.0f, i1, i2);
+			//int right = segment_circle_intersect(bottom_right, top_right, shape_pos, radius, 0.0f, 0.0f, i1, i2);
+			return
+				segment_circle_intersect(top_right, top_left, shape_pos, radius, 0.0f, 0.0f, i1, i2)
+				|| segment_circle_intersect(top_left, bottom_left, shape_pos, radius, 0.0f, 0.0f, i1, i2)
+				|| segment_circle_intersect(bottom_left, bottom_right, shape_pos, radius, 0.0f, 0.0f, i1, i2)
+				|| segment_circle_intersect(bottom_right, top_right, shape_pos, radius, 0.0f, 0.0f, i1, i2)
+			;
+		} else {
+			return false; // TODO: implement other shapes
 		}
 	}
 

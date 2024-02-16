@@ -655,8 +655,8 @@ void Application::render_world() {
     //if (select_tool.hover_object) {
     //    select_tool.hover_object->renderMask(selection_mask, false);
     //}
-    for (size_t i = 0; i < select_tool.selected_objects.size(); i++) {
-        select_tool.selected_objects[i]->renderMask(selection_mask, false);
+    for (auto obj : select_tool.selected_objects) {
+        obj->renderMask(selection_mask, false);
     }
 
     world_texture.display();
@@ -1045,7 +1045,22 @@ void Application::select_vertices_in_rect(const RectangleSelect& rectangle_selec
 }
 
 void Application::select_objects_in_rect(const RectangleSelect& rectangle_select) {
-
+    b2AABB aabb;
+    float lower_x = std::min(rectangle_select.select_origin.x, sfMousePosWorld.x);
+    float lower_y = std::min(rectangle_select.select_origin.y, sfMousePosWorld.y);
+    float upper_x = std::max(rectangle_select.select_origin.x, sfMousePosWorld.x);
+    float upper_y = std::max(rectangle_select.select_origin.y, sfMousePosWorld.y);
+    aabb.lowerBound = b2Vec2(lower_x, lower_y);
+    aabb.upperBound = b2Vec2(upper_x, upper_y);
+    QueryCallback callback;
+    world->QueryAABB(&callback, aabb);
+    for (size_t i = 0; i < callback.fixtures.size(); i++) {
+        if (utils::rect_fixture_intersect(aabb.lowerBound, aabb.upperBound, callback.fixtures[i])) {
+            GameObject* gameobject = get_gameobject(callback.fixtures[i]->GetBody());
+            select_tool.addToSelection(gameobject);
+        }
+    }
+    
 }
 
 void Application::render_rectangle_select(sf::RenderTarget& target, RectangleSelect& rectangle_select) {
