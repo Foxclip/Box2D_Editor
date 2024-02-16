@@ -224,6 +224,9 @@ namespace utils {
 		b2Vec2 bottom_right = b2Vec2(std::max(lower_bound.x, upper_bound.x), std::min(lower_bound.y, upper_bound.y));
 		b2Vec2 top_left = b2Vec2(std::min(lower_bound.x, upper_bound.x), std::max(lower_bound.y, upper_bound.y));
 		b2Vec2 top_right = b2Vec2(std::max(lower_bound.x, upper_bound.x), std::max(lower_bound.y, upper_bound.y));
+		const b2Shape* shape = fixture->GetShape();
+		const b2Body* body = fixture->GetBody();
+		//b2Vec2 body_pos = body->GetPosition();
 		auto point_inside_rect = [&](const b2Vec2& point) {
 			return
 				!right_side(point, top_right, top_left)
@@ -232,10 +235,21 @@ namespace utils {
 				&& !right_side(point, bottom_right, top_right)
 			;
 		};
-		const b2Shape* shape = fixture->GetShape();
-		const b2Body* body = fixture->GetBody();
+		auto world_pos = [&](const b2Vec2& pos) {
+			return b2Mul(body->GetTransform(), pos);
+		};
+		auto point_inside_polygon = [&](const b2Vec2& point, const b2PolygonShape* polygon_shape) {
+			for (size_t i = 0; i < polygon_shape->m_count; i++) {
+				b2Vec2 v1 = world_pos(polygon_shape->m_vertices[i]);
+				b2Vec2 v2 = world_pos(polygon_shape->m_vertices[neg_mod(i + 1, (size_t)polygon_shape->m_count)]);
+				if (right_side(point, v1, v2)) {
+					return false;
+				}
+			}
+			return true;
+		};
 		if (const b2CircleShape* circle_shape = dynamic_cast<const b2CircleShape*>(shape)) {
-			b2Vec2 circle_center = body->GetPosition() + circle_shape->m_p;
+			b2Vec2 circle_center = world_pos(circle_shape->m_p);
 			if (point_inside_rect(circle_center)) {
 				return true;
 			}
@@ -255,6 +269,32 @@ namespace utils {
 			auto right_intersect = [&]() { return segment_circle_intersect(bottom_right, top_right, circle_center, radius, 0.0f, 0.0f, i1, i2); };
 			auto intersect = [&]() { return top_intersect() || left_intersect() || bottom_intersect() || right_intersect(); };
 			return intersect();
+		} else if (const b2PolygonShape* polygon_shape = dynamic_cast<const b2PolygonShape*>(shape)) {
+			for (size_t i = 0; i < polygon_shape->m_count; i++) {
+				b2Vec2 v = world_pos(polygon_shape->m_vertices[i]);
+				if (point_inside_rect(v)) {
+					return true;
+				}
+			}
+			for (size_t i = 0; i < polygon_shape->m_count; i++) {
+				b2Vec2 v1 = world_pos(polygon_shape->m_vertices[i]);
+				b2Vec2 v2 = world_pos(polygon_shape->m_vertices[neg_mod(i + 1, (size_t)polygon_shape->m_count)]);
+				b2Vec2 intersection;
+				if (
+					line_intersect(v1, v2, top_right, top_left, 0.0f, intersection)
+					|| line_intersect(v1, v2, top_left, bottom_left, 0.0f, intersection)
+					|| line_intersect(v1, v2, bottom_left, bottom_right, 0.0f, intersection)
+					|| line_intersect(v1, v2, bottom_right, top_right, 0.0f, intersection)
+				) {
+					return true;
+				}
+			}
+			return
+				point_inside_polygon(bottom_left, polygon_shape)
+				|| point_inside_polygon(bottom_right, polygon_shape)
+				|| point_inside_polygon(top_left, polygon_shape)
+				|| point_inside_polygon(top_right, polygon_shape)
+			;
 		} else {
 			return false; // TODO: implement other shapes
 		}

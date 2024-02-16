@@ -76,6 +76,15 @@ void Application::start() {
     main_loop();
 }
 
+void Application::setCameraPos(float x, float y) {
+    viewCenterX = x;
+    viewCenterY = y;
+}
+
+void Application::setCameraZoom(float zoom) {
+    zoomFactor = zoom;
+}
+
 void Application::init_tools() {
     for (size_t i = 0; i < tools.size(); i++) {
         tools[i]->reset();
@@ -683,11 +692,11 @@ void Application::render_ui() {
     ui_texture.setView(ui_view);
     sf::RenderTarget& target = ui_texture;
 
-    for (size_t i = 0; i < game_objects.size(); i++) {
-        if (CarObject* car_object = dynamic_cast<CarObject*>(game_objects[i].get())) {
-            car_object->getPolygonObject()->drawIndices(target, sf::Color::White, 20, true);
-        }
-    }
+    //for (size_t i = 0; i < game_objects.size(); i++) {
+    //    if (CarObject* car_object = dynamic_cast<CarObject*>(game_objects[i].get())) {
+    //        car_object->getPolygonObject()->drawIndices(target, sf::Color::White, 20, true);
+    //    }
+    //}
 
     if (selected_tool == &select_tool) {
         if (select_tool.rectangle_select.active) {

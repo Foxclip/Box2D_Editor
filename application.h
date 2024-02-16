@@ -52,6 +52,8 @@ class Application {
 public:
 	void init(std::string filename = "");
 	void start();
+	void setCameraPos(float x, float y);
+	void setCameraZoom(float zoom);
 	BoxObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	BallObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
 	CarObject* create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
