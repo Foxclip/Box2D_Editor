@@ -224,25 +224,29 @@ namespace utils {
 		b2Vec2 bottom_right = b2Vec2(std::max(lower_bound.x, upper_bound.x), std::min(lower_bound.y, upper_bound.y));
 		b2Vec2 top_left = b2Vec2(std::min(lower_bound.x, upper_bound.x), std::max(lower_bound.y, upper_bound.y));
 		b2Vec2 top_right = b2Vec2(std::max(lower_bound.x, upper_bound.x), std::max(lower_bound.y, upper_bound.y));
+		auto inside = [&](const b2Vec2& point) {
+			return
+				!right_side(point, top_right, top_left)
+				&& !right_side(point, top_left, bottom_left)
+				&& !right_side(point, bottom_left, bottom_right)
+				&& !right_side(point, bottom_right, top_right)
+			;
+		};
 		const b2Shape* shape = fixture->GetShape();
 		const b2Body* body = fixture->GetBody();
 		if (const b2CircleShape* circle_shape = dynamic_cast<const b2CircleShape*>(shape)) {
 			b2Vec2 i1, i2;
-			b2Vec2 shape_pos = body->GetPosition() + circle_shape->m_p;
-			float radius = circle_shape->m_radius;
-			if (top_left.x <= shape_pos.x) {
-				std::cout << "";
+			b2Vec2 circle_center = body->GetPosition() + circle_shape->m_p;
+			if (inside(circle_center)) {
+				return true;
 			}
-			//int top = segment_circle_intersect(top_right, top_left, shape_pos, radius, 0.0f, 0.0f, i1, i2);
-			//int left = segment_circle_intersect(top_left, bottom_left, shape_pos, radius, 0.0f, 0.0f, i1, i2);
-			//int bottom = segment_circle_intersect(bottom_left, bottom_right, shape_pos, radius, 0.0f, 0.0f, i1, i2);
-			//int right = segment_circle_intersect(bottom_right, top_right, shape_pos, radius, 0.0f, 0.0f, i1, i2);
-			return
-				segment_circle_intersect(top_right, top_left, shape_pos, radius, 0.0f, 0.0f, i1, i2)
-				|| segment_circle_intersect(top_left, bottom_left, shape_pos, radius, 0.0f, 0.0f, i1, i2)
-				|| segment_circle_intersect(bottom_left, bottom_right, shape_pos, radius, 0.0f, 0.0f, i1, i2)
-				|| segment_circle_intersect(bottom_right, top_right, shape_pos, radius, 0.0f, 0.0f, i1, i2)
-			;
+			float radius = circle_shape->m_radius;
+			auto top_intersect = [&]() { return segment_circle_intersect(top_right, top_left, circle_center, radius, 0.0f, 0.0f, i1, i2); };
+			auto left_intersect = [&]() { return segment_circle_intersect(top_left, bottom_left, circle_center, radius, 0.0f, 0.0f, i1, i2); };
+			auto bottom_intersect = [&]() { return segment_circle_intersect(bottom_left, bottom_right, circle_center, radius, 0.0f, 0.0f, i1, i2); };
+			auto right_intersect = [&]() { return segment_circle_intersect(bottom_right, top_right, circle_center, radius, 0.0f, 0.0f, i1, i2); };
+			auto intersect = [&]() { return top_intersect() || left_intersect() || bottom_intersect() || right_intersect(); };
+			return intersect();
 		} else {
 			return false; // TODO: implement other shapes
 		}
