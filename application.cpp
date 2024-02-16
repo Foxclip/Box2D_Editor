@@ -1071,7 +1071,6 @@ void Application::select_objects_in_rect(const RectangleSelect& rectangle_select
             select_tool.addToRectSelection(gameobject);
         }
     }
-    
 }
 
 void Application::render_rectangle_select(sf::RenderTarget& target, RectangleSelect& rectangle_select) {

@@ -106,6 +106,9 @@ namespace utils {
 
 	template <typename TVec2>
 	bool line_intersect(const TVec2& v1, const TVec2& v2, const TVec2& v3, const TVec2& v4, float epsilon, TVec2& intersection) {
+		if (length(v1 - v2) <= abs(epsilon) || length(v3 - v4) <= abs(epsilon)) {
+			return false;
+		}
 		TVec2 p = v1;
 		TVec2 r = v2 - v1;
 		TVec2 q = v3;
@@ -126,6 +129,9 @@ namespace utils {
 
 	template <typename TVec2>
 	int line_circle_intersect(const TVec2& v1, const TVec2& v2, const TVec2& center, float radius, float epsilon, TVec2& intersection1, TVec2& intersection2) {
+		if (length(v1 - v2) <= abs(epsilon)) {
+			return 0;
+		}
 		TVec2 l1 = v1 - center;
 		TVec2 l2 = v2 - center;
 		float dx = l2.x - l1.x;

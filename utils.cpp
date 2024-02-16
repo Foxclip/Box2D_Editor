@@ -224,10 +224,14 @@ namespace utils {
 		b2Vec2 bottom_right = b2Vec2(std::max(lower_bound.x, upper_bound.x), std::min(lower_bound.y, upper_bound.y));
 		b2Vec2 top_left = b2Vec2(std::min(lower_bound.x, upper_bound.x), std::max(lower_bound.y, upper_bound.y));
 		b2Vec2 top_right = b2Vec2(std::max(lower_bound.x, upper_bound.x), std::max(lower_bound.y, upper_bound.y));
+		bool zero_area_rect = lower_bound.x == upper_bound.x || lower_bound.y == upper_bound.y;
 		const b2Shape* shape = fixture->GetShape();
 		const b2Body* body = fixture->GetBody();
 		//b2Vec2 body_pos = body->GetPosition();
 		auto point_inside_rect = [&](const b2Vec2& point) {
+			if (zero_area_rect) {
+				return false;
+			}
 			return
 				!right_side(point, top_right, top_left)
 				&& !right_side(point, top_left, bottom_left)
