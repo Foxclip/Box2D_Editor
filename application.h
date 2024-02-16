@@ -22,6 +22,7 @@ const sf::Glsl::Vec3 SELECTION_OUTLINE_COLOR = sf::Glsl::Vec3(1.0f, 1.0f, 0.0f);
 const sf::Glsl::Vec3 HOVER_OUTLINE_COLOR = sf::Glsl::Vec3(1.0f, 1.0f, 0.0f);
 const int SELECTION_OUTLINE_THICKNESS = 3;
 const int HOVER_OUTLINE_THICKNESS = 1;
+const int MOUSE_DRAG_THRESHOLD = 10;
 
 Logger& operator<<(Logger& lg, const b2Vec2& value);
 Logger& operator<<(Logger& lg, const sf::Vector2f& value);
@@ -66,6 +67,9 @@ private:
 	sf::Vector2f mousePosf;
 	sf::Vector2f sfMousePosWorld;
 	sf::Vector2i mousePrevPos;
+	sf::Vector2f mousePressPosf;
+	bool leftButtonPressed = false;
+	bool rightButtonPressed = false;
 	float zoomFactor = 30.0f;
 	float viewCenterX = 0.0f, viewCenterY = 5.0f;
 	sf::Font ui_font;
@@ -129,6 +133,7 @@ private:
 	void toggle_pause();
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
 	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);
+	sf::Vector2f sf_screen_to_world(sf::Vector2f screen_pos);
 	sf::Vector2i world_to_screen(b2Vec2 world_pos);
 	sf::Vector2f world_to_screenf(sf::Vector2f world_pos);
 	sf::Vector2f world_to_screenf(b2Vec2 world_pos);

@@ -409,9 +409,12 @@ void Application::process_mouse_event(sf::Event event) {
     if (event.type == sf::Event::MouseButtonPressed) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
+                leftButtonPressed = true;
+                mousePressPosf = mousePosf;
                 process_left_click();
                 break;
             case sf::Mouse::Right:
+                rightButtonPressed = true;
                 mousePrevPos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
                 break;
         }
@@ -419,9 +422,17 @@ void Application::process_mouse_event(sf::Event event) {
     if (event.type == sf::Event::MouseButtonReleased) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
+                leftButtonPressed = false;
                 if (select_tool.rectangle_select.active) {
                     select_tool.rectangle_select.active = false;
                     select_tool.applyRectSelection();
+                } else if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
+                    GameObject* object = get_object_at(mousePos);
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                        select_tool.toggleSelect(object);
+                    } else {
+                        select_tool.selectSingleObject(object);
+                    }
                 }
                 if (drag_tool.mouse_joint) {
                     world->DestroyJoint(drag_tool.mouse_joint);
@@ -449,6 +460,9 @@ void Application::process_mouse_event(sf::Event event) {
                     edit_tool.mode = EditTool::HOVER;
                 }
                 break;
+            case sf::Mouse::Right:
+                rightButtonPressed = false;
+                break;
         }
     }
     if (event.type == sf::Event::MouseWheelScrolled) {
@@ -466,15 +480,17 @@ void Application::process_keyboard() {
 
 void Application::process_mouse() {
     if (selected_tool == &select_tool) {
-        GameObject* old_hover = select_tool.hover_object;
-        GameObject* new_hover = get_object_at(mousePos);
-        if (old_hover) {
-            old_hover->hover = false;
+        {
+            GameObject* old_hover = select_tool.hover_object;
+            GameObject* new_hover = get_object_at(mousePos);
+            if (old_hover) {
+                old_hover->hover = false;
+            }
+            if (new_hover) {
+                new_hover->hover = true;
+            }
+            select_tool.hover_object = new_hover;
         }
-        if (new_hover) {
-            new_hover->hover = true;
-        }
-        select_tool.hover_object = new_hover;
     } else if (selected_tool == &edit_tool) {
         if (edit_tool.mode == EditTool::HOVER) {
             edit_tool.highlighted_vertex = mouse_get_ground_vertex();
@@ -489,10 +505,13 @@ void Application::process_mouse() {
             }
         }
     }
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+    if (leftButtonPressed) {
         if (selected_tool == &select_tool) {
             if (select_tool.rectangle_select.active) {
                 select_objects_in_rect(select_tool.rectangle_select);
+            } else if (utils::length(mousePosf - mousePressPosf) >= MOUSE_DRAG_THRESHOLD) {
+                select_tool.rectangle_select.active = true;
+                select_tool.rectangle_select.select_origin = sf_screen_to_world(mousePressPosf);
             }
         } else if (selected_tool == &drag_tool) {
             if (drag_tool.mouse_joint) {
@@ -525,7 +544,7 @@ void Application::process_mouse() {
             }
         }
     }
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+    if (rightButtonPressed) {
         sf::Vector2i mouseDelta = mousePrevPos - mousePos;
         viewCenterX += mouseDelta.x / zoomFactor;
         viewCenterY += -mouseDelta.y / zoomFactor;
@@ -539,14 +558,7 @@ void Application::process_left_click() {
         return;
     }
     if (selected_tool == &select_tool) {
-        GameObject* object = get_object_at(mousePos);
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
-            select_tool.toggleSelect(object);
-        } else {
-            select_tool.selectSingleObject(object);
-        }
-        select_tool.rectangle_select.active = true;
-        select_tool.rectangle_select.select_origin = sfMousePosWorld;
+        //
     } else if (selected_tool == &create_tool) {
         switch (create_tool.type) {
             case CreateTool::BOX:
@@ -927,6 +939,11 @@ b2Vec2 Application::b2_screen_to_world(sf::Vector2i screen_pos) {
 
 sf::Vector2f Application::sf_screen_to_world(sf::Vector2i screen_pos) {
     sf::Vector2f pos = world_texture.mapPixelToCoords(screen_pos, world_view);
+    return pos;
+}
+
+sf::Vector2f Application::sf_screen_to_world(sf::Vector2f screen_pos) {
+    sf::Vector2f pos = world_texture.mapPixelToCoords(to2i(screen_pos), world_view);
     return pos;
 }
 
