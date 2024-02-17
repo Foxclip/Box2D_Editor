@@ -154,6 +154,7 @@
     <ClInclude Include="history.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="polygon.h" />
+    <ClInclude Include="scenes.h" />
     <ClInclude Include="tokenizer.h" />
     <ClInclude Include="tools.h" />
     <ClInclude Include="utils.h" />

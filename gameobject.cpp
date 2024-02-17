@@ -16,6 +16,14 @@ GameObject::~GameObject() {
 	}
 }
 
+b2Vec2 GameObject::toGlobal(const b2Vec2& pos) {
+	return rigid_body->GetWorldPoint(pos);
+}
+
+b2Vec2 GameObject::toLocal(const b2Vec2& pos) {
+	return rigid_body->GetLocalPoint(pos);
+}
+
 void GameObject::updateVisual() {
 	b2Vec2 position = rigid_body->GetPosition();
 	float angle = rigid_body->GetAngle();
@@ -773,12 +781,13 @@ const GroundVertex& GroundObject::getVertex(size_t index) {
 	return vertices[index];
 }
 
-b2Vec2 GroundObject::getVertexPos(size_t index) {
-	return vertices[index].pos;
+b2Vec2 GroundObject::getGlobalVertexPos(size_t index) {
+	return rigid_body->GetWorldPoint(vertices[index].pos);
 }
 
-void GroundObject::setVertexPos(size_t index, const b2Vec2& new_pos) {
-	vertexSet(index, new_pos);
+void GroundObject::setGlobalVertexPos(size_t index, const b2Vec2& new_pos) {
+	b2Vec2 local_pos = rigid_body->GetLocalPoint(new_pos);
+	vertexSet(index, local_pos);
 	syncVertices();
 }
 
@@ -794,8 +803,9 @@ bool GroundObject::tryDeleteVertex(ptrdiff_t index) {
 	return true;
 }
 
-void GroundObject::addVertex(size_t index, const b2Vec2& pos) {
-	vertices.insert(vertices.begin() + index, pos);
+void GroundObject::addVertexGlobal(size_t index, const b2Vec2& pos) {
+	b2Vec2 local_pos = rigid_body->GetLocalPoint(pos);
+	vertices.insert(vertices.begin() + index, local_pos);
 	syncVertices();
 }
 
@@ -892,7 +902,7 @@ std::vector<b2Vec2> GroundObject::getPositions() {
 }
 
 void GroundObject::vertexSet(size_t index, const b2Vec2& new_pos) {
-	GroundVertex vertex = vertices[index];
+	GroundVertex& vertex = vertices[index];
 	vertex.pos = new_pos;
 	vertex.orig_pos = vertex.pos;
 }
@@ -918,3 +928,4 @@ GroundVertex::GroundVertex(b2Vec2 pos) {
 	this->orig_pos = pos;
 	this->selected = false;
 }
+

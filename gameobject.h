@@ -51,6 +51,8 @@ public:
 	~GameObject();
 	virtual sf::Drawable* getDrawable() = 0;
 	virtual sf::Transformable* getTransformable() = 0;
+	b2Vec2 toGlobal(const b2Vec2& pos);
+	b2Vec2 toLocal(const b2Vec2& pos);
 	void updateVisual();
 	void render(sf::RenderTarget& target);
 	void renderMask(sf::RenderTarget& mask, bool include_children);
@@ -151,10 +153,10 @@ public:
 	void saveOffsets();
 	size_t getVertexCount();
 	const GroundVertex& getVertex(size_t index);
-	b2Vec2 getVertexPos(size_t index);
-	void setVertexPos(size_t index, const b2Vec2& new_pos);
+	b2Vec2 getGlobalVertexPos(size_t index);
+	void setGlobalVertexPos(size_t index, const b2Vec2& new_pos);
 	bool tryDeleteVertex(ptrdiff_t index);
-	void addVertex(size_t index, const b2Vec2& pos);
+	void addVertexGlobal(size_t index, const b2Vec2& pos);
 	void selectVertex(size_t index);
 	bool isVertexSelected(size_t index);
 	void selectAllVertices();

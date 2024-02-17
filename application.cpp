@@ -57,14 +57,12 @@ void Application::init(std::string filename) {
     if (filename != "") {
         load_from_file(filename);
     }
-    history.save(HistoryEntry::BASE);
 
     assert(tools.size() > 0);
     assert(selected_tool);
     for (size_t i = 0; i < tools.size(); i++) {
         assert(tools[i]->widget);
     }
-    assert(history.size() == 1);
 }
 
 void Application::load(std::string filename) {
@@ -73,6 +71,8 @@ void Application::load(std::string filename) {
 }
 
 void Application::start() {
+    history.clear();
+    history.save(HistoryEntry::BASE);
     main_loop();
 }
 
@@ -465,8 +465,8 @@ void Application::process_mouse() {
         } else if (edit_tool.mode == EditTool::INSERT) {
             edit_tool.highlighted_edge = mouse_get_ground_edge();
             if (edit_tool.highlighted_edge != -1) {
-                b2Vec2 v1 = ground->getVertexPos(edit_tool.highlighted_edge);
-                b2Vec2 v2 = ground->getVertexPos(edit_tool.highlighted_edge + 1);
+                b2Vec2 v1 = ground->getGlobalVertexPos(edit_tool.highlighted_edge);
+                b2Vec2 v2 = ground->getGlobalVertexPos(edit_tool.highlighted_edge + 1);
                 edit_tool.insertVertexPos = utils::line_project(b2MousePosWorld, v1, v2);
             }
         }
@@ -505,7 +505,7 @@ void Application::process_mouse() {
                 if (edit_tool.grabbed_vertex != -1) {
                     ptrdiff_t index = edit_tool.grabbed_vertex;
                     const GroundVertex& vertex = ground->getVertex(index);
-                    b2Vec2 offset = b2MousePosWorld + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
+                    b2Vec2 offset = ground->toLocal(b2MousePosWorld) + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
                     ground->offsetVertex(index, offset, false);
                     ground->offsetSelected(offset, false);
                     ground->syncVertices();
@@ -585,7 +585,7 @@ void Application::process_left_click() {
                 edit_tool.mode = EditTool::MOVE;
                 edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
                 const GroundVertex& vertex = ground->getVertex(edit_tool.grabbed_vertex);
-                edit_tool.grabbed_vertex_offset = vertex.pos - b2MousePosWorld;
+                edit_tool.grabbed_vertex_offset = vertex.pos - ground->toLocal(b2MousePosWorld);
                 bool shift = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
                 if (!vertex.selected && !shift) {
                     ground->deselectAllVertices();
@@ -602,13 +602,13 @@ void Application::process_left_click() {
             }
         } else if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             if (edit_tool.edge_vertex == 0) {
-                ground->addVertex(0, b2MousePosWorld);
+                ground->addVertexGlobal(0, b2MousePosWorld);
             } else if (edit_tool.edge_vertex > 0) {
-                ground->addVertex(edit_tool.edge_vertex + 1, b2MousePosWorld);
+                ground->addVertexGlobal(edit_tool.edge_vertex + 1, b2MousePosWorld);
             }
             commit_action = true;
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
-            ground->addVertex(edit_tool.highlighted_edge + 1, edit_tool.insertVertexPos);
+            ground->addVertexGlobal(edit_tool.highlighted_edge + 1, edit_tool.insertVertexPos);
             commit_action = true;
         }
     }
@@ -742,7 +742,7 @@ void Application::render_ui() {
     } else if (selected_tool == &edit_tool) {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             // ghost edge
-            sf::Vector2i v1 = world_to_screen(ground->getVertexPos(edit_tool.edge_vertex));
+            sf::Vector2i v1 = world_to_screen(ground->getGlobalVertexPos(edit_tool.edge_vertex));
             sf::Vector2i v2 = mousePos;
             draw_line(target, to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
             // ghost edge normal
@@ -760,8 +760,8 @@ void Application::render_ui() {
             target.draw(edit_tool.vertex_rect);
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
             // edge highlight
-            b2Vec2 v1 = ground->getVertexPos(edit_tool.highlighted_edge);
-            b2Vec2 v2 = ground->getVertexPos(edit_tool.highlighted_edge + 1);
+            b2Vec2 v1 = ground->getGlobalVertexPos(edit_tool.highlighted_edge);
+            b2Vec2 v2 = ground->getGlobalVertexPos(edit_tool.highlighted_edge + 1);
             sf::Vector2f v1_screen = world_to_screenf(v1);
             sf::Vector2f v2_screen = world_to_screenf(v2);
             sf::Vector2f vec = v2_screen - v1_screen;
@@ -778,7 +778,7 @@ void Application::render_ui() {
         }
         // ground vertices
         for (size_t i = 0; i < ground->getVertexCount(); i++) {
-            edit_tool.vertex_rect.setPosition(world_to_screenf(ground->getVertexPos(i)));
+            edit_tool.vertex_rect.setPosition(world_to_screenf(ground->getGlobalVertexPos(i)));
             bool selected = ground->isVertexSelected(i);
             sf::Color vertex_color = selected ? sf::Color(255, 255, 0) : sf::Color(255, 0, 0);
             edit_tool.vertex_rect.setFillColor(vertex_color);
@@ -787,12 +787,12 @@ void Application::render_ui() {
         // ground edge normals
         for (size_t i = 0; i < ground->getVertexCount() - 1; i++) {
             sf::Vector2f norm_v1, norm_v2;
-            get_screen_normal(ground->getVertexPos(i), ground->getVertexPos(i + 1), norm_v1, norm_v2);
+            get_screen_normal(ground->getGlobalVertexPos(i), ground->getGlobalVertexPos(i + 1), norm_v1, norm_v2);
             draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255));
         }
         if (edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) {
             // highlighted vertex
-            sf::Vector2f vertex_pos = world_to_screenf(ground->getVertexPos(edit_tool.highlighted_vertex));
+            sf::Vector2f vertex_pos = world_to_screenf(ground->getGlobalVertexPos(edit_tool.highlighted_vertex));
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
             target.draw(edit_tool.vertex_highlight_rect);
         } else if (edit_tool.mode == EditTool::SELECT && edit_tool.rectangle_select.active) {
@@ -1044,10 +1044,10 @@ GameObject* Application::get_object_at(sf::Vector2i screen_pos) {
 
 ptrdiff_t Application::mouse_get_ground_vertex() {
     ptrdiff_t closest_vertex_i = 0;
-    sf::Vector2i closest_vertex_pos = world_to_screen(ground->getVertexPos(0));
+    sf::Vector2i closest_vertex_pos = world_to_screen(ground->getGlobalVertexPos(0));
     int closest_vertex_offset = utils::get_max_offset(closest_vertex_pos, mousePos);
     for (size_t i = 1; i < ground->getVertexCount(); i++) {
-        sf::Vector2i vertex_pos = world_to_screen(ground->getVertexPos(i));
+        sf::Vector2i vertex_pos = world_to_screen(ground->getGlobalVertexPos(i));
         float offset = utils::get_max_offset(vertex_pos, mousePos);
         if (offset < closest_vertex_offset) {
             closest_vertex_i = i;
@@ -1063,8 +1063,8 @@ ptrdiff_t Application::mouse_get_ground_vertex() {
 
 ptrdiff_t Application::mouse_get_ground_edge() {
     for (size_t i = 0; i < ground->getVertexCount() - 1; i++) {
-        b2Vec2 p1 = ground->getVertexPos(i);
-        b2Vec2 p2 = ground->getVertexPos(i + 1);
+        b2Vec2 p1 = ground->getGlobalVertexPos(i);
+        b2Vec2 p2 = ground->getGlobalVertexPos(i + 1);
         b2Vec2 dir = p2 - p1;
         b2Vec2 side1_dir = utils::rot90CW(dir);
         b2Vec2 side2_dir = utils::rot90CCW(dir);
@@ -1090,8 +1090,8 @@ ptrdiff_t Application::mouse_get_ground_edge() {
 ptrdiff_t Application::mouse_get_edge_vertex() {
     ptrdiff_t v_start_i = 0;
     ptrdiff_t v_end_i = ground->getVertexCount() - 1;
-    sf::Vector2f v_start = world_to_screenf(ground->getVertexPos(v_start_i));
-    sf::Vector2f v_end = world_to_screenf(ground->getVertexPos(v_end_i));
+    sf::Vector2f v_start = world_to_screenf(ground->getGlobalVertexPos(v_start_i));
+    sf::Vector2f v_end = world_to_screenf(ground->getGlobalVertexPos(v_end_i));
     float v_start_dist = utils::get_length(mousePosf - v_start);
     float v_end_dist = utils::get_length(mousePosf - v_end);
     if (v_start_dist <= v_end_dist) {
@@ -1112,7 +1112,7 @@ void Application::select_vertices_in_rect(const RectangleSelect& rectangle_selec
     float height = bottom - top;
     sf::FloatRect rect(left, top, width, height);
     for (size_t i = 0; i < ground->getVertexCount(); i++) {
-        if (utils::contains_point(rect, tosf(ground->getVertexPos(i)))) {
+        if (utils::contains_point(rect, tosf(ground->getGlobalVertexPos(i)))) {
             ground->selectVertex(i);
         }
     }
@@ -1206,9 +1206,10 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
     return ptr;
 }
 
-GroundObject* Application::create_ground(b2Vec2 pos, std::vector<b2Vec2> vertices, sf::Color color) {
+GroundObject* Application::create_ground(b2Vec2 pos, float angle, std::vector<b2Vec2> vertices, sf::Color color) {
     b2BodyDef def;
     def.position = pos;
+    def.angle = angle;
     std::unique_ptr<GroundObject> uptr = std::make_unique<GroundObject>(world.get(), def, vertices, color);
     GroundObject* ptr = uptr.get();
     ground = ptr;
