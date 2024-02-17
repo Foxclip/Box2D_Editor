@@ -299,8 +299,29 @@ namespace utils {
 				|| point_inside_polygon(top_left, polygon_shape)
 				|| point_inside_polygon(top_right, polygon_shape)
 			;
+		} else if (const b2ChainShape* chain_shape = dynamic_cast<const b2ChainShape*>(shape)) {
+			for (size_t i = 0; i < chain_shape->m_count; i++) {
+				b2Vec2 v = world_pos(chain_shape->m_vertices[i]);
+				if (point_inside_rect(v)) {
+					return true;
+				}
+			}
+			for (size_t i = 0; i < chain_shape->m_count - 1; i++) {
+				b2Vec2 v1 = world_pos(chain_shape->m_vertices[i]);
+				b2Vec2 v2 = world_pos(chain_shape->m_vertices[i + 1]);
+				b2Vec2 intersection;
+				if (
+					line_intersect(v1, v2, top_right, top_left, 0.0f, intersection)
+					|| line_intersect(v1, v2, top_left, bottom_left, 0.0f, intersection)
+					|| line_intersect(v1, v2, bottom_left, bottom_right, 0.0f, intersection)
+					|| line_intersect(v1, v2, bottom_right, top_right, 0.0f, intersection)
+				) {
+					return true;
+				}
+			}
+			return false;
 		} else {
-			return false; // TODO: implement other shapes
+			return false;
 		}
 	}
 
