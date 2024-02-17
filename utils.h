@@ -222,7 +222,7 @@ namespace utils {
 		for (size_t i = 0; i < polygon.size(); i++) {
 			T p1 = polygon[i];
 			T p2 = polygon[(i + 1) % polygon.size()];
-			if (!left_side(p1, p2, point)) {
+			if (right_side(p1, p2, point)) {
 				return false;
 			}
 		}

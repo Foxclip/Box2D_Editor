@@ -58,7 +58,7 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: selecting ground shape with rectangle select
+    // TODO: multiply by transform in GroundObject::getVertexPos
     // TODO: delete all fixtures in Polygon::recut method
     // TODO: rename tokenizer to serializer
     // TODO: editing shapes

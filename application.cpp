@@ -982,6 +982,34 @@ sf::Vector2f Application::world_dir_to_screenf(b2Vec2 world_dir) {
     return sf::Vector2f(world_dir.x, -world_dir.y);
 }
 
+ptrdiff_t Application::mouse_get_chain_edge(const b2Fixture* fixture) {
+    const b2ChainShape* shape = dynamic_cast<const b2ChainShape*>(fixture->GetShape());
+    const b2Body* body = fixture->GetBody();
+    for (size_t i = 0; i < shape->m_count - 1; i++) {
+        b2Vec2 p1 = body->GetWorldPoint(shape->m_vertices[i]);
+        b2Vec2 p2 = body->GetWorldPoint(shape->m_vertices[i + 1]);
+        b2Vec2 dir = p2 - p1;
+        b2Vec2 side1_dir = utils::rot90CW(dir);
+        b2Vec2 side2_dir = utils::rot90CCW(dir);
+        b2Vec2 side1_p = p1 + side1_dir;
+        b2Vec2 side2_p = p2 + side2_dir;
+        bool inside =
+            utils::left_side(b2MousePosWorld, p1, side1_p)
+            && utils::left_side(b2MousePosWorld, p2, side2_p);
+        if (!inside) {
+            continue;
+        }
+        b2Vec2 b2_mouse_pos = tob2(to2f(mousePos));
+        b2Vec2 b2_p1 = tob2(world_to_screenf(p1));
+        b2Vec2 b2_p2 = tob2(world_to_screenf(p2));
+        float dist = utils::distance_to_line(b2_mouse_pos, b2_p1, b2_p2);
+        if (dist <= EditTool::EDGE_HIGHLIGHT_DISTANCE) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
     b2Vec2 world_pos = b2_screen_to_world(screen_pos);
     b2Vec2 world_pos_next = b2_screen_to_world(screen_pos + sf::Vector2i(1, 1));
@@ -993,7 +1021,11 @@ b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
     world->QueryAABB(&callback, aabb);
     for (size_t i = 0; i < callback.fixtures.size(); i++) {
         b2Fixture* fixture = callback.fixtures[i];
-        if (fixture->TestPoint(midpoint)) {
+        if (fixture->GetShape()->m_type == b2Shape::e_chain) {
+            if (mouse_get_chain_edge(fixture) >= 0) {
+                return fixture;
+            }
+        } else if (fixture->TestPoint(midpoint)) {
             return fixture;
         }
     }
