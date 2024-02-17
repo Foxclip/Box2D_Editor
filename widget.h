@@ -29,15 +29,18 @@ public:
 		BOTTOM_CENTER,
 		BOTTOM_RIGHT,
 	};
-	std::function<void(sf::Vector2f pos)> OnClick = [](sf::Vector2f) { };
+	std::function<void(const sf::Vector2f& pos)> OnClick = [](const sf::Vector2f&) { };
+	std::function<void(const sf::Vector2f& pos)> OnRelease = [](const sf::Vector2f&) { };
 	std::function<void(void)> OnMouseEnter = []() { };
 	std::function<void(void)> OnMouseExit = []() { };
 
 	static bool click_blocked;
+	static bool release_blocked;
 	WidgetVisibility checkVisibility();
 	bool isMouseOver();
 	void updateMouseState();
 	void processClick(const sf::Vector2f& pos);
+	void processRelease(const sf::Vector2f& pos);
 	std::vector<Widget*> getChildren();
 	virtual sf::FloatRect getLocalBounds() = 0;
 	virtual sf::FloatRect getGlobalBounds() = 0;

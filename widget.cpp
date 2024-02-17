@@ -2,6 +2,7 @@
 
 RectangleWidget root_widget;
 bool Widget::click_blocked = false;
+bool Widget::release_blocked = false;
 
 bool Widget::isMouseOver() {
 	return mouseIn;
@@ -51,6 +52,21 @@ void Widget::processClick(const sf::Vector2f& pos) {
 	}
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->processClick(pos);
+	}
+}
+
+void Widget::processRelease(const sf::Vector2f& pos) {
+	if (!visible) {
+		return;
+	}
+	if (mouseIn) {
+		if (!click_through) {
+			release_blocked = true;
+		}
+		OnRelease(pos);
+	}
+	for (size_t i = 0; i < children.size(); i++) {
+		children[i]->processRelease(pos);
 	}
 }
 

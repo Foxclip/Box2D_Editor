@@ -116,6 +116,7 @@ private:
 	void process_keyboard();
 	void process_mouse();
 	void process_left_click();
+	void process_left_release();
 	void process_world();
 	void render();
 	void render_world();

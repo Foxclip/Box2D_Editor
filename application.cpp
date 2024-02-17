@@ -133,7 +133,7 @@ void Application::init_ui() {
             tool_widget->setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
             tool_widget->setFillColor(sf::Color(128, 128, 128));
             tool_widget->setOutlineColor(sf::Color::Yellow);
-            tool_widget->OnClick = [=](sf::Vector2f pos) {
+            tool_widget->OnClick = [=](const sf::Vector2f& pos) {
                 try_select_tool(i);
             };
             tool_widget->OnMouseEnter = [=]() {
@@ -188,7 +188,7 @@ void Application::init_ui() {
             button_widget->setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
             button_widget->setFillColor(sf::Color(128, 128, 128));
             button_widget->setOutlineColor(sf::Color(0, 175, 255));
-            button_widget->OnClick = [=](sf::Vector2f pos) {
+            button_widget->OnClick = [=](const sf::Vector2f& pos) {
                 select_create_type(i);
             };
             button_widget->OnMouseEnter = [=]() {
@@ -294,6 +294,7 @@ void Application::process_widgets() {
     root_widget.setSize(sf::Vector2f(ui_texture.getSize().x, ui_texture.getSize().y));
     root_widget.updateMouseState();
     Widget::click_blocked = false;
+    Widget::release_blocked = false;
 }
 
 void Application::process_input() {
@@ -423,42 +424,7 @@ void Application::process_mouse_event(sf::Event event) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
                 leftButtonPressed = false;
-                if (select_tool.rectangle_select.active) {
-                    select_tool.rectangle_select.active = false;
-                    select_tool.applyRectSelection();
-                } else if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
-                    GameObject* object = get_object_at(mousePos);
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
-                        select_tool.toggleSelect(object);
-                    } else {
-                        select_tool.selectSingleObject(object);
-                    }
-                }
-                if (drag_tool.mouse_joint) {
-                    world->DestroyJoint(drag_tool.mouse_joint);
-                    drag_tool.mouse_joint = nullptr;
-                }
-                if (move_tool.object) {
-                    //TODO: remember state for all children
-                    move_tool.object->setEnabled(move_tool.object_was_enabled, true);
-                    move_tool.object = nullptr;
-                    commit_action = true;
-                }
-                if (rotate_tool.object) {
-                    rotate_tool.object->setEnabled(rotate_tool.object_was_enabled, true);
-                    rotate_tool.object = nullptr;
-                    commit_action = true;
-                }
-                if (edit_tool.grabbed_vertex != -1) {
-                    edit_tool.grabbed_vertex = -1;
-                    ground->saveOffsets();
-                    commit_action = true;
-                    edit_tool.mode = EditTool::HOVER;
-                }
-                if (edit_tool.rectangle_select.active) {
-                    edit_tool.rectangle_select.active = false;
-                    edit_tool.mode = EditTool::HOVER;
-                }
+                process_left_release();
                 break;
             case sf::Mouse::Right:
                 rightButtonPressed = false;
@@ -512,6 +478,9 @@ void Application::process_mouse() {
             } else if (utils::length(mousePosf - mousePressPosf) >= MOUSE_DRAG_THRESHOLD) {
                 select_tool.rectangle_select.active = true;
                 select_tool.rectangle_select.select_origin = sf_screen_to_world(mousePressPosf);
+                if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                    select_tool.clearSelected();
+                }
             }
         } else if (selected_tool == &drag_tool) {
             if (drag_tool.mouse_joint) {
@@ -642,6 +611,49 @@ void Application::process_left_click() {
             ground->addVertex(edit_tool.highlighted_edge + 1, edit_tool.insertVertexPos);
             commit_action = true;
         }
+    }
+}
+
+void Application::process_left_release() {
+    root_widget.processRelease(mousePosf);
+    if (Widget::release_blocked) {
+        return;
+    }
+    if (select_tool.rectangle_select.active) {
+        select_tool.rectangle_select.active = false;
+        select_tool.applyRectSelection();
+    } else if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
+        GameObject* object = get_object_at(mousePos);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+            select_tool.toggleSelect(object);
+        } else {
+            select_tool.selectSingleObject(object);
+        }
+    }
+    if (drag_tool.mouse_joint) {
+        world->DestroyJoint(drag_tool.mouse_joint);
+        drag_tool.mouse_joint = nullptr;
+    }
+    if (move_tool.object) {
+        //TODO: remember state for all children
+        move_tool.object->setEnabled(move_tool.object_was_enabled, true);
+        move_tool.object = nullptr;
+        commit_action = true;
+    }
+    if (rotate_tool.object) {
+        rotate_tool.object->setEnabled(rotate_tool.object_was_enabled, true);
+        rotate_tool.object = nullptr;
+        commit_action = true;
+    }
+    if (edit_tool.grabbed_vertex != -1) {
+        edit_tool.grabbed_vertex = -1;
+        ground->saveOffsets();
+        commit_action = true;
+        edit_tool.mode = EditTool::HOVER;
+    }
+    if (edit_tool.rectangle_select.active) {
+        edit_tool.rectangle_select.active = false;
+        edit_tool.mode = EditTool::HOVER;
     }
 }
 
