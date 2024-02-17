@@ -21,7 +21,7 @@ bool QueryCallback::ReportFixture(b2Fixture* fixture) {
     return true;
 }
 
-void Application::init(std::string filename) {
+void Application::init() {
     sf::ContextSettings cs_window;
     cs_window.antialiasingLevel = ANTIALIASING;
     window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs_window);
@@ -54,10 +54,6 @@ void Application::init(std::string filename) {
     auto setter = [&](std::string str) { deserialize(str, false); };
     history = History(getter, setter);
 
-    if (filename != "") {
-        load_from_file(filename);
-    }
-
     assert(tools.size() > 0);
     assert(selected_tool);
     for (size_t i = 0; i < tools.size(); i++) {
@@ -65,7 +61,7 @@ void Application::init(std::string filename) {
     }
 }
 
-void Application::load(std::string filename) {
+void Application::load_action(std::string filename) {
     load_request.requested = true;
     load_request.filename = filename;
 }
@@ -74,6 +70,10 @@ void Application::start() {
     history.clear();
     history.save(HistoryEntry::BASE);
     main_loop();
+}
+
+void Application::load(std::string filename) {
+    load_from_file(filename);
 }
 
 void Application::setCameraPos(float x, float y) {

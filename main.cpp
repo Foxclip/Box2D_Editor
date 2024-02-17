@@ -6,9 +6,9 @@
 
 void execute_app() {
     Application app;
-    //app.init("level.txt");
     app.init();
-    ground_transform(app);
+    app.load("level.txt");
+    //ground_transform(app);
     app.start();
 }
 
@@ -22,7 +22,6 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: multiply by transform in GroundObject::getVertexPos
     // TODO: delete all fixtures in Polygon::recut method
     // TODO: rename tokenizer to serializer
     // TODO: editing shapes

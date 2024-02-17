@@ -51,8 +51,9 @@ private:
 class Application {
 
 public:
-	void init(std::string filename = "");
+	void init();
 	void start();
+	void load(std::string filename);
 	void setCameraPos(float x, float y);
 	void setCameraZoom(float zoom);
 	BoxObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
@@ -125,7 +126,7 @@ private:
 	std::string serialize();
 	void deserialize(std::string str, bool set_camera);
 	void save_to_file(std::string filename);
-	void load(std::string filename);
+	void load_action(std::string filename);
 	void load_from_file(std::string filename);
 	void quicksave();
 	void quickload();
