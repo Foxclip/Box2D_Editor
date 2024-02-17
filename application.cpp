@@ -619,16 +619,19 @@ void Application::process_left_release() {
     if (Widget::release_blocked) {
         return;
     }
+    if (selected_tool == &select_tool) {
+        if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
+            GameObject* object = get_object_at(mousePos);
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                select_tool.toggleSelect(object);
+            } else {
+                select_tool.selectSingleObject(object);
+            }
+        }
+    }
     if (select_tool.rectangle_select.active) {
         select_tool.rectangle_select.active = false;
         select_tool.applyRectSelection();
-    } else if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
-        GameObject* object = get_object_at(mousePos);
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
-            select_tool.toggleSelect(object);
-        } else {
-            select_tool.selectSingleObject(object);
-        }
     }
     if (drag_tool.mouse_joint) {
         world->DestroyJoint(drag_tool.mouse_joint);
