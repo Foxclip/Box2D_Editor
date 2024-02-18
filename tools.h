@@ -81,8 +81,6 @@ private:
 
 class MoveTool : public Tool {
 public:
-	GameObject* object = nullptr;
-	bool object_was_enabled = false;
 	b2Vec2 offset = b2Vec2(0.0f, 0.0f);
 
 	MoveTool();

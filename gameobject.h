@@ -58,12 +58,15 @@ public:
 	bool hover = false;
 	bool selected = false;
 	bool draw_varray = false;
+	b2Vec2 cursor_offset = b2Vec2(0.0f, 0.0f);
+	bool was_enabled = true;
 
 	GameObject();
 	~GameObject();
 	virtual bool isClosed() = 0;
 	virtual sf::Drawable* getDrawable() = 0;
 	virtual sf::Transformable* getTransformable() = 0;
+	const b2Vec2& getPosition() const;
 	b2Vec2 toGlobal(const b2Vec2& pos);
 	b2Vec2 toLocal(const b2Vec2& pos);
 	void updateVisual();

@@ -37,8 +37,6 @@ MoveTool::MoveTool() : Tool() {
 }
 
 void MoveTool::reset() {
-    object = nullptr;
-    object_was_enabled = false;
     offset = b2Vec2(0.0f, 0.0f);
 }
 

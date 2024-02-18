@@ -131,6 +131,7 @@ private:
 	void quicksave();
 	void quickload();
 	Tool* try_select_tool(int index);
+	Tool* try_select_tool(Tool* tool);
 	void select_create_type(int type);
 	void toggle_pause();
 	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);

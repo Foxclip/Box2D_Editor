@@ -336,7 +336,6 @@ void Application::process_input() {
 void Application::process_keyboard_event(sf::Event event) {
     if (event.type == sf::Event::KeyPressed) {
         switch (event.key.code) {
-            case sf::Keyboard::R: resetView(); break;
             case sf::Keyboard::Space: toggle_pause(); break;
             case sf::Keyboard::Num1: try_select_tool(0); break;
             case sf::Keyboard::Num2: try_select_tool(1); break;
@@ -349,7 +348,7 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::Num9: try_select_tool(8); break;
             case sf::Keyboard::Num0: try_select_tool(9); break;
             case sf::Keyboard::X:
-                if (selected_tool == &edit_tool) {
+                if (selected_tool == &edit_tool && active_object) {
                     if (active_object->tryDeleteVertex(edit_tool.highlighted_vertex)) {
                         commit_action = true;
                     }
@@ -378,13 +377,26 @@ void Application::process_keyboard_event(sf::Event event) {
                 quickload_requested = true;
                 break;
             case sf::Keyboard::A:
-                if (selected_tool == &edit_tool) {
+                if (selected_tool == &edit_tool && active_object) {
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
                         active_object->deselectAllVertices();
                     } else {
                         active_object->selectAllVertices();
                     }
                 }
+                break;
+            case sf::Keyboard::Tab:
+                if (selected_tool == &edit_tool) {
+                    try_select_tool(&select_tool);
+                } else {
+                    try_select_tool(&edit_tool);
+                }
+                break;
+            case sf::Keyboard::G:
+                try_select_tool(&move_tool);
+                break;
+            case sf::Keyboard::R:
+                try_select_tool(&rotate_tool);
                 break;
         }
     }
@@ -472,6 +484,16 @@ void Application::process_mouse() {
                 edit_tool.insertVertexPos = utils::line_project(b2MousePosWorld, v1, v2);
             }
         }
+    } else if (selected_tool == &move_tool) {
+        for (GameObject* obj : select_tool.selected_objects) {
+            obj->setPosition(b2MousePosWorld + obj->cursor_offset, true);
+        }
+    } else if (selected_tool == &rotate_tool) {
+        if (rotate_tool.object) {
+            b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.object->rigid_body->GetPosition();
+            float angle = atan2(mouse_vector.y, mouse_vector.x);
+            rotate_tool.object->setAngle(angle - rotate_tool.angle_offset, true);
+        }
     }
     if (leftButtonPressed) {
         if (selected_tool == &select_tool) {
@@ -487,16 +509,6 @@ void Application::process_mouse() {
         } else if (selected_tool == &drag_tool) {
             if (drag_tool.mouse_joint) {
                 drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
-            }
-        } else if (selected_tool == &move_tool) {
-            if (move_tool.object) {
-                move_tool.object->setPosition(b2MousePosWorld - move_tool.offset, true);
-            }
-        } else if (selected_tool == &rotate_tool) {
-            if (rotate_tool.object) {
-                b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.object->rigid_body->GetPosition();
-                float angle = atan2(mouse_vector.y, mouse_vector.x);
-                rotate_tool.object->setAngle(angle - rotate_tool.angle_offset, true);
             }
         } else if (selected_tool == &edit_tool) {
             if (edit_tool.mode == EditTool::SELECT) {
@@ -559,16 +571,12 @@ void Application::process_left_click() {
             drag_tool.mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
         }
     } else if (selected_tool == &move_tool) {
-        GameObject* gameobject = get_object_at(mousePos);
-        if (gameobject) {
-            b2Body* body = gameobject->rigid_body;
-            move_tool.object_was_enabled = body->IsEnabled();
-            move_tool.offset = b2MousePosWorld - body->GetPosition();
-            gameobject->setEnabled(false, true);
-            gameobject->setLinearVelocity(b2Vec2(0.0f, 0.0f), true);
-            gameobject->setAngularVelocity(0.0f, true);
-            move_tool.object = gameobject;
+        for (GameObject* obj : select_tool.selected_objects) {
+            //TODO: remember state for all children
+            obj->setEnabled(obj->was_enabled, true);
+            commit_action = true;
         }
+        try_select_tool(&select_tool);
     } else if (selected_tool == &rotate_tool) {
         GameObject* gameobject = get_object_at(mousePos);
         if (gameobject) {
@@ -639,12 +647,6 @@ void Application::process_left_release() {
     if (drag_tool.mouse_joint) {
         world->DestroyJoint(drag_tool.mouse_joint);
         drag_tool.mouse_joint = nullptr;
-    }
-    if (move_tool.object) {
-        //TODO: remember state for all children
-        move_tool.object->setEnabled(move_tool.object_was_enabled, true);
-        move_tool.object = nullptr;
-        commit_action = true;
     }
     if (rotate_tool.object) {
         rotate_tool.object->setEnabled(rotate_tool.object_was_enabled, true);
@@ -934,16 +936,29 @@ void Application::quickload() {
 Tool* Application::try_select_tool(int index) {
     if (tools.size() > index) {
         Tool* tool = tools[index];
-        selected_tool = tool;
-        create_tool.create_panel_widget->setVisible(tool == &create_tool);
-        edit_tool.edit_window_widget->setVisible(tool == &edit_tool);
-        for (size_t i = 0; i < tools.size(); i++) {
-            tools[i]->widget->setFillColor(sf::Color(128, 128, 128));
-        }
-        tool->widget->setFillColor(sf::Color::Yellow);
-        return tool;
+        try_select_tool(tool);
     }
     return nullptr;
+}
+
+Tool* Application::try_select_tool(Tool* tool) {
+    selected_tool = tool;
+    if (tool == &move_tool) {
+        for (GameObject* obj : select_tool.selected_objects) {
+            obj->cursor_offset = obj->getPosition() - b2MousePosWorld;
+            obj->was_enabled = obj->rigid_body->IsEnabled();
+            obj->setEnabled(false, true);
+            obj->setLinearVelocity(b2Vec2(0.0f, 0.0f), true);
+            obj->setAngularVelocity(0.0f, true);
+        }
+    }
+    create_tool.create_panel_widget->setVisible(tool == &create_tool);
+    edit_tool.edit_window_widget->setVisible(tool == &edit_tool);
+    for (size_t i = 0; i < tools.size(); i++) {
+        tools[i]->widget->setFillColor(sf::Color(128, 128, 128));
+    }
+    tool->widget->setFillColor(sf::Color::Yellow);
+    return tool;
 }
 
 void Application::select_create_type(int type) {

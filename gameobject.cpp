@@ -16,6 +16,10 @@ GameObject::~GameObject() {
 	}
 }
 
+const b2Vec2& GameObject::getPosition() const {
+	return rigid_body->GetPosition();
+}
+
 b2Vec2 GameObject::toGlobal(const b2Vec2& pos) {
 	return rigid_body->GetWorldPoint(pos);
 }
