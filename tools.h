@@ -117,7 +117,6 @@ public:
 		MOVE,
 	};
 	EditToolMode mode = HOVER;
-	GameObject* object = nullptr;
 	ptrdiff_t grabbed_vertex = -1;
 	ptrdiff_t highlighted_vertex = -1;
 	ptrdiff_t highlighted_edge = -1;

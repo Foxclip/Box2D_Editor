@@ -11,7 +11,7 @@ void scene1(Application& app) {
         b2Vec2(-15.0f, 2.0f),
         b2Vec2(-25.0f, 8.0f),
     };
-    GameObject* ground = app.create_ground(b2Vec2(0.0f, 0.0f), 0.0f, ground_vertices, sf::Color(255, 255, 255));
+    GameObject* ground = app.create_chain(b2Vec2(0.0f, 0.0f), 0.0f, ground_vertices, sf::Color(255, 255, 255));
 
     GameObject* box0 = app.create_box(b2Vec2(0.0f, 1.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color(0, 255, 0));
     GameObject* box1 = app.create_box(b2Vec2(0.1f, 2.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color(0, 255, 0));
@@ -41,9 +41,20 @@ void scene1(Application& app) {
 void single_box(Application& app) {
     GameObject* box0 = app.create_box(
         b2Vec2(0.0f, 0.0f),
-        utils::to_radians(45.0f),
+        utils::to_radians(0.0f),
         b2Vec2(1.0f, 1.0f),
         sf::Color(0, 255, 0)
+    );
+    app.setCameraPos(0.0f, 0.0f);
+    app.setCameraZoom(200.0f);
+}
+
+void single_ball(Application& app) {
+    GameObject* ball = app.create_ball(
+        b2Vec2(0.0f, 0.0f),
+        0.5f,
+        sf::Color(0, 255, 0),
+        sf::Color(0, 64, 0)
     );
     app.setCameraPos(0.0f, 0.0f);
     app.setCameraZoom(200.0f);
@@ -58,7 +69,7 @@ void ground_transform(Application& app) {
         b2Vec2(-15.0f, 2.0f),
         b2Vec2(-25.0f, 8.0f),
     };
-    GameObject* ground = app.create_ground(
+    GameObject* ground = app.create_chain(
         b2Vec2(0.0f, 5.0f),
         utils::to_radians(45.0f),
         ground_vertices,
@@ -78,4 +89,29 @@ void single_car(Application& app) {
     car->setRestitution(0.5f, false);
     app.setCameraPos(0.0f, 0.0f);
     app.setCameraZoom(50.0f);
+}
+
+void multiple_chains(Application& app) {
+    std::vector<b2Vec2> ground_vertices = {
+        b2Vec2(25.0f, 8.0f),
+        b2Vec2(15.0f, 2.0f),
+        b2Vec2(5.0f, 0.0f),
+        b2Vec2(-5.0f, 0.0f),
+        b2Vec2(-15.0f, 2.0f),
+        b2Vec2(-25.0f, 8.0f),
+    };
+    GameObject* chain1 = app.create_chain(
+        b2Vec2(0.0f, 0.0f),
+        utils::to_radians(0.0f),
+        ground_vertices,
+        sf::Color(255, 255, 255)
+    );
+    GameObject* chain2 = app.create_chain(
+        b2Vec2(0.0f, 5.0f),
+        utils::to_radians(0.0f),
+        ground_vertices,
+        sf::Color(255, 255, 255)
+    );
+    app.setCameraPos(0.0f, 5.0f);
+    app.setCameraZoom(30.0f);
 }

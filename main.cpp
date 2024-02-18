@@ -10,7 +10,10 @@ void execute_app() {
     //scene1(app);
     app.load("level.txt");
     //ground_transform(app);
+    //single_box(app);
+    //single_ball(app);
     //single_car(app);
+    //multiple_chains(app);
     app.start();
 }
 

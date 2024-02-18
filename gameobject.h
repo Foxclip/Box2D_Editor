@@ -60,6 +60,7 @@ public:
 
 	GameObject();
 	~GameObject();
+	virtual bool isClosed() = 0;
 	virtual sf::Drawable* getDrawable() = 0;
 	virtual sf::Transformable* getTransformable() = 0;
 	b2Vec2 toGlobal(const b2Vec2& pos);
@@ -82,7 +83,9 @@ public:
 	void offsetVertex(size_t index, const b2Vec2& offset, bool sync = true);
 	void offsetSelected(const b2Vec2& offset, bool sync = true);
 	void saveOffsets();
+	size_t indexLoop(ptrdiff_t index);
 	size_t getVertexCount();
+	size_t getEdgeCount();
 	const EditableVertex& getVertex(size_t index);
 	b2Vec2 getGlobalVertexPos(size_t index);
 	void setGlobalVertexPos(size_t index, const b2Vec2& new_pos);
@@ -108,6 +111,9 @@ protected:
 	virtual void drawMask(sf::RenderTarget& mask) = 0;
 	std::vector<b2Vec2> getPositions();
 	void vertexSet(size_t index, const b2Vec2& new_pos);
+	void destroyFixtures();
+
+private:
 
 };
 
@@ -116,6 +122,7 @@ public:
 	b2Vec2 size = b2Vec2();
 
 	BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color);
+	bool isClosed() override;
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
@@ -132,6 +139,7 @@ public:
 	float radius = 0.0f;
 
 	BallObject(b2World* world, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
+	bool isClosed() override;
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
@@ -158,6 +166,7 @@ public:
 		std::vector<b2RevoluteJointDef> joint_defs,
 		sf::Color color
 	);
+	bool isClosed() override;
 	PolygonObject* getPolygonObject() const;
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
@@ -173,14 +182,15 @@ private:
 	void create_wheel(b2Vec2 wheel_pos, float radius);
 };
 
-class GroundObject : public GameObject {
+class ChainObject : public GameObject {
 public:
-	GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
+	ChainObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
+	bool isClosed() override;
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) override;
-	static std::unique_ptr<GroundObject> deserialize(TokenReader& tr, b2World* world);
+	static std::unique_ptr<ChainObject> deserialize(TokenReader& tr, b2World* world);
 	void syncVertices() override;
 
 private:

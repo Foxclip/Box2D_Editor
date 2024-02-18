@@ -59,7 +59,7 @@ public:
 	BoxObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	BallObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
 	CarObject* create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
-	GroundObject* create_ground(b2Vec2 pos, float angle, std::vector<b2Vec2> vertices, sf::Color color);
+	ChainObject* create_chain(b2Vec2 pos, float angle, std::vector<b2Vec2> vertices, sf::Color color);
 
 private:
 	sf::Shader desat_shader;
@@ -91,8 +91,8 @@ private:
 	std::unique_ptr<b2World> world;
 	float timeStep = 1.0f / FPS;
 	bool paused = true;
-	GroundObject* ground = nullptr;
 	b2Vec2 b2MousePosWorld;
+	GameObject* active_object = nullptr;
 
 	std::vector<std::unique_ptr<GameObject>> game_objects;
 	History history;
@@ -143,8 +143,8 @@ private:
 	ptrdiff_t mouse_get_chain_edge(const b2Fixture* fixture);
 	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
 	GameObject* get_object_at(sf::Vector2i screen_pos);
-	ptrdiff_t mouse_get_ground_vertex();
-	ptrdiff_t mouse_get_ground_edge();
+	ptrdiff_t mouse_get_object_vertex();
+	ptrdiff_t mouse_get_object_edge();
 	ptrdiff_t mouse_get_edge_vertex();
 	void select_vertices_in_rect(const RectangleSelect& rectangle_select);
 	void select_objects_in_rect(const RectangleSelect& rectangle_select);

@@ -349,8 +349,10 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::Num9: try_select_tool(8); break;
             case sf::Keyboard::Num0: try_select_tool(9); break;
             case sf::Keyboard::X:
-                if (ground->tryDeleteVertex(edit_tool.highlighted_vertex)) {
-                    commit_action = true;
+                if (selected_tool == &edit_tool) {
+                    if (active_object->tryDeleteVertex(edit_tool.highlighted_vertex)) {
+                        commit_action = true;
+                    }
                 }
                 break;
             case sf::Keyboard::LControl: edit_tool.mode = EditTool::ADD; break;
@@ -378,9 +380,9 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::A:
                 if (selected_tool == &edit_tool) {
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
-                        ground->deselectAllVertices();
+                        active_object->deselectAllVertices();
                     } else {
-                        ground->selectAllVertices();
+                        active_object->selectAllVertices();
                     }
                 }
                 break;
@@ -459,14 +461,14 @@ void Application::process_mouse() {
         }
     } else if (selected_tool == &edit_tool) {
         if (edit_tool.mode == EditTool::HOVER) {
-            edit_tool.highlighted_vertex = mouse_get_ground_vertex();
+            edit_tool.highlighted_vertex = mouse_get_object_vertex();
         } else if (edit_tool.mode == EditTool::ADD) {
             edit_tool.edge_vertex = mouse_get_edge_vertex();
         } else if (edit_tool.mode == EditTool::INSERT) {
-            edit_tool.highlighted_edge = mouse_get_ground_edge();
+            edit_tool.highlighted_edge = mouse_get_object_edge();
             if (edit_tool.highlighted_edge != -1) {
-                b2Vec2 v1 = ground->getGlobalVertexPos(edit_tool.highlighted_edge);
-                b2Vec2 v2 = ground->getGlobalVertexPos(edit_tool.highlighted_edge + 1);
+                b2Vec2 v1 = active_object->getGlobalVertexPos(edit_tool.highlighted_edge);
+                b2Vec2 v2 = active_object->getGlobalVertexPos(active_object->indexLoop(edit_tool.highlighted_edge + 1));
                 edit_tool.insertVertexPos = utils::line_project(b2MousePosWorld, v1, v2);
             }
         }
@@ -504,11 +506,11 @@ void Application::process_mouse() {
             } else if (edit_tool.mode == EditTool::MOVE) {
                 if (edit_tool.grabbed_vertex != -1) {
                     ptrdiff_t index = edit_tool.grabbed_vertex;
-                    const EditableVertex& vertex = ground->getVertex(index);
-                    b2Vec2 offset = ground->toLocal(b2MousePosWorld) + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
-                    ground->offsetVertex(index, offset, false);
-                    ground->offsetSelected(offset, false);
-                    ground->syncVertices();
+                    const EditableVertex& vertex = active_object->getVertex(index);
+                    b2Vec2 offset = active_object->toLocal(b2MousePosWorld) + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
+                    active_object->offsetVertex(index, offset, false);
+                    active_object->offsetSelected(offset, false);
+                    active_object->syncVertices();
                 }
             }
         }
@@ -579,36 +581,36 @@ void Application::process_left_click() {
             gameobject->setAngularVelocity(0.0f, true);
             rotate_tool.object = gameobject;
         }
-    } else if (selected_tool == &edit_tool) {
+    } else if (selected_tool == &edit_tool && active_object) {
         if (edit_tool.mode == EditTool::HOVER) {
             if (edit_tool.highlighted_vertex != -1) {
                 edit_tool.mode = EditTool::MOVE;
                 edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
-                const EditableVertex& vertex = ground->getVertex(edit_tool.grabbed_vertex);
-                edit_tool.grabbed_vertex_offset = vertex.pos - ground->toLocal(b2MousePosWorld);
+                const EditableVertex& vertex = active_object->getVertex(edit_tool.grabbed_vertex);
+                edit_tool.grabbed_vertex_offset = vertex.pos - active_object->toLocal(b2MousePosWorld);
                 bool shift = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
                 if (!vertex.selected && !shift) {
-                    ground->deselectAllVertices();
+                    active_object->deselectAllVertices();
                 } else if (shift) {
-                    ground->selectVertex(edit_tool.grabbed_vertex);
+                    active_object->selectVertex(edit_tool.grabbed_vertex);
                 }
             } else {
                 edit_tool.mode = EditTool::SELECT;
                 edit_tool.rectangle_select.active = true;
                 edit_tool.rectangle_select.select_origin = sfMousePosWorld;
                 if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
-                    ground->deselectAllVertices();
+                    active_object->deselectAllVertices();
                 }
             }
         } else if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             if (edit_tool.edge_vertex == 0) {
-                ground->addVertexGlobal(0, b2MousePosWorld);
+                active_object->addVertexGlobal(0, b2MousePosWorld);
             } else if (edit_tool.edge_vertex > 0) {
-                ground->addVertexGlobal(edit_tool.edge_vertex + 1, b2MousePosWorld);
+                active_object->addVertexGlobal(edit_tool.edge_vertex + 1, b2MousePosWorld);
             }
             commit_action = true;
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
-            ground->addVertexGlobal(edit_tool.highlighted_edge + 1, edit_tool.insertVertexPos);
+            active_object->addVertexGlobal(edit_tool.highlighted_edge + 1, edit_tool.insertVertexPos);
             commit_action = true;
         }
     }
@@ -622,6 +624,7 @@ void Application::process_left_release() {
     if (selected_tool == &select_tool) {
         if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
             GameObject* object = get_object_at(mousePos);
+            active_object = object;
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                 select_tool.toggleSelect(object);
             } else {
@@ -650,7 +653,7 @@ void Application::process_left_release() {
     }
     if (edit_tool.grabbed_vertex != -1) {
         edit_tool.grabbed_vertex = -1;
-        ground->saveOffsets();
+        active_object->saveOffsets();
         commit_action = true;
         edit_tool.mode = EditTool::HOVER;
     }
@@ -692,8 +695,11 @@ void Application::render_world() {
     //if (select_tool.hover_object) {
     //    select_tool.hover_object->renderMask(selection_mask, false);
     //}
-    for (auto obj : select_tool.selected_objects) {
-        obj->renderMask(selection_mask, false);
+
+    if (selected_tool != &edit_tool) {
+        for (auto obj : select_tool.selected_objects) {
+            obj->renderMask(selection_mask, false);
+        }
     }
 
     world_texture.display();
@@ -739,10 +745,10 @@ void Application::render_ui() {
             sf::Vector2f body_origin = world_to_screenf(rotate_tool.object->rigid_body->GetPosition());
             draw_line(target, body_origin, mousePosf, sf::Color::Yellow);
         }
-    } else if (selected_tool == &edit_tool) {
+    } else if (selected_tool == &edit_tool && active_object) {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             // ghost edge
-            sf::Vector2i v1 = world_to_screen(ground->getGlobalVertexPos(edit_tool.edge_vertex));
+            sf::Vector2i v1 = world_to_screen(active_object->getGlobalVertexPos(edit_tool.edge_vertex));
             sf::Vector2i v2 = mousePos;
             draw_line(target, to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
             // ghost edge normal
@@ -760,8 +766,8 @@ void Application::render_ui() {
             target.draw(edit_tool.vertex_rect);
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
             // edge highlight
-            b2Vec2 v1 = ground->getGlobalVertexPos(edit_tool.highlighted_edge);
-            b2Vec2 v2 = ground->getGlobalVertexPos(edit_tool.highlighted_edge + 1);
+            b2Vec2 v1 = active_object->getGlobalVertexPos(edit_tool.highlighted_edge);
+            b2Vec2 v2 = active_object->getGlobalVertexPos(active_object->indexLoop(edit_tool.highlighted_edge + 1));
             sf::Vector2f v1_screen = world_to_screenf(v1);
             sf::Vector2f v2_screen = world_to_screenf(v2);
             sf::Vector2f vec = v2_screen - v1_screen;
@@ -776,23 +782,28 @@ void Application::render_ui() {
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
             target.draw(edit_tool.vertex_rect);
         }
-        // ground vertices
-        for (size_t i = 0; i < ground->getVertexCount(); i++) {
-            edit_tool.vertex_rect.setPosition(world_to_screenf(ground->getGlobalVertexPos(i)));
-            bool selected = ground->isVertexSelected(i);
+        // vertices
+        for (size_t i = 0; i < active_object->getVertexCount(); i++) {
+            edit_tool.vertex_rect.setPosition(world_to_screenf(active_object->getGlobalVertexPos(i)));
+            bool selected = active_object->isVertexSelected(i);
             sf::Color vertex_color = selected ? sf::Color(255, 255, 0) : sf::Color(255, 0, 0);
             edit_tool.vertex_rect.setFillColor(vertex_color);
             target.draw(edit_tool.vertex_rect);
         }
-        // ground edge normals
-        for (size_t i = 0; i < ground->getVertexCount() - 1; i++) {
+        // edge normals
+        for (size_t i = 0; i < active_object->getEdgeCount(); i++) {
             sf::Vector2f norm_v1, norm_v2;
-            get_screen_normal(ground->getGlobalVertexPos(i), ground->getGlobalVertexPos(i + 1), norm_v1, norm_v2);
+            get_screen_normal(
+                active_object->getGlobalVertexPos(i),
+                active_object->getGlobalVertexPos(active_object->indexLoop(i + 1)),
+                norm_v1, 
+                norm_v2
+            );
             draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255));
         }
         if (edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) {
             // highlighted vertex
-            sf::Vector2f vertex_pos = world_to_screenf(ground->getGlobalVertexPos(edit_tool.highlighted_vertex));
+            sf::Vector2f vertex_pos = world_to_screenf(active_object->getGlobalVertexPos(edit_tool.highlighted_vertex));
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
             target.draw(edit_tool.vertex_highlight_rect);
         } else if (edit_tool.mode == EditTool::SELECT && edit_tool.rectangle_select.active) {
@@ -874,10 +885,9 @@ void Application::deserialize(std::string str, bool set_camera) {
                 } else if (type == "car") {
                     gameobject = CarObject::deserialize(tr, world.get());
                 } else if (type == "ground") {
-                    gameobject = GroundObject::deserialize(tr, world.get());
-                    ground = static_cast<GroundObject*>(gameobject.get());
+                    gameobject = ChainObject::deserialize(tr, world.get());
                 } else {
-                    throw std::runtime_error("Unknown object type: " + type);
+                    throw std::runtime_error("Unknown active_object type: " + type);
                 }
                 game_objects.push_back(std::move(gameobject));
             } else {
@@ -1042,12 +1052,15 @@ GameObject* Application::get_object_at(sf::Vector2i screen_pos) {
     return result;
 }
 
-ptrdiff_t Application::mouse_get_ground_vertex() {
+ptrdiff_t Application::mouse_get_object_vertex() {
+    if (!active_object) {
+        return -1;
+    }
     ptrdiff_t closest_vertex_i = 0;
-    sf::Vector2i closest_vertex_pos = world_to_screen(ground->getGlobalVertexPos(0));
+    sf::Vector2i closest_vertex_pos = world_to_screen(active_object->getGlobalVertexPos(0));
     int closest_vertex_offset = utils::get_max_offset(closest_vertex_pos, mousePos);
-    for (size_t i = 1; i < ground->getVertexCount(); i++) {
-        sf::Vector2i vertex_pos = world_to_screen(ground->getGlobalVertexPos(i));
+    for (size_t i = 1; i < active_object->getVertexCount(); i++) {
+        sf::Vector2i vertex_pos = world_to_screen(active_object->getGlobalVertexPos(i));
         float offset = utils::get_max_offset(vertex_pos, mousePos);
         if (offset < closest_vertex_offset) {
             closest_vertex_i = i;
@@ -1061,10 +1074,13 @@ ptrdiff_t Application::mouse_get_ground_vertex() {
     return -1;
 }
 
-ptrdiff_t Application::mouse_get_ground_edge() {
-    for (size_t i = 0; i < ground->getVertexCount() - 1; i++) {
-        b2Vec2 p1 = ground->getGlobalVertexPos(i);
-        b2Vec2 p2 = ground->getGlobalVertexPos(i + 1);
+ptrdiff_t Application::mouse_get_object_edge() {
+    if (!active_object) {
+        return -1;
+    }
+    for (size_t i = 0; i < active_object->getEdgeCount(); i++) {
+        b2Vec2 p1 = active_object->getGlobalVertexPos(i);
+        b2Vec2 p2 = active_object->getGlobalVertexPos(active_object->indexLoop(i + 1));
         b2Vec2 dir = p2 - p1;
         b2Vec2 side1_dir = utils::rot90CW(dir);
         b2Vec2 side2_dir = utils::rot90CCW(dir);
@@ -1088,10 +1104,16 @@ ptrdiff_t Application::mouse_get_ground_edge() {
 }
 
 ptrdiff_t Application::mouse_get_edge_vertex() {
+    if (!active_object) {
+        return -1;
+    }
+    if (active_object->isClosed()) {
+        return -1;
+    }
     ptrdiff_t v_start_i = 0;
-    ptrdiff_t v_end_i = ground->getVertexCount() - 1;
-    sf::Vector2f v_start = world_to_screenf(ground->getGlobalVertexPos(v_start_i));
-    sf::Vector2f v_end = world_to_screenf(ground->getGlobalVertexPos(v_end_i));
+    ptrdiff_t v_end_i = active_object->getEdgeCount();
+    sf::Vector2f v_start = world_to_screenf(active_object->getGlobalVertexPos(v_start_i));
+    sf::Vector2f v_end = world_to_screenf(active_object->getGlobalVertexPos(v_end_i));
     float v_start_dist = utils::get_length(mousePosf - v_start);
     float v_end_dist = utils::get_length(mousePosf - v_end);
     if (v_start_dist <= v_end_dist) {
@@ -1111,9 +1133,9 @@ void Application::select_vertices_in_rect(const RectangleSelect& rectangle_selec
     float width = right - left;
     float height = bottom - top;
     sf::FloatRect rect(left, top, width, height);
-    for (size_t i = 0; i < ground->getVertexCount(); i++) {
-        if (utils::contains_point(rect, tosf(ground->getGlobalVertexPos(i)))) {
-            ground->selectVertex(i);
+    for (size_t i = 0; i < active_object->getVertexCount(); i++) {
+        if (utils::contains_point(rect, tosf(active_object->getGlobalVertexPos(i)))) {
+            active_object->selectVertex(i);
         }
     }
 }
@@ -1206,13 +1228,12 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
     return ptr;
 }
 
-GroundObject* Application::create_ground(b2Vec2 pos, float angle, std::vector<b2Vec2> vertices, sf::Color color) {
+ChainObject* Application::create_chain(b2Vec2 pos, float angle, std::vector<b2Vec2> vertices, sf::Color color) {
     b2BodyDef def;
     def.position = pos;
     def.angle = angle;
-    std::unique_ptr<GroundObject> uptr = std::make_unique<GroundObject>(world.get(), def, vertices, color);
-    GroundObject* ptr = uptr.get();
-    ground = ptr;
+    std::unique_ptr<ChainObject> uptr = std::make_unique<ChainObject>(world.get(), def, vertices, color);
+    ChainObject* ptr = uptr.get();
     game_objects.push_back(std::move(uptr));
     return ptr;
 }

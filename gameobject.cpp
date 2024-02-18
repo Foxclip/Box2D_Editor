@@ -191,8 +191,20 @@ void GameObject::saveOffsets() {
 	}
 }
 
+size_t GameObject::indexLoop(ptrdiff_t index) {
+	return utils::neg_mod(index, (ptrdiff_t)getVertexCount());
+}
+
 size_t GameObject::getVertexCount() {
 	return vertices.size();
+}
+
+size_t GameObject::getEdgeCount() {
+	if (isClosed()) {
+		return vertices.size();
+	} else {
+		return vertices.size() - 1;
+	}
 }
 
 const EditableVertex& GameObject::getVertex(size_t index) {
@@ -259,6 +271,16 @@ void GameObject::vertexSet(size_t index, const b2Vec2& new_pos) {
 	EditableVertex& vertex = vertices[index];
 	vertex.pos = new_pos;
 	vertex.orig_pos = vertex.pos;
+}
+
+void GameObject::destroyFixtures() {
+	std::vector<b2Fixture*> fixtures;
+	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+		fixtures.push_back(fixture);
+	}
+	for (size_t i = 0; i < fixtures.size(); i++) {
+		rigid_body->DestroyFixture(fixtures[i]);
+	}
 }
 
 TokenWriter& GameObject::serializeBody(TokenWriter& tw, b2Body* body) {
@@ -427,9 +449,13 @@ b2RevoluteJointDef GameObject::deserializeRevoluteJoint(TokenReader& tr) {
 BoxObject::BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color) {
 	this->color = color;
 	rigid_body = world->CreateBody(&def);
-	vertices.push_back(EditableVertex(size));
+	vertices.push_back(EditableVertex(0.5f * size));
 	syncVertices();
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+}
+
+bool BoxObject::isClosed() {
+	return false;
 }
 
 sf::Drawable* BoxObject::getDrawable() {
@@ -491,7 +517,7 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* worl
 }
 
 void BoxObject::syncVertices() {
-	size = b2Vec2(abs(vertices.front().pos.x), abs(vertices.front().pos.y));
+	size = b2Vec2(abs(vertices.front().pos.x) * 2.0f, abs(vertices.front().pos.y) * 2.0f);
 	b2Fixture* old_fixture = rigid_body->GetFixtureList();
 	if (old_fixture) {
 		rigid_body->DestroyFixture(old_fixture);
@@ -512,6 +538,10 @@ BallObject::BallObject(b2World* world, b2BodyDef def, float radius, sf::Color co
 	vertices.push_back(EditableVertex(b2Vec2(radius, 0.0f)));
 	syncVertices();
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+}
+
+bool BallObject::isClosed() {
+	return false;
 }
 
 sf::Drawable* BallObject::getDrawable() {
@@ -666,6 +696,10 @@ CarObject::CarObject(
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
+bool CarObject::isClosed() {
+	return true;
+}
+
 PolygonObject* CarObject::getPolygonObject() const {
 	return polygon.get();
 }
@@ -785,9 +819,7 @@ void CarObject::syncVertices() {
 		polygon->setPoint(i, tosf(vertices[i].pos));
 	}
 	polygon->recut();
-	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
-		rigid_body->DestroyFixture(fixture);
-	}
+	destroyFixtures();
 	std::vector<PolygonObject> convex_polygons = polygon->getConvexPolygons();
 	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
 		PolygonObject& polygon = convex_polygons[polygon_i];
@@ -857,7 +889,7 @@ void CircleNotchShape::drawMask(sf::RenderTarget& mask, sf::RenderStates states)
 	setCircleColor(orig_color);
 }
 
-GroundObject::GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color) {
+ChainObject::ChainObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color) {
 	this->color = color;
 	rigid_body = world->CreateBody(&def);
 	sf::VertexArray drawable_vertices(sf::LinesStrip, p_vertices.size());
@@ -872,19 +904,23 @@ GroundObject::GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
-sf::Drawable* GroundObject::getDrawable() {
+bool ChainObject::isClosed() {
+	return false;
+}
+
+sf::Drawable* ChainObject::getDrawable() {
 	return line_strip_shape.get();
 }
 
-sf::Transformable* GroundObject::getTransformable() {
+sf::Transformable* ChainObject::getTransformable() {
 	return line_strip_shape.get();
 }
 
-void GroundObject::drawMask(sf::RenderTarget& mask) {
+void ChainObject::drawMask(sf::RenderTarget& mask) {
 	line_strip_shape->drawMask(mask);
 }
 
-TokenWriter& GroundObject::serialize(TokenWriter& tw) {
+TokenWriter& ChainObject::serialize(TokenWriter& tw) {
 	tw << "object ground" << "\n";
 	{
 		TokenWriterIndent ground_indent(tw);
@@ -901,7 +937,7 @@ TokenWriter& GroundObject::serialize(TokenWriter& tw) {
 	return tw;
 }
 
-std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World* world) {
+std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
 		std::vector<b2Vec2> vertices;
 		sf::Color color = sf::Color::White;
@@ -917,12 +953,12 @@ std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World
 			} else if (pname == "/object") {
 				break;
 			} else {
-				throw std::runtime_error("Unknown GroundObject parameter name: " + pname);
+				throw std::runtime_error("Unknown ChainObject parameter name: " + pname);
 			}
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<GroundObject> ground = std::make_unique<GroundObject>(world, bdef, vertices, color);
+		std::unique_ptr<ChainObject> ground = std::make_unique<ChainObject>(world, bdef, vertices, color);
 		ground->setDensity(fdef.density, false);
 		ground->setFriction(fdef.friction, false);
 		ground->setRestitution(fdef.restitution, false);
@@ -932,11 +968,11 @@ std::unique_ptr<GroundObject> GroundObject::deserialize(TokenReader& tr, b2World
 	}
 }
 
-b2ChainShape* GroundObject::getShape() {
+b2ChainShape* ChainObject::getShape() {
 	return static_cast<b2ChainShape*>(rigid_body->GetFixtureList()->GetShape());
 }
 
-void GroundObject::syncVertices() {
+void ChainObject::syncVertices() {
 	std::vector<b2Vec2> b2vertices = getPositions();
 	b2Fixture* old_fixture = rigid_body->GetFixtureList();
 	if (old_fixture) {
