@@ -59,6 +59,7 @@ public:
 	bool selected = false;
 	bool draw_varray = false;
 	b2Vec2 cursor_offset = b2Vec2(0.0f, 0.0f);
+	b2Vec2 orig_pos = b2Vec2(0.0f, 0.0f);
 	bool was_enabled = true;
 
 	GameObject();
