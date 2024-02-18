@@ -336,6 +336,17 @@ void Application::process_input() {
 void Application::process_keyboard_event(sf::Event event) {
     if (event.type == sf::Event::KeyPressed) {
         switch (event.key.code) {
+        case sf::Keyboard::Escape:
+            if (selected_tool == &move_tool) {
+                for (GameObject* obj : select_tool.selected_objects) {
+                    obj->setPosition(move_tool.orig_cursor_pos + obj->cursor_offset, true);
+                    obj->setEnabled(obj->was_enabled, true);
+                }
+                try_select_tool(&select_tool);
+            } else {
+                window.close();
+            }
+            break;
             case sf::Keyboard::Space: toggle_pause(); break;
             case sf::Keyboard::Num1: try_select_tool(0); break;
             case sf::Keyboard::Num2: try_select_tool(1); break;
@@ -453,9 +464,6 @@ void Application::process_mouse_event(sf::Event event) {
 }
 
 void Application::process_keyboard() {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-        window.close();
-    }
 }
 
 void Application::process_mouse() {
@@ -944,6 +952,7 @@ Tool* Application::try_select_tool(int index) {
 Tool* Application::try_select_tool(Tool* tool) {
     selected_tool = tool;
     if (tool == &move_tool) {
+        move_tool.orig_cursor_pos = b2MousePosWorld;
         for (GameObject* obj : select_tool.selected_objects) {
             obj->cursor_offset = obj->getPosition() - b2MousePosWorld;
             obj->was_enabled = obj->rigid_body->IsEnabled();

@@ -37,7 +37,7 @@ MoveTool::MoveTool() : Tool() {
 }
 
 void MoveTool::reset() {
-    offset = b2Vec2(0.0f, 0.0f);
+    orig_cursor_pos = b2Vec2(0.0f, 0.0f);
 }
 
 RotateTool::RotateTool() : Tool() {

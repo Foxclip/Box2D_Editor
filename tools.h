@@ -81,7 +81,7 @@ private:
 
 class MoveTool : public Tool {
 public:
-	b2Vec2 offset = b2Vec2(0.0f, 0.0f);
+	b2Vec2 orig_cursor_pos = b2Vec2(0.0f, 0.0f);
 
 	MoveTool();
 	void reset() override;
