@@ -41,6 +41,8 @@ struct CutInfo {
 
 class PolygonObject : public sf::Drawable, public sf::Transformable {
 public:
+	bool draw_varray = false;
+
 	PolygonObject();
 	PolygonObject(size_t count);
 	PolygonObject(const sf::VertexArray& varray);

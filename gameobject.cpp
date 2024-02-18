@@ -712,6 +712,11 @@ sf::Transformable* CarObject::getTransformable() {
 	return polygon.get();
 }
 
+void CarObject::render(sf::RenderTarget& target) {
+	polygon->draw_varray = draw_varray;
+	GameObject::render(target);
+}
+
 void CarObject::drawMask(sf::RenderTarget& mask) {
 	sf::Color orig_color = polygon->getFillColor();
 	polygon->setFillColor(sf::Color::White);

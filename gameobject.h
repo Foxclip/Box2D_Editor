@@ -57,6 +57,7 @@ public:
 	sf::Color color;
 	bool hover = false;
 	bool selected = false;
+	bool draw_varray = false;
 
 	GameObject();
 	~GameObject();
@@ -66,7 +67,7 @@ public:
 	b2Vec2 toGlobal(const b2Vec2& pos);
 	b2Vec2 toLocal(const b2Vec2& pos);
 	void updateVisual();
-	void render(sf::RenderTarget& target);
+	virtual void render(sf::RenderTarget& target);
 	void renderMask(sf::RenderTarget& mask, bool include_children);
 	void setVisualPosition(const sf::Vector2f& pos);
 	void setVisualRotation(float angle);
@@ -170,6 +171,7 @@ public:
 	PolygonObject* getPolygonObject() const;
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
+	void render(sf::RenderTarget& target) override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) override;
 	static std::unique_ptr<CarObject> deserialize(TokenReader& tr, b2World* world);

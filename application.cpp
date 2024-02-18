@@ -690,6 +690,7 @@ void Application::render_world() {
 
     for (size_t i = 0; i < game_objects.size(); i++) {
         GameObject* gameobject = game_objects[i].get();
+        gameobject->draw_varray = selected_tool == &edit_tool && dynamic_cast<CarObject*>(gameobject);
         gameobject->render(world_texture);
     }
     //if (select_tool.hover_object) {
@@ -845,6 +846,7 @@ std::string Application::serialize() {
 }
 
 void Application::deserialize(std::string str, bool set_camera) {
+    active_object = nullptr;
     game_objects.clear();
     init_tools();
     init_world();

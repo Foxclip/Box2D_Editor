@@ -401,6 +401,7 @@ void PolygonObject::recenter() {
 		setPoint(i, new_pos);
 	}
 	setPosition(local_center);
+	setRotation(0.0f);
 }
 
 void PolygonObject::recut() {
@@ -412,15 +413,15 @@ void PolygonObject::recut() {
 		PolygonObject& polygon = convex_polygons[polygon_i];
 		polygon.recenter();
 		polygon.triangle_fan = sf::VertexArray(sf::TriangleFan, polygon.getPointCount() + 2);
-		auto add_vertex = [&](sf::Vector2f pos) {
+		auto set_vertex = [&](size_t index, sf::Vector2f pos) {
 			sf::Vertex vertex;
 			vertex.position = pos;
 			vertex.color = fill_color;
-			polygon.triangle_fan.append(vertex);
+			polygon.triangle_fan[index] = vertex;
 		};
-		add_vertex(sf::Vector2f());
+		set_vertex(0, sf::Vector2f());
 		for (size_t vertex_i = 0; vertex_i < polygon.getPointCount() + 1; vertex_i++) {
-			add_vertex(polygon.getPoint(polygon.indexLoop(vertex_i)));
+			set_vertex(vertex_i + 1, polygon.getPoint(polygon.indexLoop(vertex_i)));
 		}
 		polygon.is_convex = true;
 		polygon.parent = this;
@@ -445,7 +446,9 @@ void PolygonObject::draw(sf::RenderTarget& target, sf::RenderStates states) cons
 			target.draw(convex_polygons[i], states);
 		}
 	}
-	target.draw(varray, states);
+	if (draw_varray || (parent && parent->draw_varray)) {
+		target.draw(varray, states);
+	}
 }
 
 bool PolygonObject::isConvexVertex(size_t index) const {

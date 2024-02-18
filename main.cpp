@@ -14,6 +14,7 @@ void execute_app() {
     //single_ball(app);
     //single_car(app);
     //multiple_chains(app);
+    //polygon(app);
     app.start();
 }
 
@@ -27,12 +28,11 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: remove ground pointer, allow multiple chains
     // TODO: edit mode with tab, move with G rotate with R, delete with X, select all with A
+    // TODO: serialize car vertices
     // TODO: fix releasing left click on widgets in drag mode
-    // TODO: editing shapes
     // TODO: cut polygons with b2maxvertices
-    // TODO: select tool rectangle select
+    // TODO: self-intersecting polygon splitting
     // TODO: set whether object is static or dynamic in edit mode
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars
