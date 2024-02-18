@@ -147,6 +147,8 @@ private:
 
 class CarObject : public GameObject {
 public:
+	std::vector<float> lengths;
+
 	CarObject(b2World* world, b2BodyDef def, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
 	CarObject(
 		b2World* world,

@@ -620,6 +620,7 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 
 CarObject::CarObject(b2World* world, b2BodyDef def, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
 	this->color = color;
+	this->lengths = lengths;
 	rigid_body = world->CreateBody(&def);
 	for (size_t i = 0; i < lengths.size(); i++) {
 		b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
@@ -643,6 +644,7 @@ CarObject::CarObject(
 	sf::Color color
 ) {
 	this->color = color;
+	this->lengths = lengths;
 	rigid_body = world->CreateBody(&def);
 	for (size_t i = 0; i < lengths.size(); i++) {
 		b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
@@ -687,6 +689,7 @@ TokenWriter& CarObject::serialize(TokenWriter& tw) {
 	tw << "object car" << "\n";
 	{
 		TokenWriterIndent car_indent(tw);
+		tw.writeFloatArrParam("lengths", lengths);
 		tw.writeColorParam("color", color);
 		serializeBody(tw, rigid_body) << "\n";
 		tw << "wheels" << "\n";
