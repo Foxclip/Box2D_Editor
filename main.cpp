@@ -22,8 +22,8 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: delete all fixtures in Polygon::recut method
-    // TODO: rename tokenizer to serializer
+    // TODO: remove ground pointer, allow multiple chains
+    // TODO: edit mode with tab, move with G rotate with R, delete with X, select all with A
     // TODO: editing shapes
     // TODO: cut polygons with b2maxvertices
     // TODO: select tool rectangle select

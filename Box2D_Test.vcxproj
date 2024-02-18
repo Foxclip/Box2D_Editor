@@ -142,7 +142,7 @@
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="polygon.cpp" />
-    <ClCompile Include="tokenizer.cpp" />
+    <ClCompile Include="serializer.cpp" />
     <ClCompile Include="tools.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="widget.cpp" />
@@ -155,7 +155,7 @@
     <ClInclude Include="logger.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="scenes.h" />
-    <ClInclude Include="tokenizer.h" />
+    <ClInclude Include="serializer.h" />
     <ClInclude Include="tools.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="widget.h" />
