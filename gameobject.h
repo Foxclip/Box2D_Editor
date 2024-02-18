@@ -38,6 +38,17 @@ struct BodyDef {
 	std::vector<b2FixtureDef> fixture_defs;
 };
 
+class EditableVertex {
+public:
+	b2Vec2 pos = b2Vec2(0.0f, 0.0f);
+	b2Vec2 orig_pos = b2Vec2(0.0f, 0.0f);
+	bool selected = false;
+
+	EditableVertex(b2Vec2 pos);
+
+private:
+};
+
 class GameObject {
 public:
 	b2Body* rigid_body = nullptr;
@@ -67,6 +78,21 @@ public:
 	void setDensity(float density, bool include_children);
 	void setFriction(float friction, bool include_children);
 	void setRestitution(float restitution, bool include_children);
+	void moveVertices(const std::vector<size_t>& index_list, const b2Vec2& offset);
+	void offsetVertex(size_t index, const b2Vec2& offset, bool sync = true);
+	void offsetSelected(const b2Vec2& offset, bool sync = true);
+	void saveOffsets();
+	size_t getVertexCount();
+	const EditableVertex& getVertex(size_t index);
+	b2Vec2 getGlobalVertexPos(size_t index);
+	void setGlobalVertexPos(size_t index, const b2Vec2& new_pos);
+	bool tryDeleteVertex(ptrdiff_t index);
+	void addVertexGlobal(size_t index, const b2Vec2& pos);
+	void selectVertex(size_t index);
+	bool isVertexSelected(size_t index);
+	void selectAllVertices();
+	void deselectAllVertices();
+	virtual void syncVertices() = 0;
 	virtual TokenWriter& serialize(TokenWriter& tw) = 0;
 	static TokenWriter& serializeBody(TokenWriter& tw, b2Body* body);
 	static TokenWriter& serializeFixture(TokenWriter& tw, b2Fixture* fixture);
@@ -77,35 +103,46 @@ public:
 	static b2RevoluteJointDef deserializeRevoluteJoint(TokenReader& tr);
 
 protected:
+	std::vector<EditableVertex> vertices;
+
 	virtual void drawMask(sf::RenderTarget& mask) = 0;
+	std::vector<b2Vec2> getPositions();
+	void vertexSet(size_t index, const b2Vec2& new_pos);
 
 };
 
 class BoxObject : public GameObject {
 public:
+	b2Vec2 size = b2Vec2();
+
 	BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color);
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) override;
 	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, b2World* world);
-	b2Vec2 size = b2Vec2();
+	void syncVertices() override;
+
 private:
 	std::unique_ptr<sf::RectangleShape> rect_shape;
 };
 
 class BallObject : public GameObject {
 public:
+	float radius = 0.0f;
+
 	BallObject(b2World* world, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) override;
 	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, b2World* world);
-	float radius = 0.0f;
+	void syncVertices() override;
+
 private:
 	std::unique_ptr<CircleNotchShape> circle_notch_shape;
 	sf::Color notch_color;
+
 };
 
 class CarObject : public GameObject {
@@ -125,52 +162,28 @@ public:
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) override;
 	static std::unique_ptr<CarObject> deserialize(TokenReader& tr, b2World* world);
-	std::vector<float> lengths;
+	void syncVertices() override;
+
 private:
 	std::unique_ptr<PolygonObject> polygon;
 	std::vector<b2RevoluteJoint*> wheel_joints;
-	void create_shape(std::vector<float> lengths);
+
 	void create_wheel(b2Vec2 wheel_pos, float radius);
-};
-
-class GroundVertex {
-public:
-	b2Vec2 pos = b2Vec2(0.0f, 0.0f);
-	b2Vec2 orig_pos = b2Vec2(0.0f, 0.0f);
-	bool selected = false;
-
-	GroundVertex(b2Vec2 pos);
-
-private:
 };
 
 class GroundObject : public GameObject {
 public:
 	GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
-	void moveVertices(const std::vector<size_t>& index_list, const b2Vec2& offset);
-	void offsetVertex(size_t index, const b2Vec2& offset, bool sync = true);
-	void offsetSelected(const b2Vec2& offset, bool sync = true);
-	void saveOffsets();
-	size_t getVertexCount();
-	const GroundVertex& getVertex(size_t index);
-	b2Vec2 getGlobalVertexPos(size_t index);
-	void setGlobalVertexPos(size_t index, const b2Vec2& new_pos);
-	bool tryDeleteVertex(ptrdiff_t index);
-	void addVertexGlobal(size_t index, const b2Vec2& pos);
-	void selectVertex(size_t index);
-	bool isVertexSelected(size_t index);
-	void selectAllVertices();
-	void deselectAllVertices();
-	void syncVertices();
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) override;
 	static std::unique_ptr<GroundObject> deserialize(TokenReader& tr, b2World* world);
+	void syncVertices() override;
+
 private:
-	std::vector<GroundVertex> vertices;
 	std::unique_ptr<LineStripShape> line_strip_shape;
+
 	b2ChainShape* getShape();
-	std::vector<b2Vec2> getPositions();
-	void vertexSet(size_t index, const b2Vec2& new_pos);
+
 };

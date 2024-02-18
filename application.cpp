@@ -504,7 +504,7 @@ void Application::process_mouse() {
             } else if (edit_tool.mode == EditTool::MOVE) {
                 if (edit_tool.grabbed_vertex != -1) {
                     ptrdiff_t index = edit_tool.grabbed_vertex;
-                    const GroundVertex& vertex = ground->getVertex(index);
+                    const EditableVertex& vertex = ground->getVertex(index);
                     b2Vec2 offset = ground->toLocal(b2MousePosWorld) + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
                     ground->offsetVertex(index, offset, false);
                     ground->offsetSelected(offset, false);
@@ -584,7 +584,7 @@ void Application::process_left_click() {
             if (edit_tool.highlighted_vertex != -1) {
                 edit_tool.mode = EditTool::MOVE;
                 edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
-                const GroundVertex& vertex = ground->getVertex(edit_tool.grabbed_vertex);
+                const EditableVertex& vertex = ground->getVertex(edit_tool.grabbed_vertex);
                 edit_tool.grabbed_vertex_offset = vertex.pos - ground->toLocal(b2MousePosWorld);
                 bool shift = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
                 if (!vertex.selected && !shift) {
@@ -721,7 +721,7 @@ void Application::render_ui() {
 
     //for (size_t i = 0; i < game_objects.size(); i++) {
     //    if (CarObject* car_object = dynamic_cast<CarObject*>(game_objects[i].get())) {
-    //        car_object->getPolygonObject()->drawIndices(target, sf::Color::White, 20, true);
+    //        car_object->getPolygonObject()->drawIndices(target, sf::Color::White, 20, false);
     //    }
     //}
 

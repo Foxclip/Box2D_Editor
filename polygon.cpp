@@ -55,8 +55,7 @@ std::string CutInfo::toStr() const {
 PolygonObject::PolygonObject() { }
 
 PolygonObject::PolygonObject(size_t count) {
-	assert(count > 0);
-	this->varray = sf::VertexArray(sf::LinesStrip, count + 1);
+	resetVarray(count);
 }
 
 PolygonObject::PolygonObject(const sf::VertexArray& varray) {
@@ -388,6 +387,11 @@ std::vector<PolygonObject> PolygonObject::cutIntoConvex() {
 		result.insert(result.end(), child_children.begin(), child_children.end());
 	}
 	return result;
+}
+
+void PolygonObject::resetVarray(size_t vertex_count) {
+	assert(vertex_count > 0);
+	varray = sf::VertexArray(sf::LinesStrip, vertex_count + 1);
 }
 
 void PolygonObject::recenter() {

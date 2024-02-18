@@ -7,8 +7,10 @@
 void execute_app() {
     Application app;
     app.init();
+    //scene1(app);
     app.load("level.txt");
     //ground_transform(app);
+    //single_car(app);
     app.start();
 }
 
@@ -24,6 +26,7 @@ int main() {
 
     // TODO: remove ground pointer, allow multiple chains
     // TODO: edit mode with tab, move with G rotate with R, delete with X, select all with A
+    // TODO: fix releasing left click on widgets in drag mode
     // TODO: editing shapes
     // TODO: cut polygons with b2maxvertices
     // TODO: select tool rectangle select

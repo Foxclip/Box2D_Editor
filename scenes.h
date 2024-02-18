@@ -67,3 +67,15 @@ void ground_transform(Application& app) {
     app.setCameraPos(0.0f, 5.0f);
     app.setCameraZoom(30.0f);
 }
+
+void single_car(Application& app) {
+    std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
+    std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+    GameObject* car = app.create_car(b2Vec2(0.0f, 0.0f), lengths, wheels, sf::Color(255, 0, 0));
+    car->setType(b2_dynamicBody, false);
+    car->setDensity(1.0f, false);
+    car->setFriction(0.3f, false);
+    car->setRestitution(0.5f, false);
+    app.setCameraPos(0.0f, 0.0f);
+    app.setCameraZoom(50.0f);
+}

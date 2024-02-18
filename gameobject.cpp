@@ -157,6 +157,110 @@ void GameObject::setRestitution(float restitution, bool include_children) {
 	}
 }
 
+void GameObject::moveVertices(const std::vector<size_t>& index_list, const b2Vec2& offset) {
+	for (size_t i = 0; i < index_list.size(); i++) {
+		size_t index = index_list[i];
+		EditableVertex vertex = vertices[index];
+		vertex.pos += offset;
+		vertex.orig_pos = vertex.pos;
+	}
+	syncVertices();
+}
+
+void GameObject::offsetVertex(size_t index, const b2Vec2& offset, bool sync) {
+	vertices[index].pos = vertices[index].orig_pos + offset;
+	if (sync) {
+		syncVertices();
+	}
+}
+
+void GameObject::offsetSelected(const b2Vec2& offset, bool sync) {
+	for (size_t i = 0; i < vertices.size(); i++) {
+		if (vertices[i].selected) {
+			vertices[i].pos = vertices[i].orig_pos + offset;
+		}
+	}
+	if (sync) {
+		syncVertices();
+	}
+}
+
+void GameObject::saveOffsets() {
+	for (size_t i = 0; i < vertices.size(); i++) {
+		vertices[i].orig_pos = vertices[i].pos;
+	}
+}
+
+size_t GameObject::getVertexCount() {
+	return vertices.size();
+}
+
+const EditableVertex& GameObject::getVertex(size_t index) {
+	return vertices[index];
+}
+
+b2Vec2 GameObject::getGlobalVertexPos(size_t index) {
+	return rigid_body->GetWorldPoint(vertices[index].pos);
+}
+
+void GameObject::setGlobalVertexPos(size_t index, const b2Vec2& new_pos) {
+	b2Vec2 local_pos = rigid_body->GetLocalPoint(new_pos);
+	vertexSet(index, local_pos);
+	syncVertices();
+}
+
+bool GameObject::tryDeleteVertex(ptrdiff_t index) {
+	if (index < 0) {
+		return false;
+	}
+	if (vertices.size() <= 2) {
+		return false;
+	}
+	vertices.erase(vertices.begin() + index);
+	syncVertices();
+	return true;
+}
+
+void GameObject::addVertexGlobal(size_t index, const b2Vec2& pos) {
+	b2Vec2 local_pos = rigid_body->GetLocalPoint(pos);
+	vertices.insert(vertices.begin() + index, local_pos);
+	syncVertices();
+}
+
+void GameObject::selectVertex(size_t index) {
+	vertices[index].selected = true;
+}
+
+bool GameObject::isVertexSelected(size_t index) {
+	return vertices[index].selected;
+}
+
+void GameObject::selectAllVertices() {
+	for (size_t i = 0; i < vertices.size(); i++) {
+		vertices[i].selected = true;
+	}
+}
+
+void GameObject::deselectAllVertices() {
+	for (size_t i = 0; i < vertices.size(); i++) {
+		vertices[i].selected = false;
+	}
+}
+
+std::vector<b2Vec2> GameObject::getPositions() {
+	std::vector<b2Vec2> b2vertices(vertices.size());
+	for (size_t i = 0; i < vertices.size(); i++) {
+		b2vertices[i] = vertices[i].pos;
+	}
+	return b2vertices;
+}
+
+void GameObject::vertexSet(size_t index, const b2Vec2& new_pos) {
+	EditableVertex& vertex = vertices[index];
+	vertex.pos = new_pos;
+	vertex.orig_pos = vertex.pos;
+}
+
 TokenWriter& GameObject::serializeBody(TokenWriter& tw, b2Body* body) {
 	tw << "body" << "\n";
 	{
@@ -321,15 +425,10 @@ b2RevoluteJointDef GameObject::deserializeRevoluteJoint(TokenReader& tr) {
 }
 
 BoxObject::BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color) {
-	rigid_body = world->CreateBody(&def);
-	b2PolygonShape box_shape;
-	box_shape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
-	b2Fixture* fixture = rigid_body->CreateFixture(&box_shape, 1.0f);
-	rect_shape = std::make_unique<sf::RectangleShape>(tosf(size));
-	rect_shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
-	rect_shape->setFillColor(color);
-	this->size = size;
 	this->color = color;
+	rigid_body = world->CreateBody(&def);
+	vertices.push_back(EditableVertex(size));
+	syncVertices();
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
@@ -391,17 +490,27 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* worl
 	}
 }
 
+void BoxObject::syncVertices() {
+	size = b2Vec2(abs(vertices.front().pos.x), abs(vertices.front().pos.y));
+	b2Fixture* old_fixture = rigid_body->GetFixtureList();
+	if (old_fixture) {
+		rigid_body->DestroyFixture(old_fixture);
+	}
+	b2PolygonShape box_shape;
+	box_shape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
+	b2Fixture* fixture = rigid_body->CreateFixture(&box_shape, 1.0f);
+	rect_shape = std::make_unique<sf::RectangleShape>(tosf(size));
+	rect_shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
+	rect_shape->setFillColor(color);
+}
+
 BallObject::BallObject(b2World* world, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color) {
-	rigid_body = world->CreateBody(&def);
-	b2CircleShape circle_shape;
-	circle_shape.m_radius = radius;
-	b2Fixture* fixture = rigid_body->CreateFixture(&circle_shape, 1.0f);
-	circle_notch_shape = std::make_unique<CircleNotchShape>(radius, 30, 4);
-	circle_notch_shape->setCircleColor(color);
-	circle_notch_shape->setNotchColor(notch_color);
 	this->radius = radius;
 	this->color = color;
 	this->notch_color = notch_color;
+	rigid_body = world->CreateBody(&def);
+	vertices.push_back(EditableVertex(b2Vec2(radius, 0.0f)));
+	syncVertices();
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
@@ -469,6 +578,20 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* wo
 	}
 }
 
+void BallObject::syncVertices() {
+	radius = vertices.front().pos.Length();
+	b2Fixture* old_fixture = rigid_body->GetFixtureList();
+	if (old_fixture) {
+		rigid_body->DestroyFixture(old_fixture);
+	}
+	b2CircleShape circle_shape;
+	circle_shape.m_radius = radius;
+	b2Fixture* fixture = rigid_body->CreateFixture(&circle_shape, 1.0f);
+	circle_notch_shape = std::make_unique<CircleNotchShape>(radius, 30, 4);
+	circle_notch_shape->setCircleColor(color);
+	circle_notch_shape->setNotchColor(notch_color);
+}
+
 LineStripShape::LineStripShape() { }
 
 LineStripShape::LineStripShape(sf::VertexArray& varray) {
@@ -496,17 +619,18 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 }
 
 CarObject::CarObject(b2World* world, b2BodyDef def, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
+	this->color = color;
 	rigid_body = world->CreateBody(&def);
-	create_shape(lengths);
-	for (size_t i = 0; i < wheels.size(); i++) {
+	for (size_t i = 0; i < lengths.size(); i++) {
+		b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
+		vertices.push_back(pos);
 		if (wheels[i] > 0.0f) {
-			b2Vec2 wheel_pos = utils::get_pos<b2Vec2>(lengths, i);
-			create_wheel(wheel_pos, wheels[i]);
+			create_wheel(pos, wheels[i]);
 		}
 	}
+	polygon = std::make_unique<PolygonObject>();
+	syncVertices();
 	polygon->setFillColor(color);
-	this->lengths = lengths;
-	this->color = color;
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
@@ -518,8 +642,14 @@ CarObject::CarObject(
 	std::vector<b2RevoluteJointDef> joint_defs,
 	sf::Color color
 ) {
+	this->color = color;
 	rigid_body = world->CreateBody(&def);
-	create_shape(lengths);
+	for (size_t i = 0; i < lengths.size(); i++) {
+		b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
+		vertices.push_back(pos);
+	}
+	polygon = std::make_unique<PolygonObject>();
+	syncVertices();
 	for (size_t i = 0; i < joint_defs.size(); i++) {
 		b2RevoluteJointDef def = joint_defs[i];
 		def.bodyA = rigid_body;
@@ -531,8 +661,6 @@ CarObject::CarObject(
 		children.push_back(std::move(wheels[i]));
 	}
 	polygon->setFillColor(color);
-	this->lengths = lengths;
-	this->color = color;
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
@@ -559,7 +687,6 @@ TokenWriter& CarObject::serialize(TokenWriter& tw) {
 	tw << "object car" << "\n";
 	{
 		TokenWriterIndent car_indent(tw);
-		tw.writeFloatArrParam("lengths", lengths);
 		tw.writeColorParam("color", color);
 		serializeBody(tw, rigid_body) << "\n";
 		tw << "wheels" << "\n";
@@ -626,27 +753,6 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 	}
 }
 
-void CarObject::create_shape(std::vector<float> lengths) {
-	polygon = std::make_unique<PolygonObject>(lengths.size());
-	for (size_t i = 0; i < lengths.size(); i++) {
-		polygon->setPoint(i, utils::get_pos<sf::Vector2f>(lengths, i));
-	}
-	polygon->recut();
-	std::vector<PolygonObject> convex_polygons = polygon->getConvexPolygons();
-	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
-		PolygonObject& polygon = convex_polygons[polygon_i];
-		std::vector<b2Vec2> b2points;
-		for (size_t vertex_i = 0; vertex_i < polygon.getPointCount(); vertex_i++) {
-			sf::Vector2f point = polygon.getPoint(vertex_i);
-			point = point + polygon.getPosition();
-			b2points.push_back(tob2(point));
-		}
-		b2PolygonShape b2polygon;
-		b2polygon.Set(b2points.data(), b2points.size());
-		b2Fixture* fixture = rigid_body->CreateFixture(&b2polygon, 1.0f);
-	}
-}
-
 void CarObject::create_wheel(b2Vec2 wheel_pos, float radius) {
 	b2Vec2 anchor_pos = wheel_pos;
 	b2Vec2 anchor_pos_world = rigid_body->GetPosition() + anchor_pos;
@@ -668,6 +774,30 @@ void CarObject::create_wheel(b2Vec2 wheel_pos, float radius) {
 	wheel_joint_def.enableMotor = true;
 	b2RevoluteJoint* wheel_joint = (b2RevoluteJoint*)rigid_body->GetWorld()->CreateJoint(&wheel_joint_def);
 	wheel_joints.push_back(wheel_joint);
+}
+
+void CarObject::syncVertices() {
+	polygon->resetVarray(vertices.size());
+	for (size_t i = 0; i < vertices.size(); i++) {
+		polygon->setPoint(i, tosf(vertices[i].pos));
+	}
+	polygon->recut();
+	for (b2Fixture* fixture = rigid_body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+		rigid_body->DestroyFixture(fixture);
+	}
+	std::vector<PolygonObject> convex_polygons = polygon->getConvexPolygons();
+	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
+		PolygonObject& polygon = convex_polygons[polygon_i];
+		std::vector<b2Vec2> b2points;
+		for (size_t vertex_i = 0; vertex_i < polygon.getPointCount(); vertex_i++) {
+			sf::Vector2f point = polygon.getPoint(vertex_i);
+			point = point + polygon.getPosition();
+			b2points.push_back(tob2(point));
+		}
+		b2PolygonShape b2polygon;
+		b2polygon.Set(b2points.data(), b2points.size());
+		b2Fixture* fixture = rigid_body->CreateFixture(&b2polygon, 1.0f);
+	}
 }
 
 CircleNotchShape::CircleNotchShape(float radius, size_t point_count, size_t notch_segment_count) {
@@ -725,108 +855,18 @@ void CircleNotchShape::drawMask(sf::RenderTarget& mask, sf::RenderStates states)
 }
 
 GroundObject::GroundObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color) {
+	this->color = color;
 	rigid_body = world->CreateBody(&def);
 	sf::VertexArray drawable_vertices(sf::LinesStrip, p_vertices.size());
 	for (size_t i = 0; i < p_vertices.size(); i++) {
 		drawable_vertices[i].position = tosf(p_vertices[i]);
-		GroundVertex gv(p_vertices[i]);
-		vertices.push_back(gv);
+		EditableVertex ev(p_vertices[i]);
+		vertices.push_back(ev);
 	}
 	line_strip_shape = std::make_unique<LineStripShape>(drawable_vertices);
 	syncVertices();
 	line_strip_shape->setLineColor(color);
-	this->color = color;
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
-}
-
-void GroundObject::moveVertices(const std::vector<size_t>& index_list, const b2Vec2& offset) {
-	for (size_t i = 0; i < index_list.size(); i++) {
-		size_t index = index_list[i];
-		GroundVertex vertex = vertices[index];
-		vertex.pos += offset;
-		vertex.orig_pos = vertex.pos;
-	}
-	syncVertices();
-}
-
-void GroundObject::offsetVertex(size_t index, const b2Vec2& offset, bool sync) {
-	vertices[index].pos = vertices[index].orig_pos + offset;
-	if (sync) {
-		syncVertices();
-	}
-}
-
-void GroundObject::offsetSelected(const b2Vec2& offset, bool sync) {
-	for (size_t i = 0; i < vertices.size(); i++) {
-		if (vertices[i].selected) {
-			vertices[i].pos = vertices[i].orig_pos + offset;
-		}
-	}
-	if (sync) {
-		syncVertices();
-	}
-}
-
-void GroundObject::saveOffsets() {
-	for (size_t i = 0; i < vertices.size(); i++) {
-		vertices[i].orig_pos = vertices[i].pos;
-	}
-}
-
-size_t GroundObject::getVertexCount() {
-	return vertices.size();
-}
-
-const GroundVertex& GroundObject::getVertex(size_t index) {
-	return vertices[index];
-}
-
-b2Vec2 GroundObject::getGlobalVertexPos(size_t index) {
-	return rigid_body->GetWorldPoint(vertices[index].pos);
-}
-
-void GroundObject::setGlobalVertexPos(size_t index, const b2Vec2& new_pos) {
-	b2Vec2 local_pos = rigid_body->GetLocalPoint(new_pos);
-	vertexSet(index, local_pos);
-	syncVertices();
-}
-
-bool GroundObject::tryDeleteVertex(ptrdiff_t index) {
-	if (index < 0) {
-		return false;
-	}
-	if (vertices.size() <= 2) {
-		return false;
-	}
-	vertices.erase(vertices.begin() + index);
-	syncVertices();
-	return true;
-}
-
-void GroundObject::addVertexGlobal(size_t index, const b2Vec2& pos) {
-	b2Vec2 local_pos = rigid_body->GetLocalPoint(pos);
-	vertices.insert(vertices.begin() + index, local_pos);
-	syncVertices();
-}
-
-void GroundObject::selectVertex(size_t index) {
-	vertices[index].selected = true;
-}
-
-bool GroundObject::isVertexSelected(size_t index) {
-	return vertices[index].selected;
-}
-
-void GroundObject::selectAllVertices() {
-	for (size_t i = 0; i < vertices.size(); i++) {
-		vertices[i].selected = true;
-	}
-}
-
-void GroundObject::deselectAllVertices() {
-	for (size_t i = 0; i < vertices.size(); i++) {
-		vertices[i].selected = false;
-	}
 }
 
 sf::Drawable* GroundObject::getDrawable() {
@@ -893,20 +933,6 @@ b2ChainShape* GroundObject::getShape() {
 	return static_cast<b2ChainShape*>(rigid_body->GetFixtureList()->GetShape());
 }
 
-std::vector<b2Vec2> GroundObject::getPositions() {
-	std::vector<b2Vec2> b2vertices(vertices.size());
-	for (size_t i = 0; i < vertices.size(); i++) {
-		b2vertices[i] = vertices[i].pos;
-	}
-	return b2vertices;
-}
-
-void GroundObject::vertexSet(size_t index, const b2Vec2& new_pos) {
-	GroundVertex& vertex = vertices[index];
-	vertex.pos = new_pos;
-	vertex.orig_pos = vertex.pos;
-}
-
 void GroundObject::syncVertices() {
 	std::vector<b2Vec2> b2vertices = getPositions();
 	b2Fixture* old_fixture = rigid_body->GetFixtureList();
@@ -923,9 +949,8 @@ void GroundObject::syncVertices() {
 	}
 }
 
-GroundVertex::GroundVertex(b2Vec2 pos) {
+EditableVertex::EditableVertex(b2Vec2 pos) {
 	this->pos = pos;
 	this->orig_pos = pos;
 	this->selected = false;
 }
-

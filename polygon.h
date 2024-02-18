@@ -71,6 +71,7 @@ public:
 	std::vector<PolygonObject> getCutPolygons(const CutInfo& cut) const;
 	std::vector<PolygonObject> cutWithBestCut();
 	std::vector<PolygonObject> cutIntoConvex();
+	void resetVarray(size_t vertex_count);
 	void recenter();
 	void recut();
 	static PolygonObject createRect(sf::Vector2f size);
