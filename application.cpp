@@ -2,6 +2,7 @@
 #include "utils.h"
 #include <numbers>
 #include <iostream>
+#include <ranges>
 
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
@@ -366,7 +367,12 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::Num9: try_select_tool(8); break;
             case sf::Keyboard::Num0: try_select_tool(9); break;
             case sf::Keyboard::X:
-                if (selected_tool == &edit_tool && active_object) {
+                if (selected_tool == &select_tool) {
+                    std::vector<GameObject*> selected_copy(select_tool.selected_objects.begin(), select_tool.selected_objects.end());
+                    for (GameObject* obj : selected_copy | std::views::reverse) {
+                        delete_object(obj);
+                    }
+                } else if (selected_tool == &edit_tool && active_object) {
                     if (active_object->tryDeleteVertex(edit_tool.highlighted_vertex)) {
                         commit_action = true;
                     }
@@ -1271,6 +1277,20 @@ void Application::draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, co
 GameObject* Application::get_gameobject(b2Body* body) {
     GameObject* gameobject = reinterpret_cast<GameObject*>(body->GetUserData().pointer);
     return gameobject;
+}
+
+void Application::delete_object(GameObject* object) {
+    if (object == active_object) {
+        active_object = nullptr;
+    }
+    select_tool.selected_objects.erase(object);
+    for (size_t i = 0; i < game_objects.size(); i++) {
+        if (game_objects[i].get() == object) {
+            game_objects.erase(game_objects.begin() + i);
+            commit_action = true;
+            break;
+        }
+    }
 }
 
 BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
