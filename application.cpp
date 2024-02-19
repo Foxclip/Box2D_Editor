@@ -493,7 +493,7 @@ void Application::process_mouse() {
             }
         }
     } else if (selected_tool == &move_tool) {
-        for (GameObject* obj : select_tool.selected_objects) {
+        for (GameObject* obj : move_tool.moving_objects) {
             obj->setPosition(b2MousePosWorld + obj->cursor_offset, true);
         }
     } else if (selected_tool == &rotate_tool) {
@@ -579,7 +579,7 @@ void Application::process_left_click() {
             drag_tool.mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
         }
     } else if (selected_tool == &move_tool) {
-        for (GameObject* obj : select_tool.selected_objects) {
+        for (GameObject* obj : move_tool.moving_objects) {
             //TODO: remember state for all children
             obj->setEnabled(obj->was_enabled, true);
             commit_action = true;
@@ -952,14 +952,30 @@ Tool* Application::try_select_tool(int index) {
 Tool* Application::try_select_tool(Tool* tool) {
     selected_tool = tool;
     if (tool == &move_tool) {
-        move_tool.orig_cursor_pos = b2MousePosWorld;
-        for (GameObject* obj : select_tool.selected_objects) {
-            obj->orig_pos = obj->getPosition();
-            obj->cursor_offset = obj->getPosition() - b2MousePosWorld;
-            obj->was_enabled = obj->rigid_body->IsEnabled();
-            obj->setEnabled(false, true);
-            obj->setLinearVelocity(b2Vec2(0.0f, 0.0f), true);
-            obj->setAngularVelocity(0.0f, true);
+        if (select_tool.selected_objects.size() > 0) {
+            move_tool.orig_cursor_pos = b2MousePosWorld;
+            move_tool.moving_objects = std::vector<GameObject*>();
+            for (GameObject* obj : select_tool.selected_objects) {
+                std::vector<GameObject*> parents = obj->getParentChain();
+                bool found = false;
+                for (size_t i = 0; i < parents.size(); i++) {
+                    auto it = select_tool.selected_objects.find(parents[i]);
+                    if (it != select_tool.selected_objects.end()) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) {
+                    continue;
+                }
+                move_tool.moving_objects.push_back(obj);
+                obj->orig_pos = obj->getPosition();
+                obj->cursor_offset = obj->getPosition() - b2MousePosWorld;
+                obj->was_enabled = obj->rigid_body->IsEnabled();
+                obj->setEnabled(false, true);
+                obj->setLinearVelocity(b2Vec2(0.0f, 0.0f), true);
+                obj->setAngularVelocity(0.0f, true);
+            }
         }
     }
     create_tool.create_panel_widget->setVisible(tool == &create_tool);

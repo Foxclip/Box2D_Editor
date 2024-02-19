@@ -38,6 +38,7 @@ MoveTool::MoveTool() : Tool() {
 
 void MoveTool::reset() {
     orig_cursor_pos = b2Vec2(0.0f, 0.0f);
+    moving_objects = std::vector<GameObject*>();
 }
 
 RotateTool::RotateTool() : Tool() {

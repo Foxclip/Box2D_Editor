@@ -82,6 +82,7 @@ private:
 class MoveTool : public Tool {
 public:
 	b2Vec2 orig_cursor_pos = b2Vec2(0.0f, 0.0f);
+	std::vector<GameObject*> moving_objects;
 
 	MoveTool();
 	void reset() override;

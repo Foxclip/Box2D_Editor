@@ -20,12 +20,39 @@ const b2Vec2& GameObject::getPosition() const {
 	return rigid_body->GetPosition();
 }
 
+GameObject* GameObject::getParent() const {
+	return parent;
+}
+
+std::vector<GameObject*> GameObject::getParentChain() const {
+	const GameObject* cur_obj = this;
+	std::vector<GameObject*> result;
+	while (cur_obj) {
+		if (cur_obj->parent) {
+			result.push_back(cur_obj->parent);
+			cur_obj = cur_obj->parent;
+		} else {
+			break;
+		}
+	}
+	return result;
+}
+
+const std::vector<std::unique_ptr<GameObject>>& GameObject::getChildren() const {
+	return children;
+}
+
 b2Vec2 GameObject::toGlobal(const b2Vec2& pos) {
 	return rigid_body->GetWorldPoint(pos);
 }
 
 b2Vec2 GameObject::toLocal(const b2Vec2& pos) {
 	return rigid_body->GetLocalPoint(pos);
+}
+
+void GameObject::addChild(std::unique_ptr<GameObject> child) {
+	child->parent = this;
+	children.push_back(std::move(child));
 }
 
 void GameObject::updateVisual() {
@@ -694,7 +721,7 @@ CarObject::CarObject(
 		wheel_joints.push_back(joint);
 	}
 	for (size_t i = 0; i < wheels.size(); i++) {
-		children.push_back(std::move(wheels[i]));
+		addChild(std::move(wheels[i]));
 	}
 	polygon->setFillColor(color);
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
@@ -738,8 +765,8 @@ TokenWriter& CarObject::serialize(TokenWriter& tw) {
 		tw << "wheels" << "\n";
 		{
 			TokenWriterIndent wheels_indent(tw);
-			for (size_t i = 0; i < children.size(); i++) {
-				children[i]->serialize(tw) << "\n";
+			for (size_t i = 0; i < getChildren().size(); i++) {
+				getChildren()[i]->serialize(tw) << "\n";
 				serializeJoint(tw, wheel_joints[i]) << "\n";
 			}
 		}
@@ -812,7 +839,7 @@ void CarObject::create_wheel(b2Vec2 wheel_pos, float radius) {
 	wheel_ptr->setDensity(1.0f, false);
 	wheel_ptr->setFriction(0.3f, false);
 	wheel_ptr->setRestitution(0.5f, false);
-	children.push_back(std::move(wheel));
+	addChild(std::move(wheel));
 	b2RevoluteJointDef wheel_joint_def;
 	wheel_joint_def.Initialize(rigid_body, wheel_ptr->rigid_body, anchor_pos_world);
 	wheel_joint_def.maxMotorTorque = 30.0f;

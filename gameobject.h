@@ -52,8 +52,6 @@ private:
 class GameObject {
 public:
 	b2Body* rigid_body = nullptr;
-	std::vector<std::unique_ptr<GameObject>> children;
-	GameObject* parent = nullptr;
 	sf::Color color;
 	bool hover = false;
 	bool selected = false;
@@ -68,8 +66,12 @@ public:
 	virtual sf::Drawable* getDrawable() = 0;
 	virtual sf::Transformable* getTransformable() = 0;
 	const b2Vec2& getPosition() const;
+	GameObject* getParent() const;
+	std::vector<GameObject*> getParentChain() const;
+	const std::vector<std::unique_ptr<GameObject>>& getChildren() const;
 	b2Vec2 toGlobal(const b2Vec2& pos);
 	b2Vec2 toLocal(const b2Vec2& pos);
+	void addChild(std::unique_ptr<GameObject> child);
 	void updateVisual();
 	virtual void render(sf::RenderTarget& target);
 	void renderMask(sf::RenderTarget& mask, bool include_children);
@@ -112,6 +114,7 @@ public:
 
 protected:
 	std::vector<EditableVertex> vertices;
+	GameObject* parent = nullptr;
 
 	virtual void drawMask(sf::RenderTarget& mask) = 0;
 	std::vector<b2Vec2> getPositions();
@@ -119,6 +122,7 @@ protected:
 	void destroyFixtures();
 
 private:
+	std::vector<std::unique_ptr<GameObject>> children;
 
 };
 
