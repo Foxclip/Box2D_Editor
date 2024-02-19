@@ -395,7 +395,17 @@ void Application::process_keyboard_event(sf::Event event) {
                 quickload_requested = true;
                 break;
             case sf::Keyboard::A:
-                if (selected_tool == &edit_tool && active_object) {
+                if (selected_tool == &select_tool) {
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
+                        for (size_t i = 0; i < game_objects.size(); i++) {
+                            select_tool.deselectObject(game_objects[i].get());
+                        }
+                    } else {
+                        for (size_t i = 0; i < game_objects.size(); i++) {
+                            select_tool.selectObject(game_objects[i].get());
+                        }
+                    }
+                } else if (selected_tool == &edit_tool && active_object) {
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
                         active_object->deselectAllVertices();
                     } else {
