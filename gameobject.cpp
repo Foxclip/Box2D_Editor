@@ -870,8 +870,10 @@ void CarObject::syncVertices() {
 			b2points.push_back(tob2(point));
 		}
 		b2PolygonShape b2polygon;
-		b2polygon.Set(b2points.data(), b2points.size());
-		b2Fixture* fixture = rigid_body->CreateFixture(&b2polygon, 1.0f);
+		bool valid = b2polygon.Set(b2points.data(), b2points.size());
+		if (valid) {
+			rigid_body->CreateFixture(&b2polygon, 1.0f);
+		}
 	}
 }
 

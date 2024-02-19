@@ -29,6 +29,7 @@ int main() {
     }
 
     // TODO: edit mode with tab, move with G rotate with R, delete with X, select all with A, duplicate with Shift-D
+    // TODO: rotate tool rotates objects around common center
     // TODO: add const to GameObject get methods
     // TODO: serialize car vertices
     // TODO: fix releasing left click on widgets in drag mode
