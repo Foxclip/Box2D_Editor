@@ -46,9 +46,10 @@ RotateTool::RotateTool() : Tool() {
 }
 
 void RotateTool::reset() {
-    object = nullptr;
-    object_was_enabled = false;
-    angle_offset = 0.0f;
+    pivot_pos = b2Vec2(0.0f, 0.0f);
+    orig_cursor_pos = b2Vec2(0.0f, 0.0f);
+    rotating_objects = std::vector<GameObject*>();
+    orig_mouse_angle = 0.0f;
 }
 
 EditTool::EditTool() : Tool() {

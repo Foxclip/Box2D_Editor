@@ -92,9 +92,10 @@ private:
 
 class RotateTool : public Tool {
 public:
-	GameObject* object = nullptr;
-	bool object_was_enabled = false;
-	float angle_offset = 0.0f;
+	b2Vec2 pivot_pos = b2Vec2(0.0f, 0.0f);
+	b2Vec2 orig_cursor_pos = b2Vec2(0.0f, 0.0f);
+	std::vector<GameObject*> rotating_objects;
+	float orig_mouse_angle = 0.0f;
 
 	RotateTool();
 	void reset() override;

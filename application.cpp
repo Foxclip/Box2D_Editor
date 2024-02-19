@@ -338,8 +338,15 @@ void Application::process_keyboard_event(sf::Event event) {
         switch (event.key.code) {
         case sf::Keyboard::Escape:
             if (selected_tool == &move_tool) {
-                for (GameObject* obj : select_tool.selected_objects) {
+                for (GameObject* obj : move_tool.moving_objects) {
                     obj->setPosition(obj->orig_pos, true);
+                    obj->setEnabled(obj->was_enabled, true);
+                }
+                try_select_tool(&select_tool);
+            } else if (selected_tool == &rotate_tool) {
+                for (GameObject* obj : rotate_tool.rotating_objects) {
+                    obj->setPosition(obj->orig_pos, true);
+                    obj->setAngle(obj->orig_angle, true);
                     obj->setEnabled(obj->was_enabled, true);
                 }
                 try_select_tool(&select_tool);
@@ -497,10 +504,12 @@ void Application::process_mouse() {
             obj->setPosition(b2MousePosWorld + obj->cursor_offset, true);
         }
     } else if (selected_tool == &rotate_tool) {
-        if (rotate_tool.object) {
-            b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.object->rigid_body->GetPosition();
-            float angle = atan2(mouse_vector.y, mouse_vector.x);
-            rotate_tool.object->setAngle(angle - rotate_tool.angle_offset, true);
+        for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
+            GameObject* obj = rotate_tool.rotating_objects[i];
+            b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.pivot_pos;
+            float current_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
+            float offset = current_mouse_angle - rotate_tool.orig_mouse_angle;
+            obj->setAngle(obj->orig_angle + offset, true);
         }
     }
     if (leftButtonPressed) {
@@ -586,17 +595,12 @@ void Application::process_left_click() {
         }
         try_select_tool(&select_tool);
     } else if (selected_tool == &rotate_tool) {
-        GameObject* gameobject = get_object_at(mousePos);
-        if (gameobject) {
-            b2Body* body = gameobject->rigid_body;
-            rotate_tool.object_was_enabled = body->IsEnabled();
-            b2Vec2 mouse_vector = b2MousePosWorld - body->GetPosition();
-            float mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
-            rotate_tool.angle_offset = mouse_angle - body->GetAngle();
-            gameobject->setEnabled(false, true);
-            gameobject->setAngularVelocity(0.0f, true);
-            rotate_tool.object = gameobject;
+        for (GameObject* obj : rotate_tool.rotating_objects) {
+            //TODO: remember state for all children
+            obj->setEnabled(obj->was_enabled, true);
+            commit_action = true;
         }
+        try_select_tool(&select_tool);
     } else if (selected_tool == &edit_tool && active_object) {
         if (edit_tool.mode == EditTool::HOVER) {
             if (edit_tool.highlighted_vertex != -1) {
@@ -655,11 +659,6 @@ void Application::process_left_release() {
     if (drag_tool.mouse_joint) {
         world->DestroyJoint(drag_tool.mouse_joint);
         drag_tool.mouse_joint = nullptr;
-    }
-    if (rotate_tool.object) {
-        rotate_tool.object->setEnabled(rotate_tool.object_was_enabled, true);
-        rotate_tool.object = nullptr;
-        commit_action = true;
     }
     if (edit_tool.grabbed_vertex != -1) {
         edit_tool.grabbed_vertex = -1;
@@ -752,9 +751,8 @@ void Application::render_ui() {
             draw_line(target, grabbed_point, mousePosf, sf::Color::Yellow);
         }
     } else if (selected_tool == &rotate_tool) {
-        if (rotate_tool.object) {
-            sf::Vector2f body_origin = world_to_screenf(rotate_tool.object->rigid_body->GetPosition());
-            draw_line(target, body_origin, mousePosf, sf::Color::Yellow);
+        for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
+            draw_line(target, world_to_screenf(rotate_tool.pivot_pos), mousePosf, sf::Color::Yellow);
         }
     } else if (selected_tool == &edit_tool && active_object) {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
@@ -951,21 +949,22 @@ Tool* Application::try_select_tool(int index) {
 
 Tool* Application::try_select_tool(Tool* tool) {
     selected_tool = tool;
+    auto parent_selected = [](GameObject* obj) {
+        std::vector<GameObject*> parents = obj->getParentChain();
+        for (size_t i = 0; i < parents.size(); i++) {
+            auto it = select_tool.selected_objects.find(parents[i]);
+            if (it != select_tool.selected_objects.end()) {
+                return true;
+            }
+        }
+        return false;
+    };
     if (tool == &move_tool) {
         if (select_tool.selected_objects.size() > 0) {
             move_tool.orig_cursor_pos = b2MousePosWorld;
             move_tool.moving_objects = std::vector<GameObject*>();
             for (GameObject* obj : select_tool.selected_objects) {
-                std::vector<GameObject*> parents = obj->getParentChain();
-                bool found = false;
-                for (size_t i = 0; i < parents.size(); i++) {
-                    auto it = select_tool.selected_objects.find(parents[i]);
-                    if (it != select_tool.selected_objects.end()) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (found) {
+                if (parent_selected(obj)) {
                     continue;
                 }
                 move_tool.moving_objects.push_back(obj);
@@ -976,6 +975,30 @@ Tool* Application::try_select_tool(Tool* tool) {
                 obj->setLinearVelocity(b2Vec2(0.0f, 0.0f), true);
                 obj->setAngularVelocity(0.0f, true);
             }
+        }
+    } else if (tool == &rotate_tool) {
+        if (select_tool.selected_objects.size() > 0) {
+            rotate_tool.orig_cursor_pos = b2MousePosWorld;
+            rotate_tool.rotating_objects = std::vector<GameObject*>();
+            for (GameObject* obj : select_tool.selected_objects) {
+                if (parent_selected(obj)) {
+                    continue;
+                }
+                rotate_tool.rotating_objects.push_back(obj);
+                obj->orig_pos = obj->getPosition();
+                obj->orig_angle = obj->getRotation();
+                obj->was_enabled = obj->rigid_body->IsEnabled();
+                obj->setEnabled(false, true);
+                obj->setAngularVelocity(0.0f, true);
+            }
+            b2Vec2 sum = b2Vec2_zero;
+            for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
+                sum += rotate_tool.rotating_objects[i]->getPosition();
+            }
+            b2Vec2 avg = 1.0f / rotate_tool.rotating_objects.size() * sum;
+            rotate_tool.pivot_pos = avg;
+            b2Vec2 mouse_vector = b2MousePosWorld - avg;
+            rotate_tool.orig_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
         }
     }
     create_tool.create_panel_widget->setVisible(tool == &create_tool);

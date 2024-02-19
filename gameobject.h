@@ -58,6 +58,7 @@ public:
 	bool draw_varray = false;
 	b2Vec2 cursor_offset = b2Vec2(0.0f, 0.0f);
 	b2Vec2 orig_pos = b2Vec2(0.0f, 0.0f);
+	float orig_angle = 0.0f;
 	bool was_enabled = true;
 
 	GameObject();
@@ -66,6 +67,7 @@ public:
 	virtual sf::Drawable* getDrawable() = 0;
 	virtual sf::Transformable* getTransformable() = 0;
 	const b2Vec2& getPosition() const;
+	float getRotation() const;
 	GameObject* getParent() const;
 	std::vector<GameObject*> getParentChain() const;
 	const std::vector<std::unique_ptr<GameObject>>& getChildren() const;

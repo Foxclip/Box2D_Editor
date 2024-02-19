@@ -20,6 +20,10 @@ const b2Vec2& GameObject::getPosition() const {
 	return rigid_body->GetPosition();
 }
 
+float GameObject::getRotation() const {
+	return rigid_body->GetAngle();
+}
+
 GameObject* GameObject::getParent() const {
 	return parent;
 }
