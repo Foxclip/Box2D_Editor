@@ -28,10 +28,10 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: fix duplication of car with wheels
     // TODO: fix select all not selecting child objects
     // TODO: rotate tool rotates objects around common center
     // TODO: add const to GameObject get methods
+    // TODO: fix deleting child objects with X key
     // TODO: serialize car vertices
     // TODO: fix releasing left click on widgets in drag mode
     // TODO: cut polygons with b2maxvertices

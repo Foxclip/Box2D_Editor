@@ -443,8 +443,10 @@ void Application::process_keyboard_event(sf::Event event) {
                     if (select_tool.selectedCount() > 0) {
                         std::vector<GameObject*> new_objects;
                         for (GameObject* obj : select_tool.getSelectedSet()) {
-                            GameObject* copy = copy_object(obj);
-                            new_objects.push_back(copy);
+                            if (!is_parent_selected(obj)) {
+                                GameObject* copy = copy_object(obj);
+                                new_objects.push_back(copy);
+                            }
                         }
                         select_tool.setSelected(new_objects);
                         try_select_tool(&move_tool);
