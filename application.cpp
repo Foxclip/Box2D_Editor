@@ -368,7 +368,7 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::Num0: try_select_tool(9); break;
             case sf::Keyboard::X:
                 if (selected_tool == &select_tool) {
-                    std::vector<GameObject*> selected_copy(select_tool.selected_objects.begin(), select_tool.selected_objects.end());
+                    std::vector<GameObject*> selected_copy = select_tool.getSelectedVector();
                     for (GameObject* obj : selected_copy | std::views::reverse) {
                         delete_object(obj);
                     }
@@ -427,11 +427,30 @@ void Application::process_keyboard_event(sf::Event event) {
                 }
                 break;
             case sf::Keyboard::G:
-                try_select_tool(&move_tool);
+                if (select_tool.selectedCount() > 0) {
+                    try_select_tool(&move_tool);
+                    grab_selected();
+                }
                 break;
             case sf::Keyboard::R:
-                try_select_tool(&rotate_tool);
+                if (select_tool.selectedCount() > 0) {
+                    try_select_tool(&rotate_tool);
+                    rotate_selected();
+                }
                 break;
+            case sf::Keyboard::D:
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                    if (select_tool.selectedCount() > 0) {
+                        std::vector<GameObject*> new_objects;
+                        for (GameObject* obj : select_tool.getSelectedSet()) {
+                            GameObject* copy = copy_object(obj);
+                            new_objects.push_back(copy);
+                        }
+                        select_tool.setSelected(new_objects);
+                        try_select_tool(&move_tool);
+                        grab_selected();
+                    }
+                }
         }
     }
     if (event.type == sf::Event::KeyReleased) {
@@ -723,7 +742,7 @@ void Application::render_world() {
     //}
 
     if (selected_tool != &edit_tool) {
-        for (auto obj : select_tool.selected_objects) {
+        for (auto obj : select_tool.getSelectedSet()) {
             obj->renderMask(selection_mask, false);
         }
     }
@@ -965,58 +984,6 @@ Tool* Application::try_select_tool(int index) {
 
 Tool* Application::try_select_tool(Tool* tool) {
     selected_tool = tool;
-    auto parent_selected = [](GameObject* obj) {
-        std::vector<GameObject*> parents = obj->getParentChain();
-        for (size_t i = 0; i < parents.size(); i++) {
-            auto it = select_tool.selected_objects.find(parents[i]);
-            if (it != select_tool.selected_objects.end()) {
-                return true;
-            }
-        }
-        return false;
-    };
-    if (tool == &move_tool) {
-        if (select_tool.selected_objects.size() > 0) {
-            move_tool.orig_cursor_pos = b2MousePosWorld;
-            move_tool.moving_objects = std::vector<GameObject*>();
-            for (GameObject* obj : select_tool.selected_objects) {
-                if (parent_selected(obj)) {
-                    continue;
-                }
-                move_tool.moving_objects.push_back(obj);
-                obj->orig_pos = obj->getPosition();
-                obj->cursor_offset = obj->getPosition() - b2MousePosWorld;
-                obj->was_enabled = obj->rigid_body->IsEnabled();
-                obj->setEnabled(false, true);
-                obj->setLinearVelocity(b2Vec2(0.0f, 0.0f), true);
-                obj->setAngularVelocity(0.0f, true);
-            }
-        }
-    } else if (tool == &rotate_tool) {
-        if (select_tool.selected_objects.size() > 0) {
-            rotate_tool.orig_cursor_pos = b2MousePosWorld;
-            rotate_tool.rotating_objects = std::vector<GameObject*>();
-            for (GameObject* obj : select_tool.selected_objects) {
-                if (parent_selected(obj)) {
-                    continue;
-                }
-                rotate_tool.rotating_objects.push_back(obj);
-                obj->orig_pos = obj->getPosition();
-                obj->orig_angle = obj->getRotation();
-                obj->was_enabled = obj->rigid_body->IsEnabled();
-                obj->setEnabled(false, true);
-                obj->setAngularVelocity(0.0f, true);
-            }
-            b2Vec2 sum = b2Vec2_zero;
-            for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
-                sum += rotate_tool.rotating_objects[i]->getPosition();
-            }
-            b2Vec2 avg = 1.0f / rotate_tool.rotating_objects.size() * sum;
-            rotate_tool.pivot_pos = avg;
-            b2Vec2 mouse_vector = b2MousePosWorld - avg;
-            rotate_tool.orig_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
-        }
-    }
     create_tool.create_panel_widget->setVisible(tool == &create_tool);
     edit_tool.edit_window_widget->setVisible(tool == &edit_tool);
     for (size_t i = 0; i < tools.size(); i++) {
@@ -1274,16 +1241,89 @@ void Application::draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, co
     target.draw(line_primitive);
 }
 
+bool Application::is_parent_selected(GameObject* object) {
+    std::vector<GameObject*> parents = object->getParentChain();
+    for (size_t i = 0; i < parents.size(); i++) {
+        auto it = select_tool.getSelectedSet().find(parents[i]);
+        if (it != select_tool.getSelectedSet().end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 GameObject* Application::get_gameobject(b2Body* body) {
     GameObject* gameobject = reinterpret_cast<GameObject*>(body->GetUserData().pointer);
     return gameobject;
+}
+
+void Application::grab_selected() {
+    move_tool.orig_cursor_pos = b2MousePosWorld;
+    move_tool.moving_objects = std::vector<GameObject*>();
+    for (GameObject* obj : select_tool.getSelectedSet()) {
+        if (is_parent_selected(obj)) {
+            continue;
+        }
+        move_tool.moving_objects.push_back(obj);
+        obj->orig_pos = obj->getPosition();
+        obj->cursor_offset = obj->getPosition() - b2MousePosWorld;
+        obj->was_enabled = obj->rigid_body->IsEnabled();
+        obj->setEnabled(false, true);
+        obj->setLinearVelocity(b2Vec2(0.0f, 0.0f), true);
+        obj->setAngularVelocity(0.0f, true);
+    }
+}
+
+void Application::rotate_selected() {
+    rotate_tool.orig_cursor_pos = b2MousePosWorld;
+    rotate_tool.rotating_objects = std::vector<GameObject*>();
+    for (GameObject* obj : select_tool.getSelectedSet()) {
+        if (is_parent_selected(obj)) {
+            continue;
+        }
+        rotate_tool.rotating_objects.push_back(obj);
+        obj->orig_pos = obj->getPosition();
+        obj->orig_angle = obj->getRotation();
+        obj->was_enabled = obj->rigid_body->IsEnabled();
+        obj->setEnabled(false, true);
+        obj->setAngularVelocity(0.0f, true);
+    }
+    b2Vec2 sum = b2Vec2_zero;
+    for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
+        sum += rotate_tool.rotating_objects[i]->getPosition();
+    }
+    b2Vec2 avg = 1.0f / rotate_tool.rotating_objects.size() * sum;
+    rotate_tool.pivot_pos = avg;
+    b2Vec2 mouse_vector = b2MousePosWorld - avg;
+    rotate_tool.orig_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
+}
+
+GameObject* Application::copy_object(const GameObject* object) {
+    TokenWriter tw;
+    std::string str = object->serialize(tw).toStr();
+    TokenReader tr(str);
+    std::unique_ptr<GameObject> new_object;
+    if (dynamic_cast<const BoxObject*>(object)) {
+        new_object = BoxObject::deserialize(tr, world.get());
+    } else if (dynamic_cast<const BallObject*>(object)) {
+        new_object = BallObject::deserialize(tr, world.get());
+    } else if (dynamic_cast<const CarObject*>(object)) {
+        new_object = CarObject::deserialize(tr, world.get());
+    } else if (dynamic_cast<const ChainObject*>(object)) {
+        new_object = ChainObject::deserialize(tr, world.get());
+    } else {
+        assert(false, "Unknown object type");
+    }
+    GameObject* ptr = new_object.get();
+    game_objects.add(std::move(new_object));
+    return ptr;
 }
 
 void Application::delete_object(GameObject* object) {
     if (object == active_object) {
         active_object = nullptr;
     }
-    select_tool.selected_objects.erase(object);
+    select_tool.deselectObject(object);
     for (size_t i = 0; i < game_objects.size(); i++) {
         if (game_objects[i] == object) {
             game_objects.remove(i);

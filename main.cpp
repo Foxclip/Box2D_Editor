@@ -28,7 +28,7 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: duplicate with Shift-D
+    // TODO: fix duplication of car with wheels
     // TODO: fix select all not selecting child objects
     // TODO: rotate tool rotates objects around common center
     // TODO: add const to GameObject get methods

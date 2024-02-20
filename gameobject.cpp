@@ -508,7 +508,7 @@ void BoxObject::drawMask(sf::RenderTarget& mask) {
 	rect_shape->setFillColor(orig_color);
 }
 
-TokenWriter& BoxObject::serialize(TokenWriter& tw) {
+TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
 	tw << "object box" << "\n";
 	{
 		TokenWriterIndent box_indent(tw);
@@ -525,6 +525,9 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* worl
 		b2Vec2 size = b2Vec2(1.0f, 1.0f);
 		sf::Color color = sf::Color::White;
 		BodyDef body_def;
+		if (tr.tryEat("object")) {
+			tr.eat("box");
+		}
 		while(tr.validRange()) {
 			std::string pname = tr.readString();
 			if (pname == "size") {
@@ -591,7 +594,7 @@ void BallObject::drawMask(sf::RenderTarget& mask) {
 	circle_notch_shape->drawMask(mask);
 }
 
-TokenWriter& BallObject::serialize(TokenWriter& tw) {
+TokenWriter& BallObject::serialize(TokenWriter& tw) const {
 	tw << "object ball" << "\n";
 	{
 		TokenWriterIndent ball_indent(tw);
@@ -611,6 +614,9 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* wo
 		sf::Color notch_color = sf::Color(128, 128, 128);
 		bool notch_color_set = false;
 		BodyDef body_def;
+		if (tr.tryEat("object")) {
+			tr.eat("ball");
+		}
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
 			if (pname == "radius") {
@@ -759,7 +765,7 @@ void CarObject::drawMask(sf::RenderTarget& mask) {
 	polygon->setFillColor(orig_color);
 }
 
-TokenWriter& CarObject::serialize(TokenWriter& tw) {
+TokenWriter& CarObject::serialize(TokenWriter& tw) const {
 	tw << "object car" << "\n";
 	{
 		TokenWriterIndent car_indent(tw);
@@ -787,6 +793,9 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 		BodyDef body_def;
 		std::vector<std::unique_ptr<BallObject>> wheels;
 		std::vector<b2RevoluteJointDef> joint_defs;
+		if (tr.tryEat("object")) {
+			tr.eat("car");
+		}
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
 			if (pname == "lengths") {
@@ -962,7 +971,7 @@ void ChainObject::drawMask(sf::RenderTarget& mask) {
 	line_strip_shape->drawMask(mask);
 }
 
-TokenWriter& ChainObject::serialize(TokenWriter& tw) {
+TokenWriter& ChainObject::serialize(TokenWriter& tw) const {
 	tw << "object ground" << "\n";
 	{
 		TokenWriterIndent ground_indent(tw);
@@ -984,6 +993,9 @@ std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, b2World* 
 		std::vector<b2Vec2> vertices;
 		sf::Color color = sf::Color::White;
 		BodyDef body_def;
+		if (tr.tryEat("object")) {
+			tr.eat("ground");
+		}
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
 			if (pname == "vertices") {
@@ -1010,7 +1022,7 @@ std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, b2World* 
 	}
 }
 
-b2ChainShape* ChainObject::getShape() {
+b2ChainShape* ChainObject::getShape() const {
 	return static_cast<b2ChainShape*>(rigid_body->GetFixtureList()->GetShape());
 }
 

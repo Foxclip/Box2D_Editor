@@ -48,6 +48,16 @@ void TokenReader::eat(std::string expected) {
 	}
 }
 
+bool TokenReader::tryEat(std::string str) {
+	std::string rstr = readString();
+	if (rstr == str) {
+		return true;
+	} else {
+		move(-1);
+		return false;
+	}
+}
+
 int TokenReader::readInt() {
 	if (fail_state) {
 		return 0;

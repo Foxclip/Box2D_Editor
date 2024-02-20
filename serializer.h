@@ -22,6 +22,7 @@ public:
 	TokenReader(std::vector<WordToken>* tokens, ptrdiff_t pos = 0);
 	WordToken get();
 	void eat(std::string expected);
+	bool tryEat(std::string str);
 	std::string readString();
 	int readInt();
 	float readFloat();

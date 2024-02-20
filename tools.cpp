@@ -94,6 +94,23 @@ SelectTool::SelectTool() {
     name = "select";
 }
 
+size_t SelectTool::selectedCount() const {
+    return selected_objects.size();
+}
+
+std::vector<GameObject*> SelectTool::getSelectedVector() const {
+    return std::vector<GameObject*>(selected_objects.begin(), selected_objects.end());
+}
+
+const std::set<GameObject*>& SelectTool::getSelectedSet() const {
+    return selected_objects;
+}
+
+void SelectTool::setSelected(const std::vector<GameObject*> vec) {
+    clearSelected();
+    selected_objects = std::set<GameObject*>(vec.begin(), vec.end());
+}
+
 void SelectTool::selectObject(GameObject* object) {
     if (object) {
         object->selected = true;
