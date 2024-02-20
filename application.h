@@ -48,6 +48,20 @@ private:
 	int fps = 0;
 };
 
+class GameObjectList {
+public:
+	size_t size() const;
+	GameObject* get(size_t i) const;
+	GameObject* operator[](size_t index) const;
+	GameObject* add(std::unique_ptr<GameObject> gameobject);
+	GameObject* remove(size_t index);
+	void clear();
+
+private:
+	std::vector<std::unique_ptr<GameObject>> game_objects;
+
+};
+
 class Application {
 
 public:
@@ -93,8 +107,8 @@ private:
 	bool paused = true;
 	b2Vec2 b2MousePosWorld;
 	GameObject* active_object = nullptr;
+	GameObjectList game_objects;
 
-	std::vector<std::unique_ptr<GameObject>> game_objects;
 	History history;
 	bool commit_action = false;
 	struct LoadRequest {

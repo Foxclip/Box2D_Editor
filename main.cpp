@@ -28,13 +28,13 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: edit mode with tab, move with G rotate with R, delete with X, select all with A, duplicate with Shift-D
+    // TODO: duplicate with Shift-D
+    // TODO: fix select all not selecting child objects
     // TODO: rotate tool rotates objects around common center
     // TODO: add const to GameObject get methods
     // TODO: serialize car vertices
     // TODO: fix releasing left click on widgets in drag mode
     // TODO: cut polygons with b2maxvertices
-    // TODO: self-intersecting polygon splitting
     // TODO: set whether object is static or dynamic in edit mode
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars

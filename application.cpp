@@ -404,11 +404,11 @@ void Application::process_keyboard_event(sf::Event event) {
                 if (selected_tool == &select_tool) {
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
                         for (size_t i = 0; i < game_objects.size(); i++) {
-                            select_tool.deselectObject(game_objects[i].get());
+                            select_tool.deselectObject(game_objects[i]);
                         }
                     } else {
                         for (size_t i = 0; i < game_objects.size(); i++) {
-                            select_tool.selectObject(game_objects[i].get());
+                            select_tool.selectObject(game_objects[i]);
                         }
                     }
                 } else if (selected_tool == &edit_tool && active_object) {
@@ -714,7 +714,7 @@ void Application::render_world() {
     selection_mask.setView(world_view);
 
     for (size_t i = 0; i < game_objects.size(); i++) {
-        GameObject* gameobject = game_objects[i].get();
+        GameObject* gameobject = game_objects[i];
         gameobject->draw_varray = selected_tool == &edit_tool && dynamic_cast<CarObject*>(gameobject);
         gameobject->render(world_texture);
     }
@@ -860,7 +860,7 @@ std::string Application::serialize() {
     }
     tw << "/camera" << "\n\n";
     for (size_t i = 0; i < game_objects.size(); i++) {
-        GameObject* gameobject = game_objects[i].get();
+        GameObject* gameobject = game_objects[i];
         game_objects[i]->serialize(tw);
         if (i < game_objects.size() - 1) {
             tw << "\n\n";
@@ -915,7 +915,7 @@ void Application::deserialize(std::string str, bool set_camera) {
                 } else {
                     throw std::runtime_error("Unknown active_object type: " + type);
                 }
-                game_objects.push_back(std::move(gameobject));
+                game_objects.add(std::move(gameobject));
             } else {
                 throw std::runtime_error("Unknown entity type: " + entity);
             }
@@ -1285,8 +1285,8 @@ void Application::delete_object(GameObject* object) {
     }
     select_tool.selected_objects.erase(object);
     for (size_t i = 0; i < game_objects.size(); i++) {
-        if (game_objects[i].get() == object) {
-            game_objects.erase(game_objects.begin() + i);
+        if (game_objects[i] == object) {
+            game_objects.remove(i);
             commit_action = true;
             break;
         }
@@ -1300,7 +1300,7 @@ BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Col
     def.angle = angle;
     std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(world.get(), def, size, color);
     BoxObject* ptr = uptr.get();
-    game_objects.push_back(std::move(uptr));
+    game_objects.add(std::move(uptr));
     return ptr;
 }
 
@@ -1310,7 +1310,7 @@ BallObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, 
     def.position = pos;
     std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(world.get(), def, radius, color, notch_color);
     BallObject* ptr = uptr.get();
-    game_objects.push_back(std::move(uptr));
+    game_objects.add(std::move(uptr));
     return ptr;
 }
 
@@ -1320,7 +1320,7 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
     def.position = pos;
     std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), def, lengths, wheels, color);
     CarObject* ptr = uptr.get();
-    game_objects.push_back(std::move(uptr));
+    game_objects.add(std::move(uptr));
     return ptr;
 }
 
@@ -1330,7 +1330,7 @@ ChainObject* Application::create_chain(b2Vec2 pos, float angle, std::vector<b2Ve
     def.angle = angle;
     std::unique_ptr<ChainObject> uptr = std::make_unique<ChainObject>(world.get(), def, vertices, color);
     ChainObject* ptr = uptr.get();
-    game_objects.push_back(std::move(uptr));
+    game_objects.add(std::move(uptr));
     return ptr;
 }
 
@@ -1360,4 +1360,32 @@ int FpsCounter::frameEnd() {
 
 int FpsCounter::getFps() {
     return fps;
+}
+
+size_t GameObjectList::size() const {
+    return game_objects.size();
+}
+
+GameObject* GameObjectList::get(size_t i) const {
+    return game_objects[i].get();
+}
+
+GameObject* GameObjectList::operator[](size_t index) const {
+    return get(index);
+}
+
+GameObject* GameObjectList::add(std::unique_ptr<GameObject> gameobject) {
+    GameObject* ptr = gameobject.get();
+    game_objects.push_back(std::move(gameobject));
+    return ptr;
+}
+
+GameObject* GameObjectList::remove(size_t index) {
+    GameObject* ptr = get(index);
+    game_objects.erase(game_objects.begin() + index);
+    return ptr;
+}
+
+void GameObjectList::clear() {
+    game_objects = std::vector<std::unique_ptr<GameObject>>();
 }
