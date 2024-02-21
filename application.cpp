@@ -403,12 +403,12 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::A:
                 if (selected_tool == &select_tool) {
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
-                        for (size_t i = 0; i < game_objects.size(); i++) {
-                            select_tool.deselectObject(game_objects[i]);
+                        for (GameObject* obj : game_objects.getAll()) {
+                            select_tool.deselectObject(obj);
                         }
                     } else {
-                        for (size_t i = 0; i < game_objects.size(); i++) {
-                            select_tool.selectObject(game_objects[i]);
+                        for (GameObject* obj : game_objects.getAll()) {
+                            select_tool.selectObject(obj);
                         }
                     }
                 } else if (selected_tool == &edit_tool && active_object) {
@@ -734,8 +734,8 @@ void Application::render_world() {
     selection_mask.clear();
     selection_mask.setView(world_view);
 
-    for (size_t i = 0; i < game_objects.size(); i++) {
-        GameObject* gameobject = game_objects[i];
+    for (size_t i = 0; i < game_objects.topSize(); i++) {
+        GameObject* gameobject = game_objects.top(i);
         gameobject->draw_varray = selected_tool == &edit_tool && dynamic_cast<CarObject*>(gameobject);
         gameobject->render(world_texture);
     }
@@ -880,10 +880,10 @@ std::string Application::serialize() {
         tw << "zoom" << zoomFactor << "\n";
     }
     tw << "/camera" << "\n\n";
-    for (size_t i = 0; i < game_objects.size(); i++) {
-        GameObject* gameobject = game_objects[i];
-        game_objects[i]->serialize(tw);
-        if (i < game_objects.size() - 1) {
+    for (size_t i = 0; i < game_objects.topSize(); i++) {
+        GameObject* gameobject = game_objects.top(i);
+        gameobject->serialize(tw);
+        if (i < game_objects.topSize() - 1) {
             tw << "\n\n";
         }
     }
@@ -1322,16 +1322,15 @@ GameObject* Application::copy_object(const GameObject* object) {
 }
 
 void Application::delete_object(GameObject* object) {
+    if (!object) {
+        return;
+    }
     if (object == active_object) {
         active_object = nullptr;
     }
     select_tool.deselectObject(object);
-    for (size_t i = 0; i < game_objects.size(); i++) {
-        if (game_objects[i] == object) {
-            game_objects.remove(i);
-            commit_action = true;
-            break;
-        }
+    if (game_objects.remove(object)) {
+        commit_action = true;
     }
 }
 
@@ -1404,30 +1403,79 @@ int FpsCounter::getFps() {
     return fps;
 }
 
-size_t GameObjectList::size() const {
-    return game_objects.size();
+size_t GameObjectList::topSize() const {
+    return top_objects.size();
 }
 
-GameObject* GameObjectList::get(size_t i) const {
-    return game_objects[i].get();
+size_t GameObjectList::allSize() const {
+    return all_objects.size();
 }
 
-GameObject* GameObjectList::operator[](size_t index) const {
-    return get(index);
+GameObject* GameObjectList::top(size_t i) const {
+    return top_objects[i];
+}
+
+GameObject* GameObjectList::all(size_t i) const {
+    return all_objects[i];
+}
+
+const std::vector<GameObject*>& GameObjectList::getTop() const {
+    return top_objects;
+}
+
+const std::vector<GameObject*>& GameObjectList::getAll() const {
+    return all_objects;
 }
 
 GameObject* GameObjectList::add(std::unique_ptr<GameObject> gameobject) {
     GameObject* ptr = gameobject.get();
-    game_objects.push_back(std::move(gameobject));
+    addToAll(ptr);;
+    top_objects.push_back(ptr);
+    uptrs.push_back(std::move(gameobject));
     return ptr;
 }
 
-GameObject* GameObjectList::remove(size_t index) {
-    GameObject* ptr = get(index);
-    game_objects.erase(game_objects.begin() + index);
-    return ptr;
+bool GameObjectList::remove(GameObject* object) {
+    bool result = removeFromAll(object);
+    if (result) {
+        for (size_t i = 0; i < uptrs.size(); i++) {
+            if (uptrs[i].get() == object) {
+                top_objects.erase(top_objects.begin() + i);
+                uptrs.erase(uptrs.begin() + i);
+                break;
+            }
+        }
+    }
+    return result;
 }
 
 void GameObjectList::clear() {
-    game_objects = std::vector<std::unique_ptr<GameObject>>();
+    all_objects = std::vector<GameObject*>();
+    top_objects = std::vector<GameObject*>();
+    uptrs = std::vector<std::unique_ptr<GameObject>>();
+}
+
+void GameObjectList::addToAll(GameObject* object) {
+    all_objects.push_back(object);
+    for (size_t i = 0; i < object->getChildren().size(); i++) {
+        addToAll(object->getChildren()[i].get());
+    }
+}
+
+bool GameObjectList::removeFromAll(GameObject* object) {
+    bool result = false;
+    for (size_t i = 0; i < all_objects.size(); i++) {
+        if (all_objects[i] == object) {
+            all_objects.erase(all_objects.begin() + i);
+            result = true;
+            break;
+        }
+    }
+    if (result) {
+        for (size_t i = 0; i < object->getChildren().size(); i++) {
+            removeFromAll(object->getChildren()[i].get());
+            object->removeChild(i);
+        }
+    }
+    return result;
 }

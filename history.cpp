@@ -20,7 +20,7 @@ void History::save(HistoryEntry::Type type) {
     HistoryEntry entry(state, type);
     history.push_back(entry);
     current++;
-    logger << "Save " << HistoryEntry::typeToStr(type) << ", current: " << current << ", size : " << history.size() << "\n";
+    logger << "Save " << HistoryEntry::typeToStr(type) << ", current: " << current << ", topSize : " << history.size() << "\n";
 }
 
 void History::undo() {
@@ -28,7 +28,7 @@ void History::undo() {
         current--;
         std::string state = history[current].str;
         set(state);
-        logger << "Undo, current: " << current << ", size: " << history.size() << "\n";
+        logger << "Undo, current: " << current << ", topSize: " << history.size() << "\n";
     } else {
         logger << "Can't undo\n";
     }
@@ -39,7 +39,7 @@ void History::redo() {
         current++;
         std::string state = history[current].str;
         set(state);
-        logger << "Redo, current: " << current << ", size: " << history.size() << "\n";
+        logger << "Redo, current: " << current << ", topSize: " << history.size() << "\n";
     } else {
         logger << "Can't redo\n";
     }

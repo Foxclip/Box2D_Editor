@@ -74,6 +74,7 @@ public:
 	b2Vec2 toGlobal(const b2Vec2& pos);
 	b2Vec2 toLocal(const b2Vec2& pos);
 	void addChild(std::unique_ptr<GameObject> child);
+	void removeChild(size_t index);
 	void updateVisual();
 	virtual void render(sf::RenderTarget& target);
 	void renderMask(sf::RenderTarget& mask, bool include_children);

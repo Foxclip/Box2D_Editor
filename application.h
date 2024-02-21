@@ -50,15 +50,23 @@ private:
 
 class GameObjectList {
 public:
-	size_t size() const;
-	GameObject* get(size_t i) const;
-	GameObject* operator[](size_t index) const;
+	size_t topSize() const;
+	size_t allSize() const;
+	GameObject* top(size_t i) const;
+	GameObject* all(size_t i) const;
+	const std::vector<GameObject*>& getTop() const;
+	const std::vector<GameObject*>& getAll() const;
 	GameObject* add(std::unique_ptr<GameObject> gameobject);
-	GameObject* remove(size_t index);
+	bool remove(GameObject* object);
 	void clear();
 
 private:
-	std::vector<std::unique_ptr<GameObject>> game_objects;
+	std::vector<std::unique_ptr<GameObject>> uptrs;
+	std::vector<GameObject*> top_objects;
+	std::vector<GameObject*> all_objects;
+
+	void addToAll(GameObject* object);
+	bool removeFromAll(GameObject* object);
 
 };
 

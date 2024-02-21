@@ -59,6 +59,10 @@ void GameObject::addChild(std::unique_ptr<GameObject> child) {
 	children.push_back(std::move(child));
 }
 
+void GameObject::removeChild(size_t index) {
+	children.erase(children.begin() + index);
+}
+
 void GameObject::updateVisual() {
 	b2Vec2 position = rigid_body->GetPosition();
 	float angle = rigid_body->GetAngle();
