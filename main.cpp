@@ -28,10 +28,9 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: fix select all not selecting child objects
+    // TODO: fix deleting child objects with X key
     // TODO: rotate tool rotates objects around common center
     // TODO: add const to GameObject get methods
-    // TODO: fix deleting child objects with X key
     // TODO: check if joints are deleted when deleting object with X key
     // TODO: serialize car vertices
     // TODO: fix releasing left click on widgets in drag mode

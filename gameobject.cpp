@@ -63,6 +63,16 @@ void GameObject::removeChild(size_t index) {
 	children.erase(children.begin() + index);
 }
 
+bool GameObject::removeChild(GameObject* object) {
+	for (size_t i = 0; i < children.size(); i++) {
+		if (children[i].get() == object) {
+			removeChild(i);
+			return true;
+		}
+	}
+	return false;
+}
+
 void GameObject::updateVisual() {
 	b2Vec2 position = rigid_body->GetPosition();
 	float angle = rigid_body->GetAngle();
