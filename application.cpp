@@ -880,12 +880,23 @@ std::string Application::serialize() {
         tw << "zoom" << zoomFactor << "\n";
     }
     tw << "/camera" << "\n\n";
-    for (size_t i = 0; i < game_objects.topSize(); i++) {
-        GameObject* gameobject = game_objects.top(i);
-        gameobject->serialize(tw);
-        if (i < game_objects.topSize() - 1) {
+    size_t current_id = 0;
+    std::function<void(GameObject*)> serialize_obj = [&](GameObject* obj) {
+        if (current_id > 0) {
             tw << "\n\n";
         }
+        obj->serialize(tw, current_id);
+        current_id++;
+    };
+    std::function<void(GameObject*)> serialize_tree = [&](GameObject* obj) {
+        for (size_t i = 0; i < obj->getChildren().size(); i++) {
+            serialize_obj(obj->getChildren()[i].get());
+        }
+        serialize_obj(obj);
+    };
+    for (size_t i = 0; i < game_objects.topSize(); i++) {
+        GameObject* gameobject = game_objects.top(i);
+        serialize_tree(gameobject);
     }
     return str;
 }
@@ -896,6 +907,14 @@ void Application::deserialize(std::string str, bool set_camera) {
     init_tools();
     init_world();
     TokenReader tr(str);
+    struct ObjectId {
+        size_t id;
+        GameObject* ptr;
+        bool operator<(const ObjectId& other) const {
+            return id < other.id;
+        }
+    };
+    std::set<ObjectId> id_set;
     try {
         while (tr.validRange()) {
             std::string entity = tr.readString();
@@ -924,6 +943,7 @@ void Application::deserialize(std::string str, bool set_camera) {
                 }
             } else if (entity == "object") {
                 std::unique_ptr<GameObject> gameobject;
+                size_t id = tr.readULL();
                 std::string type = tr.readString();
                 if (type == "box") {
                     gameobject = BoxObject::deserialize(tr, world.get());
@@ -934,8 +954,12 @@ void Application::deserialize(std::string str, bool set_camera) {
                 } else if (type == "ground") {
                     gameobject = ChainObject::deserialize(tr, world.get());
                 } else {
-                    throw std::runtime_error("Unknown active_object type: " + type);
+                    throw std::runtime_error("Unknown object type: " + type);
                 }
+                ObjectId identry;
+                identry.id = id;
+                identry.ptr = gameobject.get();
+                id_set.insert(identry);
                 game_objects.add(std::move(gameobject));
             } else {
                 throw std::runtime_error("Unknown entity type: " + entity);
@@ -1302,7 +1326,7 @@ void Application::rotate_selected() {
 
 GameObject* Application::copy_object(const GameObject* object) {
     TokenWriter tw;
-    std::string str = object->serialize(tw).toStr();
+    std::string str = object->serialize(tw, 0).toStr();
     TokenReader tr(str);
     std::unique_ptr<GameObject> new_object;
     if (dynamic_cast<const BoxObject*>(object)) {

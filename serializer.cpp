@@ -58,14 +58,29 @@ bool TokenReader::tryEat(std::string str) {
 	}
 }
 
-int TokenReader::readInt() {
+long long TokenReader::readLL() {
 	if (fail_state) {
 		return 0;
 	}
 	std::string str = readString();
 	const char* start = str.c_str();
 	char* end;
-	int result = std::strtol(start, &end, 10);
+	long long result = std::strtoll(start, &end, 10);
+	if (end == start) {
+		fail_state = true;
+		return 0;
+	}
+	return result;
+}
+
+unsigned long long TokenReader::readULL() {
+	if (fail_state) {
+		return 0;
+	}
+	std::string str = readString();
+	const char* start = str.c_str();
+	char* end;
+	long long result = std::strtoull(start, &end, 10);
 	if (end == start) {
 		fail_state = true;
 		return 0;
@@ -124,10 +139,10 @@ sf::Color TokenReader::readColor() {
 		return sf::Color();
 	}
 	sf::Color color;
-	color.r = readInt();
-	color.g = readInt();
-	color.b = readInt();
-	color.a = readInt();
+	color.r = readLL();
+	color.g = readLL();
+	color.b = readLL();
+	color.a = readLL();
 	return color;
 }
 
@@ -252,6 +267,16 @@ TokenWriter& TokenWriter::writeInt(float value) {
 	return *this;
 }
 
+TokenWriter& TokenWriter::writeSizet(size_t value) {
+	writeString(std::to_string(value));
+	return *this;
+}
+
+TokenWriter& TokenWriter::writePtrdifft(ptrdiff_t value) {
+	writeString(std::to_string(value));
+	return *this;
+}
+
 TokenWriter& TokenWriter::writeFloat(float value) {
 	std::stringstream ss;
 	ss << std::setprecision(9) << value;
@@ -336,6 +361,14 @@ TokenWriter& TokenWriter::operator<<(std::string value) {
 
 TokenWriter& TokenWriter::operator<<(int value) {
 	return writeInt(value);
+}
+
+TokenWriter& TokenWriter::operator<<(size_t value) {
+	return writeSizet(value);
+}
+
+TokenWriter& TokenWriter::operator<<(ptrdiff_t value) {
+	return writePtrdifft(value);
 }
 
 TokenWriter& TokenWriter::operator<<(float value) {

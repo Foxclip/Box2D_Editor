@@ -522,8 +522,8 @@ void BoxObject::drawMask(sf::RenderTarget& mask) {
 	rect_shape->setFillColor(orig_color);
 }
 
-TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
-	tw << "object box" << "\n";
+TokenWriter& BoxObject::serialize(TokenWriter& tw, size_t id) const {
+	tw << "object" << id << "box" << "\n";
 	{
 		TokenWriterIndent box_indent(tw);
 		tw.writeb2Vec2Param("size", size);
@@ -608,8 +608,8 @@ void BallObject::drawMask(sf::RenderTarget& mask) {
 	circle_notch_shape->drawMask(mask);
 }
 
-TokenWriter& BallObject::serialize(TokenWriter& tw) const {
-	tw << "object ball" << "\n";
+TokenWriter& BallObject::serialize(TokenWriter& tw, size_t id) const {
+	tw << "object" << id << "ball" << "\n";
 	{
 		TokenWriterIndent ball_indent(tw);
 		tw.writeFloatParam("radius", radius);
@@ -779,22 +779,13 @@ void CarObject::drawMask(sf::RenderTarget& mask) {
 	polygon->setFillColor(orig_color);
 }
 
-TokenWriter& CarObject::serialize(TokenWriter& tw) const {
-	tw << "object car" << "\n";
+TokenWriter& CarObject::serialize(TokenWriter& tw, size_t id) const {
+	tw << "object" << id << "car" << "\n";
 	{
 		TokenWriterIndent car_indent(tw);
 		tw.writeFloatArrParam("lengths", lengths);
 		tw.writeColorParam("color", color);
 		serializeBody(tw, rigid_body) << "\n";
-		tw << "wheels" << "\n";
-		{
-			TokenWriterIndent wheels_indent(tw);
-			for (size_t i = 0; i < getChildren().size(); i++) {
-				getChildren()[i]->serialize(tw) << "\n";
-				serializeJoint(tw, wheel_joints[i]) << "\n";
-			}
-		}
-		tw << "/wheels" << "\n";
 	}
 	tw << "/object";
 	return tw;
@@ -985,8 +976,8 @@ void ChainObject::drawMask(sf::RenderTarget& mask) {
 	line_strip_shape->drawMask(mask);
 }
 
-TokenWriter& ChainObject::serialize(TokenWriter& tw) const {
-	tw << "object ground" << "\n";
+TokenWriter& ChainObject::serialize(TokenWriter& tw, size_t id) const {
+	tw << "object" << id << "chain" << "\n";
 	{
 		TokenWriterIndent ground_indent(tw);
 		tw << "vertices";
@@ -1008,7 +999,7 @@ std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, b2World* 
 		sf::Color color = sf::Color::White;
 		BodyDef body_def;
 		if (tr.tryEat("object")) {
-			tr.eat("ground");
+			tr.eat("ground"); // change to chain
 		}
 		while (tr.validRange()) {
 			std::string pname = tr.readString();

@@ -24,7 +24,8 @@ public:
 	void eat(std::string expected);
 	bool tryEat(std::string str);
 	std::string readString();
-	int readInt();
+	long long readLL();
+	unsigned long long readULL();
 	float readFloat();
 	bool readBool();
 	std::vector<float> readFloatArr();
@@ -56,6 +57,8 @@ public:
 	TokenWriter& operator<<(const char* value);
 	TokenWriter& operator<<(std::string value);
 	TokenWriter& operator<<(int value);
+	TokenWriter& operator<<(size_t value);
+	TokenWriter& operator<<(ptrdiff_t value);
 	TokenWriter& operator<<(float value);
 	TokenWriter& operator<<(bool value);
 	TokenWriter& operator<<(std::vector<float> value);
@@ -85,6 +88,8 @@ private:
 	TokenWriter& writeString(std::string value);
 	TokenWriter& writeInt(int value);
 	TokenWriter& writeInt(float value);
+	TokenWriter& writeSizet(size_t value);
+	TokenWriter& writePtrdifft(ptrdiff_t value);
 	TokenWriter& writeFloat(float value);
 	TokenWriter& writeBool(bool value);
 	TokenWriter& writeFloatArr(std::vector<float> value);

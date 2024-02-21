@@ -107,7 +107,7 @@ public:
 	void selectAllVertices();
 	void deselectAllVertices();
 	virtual void syncVertices() = 0;
-	virtual TokenWriter& serialize(TokenWriter& tw) const = 0;
+	virtual TokenWriter& serialize(TokenWriter& tw, size_t id) const = 0;
 	static TokenWriter& serializeBody(TokenWriter& tw, b2Body* body);
 	static TokenWriter& serializeFixture(TokenWriter& tw, b2Fixture* fixture);
 	static TokenWriter& serializeJoint(TokenWriter& tw, b2Joint* p_joint);
@@ -139,7 +139,7 @@ public:
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
-	TokenWriter& serialize(TokenWriter& tw) const override;
+	TokenWriter& serialize(TokenWriter& tw, size_t id) const override;
 	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, b2World* world);
 	void syncVertices() override;
 
@@ -156,7 +156,7 @@ public:
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
-	TokenWriter& serialize(TokenWriter& tw) const override;
+	TokenWriter& serialize(TokenWriter& tw, size_t id) const override;
 	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, b2World* world);
 	void syncVertices() override;
 
@@ -185,7 +185,7 @@ public:
 	sf::Transformable* getTransformable() override;
 	void render(sf::RenderTarget& target) override;
 	void drawMask(sf::RenderTarget& mask) override;
-	TokenWriter& serialize(TokenWriter& tw) const override;
+	TokenWriter& serialize(TokenWriter& tw, size_t id) const override;
 	static std::unique_ptr<CarObject> deserialize(TokenReader& tr, b2World* world);
 	void syncVertices() override;
 
@@ -203,7 +203,7 @@ public:
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
-	TokenWriter& serialize(TokenWriter& tw) const override;
+	TokenWriter& serialize(TokenWriter& tw, size_t id) const override;
 	static std::unique_ptr<ChainObject> deserialize(TokenReader& tr, b2World* world);
 	void syncVertices() override;
 

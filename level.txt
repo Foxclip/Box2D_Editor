@@ -1,10 +1,10 @@
 camera
-    center -12.6616573 -2.00634432
-    zoom 51.8400307
+    center 0 5
+    zoom 30
 /camera
 
-object ground
-    vertices 25 8 16.1333332 1.51666605 9.13333225 -2.01666498 3.23333097 -3.95000005 -5.93333292 -5.58333302 -19.3000011 -7.91666698 -23.2324848 2.52498007
+object 0 chain
+    vertices 25 8 15 2 5 0 -5 0 -15 2 -25 8
     color 255 255 255 255
     body
         type static
@@ -22,13 +22,13 @@ object ground
     /body
 /object
 
-object box
+object 1 box
     size 1 1
     color 0 255 0 255
     body
         type dynamic
-        position -17.0254803 -6.9933362
-        angle 3.31249738
+        position 0 1
+        angle 0
         linear_velocity 0 0
         angular_velocity 0
         fixtures
@@ -41,13 +41,13 @@ object box
     /body
 /object
 
-object box
+object 2 box
     size 1 1
     color 0 255 0 255
     body
         type dynamic
-        position -15.0191641 -6.64552355
-        angle 0.170697257
+        position 0.100000001 2
+        angle 0
         linear_velocity 0 0
         angular_velocity 0
         fixtures
@@ -60,13 +60,13 @@ object box
     /body
 /object
 
-object box
+object 3 box
     size 1 1
     color 0 255 0 255
     body
         type dynamic
-        position -16.0194607 -6.82008886
-        angle 0.170598239
+        position 0.200000003 3
+        angle 0
         linear_velocity 0 0
         angular_velocity 0
         fixtures
@@ -79,14 +79,14 @@ object box
     /body
 /object
 
-object ball
+object 4 ball
     radius 0.5
     color 0 255 0 255
     notch_color 0 64 0 255
     body
         type dynamic
-        position -14.0240555 -6.4830327
-        angle 93.9364243
+        position 0 5
+        angle 0
         linear_velocity 0 0
         angular_velocity 0
         fixtures
@@ -99,36 +99,76 @@ object ball
     /body
 /object
 
-object car
-    lengths 5 1 5 1 5 1
-    color 255 0 0 255
+object 5 ball
+    radius 1
+    color 255 255 0 255
+    notch_color 64 64 0 255
     body
         type dynamic
-        position -14.8124628 -3.57530951
-        angle 14.3099899
-        linear_velocity 1.78764292e-08 -5.49574786e-09
-        angular_velocity -5.10214582e-09
+        position 5 10
+        angle 0
+        linear_velocity 0 0
+        angular_velocity 0
         fixtures
             fixture
                 density 1
                 friction 0.300000012
                 restitution 0.5
             /fixture
+        /fixtures
+    /body
+/object
+
+object 6 ball
+    radius 1
+    color 255 255 0 255
+    notch_color 64 64 0 255
+    body
+        type dynamic
+        position -2.50000024 14.3301268
+        angle 0
+        linear_velocity 0 0
+        angular_velocity 0
+        fixtures
             fixture
                 density 1
                 friction 0.300000012
                 restitution 0.5
             /fixture
+        /fixtures
+    /body
+/object
+
+object 7 ball
+    radius 1
+    color 255 255 0 255
+    notch_color 64 64 0 255
+    body
+        type dynamic
+        position -2.49999952 5.66987276
+        angle 0
+        linear_velocity 0 0
+        angular_velocity 0
+        fixtures
             fixture
                 density 1
                 friction 0.300000012
                 restitution 0.5
             /fixture
-            fixture
-                density 1
-                friction 0.300000012
-                restitution 0.5
-            /fixture
+        /fixtures
+    /body
+/object
+
+object 8 car
+    lengths 5 1 5 1 5 1
+    color 255 0 0 255
+    body
+        type dynamic
+        position 0 10
+        angle 0
+        linear_velocity 0 0
+        angular_velocity 0
+        fixtures
             fixture
                 density 1
                 friction 0.300000012
@@ -146,96 +186,4 @@ object car
             /fixture
         /fixtures
     /body
-    wheels
-        object ball
-            radius 1
-            color 255 255 0 255
-            notch_color 64 64 0 255
-            body
-                type dynamic
-                position -15.6722832 1.35020638
-                angle -542.153198
-                linear_velocity 4.21305124e-08 -3.50454998e-09
-                angular_velocity -10
-                fixtures
-                    fixture
-                        density 1
-                        friction 0.300000012
-                        restitution 0.5
-                    /fixture
-                /fixtures
-            /body
-        /object
-        joint revolute
-            anchor_a 5 0
-            anchor_b 0 0
-            collide_connected false
-            angle_lower_limit 0
-            angle_upper_limit 0
-            angle_limit_enabled false
-            motor_max_torque 30
-            motor_speed -10
-            motor_enabled true
-        /joint
-        object ball
-            radius 1
-            color 255 255 0 255
-            notch_color 64 64 0 255
-            body
-                type dynamic
-                position -18.6481762 -6.78269291
-                angle -80.0089493
-                linear_velocity 6.36293074e-10 1.16774421e-08
-                angular_velocity 1.08327534e-08
-                fixtures
-                    fixture
-                        density 1
-                        friction 0.300000012
-                        restitution 0.5
-                    /fixture
-                /fixtures
-            /body
-        /object
-        joint revolute
-            anchor_a -2.5 4.33012676
-            anchor_b 0 0
-            collide_connected false
-            angle_lower_limit 0
-            angle_upper_limit 0
-            angle_limit_enabled false
-            motor_max_torque 30
-            motor_speed -10
-            motor_enabled true
-        /joint
-        object ball
-            radius 1
-            color 255 255 0 255
-            notch_color 64 64 0 255
-            body
-                type dynamic
-                position -10.116931 -5.29344177
-                angle -377.259399
-                linear_velocity 8.23304713e-09 -3.18482982e-08
-                angular_velocity 0
-                fixtures
-                    fixture
-                        density 1
-                        friction 0.300000012
-                        restitution 0.5
-                    /fixture
-                /fixtures
-            /body
-        /object
-        joint revolute
-            anchor_a -2.5 -4.33012676
-            anchor_b 0 0
-            collide_connected false
-            angle_lower_limit 0
-            angle_upper_limit 0
-            angle_limit_enabled false
-            motor_max_torque 30
-            motor_speed -10
-            motor_enabled true
-        /joint
-    /wheels
 /object
