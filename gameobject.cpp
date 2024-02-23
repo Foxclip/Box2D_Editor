@@ -969,9 +969,11 @@ EditableVertex::EditableVertex(b2Vec2 pos) {
 	this->selected = false;
 }
 
-RevoluteJoint::RevoluteJoint(const b2RevoluteJointDef& def, b2World* world, GameObject* object1, GameObject* object2) {
+RevoluteJoint::RevoluteJoint(b2RevoluteJointDef& def, b2World* world, GameObject* object1, GameObject* object2) {
 	this->object1 = object1;
 	this->object2 = object2;
+	def.bodyA = object1->rigid_body;
+	def.bodyB = object2->rigid_body;
 	joint = world->CreateJoint(&def);
 }
 
