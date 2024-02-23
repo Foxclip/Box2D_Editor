@@ -157,7 +157,7 @@ private:
 	bool is_parent_selected(GameObject* object);
 	void grab_selected();
 	void rotate_selected();
-	GameObject* copy_object(const GameObject* object);
+	GameObject* duplicate_object(const GameObject* object);
 	void delete_object(GameObject* object);
 
 };

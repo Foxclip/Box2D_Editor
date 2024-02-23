@@ -28,7 +28,6 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: fix deleting child objects with X key
     // TODO: rotate tool rotates objects around common center
     // TODO: add const to GameObject get methods
     // TODO: check if joints are deleted when deleting object with X key

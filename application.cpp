@@ -444,7 +444,7 @@ void Application::process_keyboard_event(sf::Event event) {
                         std::vector<GameObject*> new_objects;
                         for (GameObject* obj : select_tool.getSelectedSet()) {
                             if (!is_parent_selected(obj)) {
-                                GameObject* copy = copy_object(obj);
+                                GameObject* copy = duplicate_object(obj);
                                 new_objects.push_back(copy);
                             }
                         }
@@ -1325,7 +1325,7 @@ void Application::rotate_selected() {
     rotate_tool.orig_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
 }
 
-GameObject* Application::copy_object(const GameObject* object) {
+GameObject* Application::duplicate_object(const GameObject* object) {
     TokenWriter tw;
     std::string str = object->serialize(tw).toStr();
     TokenReader tr(str);
@@ -1342,7 +1342,7 @@ GameObject* Application::copy_object(const GameObject* object) {
         assert(false, "Unknown object type");
     }
     GameObject* ptr = new_object.get();
-    game_objects.add(std::move(new_object));
+    game_objects.add(std::move(new_object), true);
     return ptr;
 }
 
