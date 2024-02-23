@@ -460,9 +460,13 @@ void BoxObject::drawMask(sf::RenderTarget& mask) {
 }
 
 TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
-	tw << "object" << id << "box" << "\n";
+	tw << "object box" << "\n";
 	{
 		TokenWriterIndent box_indent(tw);
+		tw.writeSizetParam("id", id);
+		if (parent) {
+			tw.writeSizetParam("parent_id", parent->id);
+		}
 		tw.writeb2Vec2Param("size", size);
 		tw.writeColorParam("color", color);
 		serializeBody(tw, rigid_body) << "\n";
@@ -473,6 +477,8 @@ TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
 
 std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
+		ptrdiff_t id = -1;
+		ptrdiff_t parent_id = -1;
 		b2Vec2 size = b2Vec2(1.0f, 1.0f);
 		sf::Color color = sf::Color::White;
 		BodyDef body_def;
@@ -481,7 +487,11 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* worl
 		}
 		while(tr.validRange()) {
 			std::string pname = tr.readString();
-			if (pname == "size") {
+			if (pname == "id") {
+				id = tr.readULL();
+			} else if (pname == "parent_id") {
+				parent_id = tr.readULL();
+			} else if (pname == "size") {
 				size = tr.readb2Vec2();
 			} else if (pname == "color") {
 				color = tr.readColor();
@@ -496,6 +506,8 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* worl
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
 		std::unique_ptr<BoxObject> box = std::make_unique<BoxObject>(world, bdef, size, color);
+		box->id = id;
+		box->parent_id = parent_id;
 		box->setDensity(fdef.density, false);
 		box->setFriction(fdef.friction, false);
 		box->setRestitution(fdef.restitution, false);
@@ -546,9 +558,13 @@ void BallObject::drawMask(sf::RenderTarget& mask) {
 }
 
 TokenWriter& BallObject::serialize(TokenWriter& tw) const {
-	tw << "object" << id << "ball" << "\n";
+	tw << "object ball" << "\n";
 	{
 		TokenWriterIndent ball_indent(tw);
+		tw.writeSizetParam("id", id);
+		if (parent) {
+			tw.writeSizetParam("parent_id", parent->id);
+		}
 		tw.writeFloatParam("radius", radius);
 		tw.writeColorParam("color", color);
 		tw.writeColorParam("notch_color", notch_color);
@@ -560,6 +576,8 @@ TokenWriter& BallObject::serialize(TokenWriter& tw) const {
 
 std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
+		ptrdiff_t id = -1;
+		ptrdiff_t parent_id = -1;
 		float radius = 1.0f;
 		sf::Color color = sf::Color::White;
 		sf::Color notch_color = sf::Color(128, 128, 128);
@@ -570,7 +588,11 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* wo
 		}
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
-			if (pname == "radius") {
+			if (pname == "id") {
+				id = tr.readULL();
+			} else if (pname == "parent_id") {
+				parent_id = tr.readULL();
+			} else if (pname == "radius") {
 				radius = tr.readFloat();
 			} else if (pname == "color") {
 				color = tr.readColor();
@@ -591,6 +613,8 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* wo
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
 		std::unique_ptr<BallObject> ball = std::make_unique<BallObject>(world, bdef, radius, color, notch_color);
+		ball->id = id;
+		ball->parent_id = parent_id;
 		ball->setDensity(fdef.density, false);
 		ball->setFriction(fdef.friction, false);
 		ball->setRestitution(fdef.restitution, false);
@@ -712,9 +736,13 @@ void CarObject::drawMask(sf::RenderTarget& mask) {
 }
 
 TokenWriter& CarObject::serialize(TokenWriter& tw) const {
-	tw << "object" << id << "car" << "\n";
+	tw << "object car" << "\n";
 	{
 		TokenWriterIndent car_indent(tw);
+		tw.writeSizetParam("id", id);
+		if (parent) {
+			tw.writeSizetParam("parent_id", parent->id);
+		}
 		tw.writeFloatArrParam("lengths", lengths);
 		tw.writeColorParam("color", color);
 		serializeBody(tw, rigid_body) << "\n";
@@ -725,6 +753,8 @@ TokenWriter& CarObject::serialize(TokenWriter& tw) const {
 
 std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
+		ptrdiff_t id = -1;
+		ptrdiff_t parent_id = -1;
 		sf::Color color = sf::Color::White;
 		std::vector<float> lengths;
 		BodyDef body_def;
@@ -734,7 +764,11 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 		}
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
-			if (pname == "lengths") {
+			if (pname == "id") {
+				id = tr.readULL();
+			} else if (pname == "parent_id") {
+				parent_id = tr.readULL();
+			} else if (pname == "lengths") {
 				lengths = tr.readFloatArr();
 			} else if (pname == "color") {
 				color = tr.readColor();
@@ -749,6 +783,8 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
 		std::unique_ptr<CarObject> car = std::make_unique<CarObject>(world, bdef, lengths, color);
+		car->id = id;
+		car->parent_id = parent_id;
 		car->setDensity(fdef.density, false);
 		car->setFriction(fdef.friction, false);
 		car->setRestitution(fdef.restitution, false);
@@ -893,9 +929,13 @@ void ChainObject::drawMask(sf::RenderTarget& mask) {
 }
 
 TokenWriter& ChainObject::serialize(TokenWriter& tw) const {
-	tw << "object" << id << "chain" << "\n";
+	tw << "object chain" << "\n";
 	{
-		TokenWriterIndent ground_indent(tw);
+		TokenWriterIndent chain_indent(tw);
+		tw.writeSizetParam("id", id);
+		if (parent) {
+			tw.writeSizetParam("parent_id", parent->id);
+		}
 		tw << "vertices";
 		b2ChainShape* chain = getShape();
 		for (size_t i = 0; i < chain->m_count; i++) {
@@ -911,15 +951,21 @@ TokenWriter& ChainObject::serialize(TokenWriter& tw) const {
 
 std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
+		ptrdiff_t id = -1;
+		ptrdiff_t parent_id = -1;
 		std::vector<b2Vec2> vertices;
 		sf::Color color = sf::Color::White;
 		BodyDef body_def;
 		if (tr.tryEat("object")) {
-			tr.eat("ground"); // change to chain
+			tr.eat("chain");
 		}
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
-			if (pname == "vertices") {
+			if (pname == "id") {
+				id = tr.readULL();
+			} else if (pname == "parent_id") {
+				parent_id = tr.readULL();
+			} else if (pname == "vertices") {
 				vertices = tr.readb2Vec2Arr();
 			} else if (pname == "color") {
 				color = tr.readColor();
@@ -933,11 +979,13 @@ std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, b2World* 
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<ChainObject> ground = std::make_unique<ChainObject>(world, bdef, vertices, color);
-		ground->setDensity(fdef.density, false);
-		ground->setFriction(fdef.friction, false);
-		ground->setRestitution(fdef.restitution, false);
-		return ground;
+		std::unique_ptr<ChainObject> chain = std::make_unique<ChainObject>(world, bdef, vertices, color);
+		chain->id = id;
+		chain->parent_id = parent_id;
+		chain->setDensity(fdef.density, false);
+		chain->setFriction(fdef.friction, false);
+		chain->setRestitution(fdef.restitution, false);
+		return chain;
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
 	}

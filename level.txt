@@ -3,7 +3,8 @@ camera
     zoom 30
 /camera
 
-object 0 chain
+object chain
+    id 0
     vertices 25 8 15 2 5 0 -5 0 -15 2 -25 8
     color 255 255 255 255
     body
@@ -22,7 +23,8 @@ object 0 chain
     /body
 /object
 
-object 1 box
+object box
+    id 1
     size 1 1
     color 0 255 0 255
     body
@@ -41,7 +43,8 @@ object 1 box
     /body
 /object
 
-object 2 box
+object box
+    id 2
     size 1 1
     color 0 255 0 255
     body
@@ -60,7 +63,8 @@ object 2 box
     /body
 /object
 
-object 3 box
+object box
+    id 3
     size 1 1
     color 0 255 0 255
     body
@@ -79,7 +83,8 @@ object 3 box
     /body
 /object
 
-object 4 ball
+object ball
+    id 4
     radius 0.5
     color 0 255 0 255
     notch_color 0 64 0 255
@@ -99,7 +104,9 @@ object 4 ball
     /body
 /object
 
-object 5 ball
+object ball
+    id 5
+    parent_id 8
     radius 1
     color 255 255 0 255
     notch_color 64 64 0 255
@@ -119,7 +126,9 @@ object 5 ball
     /body
 /object
 
-object 6 ball
+object ball
+    id 6
+    parent_id 8
     radius 1
     color 255 255 0 255
     notch_color 64 64 0 255
@@ -139,7 +148,9 @@ object 6 ball
     /body
 /object
 
-object 7 ball
+object ball
+    id 7
+    parent_id 8
     radius 1
     color 255 255 0 255
     notch_color 64 64 0 255
@@ -159,7 +170,8 @@ object 7 ball
     /body
 /object
 
-object 8 car
+object car
+    id 8
     lengths 5 1 5 1 5 1
     color 255 0 0 255
     body

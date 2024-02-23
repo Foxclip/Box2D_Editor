@@ -78,6 +78,7 @@ private:
 class GameObject {
 public:
 	ptrdiff_t id = -1;
+	ptrdiff_t parent_id = -1;
 	b2Body* rigid_body = nullptr;
 	sf::Color color;
 	bool hover = false;

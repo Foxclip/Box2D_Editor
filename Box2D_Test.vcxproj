@@ -141,6 +141,7 @@
     <ClCompile Include="history.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="objectlist.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="serializer.cpp" />
     <ClCompile Include="tools.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="global.h" />
     <ClInclude Include="history.h" />
     <ClInclude Include="logger.h" />
+    <ClInclude Include="objectlist.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="scenes.h" />
     <ClInclude Include="serializer.h" />
