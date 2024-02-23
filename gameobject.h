@@ -4,6 +4,7 @@
 #include "box2d/box2d.h"
 #include "serializer.h"
 #include "polygon.h"
+#include <set>
 
 class LineStripShape : public sf::Drawable, public sf::Transformable {
 public:
@@ -49,8 +50,14 @@ public:
 private:
 };
 
+class GameObject;
+
 class Joint {
 public:
+	bool valid = true;
+	GameObject* object1 = nullptr;
+	GameObject* object2 = nullptr;
+
 	virtual TokenWriter& serialize(TokenWriter& tw) = 0;
 	~Joint();
 
@@ -60,7 +67,7 @@ protected:
 
 class RevoluteJoint : public Joint {
 public:
-	RevoluteJoint(const b2RevoluteJointDef& def, b2World* world);
+	RevoluteJoint(const b2RevoluteJointDef& def, b2World* world, GameObject* object1, GameObject* object2);
 	RevoluteJoint(b2RevoluteJoint* joint);
 	TokenWriter& serialize(TokenWriter& tw) override;
 	static b2RevoluteJointDef deserialize(TokenReader& tr, ptrdiff_t& p_body_a, ptrdiff_t& p_body_b);
@@ -80,6 +87,7 @@ public:
 	b2Vec2 orig_pos = b2Vec2(0.0f, 0.0f);
 	float orig_angle = 0.0f;
 	bool was_enabled = true;
+	std::set<Joint*> joints;
 
 	GameObject();
 	~GameObject();
@@ -190,7 +198,7 @@ public:
 
 	CarObject(
 		b2World* world,
-		std::vector<std::unique_ptr<Joint>>* joint_list,
+		std::vector<std::unique_ptr<Joint>>& joints,
 		b2BodyDef def,
 		std::vector<float> lengths,
 		std::vector<float> wheels,
@@ -215,7 +223,7 @@ public:
 private:
 	std::unique_ptr<PolygonObject> polygon;
 
-	void create_wheel(b2Vec2 wheel_pos, float radius, std::vector<std::unique_ptr<Joint>>* joint_list);
+	void create_wheel(b2Vec2 wheel_pos, float radius, std::vector<std::unique_ptr<Joint>>& joints);
 };
 
 class ChainObject : public GameObject {

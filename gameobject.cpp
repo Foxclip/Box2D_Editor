@@ -642,7 +642,7 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 
 CarObject::CarObject(
 	b2World* world,
-	std::vector<std::unique_ptr<Joint>>* joint_list,
+	std::vector<std::unique_ptr<Joint>>& joints,
 	b2BodyDef def,
 	std::vector<float> lengths,
 	std::vector<float> wheels,
@@ -655,7 +655,7 @@ CarObject::CarObject(
 		b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
 		vertices.push_back(pos);
 		if (wheels[i] > 0.0f) {
-			create_wheel(pos, wheels[i], joint_list);
+			create_wheel(pos, wheels[i], joints);
 		}
 	}
 	polygon = std::make_unique<PolygonObject>();
@@ -758,7 +758,7 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 	}
 }
 
-void CarObject::create_wheel(b2Vec2 wheel_pos, float radius, std::vector<std::unique_ptr<Joint>>* joint_list) {
+void CarObject::create_wheel(b2Vec2 wheel_pos, float radius, std::vector<std::unique_ptr<Joint>>& joints) {
 	b2Vec2 anchor_pos = wheel_pos;
 	b2Vec2 anchor_pos_world = rigid_body->GetPosition() + anchor_pos;
 	b2BodyDef wheel_body_def;
@@ -777,8 +777,10 @@ void CarObject::create_wheel(b2Vec2 wheel_pos, float radius, std::vector<std::un
 	wheel_joint_def.maxMotorTorque = 30.0f;
 	wheel_joint_def.motorSpeed = -10.0f;
 	wheel_joint_def.enableMotor = true;
-	std::unique_ptr<RevoluteJoint> joint = std::make_unique<RevoluteJoint>(wheel_joint_def, rigid_body->GetWorld());
-	joint_list->push_back(std::move(joint));
+	std::unique_ptr<RevoluteJoint> joint = std::make_unique<RevoluteJoint>(
+		wheel_joint_def, rigid_body->GetWorld(), this, wheel_ptr
+	);
+	joints.push_back(std::move(joint));
 }
 
 void CarObject::syncVertices() {
@@ -967,7 +969,9 @@ EditableVertex::EditableVertex(b2Vec2 pos) {
 	this->selected = false;
 }
 
-RevoluteJoint::RevoluteJoint(const b2RevoluteJointDef& def, b2World* world) {
+RevoluteJoint::RevoluteJoint(const b2RevoluteJointDef& def, b2World* world, GameObject* object1, GameObject* object2) {
+	this->object1 = object1;
+	this->object2 = object2;
 	joint = world->CreateJoint(&def);
 }
 
@@ -1042,5 +1046,7 @@ b2RevoluteJointDef RevoluteJoint::deserialize(TokenReader& tr, ptrdiff_t& p_body
 }
 
 Joint::~Joint() {
-	joint->GetBodyA()->GetWorld()->DestroyJoint(joint);
+	if (valid) {
+		joint->GetBodyA()->GetWorld()->DestroyJoint(joint);
+	}
 }

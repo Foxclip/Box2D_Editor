@@ -403,11 +403,11 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::A:
                 if (selected_tool == &select_tool) {
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
-                        for (GameObject* obj : game_objects.getAll()) {
+                        for (GameObject* obj : game_objects.getAllVector()) {
                             select_tool.deselectObject(obj);
                         }
                     } else {
-                        for (GameObject* obj : game_objects.getAll()) {
+                        for (GameObject* obj : game_objects.getAllVector()) {
                             select_tool.selectObject(obj);
                         }
                     }
@@ -734,8 +734,8 @@ void Application::render_world() {
     selection_mask.clear();
     selection_mask.setView(world_view);
 
-    for (size_t i = 0; i < game_objects.topSize(); i++) {
-        GameObject* gameobject = game_objects.top(i);
+    for (size_t i = 0; i < game_objects.getTopSize(); i++) {
+        GameObject* gameobject = game_objects.getFromTop(i);
         gameobject->draw_varray = selected_tool == &edit_tool && dynamic_cast<CarObject*>(gameobject);
         gameobject->render(world_texture);
     }
@@ -894,16 +894,16 @@ std::string Application::serialize() {
         }
         serialize_obj(obj);
     };
-    for (size_t i = 0; i < game_objects.topSize(); i++) {
-        GameObject* gameobject = game_objects.top(i);
+    for (size_t i = 0; i < game_objects.getTopSize(); i++) {
+        GameObject* gameobject = game_objects.getFromTop(i);
         serialize_tree(gameobject);
     }
     tw << "\n\n";
-    for (size_t i = 0; i < joints.size(); i++) {
+    for (size_t i = 0; i < game_objects.getJointsSize(); i++) {
         if (i > 0) {
             tw << "\n\n";
         }
-        joints[i]->serialize(tw);
+        game_objects.getJoint(i)->serialize(tw);
     }
     return tw.toStr();
 }
@@ -950,7 +950,7 @@ void Application::deserialize(std::string str, bool set_camera) {
                     gameobject = BallObject::deserialize(tr, world.get());
                 } else if (type == "car") {
                     gameobject = CarObject::deserialize(tr, world.get());
-                } else if (type == "ground") {
+                } else if (type == "chain") {
                     gameobject = ChainObject::deserialize(tr, world.get());
                 } else {
                     throw std::runtime_error("Unknown object type: " + type);
@@ -962,8 +962,10 @@ void Application::deserialize(std::string str, bool set_camera) {
                 if (type == "revolute") {
                     ptrdiff_t body_a_id, body_b_id;
                     b2RevoluteJointDef def = RevoluteJoint::deserialize(tr, body_a_id, body_b_id);
-                    std::unique_ptr<RevoluteJoint> uptr = std::make_unique<RevoluteJoint>(def, world.get());
-                    joints.push_back(std::move(uptr));
+                    GameObject* object1 = game_objects.getById(body_a_id);
+                    GameObject* object2 = game_objects.getById(body_b_id);
+                    std::unique_ptr<RevoluteJoint> uptr = std::make_unique<RevoluteJoint>(def, world.get(), object1, object2);
+                    game_objects.addJoint(std::move(uptr));
                 } else {
                     throw std::runtime_error("Unknown joint type: " + type);
                 }
@@ -1384,9 +1386,13 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
     b2BodyDef def;
     def.type = b2_dynamicBody;
     def.position = pos;
-    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), &joints, def, lengths, wheels, color);
+    std::vector<std::unique_ptr<Joint>> joints;
+    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), joints, def, lengths, wheels, color);
     CarObject* ptr = uptr.get();
     game_objects.add(std::move(uptr), true);
+    for (size_t i = 0; i < joints.size(); i++) {
+        game_objects.addJoint(std::move(joints[i]));
+    }
     return ptr;
 }
 
@@ -1428,19 +1434,23 @@ int FpsCounter::getFps() {
     return fps;
 }
 
-size_t GameObjectList::topSize() const {
+size_t GameObjectList::getTopSize() const {
     return top_objects.size();
 }
 
-size_t GameObjectList::allSize() const {
+size_t GameObjectList::getAllSize() const {
     return all_objects.size();
 }
 
-GameObject* GameObjectList::top(size_t i) const {
+size_t GameObjectList::getJointsSize() const {
+    return joints.size();
+}
+
+GameObject* GameObjectList::getFromTop(size_t i) const {
     return top_objects[i];
 }
 
-GameObject* GameObjectList::all(size_t i) const {
+GameObject* GameObjectList::getFromAll(size_t i) const {
     return all_objects[i];
 }
 
@@ -1451,11 +1461,15 @@ GameObject* GameObjectList::getById(size_t id) const {
     }
 }
 
-const std::vector<GameObject*>& GameObjectList::getTop() const {
+Joint* GameObjectList::getJoint(size_t i) const {
+    return joints[i];
+}
+
+const std::vector<GameObject*>& GameObjectList::getTopVector() const {
     return top_objects;
 }
 
-const std::vector<GameObject*>& GameObjectList::getAll() const {
+const std::vector<GameObject*>& GameObjectList::getAllVector() const {
     return all_objects;
 }
 
@@ -1475,6 +1489,15 @@ GameObject* GameObjectList::add(std::unique_ptr<GameObject> gameobject, bool ass
     return ptr;
 }
 
+Joint* GameObjectList::addJoint(std::unique_ptr<Joint> joint) {
+    Joint* ptr = joint.get();
+    joint->object1->joints.insert(joint.get());
+    joint->object2->joints.insert(joint.get());
+    joints.push_back(ptr);
+    joint_uptrs.push_back(std::move(joint));
+    return ptr;
+}
+
 bool GameObjectList::remove(GameObject* object) {
     bool result = removeFromAll(object);
     if (result) {
@@ -1489,10 +1512,25 @@ bool GameObjectList::remove(GameObject* object) {
     return result;
 }
 
+bool GameObjectList::removeJoint(Joint* joint) {
+    joint->object1->joints.erase(joint);
+    joint->object2->joints.erase(joint);
+    for (size_t i = 0; i < joints.size(); i++) {
+        if (joints[i] == joint) {
+            joints.erase(joints.begin() + i);
+            joint_uptrs.erase(joint_uptrs.begin() + i);
+            return true;
+        }
+    }
+    return false;
+}
+
 void GameObjectList::clear() {
     all_objects = std::vector<GameObject*>();
     top_objects = std::vector<GameObject*>();
+    joints = std::vector<Joint*>();
     ids = std::set<ObjectId>();
+    joint_uptrs = std::vector<std::unique_ptr<Joint>>();
     uptrs = std::vector<std::unique_ptr<GameObject>>();
 }
 
@@ -1524,6 +1562,11 @@ bool GameObjectList::removeFromAll(GameObject* object) {
             GameObject* parent = object->getParent();
             if (parent) {
                 parent->removeChild(object);
+            }
+            std::vector<Joint*> joints_copy(joints.begin(), joints.end());
+            for (Joint* joint : joints_copy) {
+                joint->valid = false;
+                removeJoint(joint);
             }
             all_objects.erase(all_objects.begin() + i);
             ids.erase(ObjectId(object->id, nullptr));
