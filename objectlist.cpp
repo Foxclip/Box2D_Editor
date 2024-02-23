@@ -139,10 +139,6 @@ bool GameObjectList::removeFromAll(GameObject* object) {
     bool result = false;
     for (size_t i = 0; i < all_objects.size(); i++) {
         if (all_objects[i] == object) {
-            GameObject* parent = object->getParent();
-            if (parent) {
-                parent->removeChild(object);
-            }
             std::vector<Joint*> joints_copy(joints.begin(), joints.end());
             for (Joint* joint : joints_copy) {
                 joint->valid = false;
@@ -150,6 +146,10 @@ bool GameObjectList::removeFromAll(GameObject* object) {
             }
             all_objects.erase(all_objects.begin() + i);
             ids.erase(ObjectId(object->id, nullptr));
+            GameObject* parent = object->getParent();
+            if (parent) {
+                parent->removeChild(object);
+            }
             result = true;
             break;
         }
