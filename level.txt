@@ -104,74 +104,8 @@ object ball
     /body
 /object
 
-object ball
-    id 5
-    parent_id 8
-    radius 1
-    color 255 255 0 255
-    notch_color 64 64 0 255
-    body
-        type dynamic
-        position 5 10
-        angle 0
-        linear_velocity 0 0
-        angular_velocity 0
-        fixtures
-            fixture
-                density 1
-                friction 0.300000012
-                restitution 0.5
-            /fixture
-        /fixtures
-    /body
-/object
-
-object ball
-    id 6
-    parent_id 8
-    radius 1
-    color 255 255 0 255
-    notch_color 64 64 0 255
-    body
-        type dynamic
-        position -2.50000024 14.3301268
-        angle 0
-        linear_velocity 0 0
-        angular_velocity 0
-        fixtures
-            fixture
-                density 1
-                friction 0.300000012
-                restitution 0.5
-            /fixture
-        /fixtures
-    /body
-/object
-
-object ball
-    id 7
-    parent_id 8
-    radius 1
-    color 255 255 0 255
-    notch_color 64 64 0 255
-    body
-        type dynamic
-        position -2.49999952 5.66987276
-        angle 0
-        linear_velocity 0 0
-        angular_velocity 0
-        fixtures
-            fixture
-                density 1
-                friction 0.300000012
-                restitution 0.5
-            /fixture
-        /fixtures
-    /body
-/object
-
 object car
-    id 8
+    id 5
     lengths 5 1 5 1 5 1
     color 255 0 0 255
     body
@@ -200,9 +134,75 @@ object car
     /body
 /object
 
+object ball
+    id 6
+    parent_id 5
+    radius 1
+    color 255 255 0 255
+    notch_color 64 64 0 255
+    body
+        type dynamic
+        position 5 10
+        angle 0
+        linear_velocity 0 0
+        angular_velocity 0
+        fixtures
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+        /fixtures
+    /body
+/object
+
+object ball
+    id 7
+    parent_id 5
+    radius 1
+    color 255 255 0 255
+    notch_color 64 64 0 255
+    body
+        type dynamic
+        position -2.50000024 14.3301268
+        angle 0
+        linear_velocity 0 0
+        angular_velocity 0
+        fixtures
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+        /fixtures
+    /body
+/object
+
+object ball
+    id 8
+    parent_id 5
+    radius 1
+    color 255 255 0 255
+    notch_color 64 64 0 255
+    body
+        type dynamic
+        position -2.49999952 5.66987276
+        angle 0
+        linear_velocity 0 0
+        angular_velocity 0
+        fixtures
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+        /fixtures
+    /body
+/object
+
 joint revolute
-    body_a 8
-    body_b 5
+    body_a 5
+    body_b 6
     anchor_a 5 0
     anchor_b 0 0
     collide_connected false
@@ -215,8 +215,8 @@ joint revolute
 /joint
 
 joint revolute
-    body_a 8
-    body_b 6
+    body_a 5
+    body_b 7
     anchor_a -2.50000024 4.33012676
     anchor_b 0 0
     collide_connected false
@@ -229,8 +229,8 @@ joint revolute
 /joint
 
 joint revolute
-    body_a 8
-    body_b 7
+    body_a 5
+    body_b 8
     anchor_a -2.49999952 -4.33012724
     anchor_b 0 0
     collide_connected false

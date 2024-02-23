@@ -889,10 +889,10 @@ std::string Application::serialize() {
         index++;
     };
     std::function<void(GameObject*)> serialize_tree = [&](GameObject* obj) {
+        serialize_obj(obj);
         for (size_t i = 0; i < obj->getChildren().size(); i++) {
             serialize_obj(obj->getChildren()[i].get());
         }
-        serialize_obj(obj);
     };
     for (size_t i = 0; i < game_objects.getTopSize(); i++) {
         GameObject* gameobject = game_objects.getFromTop(i);

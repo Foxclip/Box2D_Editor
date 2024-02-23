@@ -116,9 +116,6 @@ void GameObjectList::clear() {
 
 void GameObjectList::addToAll(GameObject* object, bool assign_new_id) {
     try {
-        for (size_t i = 0; i < object->getChildren().size(); i++) {
-            addToAll(object->getChildren()[i].get(), assign_new_id);
-        }
         if (assign_new_id) {
             object->id = getMaxId() + 1;
         }
@@ -129,6 +126,9 @@ void GameObjectList::addToAll(GameObject* object, bool assign_new_id) {
         auto inserted = ids.insert(ObjectId(object->id, object));
         if (!inserted.second) {
             throw std::runtime_error("Duplicate object id: " + std::to_string(object->id));
+        }
+        for (size_t i = 0; i < object->getChildren().size(); i++) {
+            addToAll(object->getChildren()[i].get(), assign_new_id);
         }
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
