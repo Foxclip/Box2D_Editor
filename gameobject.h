@@ -58,7 +58,7 @@ public:
 	GameObject* object1 = nullptr;
 	GameObject* object2 = nullptr;
 
-	virtual TokenWriter& serialize(TokenWriter& tw) = 0;
+	virtual TokenWriter& serialize(TokenWriter& tw) const = 0;
 	~Joint();
 
 protected:
@@ -69,7 +69,7 @@ class RevoluteJoint : public Joint {
 public:
 	RevoluteJoint(b2RevoluteJointDef& def, b2World* world, GameObject* object1, GameObject* object2);
 	RevoluteJoint(b2RevoluteJoint* joint);
-	TokenWriter& serialize(TokenWriter& tw) override;
+	TokenWriter& serialize(TokenWriter& tw) const override;
 	static b2RevoluteJointDef deserialize(TokenReader& tr, ptrdiff_t& p_body_a, ptrdiff_t& p_body_b);
 
 private:
@@ -79,6 +79,8 @@ class GameObject {
 public:
 	ptrdiff_t id = -1;
 	ptrdiff_t parent_id = -1;
+	ptrdiff_t orig_id = -1;
+	ptrdiff_t new_id = -1;
 	b2Body* rigid_body = nullptr;
 	sf::Color color;
 	bool hover = false;

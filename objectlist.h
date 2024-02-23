@@ -15,6 +15,8 @@ private:
 
 class GameObjectList {
 public:
+	b2World* world = nullptr;
+
 	size_t getTopSize() const;
 	size_t getAllSize() const;
 	size_t getJointsSize() const;
@@ -27,6 +29,8 @@ public:
 	ptrdiff_t getMaxId() const;
 	GameObject* add(std::unique_ptr<GameObject> gameobject, bool assign_new_id = false);
 	Joint* addJoint(std::unique_ptr<Joint> joint);
+	GameObject* duplicate(const GameObject* object);
+	Joint* duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b);
 	bool remove(GameObject* object);
 	bool removeJoint(Joint* joint);
 	void clear();

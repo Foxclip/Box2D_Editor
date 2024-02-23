@@ -78,6 +78,45 @@ Joint* GameObjectList::addJoint(std::unique_ptr<Joint> joint) {
     return ptr;
 }
 
+GameObject* GameObjectList::duplicate(const GameObject* object) {
+    TokenWriter tw;
+    std::string str = object->serialize(tw).toStr();
+    TokenReader tr(str);
+    std::unique_ptr<GameObject> new_object;
+    if (dynamic_cast<const BoxObject*>(object)) {
+        new_object = BoxObject::deserialize(tr, world);
+    } else if (dynamic_cast<const BallObject*>(object)) {
+        new_object = BallObject::deserialize(tr, world);
+    } else if (dynamic_cast<const CarObject*>(object)) {
+        new_object = CarObject::deserialize(tr, world);
+    } else if (dynamic_cast<const ChainObject*>(object)) {
+        new_object = ChainObject::deserialize(tr, world);
+    } else {
+        assert(false, "Unknown object type");
+    }
+    GameObject* ptr = new_object.get();
+    ptr->orig_id = object->id;
+    add(std::move(new_object), true);
+    return ptr;
+}
+
+Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b) {
+    TokenWriter tw;
+    std::string str = joint->serialize(tw).toStr();
+    TokenReader tr(str);
+    std::unique_ptr<Joint> new_joint;
+    ptrdiff_t body_a, body_b;
+    if (dynamic_cast<const RevoluteJoint*>(joint)) {
+        b2RevoluteJointDef def = RevoluteJoint::deserialize(tr, body_a, body_b);
+        new_joint = std::make_unique<RevoluteJoint>(def, world, new_a, new_b);
+    } else {
+        assert(false, "Unknown joint type");
+    }
+    Joint* ptr = new_joint.get();
+    addJoint(std::move(new_joint));
+    return ptr;
+}
+
 bool GameObjectList::remove(GameObject* object) {
     bool result = removeFromAll(object);
     if (result) {

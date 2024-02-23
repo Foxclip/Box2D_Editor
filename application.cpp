@@ -60,6 +60,7 @@ void Application::init() {
     for (size_t i = 0; i < tools.size(); i++) {
         assert(tools[i]->widget);
     }
+    assert(game_objects.world);
 }
 
 void Application::load_action(std::string filename) {
@@ -97,6 +98,7 @@ void Application::init_world() {
     world = std::make_unique<b2World>(gravity);
     b2BodyDef mouse_body_def;
     drag_tool.mouse_body = world->CreateBody(&mouse_body_def);
+    game_objects.world = world.get();
 }
 
 void Application::init_ui() {
@@ -442,12 +444,35 @@ void Application::process_keyboard_event(sf::Event event) {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     if (select_tool.selectedCount() > 0) {
                         std::vector<GameObject*> new_objects;
-                        for (GameObject* obj : select_tool.getSelectedSet()) {
-                            if (!is_parent_selected(obj)) {
-                                GameObject* copy = duplicate_object(obj);
-                                new_objects.push_back(copy);
+                        std::set<GameObject*> new_objects_set;
+                        std::vector<Joint*> new_joints;
+                        std::set<Joint*> duplicated_joints;
+                        std::set<Joint*> checked_joints;
+                        const std::set<GameObject*>& old_objects_set = select_tool.getSelectedSet();
+                        for (GameObject* obj : old_objects_set) {
+                            GameObject* copy = game_objects.duplicate(obj);
+                            obj->new_id = copy->id;
+                            new_objects.push_back(copy);
+                            new_objects_set.insert(copy);
+                        }
+                        for (GameObject* obj : old_objects_set) {
+                            for (Joint* joint : obj->joints) {
+                                if (checked_joints.contains(joint)) {
+                                    continue;
+                                }
+                                auto it1 = old_objects_set.find(joint->object1);
+                                auto it2 = old_objects_set.find(joint->object2);
+                                if (it1 != old_objects_set.end() && it2 != old_objects_set.end()) {
+                                    GameObject* new_object_1 = game_objects.getById((*it1)->new_id);
+                                    GameObject* new_object_2 = game_objects.getById((*it2)->new_id);
+                                    Joint* new_joint = game_objects.duplicateJoint(joint, new_object_1, new_object_2);
+                                    new_joints.push_back(new_joint);
+                                    duplicated_joints.insert(new_joint);
+                                }
+                                checked_joints.insert(joint);
                             }
                         }
+                        logger << "Duplicated " << duplicated_joints.size() << " joints\n";
                         select_tool.setSelected(new_objects);
                         try_select_tool(&move_tool);
                         grab_selected();
@@ -1323,27 +1348,6 @@ void Application::rotate_selected() {
     rotate_tool.pivot_pos = avg;
     b2Vec2 mouse_vector = b2MousePosWorld - avg;
     rotate_tool.orig_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
-}
-
-GameObject* Application::duplicate_object(const GameObject* object) {
-    TokenWriter tw;
-    std::string str = object->serialize(tw).toStr();
-    TokenReader tr(str);
-    std::unique_ptr<GameObject> new_object;
-    if (dynamic_cast<const BoxObject*>(object)) {
-        new_object = BoxObject::deserialize(tr, world.get());
-    } else if (dynamic_cast<const BallObject*>(object)) {
-        new_object = BallObject::deserialize(tr, world.get());
-    } else if (dynamic_cast<const CarObject*>(object)) {
-        new_object = CarObject::deserialize(tr, world.get());
-    } else if (dynamic_cast<const ChainObject*>(object)) {
-        new_object = ChainObject::deserialize(tr, world.get());
-    } else {
-        assert(false, "Unknown object type");
-    }
-    GameObject* ptr = new_object.get();
-    game_objects.add(std::move(new_object), true);
-    return ptr;
 }
 
 void Application::delete_object(GameObject* object) {

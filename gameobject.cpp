@@ -1029,7 +1029,7 @@ RevoluteJoint::RevoluteJoint(b2RevoluteJoint* joint) {
 	this->joint = joint;
 }
 
-TokenWriter& RevoluteJoint::serialize(TokenWriter& tw) {
+TokenWriter& RevoluteJoint::serialize(TokenWriter& tw) const {
 	b2RevoluteJoint* joint = static_cast<b2RevoluteJoint*>(this->joint);
 	size_t bodyAId = GameObject::getGameobject(joint->GetBodyA())->id;
 	size_t bodyBId = GameObject::getGameobject(joint->GetBodyB())->id;
@@ -1059,6 +1059,9 @@ b2RevoluteJointDef RevoluteJoint::deserialize(TokenReader& tr, ptrdiff_t& p_body
 		def.bodyB = nullptr;
 		p_body_a = -1;
 		p_body_b = -1;
+		if (tr.tryEat("joint")) {
+			tr.eat("revolute");
+		}
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
 			if (pname == "body_a") {
