@@ -871,22 +871,22 @@ void Application::maximize_window() {
 }
 
 std::string Application::serialize() {
-    std::string str;
-    TokenWriter tw(&str);
+    TokenWriter tw;
     tw << "camera\n";
     {
         TokenWriterIndent camera_indent(tw);
         tw << "center" << viewCenterX << viewCenterY << "\n";
         tw << "zoom" << zoomFactor << "\n";
     }
-    tw << "/camera" << "\n\n";
-    size_t current_id = 0;
+    tw << "/camera";
+    tw << "\n\n";
+    size_t index = 0;
     std::function<void(GameObject*)> serialize_obj = [&](GameObject* obj) {
-        if (current_id > 0) {
+        if (index > 0) {
             tw << "\n\n";
         }
-        obj->serialize(tw, current_id);
-        current_id++;
+        obj->serialize(tw);
+        index++;
     };
     std::function<void(GameObject*)> serialize_tree = [&](GameObject* obj) {
         for (size_t i = 0; i < obj->getChildren().size(); i++) {
@@ -898,7 +898,14 @@ std::string Application::serialize() {
         GameObject* gameobject = game_objects.top(i);
         serialize_tree(gameobject);
     }
-    return str;
+    tw << "\n\n";
+    for (size_t i = 0; i < joints.size(); i++) {
+        if (i > 0) {
+            tw << "\n\n";
+        }
+        joints[i]->serialize(tw);
+    }
+    return tw.toStr();
 }
 
 void Application::deserialize(std::string str, bool set_camera) {
@@ -907,14 +914,6 @@ void Application::deserialize(std::string str, bool set_camera) {
     init_tools();
     init_world();
     TokenReader tr(str);
-    struct ObjectId {
-        size_t id;
-        GameObject* ptr;
-        bool operator<(const ObjectId& other) const {
-            return id < other.id;
-        }
-    };
-    std::set<ObjectId> id_set;
     try {
         while (tr.validRange()) {
             std::string entity = tr.readString();
@@ -956,11 +955,18 @@ void Application::deserialize(std::string str, bool set_camera) {
                 } else {
                     throw std::runtime_error("Unknown object type: " + type);
                 }
-                ObjectId identry;
-                identry.id = id;
-                identry.ptr = gameobject.get();
-                id_set.insert(identry);
+                gameobject->id = id;
                 game_objects.add(std::move(gameobject));
+            } else if (entity == "joint") {
+                std::string type = tr.readString();
+                if (type == "revolute") {
+                    ptrdiff_t body_a_id, body_b_id;
+                    b2RevoluteJointDef def = RevoluteJoint::deserialize(tr, body_a_id, body_b_id);
+                    std::unique_ptr<RevoluteJoint> uptr = std::make_unique<RevoluteJoint>(def, world.get());
+                    joints.push_back(std::move(uptr));
+                } else {
+                    throw std::runtime_error("Unknown joint type: " + type);
+                }
             } else {
                 throw std::runtime_error("Unknown entity type: " + entity);
             }
@@ -1122,7 +1128,7 @@ GameObject* Application::get_object_at(sf::Vector2i screen_pos) {
     b2Fixture* fixture = get_fixture_at(mousePos);
     if (fixture) {
         b2Body* body = fixture->GetBody();
-        result = get_gameobject(body);
+        result = GameObject::getGameobject(body);
     }
     return result;
 }
@@ -1228,7 +1234,7 @@ void Application::select_objects_in_rect(const RectangleSelect& rectangle_select
     world->QueryAABB(&callback, aabb);
     for (size_t i = 0; i < callback.fixtures.size(); i++) {
         if (utils::rect_fixture_intersect(aabb.lowerBound, aabb.upperBound, callback.fixtures[i])) {
-            GameObject* gameobject = get_gameobject(callback.fixtures[i]->GetBody());
+            GameObject* gameobject = GameObject::getGameobject(callback.fixtures[i]->GetBody());
             select_tool.addToRectSelection(gameobject);
         }
     }
@@ -1278,11 +1284,6 @@ bool Application::is_parent_selected(GameObject* object) {
     return false;
 }
 
-GameObject* Application::get_gameobject(b2Body* body) {
-    GameObject* gameobject = reinterpret_cast<GameObject*>(body->GetUserData().pointer);
-    return gameobject;
-}
-
 void Application::grab_selected() {
     move_tool.orig_cursor_pos = b2MousePosWorld;
     move_tool.moving_objects = std::vector<GameObject*>();
@@ -1326,7 +1327,7 @@ void Application::rotate_selected() {
 
 GameObject* Application::copy_object(const GameObject* object) {
     TokenWriter tw;
-    std::string str = object->serialize(tw, 0).toStr();
+    std::string str = object->serialize(tw).toStr();
     TokenReader tr(str);
     std::unique_ptr<GameObject> new_object;
     if (dynamic_cast<const BoxObject*>(object)) {
@@ -1365,7 +1366,7 @@ BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Col
     def.angle = angle;
     std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(world.get(), def, size, color);
     BoxObject* ptr = uptr.get();
-    game_objects.add(std::move(uptr));
+    game_objects.add(std::move(uptr), true);
     return ptr;
 }
 
@@ -1375,7 +1376,7 @@ BallObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, 
     def.position = pos;
     std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(world.get(), def, radius, color, notch_color);
     BallObject* ptr = uptr.get();
-    game_objects.add(std::move(uptr));
+    game_objects.add(std::move(uptr), true);
     return ptr;
 }
 
@@ -1383,9 +1384,9 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
     b2BodyDef def;
     def.type = b2_dynamicBody;
     def.position = pos;
-    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), def, lengths, wheels, color);
+    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), &joints, def, lengths, wheels, color);
     CarObject* ptr = uptr.get();
-    game_objects.add(std::move(uptr));
+    game_objects.add(std::move(uptr), true);
     return ptr;
 }
 
@@ -1395,7 +1396,7 @@ ChainObject* Application::create_chain(b2Vec2 pos, float angle, std::vector<b2Ve
     def.angle = angle;
     std::unique_ptr<ChainObject> uptr = std::make_unique<ChainObject>(world.get(), def, vertices, color);
     ChainObject* ptr = uptr.get();
-    game_objects.add(std::move(uptr));
+    game_objects.add(std::move(uptr), true);
     return ptr;
 }
 
@@ -1443,6 +1444,13 @@ GameObject* GameObjectList::all(size_t i) const {
     return all_objects[i];
 }
 
+GameObject* GameObjectList::getById(size_t id) const {
+    auto it = ids.find(ObjectId(id, nullptr));
+    if (it != ids.end()) {
+        return (GameObject*)((*it).ptr);
+    }
+}
+
 const std::vector<GameObject*>& GameObjectList::getTop() const {
     return top_objects;
 }
@@ -1451,9 +1459,17 @@ const std::vector<GameObject*>& GameObjectList::getAll() const {
     return all_objects;
 }
 
-GameObject* GameObjectList::add(std::unique_ptr<GameObject> gameobject) {
+ptrdiff_t GameObjectList::getMaxId() const {
+    if (ids.size() > 0) {
+        return (*ids.rbegin()).id;
+    } else {
+        return -1;
+    }
+}
+
+GameObject* GameObjectList::add(std::unique_ptr<GameObject> gameobject, bool assign_new_id) {
     GameObject* ptr = gameobject.get();
-    addToAll(ptr);;
+    addToAll(ptr, assign_new_id);
     top_objects.push_back(ptr);
     uptrs.push_back(std::move(gameobject));
     return ptr;
@@ -1476,13 +1492,28 @@ bool GameObjectList::remove(GameObject* object) {
 void GameObjectList::clear() {
     all_objects = std::vector<GameObject*>();
     top_objects = std::vector<GameObject*>();
+    ids = std::set<ObjectId>();
     uptrs = std::vector<std::unique_ptr<GameObject>>();
 }
 
-void GameObjectList::addToAll(GameObject* object) {
-    all_objects.push_back(object);
-    for (size_t i = 0; i < object->getChildren().size(); i++) {
-        addToAll(object->getChildren()[i].get());
+void GameObjectList::addToAll(GameObject* object, bool assign_new_id) {
+    try {
+        for (size_t i = 0; i < object->getChildren().size(); i++) {
+            addToAll(object->getChildren()[i].get(), assign_new_id);
+        }
+        if (assign_new_id) {
+            object->id = getMaxId() + 1;
+        }
+        if (object->id < 0) {
+            throw std::runtime_error("Invalid object id: " + std::to_string(object->id));
+        }
+        all_objects.push_back(object);
+        auto inserted = ids.insert(ObjectId(object->id, object));
+        if (!inserted.second) {
+            throw std::runtime_error("Duplicate object id: " + std::to_string(object->id));
+        }
+    } catch (std::exception exc) {
+        throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
     }
 }
 
@@ -1495,6 +1526,7 @@ bool GameObjectList::removeFromAll(GameObject* object) {
                 parent->removeChild(object);
             }
             all_objects.erase(all_objects.begin() + i);
+            ids.erase(ObjectId(object->id, nullptr));
             result = true;
             break;
         }
@@ -1506,4 +1538,13 @@ bool GameObjectList::removeFromAll(GameObject* object) {
         }
     }
     return result;
+}
+
+ObjectId::ObjectId(size_t id, const GameObject* ptr) {
+    this->id = id;
+    this->ptr = ptr;
+}
+
+bool ObjectId::operator<(const ObjectId& other) const {
+    return id < other.id;
 }

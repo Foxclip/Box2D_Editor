@@ -187,3 +187,45 @@ object 8 car
         /fixtures
     /body
 /object
+
+joint revolute
+    body_a 8
+    body_b 5
+    anchor_a 5 0
+    anchor_b 0 0
+    collide_connected false
+    angle_lower_limit 0
+    angle_upper_limit 0
+    angle_limit_enabled false
+    motor_max_torque 30
+    motor_speed -10
+    motor_enabled true
+/joint
+
+joint revolute
+    body_a 8
+    body_b 6
+    anchor_a -2.50000024 4.33012676
+    anchor_b 0 0
+    collide_connected false
+    angle_lower_limit 0
+    angle_upper_limit 0
+    angle_limit_enabled false
+    motor_max_torque 30
+    motor_speed -10
+    motor_enabled true
+/joint
+
+joint revolute
+    body_a 8
+    body_b 7
+    anchor_a -2.49999952 -4.33012724
+    anchor_b 0 0
+    collide_connected false
+    angle_lower_limit 0
+    angle_upper_limit 0
+    angle_limit_enabled false
+    motor_max_torque 30
+    motor_speed -10
+    motor_enabled true
+/joint

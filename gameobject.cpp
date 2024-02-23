@@ -428,71 +428,8 @@ b2FixtureDef GameObject::deserializeFixture(TokenReader& tr) {
 	}
 }
 
-TokenWriter& GameObject::serializeJoint(TokenWriter& tw, b2Joint* p_joint) {
-	try {
-		if (b2RevoluteJoint* joint = dynamic_cast<b2RevoluteJoint*>(p_joint)) {
-			return serializeRevoluteJoint(tw, joint);
-		} else {
-			throw std::runtime_error("Unknown joint type");
-		}
-	} catch (std::exception exc) {
-		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
-	}
-}
-
-TokenWriter& GameObject::serializeRevoluteJoint(TokenWriter& tw, b2RevoluteJoint* joint) {
-	tw << "joint revolute" << "\n";
-	{
-		TokenWriterIndent joint_indent(tw);
-		tw.writeb2Vec2Param("anchor_a", joint->GetLocalAnchorA());
-		tw.writeb2Vec2Param("anchor_b", joint->GetLocalAnchorB());
-		tw.writeBoolParam("collide_connected", joint->GetCollideConnected());
-		tw.writeFloatParam("angle_lower_limit", joint->GetLowerLimit());
-		tw.writeFloatParam("angle_upper_limit", joint->GetUpperLimit());
-		tw.writeBoolParam("angle_limit_enabled", joint->IsLimitEnabled());
-		tw.writeFloatParam("motor_max_torque", joint->GetMaxMotorTorque());
-		tw.writeFloatParam("motor_speed", joint->GetMotorSpeed());
-		tw.writeBoolParam("motor_enabled", joint->IsMotorEnabled());
-	}
-	tw << "/joint";
-	return tw;
-}
-
-b2RevoluteJointDef GameObject::deserializeRevoluteJoint(TokenReader& tr) {
-	try {
-		b2RevoluteJointDef def;
-		def.bodyA = nullptr;
-		def.bodyB = nullptr;
-		while (tr.validRange()) {
-			std::string pname = tr.readString();
-			if (pname == "anchor_a") {
-				def.localAnchorA = tr.readb2Vec2();
-			} else if (pname == "anchor_b") {
-				def.localAnchorB = tr.readb2Vec2();
-			} else if (pname == "collide_connected") {
-				def.collideConnected = tr.readBool();
-			} else if (pname == "angle_lower_limit") {
-				def.lowerAngle = tr.readFloat();
-			} else if (pname == "angle_upper_limit") {
-				def.upperAngle = tr.readFloat();
-			} else if (pname == "angle_limit_enabled") {
-				def.enableLimit = tr.readBool();
-			} else if (pname == "motor_max_torque") {
-				def.maxMotorTorque = tr.readFloat();
-			} else if (pname == "motor_speed") {
-				def.motorSpeed = tr.readFloat();
-			} else if (pname == "motor_enabled") {
-				def.enableMotor = tr.readBool();
-			} else if (pname == "/joint") {
-				break;
-			} else {
-				throw std::runtime_error("Unknown RevoluteJoint parameter name: " + pname);
-			}
-		}
-		return def;
-	} catch (std::exception exc) {
-		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
-	}
+GameObject* GameObject::getGameobject(b2Body* body) {
+	return reinterpret_cast<GameObject*>(body->GetUserData().pointer);
 }
 
 BoxObject::BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color) {
@@ -522,7 +459,7 @@ void BoxObject::drawMask(sf::RenderTarget& mask) {
 	rect_shape->setFillColor(orig_color);
 }
 
-TokenWriter& BoxObject::serialize(TokenWriter& tw, size_t id) const {
+TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
 	tw << "object" << id << "box" << "\n";
 	{
 		TokenWriterIndent box_indent(tw);
@@ -608,7 +545,7 @@ void BallObject::drawMask(sf::RenderTarget& mask) {
 	circle_notch_shape->drawMask(mask);
 }
 
-TokenWriter& BallObject::serialize(TokenWriter& tw, size_t id) const {
+TokenWriter& BallObject::serialize(TokenWriter& tw) const {
 	tw << "object" << id << "ball" << "\n";
 	{
 		TokenWriterIndent ball_indent(tw);
@@ -703,7 +640,14 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 	target.draw(varray, states);
 }
 
-CarObject::CarObject(b2World* world, b2BodyDef def, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
+CarObject::CarObject(
+	b2World* world,
+	std::vector<std::unique_ptr<Joint>>* joint_list,
+	b2BodyDef def,
+	std::vector<float> lengths,
+	std::vector<float> wheels,
+	sf::Color color
+) {
 	this->color = color;
 	this->lengths = lengths;
 	rigid_body = world->CreateBody(&def);
@@ -711,7 +655,7 @@ CarObject::CarObject(b2World* world, b2BodyDef def, std::vector<float> lengths, 
 		b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
 		vertices.push_back(pos);
 		if (wheels[i] > 0.0f) {
-			create_wheel(pos, wheels[i]);
+			create_wheel(pos, wheels[i], joint_list);
 		}
 	}
 	polygon = std::make_unique<PolygonObject>();
@@ -724,8 +668,6 @@ CarObject::CarObject(
 	b2World* world,
 	b2BodyDef def,
 	std::vector<float> lengths,
-	std::vector<std::unique_ptr<BallObject>> wheels,
-	std::vector<b2RevoluteJointDef> joint_defs,
 	sf::Color color
 ) {
 	this->color = color;
@@ -737,16 +679,6 @@ CarObject::CarObject(
 	}
 	polygon = std::make_unique<PolygonObject>();
 	syncVertices();
-	for (size_t i = 0; i < joint_defs.size(); i++) {
-		b2RevoluteJointDef def = joint_defs[i];
-		def.bodyA = rigid_body;
-		def.bodyB = wheels[i]->rigid_body;
-		b2RevoluteJoint* joint = static_cast<b2RevoluteJoint*>(world->CreateJoint(&def));
-		wheel_joints.push_back(joint);
-	}
-	for (size_t i = 0; i < wheels.size(); i++) {
-		addChild(std::move(wheels[i]));
-	}
 	polygon->setFillColor(color);
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
@@ -779,7 +711,7 @@ void CarObject::drawMask(sf::RenderTarget& mask) {
 	polygon->setFillColor(orig_color);
 }
 
-TokenWriter& CarObject::serialize(TokenWriter& tw, size_t id) const {
+TokenWriter& CarObject::serialize(TokenWriter& tw) const {
 	tw << "object" << id << "car" << "\n";
 	{
 		TokenWriterIndent car_indent(tw);
@@ -797,7 +729,6 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 		std::vector<float> lengths;
 		BodyDef body_def;
 		std::vector<std::unique_ptr<BallObject>> wheels;
-		std::vector<b2RevoluteJointDef> joint_defs;
 		if (tr.tryEat("object")) {
 			tr.eat("car");
 		}
@@ -809,23 +740,6 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 				color = tr.readColor();
 			} else if (pname == "body") {
 				body_def = deserializeBody(tr);
-			} else if (pname == "wheels") {
-				while (tr.validRange()) {
-					std::string str = tr.readString();
-					if (str == "object") {
-					} else if (str == "/wheels") {
-						break;
-					} else {
-						throw std::runtime_error("Expected wheel, got: \"" + str + "\"");
-					}
-					tr.eat("ball");
-					std::unique_ptr<BallObject> wheel = BallObject::deserialize(tr, world);
-					wheels.push_back(std::move(wheel));
-					tr.eat("joint");
-					tr.eat("revolute");
-					b2RevoluteJointDef def = deserializeRevoluteJoint(tr);
-					joint_defs.push_back(def);
-				}
 			} else if (pname == "/object") {
 				break;
 			} else {
@@ -834,7 +748,7 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<CarObject> car = std::make_unique<CarObject>(world, bdef, lengths, std::move(wheels), joint_defs, color);
+		std::unique_ptr<CarObject> car = std::make_unique<CarObject>(world, bdef, lengths, color);
 		car->setDensity(fdef.density, false);
 		car->setFriction(fdef.friction, false);
 		car->setRestitution(fdef.restitution, false);
@@ -844,7 +758,7 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 	}
 }
 
-void CarObject::create_wheel(b2Vec2 wheel_pos, float radius) {
+void CarObject::create_wheel(b2Vec2 wheel_pos, float radius, std::vector<std::unique_ptr<Joint>>* joint_list) {
 	b2Vec2 anchor_pos = wheel_pos;
 	b2Vec2 anchor_pos_world = rigid_body->GetPosition() + anchor_pos;
 	b2BodyDef wheel_body_def;
@@ -863,8 +777,8 @@ void CarObject::create_wheel(b2Vec2 wheel_pos, float radius) {
 	wheel_joint_def.maxMotorTorque = 30.0f;
 	wheel_joint_def.motorSpeed = -10.0f;
 	wheel_joint_def.enableMotor = true;
-	b2RevoluteJoint* wheel_joint = (b2RevoluteJoint*)rigid_body->GetWorld()->CreateJoint(&wheel_joint_def);
-	wheel_joints.push_back(wheel_joint);
+	std::unique_ptr<RevoluteJoint> joint = std::make_unique<RevoluteJoint>(wheel_joint_def, rigid_body->GetWorld());
+	joint_list->push_back(std::move(joint));
 }
 
 void CarObject::syncVertices() {
@@ -976,7 +890,7 @@ void ChainObject::drawMask(sf::RenderTarget& mask) {
 	line_strip_shape->drawMask(mask);
 }
 
-TokenWriter& ChainObject::serialize(TokenWriter& tw, size_t id) const {
+TokenWriter& ChainObject::serialize(TokenWriter& tw) const {
 	tw << "object" << id << "chain" << "\n";
 	{
 		TokenWriterIndent ground_indent(tw);
@@ -1051,4 +965,82 @@ EditableVertex::EditableVertex(b2Vec2 pos) {
 	this->pos = pos;
 	this->orig_pos = pos;
 	this->selected = false;
+}
+
+RevoluteJoint::RevoluteJoint(const b2RevoluteJointDef& def, b2World* world) {
+	joint = world->CreateJoint(&def);
+}
+
+RevoluteJoint::RevoluteJoint(b2RevoluteJoint* joint) {
+	this->joint = joint;
+}
+
+TokenWriter& RevoluteJoint::serialize(TokenWriter& tw) {
+	b2RevoluteJoint* joint = static_cast<b2RevoluteJoint*>(this->joint);
+	size_t bodyAId = GameObject::getGameobject(joint->GetBodyA())->id;
+	size_t bodyBId = GameObject::getGameobject(joint->GetBodyB())->id;
+	tw << "joint revolute" << "\n";
+	{
+		TokenWriterIndent joint_indent(tw);
+		tw.writeSizetParam("body_a", bodyAId);
+		tw.writeSizetParam("body_b", bodyBId);
+		tw.writeb2Vec2Param("anchor_a", joint->GetLocalAnchorA());
+		tw.writeb2Vec2Param("anchor_b", joint->GetLocalAnchorB());
+		tw.writeBoolParam("collide_connected", joint->GetCollideConnected());
+		tw.writeFloatParam("angle_lower_limit", joint->GetLowerLimit());
+		tw.writeFloatParam("angle_upper_limit", joint->GetUpperLimit());
+		tw.writeBoolParam("angle_limit_enabled", joint->IsLimitEnabled());
+		tw.writeFloatParam("motor_max_torque", joint->GetMaxMotorTorque());
+		tw.writeFloatParam("motor_speed", joint->GetMotorSpeed());
+		tw.writeBoolParam("motor_enabled", joint->IsMotorEnabled());
+	}
+	tw << "/joint";
+	return tw;
+}
+
+b2RevoluteJointDef RevoluteJoint::deserialize(TokenReader& tr, ptrdiff_t& p_body_a, ptrdiff_t& p_body_b) {
+	try {
+		b2RevoluteJointDef def;
+		def.bodyA = nullptr;
+		def.bodyB = nullptr;
+		p_body_a = -1;
+		p_body_b = -1;
+		while (tr.validRange()) {
+			std::string pname = tr.readString();
+			if (pname == "body_a") {
+				p_body_a = tr.readULL();
+			} else if (pname == "body_b") {
+				p_body_b = tr.readULL();
+			} else if (pname == "anchor_a") {
+				def.localAnchorA = tr.readb2Vec2();
+			} else if (pname == "anchor_b") {
+				def.localAnchorB = tr.readb2Vec2();
+			} else if (pname == "collide_connected") {
+				def.collideConnected = tr.readBool();
+			} else if (pname == "angle_lower_limit") {
+				def.lowerAngle = tr.readFloat();
+			} else if (pname == "angle_upper_limit") {
+				def.upperAngle = tr.readFloat();
+			} else if (pname == "angle_limit_enabled") {
+				def.enableLimit = tr.readBool();
+			} else if (pname == "motor_max_torque") {
+				def.maxMotorTorque = tr.readFloat();
+			} else if (pname == "motor_speed") {
+				def.motorSpeed = tr.readFloat();
+			} else if (pname == "motor_enabled") {
+				def.enableMotor = tr.readBool();
+			} else if (pname == "/joint") {
+				break;
+			} else {
+				throw std::runtime_error("Unknown RevoluteJoint parameter name: " + pname);
+			}
+		}
+		return def;
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+	}
+}
+
+Joint::~Joint() {
+	joint->GetBodyA()->GetWorld()->DestroyJoint(joint);
 }

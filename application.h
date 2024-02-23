@@ -48,15 +48,28 @@ private:
 	int fps = 0;
 };
 
+struct ObjectId {
+public:
+	size_t id;
+	const GameObject* ptr;
+
+	ObjectId(size_t id, const GameObject* ptr);
+	bool operator<(const ObjectId& other) const;
+
+private:
+};
+
 class GameObjectList {
 public:
 	size_t topSize() const;
 	size_t allSize() const;
 	GameObject* top(size_t i) const;
 	GameObject* all(size_t i) const;
+	GameObject* getById(size_t id) const;
 	const std::vector<GameObject*>& getTop() const;
 	const std::vector<GameObject*>& getAll() const;
-	GameObject* add(std::unique_ptr<GameObject> gameobject);
+	ptrdiff_t getMaxId() const;
+	GameObject* add(std::unique_ptr<GameObject> gameobject, bool assign_new_id = false);
 	bool remove(GameObject* object);
 	void clear();
 
@@ -64,8 +77,9 @@ private:
 	std::vector<std::unique_ptr<GameObject>> uptrs;
 	std::vector<GameObject*> top_objects;
 	std::vector<GameObject*> all_objects;
+	std::set<ObjectId> ids;
 
-	void addToAll(GameObject* object);
+	void addToAll(GameObject* object, bool assign_new_id = false);
 	bool removeFromAll(GameObject* object);
 
 };
@@ -116,6 +130,7 @@ private:
 	b2Vec2 b2MousePosWorld;
 	GameObject* active_object = nullptr;
 	GameObjectList game_objects;
+	std::vector<std::unique_ptr<Joint>> joints;
 
 	History history;
 	bool commit_action = false;
@@ -176,7 +191,6 @@ private:
 	void get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color);
 	bool is_parent_selected(GameObject* object);
-	GameObject* get_gameobject(b2Body* body);
 	void grab_selected();
 	void rotate_selected();
 	GameObject* copy_object(const GameObject* object);

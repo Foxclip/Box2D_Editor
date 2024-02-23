@@ -49,8 +49,28 @@ public:
 private:
 };
 
+class Joint {
+public:
+	virtual TokenWriter& serialize(TokenWriter& tw) = 0;
+	~Joint();
+
+protected:
+	b2Joint* joint;
+};
+
+class RevoluteJoint : public Joint {
+public:
+	RevoluteJoint(const b2RevoluteJointDef& def, b2World* world);
+	RevoluteJoint(b2RevoluteJoint* joint);
+	TokenWriter& serialize(TokenWriter& tw) override;
+	static b2RevoluteJointDef deserialize(TokenReader& tr, ptrdiff_t& p_body_a, ptrdiff_t& p_body_b);
+
+private:
+};
+
 class GameObject {
 public:
+	ptrdiff_t id = -1;
 	b2Body* rigid_body = nullptr;
 	sf::Color color;
 	bool hover = false;
@@ -107,14 +127,12 @@ public:
 	void selectAllVertices();
 	void deselectAllVertices();
 	virtual void syncVertices() = 0;
-	virtual TokenWriter& serialize(TokenWriter& tw, size_t id) const = 0;
+	virtual TokenWriter& serialize(TokenWriter& tw) const = 0;
 	static TokenWriter& serializeBody(TokenWriter& tw, b2Body* body);
 	static TokenWriter& serializeFixture(TokenWriter& tw, b2Fixture* fixture);
-	static TokenWriter& serializeJoint(TokenWriter& tw, b2Joint* p_joint);
-	static TokenWriter& serializeRevoluteJoint(TokenWriter& p_tw, b2RevoluteJoint* joint);
 	static BodyDef deserializeBody(TokenReader& tr);
 	static b2FixtureDef deserializeFixture(TokenReader& tr);
-	static b2RevoluteJointDef deserializeRevoluteJoint(TokenReader& tr);
+	static GameObject* getGameobject(b2Body* body);
 
 protected:
 	std::vector<EditableVertex> vertices;
@@ -139,7 +157,7 @@ public:
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
-	TokenWriter& serialize(TokenWriter& tw, size_t id) const override;
+	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, b2World* world);
 	void syncVertices() override;
 
@@ -156,7 +174,7 @@ public:
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
-	TokenWriter& serialize(TokenWriter& tw, size_t id) const override;
+	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, b2World* world);
 	void syncVertices() override;
 
@@ -170,13 +188,18 @@ class CarObject : public GameObject {
 public:
 	std::vector<float> lengths;
 
-	CarObject(b2World* world, b2BodyDef def, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
+	CarObject(
+		b2World* world,
+		std::vector<std::unique_ptr<Joint>>* joint_list,
+		b2BodyDef def,
+		std::vector<float> lengths,
+		std::vector<float> wheels,
+		sf::Color color
+	);
 	CarObject(
 		b2World* world,
 		b2BodyDef def,
 		std::vector<float> lengths,
-		std::vector<std::unique_ptr<BallObject>> wheels,
-		std::vector<b2RevoluteJointDef> joint_defs,
 		sf::Color color
 	);
 	bool isClosed() override;
@@ -185,15 +208,14 @@ public:
 	sf::Transformable* getTransformable() override;
 	void render(sf::RenderTarget& target) override;
 	void drawMask(sf::RenderTarget& mask) override;
-	TokenWriter& serialize(TokenWriter& tw, size_t id) const override;
+	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<CarObject> deserialize(TokenReader& tr, b2World* world);
 	void syncVertices() override;
 
 private:
 	std::unique_ptr<PolygonObject> polygon;
-	std::vector<b2RevoluteJoint*> wheel_joints;
 
-	void create_wheel(b2Vec2 wheel_pos, float radius);
+	void create_wheel(b2Vec2 wheel_pos, float radius, std::vector<std::unique_ptr<Joint>>* joint_list);
 };
 
 class ChainObject : public GameObject {
@@ -203,7 +225,7 @@ public:
 	sf::Drawable* getDrawable() override;
 	sf::Transformable* getTransformable() override;
 	void drawMask(sf::RenderTarget& mask) override;
-	TokenWriter& serialize(TokenWriter& tw, size_t id) const override;
+	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<ChainObject> deserialize(TokenReader& tr, b2World* world);
 	void syncVertices() override;
 

@@ -318,6 +318,14 @@ void TokenWriter::writeIntParam(std::string name, int value) {
 	writeString(name).writeInt(value).writeNewLine();
 }
 
+void TokenWriter::writeSizetParam(std::string name, size_t value) {
+	writeString(name).writeSizet(value).writeNewLine();
+}
+
+void TokenWriter::writePtrdiffParam(std::string name, ptrdiff_t value) {
+	writeString(name).writePtrdifft(value).writeNewLine();
+}
+
 void TokenWriter::writeFloatParam(std::string name, float value) {
 	writeString(name).writeFloat(value).writeNewLine();
 }
