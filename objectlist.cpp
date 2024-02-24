@@ -178,7 +178,7 @@ bool GameObjectList::removeFromAll(GameObject* object) {
     bool result = false;
     for (size_t i = 0; i < all_objects.size(); i++) {
         if (all_objects[i] == object) {
-            std::vector<Joint*> joints_copy(joints.begin(), joints.end());
+            std::vector<Joint*> joints_copy(object->joints.begin(), object->joints.end());
             for (Joint* joint : joints_copy) {
                 joint->valid = false;
                 removeJoint(joint);

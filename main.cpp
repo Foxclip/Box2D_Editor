@@ -28,7 +28,6 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: fix missing joints after redo
     // TODO: fix deleting object with children that was duplicated before
     // TODO: rotate tool rotates objects around common center
     // TODO: add const to GameObject get methods
