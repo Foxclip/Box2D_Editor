@@ -370,7 +370,7 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::Num0: try_select_tool(9); break;
             case sf::Keyboard::X:
                 if (selected_tool == &select_tool) {
-                    std::vector<GameObject*> selected_copy = select_tool.getSelectedVector();
+                    std::vector<GameObject*> selected_copy = select_tool.getCompVector().getVector();
                     for (GameObject* obj : selected_copy | std::views::reverse) {
                         delete_object(obj);
                         commit_action = true;
@@ -444,7 +444,7 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::D:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     if (select_tool.selectedCount() > 0) {
-                        std::vector<GameObject*> old_objects = select_tool.getSelectedVector();
+                        std::vector<GameObject*> old_objects = select_tool.getCompVector().getVector();
                         std::vector<GameObject*> new_objects = duplicateObjects(old_objects);
                         select_tool.setSelected(new_objects);
                         try_select_tool(&move_tool);
@@ -742,7 +742,7 @@ void Application::render_world() {
     //}
 
     if (selected_tool != &edit_tool) {
-        for (auto obj : select_tool.getSelectedSet()) {
+        for (auto obj : select_tool.getCompVector().getVector()) {
             obj->renderMask(selection_mask, false);
         }
     }
@@ -1322,8 +1322,8 @@ std::vector<GameObject*> Application::duplicateObjects(std::vector<GameObject*>&
 bool Application::is_parent_selected(GameObject* object) {
     std::vector<GameObject*> parents = object->getParentChain();
     for (size_t i = 0; i < parents.size(); i++) {
-        auto it = select_tool.getSelectedSet().find(parents[i]);
-        if (it != select_tool.getSelectedSet().end()) {
+        auto it = select_tool.getCompVector().find(parents[i]);
+        if (it != select_tool.getCompVector().send()) {
             return true;
         }
     }
@@ -1333,7 +1333,7 @@ bool Application::is_parent_selected(GameObject* object) {
 void Application::grab_selected() {
     move_tool.orig_cursor_pos = b2MousePosWorld;
     move_tool.moving_objects = std::vector<GameObject*>();
-    for (GameObject* obj : select_tool.getSelectedSet()) {
+    for (GameObject* obj : select_tool.getCompVector().getVector()) {
         if (is_parent_selected(obj)) {
             continue;
         }
@@ -1350,7 +1350,7 @@ void Application::grab_selected() {
 void Application::rotate_selected() {
     rotate_tool.orig_cursor_pos = b2MousePosWorld;
     rotate_tool.rotating_objects = std::vector<GameObject*>();
-    for (GameObject* obj : select_tool.getSelectedSet()) {
+    for (GameObject* obj : select_tool.getCompVector().getVector()) {
         if (is_parent_selected(obj)) {
             continue;
         }

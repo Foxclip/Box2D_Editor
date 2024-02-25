@@ -98,30 +98,28 @@ size_t SelectTool::selectedCount() const {
     return selected_objects.size();
 }
 
-std::vector<GameObject*> SelectTool::getSelectedVector() const {
-    return std::vector<GameObject*>(selected_objects.begin(), selected_objects.end());
-}
-
-const std::set<GameObject*>& SelectTool::getSelectedSet() const {
+const CompoundVector<GameObject*>& SelectTool::getCompVector() const {
     return selected_objects;
 }
 
 void SelectTool::setSelected(const std::vector<GameObject*> vec) {
     clearSelected();
-    selected_objects = std::set<GameObject*>(vec.begin(), vec.end());
+    for (size_t i = 0; i < vec.size(); i++) {
+        selected_objects.add(vec[i]);
+    }
 }
 
 void SelectTool::selectObject(GameObject* object) {
     if (object) {
         object->selected = true;
-        selected_objects.insert(object);
+        selected_objects.add(object);
     }
 }
 
 void SelectTool::deselectObject(GameObject* object) {
     if (object) {
         object->selected = false;
-        selected_objects.erase(object);
+        selected_objects.add(object);
     }
 }
 
@@ -129,10 +127,10 @@ void SelectTool::toggleSelect(GameObject* object) {
     if (object) {
         if (object->selected) {
             object->selected = false;
-            selected_objects.erase(object);
+            selected_objects.remove(object);
         } else {
             object->selected = true;
-            selected_objects.insert(object);
+            selected_objects.add(object);
         }
     }
 }
@@ -149,14 +147,14 @@ void SelectTool::clearSelected() {
             obj->selected = false;
         }
     }
-    selected_objects = std::set<GameObject*>();
+    selected_objects.clear();
 }
 
 void SelectTool::clearRectSelected() {
     for (GameObject* obj : objects_in_rect) {
         deselectObject(obj);
     }
-    objects_in_rect = std::set<GameObject*>();
+    objects_in_rect.clear();
 }
 
 void SelectTool::selectSingleObject(GameObject* object) {
@@ -167,19 +165,19 @@ void SelectTool::selectSingleObject(GameObject* object) {
 void SelectTool::addToSelection(GameObject* object) {
     if (object) {
         object->selected = true;
-        selected_objects.insert(object);
+        selected_objects.add(object);
     }
 }
 
 void SelectTool::addToRectSelection(GameObject* object) {
     if (object && !object->selected) {
         addToSelection(object);
-        objects_in_rect.insert(object);
+        objects_in_rect.add(object);
     }
 }
 
 void SelectTool::applyRectSelection() {
-    objects_in_rect = std::set<GameObject*>();
+    objects_in_rect.clear();
 }
 
 RectangleSelect::RectangleSelect() {

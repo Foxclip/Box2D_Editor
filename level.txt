@@ -1,5 +1,5 @@
 camera
-    center -6.69414043 14.5864
+    center 2.30585742 9.46640491
     zoom 25.0000076
 /camera
 
@@ -208,7 +208,7 @@ object car
         type dynamic
         position 9.76768112 4.52989101
         angle -2.4201827
-        linear_velocity -1.62862216e-06 -5.90199875e-07
+        linear_velocity -1.62862216e-06 -5.90199818e-07
         angular_velocity -2.95654218e-07
         fixtures
             fixture

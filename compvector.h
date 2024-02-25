@@ -9,7 +9,7 @@ class CompoundVector {
 public:
 	CompoundVector();
 	size_t size() const;
-	void add(T value);
+	bool add(T value);
 	bool remove(T value);
 	void removeByIndex(size_t index);
 	std::vector<T>::iterator begin();
@@ -45,7 +45,7 @@ class CompoundVectorUptr {
 public:
 	CompoundVectorUptr();
 	size_t size() const;
-	void add(std::unique_ptr<T> value);
+	bool add(std::unique_ptr<T> value);
 	bool remove(T* value);
 	void removeByIndex(size_t index);
 	std::vector<T*>::iterator begin();
@@ -86,17 +86,21 @@ inline size_t CompoundVector<T>::size() const {
 }
 
 template<typename T>
-inline void CompoundVector<T>::add(T value) {
-	vector.push_back(value);
-	set.insert(value);
+inline bool CompoundVector<T>::add(T value) {
+	auto inserted = set.insert(value);
+	if (inserted.second) {
+		vector.push_back(value);
+		return true;
+	}
+	return false;
 }
 
 template<typename T>
 inline bool CompoundVector<T>::remove(T value) {
-	ptrdiff_t index = getIndex(value);
-	if (index >= 0) {
+	size_t removed = set.erase(value);
+	if (removed > 0) {
+		ptrdiff_t index = getIndex(value);
 		vector.erase(vector.begin() + index);
-		set.erase(value);
 		return true;
 	}
 	return false;
@@ -234,18 +238,22 @@ inline size_t CompoundVectorUptr<T>::size() const {
 }
 
 template<typename T>
-inline void CompoundVectorUptr<T>::add(std::unique_ptr<T> value) {
+inline bool CompoundVectorUptr<T>::add(std::unique_ptr<T> value) {
 	T* ptr = value.get();
-	uptrs.push_back(std::move(value));
-	comp.add(ptr);
+	bool added = comp.add(ptr);
+	if (added) {
+		uptrs.push_back(std::move(value));
+		return true;
+	}
+	return false;
 }
 
 template<typename T>
 inline bool CompoundVectorUptr<T>::remove(T* value) {
-	ptrdiff_t index = getIndex(value);
-	if (index >= 0) {
+	bool removed = comp.remove(value);
+	if (removed) {
+		ptrdiff_t index = getIndex(value);
 		uptrs.erase(uptrs.begin() + index);
-		comp.removeByIndex(index);
 		return true;
 	}
 	return false;

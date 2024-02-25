@@ -50,12 +50,11 @@ class SelectTool : public Tool {
 public:
 	GameObject* hover_object = nullptr;
 	RectangleSelect rectangle_select;
-	std::set<GameObject*> objects_in_rect;
+	CompoundVector<GameObject*> objects_in_rect;
 
 	SelectTool();
 	size_t selectedCount() const;
-	std::vector<GameObject*> getSelectedVector() const;
-	const std::set<GameObject*>& getSelectedSet() const;
+	const CompoundVector<GameObject*>& getCompVector() const;
 	void setSelected(const std::vector<GameObject*> vec);
 	void selectObject(GameObject* object);
 	void deselectObject(GameObject* object);
@@ -69,7 +68,7 @@ public:
 	void reset() override;
 
 private:
-	std::set<GameObject*> selected_objects;
+	CompoundVector<GameObject*> selected_objects;
 
 };
 

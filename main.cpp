@@ -28,8 +28,9 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: fix deleting object with children that was duplicated before
     // TOOO: use CompoundVector in select tool
+    // TODO: keep object selected after duplication
+    // TODO: delete duplicated objects when presing Esc key
     // TODO: use references in method arguments of CompoundVector
     // TODO: rotate tool rotates objects around common center
     // TODO: add const to GameObject get methods
