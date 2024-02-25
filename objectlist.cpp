@@ -159,8 +159,8 @@ void GameObjectList::removeJoint(Joint* joint) {
 }
 
 void GameObjectList::clear() {
+    joints.clear();
     all_objects.clear();
     top_objects.clear();
-    joints.clear();
     ids = std::set<ObjectId>();
 }
