@@ -42,8 +42,12 @@ std::vector<GameObject*> GameObject::getParentChain() const {
 	return result;
 }
 
-const std::vector<std::unique_ptr<GameObject>>& GameObject::getChildren() const {
-	return children;
+const std::vector<GameObject*>& GameObject::getChildren() const {
+	return children.getVector();
+}
+
+GameObject* GameObject::getChild(size_t index) const {
+	return children[index];
 }
 
 b2Vec2 GameObject::toGlobal(const b2Vec2& pos) {
@@ -54,23 +58,35 @@ b2Vec2 GameObject::toLocal(const b2Vec2& pos) {
 	return rigid_body->GetLocalPoint(pos);
 }
 
-void GameObject::addChild(std::unique_ptr<GameObject> child) {
-	child->parent = this;
-	children.push_back(std::move(child));
+void GameObject::addChild(GameObject* child) {
+	children.add(child);
 }
 
-void GameObject::removeChild(size_t index) {
-	children.erase(children.begin() + index);
+ptrdiff_t GameObject::getChildIndex(GameObject* object) const {
+	return children.getIndex(object);
 }
 
 bool GameObject::removeChild(GameObject* object) {
-	for (size_t i = 0; i < children.size(); i++) {
-		if (children[i].get() == object) {
-			removeChild(i);
-			return true;
+	return children.remove(object);
+}
+
+void GameObject::unparent() {
+	assert(parent);
+	parent->removeChild(this);
+	parent = nullptr;
+	parent_id = -1;
+}
+
+void GameObject::setParent(GameObject* new_parent) {
+	GameObject* old_parent = this->parent;
+	if (new_parent != old_parent) {
+		old_parent->removeChild(this);
+		if (new_parent) {
+			new_parent->addChild(this);
 		}
 	}
-	return false;
+	this->parent = new_parent;
+	parent_id = new_parent->id;
 }
 
 void GameObject::updateVisual() {
@@ -666,7 +682,6 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 
 CarObject::CarObject(
 	b2World* world,
-	std::vector<std::unique_ptr<Joint>>& joints,
 	b2BodyDef def,
 	std::vector<float> lengths,
 	std::vector<float> wheels,
@@ -678,9 +693,6 @@ CarObject::CarObject(
 	for (size_t i = 0; i < lengths.size(); i++) {
 		b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
 		vertices.push_back(pos);
-		if (wheels[i] > 0.0f) {
-			create_wheel(pos, wheels[i], joints);
-		}
 	}
 	polygon = std::make_unique<PolygonObject>();
 	syncVertices();
@@ -792,31 +804,6 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
 	}
-}
-
-void CarObject::create_wheel(b2Vec2 wheel_pos, float radius, std::vector<std::unique_ptr<Joint>>& joints) {
-	b2Vec2 anchor_pos = wheel_pos;
-	b2Vec2 anchor_pos_world = rigid_body->GetPosition() + anchor_pos;
-	b2BodyDef wheel_body_def;
-	wheel_body_def.type = b2_dynamicBody;
-	wheel_body_def.position = anchor_pos_world;
-	std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
-		rigid_body->GetWorld(), wheel_body_def, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
-	);
-	BallObject* wheel_ptr = wheel.get();
-	wheel_ptr->setDensity(1.0f, false);
-	wheel_ptr->setFriction(0.3f, false);
-	wheel_ptr->setRestitution(0.5f, false);
-	addChild(std::move(wheel));
-	b2RevoluteJointDef wheel_joint_def;
-	wheel_joint_def.Initialize(rigid_body, wheel_ptr->rigid_body, anchor_pos_world);
-	wheel_joint_def.maxMotorTorque = 30.0f;
-	wheel_joint_def.motorSpeed = -10.0f;
-	wheel_joint_def.enableMotor = true;
-	std::unique_ptr<RevoluteJoint> joint = std::make_unique<RevoluteJoint>(
-		wheel_joint_def, rigid_body->GetWorld(), this, wheel_ptr
-	);
-	joints.push_back(std::move(joint));
 }
 
 void CarObject::syncVertices() {

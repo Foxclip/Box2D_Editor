@@ -443,36 +443,8 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::D:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     if (select_tool.selectedCount() > 0) {
-                        std::vector<GameObject*> new_objects;
-                        std::set<GameObject*> new_objects_set;
-                        std::vector<Joint*> new_joints;
-                        std::set<Joint*> duplicated_joints;
-                        std::set<Joint*> checked_joints;
-                        const std::set<GameObject*>& old_objects_set = select_tool.getSelectedSet();
-                        for (GameObject* obj : old_objects_set) {
-                            GameObject* copy = game_objects.duplicate(obj);
-                            obj->new_id = copy->id;
-                            new_objects.push_back(copy);
-                            new_objects_set.insert(copy);
-                        }
-                        for (GameObject* obj : old_objects_set) {
-                            for (Joint* joint : obj->joints) {
-                                if (checked_joints.contains(joint)) {
-                                    continue;
-                                }
-                                auto it1 = old_objects_set.find(joint->object1);
-                                auto it2 = old_objects_set.find(joint->object2);
-                                if (it1 != old_objects_set.end() && it2 != old_objects_set.end()) {
-                                    GameObject* new_object_1 = game_objects.getById((*it1)->new_id);
-                                    GameObject* new_object_2 = game_objects.getById((*it2)->new_id);
-                                    Joint* new_joint = game_objects.duplicateJoint(joint, new_object_1, new_object_2);
-                                    new_joints.push_back(new_joint);
-                                    duplicated_joints.insert(new_joint);
-                                }
-                                checked_joints.insert(joint);
-                            }
-                        }
-                        logger << "Duplicated " << duplicated_joints.size() << " joints\n";
+                        std::vector<GameObject*> old_objects = select_tool.getSelectedVector();
+                        std::vector<GameObject*> new_objects = duplicateObjects(old_objects);
                         select_tool.setSelected(new_objects);
                         try_select_tool(&move_tool);
                         grab_selected();
@@ -916,7 +888,7 @@ std::string Application::serialize() {
     std::function<void(GameObject*)> serialize_tree = [&](GameObject* obj) {
         serialize_obj(obj);
         for (size_t i = 0; i < obj->getChildren().size(); i++) {
-            serialize_obj(obj->getChildren()[i].get());
+            serialize_obj(obj->getChild(i));
         }
     };
     for (size_t i = 0; i < game_objects.getTopSize(); i++) {
@@ -979,7 +951,7 @@ void Application::deserialize(std::string str, bool set_camera) {
                 } else {
                     throw std::runtime_error("Unknown object type: " + type);
                 }
-                game_objects.add(std::move(gameobject));
+                game_objects.add(std::move(gameobject), false);
             } else if (entity == "joint") {
                 std::string type = tr.readString();
                 if (type == "revolute") {
@@ -1298,6 +1270,50 @@ void Application::draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, co
     target.draw(line_primitive);
 }
 
+std::vector<GameObject*> Application::duplicateObjects(std::vector<GameObject*>& objects) {
+    std::vector<GameObject*> new_objects;
+    std::vector<Joint*> new_joints;
+    std::set<Joint*> duplicated_joints;
+    std::set<Joint*> checked_joints;
+    std::set<GameObject*> old_objects_set = std::set<GameObject*>(objects.begin(), objects.end());
+    // copy objects
+    for (GameObject* obj : old_objects_set) {
+        GameObject* copy = game_objects.duplicate(obj);
+        obj->new_id = copy->id;
+        new_objects.push_back(copy);
+    }
+    // set parents
+    for (GameObject* old_obj : old_objects_set) {
+        if (old_obj->getParent() && old_objects_set.contains(old_obj->getParent())) {
+            GameObject* new_obj = game_objects.getById(old_obj->new_id);
+            size_t new_parent_id = old_obj->getParent()->new_id;
+            GameObject* new_parent = game_objects.getById(new_parent_id);
+            new_obj->setParent(new_parent);
+            logger << "Object " << new_obj->id << " parented to " << new_parent->id << "\n";
+        }
+    }
+    // copy joints
+    for (GameObject* obj : old_objects_set) {
+        for (Joint* joint : obj->joints) {
+            if (checked_joints.contains(joint)) {
+                continue;
+            }
+            auto it1 = old_objects_set.find(joint->object1);
+            auto it2 = old_objects_set.find(joint->object2);
+            if (it1 != old_objects_set.end() && it2 != old_objects_set.end()) {
+                GameObject* new_object_1 = game_objects.getById((*it1)->new_id);
+                GameObject* new_object_2 = game_objects.getById((*it2)->new_id);
+                Joint* new_joint = game_objects.duplicateJoint(joint, new_object_1, new_object_2);
+                new_joints.push_back(new_joint);
+                duplicated_joints.insert(new_joint);
+            }
+            checked_joints.insert(joint);
+        }
+    }
+    logger << "Duplicated " << duplicated_joints.size() << " joints\n";
+    return new_objects;
+}
+
 bool Application::is_parent_selected(GameObject* object) {
     std::vector<GameObject*> parents = object->getParentChain();
     for (size_t i = 0; i < parents.size(); i++) {
@@ -1358,9 +1374,8 @@ void Application::delete_object(GameObject* object) {
         active_object = nullptr;
     }
     select_tool.deselectObject(object);
-    if (game_objects.remove(object)) {
-        commit_action = true;
-    }
+    game_objects.remove(object, true);
+    commit_action = true;
 }
 
 BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
@@ -1389,13 +1404,42 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
     def.type = b2_dynamicBody;
     def.position = pos;
     std::vector<std::unique_ptr<Joint>> joints;
-    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), joints, def, lengths, wheels, color);
-    CarObject* ptr = uptr.get();
+    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), def, lengths, wheels, color);
+    CarObject* car_ptr = uptr.get();
+    for (size_t i = 0; i < wheels.size(); i++) {
+        if (wheels[i] == 0.0f) {
+            continue;
+        }
+        b2Vec2 wheel_pos = utils::get_pos<b2Vec2>(lengths, i);
+        b2Vec2 anchor_pos = wheel_pos;
+        b2Vec2 anchor_pos_world = car_ptr->rigid_body->GetPosition() + anchor_pos;
+        float radius = wheels[i];
+        b2BodyDef wheel_body_def;
+        wheel_body_def.type = b2_dynamicBody;
+        wheel_body_def.position = anchor_pos_world;
+        std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
+            world.get(), wheel_body_def, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
+        );
+        BallObject* wheel_ptr = wheel.get();
+        wheel_ptr->setDensity(1.0f, false);
+        wheel_ptr->setFriction(0.3f, false);
+        wheel_ptr->setRestitution(0.5f, false);
+        game_objects.add(std::move(wheel), true);
+        b2RevoluteJointDef wheel_joint_def;
+        wheel_joint_def.Initialize(car_ptr->rigid_body, wheel_ptr->rigid_body, anchor_pos_world);
+        wheel_joint_def.maxMotorTorque = 30.0f;
+        wheel_joint_def.motorSpeed = -10.0f;
+        wheel_joint_def.enableMotor = true;
+        std::unique_ptr<RevoluteJoint> joint = std::make_unique<RevoluteJoint>(
+            wheel_joint_def, world.get(), car_ptr, wheel_ptr
+        );
+        joints.push_back(std::move(joint));
+    }
     game_objects.add(std::move(uptr), true);
     for (size_t i = 0; i < joints.size(); i++) {
         game_objects.addJoint(std::move(joints[i]));
     }
-    return ptr;
+    return car_ptr;
 }
 
 ChainObject* Application::create_chain(b2Vec2 pos, float angle, std::vector<b2Vec2> vertices, sf::Color color) {

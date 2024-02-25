@@ -150,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
+    <ClInclude Include="compvector.h" />
     <ClInclude Include="gameobject.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="history.h" />

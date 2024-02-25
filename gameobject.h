@@ -1,10 +1,11 @@
 #pragma once
 
+#include <set>
 #include <SFML/Graphics.hpp>
 #include "box2d/box2d.h"
 #include "serializer.h"
 #include "polygon.h"
-#include <set>
+#include "compvector.h"
 
 class LineStripShape : public sf::Drawable, public sf::Transformable {
 public:
@@ -79,7 +80,6 @@ class GameObject {
 public:
 	ptrdiff_t id = -1;
 	ptrdiff_t parent_id = -1;
-	ptrdiff_t orig_id = -1;
 	ptrdiff_t new_id = -1;
 	b2Body* rigid_body = nullptr;
 	sf::Color color;
@@ -90,7 +90,7 @@ public:
 	b2Vec2 orig_pos = b2Vec2(0.0f, 0.0f);
 	float orig_angle = 0.0f;
 	bool was_enabled = true;
-	std::set<Joint*> joints;
+	CompoundVector<Joint*> joints;
 
 	GameObject();
 	~GameObject();
@@ -101,12 +101,15 @@ public:
 	float getRotation() const;
 	GameObject* getParent() const;
 	std::vector<GameObject*> getParentChain() const;
-	const std::vector<std::unique_ptr<GameObject>>& getChildren() const;
+	const std::vector<GameObject*>& getChildren() const;
+	GameObject* getChild(size_t index) const;
 	b2Vec2 toGlobal(const b2Vec2& pos);
 	b2Vec2 toLocal(const b2Vec2& pos);
-	void addChild(std::unique_ptr<GameObject> child);
-	void removeChild(size_t index);
+	void addChild(GameObject* child);
+	ptrdiff_t getChildIndex(GameObject* object) const;
 	bool removeChild(GameObject* object);
+	void unparent();
+	void setParent(GameObject* parent);
 	void updateVisual();
 	virtual void render(sf::RenderTarget& target);
 	void renderMask(sf::RenderTarget& mask, bool include_children);
@@ -155,7 +158,7 @@ protected:
 	void destroyFixtures();
 
 private:
-	std::vector<std::unique_ptr<GameObject>> children;
+	CompoundVector<GameObject*> children;
 
 };
 
@@ -201,7 +204,6 @@ public:
 
 	CarObject(
 		b2World* world,
-		std::vector<std::unique_ptr<Joint>>& joints,
 		b2BodyDef def,
 		std::vector<float> lengths,
 		std::vector<float> wheels,
@@ -225,8 +227,6 @@ public:
 
 private:
 	std::unique_ptr<PolygonObject> polygon;
-
-	void create_wheel(b2Vec2 wheel_pos, float radius, std::vector<std::unique_ptr<Joint>>& joints);
 };
 
 class ChainObject : public GameObject {

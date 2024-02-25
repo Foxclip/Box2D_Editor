@@ -154,6 +154,7 @@ private:
 	void get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2);
 	void draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color);
+	std::vector<GameObject*> duplicateObjects(std::vector<GameObject*>& objects);
 	bool is_parent_selected(GameObject* object);
 	void grab_selected();
 	void rotate_selected();

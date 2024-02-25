@@ -89,5 +89,8 @@
     <ClInclude Include="objectlist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="compvector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,8 +7,8 @@
 void execute_app() {
     Application app;
     app.init();
-    //scene1(app);
-    app.load("level.txt");
+    scene1(app);
+    //app.load("level.txt");
     //ground_transform(app);
     //single_box(app);
     //single_ball(app);
@@ -29,6 +29,8 @@ int main() {
     }
 
     // TODO: fix deleting object with children that was duplicated before
+    // TODO: CompoundVector with vector and set
+    // TODO: use references in method arguments of CompoundVector
     // TODO: rotate tool rotates objects around common center
     // TODO: add const to GameObject get methods
     // TODO: check if joints are deleted when deleting object with X key
