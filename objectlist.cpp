@@ -168,15 +168,16 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
     if (parent) {
         object->setParent(nullptr);
     }
-    all_objects.removeByIndex(index);
-    top_objects.remove(object);
-    ids.erase(ObjectId(object->id, nullptr));
     if (remove_children) {
-        for (size_t i = 0; i < object->getChildren().size(); i++) {
-            GameObject* child = object->getChild(i);
+        std::vector<GameObject*> children_copy = object->getChildren();
+        for (size_t i = 0; i < children_copy.size(); i++) {
+            GameObject* child = children_copy[i];
             remove(child, true);
         }
     }
+    top_objects.remove(object);
+    ids.erase(ObjectId(object->id, nullptr));
+    all_objects.removeByIndex(index);
 }
 
 void GameObjectList::removeJoint(Joint* joint) {

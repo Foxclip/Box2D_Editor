@@ -11,6 +11,7 @@ GameObject::GameObject() { }
 
 GameObject::~GameObject() {
 	if (rigid_body) {
+		logger << "Destroy body, id " << id << "\n";
 		rigid_body->GetWorld()->DestroyBody(rigid_body);
 		rigid_body = nullptr;
 	}
