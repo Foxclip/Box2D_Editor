@@ -68,6 +68,7 @@ public:
 	T* operator[](size_t index);
 	const T* operator[](size_t index) const;
 	std::set<T*>::iterator find(T* value);
+	bool contains(T* value) const;
 	void clear();
 
 private:
@@ -93,7 +94,7 @@ inline void CompoundVector<T>::add(T value) {
 template<typename T>
 inline bool CompoundVector<T>::remove(T value) {
 	ptrdiff_t index = getIndex(value);
-	if (index > 0) {
+	if (index >= 0) {
 		vector.erase(vector.begin() + index);
 		set.erase(value);
 		return true;
@@ -242,7 +243,7 @@ inline void CompoundVectorUptr<T>::add(std::unique_ptr<T> value) {
 template<typename T>
 inline bool CompoundVectorUptr<T>::remove(T* value) {
 	ptrdiff_t index = getIndex(value);
-	if (index > 0) {
+	if (index >= 0) {
 		uptrs.erase(uptrs.begin() + index);
 		comp.removeByIndex(index);
 		return true;
@@ -359,6 +360,11 @@ inline const T* CompoundVectorUptr<T>::operator[](size_t index) const {
 template<typename T>
 inline std::set<T*>::iterator CompoundVectorUptr<T>::find(T* value) {
 	return comp.find(value);
+}
+
+template<typename T>
+inline bool CompoundVectorUptr<T>::contains(T* value) const {
+	return comp.contains(value);
 }
 
 template<typename T>

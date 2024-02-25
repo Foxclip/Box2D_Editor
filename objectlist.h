@@ -33,6 +33,7 @@ public:
 	Joint* addJoint(std::unique_ptr<Joint> joint);
 	GameObject* duplicate(const GameObject* object);
 	Joint* duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b);
+	void setParent(GameObject* object1, GameObject* object2);
 	void remove(GameObject* object, bool remove_children);
 	void removeJoint(Joint* joint);
 	void clear();

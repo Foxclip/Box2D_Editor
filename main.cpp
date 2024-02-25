@@ -29,7 +29,7 @@ int main() {
     }
 
     // TODO: fix deleting object with children that was duplicated before
-    // TODO: CompoundVector with vector and set
+    // TOOO: use CompoundVector in select tool
     // TODO: use references in method arguments of CompoundVector
     // TODO: rotate tool rotates objects around common center
     // TODO: add const to GameObject get methods

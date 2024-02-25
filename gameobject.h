@@ -105,11 +105,7 @@ public:
 	GameObject* getChild(size_t index) const;
 	b2Vec2 toGlobal(const b2Vec2& pos);
 	b2Vec2 toLocal(const b2Vec2& pos);
-	void addChild(GameObject* child);
 	ptrdiff_t getChildIndex(GameObject* object) const;
-	bool removeChild(GameObject* object);
-	void unparent();
-	void setParent(GameObject* parent);
 	void updateVisual();
 	virtual void render(sf::RenderTarget& target);
 	void renderMask(sf::RenderTarget& mask, bool include_children);
@@ -158,7 +154,9 @@ protected:
 	void destroyFixtures();
 
 private:
-	CompoundVector<GameObject*> children;
+	friend class GameObjectList;
+	CompoundVector<GameObject*> children; 
+	void setParent(GameObject* parent);
 
 };
 

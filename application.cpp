@@ -373,6 +373,7 @@ void Application::process_keyboard_event(sf::Event event) {
                     std::vector<GameObject*> selected_copy = select_tool.getSelectedVector();
                     for (GameObject* obj : selected_copy | std::views::reverse) {
                         delete_object(obj);
+                        commit_action = true;
                     }
                 } else if (selected_tool == &edit_tool && active_object) {
                     if (active_object->tryDeleteVertex(edit_tool.highlighted_vertex)) {
@@ -868,6 +869,8 @@ void Application::maximize_window() {
 }
 
 std::string Application::serialize() {
+    logger << __FUNCTION__"\n";
+    LoggerIndent serialize_indent;
     TokenWriter tw;
     tw << "camera\n";
     {
@@ -879,6 +882,8 @@ std::string Application::serialize() {
     tw << "\n\n";
     size_t index = 0;
     std::function<void(GameObject*)> serialize_obj = [&](GameObject* obj) {
+        logger << "Serialize object: id" << obj->id << "\n";
+        LoggerIndent object_indent;
         if (index > 0) {
             tw << "\n\n";
         }
@@ -886,13 +891,19 @@ std::string Application::serialize() {
         index++;
     };
     std::function<void(GameObject*)> serialize_tree = [&](GameObject* obj) {
+        logger << "Serialize tree: id" << obj->id << "\n";
+        LoggerIndent indent;
         serialize_obj(obj);
+        logger << "Serialize children\n";
+        LoggerIndent children_indent;
         for (size_t i = 0; i < obj->getChildren().size(); i++) {
             serialize_obj(obj->getChild(i));
         }
     };
     for (size_t i = 0; i < game_objects.getTopSize(); i++) {
         GameObject* gameobject = game_objects.getFromTop(i);
+        logger << "Serialize top object " << i << ": id" << gameobject->id << "\n";
+        LoggerIndent indent;
         serialize_tree(gameobject);
     }
     tw << "\n\n";
@@ -1288,7 +1299,7 @@ std::vector<GameObject*> Application::duplicateObjects(std::vector<GameObject*>&
             GameObject* new_obj = game_objects.getById(old_obj->new_id);
             size_t new_parent_id = old_obj->getParent()->new_id;
             GameObject* new_parent = game_objects.getById(new_parent_id);
-            new_obj->setParent(new_parent);
+            game_objects.setParent(new_obj, new_parent);
             logger << "Object " << new_obj->id << " parented to " << new_parent->id << "\n";
         }
     }
@@ -1375,7 +1386,6 @@ void Application::delete_object(GameObject* object) {
     }
     select_tool.deselectObject(object);
     game_objects.remove(object, true);
-    commit_action = true;
 }
 
 BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
@@ -1403,9 +1413,9 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
     b2BodyDef def;
     def.type = b2_dynamicBody;
     def.position = pos;
-    std::vector<std::unique_ptr<Joint>> joints;
     std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), def, lengths, wheels, color);
     CarObject* car_ptr = uptr.get();
+    game_objects.add(std::move(uptr), true);
     for (size_t i = 0; i < wheels.size(); i++) {
         if (wheels[i] == 0.0f) {
             continue;
@@ -1425,6 +1435,7 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
         wheel_ptr->setFriction(0.3f, false);
         wheel_ptr->setRestitution(0.5f, false);
         game_objects.add(std::move(wheel), true);
+        game_objects.setParent(wheel_ptr, car_ptr);
         b2RevoluteJointDef wheel_joint_def;
         wheel_joint_def.Initialize(car_ptr->rigid_body, wheel_ptr->rigid_body, anchor_pos_world);
         wheel_joint_def.maxMotorTorque = 30.0f;
@@ -1433,11 +1444,7 @@ CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::
         std::unique_ptr<RevoluteJoint> joint = std::make_unique<RevoluteJoint>(
             wheel_joint_def, world.get(), car_ptr, wheel_ptr
         );
-        joints.push_back(std::move(joint));
-    }
-    game_objects.add(std::move(uptr), true);
-    for (size_t i = 0; i < joints.size(); i++) {
-        game_objects.addJoint(std::move(joints[i]));
+        game_objects.addJoint(std::move(joint));
     }
     return car_ptr;
 }

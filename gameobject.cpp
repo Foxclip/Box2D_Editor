@@ -58,35 +58,22 @@ b2Vec2 GameObject::toLocal(const b2Vec2& pos) {
 	return rigid_body->GetLocalPoint(pos);
 }
 
-void GameObject::addChild(GameObject* child) {
-	children.add(child);
-}
-
 ptrdiff_t GameObject::getChildIndex(GameObject* object) const {
 	return children.getIndex(object);
 }
 
-bool GameObject::removeChild(GameObject* object) {
-	return children.remove(object);
-}
-
-void GameObject::unparent() {
-	assert(parent);
-	parent->removeChild(this);
-	parent = nullptr;
-	parent_id = -1;
-}
-
 void GameObject::setParent(GameObject* new_parent) {
 	GameObject* old_parent = this->parent;
-	if (new_parent != old_parent) {
-		old_parent->removeChild(this);
-		if (new_parent) {
-			new_parent->addChild(this);
-		}
+	if (old_parent) {
+		old_parent->children.remove(this);
+	}
+	if (new_parent) {
+		new_parent->children.add(this);
+		parent_id = new_parent->id;
+	} else {
+		parent_id = -1;
 	}
 	this->parent = new_parent;
-	parent_id = new_parent->id;
 }
 
 void GameObject::updateVisual() {

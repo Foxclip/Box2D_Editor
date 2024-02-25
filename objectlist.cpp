@@ -128,6 +128,17 @@ Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_a, Gam
     return ptr;
 }
 
+void GameObjectList::setParent(GameObject* object1, GameObject* object2) {
+    assert(object1);
+    assert(all_objects.contains(object1));
+    object1->setParent(object2);
+    if (object2) {
+        top_objects.remove(object1);
+    } else {
+        top_objects.add(object1);
+    }
+}
+
 void GameObjectList::remove(GameObject* object, bool remove_children) {
     assert(object);
     ptrdiff_t index = all_objects.getIndex(object);
@@ -137,12 +148,13 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
         joint->valid = false;
         removeJoint(joint);
     }
-    all_objects.removeByIndex(index);
-    ids.erase(ObjectId(object->id, nullptr));
     GameObject* parent = object->getParent();
     if (parent) {
-        parent->removeChild(object);
+        object->setParent(nullptr);
     }
+    all_objects.removeByIndex(index);
+    top_objects.remove(object);
+    ids.erase(ObjectId(object->id, nullptr));
     if (remove_children) {
         for (size_t i = 0; i < object->getChildren().size(); i++) {
             GameObject* child = object->getChild(i);
