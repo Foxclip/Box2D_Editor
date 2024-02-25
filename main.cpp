@@ -7,8 +7,8 @@
 void execute_app() {
     Application app;
     app.init();
-    scene1(app);
-    //app.load("level.txt");
+    //scene1(app);
+    app.load("level.txt");
     //ground_transform(app);
     //single_box(app);
     //single_ball(app);

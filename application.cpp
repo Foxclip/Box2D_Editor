@@ -883,7 +883,6 @@ std::string Application::serialize() {
     size_t index = 0;
     std::function<void(GameObject*)> serialize_obj = [&](GameObject* obj) {
         logger << "Serialize object: id" << obj->id << "\n";
-        LoggerIndent object_indent;
         if (index > 0) {
             tw << "\n\n";
         }
@@ -891,10 +890,7 @@ std::string Application::serialize() {
         index++;
     };
     std::function<void(GameObject*)> serialize_tree = [&](GameObject* obj) {
-        logger << "Serialize tree: id" << obj->id << "\n";
-        LoggerIndent indent;
         serialize_obj(obj);
-        logger << "Serialize children\n";
         LoggerIndent children_indent;
         for (size_t i = 0; i < obj->getChildren().size(); i++) {
             serialize_obj(obj->getChild(i));
@@ -902,8 +898,6 @@ std::string Application::serialize() {
     };
     for (size_t i = 0; i < game_objects.getTopSize(); i++) {
         GameObject* gameobject = game_objects.getFromTop(i);
-        logger << "Serialize top object " << i << ": id" << gameobject->id << "\n";
-        LoggerIndent indent;
         serialize_tree(gameobject);
     }
     tw << "\n\n";
