@@ -449,6 +449,7 @@ void Application::process_keyboard_event(sf::Event event) {
                         select_tool.setSelected(new_objects);
                         try_select_tool(&move_tool);
                         grab_selected();
+                        commit_action = true;
                     }
                 }
         }

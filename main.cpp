@@ -28,7 +28,6 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: delete duplicated objects when presing Esc key
     // TODO: use references in method arguments of CompoundVector
     // TODO: rotate tool rotates objects around common center
     // TODO: add const to GameObject get methods
