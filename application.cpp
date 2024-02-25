@@ -478,6 +478,7 @@ void Application::process_mouse_event(sf::Event event) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:
                 leftButtonPressed = true;
+                leftButtonPressGesture = true;
                 mousePressPosf = mousePosf;
                 process_left_click();
                 break;
@@ -492,6 +493,7 @@ void Application::process_mouse_event(sf::Event event) {
             case sf::Mouse::Left:
                 leftButtonPressed = false;
                 process_left_release();
+                leftButtonPressGesture = false;
                 break;
             case sf::Mouse::Right:
                 rightButtonPressed = false;
@@ -627,6 +629,7 @@ void Application::process_left_click() {
             //TODO: remember state for all children
             obj->setEnabled(obj->was_enabled, true);
             commit_action = true;
+            leftButtonPressGesture = false;
         }
         try_select_tool(&select_tool);
     } else if (selected_tool == &rotate_tool) {
@@ -634,6 +637,7 @@ void Application::process_left_click() {
             //TODO: remember state for all children
             obj->setEnabled(obj->was_enabled, true);
             commit_action = true;
+            leftButtonPressGesture = false;
         }
         try_select_tool(&select_tool);
     } else if (selected_tool == &edit_tool && active_object) {
@@ -673,6 +677,9 @@ void Application::process_left_click() {
 
 void Application::process_left_release() {
     root_widget.processRelease(mousePosf);
+    if (!leftButtonPressGesture) {
+        return;
+    }
     if (Widget::release_blocked) {
         return;
     }

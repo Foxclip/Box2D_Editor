@@ -72,6 +72,7 @@ private:
 	sf::Vector2f mousePressPosf;
 	bool leftButtonPressed = false;
 	bool rightButtonPressed = false;
+	bool leftButtonPressGesture = false;
 	float zoomFactor = 30.0f;
 	float viewCenterX = 0.0f, viewCenterY = 5.0f;
 	sf::Font ui_font;
