@@ -8,11 +8,11 @@ void execute_app() {
     Application app;
     app.init();
     //scene1(app);
-    app.load("level.txt");
+    //app.load("level.txt");
     //ground_transform(app);
     //single_box(app);
     //single_ball(app);
-    //single_car(app);
+    single_car(app);
     //multiple_chains(app);
     //polygon(app);
     app.start();

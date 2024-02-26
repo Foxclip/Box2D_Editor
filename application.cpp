@@ -372,7 +372,7 @@ void Application::process_keyboard_event(sf::Event event) {
                 if (selected_tool == &select_tool) {
                     std::vector<GameObject*> selected_copy = select_tool.getSelectedObjects().getVector();
                     for (GameObject* obj : selected_copy | std::views::reverse) {
-                        delete_object(obj);
+                        delete_object(obj, false);
                         commit_action = true;
                     }
                 } else if (selected_tool == &edit_tool && active_object) {
@@ -1379,7 +1379,7 @@ void Application::rotate_selected() {
     rotate_tool.orig_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
 }
 
-void Application::delete_object(GameObject* object) {
+void Application::delete_object(GameObject* object, bool remove_children) {
     if (!object) {
         return;
     }
@@ -1387,7 +1387,7 @@ void Application::delete_object(GameObject* object) {
         active_object = nullptr;
     }
     select_tool.deselectObject(object);
-    game_objects.remove(object, true);
+    game_objects.remove(object, remove_children);
 }
 
 BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {

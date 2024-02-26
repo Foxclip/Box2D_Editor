@@ -158,12 +158,13 @@ void test_CompoundVector() {
 	{
 		// no duplicates
 		CompoundVector<int> vec = { 1, 2, 2, 3 };
-		assert(vec.size() == 3);
-		assert(vec[0] == 1);
-		assert(vec[1] == 2);
-		assert(vec[2] == 3);
-		assert(vec.front() == 1);
-		assert(vec.back() == 3);
+		assert(vec == CompoundVector<int>({ 1, 2, 3 }));
+	}
+	{
+		// removing missing
+		CompoundVector<int> vec = { 1, 2, 3 };
+		vec.remove(5);
+		assert(vec == CompoundVector<int>({ 1, 2, 3 }));
 	}
 	{
 		// value modification
@@ -215,6 +216,7 @@ void test_CompoundVectorUptr() {
 		int* ptr1 = new int(1);
 		int* ptr2 = new int(2);
 		int* ptr3 = new int(3);
+		int* ptr5 = new int(5);
 		CompoundVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
 		vec.remove(ptr2);
 		assert(vec.size() == 2);
@@ -348,8 +350,19 @@ void test_CompoundVectorUptr() {
 		assert(*vec[0] == 1);
 		assert(*vec[1] == 2);
 		assert(*vec[2] == 3);
-		assert(*vec.front() == 1);
-		assert(*vec.back() == 3);
+	}
+	{
+		// removing missing
+		int* ptr1 = new int(1);
+		int* ptr2 = new int(2);
+		int* ptr3 = new int(3);
+		int* ptr5 = new int(5);
+		CompoundVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
+		vec.remove(ptr5);
+		assert(vec.size() == 3);
+		assert(*vec[0] == 1);
+		assert(*vec[1] == 2);
+		assert(*vec[2] == 3);
 	}
 }
 
