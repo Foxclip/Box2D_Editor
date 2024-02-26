@@ -119,7 +119,7 @@ void SelectTool::selectObject(GameObject* object) {
 void SelectTool::deselectObject(GameObject* object) {
     if (object) {
         object->selected = false;
-        selected_objects.add(object);
+        selected_objects.remove(object);
     }
 }
 

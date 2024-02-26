@@ -108,7 +108,7 @@ public:
 	ptrdiff_t getChildIndex(GameObject* object) const;
 	void updateVisual();
 	virtual void render(sf::RenderTarget& target);
-	void renderMask(sf::RenderTarget& mask, bool include_children);
+	void renderMask(sf::RenderTarget& mask);
 	void setVisualPosition(const sf::Vector2f& pos);
 	void setVisualRotation(float angle);
 	void setEnabled(bool enabled, bool include_children);

@@ -751,7 +751,7 @@ void Application::render_world() {
 
     if (selected_tool != &edit_tool) {
         for (auto obj : select_tool.getCompVector().getVector()) {
-            obj->renderMask(selection_mask, false);
+            obj->renderMask(selection_mask);
         }
     }
 

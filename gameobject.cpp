@@ -92,12 +92,7 @@ void GameObject::render(sf::RenderTarget& target) {
 	target.draw(*getDrawable());
 }
 
-void GameObject::renderMask(sf::RenderTarget& mask, bool include_children) {
-	if (include_children) {
-		for (size_t i = 0; i < children.size(); i++) {
-			children[i]->renderMask(mask, true);
-		}
-	}
+void GameObject::renderMask(sf::RenderTarget& mask) {
 	updateVisual();
 	drawMask(mask);
 }
