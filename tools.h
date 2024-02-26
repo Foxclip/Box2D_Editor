@@ -54,7 +54,7 @@ public:
 
 	SelectTool();
 	size_t selectedCount() const;
-	const CompoundVector<GameObject*>& getCompVector() const;
+	const CompoundVector<GameObject*>& getSelectedObjects() const;
 	void setSelected(const std::vector<GameObject*> vec);
 	void selectObject(GameObject* object);
 	void deselectObject(GameObject* object);

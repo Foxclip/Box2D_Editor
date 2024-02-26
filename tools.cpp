@@ -98,7 +98,7 @@ size_t SelectTool::selectedCount() const {
     return selected_objects.size();
 }
 
-const CompoundVector<GameObject*>& SelectTool::getCompVector() const {
+const CompoundVector<GameObject*>& SelectTool::getSelectedObjects() const {
     return selected_objects;
 }
 
@@ -142,7 +142,7 @@ void SelectTool::reset() {
 }
 
 void SelectTool::clearSelected() {
-    for (GameObject* obj : selected_objects.getVector()) {
+    for (GameObject* obj : selected_objects) {
         if (obj) {
             obj->selected = false;
         }
@@ -151,7 +151,7 @@ void SelectTool::clearSelected() {
 }
 
 void SelectTool::clearRectSelected() {
-    for (GameObject* obj : objects_in_rect.getVector()) {
+    for (GameObject* obj : objects_in_rect) {
         deselectObject(obj);
     }
     objects_in_rect.clear();

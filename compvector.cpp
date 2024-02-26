@@ -3,6 +3,7 @@
 #include "compvector.h"
 #include <cassert>
 #include <algorithm>
+#include <ranges>
 
 CompoundVectorTest compound_vector_test;
 
@@ -62,6 +63,46 @@ void test_CompoundVector() {
 		assert(vec[1] == 3);
 		assert(vec.front() == 1);
 		assert(vec.back() == 3);
+	}
+	{
+		// iterators
+		CompoundVector<int> vec = { 1, 2, 3 };
+		{
+			auto it = vec.begin();
+			assert(*it == 1);
+			assert(*++it == 2);
+			assert(*++it == 3);
+			assert(++it == vec.end());
+		}
+		{
+			auto it = vec.end();
+			assert(*--it == 3);
+			assert(*--it == 2);
+			assert(*--it == 1);
+			assert(it == vec.begin());
+		}
+		{
+			auto it = vec.rbegin();
+			assert(*it == 3);
+			assert(*++it == 2);
+			assert(*++it == 1);
+			assert(++it == vec.rend());
+		}
+		{
+			auto it = vec.rend();
+			assert(*--it == 1);
+			assert(*--it == 2);
+			assert(*--it == 3);
+			assert(it == vec.rbegin());
+		}
+		{
+			for (int value : vec) {
+				assert(value > 0);
+			}
+			for (int value : vec | std::views::reverse) {
+				assert(value > 0);
+			}
+		}
 	}
 	{
 		// get method
@@ -191,6 +232,46 @@ void test_CompoundVectorUptr() {
 		assert(*vec[1] == 3);
 		assert(*vec.front() == 1);
 		assert(*vec.back() == 3);
+	}
+	{
+		// iterators
+		CompoundVectorUptr<int> vec = { 1, 2, 3 };
+		{
+			auto it = vec.begin();
+			assert(**it == 1);
+			assert(**++it == 2);
+			assert(**++it == 3);
+			assert(++it == vec.end());
+		}
+		{
+			auto it = vec.end();
+			assert(**--it == 3);
+			assert(**--it == 2);
+			assert(**--it == 1);
+			assert(it == vec.begin());
+		}
+		{
+			auto it = vec.rbegin();
+			assert(**it == 3);
+			assert(**++it == 2);
+			assert(**++it == 1);
+			assert(++it == vec.rend());
+		}
+		{
+			auto it = vec.rend();
+			assert(**--it == 1);
+			assert(**--it == 2);
+			assert(**--it == 3);
+			assert(it == vec.rbegin());
+		}
+		{
+			for (int* value : vec) {
+				assert(value);
+			}
+			for (int* value : vec | std::views::reverse) {
+				assert(value);
+			}
+		}
 	}
 	{
 		// get method

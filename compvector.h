@@ -21,6 +21,10 @@ public:
 	bool add(const T& value);
 	ptrdiff_t remove(const T& value);
 	void removeByIndex(size_t index);
+	std::vector<T>::const_iterator begin() const;
+	std::vector<T>::const_iterator end() const;
+	std::vector<T>::const_reverse_iterator rbegin() const;
+	std::vector<T>::const_reverse_iterator rend() const;
 	T& front();
 	const T& front() const;
 	T& back();
@@ -63,6 +67,10 @@ public:
 	bool add(std::unique_ptr<T> value);
 	ptrdiff_t remove(T* value);
 	void removeByIndex(size_t index);
+	std::vector<T*>::const_iterator begin() const;
+	std::vector<T*>::const_iterator end() const;
+	std::vector<T*>::const_reverse_iterator rbegin() const;
+	std::vector<T*>::const_reverse_iterator rend() const;
 	T* front();
 	const T* front() const;
 	T* back();
@@ -125,6 +133,26 @@ inline void CompoundVector<T>::removeByIndex(size_t index) {
 	T value = vector[index];
 	vector.erase(vector.begin() + index);
 	set.erase(value);
+}
+
+template<typename T>
+inline std::vector<T>::const_iterator CompoundVector<T>::begin() const {
+	return vector.begin();
+}
+
+template<typename T>
+inline std::vector<T>::const_iterator CompoundVector<T>::end() const {
+	return vector.end();
+}
+
+template<typename T>
+inline std::vector<T>::const_reverse_iterator CompoundVector<T>::rbegin() const {
+	return vector.rbegin();
+}
+
+template<typename T>
+inline std::vector<T>::const_reverse_iterator CompoundVector<T>::rend() const {
+	return vector.rend();
 }
 
 template<typename T>
@@ -295,6 +323,26 @@ template<typename T>
 inline void CompoundVectorUptr<T>::removeByIndex(size_t index) {
 	uptrs.erase(uptrs.begin() + index);
 	comp.removeByIndex(index);
+}
+
+template<typename T>
+inline std::vector<T*>::const_iterator CompoundVectorUptr<T>::begin() const {
+	return comp.begin();
+}
+
+template<typename T>
+inline std::vector<T*>::const_iterator CompoundVectorUptr<T>::end() const {
+	return comp.end();
+}
+
+template<typename T>
+inline std::vector<T*>::const_reverse_iterator CompoundVectorUptr<T>::rbegin() const {
+	return comp.rbegin();
+}
+
+template<typename T>
+inline std::vector<T*>::const_reverse_iterator CompoundVectorUptr<T>::rend() const {
+	return comp.rend();
 }
 
 template<typename T>
