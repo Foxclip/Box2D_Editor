@@ -86,6 +86,7 @@ private:
 	RectangleWidget* logger_widget;
 	TextWidget* logger_text_widget;
 	sf::Font console_font;
+	sf::CircleShape origin_shape;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;
@@ -110,6 +111,7 @@ private:
 	void init_tools();
 	void init_world();
 	void init_ui();
+	void init_widgets();
 	void main_loop();
 	void resetView();
 	void process_widgets();
@@ -136,16 +138,16 @@ private:
 	Tool* try_select_tool(Tool* tool);
 	void select_create_type(int type);
 	void toggle_pause();
-	b2Vec2 b2_screen_to_world(sf::Vector2i screen_pos);
-	sf::Vector2f sf_screen_to_world(sf::Vector2i screen_pos);
-	sf::Vector2f sf_screen_to_world(sf::Vector2f screen_pos);
-	sf::Vector2i world_to_screen(b2Vec2 world_pos);
-	sf::Vector2f world_to_screenf(sf::Vector2f world_pos);
-	sf::Vector2f world_to_screenf(b2Vec2 world_pos);
-	sf::Vector2f world_dir_to_screenf(b2Vec2 world_dir);
+	sf::Vector2f screen_to_world(const sf::Vector2f& screen_pos);
+	sf::Vector2f pixel_to_world(const sf::Vector2i& screen_pos);
+	sf::Vector2f world_to_screen(const sf::Vector2f& world_pos);
+	sf::Vector2f world_to_screen(const b2Vec2& world_pos);
+	sf::Vector2i world_to_pixel(const sf::Vector2f& world_pos);
+	sf::Vector2i world_to_pixel(const b2Vec2& world_pos);
+	sf::Vector2f world_dir_to_screenf(const b2Vec2& world_dir);
 	ptrdiff_t mouse_get_chain_edge(const b2Fixture* fixture);
-	b2Fixture* get_fixture_at(sf::Vector2i screen_pos);
-	GameObject* get_object_at(sf::Vector2i screen_pos);
+	b2Fixture* get_fixture_at(sf::Vector2f screen_pos);
+	GameObject* get_object_at(sf::Vector2f screen_pos);
 	ptrdiff_t mouse_get_object_vertex();
 	ptrdiff_t mouse_get_object_edge();
 	ptrdiff_t mouse_get_edge_vertex();

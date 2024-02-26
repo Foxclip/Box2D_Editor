@@ -48,7 +48,7 @@ const std::vector<GameObject*>& GameObjectList::getTopVector() const {
     return top_objects.getVector();
 }
 
-std::vector<GameObject*> GameObjectList::getAllVector() const {
+const std::vector<GameObject*>& GameObjectList::getAllVector() const {
     return all_objects.getVector();
 }
 

@@ -27,7 +27,7 @@ public:
 	ptrdiff_t getTopIndex(GameObject* object) const;
 	Joint* getJoint(size_t i);
 	const std::vector<GameObject*>& getTopVector() const;
-	std::vector<GameObject*> getAllVector() const;
+	const std::vector<GameObject*>& getAllVector() const;
 	ptrdiff_t getMaxId() const;
 	GameObject* add(std::unique_ptr<GameObject> object, bool assign_new_id);
 	Joint* addJoint(std::unique_ptr<Joint> joint);

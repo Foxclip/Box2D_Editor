@@ -171,7 +171,7 @@ void PolygonObject::drawIndices(
 		sf::Vector2f pos = getGlobalTransform() * getPoint(i);
 		vertex_text.setCharacterSize(size);
 		vertex_text.setString(std::to_string(i));
-		vertex_text.setPosition(world_to_screenf(pos));
+		vertex_text.setPosition(world_to_screen(pos));
 		vertex_text.setFillColor(color);
 		target.draw(vertex_text);
 	}

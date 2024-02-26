@@ -14,9 +14,10 @@ sf::Vector2f sfScreenToWorld(const sf::Vector2i& screen_pos) {
 	return pos;
 }
 
-sf::Vector2f world_to_screenf(sf::Vector2f world_pos) {
-	sf::Vector2i pos = window.mapCoordsToPixel(world_pos, world_view);
-	return utils::to2f(pos);
+sf::Vector2f world_to_screen(sf::Vector2f world_pos) {
+	sf::Transform combined = ui_view.getInverseTransform() * world_view.getTransform();
+	sf::Vector2f result = combined.transformPoint(world_pos);
+	return result;
 }
 
 void drawLine(sf::RenderTarget& target, const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color, const sf::Transform& transform) {

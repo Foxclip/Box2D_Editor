@@ -13,7 +13,7 @@ extern sf::RenderTexture selection_mask;
 extern sf::VertexArray line_primitive;
 
 sf::Vector2f sfScreenToWorld(const sf::Vector2i& screen_pos);
-sf::Vector2f world_to_screenf(sf::Vector2f world_pos);
+sf::Vector2f world_to_screen(sf::Vector2f world_pos);
 void drawLine(
 	sf::RenderTarget& target,
 	const sf::Vector2f& v1,

@@ -122,6 +122,16 @@ void Application::init_ui() {
     vertex_text.setCharacterSize(20);
     vertex_text.setFillColor(sf::Color::White);
 
+    origin_shape.setRadius(3.0f);
+    origin_shape.setOrigin(origin_shape.getRadius(), origin_shape.getRadius());
+    origin_shape.setFillColor(sf::Color(255, 159, 44));
+    origin_shape.setOutlineColor(sf::Color::Black);
+    origin_shape.setOutlineThickness(1.0f);
+
+    init_widgets();
+}
+
+void Application::init_widgets() {
     {
         std::unique_ptr<ContainerWidget> toolbox_widget_uptr = std::make_unique<ContainerWidget>();
         toolbox_widget = toolbox_widget_uptr.get();
@@ -473,7 +483,7 @@ void Application::process_keyboard_event(sf::Event event) {
 void Application::process_mouse_event(sf::Event event) {
     mousePos = sf::Mouse::getPosition(window);
     mousePosf = to2f(mousePos);
-    sfMousePosWorld = sf_screen_to_world(mousePos);
+    sfMousePosWorld = pixel_to_world(mousePos);
     b2MousePosWorld = tob2(sfMousePosWorld);
     if (event.type == sf::Event::MouseButtonPressed) {
         switch (event.mouseButton.button) {
@@ -515,7 +525,7 @@ void Application::process_mouse() {
     if (selected_tool == &select_tool) {
         {
             GameObject* old_hover = select_tool.hover_object;
-            GameObject* new_hover = get_object_at(mousePos);
+            GameObject* new_hover = get_object_at(mousePosf);
             if (old_hover) {
                 old_hover->hover = false;
             }
@@ -556,7 +566,7 @@ void Application::process_mouse() {
                 select_objects_in_rect(select_tool.rectangle_select);
             } else if (utils::length(mousePosf - mousePressPosf) >= MOUSE_DRAG_THRESHOLD) {
                 select_tool.rectangle_select.active = true;
-                select_tool.rectangle_select.select_origin = sf_screen_to_world(mousePressPosf);
+                select_tool.rectangle_select.select_origin = screen_to_world(mousePressPosf);
                 if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     select_tool.clearSelected();
                 }
@@ -613,7 +623,7 @@ void Application::process_left_click() {
                 break;
         }
     } else if (selected_tool == &drag_tool) {
-        b2Fixture* grabbed_fixture = get_fixture_at(mousePos);
+        b2Fixture* grabbed_fixture = get_fixture_at(mousePosf);
         if (grabbed_fixture) {
             b2Body* grabbed_body = grabbed_fixture->GetBody();
             b2MouseJointDef mouse_joint_def;
@@ -686,7 +696,7 @@ void Application::process_left_release() {
     }
     if (selected_tool == &select_tool) {
         if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
-            GameObject* object = get_object_at(mousePos);
+            GameObject* object = get_object_at(mousePosf);
             active_object = object;
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                 select_tool.toggleSelect(object);
@@ -778,6 +788,22 @@ void Application::render_ui() {
     ui_texture.setView(ui_view);
     sf::RenderTarget& target = ui_texture;
 
+    // parent relation lines
+    for (GameObject* object : game_objects.getAllVector()) {
+        for (GameObject* child : object->getChildren()) {
+            sf::Vector2f v1 = world_to_screen(object->getPosition());
+            sf::Vector2f v2 = world_to_screen(child->getPosition());
+            drawLine(target, v1, v2, sf::Color(128, 128, 128));
+        }
+    }
+
+    // origin circle
+    for (size_t i = 0; i < game_objects.getAllSize(); i++) {
+        GameObject* gameobject = game_objects.getFromAll(i);
+        origin_shape.setPosition(world_to_screen(gameobject->getPosition()));
+        target.draw(origin_shape);
+    }
+
     //for (size_t i = 0; i < game_objects.size(); i++) {
     //    if (CarObject* car_object = dynamic_cast<CarObject*>(game_objects[i].get())) {
     //        car_object->getPolygonObject()->drawIndices(target, sf::Color::White, 20, false);
@@ -790,17 +816,17 @@ void Application::render_ui() {
         }
     } else if (selected_tool == &drag_tool) {
         if (drag_tool.mouse_joint) {
-            sf::Vector2f grabbed_point = world_to_screenf(drag_tool.mouse_joint->GetAnchorB());
+            sf::Vector2f grabbed_point = world_to_screen(drag_tool.mouse_joint->GetAnchorB());
             draw_line(target, grabbed_point, mousePosf, sf::Color::Yellow);
         }
     } else if (selected_tool == &rotate_tool) {
         for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
-            draw_line(target, world_to_screenf(rotate_tool.pivot_pos), mousePosf, sf::Color::Yellow);
+            draw_line(target, world_to_screen(rotate_tool.pivot_pos), mousePosf, sf::Color::Yellow);
         }
     } else if (selected_tool == &edit_tool && active_object) {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             // ghost edge
-            sf::Vector2i v1 = world_to_screen(active_object->getGlobalVertexPos(edit_tool.edge_vertex));
+            sf::Vector2i v1 = world_to_pixel(active_object->getGlobalVertexPos(edit_tool.edge_vertex));
             sf::Vector2i v2 = mousePos;
             draw_line(target, to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
             // ghost edge normal
@@ -820,8 +846,8 @@ void Application::render_ui() {
             // edge highlight
             b2Vec2 v1 = active_object->getGlobalVertexPos(edit_tool.highlighted_edge);
             b2Vec2 v2 = active_object->getGlobalVertexPos(active_object->indexLoop(edit_tool.highlighted_edge + 1));
-            sf::Vector2f v1_screen = world_to_screenf(v1);
-            sf::Vector2f v2_screen = world_to_screenf(v2);
+            sf::Vector2f v1_screen = world_to_screen(v1);
+            sf::Vector2f v2_screen = world_to_screen(v2);
             sf::Vector2f vec = v2_screen - v1_screen;
             float angle = atan2(vec.y, vec.x);
             edit_tool.edge_highlight.setPosition(v1_screen);
@@ -829,14 +855,14 @@ void Application::render_ui() {
             edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
             target.draw(edit_tool.edge_highlight);
             // ghost vertex on the edge
-            sf::Vector2f ghost_vertex_pos = world_to_screenf(edit_tool.insertVertexPos);
+            sf::Vector2f ghost_vertex_pos = world_to_screen(edit_tool.insertVertexPos);
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
             target.draw(edit_tool.vertex_rect);
         }
         // vertices
         for (size_t i = 0; i < active_object->getVertexCount(); i++) {
-            edit_tool.vertex_rect.setPosition(world_to_screenf(active_object->getGlobalVertexPos(i)));
+            edit_tool.vertex_rect.setPosition(world_to_screen(active_object->getGlobalVertexPos(i)));
             bool selected = active_object->isVertexSelected(i);
             sf::Color vertex_color = selected ? sf::Color(255, 255, 0) : sf::Color(255, 0, 0);
             edit_tool.vertex_rect.setFillColor(vertex_color);
@@ -855,7 +881,7 @@ void Application::render_ui() {
         }
         if (edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) {
             // highlighted vertex
-            sf::Vector2f vertex_pos = world_to_screenf(active_object->getGlobalVertexPos(edit_tool.highlighted_vertex));
+            sf::Vector2f vertex_pos = world_to_screen(active_object->getGlobalVertexPos(edit_tool.highlighted_vertex));
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
             target.draw(edit_tool.vertex_highlight_rect);
         } else if (edit_tool.mode == EditTool::SELECT && edit_tool.rectangle_select.active) {
@@ -1048,37 +1074,35 @@ void Application::toggle_pause() {
     paused_rect_widget->setVisible(paused);
 }
 
-b2Vec2 Application::b2_screen_to_world(sf::Vector2i screen_pos) {
-    sf::Vector2f pos = world_texture.mapPixelToCoords(screen_pos, world_view);
-    return tob2(pos);
+sf::Vector2f Application::screen_to_world(const sf::Vector2f& screen_pos) {
+    sf::Transform combined = world_view.getInverseTransform() * ui_view.getTransform();
+    sf::Vector2f result = combined.transformPoint(screen_pos);
+    return result;
 }
 
-sf::Vector2f Application::sf_screen_to_world(sf::Vector2i screen_pos) {
-    sf::Vector2f pos = world_texture.mapPixelToCoords(screen_pos, world_view);
-    return pos;
+sf::Vector2f Application::pixel_to_world(const sf::Vector2i& screen_pos) {
+    return screen_to_world(to2f(screen_pos) + sf::Vector2f(0.5f, 0.5f));
 }
 
-sf::Vector2f Application::sf_screen_to_world(sf::Vector2f screen_pos) {
-    sf::Vector2f pos = world_texture.mapPixelToCoords(to2i(screen_pos), world_view);
-    return pos;
+sf::Vector2f Application::world_to_screen(const sf::Vector2f& world_pos) {
+    sf::Transform combined = ui_view.getInverseTransform() * world_view.getTransform();
+    sf::Vector2f result = combined.transformPoint(world_pos);
+    return result;
 }
 
-sf::Vector2i Application::world_to_screen(b2Vec2 world_pos) {
-    sf::Vector2i pos = world_texture.mapCoordsToPixel(tosf(world_pos), world_view);
-    return pos;
+sf::Vector2f Application::world_to_screen(const b2Vec2& world_pos) {
+    return world_to_screen(tosf(world_pos));
 }
 
-sf::Vector2f Application::world_to_screenf(sf::Vector2f world_pos) {
-    sf::Vector2i pos = world_texture.mapCoordsToPixel(world_pos, world_view);
-    return to2f(pos);
+sf::Vector2i Application::world_to_pixel(const sf::Vector2f& world_pos) {
+    return to2i(world_to_screen(world_pos));
 }
 
-sf::Vector2f Application::world_to_screenf(b2Vec2 world_pos) {
-    sf::Vector2i vec2i = world_to_screen(world_pos);
-    return to2f(vec2i);
+sf::Vector2i Application::world_to_pixel(const b2Vec2& world_pos) {
+    return to2i(world_to_screen(tosf(world_pos)));
 }
 
-sf::Vector2f Application::world_dir_to_screenf(b2Vec2 world_dir) {
+sf::Vector2f Application::world_dir_to_screenf(const b2Vec2& world_dir) {
     //TODO: calculate new direction using an actual sf::View
     return sf::Vector2f(world_dir.x, -world_dir.y);
 }
@@ -1101,8 +1125,8 @@ ptrdiff_t Application::mouse_get_chain_edge(const b2Fixture* fixture) {
             continue;
         }
         b2Vec2 b2_mouse_pos = tob2(to2f(mousePos));
-        b2Vec2 b2_p1 = tob2(world_to_screenf(p1));
-        b2Vec2 b2_p2 = tob2(world_to_screenf(p2));
+        b2Vec2 b2_p1 = tob2(world_to_screen(p1));
+        b2Vec2 b2_p2 = tob2(world_to_screen(p2));
         float dist = utils::distance_to_line(b2_mouse_pos, b2_p1, b2_p2);
         if (dist <= EditTool::EDGE_HIGHLIGHT_DISTANCE) {
             return i;
@@ -1111,9 +1135,9 @@ ptrdiff_t Application::mouse_get_chain_edge(const b2Fixture* fixture) {
     return -1;
 }
 
-b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
-    b2Vec2 world_pos = b2_screen_to_world(screen_pos);
-    b2Vec2 world_pos_next = b2_screen_to_world(screen_pos + sf::Vector2i(1, 1));
+b2Fixture* Application::get_fixture_at(sf::Vector2f screen_pos) {
+    b2Vec2 world_pos = tob2(screen_to_world(screen_pos));
+    b2Vec2 world_pos_next = tob2(screen_to_world(screen_pos + sf::Vector2f(1.0f, 1.0f)));
     b2Vec2 midpoint = 0.5f * (world_pos + world_pos_next);
     QueryCallback callback;
     b2AABB aabb;
@@ -1133,9 +1157,9 @@ b2Fixture* Application::get_fixture_at(sf::Vector2i screen_pos) {
     return nullptr;
 }
 
-GameObject* Application::get_object_at(sf::Vector2i screen_pos) {
+GameObject* Application::get_object_at(sf::Vector2f screen_pos) {
     GameObject* result = nullptr;
-    b2Fixture* fixture = get_fixture_at(mousePos);
+    b2Fixture* fixture = get_fixture_at(mousePosf);
     if (fixture) {
         b2Body* body = fixture->GetBody();
         result = GameObject::getGameobject(body);
@@ -1148,10 +1172,10 @@ ptrdiff_t Application::mouse_get_object_vertex() {
         return -1;
     }
     ptrdiff_t closest_vertex_i = 0;
-    sf::Vector2i closest_vertex_pos = world_to_screen(active_object->getGlobalVertexPos(0));
+    sf::Vector2i closest_vertex_pos = world_to_pixel(active_object->getGlobalVertexPos(0));
     int closest_vertex_offset = utils::get_max_offset(closest_vertex_pos, mousePos);
     for (size_t i = 1; i < active_object->getVertexCount(); i++) {
-        sf::Vector2i vertex_pos = world_to_screen(active_object->getGlobalVertexPos(i));
+        sf::Vector2i vertex_pos = world_to_pixel(active_object->getGlobalVertexPos(i));
         float offset = utils::get_max_offset(vertex_pos, mousePos);
         if (offset < closest_vertex_offset) {
             closest_vertex_i = i;
@@ -1184,8 +1208,8 @@ ptrdiff_t Application::mouse_get_object_edge() {
             continue;
         }
         b2Vec2 b2_mouse_pos = tob2(to2f(mousePos));
-        b2Vec2 b2_p1 = tob2(world_to_screenf(p1));
-        b2Vec2 b2_p2 = tob2(world_to_screenf(p2));
+        b2Vec2 b2_p1 = tob2(world_to_screen(p1));
+        b2Vec2 b2_p2 = tob2(world_to_screen(p2));
         float dist = utils::distance_to_line(b2_mouse_pos, b2_p1, b2_p2);
         if (dist <= EditTool::EDGE_HIGHLIGHT_DISTANCE) {
             return i;
@@ -1203,8 +1227,8 @@ ptrdiff_t Application::mouse_get_edge_vertex() {
     }
     ptrdiff_t v_start_i = 0;
     ptrdiff_t v_end_i = active_object->getEdgeCount();
-    sf::Vector2f v_start = world_to_screenf(active_object->getGlobalVertexPos(v_start_i));
-    sf::Vector2f v_end = world_to_screenf(active_object->getGlobalVertexPos(v_end_i));
+    sf::Vector2f v_start = world_to_screen(active_object->getGlobalVertexPos(v_start_i));
+    sf::Vector2f v_end = world_to_screen(active_object->getGlobalVertexPos(v_end_i));
     float v_start_dist = utils::get_length(mousePosf - v_start);
     float v_end_dist = utils::get_length(mousePosf - v_end);
     if (v_start_dist <= v_end_dist) {
@@ -1251,7 +1275,7 @@ void Application::select_objects_in_rect(const RectangleSelect& rectangle_select
 }
 
 void Application::render_rectangle_select(sf::RenderTarget& target, RectangleSelect& rectangle_select) {
-    sf::Vector2f pos = world_to_screenf(rectangle_select.select_origin);
+    sf::Vector2f pos = world_to_screen(rectangle_select.select_origin);
     rectangle_select.select_rect.setPosition(pos);
     rectangle_select.select_rect.setSize(mousePosf - pos);
     target.draw(rectangle_select.select_rect);
@@ -1259,7 +1283,7 @@ void Application::render_rectangle_select(sf::RenderTarget& target, RectangleSel
 
 void Application::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) {
     b2Vec2 midpoint = 0.5f * (v1 + v2);
-    norm_v1 = world_to_screenf(midpoint);
+    norm_v1 = world_to_screen(midpoint);
     sf::Vector2f edge_dir = utils::normalize(world_dir_to_screenf(v2 - v1));
     sf::Vector2f norm_dir = utils::rot90CCW(edge_dir);
     norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
