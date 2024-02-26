@@ -51,6 +51,9 @@
     <ClCompile Include="objectlist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="compvector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h">

@@ -142,7 +142,7 @@ void SelectTool::reset() {
 }
 
 void SelectTool::clearSelected() {
-    for (GameObject* obj : selected_objects) {
+    for (GameObject* obj : selected_objects.getVector()) {
         if (obj) {
             obj->selected = false;
         }
@@ -151,7 +151,7 @@ void SelectTool::clearSelected() {
 }
 
 void SelectTool::clearRectSelected() {
-    for (GameObject* obj : objects_in_rect) {
+    for (GameObject* obj : objects_in_rect.getVector()) {
         deselectObject(obj);
     }
     objects_in_rect.clear();

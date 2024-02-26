@@ -136,6 +136,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
+    <ClCompile Include="compvector.cpp" />
     <ClCompile Include="gameobject.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="history.cpp" />

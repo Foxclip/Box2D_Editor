@@ -1307,7 +1307,7 @@ std::vector<GameObject*> Application::duplicateObjects(std::vector<GameObject*>&
     }
     // copy joints
     for (GameObject* obj : old_objects_set) {
-        for (Joint* joint : obj->joints) {
+        for (Joint* joint : obj->joints.getVector()) {
             if (checked_joints.contains(joint)) {
                 continue;
             }
@@ -1331,7 +1331,7 @@ bool Application::is_parent_selected(GameObject* object) {
     std::vector<GameObject*> parents = object->getParentChain();
     for (size_t i = 0; i < parents.size(); i++) {
         auto it = select_tool.getCompVector().find(parents[i]);
-        if (it != select_tool.getCompVector().send()) {
+        if (it != select_tool.getCompVector().getSet().end()) {
             return true;
         }
     }
