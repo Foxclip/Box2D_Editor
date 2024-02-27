@@ -1,0 +1,236 @@
+camera
+    center 10.3258629 6.60456991
+    zoom 25
+/camera
+
+object ground
+    vertices 25 8 16.1333332 1.51666605 9.13333225 -2.01666498 3.23333097 -3.95000005 -5.93333292 -5.58333302 -19.3000011 -7.91666698
+    color 255 255 255 255
+    body
+        type static
+        position 0 0
+        angle 0
+        linear_velocity 0 0
+        angular_velocity 0
+        fixtures
+            fixture
+                density 1
+                friction 0.200000003
+                restitution 0
+            /fixture
+        /fixtures
+    /body
+/object
+
+object box
+    size 1 1
+    color 0 255 0 255
+    body
+        type dynamic
+        position -0.708761394 -4.12524891
+        angle 1.74911582
+        linear_velocity -1.27553833 -0.227277741
+        angular_velocity -2.82684205e-08
+        fixtures
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+        /fixtures
+    /body
+/object
+
+object box
+    size 1 1
+    color 0 255 0 255
+    body
+        type dynamic
+        position 1.29806697 -3.76952529
+        angle 0.174501523
+        linear_velocity -1.27553833 -0.227277771
+        angular_velocity -1.43964103e-08
+        fixtures
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+        /fixtures
+    /body
+/object
+
+object box
+    size 1 1
+    color 0 255 0 255
+    body
+        type dynamic
+        position 0.295923263 -3.94809031
+        angle 0.177328914
+        linear_velocity -1.27553844 -0.227277771
+        angular_velocity 9.39683815e-08
+        fixtures
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+        /fixtures
+    /body
+/object
+
+object ball
+    radius 0.5
+    color 0 255 0 255
+    notch_color 0 64 0 255
+    body
+        type dynamic
+        position 2.29286265 -3.60202599
+        angle 61.9054909
+        linear_velocity -1.27553868 -0.227277532
+        angular_velocity 2.59761047
+        fixtures
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+        /fixtures
+    /body
+/object
+
+object car
+    lengths 5 1 5 1 5 1
+    color 255 0 0 255
+    body
+        type dynamic
+        position -0.882866383 15.2863264
+        angle 10.6336279
+        linear_velocity -0.952171922 -3.16454983
+        angular_velocity 2.57934833
+        fixtures
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+            fixture
+                density 1
+                friction 0.300000012
+                restitution 0.5
+            /fixture
+        /fixtures
+    /body
+    wheels
+        object ball
+            radius 1
+            color 255 255 0 255
+            notch_color 64 64 0 255
+            body
+                type dynamic
+                position -2.65334439 10.61028
+                angle -427.173218
+                linear_velocity 10.9016857 -8.24510098
+                angular_velocity -7.42066336
+                fixtures
+                    fixture
+                        density 1
+                        friction 0.300000012
+                        restitution 0.5
+                    /fixture
+                /fixtures
+            /body
+        /object
+        joint revolute
+            anchor_a 5 0
+            anchor_b 0 0
+            collide_connected false
+            angle_lower_limit 0
+            angle_upper_limit 0
+            angle_limit_enabled false
+            motor_max_torque 30
+            motor_speed -10
+            motor_enabled true
+        /joint
+        object ball
+            radius 1
+            color 255 255 0 255
+            notch_color 64 64 0 255
+            body
+                type dynamic
+                position 4.05196333 16.0912285
+                angle -81.6665344
+                linear_velocity -2.47922039 9.64141083
+                angular_velocity -7.42062235
+                fixtures
+                    fixture
+                        density 1
+                        friction 0.300000012
+                        restitution 0.5
+                    /fixture
+                /fixtures
+            /body
+        /object
+        joint revolute
+            anchor_a -2.5 4.33012676
+            anchor_b 0 0
+            collide_connected false
+            angle_lower_limit 0
+            angle_upper_limit 0
+            angle_limit_enabled false
+            motor_max_torque 30
+            motor_speed -10
+            motor_enabled true
+        /joint
+        object ball
+            radius 1
+            color 255 255 0 255
+            notch_color 64 64 0 255
+            body
+                type dynamic
+                position -4.04714823 19.1576881
+                angle -374.639221
+                linear_velocity -11.2791157 -10.8900633
+                angular_velocity -7.42064142
+                fixtures
+                    fixture
+                        density 1
+                        friction 0.300000012
+                        restitution 0.5
+                    /fixture
+                /fixtures
+            /body
+        /object
+        joint revolute
+            anchor_a -2.5 -4.33012676
+            anchor_b 0 0
+            collide_connected false
+            angle_lower_limit 0
+            angle_upper_limit 0
+            angle_limit_enabled false
+            motor_max_torque 30
+            motor_speed -10
+            motor_enabled true
+        /joint
+    /wheels
+/object
