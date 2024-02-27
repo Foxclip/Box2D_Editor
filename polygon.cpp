@@ -52,26 +52,26 @@ std::string CutInfo::toStr() const {
 	return result;
 }
 
-PolygonObject::PolygonObject() { }
+SplittablePolygon::SplittablePolygon() { }
 
-PolygonObject::PolygonObject(size_t count) {
+SplittablePolygon::SplittablePolygon(size_t count) {
 	resetVarray(count);
 }
 
-PolygonObject::PolygonObject(const sf::VertexArray& varray) {
+SplittablePolygon::SplittablePolygon(const sf::VertexArray& varray) {
 	assert(varray.getVertexCount() > 0);
 	this->varray = varray;
 }
 
-size_t PolygonObject::getPointCount() const {
+size_t SplittablePolygon::getPointCount() const {
 	return varray.getVertexCount() - 1;
 }
 
-sf::Vector2f PolygonObject::getPoint(size_t index) const {
+sf::Vector2f SplittablePolygon::getPoint(size_t index) const {
 	return varray[index].position;
 }
 
-sf::Vector2f PolygonObject::getLocalCenter() const {
+sf::Vector2f SplittablePolygon::getLocalCenter() const {
 	sf::Vector2f sum = sf::Vector2f(0.0f, 0.0f);
 	for (size_t i = 0; i < getPointCount(); i++) {
 		sum += getPoint(i);
@@ -79,12 +79,12 @@ sf::Vector2f PolygonObject::getLocalCenter() const {
 	return sum / (float)getPointCount();
 }
 
-sf::Vector2f PolygonObject::getGlobalCenter() const {
+sf::Vector2f SplittablePolygon::getGlobalCenter() const {
 	sf::Vector2f local_center = getLocalCenter();
 	return getTransform() * getLocalCenter();
 }
 
-sf::FloatRect PolygonObject::getLocalBounds() const {
+sf::FloatRect SplittablePolygon::getLocalBounds() const {
 	sf::FloatRect result = sf::FloatRect(getPoint(0), sf::Vector2f(0.0f, 0.0f));
 	for (size_t i = 0; i < getPointCount(); i++) {
 		sf::Vector2f point = getPoint(i);
@@ -93,7 +93,7 @@ sf::FloatRect PolygonObject::getLocalBounds() const {
 	return result;
 }
 
-sf::FloatRect PolygonObject::getGlobalBounds() const {
+sf::FloatRect SplittablePolygon::getGlobalBounds() const {
 	sf::FloatRect result = sf::FloatRect(getTransform() * getPoint(0), sf::Vector2f(0.0f, 0.0f));
 	for (size_t i = 0; i < getPointCount(); i++) {
 		sf::Vector2f point = getTransform() * getPoint(i);
@@ -102,26 +102,26 @@ sf::FloatRect PolygonObject::getGlobalBounds() const {
 	return result;
 }
 
-sf::Color PolygonObject::getFillColor() const {
+sf::Color SplittablePolygon::getFillColor() const {
 	return fill_color;
 }
 
-std::vector<PolygonObject> PolygonObject::getConvexPolygons() const {
+std::vector<SplittablePolygon> SplittablePolygon::getConvexPolygons() const {
 	return convex_polygons;
 }
 
-sf::Transform PolygonObject::getParentGlobalTransform() const {
+sf::Transform SplittablePolygon::getParentGlobalTransform() const {
 	if (parent) {
 		return parent->getGlobalTransform();
 	}
 	return sf::Transform::Identity;
 }
 
-sf::Transform PolygonObject::getGlobalTransform() const {
+sf::Transform SplittablePolygon::getGlobalTransform() const {
 	return getParentGlobalTransform() * getTransform();
 }
 
-bool PolygonObject::isConvex() const {
+bool SplittablePolygon::isConvex() const {
 	for (size_t i = 0; i < getPointCount(); i++) {
 		if (!isConvexVertex(i)) {
 			return false;
@@ -130,7 +130,7 @@ bool PolygonObject::isConvex() const {
 	return true;
 }
 
-void PolygonObject::setPoint(size_t index, const sf::Vector2f& point) {
+void SplittablePolygon::setPoint(size_t index, const sf::Vector2f& point) {
 	assert(index < getPointCount());
 	setCutsValid(false);
 	varray[index].position = point;
@@ -141,14 +141,14 @@ void PolygonObject::setPoint(size_t index, const sf::Vector2f& point) {
 	}
 }
 
-void PolygonObject::setLineColor(const sf::Color& color) {
+void SplittablePolygon::setLineColor(const sf::Color& color) {
 	for (int i = 0; i < varray.getVertexCount(); i++) {
 		varray[i].color = color;
 	}
 	line_color = color;
 }
 
-void PolygonObject::setFillColor(const sf::Color& color) {
+void SplittablePolygon::setFillColor(const sf::Color& color) {
 	fill_color = color;
 	if (is_convex) {
 		for (size_t i = 0; i < triangle_fan.getVertexCount(); i++) {
@@ -161,7 +161,7 @@ void PolygonObject::setFillColor(const sf::Color& color) {
 	}
 }
 
-void PolygonObject::drawIndices(
+void SplittablePolygon::drawIndices(
 	sf::RenderTarget& target,
 	const sf::Color& color,
 	unsigned int size,
@@ -182,7 +182,7 @@ void PolygonObject::drawIndices(
 	}
 }
 
-void PolygonObject::calcPotentialCuts() {
+void SplittablePolygon::calcPotentialCuts() {
 	logger << __FUNCTION__"\n";
 	LoggerIndent polygon_object_indent;
 	std::vector<std::vector<CutInfo>> result(getPointCount());
@@ -288,15 +288,15 @@ void PolygonObject::calcPotentialCuts() {
 	createCutsVarray();
 }
 
-size_t PolygonObject::getPotentialCutsCount() const {
+size_t SplittablePolygon::getPotentialCutsCount() const {
 	return potential_cuts.size();
 }
 
-void PolygonObject::drawPotentialCuts(sf::RenderTarget& target) {
+void SplittablePolygon::drawPotentialCuts(sf::RenderTarget& target) {
 	target.draw(cuts_varray, getTransform());
 }
 
-CutInfo PolygonObject::getBestCut() const {
+CutInfo SplittablePolygon::getBestCut() const {
 	logger << __FUNCTION__"\n";
 	LoggerIndent get_best_cut_indent;
 	std::vector<CutInfo> cuts(potential_cuts);
@@ -319,20 +319,20 @@ CutInfo PolygonObject::getBestCut() const {
 	return cuts[0];
 }
 
-std::vector<PolygonObject> PolygonObject::getCutPolygons(const CutInfo& cut) const {
+std::vector<SplittablePolygon> SplittablePolygon::getCutPolygons(const CutInfo& cut) const {
 	logger << __FUNCTION__"\n";
 	LoggerIndent polygon_cut_indent;
 	logger << "From: " << cut.from << " to: " << cut.to << "\n";
 	assert(cut.from != cut.to);
-	std::vector<PolygonObject> result(2);
+	std::vector<SplittablePolygon> result(2);
 	size_t lower_index = std::min(cut.from, cut.to);
 	size_t upper_index = std::max(cut.from, cut.to);
 	size_t polygon2_count = upper_index - lower_index + 1;
 	size_t polygon1_count = getPointCount() - polygon2_count + 2;
 	logger << "Polygon 1 count: " << polygon1_count << "\n";
 	logger << "Polygon 2 count: " << polygon2_count << "\n";
-	PolygonObject polygon1(polygon1_count);
-	PolygonObject polygon2(polygon2_count);
+	SplittablePolygon polygon1(polygon1_count);
+	SplittablePolygon polygon2(polygon2_count);
 	size_t polygon1_cur = 0;
 	size_t polygon2_cur = 0;
 	for (size_t i = 0; i < getPointCount(); i++) {
@@ -356,10 +356,10 @@ std::vector<PolygonObject> PolygonObject::getCutPolygons(const CutInfo& cut) con
 	return result;
 }
 
-std::vector<PolygonObject> PolygonObject::cutWithBestCut() {
+std::vector<SplittablePolygon> SplittablePolygon::cutWithBestCut() {
 	logger << __FUNCTION__"\n";
 	LoggerIndent cut_indent;
-	std::vector<PolygonObject> result;
+	std::vector<SplittablePolygon> result;
 	if (!cuts_valid) {
 		calcPotentialCuts();
 	}
@@ -367,34 +367,34 @@ std::vector<PolygonObject> PolygonObject::cutWithBestCut() {
 		return result;
 	}
 	CutInfo cut = getBestCut();
-	std::vector<PolygonObject> new_polygons = getCutPolygons(cut);
+	std::vector<SplittablePolygon> new_polygons = getCutPolygons(cut);
 	result.push_back(new_polygons[0]);
 	result.push_back(new_polygons[1]);
 	return result;
 }
 
-std::vector<PolygonObject> PolygonObject::cutIntoConvex() {
+std::vector<SplittablePolygon> SplittablePolygon::cutIntoConvex() {
 	logger << __FUNCTION__"\n";
 	LoggerIndent cut_indent;
-	std::vector<PolygonObject> result;
+	std::vector<SplittablePolygon> result;
 	if (isConvex()) {
 		result.push_back(*this);
 		return result;
 	}
-	std::vector<PolygonObject> child_polygons = cutWithBestCut();
+	std::vector<SplittablePolygon> child_polygons = cutWithBestCut();
 	for (size_t i = 0; i < child_polygons.size(); i++) {
-		std::vector<PolygonObject> child_children = child_polygons[i].cutIntoConvex();
+		std::vector<SplittablePolygon> child_children = child_polygons[i].cutIntoConvex();
 		result.insert(result.end(), child_children.begin(), child_children.end());
 	}
 	return result;
 }
 
-void PolygonObject::resetVarray(size_t vertex_count) {
+void SplittablePolygon::resetVarray(size_t vertex_count) {
 	assert(vertex_count > 0);
 	varray = sf::VertexArray(sf::LinesStrip, vertex_count + 1);
 }
 
-void PolygonObject::recenter() {
+void SplittablePolygon::recenter() {
 	sf::Vector2f local_center = getLocalCenter();
 	for (size_t i = 0; i < getPointCount(); i++) {
 		sf::Vector2f new_pos = getPoint(i) - local_center;
@@ -404,13 +404,13 @@ void PolygonObject::recenter() {
 	setRotation(0.0f);
 }
 
-void PolygonObject::recut() {
+void SplittablePolygon::recut() {
 	LoggerDeactivate ld;
 	logger << __FUNCTION__"\n";
 	LoggerIndent recut_indent;
 	convex_polygons = cutIntoConvex();
 	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
-		PolygonObject& polygon = convex_polygons[polygon_i];
+		SplittablePolygon& polygon = convex_polygons[polygon_i];
 		polygon.recenter();
 		polygon.triangle_fan = sf::VertexArray(sf::TriangleFan, polygon.getPointCount() + 2);
 		auto set_vertex = [&](size_t index, sf::Vector2f pos) {
@@ -428,8 +428,8 @@ void PolygonObject::recut() {
 	}
 }
 
-PolygonObject PolygonObject::createRect(sf::Vector2f size) {
-	PolygonObject rect(4);
+SplittablePolygon SplittablePolygon::createRect(sf::Vector2f size) {
+	SplittablePolygon rect(4);
 	rect.setPoint(0, sf::Vector2f(size.x / 2.0f, size.y / 2.0f));
 	rect.setPoint(1, sf::Vector2f(-size.x / 2.0f, size.y / 2.0f));
 	rect.setPoint(2, sf::Vector2f(-size.x / 2.0f, -size.y / 2.0f));
@@ -437,7 +437,7 @@ PolygonObject PolygonObject::createRect(sf::Vector2f size) {
 	return rect;
 }
 
-void PolygonObject::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+void SplittablePolygon::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	if (is_convex) {
 		target.draw(triangle_fan, states);
@@ -451,7 +451,7 @@ void PolygonObject::draw(sf::RenderTarget& target, sf::RenderStates states) cons
 	}
 }
 
-bool PolygonObject::isConvexVertex(size_t index) const {
+bool SplittablePolygon::isConvexVertex(size_t index) const {
 	assert(getPointCount() >= 3);
 	sf::Vector2f v1 = getPoint(indexLoop(index - 1));
 	sf::Vector2f v2 = getPoint(indexLoop(index));
@@ -459,7 +459,7 @@ bool PolygonObject::isConvexVertex(size_t index) const {
 	return !utils::left_side(v2, v1, v3);
 }
 
-bool PolygonObject::intersectsEdge(const sf::Vector2f& v1, const sf::Vector2f& v2, size_t& intersect) const {
+bool SplittablePolygon::intersectsEdge(const sf::Vector2f& v1, const sf::Vector2f& v2, size_t& intersect) const {
 	for (size_t i = 0; i < getPointCount(); i++) {
 		sf::Vector2f e1 = getPoint(i);
 		sf::Vector2f e2 = getPoint(indexLoop(i + 1));
@@ -472,11 +472,11 @@ bool PolygonObject::intersectsEdge(const sf::Vector2f& v1, const sf::Vector2f& v
 	return false;
 }
 
-size_t PolygonObject::indexLoop(ptrdiff_t index) const {
+size_t SplittablePolygon::indexLoop(ptrdiff_t index) const {
 	return utils::neg_mod(index, (ptrdiff_t)getPointCount());
 }
 
-void PolygonObject::createCutsVarray() {
+void SplittablePolygon::createCutsVarray() {
 	if (!cuts_valid) {
 		return;
 	}
@@ -499,12 +499,12 @@ void PolygonObject::createCutsVarray() {
 	}
 }
 
-void PolygonObject::setCutsValid(bool value) {
+void SplittablePolygon::setCutsValid(bool value) {
 	if (value) {
 		cuts_valid = true;
 	} else {
 		cuts_valid = false;
 		cuts_varray = sf::VertexArray();
-		convex_polygons = std::vector<PolygonObject>();
+		convex_polygons = std::vector<SplittablePolygon>();
 	}
 }

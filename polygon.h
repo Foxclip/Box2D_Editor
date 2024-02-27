@@ -39,13 +39,13 @@ struct CutInfo {
 	std::string toStr() const;
 };
 
-class PolygonObject : public sf::Drawable, public sf::Transformable {
+class SplittablePolygon : public sf::Drawable, public sf::Transformable {
 public:
 	bool draw_varray = false;
 
-	PolygonObject();
-	PolygonObject(size_t count);
-	PolygonObject(const sf::VertexArray& varray);
+	SplittablePolygon();
+	SplittablePolygon(size_t count);
+	SplittablePolygon(const sf::VertexArray& varray);
 	size_t getPointCount() const;
 	sf::Vector2f getPoint(size_t index) const;
 	sf::Vector2f getLocalCenter() const;
@@ -53,7 +53,7 @@ public:
 	sf::FloatRect getLocalBounds() const;
 	sf::FloatRect getGlobalBounds() const;
 	sf::Color getFillColor() const;
-	std::vector<PolygonObject> getConvexPolygons() const;
+	std::vector<SplittablePolygon> getConvexPolygons() const;
 	sf::Transform getParentGlobalTransform() const;
 	sf::Transform getGlobalTransform() const;
 	bool isConvex() const;
@@ -70,19 +70,19 @@ public:
 	size_t getPotentialCutsCount() const;
 	void drawPotentialCuts(sf::RenderTarget& target);
 	CutInfo getBestCut() const;
-	std::vector<PolygonObject> getCutPolygons(const CutInfo& cut) const;
-	std::vector<PolygonObject> cutWithBestCut();
-	std::vector<PolygonObject> cutIntoConvex();
+	std::vector<SplittablePolygon> getCutPolygons(const CutInfo& cut) const;
+	std::vector<SplittablePolygon> cutWithBestCut();
+	std::vector<SplittablePolygon> cutIntoConvex();
 	void resetVarray(size_t vertex_count);
 	void recenter();
 	void recut();
-	static PolygonObject createRect(sf::Vector2f size);
+	static SplittablePolygon createRect(sf::Vector2f size);
 private:
 	sf::VertexArray varray;
 	sf::VertexArray triangle_fan;
-	std::vector<PolygonObject> convex_polygons;
+	std::vector<SplittablePolygon> convex_polygons;
 	sf::VertexArray cuts_varray;
-	PolygonObject* parent = nullptr;
+	SplittablePolygon* parent = nullptr;
 	sf::Color line_color;
 	sf::Color fill_color;
 	std::vector<CutInfo> potential_cuts;

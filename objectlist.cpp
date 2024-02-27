@@ -115,8 +115,8 @@ GameObject* GameObjectList::duplicate(const GameObject* object) {
         new_object = BoxObject::deserialize(tr, world);
     } else if (dynamic_cast<const BallObject*>(object)) {
         new_object = BallObject::deserialize(tr, world);
-    } else if (dynamic_cast<const CarObject*>(object)) {
-        new_object = CarObject::deserialize(tr, world);
+    } else if (dynamic_cast<const PolygonObject*>(object)) {
+        new_object = PolygonObject::deserialize(tr, world);
     } else if (dynamic_cast<const ChainObject*>(object)) {
         new_object = ChainObject::deserialize(tr, world);
     } else {

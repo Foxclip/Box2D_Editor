@@ -195,35 +195,35 @@ private:
 
 };
 
-class CarObject : public GameObject {
+class PolygonObject : public GameObject {
 public:
 	std::vector<float> lengths;
 
-	CarObject(
+	PolygonObject(
 		b2World* world,
 		b2BodyDef def,
 		std::vector<float> lengths,
 		std::vector<float> wheels,
 		sf::Color color
 	);
-	CarObject(
+	PolygonObject(
 		b2World* world,
 		b2BodyDef def,
 		std::vector<float> lengths,
 		sf::Color color
 	);
 	bool isClosed() const override;
-	PolygonObject* getPolygonObject() const;
+	SplittablePolygon* getSplittablePolygon() const;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
 	void render(sf::RenderTarget& target) override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static std::unique_ptr<CarObject> deserialize(TokenReader& tr, b2World* world);
+	static std::unique_ptr<PolygonObject> deserialize(TokenReader& tr, b2World* world);
 	void syncVertices() override;
 
 private:
-	std::unique_ptr<PolygonObject> polygon;
+	std::unique_ptr<SplittablePolygon> polygon;
 };
 
 class ChainObject : public GameObject {

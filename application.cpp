@@ -754,7 +754,7 @@ void Application::render_world() {
 
     for (size_t i = 0; i < game_objects.getTopSize(); i++) {
         GameObject* gameobject = game_objects.getFromTop(i);
-        gameobject->draw_varray = selected_tool == &edit_tool && dynamic_cast<CarObject*>(gameobject);
+        gameobject->draw_varray = selected_tool == &edit_tool && dynamic_cast<PolygonObject*>(gameobject);
         gameobject->render(world_texture);
     }
     //if (select_tool.hover_object) {
@@ -807,8 +807,8 @@ void Application::render_ui() {
     }
 
     //for (size_t i = 0; i < game_objects.size(); i++) {
-    //    if (CarObject* car_object = dynamic_cast<CarObject*>(game_objects[i].get())) {
-    //        car_object->getPolygonObject()->drawIndices(target, sf::Color::White, 20, false);
+    //    if (PolygonObject* car_object = dynamic_cast<PolygonObject*>(game_objects[i].get())) {
+    //        car_object->getSplittablePolygon()->drawIndices(target, sf::Color::White, 20, false);
     //    }
     //}
 
@@ -1002,7 +1002,7 @@ void Application::deserialize(std::string str, bool set_camera) {
                 } else if (type == "ball") {
                     gameobject = BallObject::deserialize(tr, world.get());
                 } else if (type == "car") {
-                    gameobject = CarObject::deserialize(tr, world.get());
+                    gameobject = PolygonObject::deserialize(tr, world.get());
                 } else if (type == "chain") {
                     gameobject = ChainObject::deserialize(tr, world.get());
                 } else {
@@ -1453,12 +1453,12 @@ BallObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, 
     return ptr;
 }
 
-CarObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
+PolygonObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
     b2BodyDef def;
     def.type = b2_dynamicBody;
     def.position = pos;
-    std::unique_ptr<CarObject> uptr = std::make_unique<CarObject>(world.get(), def, lengths, wheels, color);
-    CarObject* car_ptr = uptr.get();
+    std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(world.get(), def, lengths, wheels, color);
+    PolygonObject* car_ptr = uptr.get();
     game_objects.add(std::move(uptr), true);
     for (size_t i = 0; i < wheels.size(); i++) {
         if (wheels[i] == 0.0f) {

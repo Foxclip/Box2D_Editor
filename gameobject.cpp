@@ -659,7 +659,7 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 	target.draw(varray, states);
 }
 
-CarObject::CarObject(
+PolygonObject::PolygonObject(
 	b2World* world,
 	b2BodyDef def,
 	std::vector<float> lengths,
@@ -673,13 +673,13 @@ CarObject::CarObject(
 		b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
 		vertices.push_back(pos);
 	}
-	polygon = std::make_unique<PolygonObject>();
+	polygon = std::make_unique<SplittablePolygon>();
 	syncVertices();
 	polygon->setFillColor(color);
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
-CarObject::CarObject(
+PolygonObject::PolygonObject(
 	b2World* world,
 	b2BodyDef def,
 	std::vector<float> lengths,
@@ -692,41 +692,41 @@ CarObject::CarObject(
 		b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
 		vertices.push_back(pos);
 	}
-	polygon = std::make_unique<PolygonObject>();
+	polygon = std::make_unique<SplittablePolygon>();
 	syncVertices();
 	polygon->setFillColor(color);
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
-bool CarObject::isClosed() const {
+bool PolygonObject::isClosed() const {
 	return true;
 }
 
-PolygonObject* CarObject::getPolygonObject() const {
+SplittablePolygon* PolygonObject::getSplittablePolygon() const {
 	return polygon.get();
 }
 
-sf::Drawable* CarObject::getDrawable() const {
+sf::Drawable* PolygonObject::getDrawable() const {
 	return polygon.get();
 }
 
-sf::Transformable* CarObject::getTransformable() const {
+sf::Transformable* PolygonObject::getTransformable() const {
 	return polygon.get();
 }
 
-void CarObject::render(sf::RenderTarget& target) {
+void PolygonObject::render(sf::RenderTarget& target) {
 	polygon->draw_varray = draw_varray;
 	GameObject::render(target);
 }
 
-void CarObject::drawMask(sf::RenderTarget& mask) {
+void PolygonObject::drawMask(sf::RenderTarget& mask) {
 	sf::Color orig_color = polygon->getFillColor();
 	polygon->setFillColor(sf::Color::White);
 	mask.draw(*polygon);
 	polygon->setFillColor(orig_color);
 }
 
-TokenWriter& CarObject::serialize(TokenWriter& tw) const {
+TokenWriter& PolygonObject::serialize(TokenWriter& tw) const {
 	tw << "object car" << "\n";
 	{
 		TokenWriterIndent car_indent(tw);
@@ -742,7 +742,7 @@ TokenWriter& CarObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* world) {
+std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, b2World* world) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -768,12 +768,12 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 			} else if (pname == "/object") {
 				break;
 			} else {
-				throw std::runtime_error("Unknown CarObject parameter name: " + pname);
+				throw std::runtime_error("Unknown PolygonObject parameter name: " + pname);
 			}
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<CarObject> car = std::make_unique<CarObject>(world, bdef, lengths, color);
+		std::unique_ptr<PolygonObject> car = std::make_unique<PolygonObject>(world, bdef, lengths, color);
 		car->id = id;
 		car->parent_id = parent_id;
 		car->setDensity(fdef.density, false);
@@ -785,16 +785,16 @@ std::unique_ptr<CarObject> CarObject::deserialize(TokenReader& tr, b2World* worl
 	}
 }
 
-void CarObject::syncVertices() {
+void PolygonObject::syncVertices() {
 	polygon->resetVarray(vertices.size());
 	for (size_t i = 0; i < vertices.size(); i++) {
 		polygon->setPoint(i, tosf(vertices[i].pos));
 	}
 	polygon->recut();
 	destroyFixtures();
-	std::vector<PolygonObject> convex_polygons = polygon->getConvexPolygons();
+	std::vector<SplittablePolygon> convex_polygons = polygon->getConvexPolygons();
 	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
-		PolygonObject& polygon = convex_polygons[polygon_i];
+		SplittablePolygon& polygon = convex_polygons[polygon_i];
 		std::vector<b2Vec2> b2points;
 		for (size_t vertex_i = 0; vertex_i < polygon.getPointCount(); vertex_i++) {
 			sf::Vector2f point = polygon.getPoint(vertex_i);
