@@ -51,16 +51,16 @@ GameObject* GameObject::getChild(size_t index) const {
 	return children[index];
 }
 
-b2Vec2 GameObject::toGlobal(const b2Vec2& pos) {
+b2Vec2 GameObject::toGlobal(const b2Vec2& pos) const {
 	return rigid_body->GetWorldPoint(pos);
 }
 
-b2Vec2 GameObject::toLocal(const b2Vec2& pos) {
+b2Vec2 GameObject::toLocal(const b2Vec2& pos) const {
 	return rigid_body->GetLocalPoint(pos);
 }
 
-ptrdiff_t GameObject::getChildIndex(GameObject* object) const {
-	return children.getIndex(object);
+ptrdiff_t GameObject::getChildIndex(const GameObject* object) const {
+	return children.getIndex(const_cast<GameObject*>(object));
 }
 
 void GameObject::setParent(GameObject* new_parent) {
@@ -235,15 +235,15 @@ void GameObject::saveOffsets() {
 	}
 }
 
-size_t GameObject::indexLoop(ptrdiff_t index) {
+size_t GameObject::indexLoop(ptrdiff_t index) const {
 	return utils::neg_mod(index, (ptrdiff_t)getVertexCount());
 }
 
-size_t GameObject::getVertexCount() {
+size_t GameObject::getVertexCount() const {
 	return vertices.size();
 }
 
-size_t GameObject::getEdgeCount() {
+size_t GameObject::getEdgeCount() const {
 	if (isClosed()) {
 		return vertices.size();
 	} else {
@@ -251,11 +251,11 @@ size_t GameObject::getEdgeCount() {
 	}
 }
 
-const EditableVertex& GameObject::getVertex(size_t index) {
+const EditableVertex& GameObject::getVertex(size_t index) const {
 	return vertices[index];
 }
 
-b2Vec2 GameObject::getGlobalVertexPos(size_t index) {
+b2Vec2 GameObject::getGlobalVertexPos(size_t index) const {
 	return rigid_body->GetWorldPoint(vertices[index].pos);
 }
 
@@ -287,7 +287,7 @@ void GameObject::selectVertex(size_t index) {
 	vertices[index].selected = true;
 }
 
-bool GameObject::isVertexSelected(size_t index) {
+bool GameObject::isVertexSelected(size_t index) const {
 	return vertices[index].selected;
 }
 
@@ -435,15 +435,15 @@ BoxObject::BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
-bool BoxObject::isClosed() {
+bool BoxObject::isClosed() const {
 	return false;
 }
 
-sf::Drawable* BoxObject::getDrawable() {
+sf::Drawable* BoxObject::getDrawable() const {
 	return rect_shape.get();
 }
 
-sf::Transformable* BoxObject::getTransformable() {
+sf::Transformable* BoxObject::getTransformable() const {
 	return rect_shape.get();
 }
 
@@ -536,15 +536,15 @@ BallObject::BallObject(b2World* world, b2BodyDef def, float radius, sf::Color co
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
-bool BallObject::isClosed() {
+bool BallObject::isClosed() const {
 	return false;
 }
 
-sf::Drawable* BallObject::getDrawable() {
+sf::Drawable* BallObject::getDrawable() const {
 	return circle_notch_shape.get();
 }
 
-sf::Transformable* BallObject::getTransformable() {
+sf::Transformable* BallObject::getTransformable() const {
 	return circle_notch_shape.get();
 }
 
@@ -698,7 +698,7 @@ CarObject::CarObject(
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
-bool CarObject::isClosed() {
+bool CarObject::isClosed() const {
 	return true;
 }
 
@@ -706,11 +706,11 @@ PolygonObject* CarObject::getPolygonObject() const {
 	return polygon.get();
 }
 
-sf::Drawable* CarObject::getDrawable() {
+sf::Drawable* CarObject::getDrawable() const {
 	return polygon.get();
 }
 
-sf::Transformable* CarObject::getTransformable() {
+sf::Transformable* CarObject::getTransformable() const {
 	return polygon.get();
 }
 
@@ -878,15 +878,15 @@ ChainObject::ChainObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_ve
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
-bool ChainObject::isClosed() {
+bool ChainObject::isClosed() const {
 	return false;
 }
 
-sf::Drawable* ChainObject::getDrawable() {
+sf::Drawable* ChainObject::getDrawable() const {
 	return line_strip_shape.get();
 }
 
-sf::Transformable* ChainObject::getTransformable() {
+sf::Transformable* ChainObject::getTransformable() const {
 	return line_strip_shape.get();
 }
 

@@ -94,18 +94,18 @@ public:
 
 	GameObject();
 	~GameObject();
-	virtual bool isClosed() = 0;
-	virtual sf::Drawable* getDrawable() = 0;
-	virtual sf::Transformable* getTransformable() = 0;
+	virtual bool isClosed() const = 0;
+	virtual sf::Drawable* getDrawable() const = 0;
+	virtual sf::Transformable* getTransformable() const = 0;
 	const b2Vec2& getPosition() const;
 	float getRotation() const;
 	GameObject* getParent() const;
 	std::vector<GameObject*> getParentChain() const;
 	const std::vector<GameObject*>& getChildren() const;
 	GameObject* getChild(size_t index) const;
-	b2Vec2 toGlobal(const b2Vec2& pos);
-	b2Vec2 toLocal(const b2Vec2& pos);
-	ptrdiff_t getChildIndex(GameObject* object) const;
+	b2Vec2 toGlobal(const b2Vec2& pos) const;
+	b2Vec2 toLocal(const b2Vec2& pos) const;
+	ptrdiff_t getChildIndex(const GameObject* object) const;
 	void updateVisual();
 	virtual void render(sf::RenderTarget& target);
 	void renderMask(sf::RenderTarget& mask);
@@ -124,16 +124,16 @@ public:
 	void offsetVertex(size_t index, const b2Vec2& offset, bool sync = true);
 	void offsetSelected(const b2Vec2& offset, bool sync = true);
 	void saveOffsets();
-	size_t indexLoop(ptrdiff_t index);
-	size_t getVertexCount();
-	size_t getEdgeCount();
-	const EditableVertex& getVertex(size_t index);
-	b2Vec2 getGlobalVertexPos(size_t index);
+	size_t indexLoop(ptrdiff_t index) const;
+	size_t getVertexCount() const;
+	size_t getEdgeCount() const;
+	const EditableVertex& getVertex(size_t index) const;
+	b2Vec2 getGlobalVertexPos(size_t index) const;
 	void setGlobalVertexPos(size_t index, const b2Vec2& new_pos);
 	bool tryDeleteVertex(ptrdiff_t index);
 	void addVertexGlobal(size_t index, const b2Vec2& pos);
 	void selectVertex(size_t index);
-	bool isVertexSelected(size_t index);
+	bool isVertexSelected(size_t index) const;
 	void selectAllVertices();
 	void deselectAllVertices();
 	virtual void syncVertices() = 0;
@@ -165,9 +165,9 @@ public:
 	b2Vec2 size = b2Vec2();
 
 	BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color);
-	bool isClosed() override;
-	sf::Drawable* getDrawable() override;
-	sf::Transformable* getTransformable() override;
+	bool isClosed() const override;
+	sf::Drawable* getDrawable() const override;
+	sf::Transformable* getTransformable() const override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, b2World* world);
@@ -182,9 +182,9 @@ public:
 	float radius = 0.0f;
 
 	BallObject(b2World* world, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
-	bool isClosed() override;
-	sf::Drawable* getDrawable() override;
-	sf::Transformable* getTransformable() override;
+	bool isClosed() const override;
+	sf::Drawable* getDrawable() const override;
+	sf::Transformable* getTransformable() const override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, b2World* world);
@@ -213,10 +213,10 @@ public:
 		std::vector<float> lengths,
 		sf::Color color
 	);
-	bool isClosed() override;
+	bool isClosed() const override;
 	PolygonObject* getPolygonObject() const;
-	sf::Drawable* getDrawable() override;
-	sf::Transformable* getTransformable() override;
+	sf::Drawable* getDrawable() const override;
+	sf::Transformable* getTransformable() const override;
 	void render(sf::RenderTarget& target) override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
@@ -230,9 +230,9 @@ private:
 class ChainObject : public GameObject {
 public:
 	ChainObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
-	bool isClosed() override;
-	sf::Drawable* getDrawable() override;
-	sf::Transformable* getTransformable() override;
+	bool isClosed() const override;
+	sf::Drawable* getDrawable() const override;
+	sf::Transformable* getTransformable() const override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<ChainObject> deserialize(TokenReader& tr, b2World* world);

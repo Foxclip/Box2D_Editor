@@ -83,7 +83,7 @@ public:
 	T* operator[](size_t index);
 	const T* operator[](size_t index) const;
 	std::set<T*>::iterator find(const T* value) const;
-	bool contains(T* value) const;
+	bool contains(const T* value) const;
 	void clear();
 
 private:
@@ -265,7 +265,7 @@ inline CompoundVectorUptr<T>::CompoundVectorUptr(const std::initializer_list<T*>
 template<typename T>
 inline CompoundVectorUptr<T>::CompoundVectorUptr(const std::vector<T*>& vec) {
 	for (const T* value : vec) {
-		std::unique_ptr<T> uptr = std::unique_ptr<T>((T*)value);
+		std::unique_ptr<T> uptr = std::unique_ptr<T>(const_cast<T*>(value));
 		add(std::move(uptr));
 	}
 }
@@ -277,8 +277,8 @@ inline size_t CompoundVectorUptr<T>::size() const {
 
 template<typename T>
 inline bool CompoundVectorUptr<T>::add(const T& value) {
-	T* ptr = (T*)&value;
-	bool added = comp.add(ptr);
+	const T* ptr = &value;
+	bool added = comp.add(const_cast<T*>(ptr));
 	if (added) {
 		std::unique_ptr<T> uptr = std::make_unique<T>(value);
 		uptrs.push_back(std::move(uptr));
@@ -289,9 +289,9 @@ inline bool CompoundVectorUptr<T>::add(const T& value) {
 
 template<typename T>
 inline bool CompoundVectorUptr<T>::add(const T* ptr) {
-	bool added = comp.add((T*)ptr);
+	bool added = comp.add(const_cast<T*>(ptr));
 	if (added) {
-		std::unique_ptr<T> uptr = std::unique_ptr<T>((T*)ptr);
+		std::unique_ptr<T> uptr = std::unique_ptr<T>(const_cast<T*>(ptr));
 		uptrs.push_back(std::move(uptr));
 		return true;
 	}
@@ -407,12 +407,12 @@ inline const T* CompoundVectorUptr<T>::operator[](size_t index) const {
 
 template<typename T>
 inline std::set<T*>::iterator CompoundVectorUptr<T>::find(const T* value) const {
-	return comp.find((T*)value);
+	return comp.find(const_cast<T*>(value));
 }
 
 template<typename T>
-inline bool CompoundVectorUptr<T>::contains(T* value) const {
-	return comp.contains(value);
+inline bool CompoundVectorUptr<T>::contains(const T* value) const {
+	return comp.contains(const_cast<T*>(value));
 }
 
 template<typename T>
