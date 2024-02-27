@@ -57,10 +57,10 @@ public:
 	void load(std::string filename);
 	void setCameraPos(float x, float y);
 	void setCameraZoom(float zoom);
-	BoxObject* create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
-	BallObject* create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
-	PolygonObject* create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
-	ChainObject* create_chain(b2Vec2 pos, float angle, std::vector<b2Vec2> vertices, sf::Color color);
+	BoxObject* create_box(std::string name, b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
+	BallObject* create_ball(std::string name, b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
+	PolygonObject* create_car(std::string name, b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
+	ChainObject* create_chain(std::string name, b2Vec2 pos, float angle, std::vector<b2Vec2> vertices, sf::Color color);
 
 private:
 	sf::Shader desat_shader;
@@ -87,6 +87,7 @@ private:
 	TextWidget* logger_text_widget;
 	sf::Font console_font;
 	sf::CircleShape origin_shape;
+	sf::Text name_text;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;

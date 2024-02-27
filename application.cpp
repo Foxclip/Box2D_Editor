@@ -128,6 +128,10 @@ void Application::init_ui() {
     origin_shape.setOutlineColor(sf::Color::Black);
     origin_shape.setOutlineThickness(1.0f);
 
+    name_text.setFont(console_font);
+    name_text.setCharacterSize(10);
+    name_text.setFillColor(sf::Color::White);
+
     init_widgets();
 }
 
@@ -610,16 +614,17 @@ void Application::process_left_click() {
     if (selected_tool == &select_tool) {
         //
     } else if (selected_tool == &create_tool) {
+        std::string id_string = std::to_string(game_objects.getMaxId());
         switch (create_tool.type) {
             case CreateTool::BOX:
                 create_box(
-                    b2MousePosWorld, 0.0f, NEW_BOX_SIZE, NEW_BOX_COLOR
+                    "box" + id_string, b2MousePosWorld, 0.0f, NEW_BOX_SIZE, NEW_BOX_COLOR
                 );
                 commit_action = true;
                 break;
             case CreateTool::BALL:
                 create_ball(
-                    b2MousePosWorld, NEW_BALL_RADIUS, NEW_BALL_COLOR, NEW_BALL_NOTCH_COLOR
+                    "ball" + id_string, b2MousePosWorld, NEW_BALL_RADIUS, NEW_BALL_COLOR, NEW_BALL_NOTCH_COLOR
                 );
                 commit_action = true;
                 break;
@@ -806,6 +811,15 @@ void Application::render_ui() {
         target.draw(origin_shape);
     }
 
+    // names
+    for (size_t i = 0; i < game_objects.getAllSize(); i++) {
+        GameObject* gameobject = game_objects.getFromAll(i);
+        name_text.setPosition(world_to_screen(gameobject->getPosition()));
+        name_text.setString(gameobject->name);
+        target.draw(name_text);
+    }
+
+    // indices
     //for (size_t i = 0; i < game_objects.size(); i++) {
     //    if (PolygonObject* car_object = dynamic_cast<PolygonObject*>(game_objects[i].get())) {
     //        car_object->getSplittablePolygon()->drawIndices(target, sf::Color::White, 20, false);
@@ -1432,28 +1446,30 @@ void Application::delete_object(GameObject* object, bool remove_children) {
     game_objects.remove(object, remove_children);
 }
 
-BoxObject* Application::create_box(b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
+BoxObject* Application::create_box(std::string name, b2Vec2 pos, float angle, b2Vec2 size, sf::Color color) {
     b2BodyDef def;
     def.type = b2_dynamicBody;
     def.position = pos;
     def.angle = angle;
     std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(world.get(), def, size, color);
     BoxObject* ptr = uptr.get();
+    ptr->name = name;
     game_objects.add(std::move(uptr), true);
     return ptr;
 }
 
-BallObject* Application::create_ball(b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color) {
+BallObject* Application::create_ball(std::string name, b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color) {
     b2BodyDef def;
     def.type = b2_dynamicBody;
     def.position = pos;
     std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(world.get(), def, radius, color, notch_color);
     BallObject* ptr = uptr.get();
+    ptr->name = name;
     game_objects.add(std::move(uptr), true);
     return ptr;
 }
 
-PolygonObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
+PolygonObject* Application::create_car(std::string name, b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color) {
     b2BodyDef def;
     def.type = b2_dynamicBody;
     def.position = pos;
@@ -1464,6 +1480,7 @@ PolygonObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, s
     }
     std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(world.get(), def, vertices, color);
     PolygonObject* car_ptr = uptr.get();
+    car_ptr->name = name;
     game_objects.add(std::move(uptr), true);
     for (size_t i = 0; i < wheels.size(); i++) {
         if (wheels[i] == 0.0f) {
@@ -1480,6 +1497,7 @@ PolygonObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, s
             world.get(), wheel_body_def, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
         );
         BallObject* wheel_ptr = wheel.get();
+        wheel_ptr->name = car_ptr->name + " wheel" + std::to_string(i);
         wheel_ptr->setDensity(1.0f, false);
         wheel_ptr->setFriction(0.3f, false);
         wheel_ptr->setRestitution(0.5f, false);
@@ -1498,12 +1516,13 @@ PolygonObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, s
     return car_ptr;
 }
 
-ChainObject* Application::create_chain(b2Vec2 pos, float angle, std::vector<b2Vec2> vertices, sf::Color color) {
+ChainObject* Application::create_chain(std::string name, b2Vec2 pos, float angle, std::vector<b2Vec2> vertices, sf::Color color) {
     b2BodyDef def;
     def.position = pos;
     def.angle = angle;
     std::unique_ptr<ChainObject> uptr = std::make_unique<ChainObject>(world.get(), def, vertices, color);
     ChainObject* ptr = uptr.get();
+    ptr->name = name;
     game_objects.add(std::move(uptr), true);
     return ptr;
 }
