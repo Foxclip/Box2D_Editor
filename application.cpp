@@ -557,6 +557,8 @@ void Application::process_mouse() {
             b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.pivot_pos;
             float current_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
             float offset = current_mouse_angle - rotate_tool.orig_mouse_angle;
+            b2Vec2 new_pos = utils::rotate_point(obj->orig_pos, rotate_tool.pivot_pos, offset);
+            obj->setPosition(new_pos, true);
             obj->setAngle(obj->orig_angle + offset, true);
         }
     }
@@ -852,7 +854,7 @@ void Application::render_ui() {
             float angle = atan2(vec.y, vec.x);
             edit_tool.edge_highlight.setPosition(v1_screen);
             edit_tool.edge_highlight.setRotation(utils::to_degrees(angle));
-            edit_tool.edge_highlight.setSize(sf::Vector2f(utils::get_length(vec), 3.0f));
+            edit_tool.edge_highlight.setSize(sf::Vector2f(utils::length(vec), 3.0f));
             target.draw(edit_tool.edge_highlight);
             // ghost vertex on the edge
             sf::Vector2f ghost_vertex_pos = world_to_screen(edit_tool.insertVertexPos);
@@ -1229,8 +1231,8 @@ ptrdiff_t Application::mouse_get_edge_vertex() {
     ptrdiff_t v_end_i = active_object->getEdgeCount();
     sf::Vector2f v_start = world_to_screen(active_object->getGlobalVertexPos(v_start_i));
     sf::Vector2f v_end = world_to_screen(active_object->getGlobalVertexPos(v_end_i));
-    float v_start_dist = utils::get_length(mousePosf - v_start);
-    float v_end_dist = utils::get_length(mousePosf - v_end);
+    float v_start_dist = utils::length(mousePosf - v_start);
+    float v_end_dist = utils::length(mousePosf - v_end);
     if (v_start_dist <= v_end_dist) {
         return v_start_i;
     } else {

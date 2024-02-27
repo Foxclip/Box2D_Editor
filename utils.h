@@ -228,9 +228,17 @@ namespace utils {
 		return true;
 	}
 
-	template <typename T>
-	float get_length(const T& vec) {
-		return sqrt(vec.x * vec.x + vec.y * vec.y);
+	template <typename TVec2>
+	TVec2 rotate_point(const TVec2& point, const TVec2& pivot, float angle) {
+		TVec2 rel_pos = point - pivot;
+		float old_angle = atan2(rel_pos.y, rel_pos.x);
+		float new_angle = old_angle + angle;
+		float radius = length(rel_pos);
+		float new_x = cos(new_angle) * radius;
+		float new_y = sin(new_angle) * radius;
+		TVec2 new_rel_pos = TVec2(new_x, new_y);
+		TVec2 new_pos = pivot + new_rel_pos;
+		return new_pos;
 	}
 
 	template <typename T>

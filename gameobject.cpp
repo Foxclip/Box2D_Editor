@@ -120,7 +120,8 @@ void GameObject::setPosition(const b2Vec2& pos, bool move_children) {
 	rigid_body->SetTransform(pos, rigid_body->GetAngle());
 	if (move_children) {
 		for (size_t i = 0; i < children.size(); i++) {
-			children[i]->setPosition(children[i]->rigid_body->GetPosition() + offset, true);
+			b2Vec2 new_pos = children[i]->rigid_body->GetPosition() + offset;
+			children[i]->setPosition(new_pos, true);
 		}
 	}
 }
@@ -129,18 +130,13 @@ void GameObject::setAngle(float angle, bool rotate_children) {
 	float angle_offset = angle - rigid_body->GetAngle();
 	rigid_body->SetTransform(rigid_body->GetPosition(), angle);
 	if (rotate_children) {
+		b2Vec2 parent_pos = rigid_body->GetPosition();
 		for (size_t i = 0; i < children.size(); i++) {
 			b2Vec2 old_pos = children[i]->rigid_body->GetPosition();
-			b2Vec2 rel_pos = old_pos - rigid_body->GetPosition();
-			float old_child_angle = atan2(rel_pos.y, rel_pos.x);
-			float new_child_angle = old_child_angle + angle_offset;
-			float radius = rel_pos.Length();
-			float new_x = cos(new_child_angle) * radius;
-			float new_y = sin(new_child_angle) * radius;
-			b2Vec2 new_rel_pos = b2Vec2(new_x, new_y);
-			b2Vec2 new_pos = rigid_body->GetPosition() + new_rel_pos;
+			b2Vec2 new_pos = utils::rotate_point(old_pos, parent_pos, angle_offset);
+			float new_angle = children[i]->rigid_body->GetAngle() + angle_offset;
 			children[i]->setPosition(new_pos, true);
-			children[i]->setAngle(children[i]->rigid_body->GetAngle() + angle_offset, true);
+			children[i]->setAngle(new_angle, true);
 		}
 	}
 }
