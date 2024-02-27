@@ -1482,6 +1482,8 @@ PolygonObject* Application::create_car(std::string name, b2Vec2 pos, std::vector
     PolygonObject* car_ptr = uptr.get();
     car_ptr->name = name;
     game_objects.add(std::move(uptr), true);
+    size_t wheel_count = 0;
+
     for (size_t i = 0; i < wheels.size(); i++) {
         if (wheels[i] == 0.0f) {
             continue;
@@ -1491,28 +1493,36 @@ PolygonObject* Application::create_car(std::string name, b2Vec2 pos, std::vector
         b2Vec2 anchor_pos_world = car_ptr->rigid_body->GetPosition() + anchor_pos;
         float radius = wheels[i];
         b2BodyDef wheel_body_def;
-        wheel_body_def.type = b2_dynamicBody;
-        wheel_body_def.position = anchor_pos_world;
+        {
+            wheel_body_def.type = b2_dynamicBody;
+            wheel_body_def.position = anchor_pos_world;
+        }
         std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
             world.get(), wheel_body_def, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
         );
         BallObject* wheel_ptr = wheel.get();
-        wheel_ptr->name = car_ptr->name + " wheel" + std::to_string(i);
-        wheel_ptr->setDensity(1.0f, false);
-        wheel_ptr->setFriction(0.3f, false);
-        wheel_ptr->setRestitution(0.5f, false);
-        game_objects.add(std::move(wheel), true);
-        game_objects.setParent(wheel_ptr, car_ptr);
+        {
+            wheel_ptr->name = car_ptr->name + " wheel" + std::to_string(wheel_count);
+            wheel_ptr->setDensity(1.0f, false);
+            wheel_ptr->setFriction(0.3f, false);
+            wheel_ptr->setRestitution(0.5f, false);
+            game_objects.add(std::move(wheel), true);
+            game_objects.setParent(wheel_ptr, car_ptr);
+        }
         b2RevoluteJointDef wheel_joint_def;
-        wheel_joint_def.Initialize(car_ptr->rigid_body, wheel_ptr->rigid_body, anchor_pos_world);
-        wheel_joint_def.maxMotorTorque = 30.0f;
-        wheel_joint_def.motorSpeed = -10.0f;
-        wheel_joint_def.enableMotor = true;
-        std::unique_ptr<RevoluteJoint> joint = std::make_unique<RevoluteJoint>(
-            wheel_joint_def, world.get(), car_ptr, wheel_ptr
-        );
-        game_objects.addJoint(std::move(joint));
+        {
+            wheel_joint_def.Initialize(car_ptr->rigid_body, wheel_ptr->rigid_body, anchor_pos_world);
+            wheel_joint_def.maxMotorTorque = 30.0f;
+            wheel_joint_def.motorSpeed = -10.0f;
+            wheel_joint_def.enableMotor = true;
+            std::unique_ptr<RevoluteJoint> joint = std::make_unique<RevoluteJoint>(
+                wheel_joint_def, world.get(), car_ptr, wheel_ptr
+            );
+            game_objects.addJoint(std::move(joint));
+        }
+        wheel_count++;
     }
+
     return car_ptr;
 }
 
