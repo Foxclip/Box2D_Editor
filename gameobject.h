@@ -197,20 +197,11 @@ private:
 
 class PolygonObject : public GameObject {
 public:
-	std::vector<float> lengths;
-
 	PolygonObject(
 		b2World* world,
 		b2BodyDef def,
-		std::vector<float> lengths,
-		std::vector<float> wheels,
-		sf::Color color
-	);
-	PolygonObject(
-		b2World* world,
-		b2BodyDef def,
-		std::vector<float> lengths,
-		sf::Color color
+		const std::vector<b2Vec2>& vertices,
+		const sf::Color& color
 	);
 	bool isClosed() const override;
 	SplittablePolygon* getSplittablePolygon() const;

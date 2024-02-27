@@ -662,35 +662,13 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 PolygonObject::PolygonObject(
 	b2World* world,
 	b2BodyDef def,
-	std::vector<float> lengths,
-	std::vector<float> wheels,
-	sf::Color color
+	const std::vector<b2Vec2>& vertices,
+	const sf::Color& color
 ) {
 	this->color = color;
-	this->lengths = lengths;
 	rigid_body = world->CreateBody(&def);
-	for (size_t i = 0; i < lengths.size(); i++) {
-		b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
-		vertices.push_back(pos);
-	}
-	polygon = std::make_unique<SplittablePolygon>();
-	syncVertices();
-	polygon->setFillColor(color);
-	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
-}
-
-PolygonObject::PolygonObject(
-	b2World* world,
-	b2BodyDef def,
-	std::vector<float> lengths,
-	sf::Color color
-) {
-	this->color = color;
-	this->lengths = lengths;
-	rigid_body = world->CreateBody(&def);
-	for (size_t i = 0; i < lengths.size(); i++) {
-		b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
-		vertices.push_back(pos);
+	for (size_t i = 0; i < vertices.size(); i++) {
+		this->vertices.push_back(EditableVertex(vertices[i]));
 	}
 	polygon = std::make_unique<SplittablePolygon>();
 	syncVertices();
@@ -727,14 +705,18 @@ void PolygonObject::drawMask(sf::RenderTarget& mask) {
 }
 
 TokenWriter& PolygonObject::serialize(TokenWriter& tw) const {
-	tw << "object car" << "\n";
+	tw << "object polygon" << "\n";
 	{
 		TokenWriterIndent car_indent(tw);
 		tw.writeSizetParam("id", id);
 		if (parent) {
 			tw.writeSizetParam("parent_id", parent->id);
 		}
-		tw.writeFloatArrParam("lengths", lengths);
+		tw << "vertices";
+		for (size_t i = 0; i < vertices.size(); i++) {
+			tw << vertices[i].pos;
+		}
+		tw << "\n";
 		tw.writeColorParam("color", color);
 		serializeBody(tw, rigid_body) << "\n";
 	}
@@ -747,11 +729,11 @@ std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, b2Wor
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
 		sf::Color color = sf::Color::White;
-		std::vector<float> lengths;
+		std::vector<b2Vec2> vertices;
 		BodyDef body_def;
 		std::vector<std::unique_ptr<BallObject>> wheels;
 		if (tr.tryEat("object")) {
-			tr.eat("car");
+			tr.eat("polygon");
 		}
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
@@ -759,8 +741,8 @@ std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, b2Wor
 				id = tr.readULL();
 			} else if (pname == "parent_id") {
 				parent_id = tr.readULL();
-			} else if (pname == "lengths") {
-				lengths = tr.readFloatArr();
+			} else if (pname == "vertices") {
+				vertices = tr.readb2Vec2Arr();
 			} else if (pname == "color") {
 				color = tr.readColor();
 			} else if (pname == "body") {
@@ -773,7 +755,7 @@ std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, b2Wor
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<PolygonObject> car = std::make_unique<PolygonObject>(world, bdef, lengths, color);
+		std::unique_ptr<PolygonObject> car = std::make_unique<PolygonObject>(world, bdef, vertices, color);
 		car->id = id;
 		car->parent_id = parent_id;
 		car->setDensity(fdef.density, false);

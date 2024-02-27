@@ -28,9 +28,9 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: serialize car vertices
     // TODO: game object names and rendering of debug info like ids and names
     // TODO: fix releasing left click on widgets in drag mode
+    // TODO: add const to serializer
     // TODO: use local coordinates to move and rotate children (children position is in local coordinates)
     // TODO: cut polygons with b2maxvertices
     // TODO: set whether object is static or dynamic in edit mode

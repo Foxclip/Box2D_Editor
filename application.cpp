@@ -1001,7 +1001,7 @@ void Application::deserialize(std::string str, bool set_camera) {
                     gameobject = BoxObject::deserialize(tr, world.get());
                 } else if (type == "ball") {
                     gameobject = BallObject::deserialize(tr, world.get());
-                } else if (type == "car") {
+                } else if (type == "polygon") {
                     gameobject = PolygonObject::deserialize(tr, world.get());
                 } else if (type == "chain") {
                     gameobject = ChainObject::deserialize(tr, world.get());
@@ -1457,7 +1457,12 @@ PolygonObject* Application::create_car(b2Vec2 pos, std::vector<float> lengths, s
     b2BodyDef def;
     def.type = b2_dynamicBody;
     def.position = pos;
-    std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(world.get(), def, lengths, wheels, color);
+    std::vector<b2Vec2> vertices;
+    for (size_t i = 0; i < lengths.size(); i++) {
+        b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
+        vertices.push_back(pos);
+    }
+    std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(world.get(), def, vertices, color);
     PolygonObject* car_ptr = uptr.get();
     game_objects.add(std::move(uptr), true);
     for (size_t i = 0; i < wheels.size(); i++) {
