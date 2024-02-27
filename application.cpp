@@ -114,6 +114,9 @@ void Application::init_ui() {
     if (!console_font.loadFromFile(console_font_filename)) {
         throw std::runtime_error("Font loading error (" + console_font_filename + ")");
     }
+    ui_font.setSmooth(false);
+    fps_font.setSmooth(false);
+    console_font.setSmooth(false);
 
     root_widget.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
     root_widget.setFillColor(sf::Color::Transparent);
