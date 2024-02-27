@@ -55,7 +55,6 @@ class GameObject;
 
 class Joint {
 public:
-	bool valid = true;
 	GameObject* object1 = nullptr;
 	GameObject* object2 = nullptr;
 

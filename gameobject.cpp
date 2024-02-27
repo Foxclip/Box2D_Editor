@@ -11,7 +11,7 @@ GameObject::GameObject() { }
 
 GameObject::~GameObject() {
 	if (rigid_body) {
-		logger << "Destroy body, id " << id << "\n";
+		logger << "Destroy body: " << id << "\n";
 		rigid_body->GetWorld()->DestroyBody(rigid_body);
 		rigid_body = nullptr;
 	}
@@ -1065,7 +1065,8 @@ b2RevoluteJointDef RevoluteJoint::deserialize(TokenReader& tr, ptrdiff_t& p_body
 }
 
 Joint::~Joint() {
-	if (valid) {
-		joint->GetBodyA()->GetWorld()->DestroyJoint(joint);
-	}
+	size_t object_a_id = GameObject::getGameobject(joint->GetBodyA())->id;
+	size_t object_b_id = GameObject::getGameobject(joint->GetBodyB())->id;
+	logger << "Destroy joint: " << object_a_id << " " << object_b_id << "\n";
+	joint->GetBodyA()->GetWorld()->DestroyJoint(joint);
 }

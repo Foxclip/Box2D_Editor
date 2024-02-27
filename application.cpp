@@ -918,7 +918,7 @@ std::string Application::serialize() {
     tw << "\n\n";
     size_t index = 0;
     std::function<void(GameObject*)> serialize_obj = [&](GameObject* obj) {
-        logger << "Serialize object: id" << obj->id << "\n";
+        logger << "Object: " << obj->id << "\n";
         if (index > 0) {
             tw << "\n\n";
         }
@@ -932,16 +932,32 @@ std::string Application::serialize() {
             serialize_obj(obj->getChild(i));
         }
     };
-    for (size_t i = 0; i < game_objects.getTopSize(); i++) {
-        GameObject* gameobject = game_objects.getFromTop(i);
-        serialize_tree(gameobject);
+    {
+        logger << "Objects\n";
+        LoggerIndent objects_indent;
+        if (game_objects.getAllSize() == 0) {
+            logger << "<empty>\n";
+        }
+        for (size_t i = 0; i < game_objects.getTopSize(); i++) {
+            GameObject* gameobject = game_objects.getFromTop(i);
+            serialize_tree(gameobject);
+        }
     }
     tw << "\n\n";
-    for (size_t i = 0; i < game_objects.getJointsSize(); i++) {
-        if (i > 0) {
-            tw << "\n\n";
+    {
+        logger << "Joints\n";
+        LoggerIndent joints_indent;
+        if (game_objects.getJointsSize() == 0) {
+            logger << "<empty>\n";
         }
-        game_objects.getJoint(i)->serialize(tw);
+        for (size_t i = 0; i < game_objects.getJointsSize(); i++) {
+            if (i > 0) {
+                tw << "\n\n";
+            }
+            Joint* joint = game_objects.getJoint(i);
+            logger << "Joint: " << joint->object1->id << " " << joint->object2->id << "\n";
+            game_objects.getJoint(i)->serialize(tw);
+        }
     }
     return tw.toStr();
 }

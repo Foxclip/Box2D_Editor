@@ -161,7 +161,6 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
     assert(index >= 0);
     std::vector<Joint*> joints_copy = object->joints.getVector();
     for (Joint* joint : joints_copy) {
-        joint->valid = false;
         removeJoint(joint);
     }
     setParent(object, nullptr);
