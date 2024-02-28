@@ -121,9 +121,12 @@ void Application::init_ui() {
     origin_shape.setOutlineColor(sf::Color::Black);
     origin_shape.setOutlineThickness(1.0f);
 
+    id_text.setFont(small_font);
+    id_text.setCharacterSize(10);
+    id_text.setOrigin(sf::Vector2f(0.0f, id_text.getCharacterSize()));
+    id_text.setFillColor(sf::Color::White);
     name_text.setFont(small_font);
     name_text.setCharacterSize(10);
-    //name_text.setStyle(sf::Text::Bold);
     name_text.setFillColor(sf::Color::White);
 
     init_widgets();
@@ -347,24 +350,24 @@ void Application::process_input() {
 void Application::process_keyboard_event(sf::Event event) {
     if (event.type == sf::Event::KeyPressed) {
         switch (event.key.code) {
-        case sf::Keyboard::Escape:
-            if (selected_tool == &move_tool) {
-                for (GameObject* obj : move_tool.moving_objects) {
-                    obj->setPosition(obj->orig_pos, true);
-                    obj->setEnabled(obj->was_enabled, true);
+            case sf::Keyboard::Escape:
+                if (selected_tool == &move_tool) {
+                    for (GameObject* obj : move_tool.moving_objects) {
+                        obj->setPosition(obj->orig_pos, true);
+                        obj->setEnabled(obj->was_enabled, true);
+                    }
+                    try_select_tool(&select_tool);
+                } else if (selected_tool == &rotate_tool) {
+                    for (GameObject* obj : rotate_tool.rotating_objects) {
+                        obj->setPosition(obj->orig_pos, true);
+                        obj->setAngle(obj->orig_angle, true);
+                        obj->setEnabled(obj->was_enabled, true);
+                    }
+                    try_select_tool(&select_tool);
+                } else {
+                    window.close();
                 }
-                try_select_tool(&select_tool);
-            } else if (selected_tool == &rotate_tool) {
-                for (GameObject* obj : rotate_tool.rotating_objects) {
-                    obj->setPosition(obj->orig_pos, true);
-                    obj->setAngle(obj->orig_angle, true);
-                    obj->setEnabled(obj->was_enabled, true);
-                }
-                try_select_tool(&select_tool);
-            } else {
-                window.close();
-            }
-            break;
+                break;
             case sf::Keyboard::Space: toggle_pause(); break;
             case sf::Keyboard::Num1: try_select_tool(0); break;
             case sf::Keyboard::Num2: try_select_tool(1); break;
@@ -460,6 +463,10 @@ void Application::process_keyboard_event(sf::Event event) {
                         commit_action = true;
                     }
                 }
+                break;
+            case sf::Keyboard::I:
+                render_object_info = !render_object_info;
+                break;
         }
     }
     if (event.type == sf::Event::KeyReleased) {
@@ -753,12 +760,9 @@ void Application::render_world() {
 
     for (size_t i = 0; i < game_objects.getTopSize(); i++) {
         GameObject* gameobject = game_objects.getFromTop(i);
-        gameobject->draw_varray = selected_tool == &edit_tool && dynamic_cast<PolygonObject*>(gameobject);
+        gameobject->draw_varray = selected_tool == &edit_tool && gameobject == active_object;
         gameobject->render(world_texture);
     }
-    //if (select_tool.hover_object) {
-    //    select_tool.hover_object->renderMask(selection_mask, false);
-    //}
 
     if (selected_tool != &edit_tool) {
         for (auto obj : select_tool.getSelectedObjects()) {
@@ -789,41 +793,44 @@ void Application::render_ui() {
     ui_texture.setView(ui_view);
     sf::RenderTarget& target = ui_texture;
 
-    // parent relation lines
-    for (GameObject* object : game_objects.getAllVector()) {
-        for (GameObject* child : object->getChildren()) {
-            sf::Vector2f v1 = world_to_screen(object->getPosition());
-            sf::Vector2f v2 = world_to_screen(child->getPosition());
-            drawLine(target, v1, v2, sf::Color(128, 128, 128));
+    if (render_object_info) {
+        // parent relation lines
+        for (GameObject* object : game_objects.getAllVector()) {
+            for (GameObject* child : object->getChildren()) {
+                sf::Vector2f v1 = world_to_screen(object->getPosition());
+                sf::Vector2f v2 = world_to_screen(child->getPosition());
+                drawLine(target, v1, v2, sf::Color(128, 128, 128));
+            }
         }
+        // object origin circles
+        for (size_t i = 0; i < game_objects.getAllSize(); i++) {
+            GameObject* gameobject = game_objects.getFromAll(i);
+            origin_shape.setPosition(world_to_screen(gameobject->getPosition()));
+            target.draw(origin_shape);
+        }
+        // names
+        for (size_t i = 0; i < game_objects.getAllSize(); i++) {
+            GameObject* gameobject = game_objects.getFromAll(i);
+            // rounding coordinates so letters don't wobble around
+            sf::Vector2f pos = world_to_screen(gameobject->getPosition());
+            sf::Vector2f rounded_pos = sf::Vector2f(std::round(pos.x), std::round(pos.y));
+            id_text.setPosition(rounded_pos);
+            id_text.setString("id: " + std::to_string(gameobject->id));
+            name_text.setPosition(rounded_pos);
+            name_text.setString(gameobject->name);
+            // rendering twice so it is more opaque
+            target.draw(id_text);
+            target.draw(id_text);
+            target.draw(name_text);
+            target.draw(name_text);
+        }
+        // indices
+        //for (size_t i = 0; i < game_objects.size(); i++) {
+        //    if (PolygonObject* car_object = dynamic_cast<PolygonObject*>(game_objects[i].get())) {
+        //        car_object->getSplittablePolygon()->drawIndices(target, sf::Color::White, 20, false);
+        //    }
+        //}
     }
-
-    // object origin circles
-    for (size_t i = 0; i < game_objects.getAllSize(); i++) {
-        GameObject* gameobject = game_objects.getFromAll(i);
-        origin_shape.setPosition(world_to_screen(gameobject->getPosition()));
-        target.draw(origin_shape);
-    }
-
-    // names
-    for (size_t i = 0; i < game_objects.getAllSize(); i++) {
-        GameObject* gameobject = game_objects.getFromAll(i);
-        // rounding coordinates so letters don't wobble around
-        sf::Vector2f pos = world_to_screen(gameobject->getPosition());
-        sf::Vector2f rounded_pos = sf::Vector2f(std::round(pos.x), std::round(pos.y));
-        name_text.setPosition(rounded_pos);
-        name_text.setString(gameobject->name);
-        // rendering twice so it is more opaque
-        target.draw(name_text);
-        target.draw(name_text);
-    }
-
-    // indices
-    //for (size_t i = 0; i < game_objects.size(); i++) {
-    //    if (PolygonObject* car_object = dynamic_cast<PolygonObject*>(game_objects[i].get())) {
-    //        car_object->getSplittablePolygon()->drawIndices(target, sf::Color::White, 20, false);
-    //    }
-    //}
 
     if (selected_tool == &select_tool) {
         if (select_tool.rectangle_select.active) {

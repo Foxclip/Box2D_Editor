@@ -89,6 +89,7 @@ private:
 	sf::CircleShape origin_shape;
 	sf::Font small_font;
 	sf::Text name_text;
+	sf::Text id_text;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;
@@ -96,6 +97,7 @@ private:
 	std::unique_ptr<b2World> world;
 	float timeStep = 1.0f / FPS;
 	bool paused = true;
+	bool render_object_info = true;
 	b2Vec2 b2MousePosWorld;
 	GameObject* active_object = nullptr;
 	GameObjectList game_objects;
