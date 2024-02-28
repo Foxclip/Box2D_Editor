@@ -218,6 +218,28 @@ namespace utils {
 		}
 	}
 
+	std::string char_to_str(char c) {
+		if (c < -1) {
+			return "(" + std::to_string(c) + ")";
+		} else if (c == '\n') {
+			return "\\n";
+		} else if (c == '\r') {
+			return "\\r";
+		} else if (c == '\t') {
+			return "\\t";
+		} else if (c == '\0') {
+			return "\\0";
+		} else if (c == '\\') {
+			return "\\\\";
+		} else if (c == '"') {
+			return "\\\"";
+		} else if (c == EOF) {
+			return "(EOF)";
+		} else {
+			return std::string(1, c);
+		}
+	}
+
 	bool rect_fixture_intersect(const b2Vec2& lower_bound, const b2Vec2& upper_bound, const b2Fixture* fixture) {
 		b2Vec2 bottom_left = b2Vec2(std::min(lower_bound.x, upper_bound.x), std::min(lower_bound.y, upper_bound.y));
 		b2Vec2 bottom_right = b2Vec2(std::max(lower_bound.x, upper_bound.x), std::min(lower_bound.y, upper_bound.y));

@@ -34,6 +34,7 @@ namespace utils {
 	void extend_bounds(sf::FloatRect& rect, const sf::Vector2f point);
 	bool rect_fixture_intersect(const b2Vec2& lower_bound, const b2Vec2& upper_bound, const b2Fixture* fixture);
 	float sgn(float value);
+	std::string char_to_str(char c);
 
 	template <typename TVec2>
 	TVec2 get_pos(const std::vector<float>& lengths, ptrdiff_t i) {

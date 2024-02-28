@@ -203,23 +203,73 @@ size_t TokenReader::getLine(ptrdiff_t offset) {
 std::vector<WordToken> TokenReader::tokenize(std::string str) {
 	std::vector<WordToken> results;
 	std::string current_word;
+	enum State {
+		SPACE,
+		WORD,
+		STRING,
+		BACKSLASH,
+	};
+	State state = WORD;
 	str += EOF;
 	size_t current_line = 1;
-	for (size_t i = 0; i < str.size(); i++) {
-		char c = str[i];
-		if (isspace(c) || c == EOF) {
-			if (current_word.size() > 0) {
-				results.push_back(WordToken(current_word, current_line));
+	auto add_word = [&]() {
+		if (current_word.size() > 0) {
+			results.push_back(WordToken(current_word, current_line));
+		}
+		current_word = "";
+	};
+	auto throw_unexpected_char = [&](char c) {
+		throw std::runtime_error(
+			"Current word: " + current_word + ", unexpected char: " + utils::char_to_str(c)
+		);
+	};
+	try {
+		for (size_t i = 0; i < str.size(); i++) {
+			char c = str[i];
+			if (c < -1) {
+				throw std::runtime_error("Invalid char: " + std::to_string(c));
 			}
-			current_word = "";
-		} else {
-			current_word += c;
+			if (state == SPACE) {
+				if (isspace(c) || c == EOF) {
+					// skip
+				} else if (c == '"') {
+					state = STRING;
+				} else {
+					current_word += c;
+					state = WORD;
+				}
+			} else if (state == WORD) {
+				if (isspace(c) || c == EOF) {
+					add_word();
+					state = SPACE;
+				} else if (c == '"') {
+					throw_unexpected_char(c);
+				} else {
+					current_word += c;
+				}
+			} else if (state == STRING) {
+				if (c == '"') {
+					add_word();
+					state = SPACE;
+				} else if (c == EOF) {
+					throw_unexpected_char(c);
+				} else {
+					current_word += c;
+				}
+			}
+			if (c == '\n') {
+				current_line++;
+			}
 		}
-		if (c == '\n') {
-			current_line++;
-		}
+		return results;
+	} catch (std::exception exc) {
+		throw std::runtime_error(
+			__FUNCTION__": Line "
+			+ std::to_string(current_line)
+			+ ": "
+			+ std::string(exc.what())
+		);
 	}
-	return results;
 }
 
 bool TokenReader::isValidPos(ptrdiff_t position) {
@@ -312,6 +362,12 @@ TokenWriter& TokenWriter::writeb2Vec2(b2Vec2 value) {
 
 void TokenWriter::writeStringParam(std::string name, std::string value) {
 	writeString(name).writeString(value).writeNewLine();
+}
+
+void TokenWriter::writeQuotedStringParam(std::string name, std::string value) {
+	value.insert(value.begin(), '"');
+	value.insert(value.end(), '"');
+	writeStringParam(name, value);
 }
 
 void TokenWriter::writeIntParam(std::string name, int value) {

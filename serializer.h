@@ -65,6 +65,7 @@ public:
 	TokenWriter& operator<<(sf::Color value);
 	TokenWriter& operator<<(b2Vec2 value);
 	void writeStringParam(std::string name, std::string value);
+	void writeQuotedStringParam(std::string name, std::string value);
 	void writeIntParam(std::string name, int value);
 	void writeSizetParam(std::string name, size_t value);
 	void writePtrdiffParam(std::string name, ptrdiff_t value);
