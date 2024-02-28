@@ -102,21 +102,11 @@ void Application::init_world() {
 }
 
 void Application::init_ui() {
-    std::string ui_font_filename = "STAN0757.TTF";
-    if (!ui_font.loadFromFile(ui_font_filename)) {
-        throw std::runtime_error("Font loading error (" + ui_font_filename + ")");
-    }
-    std::string fps_font_filename = "fraps.ttf";;
-    if (!fps_font.loadFromFile(fps_font_filename)) {
-        throw std::runtime_error("Font loading error (" + fps_font_filename + ")");
-    }
-    std::string console_font_filename = "courbd.ttf";
-    if (!console_font.loadFromFile(console_font_filename)) {
-        throw std::runtime_error("Font loading error (" + console_font_filename + ")");
-    }
-    ui_font.setSmooth(false);
-    fps_font.setSmooth(false);
-    console_font.setSmooth(false);
+    load_font(ui_font, "STAN0757.TTF");
+    load_font(fps_font, "fraps.ttf");
+    load_font(console_font, "courbd.ttf");
+    load_font(small_font, "verdana.ttf");
+    //load_font(small_font, "courbd.ttf");
 
     root_widget.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
     root_widget.setFillColor(sf::Color::Transparent);
@@ -131,8 +121,9 @@ void Application::init_ui() {
     origin_shape.setOutlineColor(sf::Color::Black);
     origin_shape.setOutlineThickness(1.0f);
 
-    name_text.setFont(console_font);
+    name_text.setFont(small_font);
     name_text.setCharacterSize(10);
+    //name_text.setStyle(sf::Text::Bold);
     name_text.setFillColor(sf::Color::White);
 
     init_widgets();
@@ -807,7 +798,7 @@ void Application::render_ui() {
         }
     }
 
-    // origin circle
+    // object origin circles
     for (size_t i = 0; i < game_objects.getAllSize(); i++) {
         GameObject* gameobject = game_objects.getFromAll(i);
         origin_shape.setPosition(world_to_screen(gameobject->getPosition()));
@@ -817,8 +808,13 @@ void Application::render_ui() {
     // names
     for (size_t i = 0; i < game_objects.getAllSize(); i++) {
         GameObject* gameobject = game_objects.getFromAll(i);
-        name_text.setPosition(world_to_screen(gameobject->getPosition()));
+        // rounding coordinates so letters don't wobble around
+        sf::Vector2f pos = world_to_screen(gameobject->getPosition());
+        sf::Vector2f rounded_pos = sf::Vector2f(std::round(pos.x), std::round(pos.y));
+        name_text.setPosition(rounded_pos);
         name_text.setString(gameobject->name);
+        // rendering twice so it is more opaque
+        target.draw(name_text);
         target.draw(name_text);
     }
 
@@ -910,7 +906,6 @@ void Application::render_ui() {
     }
 
     root_widget.render();
-
     ui_texture.display();
     sf::Sprite ui_sprite(ui_texture.getTexture());
     window.draw(ui_sprite);
@@ -1107,6 +1102,13 @@ void Application::select_create_type(int type) {
 void Application::toggle_pause() {
     paused = !paused;
     paused_rect_widget->setVisible(paused);
+}
+
+void Application::load_font(sf::Font& font, const std::string& filename) {
+    if (!font.loadFromFile(filename)) {
+        throw std::runtime_error("Font loading error (" + filename + ")");
+    }
+    font.setSmooth(false);
 }
 
 sf::Vector2f Application::screen_to_world(const sf::Vector2f& screen_pos) {

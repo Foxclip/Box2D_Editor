@@ -87,6 +87,7 @@ private:
 	TextWidget* logger_text_widget;
 	sf::Font console_font;
 	sf::CircleShape origin_shape;
+	sf::Font small_font;
 	sf::Text name_text;
 
 	const int32 VELOCITY_ITERATIONS = 6;
@@ -139,6 +140,7 @@ private:
 	Tool* try_select_tool(Tool* tool);
 	void select_create_type(int type);
 	void toggle_pause();
+	void load_font(sf::Font& font, const std::string& filename);
 	sf::Vector2f screen_to_world(const sf::Vector2f& screen_pos);
 	sf::Vector2f pixel_to_world(const sf::Vector2i& screen_pos);
 	sf::Vector2f world_to_screen(const sf::Vector2f& world_pos);
