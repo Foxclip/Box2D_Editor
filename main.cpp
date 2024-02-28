@@ -28,7 +28,6 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: fix releasing left click on widgets in drag mode
     // TODO: add const to serializer
     // TODO: use local coordinates to move and rotate children (children position is in local coordinates)
     // TODO: cut polygons with b2maxvertices

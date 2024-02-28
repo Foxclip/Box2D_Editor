@@ -444,6 +444,7 @@ void Application::process_keyboard_event(sf::Event event) {
                 if (select_tool.selectedCount() > 0) {
                     try_select_tool(&move_tool);
                     grab_selected();
+                    leftButtonProcessWidgetsOnPress = false;
                 }
                 break;
             case sf::Keyboard::R:
@@ -461,6 +462,7 @@ void Application::process_keyboard_event(sf::Event event) {
                         try_select_tool(&move_tool);
                         grab_selected();
                         commit_action = true;
+                        leftButtonProcessWidgetsOnPress = false;
                     }
                 }
                 break;
@@ -495,8 +497,10 @@ void Application::process_mouse_event(sf::Event event) {
             case sf::Mouse::Left:
                 leftButtonPressed = true;
                 leftButtonPressGesture = true;
+                leftButtonProcessWidgetsOnRelease = true;
                 mousePressPosf = mousePosf;
                 process_left_click();
+                leftButtonProcessWidgetsOnPress = true;
                 break;
             case sf::Mouse::Right:
                 rightButtonPressed = true;
@@ -608,12 +612,14 @@ void Application::process_mouse() {
 }
 
 void Application::process_left_click() {
-    root_widget.processClick(mousePosf);
-    if (Widget::click_blocked) {
-        return;
+    if (leftButtonProcessWidgetsOnPress) {
+        root_widget.processClick(mousePosf);
+        if (Widget::click_blocked) {
+            return;
+        }
     }
     if (selected_tool == &select_tool) {
-        //
+        leftButtonProcessWidgetsOnRelease = false;
     } else if (selected_tool == &create_tool) {
         std::string id_string = std::to_string(game_objects.getMaxId());
         switch (create_tool.type) {
@@ -642,6 +648,7 @@ void Application::process_left_click() {
             mouse_joint_def.stiffness = 50.0f;
             mouse_joint_def.target = b2MousePosWorld;
             drag_tool.mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
+            leftButtonProcessWidgetsOnRelease = false;
         }
     } else if (selected_tool == &move_tool) {
         for (GameObject* obj : move_tool.moving_objects) {
@@ -695,12 +702,14 @@ void Application::process_left_click() {
 }
 
 void Application::process_left_release() {
-    root_widget.processRelease(mousePosf);
     if (!leftButtonPressGesture) {
         return;
     }
-    if (Widget::release_blocked) {
-        return;
+    if (leftButtonProcessWidgetsOnRelease) {
+        root_widget.processRelease(mousePosf);
+        if (Widget::release_blocked) {
+            return;
+        }
     }
     if (selected_tool == &select_tool) {
         if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
