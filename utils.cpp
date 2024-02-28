@@ -210,36 +210,6 @@ namespace utils {
 		}
 	}
 
-	float sgn(float value) {
-		if (value >= 0.0f) {
-			return 1.0f;
-		} else {
-			return -1.0f;
-		}
-	}
-
-	std::string char_to_str(char c) {
-		if (c < -1) {
-			return "(" + std::to_string(c) + ")";
-		} else if (c == '\n') {
-			return "\\n";
-		} else if (c == '\r') {
-			return "\\r";
-		} else if (c == '\t') {
-			return "\\t";
-		} else if (c == '\0') {
-			return "\\0";
-		} else if (c == '\\') {
-			return "\\\\";
-		} else if (c == '"') {
-			return "\\\"";
-		} else if (c == EOF) {
-			return "(EOF)";
-		} else {
-			return std::string(1, c);
-		}
-	}
-
 	bool rect_fixture_intersect(const b2Vec2& lower_bound, const b2Vec2& upper_bound, const b2Fixture* fixture) {
 		b2Vec2 bottom_left = b2Vec2(std::min(lower_bound.x, upper_bound.x), std::min(lower_bound.y, upper_bound.y));
 		b2Vec2 bottom_right = b2Vec2(std::max(lower_bound.x, upper_bound.x), std::min(lower_bound.y, upper_bound.y));
@@ -343,6 +313,92 @@ namespace utils {
 			return false;
 		} else {
 			return false;
+		}
+	}
+
+	float sgn(float value) {
+		if (value >= 0.0f) {
+			return 1.0f;
+		} else {
+			return -1.0f;
+		}
+	}
+
+	std::string char_to_str(char c) {
+		if (c < -1) {
+			return "(" + std::to_string(c) + ")";
+		} else if (c == '\n') {
+			return "\\n";
+		} else if (c == '\r') {
+			return "\\r";
+		} else if (c == '\t') {
+			return "\\t";
+		} else if (c == '\0') {
+			return "\\0";
+		} else if (c == '\\') {
+			return "\\\\";
+		} else if (c == '"') {
+			return "\\\"";
+		} else if (c == EOF) {
+			return "(EOF)";
+		} else {
+			return std::string(1, c);
+		}
+	}
+
+	std::string char_to_esc(std::string str) {
+		std::string result;
+		for (size_t i = 0; i < str.size(); i++) {
+			char current_char = str[i];
+			result += char_to_str(current_char);
+		}
+		return result;
+	}
+
+	std::string esc_to_char(std::string str) {
+		try {
+			std::string result;
+			enum State {
+				NORMAL,
+				ESCAPE,
+			};
+			State state = NORMAL;
+			std::string str_orig = str;
+			str += EOF;
+			for (size_t i = 0; i < str.size(); i++) {
+				char current_char = str[i];
+				if (state == NORMAL) {
+					if (current_char == '\\') {
+						state = ESCAPE;
+					} else if (current_char == EOF) {
+						break;
+					} else {
+						result += current_char;
+					}
+				} else if (state == ESCAPE) {
+					if (current_char == 'n') {
+						result += "\n";
+						state = NORMAL;
+					} else if (current_char == 'r') {
+						result += "\r";
+						state = NORMAL;
+					} else if (current_char == 't') {
+						result += "\t";
+						state = NORMAL;
+					} else if (current_char == '"') {
+						result += "\"";
+						state = NORMAL;
+					} else if (current_char == '\\') {
+						result += "\\";
+						state = NORMAL;
+					} else {
+						throw std::runtime_error("Unexpected char: " + char_to_str(current_char));
+					}
+				}
+			}
+			return result;
+		} catch (std::exception exc) {
+			throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
 		}
 	}
 

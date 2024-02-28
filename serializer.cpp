@@ -207,7 +207,7 @@ std::vector<WordToken> TokenReader::tokenize(std::string str) {
 		SPACE,
 		WORD,
 		STRING,
-		BACKSLASH,
+		ESCAPE,
 	};
 	State state = WORD;
 	str += EOF;
@@ -249,13 +249,19 @@ std::vector<WordToken> TokenReader::tokenize(std::string str) {
 				}
 			} else if (state == STRING) {
 				if (c == '"') {
+					current_word = utils::esc_to_char(current_word);
 					add_word();
 					state = SPACE;
 				} else if (c == EOF) {
 					throw_unexpected_char(c);
+				} else if (c == '\\') {
+					state = ESCAPE;
 				} else {
 					current_word += c;
 				}
+			} else if (state == ESCAPE) {
+				current_word += c;
+				state = STRING;
 			}
 			if (c == '\n') {
 				current_line++;
@@ -365,9 +371,10 @@ void TokenWriter::writeStringParam(std::string name, std::string value) {
 }
 
 void TokenWriter::writeQuotedStringParam(std::string name, std::string value) {
-	value.insert(value.begin(), '"');
-	value.insert(value.end(), '"');
-	writeStringParam(name, value);
+	std::string str_esc = utils::char_to_esc(value);
+	str_esc.insert(str_esc.begin(), '"');
+	str_esc.insert(str_esc.end(), '"');
+	writeStringParam(name, str_esc);
 }
 
 void TokenWriter::writeIntParam(std::string name, int value) {

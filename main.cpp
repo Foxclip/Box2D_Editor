@@ -28,7 +28,6 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: serialize names
     // TODO: game object names and rendering of debug info like ids and names
     // TODO: fix releasing left click on widgets in drag mode
     // TODO: add const to serializer
