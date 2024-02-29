@@ -7,12 +7,12 @@ WordToken::WordToken(std::string str, size_t line) {
 	this->line = line;
 }
 
-TokenReader::TokenReader(std::string& str) {
+TokenReader::TokenReader(const std::string& str) {
 	internal_tokens = tokenize(str);
 	tokens = &internal_tokens;
 }
 
-TokenReader::TokenReader(std::vector<WordToken>* tokens, ptrdiff_t pos) {
+TokenReader::TokenReader(const std::vector<WordToken>* tokens, ptrdiff_t pos) {
 	this->tokens = tokens;
 	this->pos = pos;
 }
@@ -172,7 +172,7 @@ std::vector<b2Vec2> TokenReader::readb2Vec2Arr() {
 	return result;
 }
 
-WordToken TokenReader::peek(ptrdiff_t offset) {
+const WordToken& TokenReader::peek(ptrdiff_t offset) const {
 	return tokens->at(pos + offset);
 }
 
@@ -180,15 +180,15 @@ void TokenReader::move(ptrdiff_t offset) {
 	pos += offset;
 }
 
-bool TokenReader::eof() {
+bool TokenReader::eof() const {
 	return pos == tokens->size() - 1;
 }
 
-bool TokenReader::validRange() {
+bool TokenReader::validRange() const {
 	return isValidPos(pos);
 }
 
-bool TokenReader::fail() {
+bool TokenReader::fail() const {
 	return fail_state;
 }
 
@@ -196,11 +196,11 @@ void TokenReader::reset() {
 	fail_state = false;
 }
 
-size_t TokenReader::getLine(ptrdiff_t offset) {
+size_t TokenReader::getLine(ptrdiff_t offset) const {
 	return peek(offset).line;
 }
 
-std::vector<WordToken> TokenReader::tokenize(std::string str) {
+std::vector<WordToken> TokenReader::tokenize(const std::string& str) const {
 	std::vector<WordToken> results;
 	std::string current_word;
 	enum State {
@@ -210,7 +210,6 @@ std::vector<WordToken> TokenReader::tokenize(std::string str) {
 		ESCAPE,
 	};
 	State state = WORD;
-	str += EOF;
 	size_t current_line = 1;
 	auto add_word = [&]() {
 		if (current_word.size() > 0) {
@@ -225,7 +224,10 @@ std::vector<WordToken> TokenReader::tokenize(std::string str) {
 	};
 	try {
 		for (size_t i = 0; i < str.size(); i++) {
-			char c = str[i];
+			char c = EOF;
+			if (i < str.size()) {
+				c = str[i];
+			}
 			if (c < -1) {
 				throw std::runtime_error("Invalid char: " + std::to_string(c));
 			}
@@ -278,7 +280,7 @@ std::vector<WordToken> TokenReader::tokenize(std::string str) {
 	}
 }
 
-bool TokenReader::isValidPos(ptrdiff_t position) {
+bool TokenReader::isValidPos(ptrdiff_t position) const {
 	return position >= 0 && position < tokens->size();
 }
 
@@ -288,7 +290,7 @@ TokenWriter::TokenWriter(int indent_level) {
 	updateIndentStr();
 }
 
-TokenWriter::TokenWriter(TokenWriter& parent) {
+TokenWriter::TokenWriter(const TokenWriter& parent) {
 	this->target = &internal_str;
 	this->indent_level = parent.getIndentLevel();
 	updateIndentStr();
@@ -409,16 +411,16 @@ void TokenWriter::writeb2Vec2Param(std::string name, b2Vec2 value) {
 	writeString(name).writeb2Vec2(value).writeNewLine();
 }
 
-int TokenWriter::getIndentLevel() {
+size_t TokenWriter::getIndentLevel() const {
 	return indent_level;
 }
 
-void TokenWriter::addIndentLevel(int add) {
+void TokenWriter::addIndentLevel(size_t add) {
 	indent_level += add;
 	updateIndentStr();
 }
 
-std::string TokenWriter::toStr() {
+std::string TokenWriter::toStr() const {
 	return std::string(*target);
 }
 

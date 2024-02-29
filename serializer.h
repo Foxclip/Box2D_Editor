@@ -18,8 +18,8 @@ public:
 
 class TokenReader {
 public:
-	TokenReader(std::string& str);
-	TokenReader(std::vector<WordToken>* tokens, ptrdiff_t pos = 0);
+	TokenReader(const std::string& str);
+	TokenReader(const std::vector<WordToken>* tokens, ptrdiff_t pos = 0);
 	WordToken get();
 	void eat(std::string expected);
 	bool tryEat(std::string str);
@@ -32,27 +32,27 @@ public:
 	sf::Color readColor();
 	b2Vec2 readb2Vec2();
 	std::vector<b2Vec2> readb2Vec2Arr();
-	WordToken peek(ptrdiff_t offset = 0);
+	const WordToken& peek(ptrdiff_t offset = 0) const;
 	void move(ptrdiff_t offset);
-	bool eof();
-	bool validRange();
-	bool fail();
+	bool eof() const;
+	bool validRange() const;
+	bool fail() const;
 	void reset();
-	size_t getLine(ptrdiff_t offset = 0);
+	size_t getLine(ptrdiff_t offset = 0) const;
 private:
 	std::vector<WordToken> internal_tokens;
-	std::vector<WordToken>* tokens;
+	const std::vector<WordToken>* tokens;
 	ptrdiff_t pos = 0;
 	bool fail_state = false;
 
-	std::vector<WordToken> tokenize(std::string str);
-	bool isValidPos(ptrdiff_t pos);
+	std::vector<WordToken> tokenize(const std::string& str) const;
+	bool isValidPos(ptrdiff_t pos) const;
 };
 
 class TokenWriter {
 public:
 	TokenWriter(int indent_level = 0);
-	TokenWriter(TokenWriter& parent);
+	TokenWriter(const TokenWriter& parent);
 	TokenWriter(std::string* target, int indent_level = 0);
 	TokenWriter& operator<<(const char* value);
 	TokenWriter& operator<<(std::string value);
@@ -74,17 +74,17 @@ public:
 	void writeFloatArrParam(std::string name, std::vector<float> value);
 	void writeColorParam(std::string name, sf::Color value);
 	void writeb2Vec2Param(std::string name, b2Vec2 value);
-	int getIndentLevel();
-	std::string toStr();
+	size_t getIndentLevel() const;
+	std::string toStr() const;
 
 private:
 	std::string* target;
 	std::string internal_str;
-	int indent_level = 0;
+	size_t indent_level = 0;
 	std::string indent_str;
 	bool new_line = true;
 
-	void addIndentLevel(int add);
+	void addIndentLevel(size_t add);
 	void updateIndentStr();
 	void writeLine(std::string str);
 	void writeNewLine();
