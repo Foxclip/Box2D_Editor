@@ -6,12 +6,12 @@
 #include <fstream>
 #include <filesystem>
 #include <vector>
+#include <numbers>
 
 namespace utils {
 
 	float to_degrees(float angle);
 	float to_radians(float angle);
-	std::pair<float, float> getCircleVertex(ptrdiff_t index, size_t point_count, float radius, float offset = 0.0f);
 	b2Vec2 tob2(const sf::Vector2f& vec);
 	sf::Vector2f tosf(const b2Vec2& vec);
 	sf::Vector2i to2i(const sf::Vector2f& vec);
@@ -37,6 +37,14 @@ namespace utils {
 	std::string char_to_str(char c);
 	std::string char_to_esc(std::string str);
 	std::string esc_to_char(std::string str);
+
+	template <typename TVec2>
+	TVec2 get_circle_vertex(ptrdiff_t index, size_t point_count, float radius, float offset = 0.0f) {
+		float angle = (float)index / point_count * 2 * std::numbers::pi + offset;
+		float x = std::cos(angle) * radius;
+		float y = std::sin(angle) * radius;
+		return TVec2(x, y);
+	}
 
 	template <typename TVec2>
 	TVec2 get_pos(const std::vector<float>& lengths, ptrdiff_t i) {

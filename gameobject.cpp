@@ -867,13 +867,13 @@ CircleNotchShape::CircleNotchShape(float radius, size_t point_count, size_t notc
 	float angle_offset = -notch_angle / 2.0f;
 	varray_circle[0] = sf::Vertex(sf::Vector2f(0.0f, 0.0f));
 	for (size_t i = 0; i < point_count; i++) {
-		std::pair<float, float> pair = utils::getCircleVertex(i, point_count, radius, angle_offset);
-		varray_circle[i] = sf::Vertex(sf::Vector2f(pair.first, pair.second));
+		sf::Vector2f pos = utils::get_circle_vertex<sf::Vector2f>(i, point_count, radius, angle_offset);
+		varray_circle[i] = sf::Vertex(pos);
 	}
 	varray_notch[0] = sf::Vertex(sf::Vector2f(0.0f, 0.0f));
 	for (size_t i = 0; i < notch_segment_count + 1; i++) {
-		std::pair<float, float> pair = utils::getCircleVertex(i, point_count, radius, angle_offset);
-		varray_notch[i] = sf::Vertex(sf::Vector2f(pair.first, pair.second));
+		sf::Vector2f pos = utils::get_circle_vertex<sf::Vector2f>(i, point_count, radius, angle_offset);
+		varray_notch[i] = sf::Vertex(pos);
 	}
 }
 

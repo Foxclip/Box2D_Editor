@@ -1,5 +1,4 @@
 #include "utils.h"
-#include <numbers>
 #include <utility>
 #include <cmath>
 #include <iostream>
@@ -15,13 +14,6 @@ namespace utils {
 
 	float to_radians(float angle) {
 		return RAD_IN_DEG * angle;
-	}
-
-	std::pair<float, float> getCircleVertex(ptrdiff_t index, size_t point_count, float radius, float offset) {
-		float angle = (float)index / point_count * 2 * std::numbers::pi + offset;
-		float x = std::cos(angle) * radius;
-		float y = std::sin(angle) * radius;
-		return std::make_pair(x, y);
 	}
 
 	b2Vec2 tob2(const sf::Vector2f& vec) {

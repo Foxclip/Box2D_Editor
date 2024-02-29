@@ -54,14 +54,45 @@ class Application {
 public:
 	void init();
 	void start();
-	void load(std::string filename);
+	void load(const std::string& filename);
 	void setCameraPos(float x, float y);
 	void setCameraZoom(float zoom);
 	GameObjectList& getObjectList();
-	BoxObject* create_box(std::string name, b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
-	BallObject* create_ball(std::string name, b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
-	PolygonObject* create_car(std::string name, b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);
-	ChainObject* create_chain(std::string name, b2Vec2 pos, float angle, std::vector<b2Vec2> vertices, sf::Color color);
+	BoxObject* create_box(
+		const std::string& name,
+		const b2Vec2& pos,
+		float angle,
+		const b2Vec2& size,
+		const sf::Color& color
+	);
+	BallObject* create_ball(
+		const std::string& name,
+		const b2Vec2& pos,
+		float radius,
+		const sf::Color& color,
+		const sf::Color& notch_color = sf::Color::Transparent
+	);
+	PolygonObject* create_polygon(
+		const std::string& name,
+		const b2Vec2& pos,
+		float angle,
+		const std::vector<b2Vec2>& vertices,
+		const sf::Color& color
+	);
+	PolygonObject* create_car(
+		const std::string& name,
+		const b2Vec2& pos,
+		const std::vector<float>& lengths,
+		const std::vector<float>& wheels,
+		const sf::Color& color
+	);
+	ChainObject* create_chain(
+		const std::string& name,
+		const b2Vec2& pos,
+		float angle,
+		const std::vector<b2Vec2>& vertices,
+		const sf::Color& color
+	);
 
 private:
 	sf::Shader desat_shader;
