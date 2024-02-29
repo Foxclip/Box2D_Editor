@@ -982,11 +982,13 @@ void Application::render_ui() {
             target.draw(name_text);
         }
         // indices
-        //for (size_t i = 0; i < game_objects.size(); i++) {
-        //    if (PolygonObject* car_object = dynamic_cast<PolygonObject*>(game_objects[i].get())) {
-        //        car_object->getSplittablePolygon()->drawIndices(target, sf::Color::White, 20, false);
-        //    }
-        //}
+        for (size_t i = 0; i < game_objects.getAllSize(); i++) {
+            if (PolygonObject* polygon_object = dynamic_cast<PolygonObject*>(game_objects.getFromAll(i))) {
+                if (polygon_object->draw_indices) {
+                    polygon_object->getSplittablePolygon()->drawIndices(target, sf::Color::White, 20, false);
+                }
+            }
+        }
     }
 
     if (selected_tool == &select_tool) {

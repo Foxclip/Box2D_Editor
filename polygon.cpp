@@ -48,7 +48,11 @@ std::string CutInfo::toStr() const {
 	if (!has_reciprocal) {
 		recip_str = "";
 	}
-	result += std::to_string(from) + "-" + std::to_string(to) + " " + zone_str + recip_str;
+	result += std::to_string(from) + "-" + std::to_string(to)
+		+ " sqr_dist: " + std::to_string(sqr_dist)
+		+ " angle_diff: " + std::to_string(angle_diff)
+		+ " angle_diff_sum: " + std::to_string(angle_diff_sum)
+		+ " " + zone_str + recip_str;
 	return result;
 }
 
@@ -182,7 +186,7 @@ void SplittablePolygon::drawIndices(
 	}
 }
 
-void SplittablePolygon::calcPotentialCuts() {
+void SplittablePolygon::calcPotentialCuts(bool consider_convex_vertices) {
 	logger << __FUNCTION__"\n";
 	LoggerIndent polygon_object_indent;
 	std::vector<std::vector<CutInfo>> result(getPointCount());
@@ -194,7 +198,9 @@ void SplittablePolygon::calcPotentialCuts() {
 		sf::Vector2f vertex = getPoint(vert_i);
 		if (is_convex_vertex[vert_i]) {
 			logger << "Vertex: " << vert_i << ", pos: " << vertex << ", convex" << "\n";
-			continue;
+			if (!consider_convex_vertices) {
+				continue;
+			}
 		} else {
 			logger << "Vertex: " << vert_i << ", pos: " << vertex << ", concave" << "\n";
 		}
@@ -203,7 +209,9 @@ void SplittablePolygon::calcPotentialCuts() {
 		sf::Vector2f next_vertex = getPoint(indexLoop(vert_i + 1));
 		sf::Vector2f side1_dir = utils::normalize(vertex - prev_vertex);
 		sf::Vector2f side2_dir = utils::normalize(vertex - next_vertex);
-		sf::Vector2f vertex_normal = utils::normalize(side1_dir + side2_dir);
+		sf::Vector2f side1_dir_rot = utils::rot90CCW(side1_dir);
+		sf::Vector2f side2_dir_rot = utils::rot90CW(side2_dir);
+		sf::Vector2f vertex_normal = utils::normalize(side1_dir_rot + side2_dir_rot);
 		for (size_t cut_i = 0; cut_i < getPointCount(); cut_i++) {
 			bool prev = cut_i == indexLoop(vert_i - 1);
 			bool curr = cut_i == indexLoop(vert_i);
@@ -296,18 +304,26 @@ void SplittablePolygon::drawPotentialCuts(sf::RenderTarget& target) {
 	target.draw(cuts_varray, getTransform());
 }
 
-CutInfo SplittablePolygon::getBestCut() const {
+CutInfo SplittablePolygon::getBestCut(BestCutCriterion criterion) const {
 	logger << __FUNCTION__"\n";
 	LoggerIndent get_best_cut_indent;
 	std::vector<CutInfo> cuts(potential_cuts);
-	auto cmp = [](const CutInfo& left, const CutInfo& right) {
+	auto cmp = [&](const CutInfo& left, const CutInfo& right) {
 		LoggerIndent cmp_indent;
 		CutInfo::CutType left_type = left.getType();
 		CutInfo::CutType right_type = right.getType();
 		if (left_type != right_type) {
 			return left_type < right_type;
 		} else {
-			return left.sqr_dist < right.sqr_dist;
+			if (criterion == BestCutCriterion::MIN_DIST) {
+				return left.sqr_dist < right.sqr_dist;
+			} else if (criterion == BestCutCriterion::MAX_DIST) {
+				return left.sqr_dist > right.sqr_dist;
+			} else if (criterion == BestCutCriterion::MIN_ANGLE) {
+				return left.angle_diff_sum < right.angle_diff_sum;
+			} else {
+				assert(false, "Unknown BestCutCriterion: " + std::to_string(criterion));
+			}
 		}
 	};
 	std::sort(cuts.begin(), cuts.end(), cmp);
@@ -356,34 +372,38 @@ std::vector<SplittablePolygon> SplittablePolygon::getCutPolygons(const CutInfo& 
 	return result;
 }
 
-std::vector<SplittablePolygon> SplittablePolygon::cutWithBestCut() {
+std::vector<SplittablePolygon> SplittablePolygon::cutWithBestCut(bool cut_convex) {
 	logger << __FUNCTION__"\n";
 	LoggerIndent cut_indent;
 	std::vector<SplittablePolygon> result;
 	if (!cuts_valid) {
-		calcPotentialCuts();
+		calcPotentialCuts(cut_convex);
 	}
 	if (getPotentialCutsCount() == 0) {
 		return result;
 	}
-	CutInfo cut = getBestCut();
+	//BestCutCriterion criterion = cut_convex ? BestCutCriterion::MIN_ANGLE : BestCutCriterion::MIN_DIST;
+	BestCutCriterion criterion = BestCutCriterion::MIN_ANGLE;
+	CutInfo cut = getBestCut(criterion);
 	std::vector<SplittablePolygon> new_polygons = getCutPolygons(cut);
 	result.push_back(new_polygons[0]);
 	result.push_back(new_polygons[1]);
 	return result;
 }
 
-std::vector<SplittablePolygon> SplittablePolygon::cutIntoConvex() {
+std::vector<SplittablePolygon> SplittablePolygon::cutIntoConvex(size_t max_vertices) {
 	logger << __FUNCTION__"\n";
 	LoggerIndent cut_indent;
 	std::vector<SplittablePolygon> result;
-	if (isConvex()) {
+	bool is_convex = isConvex();
+	bool vertices_ok = max_vertices == 0 || getPointCount() <= max_vertices;
+	if (is_convex && vertices_ok) {
 		result.push_back(*this);
 		return result;
 	}
-	std::vector<SplittablePolygon> child_polygons = cutWithBestCut();
+	std::vector<SplittablePolygon> child_polygons = cutWithBestCut(is_convex);
 	for (size_t i = 0; i < child_polygons.size(); i++) {
-		std::vector<SplittablePolygon> child_children = child_polygons[i].cutIntoConvex();
+		std::vector<SplittablePolygon> child_children = child_polygons[i].cutIntoConvex(max_vertices);
 		result.insert(result.end(), child_children.begin(), child_children.end());
 	}
 	return result;
@@ -408,7 +428,7 @@ void SplittablePolygon::recut() {
 	LoggerDeactivate ld;
 	logger << __FUNCTION__"\n";
 	LoggerIndent recut_indent;
-	convex_polygons = cutIntoConvex();
+	convex_polygons = cutIntoConvex(b2_maxPolygonVertices);
 	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
 		SplittablePolygon& polygon = convex_polygons[polygon_i];
 		polygon.recenter();

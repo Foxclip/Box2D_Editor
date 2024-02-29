@@ -108,6 +108,7 @@ public:
 	bool hover = false;
 	bool selected = false;
 	bool draw_varray = false;
+	bool draw_indices = false;
 	b2Vec2 cursor_offset = b2Vec2_zero;
 	b2Vec2 orig_pos = b2Vec2_zero;
 	float orig_angle = 0.0f;

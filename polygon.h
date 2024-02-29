@@ -41,6 +41,11 @@ struct CutInfo {
 
 class SplittablePolygon : public sf::Drawable, public sf::Transformable {
 public:
+	enum BestCutCriterion {
+		MIN_DIST,
+		MAX_DIST,
+		MIN_ANGLE,
+	};
 	bool draw_varray = false;
 
 	SplittablePolygon();
@@ -66,13 +71,13 @@ public:
 		unsigned int size,
 		bool include_convex = false
 	) const;
-	void calcPotentialCuts();
+	void calcPotentialCuts(bool consider_convex_vertices);
 	size_t getPotentialCutsCount() const;
 	void drawPotentialCuts(sf::RenderTarget& target);
-	CutInfo getBestCut() const;
+	CutInfo getBestCut(BestCutCriterion criterion) const;
 	std::vector<SplittablePolygon> getCutPolygons(const CutInfo& cut) const;
-	std::vector<SplittablePolygon> cutWithBestCut();
-	std::vector<SplittablePolygon> cutIntoConvex();
+	std::vector<SplittablePolygon> cutWithBestCut(bool cut_convex);
+	std::vector<SplittablePolygon> cutIntoConvex(size_t max_vertices = 0);
 	void resetVarray(size_t vertex_count);
 	void recenter();
 	void recut();

@@ -34,6 +34,7 @@ GameObject* GameObjectList::getById(size_t id) {
     if (it != ids.end()) {
         return const_cast<GameObject*>((*it).ptr);
     }
+    return nullptr;
 }
 
 ptrdiff_t GameObjectList::getTopIndex(GameObject* object) const {

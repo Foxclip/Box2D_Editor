@@ -163,3 +163,20 @@ void box_parent(Application& app) {
     app.setCameraPos(0.0f, 0.0f);
     app.setCameraZoom(200.0f);
 }
+
+void convex_polygon(Application& app) {
+    std::vector<b2Vec2> vertices;
+    const size_t VERTEX_COUNT = 50;
+    for (size_t i = 0; i < VERTEX_COUNT; i++) {
+        b2Vec2 pos = utils::get_circle_vertex<b2Vec2>(i, VERTEX_COUNT, 1.0f);
+        vertices.push_back(pos);
+    }
+    PolygonObject* polygon = app.create_polygon("polygon", b2Vec2(0.0f, 0.0f), 0.0f, vertices, sf::Color(255, 0, 0));
+    polygon->setType(b2_dynamicBody, false);
+    polygon->setDensity(1.0f, false);
+    polygon->setFriction(0.3f, false);
+    polygon->setRestitution(0.5f, false);
+    polygon->draw_indices = true;
+    app.setCameraPos(0.0f, 0.0f);
+    app.setCameraZoom(50.0f);
+}
