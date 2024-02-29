@@ -15,6 +15,7 @@ void execute_app() {
     //single_car(app);
     //multiple_chains(app);
     //polygon(app);
+    //box_parent(app);
     app.start();
 }
 
@@ -28,7 +29,6 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: use local coordinates to move and rotate children (children position is in local coordinates)
     // TODO: cut polygons with b2maxvertices
     // TODO: set whether object is static or dynamic in edit mode
     // TODO: evolving cars

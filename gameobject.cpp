@@ -18,11 +18,37 @@ GameObject::~GameObject() {
 }
 
 const b2Vec2& GameObject::getPosition() const {
-	return rigid_body->GetPosition();
+	return getTransform().p;
 }
 
 float GameObject::getRotation() const {
-	return rigid_body->GetAngle();
+	return getTransform().q.GetAngle();
+}
+
+const b2Vec2& GameObject::getGlobalPosition() {
+	return getGlobalTransform().p;
+}
+
+float GameObject::getGlobalRotation() {
+	return getGlobalTransform().q.GetAngle();
+}
+
+const b2Transform& GameObject::getTransform() const {
+	return transforms.getTransform();
+}
+
+const b2Transform& GameObject::getGlobalTransform() {
+	return transforms.getGlobalTransform();
+}
+
+const b2Transform& GameObject::getParentGlobalTransform() const {
+	if (parent) {
+		return parent->getGlobalTransform();
+	} else {
+		b2Transform tr;
+		tr.SetIdentity();
+		return tr;
+	}
 }
 
 GameObject* GameObject::getParent() const {
@@ -51,12 +77,34 @@ GameObject* GameObject::getChild(size_t index) const {
 	return children[index];
 }
 
-b2Vec2 GameObject::toGlobal(const b2Vec2& pos) const {
-	return rigid_body->GetWorldPoint(pos);
+b2Vec2 GameObject::toGlobal(const b2Vec2& pos) {
+	b2Transform gt = getGlobalTransform();
+	return b2Mul(gt, pos);
 }
 
-b2Vec2 GameObject::toLocal(const b2Vec2& pos) const {
-	return rigid_body->GetLocalPoint(pos);
+b2Vec2 GameObject::toLocal(const b2Vec2& pos) {
+	b2Transform gt = getGlobalTransform();
+	return b2MulT(gt, pos);
+}
+
+float GameObject::toGlobalAngle(float angle) {
+	b2Transform gt = getGlobalTransform();
+	return gt.q.GetAngle() + angle;
+}
+
+float GameObject::toLocalAngle(float angle) {
+	b2Transform gt = getGlobalTransform();
+	return angle - gt.q.GetAngle();
+}
+
+b2Vec2 GameObject::toParentLocal(const b2Vec2& pos) {
+	b2Transform pgt = getParentGlobalTransform();
+	return b2MulT(pgt, pos);
+}
+
+float GameObject::toParentLocalAngle(float angle) {
+	b2Transform pgt = getParentGlobalTransform();
+	return angle - pgt.q.GetAngle();
 }
 
 ptrdiff_t GameObject::getChildIndex(const GameObject* object) const {
@@ -74,12 +122,14 @@ void GameObject::setParent(GameObject* new_parent) {
 	} else {
 		parent_id = -1;
 	}
+	b2Vec2 global_pos = getGlobalPosition();
 	this->parent = new_parent;
+	setGlobalPosition(global_pos);
 }
 
 void GameObject::updateVisual() {
-	b2Vec2 position = rigid_body->GetPosition();
-	float angle = rigid_body->GetAngle();
+	b2Vec2 position = getGlobalPosition();
+	float angle = getGlobalRotation();
 	setVisualPosition(tosf(position));
 	setVisualRotation(utils::to_degrees(angle));
 }
@@ -115,30 +165,16 @@ void GameObject::setEnabled(bool enabled, bool include_children) {
 	}
 }
 
-void GameObject::setPosition(const b2Vec2& pos, bool move_children) {
-	b2Vec2 offset = pos - rigid_body->GetPosition();
-	rigid_body->SetTransform(pos, rigid_body->GetAngle());
-	if (move_children) {
-		for (size_t i = 0; i < children.size(); i++) {
-			b2Vec2 new_pos = children[i]->rigid_body->GetPosition() + offset;
-			children[i]->setPosition(new_pos, true);
-		}
-	}
+void GameObject::setGlobalPosition(const b2Vec2& pos) {
+	b2Vec2 parent_local_pos = toParentLocal(pos);
+	transforms.setPosition(parent_local_pos);
+	transformToRigidbody();
 }
 
-void GameObject::setAngle(float angle, bool rotate_children) {
-	float angle_offset = angle - rigid_body->GetAngle();
-	rigid_body->SetTransform(rigid_body->GetPosition(), angle);
-	if (rotate_children) {
-		b2Vec2 parent_pos = rigid_body->GetPosition();
-		for (size_t i = 0; i < children.size(); i++) {
-			b2Vec2 old_pos = children[i]->rigid_body->GetPosition();
-			b2Vec2 new_pos = utils::rotate_point(old_pos, parent_pos, angle_offset);
-			float new_angle = children[i]->rigid_body->GetAngle() + angle_offset;
-			children[i]->setPosition(new_pos, true);
-			children[i]->setAngle(new_angle, true);
-		}
-	}
+void GameObject::setGlobalAngle(float angle) {
+	float parent_local_angle = toParentLocalAngle(angle);
+	transforms.setAngle(parent_local_angle);
+	transformToRigidbody();
 }
 
 void GameObject::setLinearVelocity(const b2Vec2& velocity, bool include_children) {
@@ -255,12 +291,12 @@ const EditableVertex& GameObject::getVertex(size_t index) const {
 	return vertices[index];
 }
 
-b2Vec2 GameObject::getGlobalVertexPos(size_t index) const {
-	return rigid_body->GetWorldPoint(vertices[index].pos);
+b2Vec2 GameObject::getGlobalVertexPos(size_t index) {
+	return toGlobal(vertices[index].pos);
 }
 
 void GameObject::setGlobalVertexPos(size_t index, const b2Vec2& new_pos) {
-	b2Vec2 local_pos = rigid_body->GetLocalPoint(new_pos);
+	b2Vec2 local_pos = toLocal(new_pos);
 	vertexSet(index, local_pos);
 	syncVertices();
 }
@@ -278,7 +314,7 @@ bool GameObject::tryDeleteVertex(ptrdiff_t index) {
 }
 
 void GameObject::addVertexGlobal(size_t index, const b2Vec2& pos) {
-	b2Vec2 local_pos = rigid_body->GetLocalPoint(pos);
+	b2Vec2 local_pos = toLocal(pos);
 	vertices.insert(vertices.begin() + index, local_pos);
 	syncVertices();
 }
@@ -303,7 +339,21 @@ void GameObject::deselectAllVertices() {
 	}
 }
 
-std::vector<b2Vec2> GameObject::getPositions() {
+void GameObject::transformFromRigidbody() {
+	transforms.fromRigidbody();
+	for (size_t i = 0; i < children.size(); i++) {
+		children[i]->transformFromRigidbody();
+	}
+}
+
+void GameObject::transformToRigidbody() {
+	rigid_body->SetTransform(getGlobalPosition(), getGlobalRotation());
+	for (size_t i = 0; i < children.size(); i++) {
+		children[i]->transformToRigidbody();
+	}
+}
+
+std::vector<b2Vec2> GameObject::getPositions() const {
 	std::vector<b2Vec2> b2vertices(vertices.size());
 	for (size_t i = 0; i < vertices.size(); i++) {
 		b2vertices[i] = vertices[i].pos;
@@ -432,6 +482,7 @@ BoxObject::BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color
 	rigid_body = world->CreateBody(&def);
 	vertices.push_back(EditableVertex(0.5f * size));
 	syncVertices();
+	transformFromRigidbody();
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
@@ -538,6 +589,7 @@ BallObject::BallObject(b2World* world, b2BodyDef def, float radius, sf::Color co
 	rigid_body = world->CreateBody(&def);
 	vertices.push_back(EditableVertex(b2Vec2(radius, 0.0f)));
 	syncVertices();
+	transformFromRigidbody();
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
@@ -682,6 +734,7 @@ PolygonObject::PolygonObject(
 	}
 	polygon = std::make_unique<SplittablePolygon>();
 	syncVertices();
+	transformFromRigidbody();
 	polygon->setFillColor(color);
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
@@ -871,6 +924,7 @@ ChainObject::ChainObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_ve
 	}
 	line_strip_shape = std::make_unique<LineStripShape>(drawable_vertices);
 	syncVertices();
+	transformFromRigidbody();
 	line_strip_shape->setLineColor(color);
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
@@ -1071,4 +1125,55 @@ Joint::~Joint() {
 	size_t object_b_id = GameObject::getGameobject(joint->GetBodyB())->id;
 	logger << "Destroy joint: " << object_a_id << " " << object_b_id << "\n";
 	joint->GetBodyA()->GetWorld()->DestroyJoint(joint);
+}
+
+GameObjectTransforms::GameObjectTransforms(const GameObject* object) {
+	this->object = object;
+	transform.SetIdentity();
+	global_transform.SetIdentity();
+}
+
+const b2Transform& GameObjectTransforms::getTransform() const {
+	return transform;
+}
+
+const b2Transform& GameObjectTransforms::getGlobalTransform() {
+	if (!global_transform_valid) {
+		recalcGlobalTransform();
+	}
+	return global_transform;
+}
+
+void GameObjectTransforms::invalidateGlobalTransform() {
+	global_transform_valid = false;
+	for (size_t i = 0; i < object->children.size(); i++) {
+		object->children[i]->transforms.invalidateGlobalTransform();
+	}
+}
+
+void GameObjectTransforms::setTransform(const b2Vec2& position, float angle) {
+	transform.Set(position, angle);
+	invalidateGlobalTransform();
+}
+
+void GameObjectTransforms::setPosition(const b2Vec2& position) {
+	transform.Set(position, transform.q.GetAngle());
+	invalidateGlobalTransform();
+}
+
+void GameObjectTransforms::setAngle(float angle) {
+	transform.Set(transform.p, angle);
+	invalidateGlobalTransform();
+}
+
+void GameObjectTransforms::fromRigidbody() {
+	b2Transform pgt = object->getParentGlobalTransform();
+	transform = b2MulT(pgt, object->rigid_body->GetTransform());
+	invalidateGlobalTransform();
+}
+
+void GameObjectTransforms::recalcGlobalTransform() {
+	b2Transform parent_global_transform = object->getParentGlobalTransform();
+	global_transform = b2Mul(parent_global_transform, transform);
+	global_transform_valid = true;
 }

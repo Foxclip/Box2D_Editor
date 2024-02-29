@@ -57,6 +57,7 @@ public:
 	void load(std::string filename);
 	void setCameraPos(float x, float y);
 	void setCameraZoom(float zoom);
+	GameObjectList& getObjectList();
 	BoxObject* create_box(std::string name, b2Vec2 pos, float angle, b2Vec2 size, sf::Color color);
 	BallObject* create_ball(std::string name, b2Vec2 pos, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
 	PolygonObject* create_car(std::string name, b2Vec2 pos, std::vector<float> lengths, std::vector<float> wheels, sf::Color color);

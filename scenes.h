@@ -132,3 +132,34 @@ void polygon(Application& app) {
     app.setCameraPos(0.0f, 0.0f);
     app.setCameraZoom(50.0f);
 }
+
+void box_parent(Application& app) {
+    GameObject* parent = app.create_box(
+        "parent",
+        b2Vec2(0.0f, 0.0f),
+        utils::to_radians(0.0f),
+        b2Vec2(1.0f, 1.0f),
+        sf::Color(0, 255, 0)
+    );
+    GameObject* child = app.create_box(
+        "child",
+        b2Vec2(2.0f, 0.0f),
+        utils::to_radians(0.0f),
+        b2Vec2(1.0f, 1.0f),
+        sf::Color(0, 255, 0)
+    );
+    GameObject* another_child = app.create_box(
+        "another child",
+        b2Vec2(4.0f, 0.0f),
+        utils::to_radians(0.0f),
+        b2Vec2(1.0f, 1.0f),
+        sf::Color(0, 255, 0)
+    );
+    GameObjectList& objects = app.getObjectList();
+    objects.setParent(child, parent);
+    objects.setParent(another_child, child);
+    //parent->setGlobalAngle(utils::to_radians(45.0f));
+    parent->setGlobalPosition(b2Vec2(1.0f, 0.0f));
+    app.setCameraPos(0.0f, 0.0f);
+    app.setCameraZoom(200.0f);
+}

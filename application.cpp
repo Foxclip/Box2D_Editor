@@ -69,8 +69,6 @@ void Application::load_action(std::string filename) {
 }
 
 void Application::start() {
-    history.clear();
-    history.save(HistoryEntry::BASE);
     main_loop();
 }
 
@@ -85,6 +83,10 @@ void Application::setCameraPos(float x, float y) {
 
 void Application::setCameraZoom(float zoom) {
     zoomFactor = zoom;
+}
+
+GameObjectList& Application::getObjectList() {
+    return game_objects;
 }
 
 void Application::init_tools() {
@@ -286,6 +288,8 @@ void Application::init_widgets() {
 }
 
 void Application::main_loop() {
+    history.clear();
+    history.save(HistoryEntry::BASE);
     fps_counter.init();
     while (window.isOpen()) {
         fps_counter.frameBegin();
@@ -353,14 +357,14 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::Escape:
                 if (selected_tool == &move_tool) {
                     for (GameObject* obj : move_tool.moving_objects) {
-                        obj->setPosition(obj->orig_pos, true);
+                        obj->setGlobalPosition(obj->orig_pos);
                         obj->setEnabled(obj->was_enabled, true);
                     }
                     try_select_tool(&select_tool);
                 } else if (selected_tool == &rotate_tool) {
                     for (GameObject* obj : rotate_tool.rotating_objects) {
-                        obj->setPosition(obj->orig_pos, true);
-                        obj->setAngle(obj->orig_angle, true);
+                        obj->setGlobalPosition(obj->orig_pos);
+                        obj->setGlobalAngle(obj->orig_angle);
                         obj->setEnabled(obj->was_enabled, true);
                     }
                     try_select_tool(&select_tool);
@@ -558,7 +562,7 @@ void Application::process_mouse() {
         }
     } else if (selected_tool == &move_tool) {
         for (GameObject* obj : move_tool.moving_objects) {
-            obj->setPosition(b2MousePosWorld + obj->cursor_offset, true);
+            obj->setGlobalPosition(b2MousePosWorld + obj->cursor_offset);
         }
     } else if (selected_tool == &rotate_tool) {
         for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
@@ -567,8 +571,8 @@ void Application::process_mouse() {
             float current_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
             float offset = current_mouse_angle - rotate_tool.orig_mouse_angle;
             b2Vec2 new_pos = utils::rotate_point(obj->orig_pos, rotate_tool.pivot_pos, offset);
-            obj->setPosition(new_pos, true);
-            obj->setAngle(obj->orig_angle + offset, true);
+            obj->setGlobalPosition(new_pos);
+            obj->setGlobalAngle(obj->orig_angle + offset);
         }
     }
     if (leftButtonPressed) {
@@ -745,6 +749,7 @@ void Application::process_left_release() {
 void Application::process_world() {
     if (!paused) {
         world->Step(timeStep, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+        game_objects.transformFromRigidbody();
     }
 }
 
@@ -806,22 +811,22 @@ void Application::render_ui() {
         // parent relation lines
         for (GameObject* object : game_objects.getAllVector()) {
             for (GameObject* child : object->getChildren()) {
-                sf::Vector2f v1 = world_to_screen(object->getPosition());
-                sf::Vector2f v2 = world_to_screen(child->getPosition());
+                sf::Vector2f v1 = world_to_screen(object->getGlobalPosition());
+                sf::Vector2f v2 = world_to_screen(child->getGlobalPosition());
                 drawLine(target, v1, v2, sf::Color(128, 128, 128));
             }
         }
         // object origin circles
         for (size_t i = 0; i < game_objects.getAllSize(); i++) {
             GameObject* gameobject = game_objects.getFromAll(i);
-            origin_shape.setPosition(world_to_screen(gameobject->getPosition()));
+            origin_shape.setPosition(world_to_screen(gameobject->getGlobalPosition()));
             target.draw(origin_shape);
         }
         // names
         for (size_t i = 0; i < game_objects.getAllSize(); i++) {
             GameObject* gameobject = game_objects.getFromAll(i);
             // rounding coordinates so letters don't wobble around
-            sf::Vector2f pos = world_to_screen(gameobject->getPosition());
+            sf::Vector2f pos = world_to_screen(gameobject->getGlobalPosition());
             sf::Vector2f rounded_pos = sf::Vector2f(std::round(pos.x), std::round(pos.y));
             id_text.setPosition(rounded_pos);
             id_text.setString("id: " + std::to_string(gameobject->id));
@@ -957,7 +962,7 @@ std::string Application::serialize() {
         serialize_obj(obj);
         LoggerIndent children_indent;
         for (size_t i = 0; i < obj->getChildren().size(); i++) {
-            serialize_obj(obj->getChild(i));
+            serialize_tree(obj->getChild(i));
         }
     };
     {
@@ -971,12 +976,13 @@ std::string Application::serialize() {
             serialize_tree(gameobject);
         }
     }
-    tw << "\n\n";
     {
         logger << "Joints\n";
         LoggerIndent joints_indent;
         if (game_objects.getJointsSize() == 0) {
             logger << "<empty>\n";
+        } else {
+            tw << "\n\n";
         }
         for (size_t i = 0; i < game_objects.getJointsSize(); i++) {
             if (i > 0) {
@@ -1423,8 +1429,8 @@ void Application::grab_selected() {
             continue;
         }
         move_tool.moving_objects.push_back(obj);
-        obj->orig_pos = obj->getPosition();
-        obj->cursor_offset = obj->getPosition() - b2MousePosWorld;
+        obj->orig_pos = obj->getGlobalPosition();
+        obj->cursor_offset = obj->getGlobalPosition() - b2MousePosWorld;
         obj->was_enabled = obj->rigid_body->IsEnabled();
         obj->setEnabled(false, true);
         obj->setLinearVelocity(b2Vec2(0.0f, 0.0f), true);
@@ -1440,15 +1446,15 @@ void Application::rotate_selected() {
             continue;
         }
         rotate_tool.rotating_objects.push_back(obj);
-        obj->orig_pos = obj->getPosition();
-        obj->orig_angle = obj->getRotation();
+        obj->orig_pos = obj->getGlobalPosition();
+        obj->orig_angle = obj->getGlobalRotation();
         obj->was_enabled = obj->rigid_body->IsEnabled();
         obj->setEnabled(false, true);
         obj->setAngularVelocity(0.0f, true);
     }
     b2Vec2 sum = b2Vec2_zero;
     for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
-        sum += rotate_tool.rotating_objects[i]->getPosition();
+        sum += rotate_tool.rotating_objects[i]->getGlobalPosition();
     }
     b2Vec2 avg = 1.0f / rotate_tool.rotating_objects.size() * sum;
     rotate_tool.pivot_pos = avg;

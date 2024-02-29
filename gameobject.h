@@ -75,6 +75,28 @@ public:
 private:
 };
 
+class GameObjectTransforms {
+public:
+	GameObjectTransforms(const GameObject* object);
+	const b2Transform& getTransform() const;
+	const b2Transform& getGlobalTransform();
+	void invalidateGlobalTransform();
+	void setTransform(const b2Vec2& position, float angle);
+	void setPosition(const b2Vec2& position);
+	void setAngle(float angle);
+	void fromRigidbody();
+
+private:
+	friend class GameObject;
+	const GameObject* object = nullptr;
+	b2Transform transform;
+	b2Transform global_transform;
+	bool global_transform_valid = false;
+
+	void recalcGlobalTransform();
+
+};
+
 class GameObject {
 public:
 	ptrdiff_t id = -1;
@@ -86,8 +108,8 @@ public:
 	bool hover = false;
 	bool selected = false;
 	bool draw_varray = false;
-	b2Vec2 cursor_offset = b2Vec2(0.0f, 0.0f);
-	b2Vec2 orig_pos = b2Vec2(0.0f, 0.0f);
+	b2Vec2 cursor_offset = b2Vec2_zero;
+	b2Vec2 orig_pos = b2Vec2_zero;
 	float orig_angle = 0.0f;
 	bool was_enabled = true;
 	CompoundVector<Joint*> joints;
@@ -99,21 +121,28 @@ public:
 	virtual sf::Transformable* getTransformable() const = 0;
 	const b2Vec2& getPosition() const;
 	float getRotation() const;
+	const b2Vec2& getGlobalPosition();
+	float getGlobalRotation();
+	const b2Transform& getTransform() const;
+	const b2Transform& getGlobalTransform();
+	const b2Transform& getParentGlobalTransform() const;
 	GameObject* getParent() const;
 	std::vector<GameObject*> getParentChain() const;
 	const std::vector<GameObject*>& getChildren() const;
 	GameObject* getChild(size_t index) const;
-	b2Vec2 toGlobal(const b2Vec2& pos) const;
-	b2Vec2 toLocal(const b2Vec2& pos) const;
+	b2Vec2 toGlobal(const b2Vec2& pos);
+	b2Vec2 toLocal(const b2Vec2& pos);
+	float toGlobalAngle(float angle);
+	float toLocalAngle(float angle);
+	b2Vec2 toParentLocal(const b2Vec2& pos);
+	float toParentLocalAngle(float angle);
 	ptrdiff_t getChildIndex(const GameObject* object) const;
 	void updateVisual();
 	virtual void render(sf::RenderTarget& target);
 	void renderMask(sf::RenderTarget& mask);
-	void setVisualPosition(const sf::Vector2f& pos);
-	void setVisualRotation(float angle);
 	void setEnabled(bool enabled, bool include_children);
-	void setPosition(const b2Vec2& pos, bool move_children);
-	void setAngle(float angle, bool rotate_children);
+	void setGlobalPosition(const b2Vec2& pos);
+	void setGlobalAngle(float angle);
 	void setLinearVelocity(const b2Vec2& velocity, bool include_children);
 	void setAngularVelocity(float velocity, bool include_children);
 	void setType(b2BodyType type, bool include_children);
@@ -128,7 +157,7 @@ public:
 	size_t getVertexCount() const;
 	size_t getEdgeCount() const;
 	const EditableVertex& getVertex(size_t index) const;
-	b2Vec2 getGlobalVertexPos(size_t index) const;
+	b2Vec2 getGlobalVertexPos(size_t index);
 	void setGlobalVertexPos(size_t index, const b2Vec2& new_pos);
 	bool tryDeleteVertex(ptrdiff_t index);
 	void addVertexGlobal(size_t index, const b2Vec2& pos);
@@ -137,6 +166,8 @@ public:
 	void selectAllVertices();
 	void deselectAllVertices();
 	virtual void syncVertices() = 0;
+	void transformFromRigidbody();
+	void transformToRigidbody();
 	virtual TokenWriter& serialize(TokenWriter& tw) const = 0;
 	static TokenWriter& serializeBody(TokenWriter& tw, b2Body* body);
 	static TokenWriter& serializeFixture(TokenWriter& tw, b2Fixture* fixture);
@@ -149,13 +180,18 @@ protected:
 	GameObject* parent = nullptr;
 
 	virtual void drawMask(sf::RenderTarget& mask) = 0;
-	std::vector<b2Vec2> getPositions();
+	std::vector<b2Vec2> getPositions() const;
+	void setVisualPosition(const sf::Vector2f& pos);
+	void setVisualRotation(float angle);
 	void vertexSet(size_t index, const b2Vec2& new_pos);
 	void destroyFixtures();
 
 private:
 	friend class GameObjectList;
-	CompoundVector<GameObject*> children; 
+	friend class GameObjectTransforms;
+	CompoundVector<GameObject*> children;
+	GameObjectTransforms transforms = GameObjectTransforms(this);
+
 	void setParent(GameObject* parent);
 
 };

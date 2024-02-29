@@ -144,14 +144,24 @@ Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_a, Gam
     return ptr;
 }
 
-void GameObjectList::setParent(GameObject* object1, GameObject* object2) {
-    assert(object1);
-    assert(all_objects.contains(object1));
-    object1->setParent(object2);
-    if (object2) {
-        top_objects.remove(object1);
+void GameObjectList::setParent(GameObject* child, GameObject* new_parent) {
+    assert(child);
+    assert(all_objects.contains(child));
+    if (new_parent) {
+        assert(all_objects.contains(new_parent));
+    }
+    child->setParent(new_parent);
+    if (new_parent) {
+        top_objects.remove(child);
     } else {
-        top_objects.add(object1);
+        top_objects.add(child);
+    }
+}
+
+void GameObjectList::transformFromRigidbody() {
+    for (size_t i = 0; i < top_objects.size(); i++) {
+        GameObject* object = top_objects[i];
+        object->transformFromRigidbody();
     }
 }
 
