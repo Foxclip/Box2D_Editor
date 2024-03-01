@@ -56,11 +56,10 @@ public:
 	size_t selectedCount() const;
 	const CompoundVector<GameObject*>& getSelectedObjects() const;
 	void setSelected(const std::vector<GameObject*> vec);
-	void selectObject(GameObject* object);
-	void deselectObject(GameObject* object);
-	void toggleSelect(GameObject* object);
-	void selectSingleObject(GameObject* object);
-	void addToSelection(GameObject* object);
+	void selectObject(GameObject* object, bool with_children = false);
+	void deselectObject(GameObject* object, bool with_children = false);
+	void toggleSelect(GameObject* object, bool with_children = false);
+	void selectSingleObject(GameObject* object, bool with_children = false);
 	void addToRectSelection(GameObject* object);
 	void applyRectSelection();
 	void clearSelected();

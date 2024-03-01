@@ -109,28 +109,36 @@ void SelectTool::setSelected(const std::vector<GameObject*> vec) {
     }
 }
 
-void SelectTool::selectObject(GameObject* object) {
+void SelectTool::selectObject(GameObject* object, bool with_children) {
     if (object) {
         object->selected = true;
         selected_objects.add(object);
+        if (with_children) {
+            for (size_t i = 0; i < object->getChildren().size(); i++) {
+                selectObject(object->getChild(i), true);
+            }
+        }
     }
 }
 
-void SelectTool::deselectObject(GameObject* object) {
+void SelectTool::deselectObject(GameObject* object, bool with_children) {
     if (object) {
         object->selected = false;
         selected_objects.remove(object);
+        if (with_children) {
+            for (size_t i = 0; i < object->getChildren().size(); i++) {
+                deselectObject(object->getChild(i), true);
+            }
+        }
     }
 }
 
-void SelectTool::toggleSelect(GameObject* object) {
+void SelectTool::toggleSelect(GameObject* object, bool with_children) {
     if (object) {
         if (object->selected) {
-            object->selected = false;
-            selected_objects.remove(object);
+            deselectObject(object, with_children);
         } else {
-            object->selected = true;
-            selected_objects.add(object);
+            selectObject(object, with_children);
         }
     }
 }
@@ -157,21 +165,14 @@ void SelectTool::clearRectSelected() {
     objects_in_rect.clear();
 }
 
-void SelectTool::selectSingleObject(GameObject* object) {
+void SelectTool::selectSingleObject(GameObject* object, bool with_children) {
     clearSelected();
-    addToSelection(object);
-}
-
-void SelectTool::addToSelection(GameObject* object) {
-    if (object) {
-        object->selected = true;
-        selected_objects.add(object);
-    }
+    selectObject(object, with_children);
 }
 
 void SelectTool::addToRectSelection(GameObject* object) {
     if (object && !object->selected) {
-        addToSelection(object);
+        selectObject(object);
         objects_in_rect.add(object);
     }
 }

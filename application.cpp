@@ -862,10 +862,11 @@ void Application::process_left_release() {
         if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
             GameObject* object = get_object_at(mousePosf);
             active_object = object;
+            bool with_children = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
-                select_tool.toggleSelect(object);
+                select_tool.toggleSelect(object, with_children);
             } else {
-                select_tool.selectSingleObject(object);
+                select_tool.selectSingleObject(object, with_children);
             }
         }
     }
