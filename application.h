@@ -113,6 +113,7 @@ private:
 	ContainerWidget* paused_rect_widget;
 	ContainerWidget* toolbox_widget;
 	Tool* selected_tool = nullptr;
+	std::vector<Tool*> tools_in_tool_panel;
 	sf::Font fps_font;
 	FpsCounter fps_counter;
 	ContainerWidget* fps_widget;
@@ -172,7 +173,7 @@ private:
 	void load_from_file(std::string filename);
 	void quicksave();
 	void quickload();
-	Tool* try_select_tool(int index);
+	Tool* try_select_tool_by_index(size_t index);
 	Tool* try_select_tool(Tool* tool);
 	void select_create_type(int type);
 	void toggle_pause();

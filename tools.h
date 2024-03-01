@@ -39,6 +39,7 @@ class Tool {
 public:
 	std::string name;
 	Widget* widget = nullptr;
+	virtual bool showInToolPanel() const = 0;
 
 	Tool();
 	virtual void reset() = 0;
@@ -53,6 +54,7 @@ public:
 	CompoundVector<GameObject*> objects_in_rect;
 
 	SelectTool();
+	bool showInToolPanel() const override;
 	size_t selectedCount() const;
 	const CompoundVector<GameObject*>& getSelectedObjects() const;
 	void setSelected(const std::vector<GameObject*> vec);
@@ -77,6 +79,7 @@ public:
 	b2MouseJoint* mouse_joint = nullptr;
 
 	DragTool();
+	bool showInToolPanel() const override;
 	void reset() override;
 
 private:
@@ -88,6 +91,7 @@ public:
 	std::vector<GameObject*> moving_objects;
 
 	MoveTool();
+	bool showInToolPanel() const override;
 	void reset() override;
 
 private:
@@ -101,6 +105,7 @@ public:
 	float orig_mouse_angle = 0.0f;
 
 	RotateTool();
+	bool showInToolPanel() const override;
 	void reset() override;
 
 private:
@@ -133,6 +138,7 @@ public:
 	ContainerWidget* edit_window_widget = nullptr;
 
 	EditTool();
+	bool showInToolPanel() const override;
 	void reset() override;
 	static std::string modeToStr(EditToolMode mode);
 
@@ -150,6 +156,7 @@ public:
 	ContainerWidget* create_panel_widget = nullptr;
 
 	CreateTool();
+	bool showInToolPanel() const override;
 	void reset() override;
 	static std::string create_type_name(ObjectType type);
 };

@@ -16,6 +16,10 @@ CreateTool::CreateTool() : Tool() {
     name = "create";
 }
 
+bool CreateTool::showInToolPanel() const {
+    return true;
+}
+
 std::string CreateTool::create_type_name(ObjectType type) {
     switch (type) {
         case CreateTool::BOX: return "box"; break;
@@ -27,6 +31,10 @@ DragTool::DragTool() : Tool() {
     name = "drag";
 }
 
+bool DragTool::showInToolPanel() const {
+    return true;
+}
+
 void DragTool::reset() {
     mouse_body = nullptr;
     mouse_joint = nullptr;
@@ -36,6 +44,10 @@ MoveTool::MoveTool() : Tool() {
     name = "move";
 }
 
+bool MoveTool::showInToolPanel() const {
+    return false;
+}
+
 void MoveTool::reset() {
     orig_cursor_pos = b2Vec2(0.0f, 0.0f);
     moving_objects = std::vector<GameObject*>();
@@ -43,6 +55,10 @@ void MoveTool::reset() {
 
 RotateTool::RotateTool() : Tool() {
     name = "rotate";
+}
+
+bool RotateTool::showInToolPanel() const {
+    return false;
 }
 
 void RotateTool::reset() {
@@ -66,6 +82,10 @@ EditTool::EditTool() : Tool() {
     vertex_highlight_rect.setOrigin(vertex_highlight_rect.getSize() / 2.0f);
     edge_highlight.setFillColor(sf::Color::Yellow);
     edge_highlight.setOrigin(sf::Vector2f(0.0f, 1.5f));
+}
+
+bool EditTool::showInToolPanel() const {
+    return false;
 }
 
 void EditTool::reset() {
@@ -92,6 +112,10 @@ std::string EditTool::modeToStr(EditToolMode mode) {
 
 SelectTool::SelectTool() {
     name = "select";
+}
+
+bool SelectTool::showInToolPanel() const {
+    return true;
 }
 
 size_t SelectTool::selectedCount() const {
