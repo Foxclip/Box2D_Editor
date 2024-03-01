@@ -79,7 +79,7 @@ class GameObjectTransforms {
 public:
 	GameObjectTransforms(const GameObject* object);
 	const b2Transform& getTransform() const;
-	const b2Transform& getGlobalTransform();
+	const b2Transform& getGlobalTransform() const;
 	void invalidateGlobalTransform();
 	void setTransform(const b2Vec2& position, float angle);
 	void setPosition(const b2Vec2& position);
@@ -90,10 +90,10 @@ private:
 	friend class GameObject;
 	const GameObject* object = nullptr;
 	b2Transform transform;
-	b2Transform global_transform;
-	bool global_transform_valid = false;
+	mutable b2Transform global_transform;
+	mutable bool global_transform_valid = false;
 
-	void recalcGlobalTransform();
+	void recalcGlobalTransform() const;
 
 };
 
@@ -122,10 +122,10 @@ public:
 	virtual sf::Transformable* getTransformable() const = 0;
 	const b2Vec2& getPosition() const;
 	float getRotation() const;
-	const b2Vec2& getGlobalPosition();
-	float getGlobalRotation();
+	const b2Vec2& getGlobalPosition() const;
+	float getGlobalRotation() const;
 	const b2Transform& getTransform() const;
-	const b2Transform& getGlobalTransform();
+	const b2Transform& getGlobalTransform() const;
 	const b2Transform& getParentGlobalTransform() const;
 	GameObject* getParent() const;
 	std::vector<GameObject*> getParentChain() const;

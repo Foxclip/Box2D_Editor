@@ -30,7 +30,9 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
+    // TODO: upload project to github
     // TODO: set whether object is static or dynamic in edit mode
+    // TODO: select children with Ctrl-click
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars
     // TODO: edit and simulate modes

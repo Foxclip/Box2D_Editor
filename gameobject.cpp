@@ -25,11 +25,11 @@ float GameObject::getRotation() const {
 	return getTransform().q.GetAngle();
 }
 
-const b2Vec2& GameObject::getGlobalPosition() {
+const b2Vec2& GameObject::getGlobalPosition() const {
 	return getGlobalTransform().p;
 }
 
-float GameObject::getGlobalRotation() {
+float GameObject::getGlobalRotation() const {
 	return getGlobalTransform().q.GetAngle();
 }
 
@@ -37,7 +37,7 @@ const b2Transform& GameObject::getTransform() const {
 	return transforms.getTransform();
 }
 
-const b2Transform& GameObject::getGlobalTransform() {
+const b2Transform& GameObject::getGlobalTransform() const {
 	return transforms.getGlobalTransform();
 }
 
@@ -1137,7 +1137,7 @@ const b2Transform& GameObjectTransforms::getTransform() const {
 	return transform;
 }
 
-const b2Transform& GameObjectTransforms::getGlobalTransform() {
+const b2Transform& GameObjectTransforms::getGlobalTransform() const {
 	if (!global_transform_valid) {
 		recalcGlobalTransform();
 	}
@@ -1172,7 +1172,7 @@ void GameObjectTransforms::fromRigidbody() {
 	invalidateGlobalTransform();
 }
 
-void GameObjectTransforms::recalcGlobalTransform() {
+void GameObjectTransforms::recalcGlobalTransform() const {
 	b2Transform parent_global_transform = object->getParentGlobalTransform();
 	global_transform = b2Mul(parent_global_transform, transform);
 	global_transform_valid = true;
