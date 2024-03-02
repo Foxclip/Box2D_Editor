@@ -89,6 +89,54 @@ GameObjectList& Application::getObjectList() {
     return game_objects;
 }
 
+void Application::selectSingleObject(GameObject* object, bool with_children) {
+    select_tool.selectSingleObject(object, with_children);
+}
+
+std::vector<GameObject*> Application::duplicateObjects(const std::vector<GameObject*>& objects) {
+    std::vector<GameObject*> new_objects;
+    std::vector<Joint*> new_joints;
+    std::set<Joint*> duplicated_joints;
+    std::set<Joint*> checked_joints;
+    std::set<GameObject*> old_objects_set = std::set<GameObject*>(objects.begin(), objects.end());
+    // copy objects
+    for (GameObject* obj : old_objects_set) {
+        GameObject* copy = game_objects.duplicate(obj);
+        obj->new_id = copy->id;
+        new_objects.push_back(copy);
+    }
+    // set parents
+    for (GameObject* old_obj : old_objects_set) {
+        if (old_obj->getParent() && old_objects_set.contains(old_obj->getParent())) {
+            GameObject* new_obj = game_objects.getById(old_obj->new_id);
+            size_t new_parent_id = old_obj->getParent()->new_id;
+            GameObject* new_parent = game_objects.getById(new_parent_id);
+            game_objects.setParent(new_obj, new_parent);
+            logger << "Object " << new_obj->id << " parented to " << new_parent->id << "\n";
+        }
+    }
+    // copy joints
+    for (GameObject* obj : old_objects_set) {
+        for (Joint* joint : obj->joints) {
+            if (checked_joints.contains(joint)) {
+                continue;
+            }
+            auto it1 = old_objects_set.find(joint->object1);
+            auto it2 = old_objects_set.find(joint->object2);
+            if (it1 != old_objects_set.end() && it2 != old_objects_set.end()) {
+                GameObject* new_object_1 = game_objects.getById((*it1)->new_id);
+                GameObject* new_object_2 = game_objects.getById((*it2)->new_id);
+                Joint* new_joint = game_objects.duplicateJoint(joint, new_object_1, new_object_2);
+                new_joints.push_back(new_joint);
+                duplicated_joints.insert(new_joint);
+            }
+            checked_joints.insert(joint);
+        }
+    }
+    logger << "Duplicated " << duplicated_joints.size() << " joints\n";
+    return new_objects;
+}
+
 BoxObject* Application::create_box(
     const std::string& name,
     const b2Vec2& pos,
@@ -104,8 +152,8 @@ BoxObject* Application::create_box(
         world.get(), def, size, color
     );
     BoxObject* ptr = uptr.get();
-    ptr->name = name;
     game_objects.add(std::move(uptr), true);
+    game_objects.setName(ptr, name);
     return ptr;
 }
 
@@ -123,8 +171,8 @@ BallObject* Application::create_ball(
         world.get(), def, radius, color, notch_color
     );
     BallObject* ptr = uptr.get();
-    ptr->name = name;
     game_objects.add(std::move(uptr), true);
+    game_objects.setName(ptr, name);
     return ptr;
 }
 
@@ -143,8 +191,8 @@ PolygonObject* Application::create_polygon(
         world.get(), def, vertices, color
     );
     PolygonObject* ptr = uptr.get();
-    ptr->name = name;
     game_objects.add(std::move(uptr), true);
+    game_objects.setName(ptr, name);
     return ptr;
 }
 
@@ -167,8 +215,8 @@ PolygonObject* Application::create_car(
         world.get(), def, vertices, color
     );
     PolygonObject* car_ptr = uptr.get();
-    car_ptr->name = name;
     game_objects.add(std::move(uptr), true);
+    game_objects.setName(car_ptr, name);
     size_t wheel_count = 0;
 
     for (size_t i = 0; i < wheels.size(); i++) {
@@ -189,11 +237,12 @@ PolygonObject* Application::create_car(
         );
         BallObject* wheel_ptr = wheel.get();
         {
-            wheel_ptr->name = car_ptr->name + " wheel" + std::to_string(wheel_count);
             wheel_ptr->setDensity(1.0f, false);
             wheel_ptr->setFriction(0.3f, false);
             wheel_ptr->setRestitution(0.5f, false);
             game_objects.add(std::move(wheel), true);
+            std::string wheel_name = car_ptr->getName() + " wheel" + std::to_string(wheel_count);
+            game_objects.setName(wheel_ptr, wheel_name);
             game_objects.setParent(wheel_ptr, car_ptr);
         }
         b2RevoluteJointDef wheel_joint_def;
@@ -227,8 +276,8 @@ ChainObject* Application::create_chain(
         world.get(), def, vertices, color
     );
     ChainObject* ptr = uptr.get();
-    ptr->name = name;
     game_objects.add(std::move(uptr), true);
+    game_objects.setName(ptr, name);
     return ptr;
 }
 
@@ -981,7 +1030,7 @@ void Application::render_ui() {
             id_text.setPosition(rounded_pos);
             id_text.setString("id: " + std::to_string(gameobject->id));
             name_text.setPosition(rounded_pos);
-            name_text.setString(gameobject->name);
+            name_text.setString(gameobject->getName());
             // rendering twice so it is more opaque
             target.draw(id_text);
             target.draw(id_text);
@@ -1518,50 +1567,6 @@ void Application::draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, co
     line_primitive[1].position = v2;
     line_primitive[1].color = color;
     target.draw(line_primitive);
-}
-
-std::vector<GameObject*> Application::duplicateObjects(std::vector<GameObject*>& objects) {
-    std::vector<GameObject*> new_objects;
-    std::vector<Joint*> new_joints;
-    std::set<Joint*> duplicated_joints;
-    std::set<Joint*> checked_joints;
-    std::set<GameObject*> old_objects_set = std::set<GameObject*>(objects.begin(), objects.end());
-    // copy objects
-    for (GameObject* obj : old_objects_set) {
-        GameObject* copy = game_objects.duplicate(obj);
-        obj->new_id = copy->id;
-        new_objects.push_back(copy);
-    }
-    // set parents
-    for (GameObject* old_obj : old_objects_set) {
-        if (old_obj->getParent() && old_objects_set.contains(old_obj->getParent())) {
-            GameObject* new_obj = game_objects.getById(old_obj->new_id);
-            size_t new_parent_id = old_obj->getParent()->new_id;
-            GameObject* new_parent = game_objects.getById(new_parent_id);
-            game_objects.setParent(new_obj, new_parent);
-            logger << "Object " << new_obj->id << " parented to " << new_parent->id << "\n";
-        }
-    }
-    // copy joints
-    for (GameObject* obj : old_objects_set) {
-        for (Joint* joint : obj->joints) {
-            if (checked_joints.contains(joint)) {
-                continue;
-            }
-            auto it1 = old_objects_set.find(joint->object1);
-            auto it2 = old_objects_set.find(joint->object2);
-            if (it1 != old_objects_set.end() && it2 != old_objects_set.end()) {
-                GameObject* new_object_1 = game_objects.getById((*it1)->new_id);
-                GameObject* new_object_2 = game_objects.getById((*it2)->new_id);
-                Joint* new_joint = game_objects.duplicateJoint(joint, new_object_1, new_object_2);
-                new_joints.push_back(new_joint);
-                duplicated_joints.insert(new_joint);
-            }
-            checked_joints.insert(joint);
-        }
-    }
-    logger << "Duplicated " << duplicated_joints.size() << " joints\n";
-    return new_objects;
 }
 
 bool Application::is_parent_selected(GameObject* object) {

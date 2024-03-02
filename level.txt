@@ -1,6 +1,6 @@
 camera
-    center 0 5
-    zoom 30
+    center 3.49151206 9.18595695
+    zoom 36.0000038
 /camera
 
 object chain
@@ -31,10 +31,10 @@ object box
     color 0 255 0 255
     body
         type dynamic
-        position 0 1
-        angle 0
-        linear_velocity 0 0
-        angular_velocity 0
+        position -0.861194193 0.555576384
+        angle -0.0210744049
+        linear_velocity 2.94819713 -0.719464242
+        angular_velocity 2.90119362
         fixtures
             fixture
                 density 1
@@ -52,10 +52,10 @@ object box
     color 0 255 0 255
     body
         type dynamic
-        position 0.100000001 2
-        angle 0
-        linear_velocity 0 0
-        angular_velocity 0
+        position 0.237411678 0.646664679
+        angle -1.42693293
+        linear_velocity 1.6766957 0.624023557
+        angular_velocity -2.74527073
         fixtures
             fixture
                 density 1
@@ -73,10 +73,10 @@ object box
     color 0 255 0 255
     body
         type dynamic
-        position 0.200000003 3
-        angle 0
-        linear_velocity 0 0
-        angular_velocity 0
+        position 1.44766772 0.746580839
+        angle -0.997358024
+        linear_velocity 1.62045205 -0.79418391
+        angular_velocity -1.44541621
         fixtures
             fixture
                 density 1
@@ -95,10 +95,10 @@ object ball
     notch_color 0 64 0 255
     body
         type dynamic
-        position 0 5
-        angle 0
-        linear_velocity 0 0
-        angular_velocity 0
+        position 4.4842391 0.506344318
+        angle 10.3029346
+        linear_velocity 2.02300119 0
+        angular_velocity 9.13359547
         fixtures
             fixture
                 density 1
@@ -116,10 +116,10 @@ object polygon
     color 255 0 0 255
     body
         type dynamic
-        position 0 10
-        angle 0
-        linear_velocity 0 0
-        angular_velocity 0
+        position 1.89719296 3.64341426
+        angle -0.49147746
+        linear_velocity 1.8580122 0.193420127
+        angular_velocity 0.0479652472
         fixtures
             fixture
                 density 1
@@ -149,10 +149,10 @@ object ball
     notch_color 64 64 0 255
     body
         type dynamic
-        position 5 10
-        angle 0
-        linear_velocity 0 0
-        angular_velocity 0
+        position 6.30537558 1.28376949
+        angle -16.022089
+        linear_velocity 1.97160947 0.394321442
+        angular_velocity -3.79487514
         fixtures
             fixture
                 density 1
@@ -172,10 +172,10 @@ object ball
     notch_color 64 64 0 255
     body
         type dynamic
-        position -2.50000024 14.3301268
-        angle 0
-        linear_velocity 0 0
-        angular_velocity 0
+        position 1.73691499 8.64077187
+        angle -19.989563
+        linear_velocity 1.60043645 0.188322157
+        angular_velocity -9.94946003
         fixtures
             fixture
                 density 1
@@ -195,10 +195,10 @@ object ball
     notch_color 64 64 0 255
     body
         type dynamic
-        position -2.49999952 5.66987276
-        angle 0
-        linear_velocity 0 0
-        angular_velocity 0
+        position -2.35051298 1.00575614
+        angle -6.97867107
+        linear_velocity 2.01478004 -7.4505806e-09
+        angular_velocity -2.05182433
         fixtures
             fixture
                 density 1

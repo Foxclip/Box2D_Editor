@@ -105,9 +105,9 @@ void test_CompoundVector() {
 		}
 	}
 	{
-		// get method
+		// at method
 		CompoundVector<int> vec = { 1, 2, 3 };
-		assert(vec.get(1) == 2);
+		assert(vec.at(1) == 2);
 	}
 	{
 		// getIndex method
@@ -276,9 +276,9 @@ void test_CompoundVectorUptr() {
 		}
 	}
 	{
-		// get method
+		// at method
 		CompoundVectorUptr<int> vec = { 1, 2, 3 };
-		assert(*vec.get(1) == 2);
+		assert(*vec.at(1) == 2);
 	}
 	{
 		// getIndex method

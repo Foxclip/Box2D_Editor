@@ -1,14 +1,5 @@
 #include "objectlist.h"
 
-ObjectId::ObjectId(size_t id, const GameObject* ptr) {
-    this->id = id;
-    this->ptr = ptr;
-}
-
-bool ObjectId::operator<(const ObjectId& other) const {
-    return id < other.id;
-}
-
 size_t GameObjectList::getTopSize() const {
     return top_objects.size();
 }
@@ -21,27 +12,27 @@ size_t GameObjectList::getJointsSize() const {
     return joints.size();
 }
 
-GameObject* GameObjectList::getFromTop(size_t i) {
+GameObject* GameObjectList::getFromTop(size_t i) const {
     return top_objects[i];
 }
 
-GameObject* GameObjectList::getFromAll(size_t i) {
+GameObject* GameObjectList::getFromAll(size_t i) const {
     return all_objects[i];
 }
 
-GameObject* GameObjectList::getById(size_t id) {
-    auto it = ids.find(ObjectId(id, nullptr));
-    if (it != ids.end()) {
-        return const_cast<GameObject*>((*it).ptr);
-    }
-    return nullptr;
+GameObject* GameObjectList::getById(size_t id) const {
+    return getByData(ids, id);
+}
+
+GameObject* GameObjectList::getByName(const std::string& name) const {
+    return getByData(names, name);
 }
 
 ptrdiff_t GameObjectList::getTopIndex(GameObject* object) const {
     return top_objects.getIndex(object);
 }
 
-Joint* GameObjectList::getJoint(size_t i) {
+Joint* GameObjectList::getJoint(size_t i) const {
     return joints[i];
 }
 
@@ -55,7 +46,7 @@ const std::vector<GameObject*>& GameObjectList::getAllVector() const {
 
 ptrdiff_t GameObjectList::getMaxId() const {
     if (ids.size() > 0) {
-        return (*ids.rbegin()).id;
+        return (*ids.rbegin()).data;
     } else {
         return -1;
     }
@@ -72,7 +63,7 @@ GameObject* GameObjectList::add(std::unique_ptr<GameObject> object, bool assign_
         }
         GameObject* parent = nullptr;
         if (ptr->parent_id >= 0) {
-            auto pid = ids.find(ObjectId(ptr->parent_id, nullptr));
+            auto pid = ids.find(ObjectData<size_t>(ptr->parent_id, nullptr));
             if (pid == ids.end()) {
                 throw std::runtime_error(
                     "Parent not found: id: "
@@ -89,10 +80,11 @@ GameObject* GameObjectList::add(std::unique_ptr<GameObject> object, bool assign_
         } else {
             top_objects.add(ptr);
         }
-        auto inserted = ids.insert(ObjectId(ptr->id, ptr));
+        auto inserted = ids.insert(ObjectData<size_t>(ptr->id, ptr));
         if (!inserted.second) {
             throw std::runtime_error("Duplicate object id: " + std::to_string(ptr->id));
         }
+        names.insert(ObjectData<std::string>(ptr->name, ptr));
         all_objects.add(std::move(object));
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
@@ -159,6 +151,13 @@ void GameObjectList::setParent(GameObject* child, GameObject* new_parent) {
     }
 }
 
+void GameObjectList::setName(GameObject* object, const std::string& new_name) {
+    assert(all_objects.contains(object));
+    names.erase(ObjectData<std::string>(object->name, object));
+    object->name = new_name;
+    names.insert(ObjectData<std::string>(object->name, object));
+}
+
 void GameObjectList::transformFromRigidbody() {
     for (size_t i = 0; i < top_objects.size(); i++) {
         GameObject* object = top_objects[i];
@@ -188,7 +187,8 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
         }
     }
     top_objects.remove(object);
-    ids.erase(ObjectId(object->id, nullptr));
+    ids.erase(ObjectData<size_t>(object->id, nullptr));
+    names.erase(ObjectData<std::string>(object->name, nullptr));
     all_objects.removeByIndex(index);
 }
 
@@ -203,5 +203,7 @@ void GameObjectList::clear() {
     joints.clear();
     all_objects.clear();
     top_objects.clear();
-    ids = std::set<ObjectId>();
+    ids = std::set<ObjectData<size_t>>();
+    names = std::set<ObjectData<std::string>>();
 }
+

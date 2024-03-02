@@ -3,13 +3,19 @@
 #include "gameobject.h"
 #include "compvector.h"
 
-struct ObjectId {
+template<typename T>
+struct ObjectData {
 public:
-	size_t id;
-	const GameObject* ptr;
+	T data;
+	const GameObject* ptr = nullptr;
 
-	ObjectId(size_t id, const GameObject* ptr);
-	bool operator<(const ObjectId& other) const;
+	ObjectData(T data, const GameObject* ptr) {
+		this->data = data;
+		this->ptr = ptr;
+	}
+	bool operator<(const ObjectData& other) const {
+		return data < other.data;
+	}
 
 private:
 };
@@ -21,11 +27,12 @@ public:
 	size_t getTopSize() const;
 	size_t getAllSize() const;
 	size_t getJointsSize() const;
-	GameObject* getFromTop(size_t i);
-	GameObject* getFromAll(size_t i);
-	GameObject* getById(size_t id);
+	GameObject* getFromTop(size_t i) const;
+	GameObject* getFromAll(size_t i) const;
+	GameObject* getById(size_t id) const;
+	GameObject* getByName(const std::string& name) const;
 	ptrdiff_t getTopIndex(GameObject* object) const;
-	Joint* getJoint(size_t i);
+	Joint* getJoint(size_t i) const;
 	const std::vector<GameObject*>& getTopVector() const;
 	const std::vector<GameObject*>& getAllVector() const;
 	ptrdiff_t getMaxId() const;
@@ -34,6 +41,7 @@ public:
 	GameObject* duplicate(const GameObject* object);
 	Joint* duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b);
 	void setParent(GameObject* child, GameObject* new_parent);
+	void setName(GameObject* object, const std::string& new_name);
 	void transformFromRigidbody();
 	void remove(GameObject* object, bool remove_children);
 	void removeJoint(Joint* joint);
@@ -43,5 +51,19 @@ private:
 	CompoundVectorUptr<GameObject> all_objects;
 	CompoundVector<GameObject*> top_objects;
 	CompoundVectorUptr<Joint> joints;
-	std::set<ObjectId> ids;
+	std::set<ObjectData<size_t>> ids;
+	std::set<ObjectData<std::string>> names;
+
+	template<typename T> GameObject* getByData(
+		const std::set<ObjectData<T>>& set, const T& data
+	) const;
 };
+
+template<typename T>
+inline GameObject* GameObjectList::getByData(const std::set<ObjectData<T>>& set, const T& data) const {
+	auto it = set.find(ObjectData<T>(data, nullptr));
+	if (it != set.end()) {
+		return const_cast<GameObject*>((*it).ptr);
+	}
+	return nullptr;
+}

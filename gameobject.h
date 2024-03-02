@@ -102,7 +102,6 @@ public:
 	ptrdiff_t id = -1;
 	ptrdiff_t parent_id = -1;
 	ptrdiff_t new_id = -1;
-	std::string name = "<unnamed>";
 	b2Body* rigid_body = nullptr;
 	sf::Color color;
 	bool hover = false;
@@ -118,6 +117,7 @@ public:
 	GameObject();
 	~GameObject();
 	virtual bool isClosed() const = 0;
+	const std::string& getName() const;
 	virtual sf::Drawable* getDrawable() const = 0;
 	virtual sf::Transformable* getTransformable() const = 0;
 	const b2Vec2& getPosition() const;
@@ -177,6 +177,7 @@ public:
 	static GameObject* getGameobject(b2Body* body);
 
 protected:
+	std::string name = "<unnamed>";
 	std::vector<EditableVertex> vertices;
 	GameObject* parent = nullptr;
 

@@ -17,6 +17,10 @@ GameObject::~GameObject() {
 	}
 }
 
+const std::string& GameObject::getName() const {
+	return name;
+}
+
 const b2Vec2& GameObject::getPosition() const {
 	return getTransform().p;
 }

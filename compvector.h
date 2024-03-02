@@ -29,8 +29,8 @@ public:
 	const T& front() const;
 	T& back();
 	const T& back() const;
-	T& get(size_t index);
-	const T& get(size_t index) const;
+	T& at(size_t index);
+	const T& at(size_t index) const;
 	ptrdiff_t getIndex(const T& value) const;
 	const std::vector<T>& getVector() const;
 	const std::set<T>& getSet() const;
@@ -72,16 +72,16 @@ public:
 	std::vector<T*>::const_reverse_iterator rbegin() const;
 	std::vector<T*>::const_reverse_iterator rend() const;
 	T* front();
-	const T* front() const;
+	T* front() const;
 	T* back();
-	const T* back() const;
-	T* get(size_t index);
-	const T* get(size_t index) const;
+	T* back() const;
+	T* at(size_t index);
+	T* at(size_t index) const;
 	ptrdiff_t getIndex(const T* value) const;
 	const std::vector<T*>& getVector() const;
 	const std::set<T*>& getSet() const;
 	T* operator[](size_t index);
-	const T* operator[](size_t index) const;
+	T* operator[](size_t index) const;
 	std::set<T*>::iterator find(const T* value) const;
 	bool contains(const T* value) const;
 	void clear();
@@ -176,12 +176,12 @@ inline const T& CompoundVector<T>::back() const {
 }
 
 template<typename T>
-inline T& CompoundVector<T>::get(size_t index) {
+inline T& CompoundVector<T>::at(size_t index) {
 	return vector[index];
 }
 
 template<typename T>
-inline const T& CompoundVector<T>::get(size_t index) const {
+inline const T& CompoundVector<T>::at(size_t index) const {
 	return vector[index];
 }
 
@@ -207,12 +207,12 @@ inline const std::set<T>& CompoundVector<T>::getSet() const {
 
 template<typename T>
 inline T& CompoundVector<T>::operator[](size_t index) {
-	return get(index);
+	return at(index);
 }
 
 template<typename T>
 inline const T& CompoundVector<T>::operator[](size_t index) const {
-	return get(index);
+	return at(index);
 }
 
 template<typename T>
@@ -237,7 +237,7 @@ inline bool CompoundVector<T>::operator==(const CompoundVector<T>& other) const 
 		return false;
 	}
 	for (size_t i = 0; i < size(); i++) {
-		if (other[i] != get(i)) {
+		if (other[i] != at(i)) {
 			return false;
 		}
 	}
@@ -351,7 +351,7 @@ inline T* CompoundVectorUptr<T>::front() {
 }
 
 template<typename T>
-inline const T* CompoundVectorUptr<T>::front() const {
+inline T* CompoundVectorUptr<T>::front() const {
 	return comp.front();
 }
 
@@ -361,17 +361,17 @@ inline T* CompoundVectorUptr<T>::back() {
 }
 
 template<typename T>
-inline const T* CompoundVectorUptr<T>::back() const {
+inline T* CompoundVectorUptr<T>::back() const {
 	return comp.back();
 }
 
 template<typename T>
-inline T* CompoundVectorUptr<T>::get(size_t index) {
+inline T* CompoundVectorUptr<T>::at(size_t index) {
 	return comp[index];
 }
 
 template<typename T>
-inline const T* CompoundVectorUptr<T>::get(size_t index) const {
+inline T* CompoundVectorUptr<T>::at(size_t index) const {
 	return comp[index];
 }
 
@@ -401,7 +401,7 @@ inline T* CompoundVectorUptr<T>::operator[](size_t index) {
 }
 
 template<typename T>
-inline const T* CompoundVectorUptr<T>::operator[](size_t index) const {
+inline T* CompoundVectorUptr<T>::operator[](size_t index) const {
 	return comp[index];
 }
 
