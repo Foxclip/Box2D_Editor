@@ -262,7 +262,6 @@ void Application::init_ui() {
 
     origin_shape.setRadius(3.0f);
     origin_shape.setOrigin(origin_shape.getRadius(), origin_shape.getRadius());
-    origin_shape.setFillColor(sf::Color(255, 159, 44));
     origin_shape.setOutlineColor(sf::Color::Black);
     origin_shape.setOutlineThickness(1.0f);
 
@@ -968,6 +967,8 @@ void Application::render_ui() {
         // object origin circles
         for (size_t i = 0; i < game_objects.getAllSize(); i++) {
             GameObject* gameobject = game_objects.getFromAll(i);
+            sf::Color circle_color = gameobject == active_object ? sf::Color(255, 255, 0) : sf::Color(255, 159, 44);
+            origin_shape.setFillColor(circle_color);
             origin_shape.setPosition(world_to_screen(gameobject->getGlobalPosition()));
             target.draw(origin_shape);
         }
