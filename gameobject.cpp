@@ -136,9 +136,9 @@ void GameObject::setParent(GameObject* new_parent) {
 	} else {
 		parent_id = -1;
 	}
-	b2Vec2 global_pos = getGlobalPosition();
+	b2Transform global_transform = getGlobalTransform();
 	this->parent = new_parent;
-	setGlobalPosition(global_pos);
+	setGlobalTransform(global_transform);
 }
 
 void GameObject::updateVisual() {
@@ -177,6 +177,10 @@ void GameObject::setEnabled(bool enabled, bool include_children) {
 			children[i]->setEnabled(enabled, true);
 		}
 	}
+}
+
+void GameObject::setGlobalTransform(const b2Transform& transform) {
+	transforms.setGlobalTransform(transform);
 }
 
 void GameObject::setGlobalPosition(const b2Vec2& pos) {
@@ -1168,6 +1172,13 @@ void GameObjectTransforms::invalidateGlobalTransform() {
 void GameObjectTransforms::setTransform(const b2Vec2& position, float angle) {
 	transform.Set(position, angle);
 	invalidateGlobalTransform();
+}
+
+void GameObjectTransforms::setGlobalTransform(const b2Transform& global_transform) {
+	b2Transform parent_transform = object->getParentGlobalTransform();
+	transform = b2MulT(parent_transform, global_transform);
+	this->global_transform = global_transform;
+	global_transform_valid = true;
 }
 
 void GameObjectTransforms::setPosition(const b2Vec2& position) {

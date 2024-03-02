@@ -7,7 +7,7 @@
 void execute_app() {
     Application app;
     app.init();
-    //scene1(app);
+    scene1(app);
     //app.load("level.txt");
     //ground_transform(app);
     //single_box(app);
@@ -17,7 +17,7 @@ void execute_app() {
     //polygon(app);
     //box_parent(app);
     //convex_polygon(app);
-    duplication(app);
+    //duplication(app);
     app.start();
 }
 
@@ -31,7 +31,7 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: fix child objects rotating after duplication
+    // TODO: add const to Application methods
     // TODO: set whether object is static or dynamic in edit mode
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars

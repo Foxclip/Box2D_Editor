@@ -82,6 +82,7 @@ public:
 	const b2Transform& getGlobalTransform() const;
 	void invalidateGlobalTransform();
 	void setTransform(const b2Vec2& position, float angle);
+	void setGlobalTransform(const b2Transform& transform);
 	void setPosition(const b2Vec2& position);
 	void setAngle(float angle);
 	void fromRigidbody();
@@ -142,6 +143,7 @@ public:
 	virtual void render(sf::RenderTarget& target);
 	void renderMask(sf::RenderTarget& mask);
 	void setEnabled(bool enabled, bool include_children);
+	void setGlobalTransform(const b2Transform& transform);
 	void setGlobalPosition(const b2Vec2& pos);
 	void setGlobalAngle(float angle);
 	void setLinearVelocity(const b2Vec2& velocity, bool include_children);
