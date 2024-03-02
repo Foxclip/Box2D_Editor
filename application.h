@@ -59,7 +59,7 @@ public:
 	void setCameraZoom(float zoom);
 	GameObjectList& getObjectList();
 	void selectSingleObject(GameObject* object, bool with_children = false);
-	std::vector<GameObject*> duplicateObjects(const std::vector<GameObject*>& objects);
+	std::vector<GameObject*> duplicateObjects(const CompoundVector<GameObject*>& objects);
 	BoxObject* create_box(
 		const std::string& name,
 		const b2Vec2& pos,

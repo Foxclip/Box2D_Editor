@@ -120,6 +120,47 @@ GameObject* GameObjectList::duplicate(const GameObject* object) {
     return ptr;
 }
 
+std::vector<GameObject*> GameObjectList::duplicateObjects(const CompoundVector<GameObject*>& old_objects) {
+    std::vector<GameObject*> new_objects;
+    std::vector<Joint*> new_joints;
+    std::set<Joint*> duplicated_joints;
+    std::set<Joint*> checked_joints;
+    // copy objects
+    for (GameObject* obj : old_objects) {
+        GameObject* copy = duplicate(obj);
+        obj->new_id = copy->id;
+        new_objects.push_back(copy);
+    }
+    // set parents
+    for (GameObject* old_obj : old_objects) {
+        if (old_obj->getParent() && old_objects.contains(old_obj->getParent())) {
+            GameObject* new_obj = getById(old_obj->new_id);
+            size_t new_parent_id = old_obj->getParent()->new_id;
+            GameObject* new_parent = getById(new_parent_id);
+            setParent(new_obj, new_parent);
+        }
+    }
+    // copy joints
+    for (GameObject* obj : old_objects) {
+        for (Joint* joint : obj->joints) {
+            if (checked_joints.contains(joint)) {
+                continue;
+            }
+            auto it1 = old_objects.find(joint->object1);
+            auto it2 = old_objects.find(joint->object2);
+            if (it1 != old_objects.getSet().end() && it2 != old_objects.getSet().end()) {
+                GameObject* new_object_1 = getById((*it1)->new_id);
+                GameObject* new_object_2 = getById((*it2)->new_id);
+                Joint* new_joint = duplicateJoint(joint, new_object_1, new_object_2);
+                new_joints.push_back(new_joint);
+                duplicated_joints.insert(new_joint);
+            }
+            checked_joints.insert(joint);
+        }
+    }
+    return new_objects;
+}
+
 Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b) {
     TokenWriter tw;
     std::string str = joint->serialize(tw).toStr();

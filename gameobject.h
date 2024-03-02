@@ -101,7 +101,6 @@ class GameObject {
 public:
 	ptrdiff_t id = -1;
 	ptrdiff_t parent_id = -1;
-	ptrdiff_t new_id = -1;
 	b2Body* rigid_body = nullptr;
 	sf::Color color;
 	bool hover = false;
@@ -191,6 +190,7 @@ protected:
 private:
 	friend class GameObjectList;
 	friend class GameObjectTransforms;
+	ptrdiff_t new_id = -1;
 	CompoundVector<GameObject*> children;
 	GameObjectTransforms transforms = GameObjectTransforms(this);
 

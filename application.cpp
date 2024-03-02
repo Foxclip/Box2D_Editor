@@ -93,48 +93,8 @@ void Application::selectSingleObject(GameObject* object, bool with_children) {
     select_tool.selectSingleObject(object, with_children);
 }
 
-std::vector<GameObject*> Application::duplicateObjects(const std::vector<GameObject*>& objects) {
-    std::vector<GameObject*> new_objects;
-    std::vector<Joint*> new_joints;
-    std::set<Joint*> duplicated_joints;
-    std::set<Joint*> checked_joints;
-    std::set<GameObject*> old_objects_set = std::set<GameObject*>(objects.begin(), objects.end());
-    // copy objects
-    for (GameObject* obj : old_objects_set) {
-        GameObject* copy = game_objects.duplicate(obj);
-        obj->new_id = copy->id;
-        new_objects.push_back(copy);
-    }
-    // set parents
-    for (GameObject* old_obj : old_objects_set) {
-        if (old_obj->getParent() && old_objects_set.contains(old_obj->getParent())) {
-            GameObject* new_obj = game_objects.getById(old_obj->new_id);
-            size_t new_parent_id = old_obj->getParent()->new_id;
-            GameObject* new_parent = game_objects.getById(new_parent_id);
-            game_objects.setParent(new_obj, new_parent);
-            logger << "Object " << new_obj->id << " parented to " << new_parent->id << "\n";
-        }
-    }
-    // copy joints
-    for (GameObject* obj : old_objects_set) {
-        for (Joint* joint : obj->joints) {
-            if (checked_joints.contains(joint)) {
-                continue;
-            }
-            auto it1 = old_objects_set.find(joint->object1);
-            auto it2 = old_objects_set.find(joint->object2);
-            if (it1 != old_objects_set.end() && it2 != old_objects_set.end()) {
-                GameObject* new_object_1 = game_objects.getById((*it1)->new_id);
-                GameObject* new_object_2 = game_objects.getById((*it2)->new_id);
-                Joint* new_joint = game_objects.duplicateJoint(joint, new_object_1, new_object_2);
-                new_joints.push_back(new_joint);
-                duplicated_joints.insert(new_joint);
-            }
-            checked_joints.insert(joint);
-        }
-    }
-    logger << "Duplicated " << duplicated_joints.size() << " joints\n";
-    return new_objects;
+std::vector<GameObject*> Application::duplicateObjects(const CompoundVector<GameObject*>& objects) {
+    return game_objects.duplicateObjects(objects);
 }
 
 BoxObject* Application::create_box(
@@ -656,7 +616,7 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::D:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
-                        std::vector<GameObject*> old_objects = select_tool.getSelectedObjects().getVector();
+                        CompoundVector<GameObject*> old_objects = select_tool.getSelectedObjects();
                         std::vector<GameObject*> new_objects = duplicateObjects(old_objects);
                         select_tool.setSelected(new_objects);
                         try_select_tool(&move_tool);

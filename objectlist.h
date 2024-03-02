@@ -45,7 +45,7 @@ public:
 	GameObject* add(std::unique_ptr<GameObject> object, bool assign_new_id);
 	Joint* addJoint(std::unique_ptr<Joint> joint);
 	GameObject* duplicate(const GameObject* object);
-	Joint* duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b);
+	std::vector<GameObject*> duplicateObjects(const CompoundVector<GameObject*>& old_objects);
 	void setParent(GameObject* child, GameObject* new_parent);
 	void setName(GameObject* object, const std::string& new_name);
 	void transformFromRigidbody();
@@ -65,6 +65,8 @@ private:
 	GameObject* getByData(
 		const TSet& set, const TData& data
 	) const;
+	Joint* duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b);
+
 };
 
 template<typename TSet, typename TData>
