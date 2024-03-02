@@ -588,26 +588,26 @@ void Application::process_keyboard_event(sf::Event event) {
             case sf::Keyboard::Tab:
                 if (selected_tool == &edit_tool) {
                     try_select_tool(&select_tool);
-                } else {
+                } else if (selected_tool == &select_tool && active_object) {
                     try_select_tool(&edit_tool);
                 }
                 break;
             case sf::Keyboard::G:
-                if (select_tool.selectedCount() > 0) {
+                if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
                     try_select_tool(&move_tool);
                     grab_selected();
                     leftButtonProcessWidgetsOnPress = false;
                 }
                 break;
             case sf::Keyboard::R:
-                if (select_tool.selectedCount() > 0) {
+                if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
                     try_select_tool(&rotate_tool);
                     rotate_selected();
                 }
                 break;
             case sf::Keyboard::D:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
-                    if (select_tool.selectedCount() > 0) {
+                    if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
                         std::vector<GameObject*> old_objects = select_tool.getSelectedObjects().getVector();
                         std::vector<GameObject*> new_objects = duplicateObjects(old_objects);
                         select_tool.setSelected(new_objects);
