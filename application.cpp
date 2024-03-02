@@ -63,11 +63,6 @@ void Application::init() {
     assert(game_objects.world);
 }
 
-void Application::load_action(std::string filename) {
-    load_request.requested = true;
-    load_request.filename = filename;
-}
-
 void Application::start() {
     main_loop();
 }
@@ -503,7 +498,7 @@ void Application::process_input() {
     }
 }
 
-void Application::process_keyboard_event(sf::Event event) {
+void Application::process_keyboard_event(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
         switch (event.key.code) {
             case sf::Keyboard::Escape:
@@ -643,7 +638,7 @@ void Application::process_keyboard_event(sf::Event event) {
     }
 }
 
-void Application::process_mouse_event(sf::Event event) {
+void Application::process_mouse_event(const sf::Event& event) {
     mousePos = sf::Mouse::getPosition(window);
     mousePosf = to2f(mousePos);
     sfMousePosWorld = pixel_to_world(mousePos);
@@ -1089,12 +1084,12 @@ void Application::render_ui() {
     window.draw(ui_sprite);
 }
 
-void Application::maximize_window() {
+void Application::maximize_window() const {
     sf::WindowHandle windowHandle = window.getSystemHandle();
     ShowWindow(windowHandle, SW_MAXIMIZE);
 }
 
-std::string Application::serialize() {
+std::string Application::serialize() const {
     logger << __FUNCTION__"\n";
     LoggerIndent serialize_indent;
     TokenWriter tw;
@@ -1153,7 +1148,7 @@ std::string Application::serialize() {
     return tw.toStr();
 }
 
-void Application::deserialize(std::string str, bool set_camera) {
+void Application::deserialize(const std::string& str, bool set_camera) {
     active_object = nullptr;
     game_objects.clear();
     init_tools();
@@ -1221,13 +1216,18 @@ void Application::deserialize(std::string str, bool set_camera) {
     }
 }
 
-void Application::save_to_file(std::string filename) {
+void Application::save_to_file(const std::string& filename) const {
     std::string str = serialize();
     utils::str_to_file(str, filename);
     logger << "Saved to " << filename << "\n";
 }
 
-void Application::load_from_file(std::string filename) {
+void Application::load_action(const std::string& filename) {
+    load_request.requested = true;
+    load_request.filename = filename;
+}
+
+void Application::load_from_file(const std::string& filename) {
     try {
         std::string str = utils::file_to_str(filename);
         deserialize(str, true);
@@ -1325,7 +1325,7 @@ sf::Vector2f Application::world_dir_to_screenf(const b2Vec2& world_dir) {
     return sf::Vector2f(world_dir.x, -world_dir.y);
 }
 
-ptrdiff_t Application::mouse_get_chain_edge(const b2Fixture* fixture) {
+ptrdiff_t Application::mouse_get_chain_edge(const b2Fixture* fixture) const {
     const b2ChainShape* shape = dynamic_cast<const b2ChainShape*>(fixture->GetShape());
     const b2Body* body = fixture->GetBody();
     for (size_t i = 0; i < shape->m_count - 1; i++) {
@@ -1353,7 +1353,7 @@ ptrdiff_t Application::mouse_get_chain_edge(const b2Fixture* fixture) {
     return -1;
 }
 
-b2Fixture* Application::get_fixture_at(sf::Vector2f screen_pos) {
+b2Fixture* Application::get_fixture_at(const sf::Vector2f& screen_pos) const {
     b2Vec2 world_pos = tob2(screen_to_world(screen_pos));
     b2Vec2 world_pos_next = tob2(screen_to_world(screen_pos + sf::Vector2f(1.0f, 1.0f)));
     b2Vec2 midpoint = 0.5f * (world_pos + world_pos_next);
@@ -1375,7 +1375,7 @@ b2Fixture* Application::get_fixture_at(sf::Vector2f screen_pos) {
     return nullptr;
 }
 
-GameObject* Application::get_object_at(sf::Vector2f screen_pos) {
+GameObject* Application::get_object_at(const sf::Vector2f& screen_pos) const {
     GameObject* result = nullptr;
     b2Fixture* fixture = get_fixture_at(mousePosf);
     if (fixture) {
@@ -1385,7 +1385,7 @@ GameObject* Application::get_object_at(sf::Vector2f screen_pos) {
     return result;
 }
 
-ptrdiff_t Application::mouse_get_object_vertex() {
+ptrdiff_t Application::mouse_get_object_vertex() const {
     if (!active_object) {
         return -1;
     }
@@ -1407,7 +1407,7 @@ ptrdiff_t Application::mouse_get_object_vertex() {
     return -1;
 }
 
-ptrdiff_t Application::mouse_get_object_edge() {
+ptrdiff_t Application::mouse_get_object_edge() const {
     if (!active_object) {
         return -1;
     }
@@ -1436,7 +1436,7 @@ ptrdiff_t Application::mouse_get_object_edge() {
     return -1;
 }
 
-ptrdiff_t Application::mouse_get_edge_vertex() {
+ptrdiff_t Application::mouse_get_edge_vertex() const {
     if (!active_object) {
         return -1;
     }
@@ -1499,7 +1499,7 @@ void Application::render_rectangle_select(sf::RenderTarget& target, RectangleSel
     target.draw(rectangle_select.select_rect);
 }
 
-void Application::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) {
+void Application::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
     b2Vec2 midpoint = 0.5f * (v1 + v2);
     norm_v1 = world_to_screen(midpoint);
     sf::Vector2f edge_dir = utils::normalize(world_dir_to_screenf(v2 - v1));
@@ -1507,7 +1507,7 @@ void Application::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vect
     norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
 }
 
-void Application::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) {
+void Application::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
     sf::Vector2f v1f = to2f(v1);
     sf::Vector2f v2f = to2f(v2);
     sf::Vector2f midpoint = (v1f + v2f) / 2.0f;
@@ -1525,7 +1525,7 @@ void Application::draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, co
     target.draw(line_primitive);
 }
 
-bool Application::is_parent_selected(GameObject* object) {
+bool Application::is_parent_selected(const GameObject* object) const {
     std::vector<GameObject*> parents = object->getParentChain();
     for (size_t i = 0; i < parents.size(); i++) {
         auto it = select_tool.getSelectedObjects().find(parents[i]);
@@ -1612,6 +1612,6 @@ int FpsCounter::frameEnd() {
     return fps;
 }
 
-int FpsCounter::getFps() {
+int FpsCounter::getFps() const {
     return fps;
 }
