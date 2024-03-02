@@ -32,6 +32,17 @@ void test_CompoundVector() {
 		assert(vec.back() == 3);
 	}
 	{
+		// from vector
+		std::vector<int> vec = { 1, 2, 3 };
+		CompoundVector<int> cvec(vec);
+		assert(vec.size() == 3);
+		assert(vec[0] == 1);
+		assert(vec[1] == 2);
+		assert(vec[2] == 3);
+		assert(vec.front() == 1);
+		assert(vec.back() == 3);
+	}
+	{
 		// add method
 		CompoundVector<int> vec;
 		vec.add(1);

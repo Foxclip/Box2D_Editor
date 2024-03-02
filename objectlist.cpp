@@ -99,35 +99,28 @@ Joint* GameObjectList::addJoint(std::unique_ptr<Joint> joint) {
     return ptr;
 }
 
-GameObject* GameObjectList::duplicate(const GameObject* object) {
-    TokenWriter tw;
-    std::string str = object->serialize(tw).toStr();
-    TokenReader tr(str);
-    std::unique_ptr<GameObject> new_object;
-    if (dynamic_cast<const BoxObject*>(object)) {
-        new_object = BoxObject::deserialize(tr, world);
-    } else if (dynamic_cast<const BallObject*>(object)) {
-        new_object = BallObject::deserialize(tr, world);
-    } else if (dynamic_cast<const PolygonObject*>(object)) {
-        new_object = PolygonObject::deserialize(tr, world);
-    } else if (dynamic_cast<const ChainObject*>(object)) {
-        new_object = ChainObject::deserialize(tr, world);
+GameObject* GameObjectList::duplicate(const GameObject* object, bool with_children) {
+    if (with_children) {
+        std::vector<GameObject*> objects = { const_cast<GameObject*>(object) };
+        std::vector<GameObject*> all_children = object->getAllChildren();
+        objects.insert(objects.end(), all_children.begin(), all_children.end());
+        std::vector<GameObject*> new_objects = duplicate(objects);
+        GameObject* new_object = getById(object->new_id);
+        return new_object;
     } else {
-        assert(false, "Unknown object type");
+        GameObject* new_object = duplicateObject(object);
+        return new_object;
     }
-    GameObject* ptr = new_object.get();
-    add(std::move(new_object), true);
-    return ptr;
 }
 
-std::vector<GameObject*> GameObjectList::duplicateObjects(const CompoundVector<GameObject*>& old_objects) {
+std::vector<GameObject*> GameObjectList::duplicate(const CompoundVector<GameObject*>& old_objects) {
     std::vector<GameObject*> new_objects;
     std::vector<Joint*> new_joints;
     std::set<Joint*> duplicated_joints;
     std::set<Joint*> checked_joints;
     // copy objects
     for (GameObject* obj : old_objects) {
-        GameObject* copy = duplicate(obj);
+        GameObject* copy = duplicateObject(obj);
         obj->new_id = copy->id;
         new_objects.push_back(copy);
     }
@@ -159,6 +152,27 @@ std::vector<GameObject*> GameObjectList::duplicateObjects(const CompoundVector<G
         }
     }
     return new_objects;
+}
+
+GameObject* GameObjectList::duplicateObject(const GameObject* object) {
+    TokenWriter tw;
+    std::string str = object->serialize(tw).toStr();
+    TokenReader tr(str);
+    std::unique_ptr<GameObject> new_object;
+    if (dynamic_cast<const BoxObject*>(object)) {
+        new_object = BoxObject::deserialize(tr, world);
+    } else if (dynamic_cast<const BallObject*>(object)) {
+        new_object = BallObject::deserialize(tr, world);
+    } else if (dynamic_cast<const PolygonObject*>(object)) {
+        new_object = PolygonObject::deserialize(tr, world);
+    } else if (dynamic_cast<const ChainObject*>(object)) {
+        new_object = ChainObject::deserialize(tr, world);
+    } else {
+        assert(false, "Unknown object type");
+    }
+    GameObject* ptr = new_object.get();
+    add(std::move(new_object), true);
+    return ptr;
 }
 
 Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b) {

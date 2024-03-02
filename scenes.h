@@ -186,4 +186,7 @@ void duplication(Application& app) {
     GameObjectList& objects = app.getObjectList();
     GameObject* car = objects.getByName("car0");
     logger << "Car pos: " << car->getPosition() << "\n";
+    GameObject* car_copy = objects.duplicate(car, true);
+    car_copy->setGlobalPosition(car->getGlobalPosition() + b2Vec2(0.0f, 8.0f));
+    logger << "Car copy pos: " << car_copy->getPosition() << "\n";
 }

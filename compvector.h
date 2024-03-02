@@ -17,6 +17,7 @@ public:
 
 	CompoundVector();
 	CompoundVector(const std::initializer_list<T>& list);
+	CompoundVector(const std::vector<T>& vec);
 	size_t size() const;
 	bool add(const T& value);
 	ptrdiff_t remove(const T& value);
@@ -98,6 +99,13 @@ inline CompoundVector<T>::CompoundVector() { }
 template<typename T>
 inline CompoundVector<T>::CompoundVector(const std::initializer_list<T>& list) {
 	for (const T& value : list) {
+		add(value);
+	}
+}
+
+template<typename T>
+inline CompoundVector<T>::CompoundVector(const std::vector<T>& vec) {
+	for (const T& value : vec) {
 		add(value);
 	}
 }

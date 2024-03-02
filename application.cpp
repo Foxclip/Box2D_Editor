@@ -93,10 +93,6 @@ void Application::selectSingleObject(GameObject* object, bool with_children) {
     select_tool.selectSingleObject(object, with_children);
 }
 
-std::vector<GameObject*> Application::duplicateObjects(const CompoundVector<GameObject*>& objects) {
-    return game_objects.duplicateObjects(objects);
-}
-
 BoxObject* Application::create_box(
     const std::string& name,
     const b2Vec2& pos,
@@ -617,7 +613,7 @@ void Application::process_keyboard_event(sf::Event event) {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
                         CompoundVector<GameObject*> old_objects = select_tool.getSelectedObjects();
-                        std::vector<GameObject*> new_objects = duplicateObjects(old_objects);
+                        std::vector<GameObject*> new_objects = game_objects.duplicate(old_objects);
                         select_tool.setSelected(new_objects);
                         try_select_tool(&move_tool);
                         grab_selected();

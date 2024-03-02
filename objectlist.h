@@ -44,8 +44,8 @@ public:
 	ptrdiff_t getMaxId() const;
 	GameObject* add(std::unique_ptr<GameObject> object, bool assign_new_id);
 	Joint* addJoint(std::unique_ptr<Joint> joint);
-	GameObject* duplicate(const GameObject* object);
-	std::vector<GameObject*> duplicateObjects(const CompoundVector<GameObject*>& old_objects);
+	GameObject* duplicate(const GameObject* object, bool with_children = false);
+	std::vector<GameObject*> duplicate(const CompoundVector<GameObject*>& old_objects);
 	void setParent(GameObject* child, GameObject* new_parent);
 	void setName(GameObject* object, const std::string& new_name);
 	void transformFromRigidbody();
@@ -65,6 +65,7 @@ private:
 	GameObject* getByData(
 		const TSet& set, const TData& data
 	) const;
+	GameObject* duplicateObject(const GameObject* object);
 	Joint* duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b);
 
 };

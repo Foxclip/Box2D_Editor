@@ -129,6 +129,7 @@ public:
 	GameObject* getParent() const;
 	std::vector<GameObject*> getParentChain() const;
 	const std::vector<GameObject*>& getChildren() const;
+	std::vector<GameObject*> getAllChildren() const;
 	GameObject* getChild(size_t index) const;
 	b2Vec2 toGlobal(const b2Vec2& pos);
 	b2Vec2 toLocal(const b2Vec2& pos);
