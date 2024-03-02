@@ -358,7 +358,7 @@ void GameObject::deselectAllVertices() {
 }
 
 void GameObject::transformFromRigidbody() {
-	transforms.fromRigidbody();
+	transforms.setGlobalTransform(rigid_body->GetTransform());
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->transformFromRigidbody();
 	}
@@ -1188,12 +1188,6 @@ void GameObjectTransforms::setPosition(const b2Vec2& position) {
 
 void GameObjectTransforms::setAngle(float angle) {
 	transform.Set(transform.p, angle);
-	invalidateGlobalTransform();
-}
-
-void GameObjectTransforms::fromRigidbody() {
-	b2Transform pgt = object->getParentGlobalTransform();
-	transform = b2MulT(pgt, object->rigid_body->GetTransform());
 	invalidateGlobalTransform();
 }
 

@@ -85,7 +85,6 @@ public:
 	void setGlobalTransform(const b2Transform& transform);
 	void setPosition(const b2Vec2& position);
 	void setAngle(float angle);
-	void fromRigidbody();
 
 private:
 	friend class GameObject;
