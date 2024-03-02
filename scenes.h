@@ -180,3 +180,10 @@ void convex_polygon(Application& app) {
     app.setCameraPos(0.0f, 0.0f);
     app.setCameraZoom(50.0f);
 }
+
+void duplication(Application& app) {
+    app.load("level.txt");
+    GameObjectList& objects = app.getObjectList();
+    GameObject* car = objects.getByName("car0");
+    logger << "Car pos: " << car->getPosition() << "\n";
+}

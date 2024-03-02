@@ -204,6 +204,5 @@ void GameObjectList::clear() {
     all_objects.clear();
     top_objects.clear();
     ids = std::set<ObjectData<size_t>>();
-    names = std::set<ObjectData<std::string>>();
+    names = std::multiset<ObjectData<std::string>>();
 }
-

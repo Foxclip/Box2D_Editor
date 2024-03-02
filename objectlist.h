@@ -20,6 +20,12 @@ public:
 private:
 };
 
+template<typename TSet, typename TData>
+concept is_object_data_set = requires {
+	std::same_as<TSet, std::set<ObjectData<TData>>>
+	|| std::same_as<TSet, std::multiset<ObjectData<TData>>>;
+};
+
 class GameObjectList {
 public:
 	b2World* world = nullptr;
@@ -52,16 +58,19 @@ private:
 	CompoundVector<GameObject*> top_objects;
 	CompoundVectorUptr<Joint> joints;
 	std::set<ObjectData<size_t>> ids;
-	std::set<ObjectData<std::string>> names;
+	std::multiset<ObjectData<std::string>> names;
 
-	template<typename T> GameObject* getByData(
-		const std::set<ObjectData<T>>& set, const T& data
+	template<typename TSet, typename TData>
+	requires is_object_data_set<TSet, TData>
+	GameObject* getByData(
+		const TSet& set, const TData& data
 	) const;
 };
 
-template<typename T>
-inline GameObject* GameObjectList::getByData(const std::set<ObjectData<T>>& set, const T& data) const {
-	auto it = set.find(ObjectData<T>(data, nullptr));
+template<typename TSet, typename TData>
+requires is_object_data_set<TSet, TData>
+inline GameObject* GameObjectList::getByData(const TSet& set, const TData& data) const {
+	auto it = set.find(ObjectData<TData>(data, nullptr));
 	if (it != set.end()) {
 		return const_cast<GameObject*>((*it).ptr);
 	}
