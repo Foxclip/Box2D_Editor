@@ -79,6 +79,7 @@ public:
 	T* at(size_t index);
 	T* at(size_t index) const;
 	ptrdiff_t getIndex(const T* value) const;
+	const CompoundVector<T*>& getCompVector() const;
 	const std::vector<T*>& getVector() const;
 	const std::set<T*>& getSet() const;
 	T* operator[](size_t index);
@@ -391,6 +392,11 @@ inline ptrdiff_t CompoundVectorUptr<T>::getIndex(const T* value) const {
 		}
 	}
 	return -1;
+}
+
+template<typename T>
+inline const CompoundVector<T*>& CompoundVectorUptr<T>::getCompVector() const {
+	return comp;
 }
 
 template<typename T>

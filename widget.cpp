@@ -70,12 +70,8 @@ void Widget::processRelease(const sf::Vector2f& pos) {
 	}
 }
 
-std::vector<Widget*> Widget::getChildren() {
-	std::vector<Widget*> result;
-	for (size_t i = 0; i < children.size(); i++) {
-		result.push_back(children[i].get());
-	}
-	return result;
+const CompoundVector<Widget*>& Widget::getChildren() {
+	return children.getCompVector();
 }
 
 float Widget::getWidth() {
@@ -87,7 +83,12 @@ float Widget::getHeight() {
 }
 
 const sf::Vector2f& Widget::getPosition() {
-	return getTransformable().getPosition();
+	return transforms.getPosition();
+}
+
+sf::Vector2f Widget::getGlobalPosition() {
+	sf::Vector2f pos = getGlobalTransform().transformPoint(sf::Vector2f());
+	return pos;
 }
 
 const sf::Vector2f Widget::getTopLeft() {
@@ -148,25 +149,25 @@ void Widget::setAnchorOffset(const sf::Vector2f& offset) {
 }
 
 void Widget::setPosition(float x, float y) {
-	getTransformable().setPosition(x, y);
+	transforms.setPosition(sf::Vector2f(x, y));
 }
 
 void Widget::setPosition(const sf::Vector2f& position) {
-	getTransformable().setPosition(position);
+	transforms.setPosition(position);
 }
 
 void Widget::setAdjustedPosition(float x, float y) {
 	sf::FloatRect bounds = getLocalBounds();
-	getTransformable().setPosition(x - bounds.left, y - bounds.top);
+	transforms.setPosition(sf::Vector2f(x - bounds.left, y - bounds.top));
 }
 
 void Widget::setAdjustedPosition(const sf::Vector2f& position) {
 	sf::FloatRect bounds = getLocalBounds();
-	getTransformable().setPosition(position - bounds.getPosition());
+	transforms.setPosition(position - bounds.getPosition());
 }
 
 void Widget::setRotation(float angle) {
-	getTransformable().setRotation(angle);
+	transforms.setRotation(angle);
 }
 
 void Widget::setVisible(bool value) {
@@ -221,27 +222,42 @@ void Widget::render(sf::RenderTarget& target) {
 
 void Widget::addChild(std::unique_ptr<Widget> child) {
 	child->parent = this;
-	children.push_back(std::move(child));
+	children.add(std::move(child));
 }
 
-sf::Transform Widget::getGlobalTransform() {
-	// TODO: cache transform
-	return getParentGlobalTransform() * getTransformable().getTransform();
+const sf::Transform& Widget::getGlobalTransform() const {
+	return transforms.getGlobalTransform();
 }
 
-sf::Transform Widget::getParentGlobalTransform() {
+const sf::Transform& Widget::getParentGlobalTransform() const {
 	if (parent) {
 		return parent->getGlobalTransform();
+	} else {
+		return sf::Transform::Identity;
 	}
-	return sf::Transform::Identity;
+}
+
+const sf::Transform& Widget::getInverseGlobalTransform() const {
+	return transforms.getInverseGlobalTransform();
+}
+
+const sf::Transform& Widget::getInverseParentGlobalTransform() const {
+	if (parent) {
+		return parent->getInverseGlobalTransform();
+	} else {
+		return sf::Transform::Identity;
+	}
 }
 
 sf::FloatRect ShapeWidget::getLocalBounds() {
 	return getShape().getLocalBounds();
 }
 
+sf::FloatRect ShapeWidget::getParentLocalBounds() {
+	return getShape().getGlobalBounds();
+}
+
 sf::FloatRect ShapeWidget::getGlobalBounds() {
-	// cache this
 	return getParentGlobalTransform().transformRect(getShape().getGlobalBounds());
 }
 
@@ -276,6 +292,10 @@ sf::Transformable& RectangleWidget::getTransformable() {
 	return rect;
 }
 
+const sf::Transformable& RectangleWidget::getTransformable() const {
+	return rect;
+}
+
 sf::Shape& RectangleWidget::getShape() {
 	return rect;
 }
@@ -284,8 +304,11 @@ sf::FloatRect TextWidget::getLocalBounds() {
 	return text.getLocalBounds();
 }
 
+sf::FloatRect TextWidget::getParentLocalBounds() {
+	return text.getGlobalBounds();
+}
+
 sf::FloatRect TextWidget::getGlobalBounds() {
-	// cache this
 	return getParentGlobalTransform().transformRect(text.getGlobalBounds());
 }
 
@@ -323,6 +346,10 @@ sf::Transformable& TextWidget::getTransformable() {
 	return text;
 }
 
+const sf::Transformable& TextWidget::getTransformable() const {
+	return text;
+}
+
 ContainerWidget::ContainerWidget() : RectangleWidget() { }
 
 void ContainerWidget::setAutoResize(bool value) {
@@ -342,7 +369,7 @@ void ContainerWidget::update() {
 	sf::FloatRect container_bounds = sf::FloatRect();
 	float next_x = padding, next_y = padding;
 	for (size_t i = 0; i < children.size(); i++) {
-		Widget* child = children[i].get();
+		Widget* child = children[i];
 		child->setAdjustedPosition(next_x, next_y);
 		sf::FloatRect child_bounds = sf::FloatRect(next_x, next_y, child->getWidth(), child->getHeight());
 		utils::extend_bounds(container_bounds, child_bounds);
@@ -355,4 +382,78 @@ void ContainerWidget::update() {
 	if (auto_resize) {
 		setSize(sf::Vector2f(container_bounds.width + padding, container_bounds.height + padding));
 	}
+}
+
+WidgetTransform::WidgetTransform(Widget* widget) {
+	this->widget = widget;
+	global_transform = sf::Transform::Identity;
+	global_transform_valid = false;
+}
+
+const sf::Transform& WidgetTransform::getTransform() const {
+	return widget->getTransformable().getTransform();
+}
+
+const sf::Transform& WidgetTransform::getGlobalTransform() const {
+	if (!global_transform_valid) {
+		recalcGlobalTransform();
+	}
+	return global_transform;
+}
+
+const sf::Transform& WidgetTransform::getInverseGlobalTransform() const {
+	if (!inv_global_transform_valid) {
+		recalcInverseGlobalTransform();
+	}
+	return inv_global_transform;
+}
+
+const sf::Vector2f& WidgetTransform::getPosition() const {
+	return widget->getTransformable().getPosition();
+}
+
+float WidgetTransform::getRotation() const {
+	return widget->getTransformable().getRotation();
+}
+
+const sf::Vector2f& WidgetTransform::getScale() const {
+	return widget->getTransformable().getScale();
+}
+
+void WidgetTransform::invalidateGlobalTransform() {
+	global_transform_valid = false;
+	inv_global_transform_valid = false;
+	for (size_t i = 0; i < widget->getChildren().size(); i++) {
+		Widget* child = widget->getChildren()[i];
+		child->transforms.invalidateGlobalTransform();
+	}
+}
+
+void WidgetTransform::setPosition(const sf::Vector2f& position) {
+	widget->getTransformable().setPosition(position);
+	invalidateGlobalTransform();
+}
+
+void WidgetTransform::setRotation(float angle) {
+	widget->getTransformable().setRotation(angle);
+	invalidateGlobalTransform();
+}
+
+void WidgetTransform::setScale(const sf::Vector2f& scale) {
+	widget->getTransformable().setScale(scale);
+	invalidateGlobalTransform();
+}
+
+void WidgetTransform::recalcGlobalTransform() const {
+	const sf::Transform& transform = getTransform();
+	const sf::Transform& parent_transform = widget->getParentGlobalTransform();
+	global_transform = parent_transform * transform;
+	global_transform_valid = true;
+}
+
+void WidgetTransform::recalcInverseGlobalTransform() const {
+	const sf::Transform& transform = getTransform();
+	const sf::Transform& global_transform = getGlobalTransform();
+	inv_global_transform = global_transform.getInverse();
+	inv_global_transform_valid = true;
 }

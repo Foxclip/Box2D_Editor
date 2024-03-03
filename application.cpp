@@ -326,7 +326,7 @@ void Application::init_widgets() {
         ContainerWidget* edit_window_widget = edit_window_widget_uptr.get();
         edit_window_widget->setVisible(false);
         edit_window_widget->setSize(sf::Vector2f(100.0f, 200.0f));
-        edit_window_widget->setFillColor(sf::Color(255, 0, 0));
+        edit_window_widget->setFillColor(sf::Color(128, 128, 128));
         edit_window_widget->setOrigin(Widget::TOP_RIGHT);
         edit_window_widget->setParentAnchor(Widget::TOP_RIGHT);
         edit_window_widget->setAnchorOffset(-20.0f, 20.0f);

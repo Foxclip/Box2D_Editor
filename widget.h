@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "logger.h"
 #include "global.h"
+#include "compvector.h"
 
 struct WidgetVisibility {
 	bool addedToRoot = false;
@@ -13,6 +14,34 @@ struct WidgetVisibility {
 	bool nonZeroSize = false;
 	bool opaque = false;
 	//bool notCovered = false;
+};
+
+class Widget;
+
+class WidgetTransform {
+public:
+	WidgetTransform(Widget* widget);
+	const sf::Transform& getTransform() const;
+	const sf::Transform& getGlobalTransform() const;
+	const sf::Transform& getInverseGlobalTransform() const;
+	const sf::Vector2f& getPosition() const;
+	float getRotation() const;
+	const sf::Vector2f& getScale() const;
+	void invalidateGlobalTransform();
+	void setPosition(const sf::Vector2f& position);
+	void setRotation(float angle);
+	void setScale(const sf::Vector2f& scale);
+
+private:
+	Widget* widget = nullptr;
+	mutable sf::Transform global_transform;
+	mutable sf::Transform inv_global_transform;
+	mutable bool global_transform_valid = false;
+	mutable bool inv_global_transform_valid = false;
+
+	void recalcGlobalTransform() const;
+	void recalcInverseGlobalTransform() const;
+
 };
 
 class Widget {
@@ -41,12 +70,14 @@ public:
 	void updateMouseState();
 	void processClick(const sf::Vector2f& pos);
 	void processRelease(const sf::Vector2f& pos);
-	std::vector<Widget*> getChildren();
+	const CompoundVector<Widget*>& getChildren();
 	virtual sf::FloatRect getLocalBounds() = 0;
+	virtual sf::FloatRect getParentLocalBounds() = 0;
 	virtual sf::FloatRect getGlobalBounds() = 0;
 	float getWidth();
 	float getHeight();
 	const sf::Vector2f& getPosition();
+	sf::Vector2f getGlobalPosition();
 	const sf::Vector2f getTopLeft();
 	const sf::Vector2f getTopRight();
 	const sf::Vector2f getBottomLeft();
@@ -71,18 +102,24 @@ public:
 	void addChild(std::unique_ptr<Widget> child);
 
 protected:
+	friend class WidgetTransform;
+	WidgetTransform transforms = WidgetTransform(this);
 	Widget* parent = nullptr;
-	std::vector<std::unique_ptr<Widget>> children;
+	CompoundVectorUptr<Widget> children;
 	Anchor origin_anchor = CUSTOM;
 	Anchor parent_anchor = CUSTOM;
 	sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);
 	bool visible = true;
 	bool click_through = true;
 	bool mouseIn = false;
-	sf::Transform getGlobalTransform();
-	sf::Transform getParentGlobalTransform();
+
+	const sf::Transform& getGlobalTransform() const;
+	const sf::Transform& getParentGlobalTransform() const;
+	const sf::Transform& getInverseGlobalTransform() const;
+	const sf::Transform& getInverseParentGlobalTransform() const;
 	virtual sf::Drawable& getDrawable() = 0;
 	virtual sf::Transformable& getTransformable() = 0;
+	virtual const sf::Transformable& getTransformable() const = 0;
 	virtual void update();
 	sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size);
 
@@ -93,6 +130,7 @@ private:
 class ShapeWidget : public Widget {
 public:
 	sf::FloatRect getLocalBounds() override;
+	sf::FloatRect getParentLocalBounds() override;
 	sf::FloatRect getGlobalBounds() override;
 	const sf::Color& getFillColor() override;
 	void setFillColor(const sf::Color& color) override;
@@ -113,6 +151,7 @@ protected:
 
 	sf::Drawable& getDrawable() override;
 	sf::Transformable& getTransformable() override;
+	const sf::Transformable& getTransformable() const override;
 	sf::Shape& getShape() override;
 
 private:
@@ -139,6 +178,7 @@ private:
 class TextWidget : public Widget {
 public:
 	sf::FloatRect getLocalBounds() override;
+	sf::FloatRect getParentLocalBounds() override;
 	sf::FloatRect getGlobalBounds() override;
 	const sf::Color& getFillColor() override;
 	void setFont(const sf::Font& font);
@@ -150,6 +190,7 @@ public:
 protected:
 	sf::Drawable& getDrawable() override;
 	sf::Transformable& getTransformable() override;
+	const sf::Transformable& getTransformable() const override;
 
 private:
 	sf::Text text;
