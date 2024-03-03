@@ -445,6 +445,7 @@ void SplittablePolygon::recut() {
 		}
 		polygon.is_convex = true;
 		polygon.parent = this;
+		polygon.draw_varray = false;
 	}
 }
 
