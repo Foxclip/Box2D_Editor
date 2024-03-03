@@ -28,11 +28,14 @@ WidgetVisibility Widget::checkVisibility() const {
 
 void Widget::updateMouseState() {
 	sf::FloatRect bounds = getGlobalBounds();
-	bool is_over = utils::contains_point(bounds, utils::to2f(sf::Mouse::getPosition(window)));
+	sf::Vector2f mouse_pos = utils::to2f(sf::Mouse::getPosition(window));
+	bool is_over = utils::contains_point(bounds, mouse_pos);
 	if (is_over && !mouseIn) {
-		OnMouseEnter();
+		internalOnMouseEnter(mouse_pos);
+		OnMouseEnter(mouse_pos);
 	} else if (!is_over && mouseIn) {
-		OnMouseExit();
+		internalOnMouseExit(mouse_pos);
+		OnMouseExit(mouse_pos);
 	}
 	mouseIn = is_over;
 	for (size_t i = 0; i < children.size(); i++) {
@@ -190,6 +193,10 @@ void Widget::update() {
 }
 
 void Widget::internalOnClick(const sf::Vector2f& pos) { }
+
+void Widget::internalOnMouseEnter(const sf::Vector2f& pos) { }
+
+void Widget::internalOnMouseExit(const sf::Vector2f& pos) { }
 
 void Widget::render() {
 	render(ui_texture);
@@ -474,18 +481,43 @@ void WidgetTransform::recalcInverseGlobalTransform() const {
 
 CheckboxWidget::CheckboxWidget() {
 	setSize(DEFAULT_SIZE);
+	RectangleWidget::setFillColor(background_fill_color);
 	std::unique_ptr<RectangleWidget> check_widget_uptr = std::make_unique<RectangleWidget>();
 	check_widget = check_widget_uptr.get();
+	check_widget->setVisible(checked);
 	check_widget->setSize(rect.getSize() * check_size);
-	check_widget->setFillColor(sf::Color(255, 128, 0));
+	check_widget->setFillColor(check_fill_color);
 	check_widget->setOrigin(CENTER);
 	check_widget->setParentAnchor(CENTER);
 	addChild(std::move(check_widget_uptr));
-	checked = true;
 }
 
 bool CheckboxWidget::isChecked() const {
 	return checked;
+}
+
+const sf::Color& CheckboxWidget::getFillColor() const {
+	return background_fill_color;
+}
+
+const sf::Color& CheckboxWidget::getHighlightFillColor() const {
+	return highlight_fill_color;
+}
+
+const sf::Color& CheckboxWidget::getCheckFillColor() const {
+	return check_fill_color;
+}
+
+void CheckboxWidget::setFillColor(const sf::Color& color) {
+	background_fill_color = color;
+}
+
+void CheckboxWidget::setHighlightFillColor(const sf::Color& color) {
+	highlight_fill_color = color;
+}
+
+void CheckboxWidget::setCheckFillColor(const sf::Color& color) {
+	check_fill_color = color;
 }
 
 void CheckboxWidget::setChecked(bool value) {
@@ -500,6 +532,14 @@ void CheckboxWidget::update() {
 
 void CheckboxWidget::internalOnClick(const sf::Vector2f& pos) {
 	toggleChecked();
+}
+
+void CheckboxWidget::internalOnMouseEnter(const sf::Vector2f& pos) {
+	RectangleWidget::setFillColor(highlight_fill_color);
+}
+
+void CheckboxWidget::internalOnMouseExit(const sf::Vector2f& pos) {
+	RectangleWidget::setFillColor(background_fill_color);
 }
 
 void CheckboxWidget::toggleChecked() {

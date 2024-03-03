@@ -58,10 +58,10 @@ public:
 		BOTTOM_CENTER,
 		BOTTOM_RIGHT,
 	};
-	std::function<void(const sf::Vector2f& pos)> OnClick = [](const sf::Vector2f&) { };
-	std::function<void(const sf::Vector2f& pos)> OnRelease = [](const sf::Vector2f&) { };
-	std::function<void(void)> OnMouseEnter = []() { };
-	std::function<void(void)> OnMouseExit = []() { };
+	std::function<void(const sf::Vector2f& pos)> OnClick = [](const sf::Vector2f& pos) { };
+	std::function<void(const sf::Vector2f& pos)> OnRelease = [](const sf::Vector2f& pos) { };
+	std::function<void(const sf::Vector2f& pos)> OnMouseEnter = [](const sf::Vector2f& pos) { };
+	std::function<void(const sf::Vector2f& pos)> OnMouseExit = [](const sf::Vector2f& pos) { };
 
 	static bool click_blocked;
 	static bool release_blocked;
@@ -126,6 +126,8 @@ protected:
 	virtual const sf::Transformable& getTransformable() const = 0;
 	virtual void update();
 	virtual void internalOnClick(const sf::Vector2f& pos);
+	virtual void internalOnMouseEnter(const sf::Vector2f& pos);
+	virtual void internalOnMouseExit(const sf::Vector2f& pos);
 
 private:
 
@@ -136,8 +138,8 @@ public:
 	sf::FloatRect getLocalBounds() const override;
 	sf::FloatRect getParentLocalBounds() const override;
 	sf::FloatRect getGlobalBounds() const override;
-	const sf::Color& getFillColor() const override;
-	void setFillColor(const sf::Color& color) override;
+	virtual const sf::Color& getFillColor() const override;
+	virtual void setFillColor(const sf::Color& color) override;
 	void setOutlineColor(const sf::Color& color);
 	void setOutlineThickness(float thickness);
 
@@ -186,17 +188,28 @@ class CheckboxWidget : public RectangleWidget {
 public:
 	CheckboxWidget();
 	bool isChecked() const;
+	const sf::Color& getFillColor() const override;
+	const sf::Color& getHighlightFillColor() const;
+	const sf::Color& getCheckFillColor() const;
+	void setFillColor(const sf::Color& color) override;
+	void setHighlightFillColor(const sf::Color& color);
+	void setCheckFillColor(const sf::Color& color);
 	void setChecked(bool value);
 
 protected:
 	void update() override;
 	void internalOnClick(const sf::Vector2f& pos) override;
+	void internalOnMouseEnter(const sf::Vector2f& pos) override;
+	void internalOnMouseExit(const sf::Vector2f& pos) override;
 
 private:
 	bool checked = false;
 	const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(20.0f, 20.0f);
 	float check_size = 0.6f;
 	RectangleWidget* check_widget;
+	sf::Color background_fill_color = sf::Color(50, 50, 50);
+	sf::Color highlight_fill_color = sf::Color(128, 128, 128);
+	sf::Color check_fill_color = sf::Color(255, 128, 0);
 
 	void toggleChecked();
 };

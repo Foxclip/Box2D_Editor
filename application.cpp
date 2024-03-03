@@ -298,10 +298,10 @@ void Application::init_widgets() {
             tool_widget->OnClick = [=](const sf::Vector2f& pos) {
                 try_select_tool(tool);
             };
-            tool_widget->OnMouseEnter = [=]() {
+            tool_widget->OnMouseEnter = [=](const sf::Vector2f pos) {
                 tool_widget->setOutlineThickness(-1.0f);
             };
-            tool_widget->OnMouseExit = [=]() {
+            tool_widget->OnMouseExit = [=](const sf::Vector2f pos) {
                 tool_widget->setOutlineThickness(0.0f);
             };
             {
@@ -337,7 +337,6 @@ void Application::init_widgets() {
         {
             std::unique_ptr<CheckboxWidget> checkbox_widget_uptr = std::make_unique<CheckboxWidget>();
             CheckboxWidget* checkbox_widget = checkbox_widget_uptr.get();
-            checkbox_widget->setFillColor(sf::Color(50, 50, 50));
             checkbox_widget->setOrigin(Widget::TOP_LEFT);
             edit_window_widget->addChild(std::move(checkbox_widget_uptr));
         }
@@ -361,10 +360,10 @@ void Application::init_widgets() {
             button_widget->OnClick = [=](const sf::Vector2f& pos) {
                 select_create_type(i);
             };
-            button_widget->OnMouseEnter = [=]() {
+            button_widget->OnMouseEnter = [=](const sf::Vector2f pos) {
                 button_widget->setOutlineThickness(-1.0f);
             };
-            button_widget->OnMouseExit = [=]() {
+            button_widget->OnMouseExit = [=](const sf::Vector2f pos) {
                 button_widget->setOutlineThickness(0.0f);
             };
             {
