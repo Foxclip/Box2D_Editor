@@ -115,6 +115,7 @@ protected:
 	bool click_through = true;
 	bool mouseIn = false;
 
+	sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size);
 	const sf::Transform& getGlobalTransform() const;
 	const sf::Transform& getParentGlobalTransform() const;
 	const sf::Transform& getInverseGlobalTransform() const;
@@ -124,7 +125,7 @@ protected:
 	virtual sf::Transformable& getTransformable() = 0;
 	virtual const sf::Transformable& getTransformable() const = 0;
 	virtual void update();
-	sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size);
+	virtual void internalOnClick(const sf::Vector2f& pos);
 
 private:
 
@@ -189,6 +190,7 @@ public:
 
 protected:
 	void update() override;
+	void internalOnClick(const sf::Vector2f& pos) override;
 
 private:
 	bool checked = false;
@@ -196,6 +198,7 @@ private:
 	float check_size = 0.6f;
 	RectangleWidget* check_widget;
 
+	void toggleChecked();
 };
 
 class TextWidget : public Widget {

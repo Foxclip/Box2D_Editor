@@ -48,6 +48,7 @@ void Widget::processClick(const sf::Vector2f& pos) {
 		if (!click_through) {
 			click_blocked = true;
 		}
+		internalOnClick(pos);
 		OnClick(pos);
 	}
 	for (size_t i = 0; i < children.size(); i++) {
@@ -188,21 +189,7 @@ void Widget::update() {
 	setPosition(anchored_pos + anchor_offset);
 }
 
-sf::Vector2f Widget::anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size) {
-	float x = orig.x, y = orig.y;
-	switch (p_anchor) {
-		case Widget::TOP_LEFT: x = 0.0f; y = 0.0f; break;
-		case Widget::TOP_CENTER: x = size.x / 2.0f; y = 0.0f; break;
-		case Widget::TOP_RIGHT: x = size.x; y = 0.0f; break;
-		case Widget::CENTER_LEFT: x = 0.0f; y = size.y / 2.0f; break;
-		case Widget::CENTER: x = size.x / 2.0f; y = size.y / 2.0f; break;
-		case Widget::CENTER_RIGHT: x = size.x; y = size.y / 2.0f; break;
-		case Widget::BOTTOM_LEFT: x = 0.0f; y = size.y; break;
-		case Widget::BOTTOM_CENTER: x = size.x / 2.0f; y = size.y; break;
-		case Widget::BOTTOM_RIGHT: x = size.x; y = size.y; break;
-	}
-	return sf::Vector2f(x, y);
-}
+void Widget::internalOnClick(const sf::Vector2f& pos) { }
 
 void Widget::render() {
 	render(ui_texture);
@@ -222,6 +209,22 @@ void Widget::render(sf::RenderTarget& target) {
 void Widget::addChild(std::unique_ptr<Widget> child) {
 	child->parent = this;
 	children.add(std::move(child));
+}
+
+sf::Vector2f Widget::anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size) {
+	float x = orig.x, y = orig.y;
+	switch (p_anchor) {
+		case Widget::TOP_LEFT: x = 0.0f; y = 0.0f; break;
+		case Widget::TOP_CENTER: x = size.x / 2.0f; y = 0.0f; break;
+		case Widget::TOP_RIGHT: x = size.x; y = 0.0f; break;
+		case Widget::CENTER_LEFT: x = 0.0f; y = size.y / 2.0f; break;
+		case Widget::CENTER: x = size.x / 2.0f; y = size.y / 2.0f; break;
+		case Widget::CENTER_RIGHT: x = size.x; y = size.y / 2.0f; break;
+		case Widget::BOTTOM_LEFT: x = 0.0f; y = size.y; break;
+		case Widget::BOTTOM_CENTER: x = size.x / 2.0f; y = size.y; break;
+		case Widget::BOTTOM_RIGHT: x = size.x; y = size.y; break;
+	}
+	return sf::Vector2f(x, y);
 }
 
 const sf::Transform& Widget::getGlobalTransform() const {
@@ -493,4 +496,12 @@ void CheckboxWidget::setChecked(bool value) {
 void CheckboxWidget::update() {
 	Widget::update();
 	check_widget->setSize(rect.getSize() * check_size);
+}
+
+void CheckboxWidget::internalOnClick(const sf::Vector2f& pos) {
+	toggleChecked();
+}
+
+void CheckboxWidget::toggleChecked() {
+	setChecked(!checked);
 }
