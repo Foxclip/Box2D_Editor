@@ -74,12 +74,20 @@ const CompoundVector<Widget*>& Widget::getChildren() const {
 	return children.getCompVector();
 }
 
+sf::Vector2f Widget::getSize() const {
+	return getLocalBounds().getSize();
+}
+
 float Widget::getWidth() const {
 	return getLocalBounds().width;
 }
 
 float Widget::getHeight() const {
 	return getLocalBounds().height;
+}
+
+const sf::Vector2f& Widget::getOrigin() const {
+	return getTransformable().getOrigin();
 }
 
 const sf::Vector2f& Widget::getPosition() const {
@@ -112,17 +120,8 @@ const sf::Vector2f Widget::getBottomRight() const {
 }
 
 void Widget::setOrigin(Anchor anchor) {
-	switch (anchor) {
-		case Widget::TOP_LEFT: setOrigin(0.0f, 0.0f); break;
-		case Widget::TOP_CENTER: setOrigin(getWidth() / 2.0f, 0.0f); break;
-		case Widget::TOP_RIGHT: setOrigin(getWidth(), 0.0f); break;
-		case Widget::CENTER_LEFT: setOrigin(0.0f, getHeight() / 2.0f); break;
-		case Widget::CENTER: setOrigin(getWidth() / 2.0f, getHeight() / 2.0f); break;
-		case Widget::CENTER_RIGHT: setOrigin(getWidth(), getHeight() / 2.0f); break;
-		case Widget::BOTTOM_LEFT: setOrigin(0.0f, getHeight()); break;
-		case Widget::BOTTOM_CENTER: setOrigin(getWidth() / 2.0f, getHeight()); break;
-		case Widget::BOTTOM_RIGHT: setOrigin(getWidth(), getHeight()); break;
-	}
+	sf::Vector2f origin_pos = anchorToPos(anchor, getOrigin(), getSize());
+	setOrigin(origin_pos);
 	this->origin_anchor = anchor;
 }
 
@@ -468,4 +467,30 @@ void WidgetTransform::recalcInverseGlobalTransform() const {
 	const sf::Transform& global_transform = getGlobalTransform();
 	inv_global_transform = global_transform.getInverse();
 	inv_global_transform_valid = true;
+}
+
+CheckboxWidget::CheckboxWidget() {
+	setSize(DEFAULT_SIZE);
+	std::unique_ptr<RectangleWidget> check_widget_uptr = std::make_unique<RectangleWidget>();
+	check_widget = check_widget_uptr.get();
+	check_widget->setSize(rect.getSize() * check_size);
+	check_widget->setFillColor(sf::Color(255, 128, 0));
+	check_widget->setOrigin(CENTER);
+	check_widget->setParentAnchor(CENTER);
+	addChild(std::move(check_widget_uptr));
+	checked = true;
+}
+
+bool CheckboxWidget::isChecked() const {
+	return checked;
+}
+
+void CheckboxWidget::setChecked(bool value) {
+	checked = value;
+	check_widget->setVisible(value);
+}
+
+void CheckboxWidget::update() {
+	Widget::update();
+	check_widget->setSize(rect.getSize() * check_size);
 }

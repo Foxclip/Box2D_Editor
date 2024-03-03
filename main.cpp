@@ -31,7 +31,7 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: add const to Widget
+    // TODO: checkbox widget
     // TODO: set whether object is static or dynamic in edit mode
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars

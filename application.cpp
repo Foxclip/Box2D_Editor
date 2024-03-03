@@ -334,6 +334,13 @@ void Application::init_widgets() {
         edit_window_widget->setClickThrough(false);
         edit_window_widget->setAutoResize(false);
         edit_tool.edit_window_widget = edit_window_widget;
+        {
+            std::unique_ptr<CheckboxWidget> checkbox_widget_uptr = std::make_unique<CheckboxWidget>();
+            CheckboxWidget* checkbox_widget = checkbox_widget_uptr.get();
+            checkbox_widget->setFillColor(sf::Color(50, 50, 50));
+            checkbox_widget->setOrigin(Widget::TOP_LEFT);
+            edit_window_widget->addChild(std::move(checkbox_widget_uptr));
+        }
         root_widget.addChild(std::move(edit_window_widget_uptr));
     }
     {

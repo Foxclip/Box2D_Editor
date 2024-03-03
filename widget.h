@@ -74,8 +74,10 @@ public:
 	virtual sf::FloatRect getLocalBounds() const = 0;
 	virtual sf::FloatRect getParentLocalBounds() const = 0;
 	virtual sf::FloatRect getGlobalBounds() const = 0;
+	sf::Vector2f getSize() const;
 	float getWidth() const;
 	float getHeight() const;
+	const sf::Vector2f& getOrigin() const;
 	const sf::Vector2f& getPosition() const;
 	sf::Vector2f getGlobalPosition() const;
 	const sf::Vector2f getTopLeft() const;
@@ -176,6 +178,23 @@ private:
 	bool auto_resize = true;
 	bool horizontal = true;
 	float padding = 0.0f;
+
+};
+
+class CheckboxWidget : public RectangleWidget {
+public:
+	CheckboxWidget();
+	bool isChecked() const;
+	void setChecked(bool value);
+
+protected:
+	void update() override;
+
+private:
+	bool checked = false;
+	const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(20.0f, 20.0f);
+	float check_size = 0.6f;
+	RectangleWidget* check_widget;
 
 };
 
