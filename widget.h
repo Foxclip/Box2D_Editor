@@ -65,24 +65,24 @@ public:
 
 	static bool click_blocked;
 	static bool release_blocked;
-	WidgetVisibility checkVisibility();
-	bool isMouseOver();
+	WidgetVisibility checkVisibility() const;
+	bool isMouseOver() const;
 	void updateMouseState();
 	void processClick(const sf::Vector2f& pos);
 	void processRelease(const sf::Vector2f& pos);
-	const CompoundVector<Widget*>& getChildren();
-	virtual sf::FloatRect getLocalBounds() = 0;
-	virtual sf::FloatRect getParentLocalBounds() = 0;
-	virtual sf::FloatRect getGlobalBounds() = 0;
-	float getWidth();
-	float getHeight();
-	const sf::Vector2f& getPosition();
-	sf::Vector2f getGlobalPosition();
-	const sf::Vector2f getTopLeft();
-	const sf::Vector2f getTopRight();
-	const sf::Vector2f getBottomLeft();
-	const sf::Vector2f getBottomRight();
-	virtual const sf::Color& getFillColor() = 0;
+	const CompoundVector<Widget*>& getChildren() const;
+	virtual sf::FloatRect getLocalBounds() const = 0;
+	virtual sf::FloatRect getParentLocalBounds() const = 0;
+	virtual sf::FloatRect getGlobalBounds() const = 0;
+	float getWidth() const;
+	float getHeight() const;
+	const sf::Vector2f& getPosition() const;
+	sf::Vector2f getGlobalPosition() const;
+	const sf::Vector2f getTopLeft() const;
+	const sf::Vector2f getTopRight() const;
+	const sf::Vector2f getBottomLeft() const;
+	const sf::Vector2f getBottomRight() const;
+	virtual const sf::Color& getFillColor() const = 0;
 	void setOrigin(Anchor anchor);
 	void setOrigin(float x, float y);
 	void setOrigin(const sf::Vector2f& origin);
@@ -118,6 +118,7 @@ protected:
 	const sf::Transform& getInverseGlobalTransform() const;
 	const sf::Transform& getInverseParentGlobalTransform() const;
 	virtual sf::Drawable& getDrawable() = 0;
+	virtual const sf::Drawable& getDrawable() const = 0;
 	virtual sf::Transformable& getTransformable() = 0;
 	virtual const sf::Transformable& getTransformable() const = 0;
 	virtual void update();
@@ -129,16 +130,17 @@ private:
 
 class ShapeWidget : public Widget {
 public:
-	sf::FloatRect getLocalBounds() override;
-	sf::FloatRect getParentLocalBounds() override;
-	sf::FloatRect getGlobalBounds() override;
-	const sf::Color& getFillColor() override;
+	sf::FloatRect getLocalBounds() const override;
+	sf::FloatRect getParentLocalBounds() const override;
+	sf::FloatRect getGlobalBounds() const override;
+	const sf::Color& getFillColor() const override;
 	void setFillColor(const sf::Color& color) override;
 	void setOutlineColor(const sf::Color& color);
 	void setOutlineThickness(float thickness);
 
 protected:
 	virtual sf::Shape& getShape() = 0;
+	virtual const sf::Shape& getShape() const = 0;
 };
 
 class RectangleWidget : public ShapeWidget {
@@ -150,9 +152,11 @@ protected:
 	sf::RectangleShape rect;
 
 	sf::Drawable& getDrawable() override;
+	const sf::Drawable& getDrawable() const override;
 	sf::Transformable& getTransformable() override;
 	const sf::Transformable& getTransformable() const override;
 	sf::Shape& getShape() override;
+	const sf::Shape& getShape() const override;
 
 private:
 
@@ -177,10 +181,10 @@ private:
 
 class TextWidget : public Widget {
 public:
-	sf::FloatRect getLocalBounds() override;
-	sf::FloatRect getParentLocalBounds() override;
-	sf::FloatRect getGlobalBounds() override;
-	const sf::Color& getFillColor() override;
+	sf::FloatRect getLocalBounds() const override;
+	sf::FloatRect getParentLocalBounds() const override;
+	sf::FloatRect getGlobalBounds() const override;
+	const sf::Color& getFillColor() const override;
 	void setFont(const sf::Font& font);
 	void setString(const std::string& string);
 	void setCharacterSize(unsigned int size);
@@ -189,6 +193,7 @@ public:
 
 protected:
 	sf::Drawable& getDrawable() override;
+	const sf::Drawable& getDrawable() const override;
 	sf::Transformable& getTransformable() override;
 	const sf::Transformable& getTransformable() const override;
 

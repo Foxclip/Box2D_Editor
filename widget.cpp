@@ -4,14 +4,14 @@ RectangleWidget root_widget;
 bool Widget::click_blocked = false;
 bool Widget::release_blocked = false;
 
-bool Widget::isMouseOver() {
+bool Widget::isMouseOver() const {
 	return mouseIn;
 }
 
-WidgetVisibility Widget::checkVisibility() {
+WidgetVisibility Widget::checkVisibility() const {
 	WidgetVisibility v;
 	sf::FloatRect global_bounds = getGlobalBounds();
-	Widget* current = this;
+	const Widget* current = this;
 	while (current) {
 		if (current == &root_widget) {
 			v.addedToRoot = true;
@@ -70,43 +70,43 @@ void Widget::processRelease(const sf::Vector2f& pos) {
 	}
 }
 
-const CompoundVector<Widget*>& Widget::getChildren() {
+const CompoundVector<Widget*>& Widget::getChildren() const {
 	return children.getCompVector();
 }
 
-float Widget::getWidth() {
+float Widget::getWidth() const {
 	return getLocalBounds().width;
 }
 
-float Widget::getHeight() {
+float Widget::getHeight() const {
 	return getLocalBounds().height;
 }
 
-const sf::Vector2f& Widget::getPosition() {
+const sf::Vector2f& Widget::getPosition() const {
 	return transforms.getPosition();
 }
 
-sf::Vector2f Widget::getGlobalPosition() {
+sf::Vector2f Widget::getGlobalPosition() const {
 	sf::Vector2f pos = getGlobalTransform().transformPoint(sf::Vector2f());
 	return pos;
 }
 
-const sf::Vector2f Widget::getTopLeft() {
+const sf::Vector2f Widget::getTopLeft() const {
 	sf::FloatRect bounds = getGlobalBounds();
 	return sf::Vector2f(bounds.left, bounds.top);
 }
 
-const sf::Vector2f Widget::getTopRight() {
+const sf::Vector2f Widget::getTopRight() const {
 	sf::FloatRect bounds = getGlobalBounds();
 	return sf::Vector2f(bounds.left + bounds.width, bounds.top);
 }
 
-const sf::Vector2f Widget::getBottomLeft() {
+const sf::Vector2f Widget::getBottomLeft() const {
 	sf::FloatRect bounds = getGlobalBounds();
 	return sf::Vector2f(bounds.left, bounds.top + bounds.height);
 }
 
-const sf::Vector2f Widget::getBottomRight() {
+const sf::Vector2f Widget::getBottomRight() const {
 	sf::FloatRect bounds = getGlobalBounds();
 	return sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height);
 }
@@ -249,19 +249,19 @@ const sf::Transform& Widget::getInverseParentGlobalTransform() const {
 	}
 }
 
-sf::FloatRect ShapeWidget::getLocalBounds() {
+sf::FloatRect ShapeWidget::getLocalBounds() const {
 	return getShape().getLocalBounds();
 }
 
-sf::FloatRect ShapeWidget::getParentLocalBounds() {
+sf::FloatRect ShapeWidget::getParentLocalBounds() const {
 	return getShape().getGlobalBounds();
 }
 
-sf::FloatRect ShapeWidget::getGlobalBounds() {
+sf::FloatRect ShapeWidget::getGlobalBounds() const {
 	return getParentGlobalTransform().transformRect(getShape().getGlobalBounds());
 }
 
-const sf::Color& ShapeWidget::getFillColor() {
+const sf::Color& ShapeWidget::getFillColor() const {
 	return getShape().getFillColor();
 }
 
@@ -288,6 +288,10 @@ sf::Drawable& RectangleWidget::getDrawable() {
 	return rect;
 }
 
+const sf::Drawable& RectangleWidget::getDrawable() const {
+	return rect;
+}
+
 sf::Transformable& RectangleWidget::getTransformable() {
 	return rect;
 }
@@ -300,19 +304,23 @@ sf::Shape& RectangleWidget::getShape() {
 	return rect;
 }
 
-sf::FloatRect TextWidget::getLocalBounds() {
+const sf::Shape& RectangleWidget::getShape() const {
+	return rect;
+}
+
+sf::FloatRect TextWidget::getLocalBounds() const {
 	return text.getLocalBounds();
 }
 
-sf::FloatRect TextWidget::getParentLocalBounds() {
+sf::FloatRect TextWidget::getParentLocalBounds() const {
 	return text.getGlobalBounds();
 }
 
-sf::FloatRect TextWidget::getGlobalBounds() {
+sf::FloatRect TextWidget::getGlobalBounds() const {
 	return getParentGlobalTransform().transformRect(text.getGlobalBounds());
 }
 
-const sf::Color& TextWidget::getFillColor() {
+const sf::Color& TextWidget::getFillColor() const {
 	return text.getFillColor();
 }
 
@@ -339,6 +347,10 @@ void TextWidget::setOriginToTextCenter() {
 }
 
 sf::Drawable& TextWidget::getDrawable() {
+	return text;
+}
+
+const sf::Drawable& TextWidget::getDrawable() const {
 	return text;
 }
 
