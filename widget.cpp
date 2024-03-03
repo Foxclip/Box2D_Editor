@@ -1,29 +1,7 @@
 #include "widget.h"
 
-RectangleWidget root_widget;
-bool Widget::click_blocked = false;
-bool Widget::release_blocked = false;
-
 bool Widget::isMouseOver() const {
 	return mouseIn;
-}
-
-WidgetVisibility Widget::checkVisibility() const {
-	WidgetVisibility v;
-	sf::FloatRect global_bounds = getGlobalBounds();
-	const Widget* current = this;
-	while (current) {
-		if (current == &root_widget) {
-			v.addedToRoot = true;
-			break;
-		}
-		current = parent;
-	}
-	v.visibleSetting = visible;
-	v.onScreen = root_widget.getGlobalBounds().intersects(global_bounds);
-	v.nonZeroSize = global_bounds.width > 0 && global_bounds.height > 0;
-	v.opaque = getFillColor().a > 0;
-	return v;
 }
 
 void Widget::updateMouseState() {
@@ -43,13 +21,31 @@ void Widget::updateMouseState() {
 	}
 }
 
+WidgetVisibility Widget::checkVisibility() const {
+	WidgetVisibility v;
+	sf::FloatRect global_bounds = getGlobalBounds();
+	const Widget* current = this;
+	while (current) {
+		if (current == widget_list->getRootWidget()) {
+			v.addedToRoot = true;
+			break;
+		}
+		current = parent;
+	}
+	v.visibleSetting = visible;
+	v.onScreen = widget_list->getRootWidget()->getGlobalBounds().intersects(global_bounds);
+	v.nonZeroSize = global_bounds.width > 0 && global_bounds.height > 0;
+	v.opaque = getFillColor().a > 0;
+	return v;
+}
+
 void Widget::processClick(const sf::Vector2f& pos) {
 	if (!visible) {
 		return;
 	}
 	if (mouseIn) {
 		if (!click_through) {
-			click_blocked = true;
+			widget_list->click_blocked = true;
 		}
 		internalOnClick(pos);
 		OnClick(pos);
@@ -65,7 +61,7 @@ void Widget::processRelease(const sf::Vector2f& pos) {
 	}
 	if (mouseIn) {
 		if (!click_through) {
-			release_blocked = true;
+			widget_list->release_blocked = true;
 		}
 		OnRelease(pos);
 	}
@@ -74,8 +70,12 @@ void Widget::processRelease(const sf::Vector2f& pos) {
 	}
 }
 
+Widget* Widget::getParent() const {
+	return parent;
+}
+
 const CompoundVector<Widget*>& Widget::getChildren() const {
-	return children.getCompVector();
+	return children;
 }
 
 sf::Vector2f Widget::getSize() const {
@@ -181,6 +181,19 @@ void Widget::setClickThrough(bool value) {
 	this->click_through = value;
 }
 
+void Widget::setParent(Widget* new_parent) {
+	if (!new_parent) {
+		return setParent(widget_list->root_widget);
+	}
+	Widget* old_parent = this->parent;
+	if (old_parent) {
+		old_parent->children.remove(this);
+	}
+	new_parent->children.add(this);
+	this->parent = new_parent;
+	transforms.invalidateGlobalTransform();
+}
+
 void Widget::update() {
 	sf::Vector2f parent_size;
 	if (parent) {
@@ -211,11 +224,6 @@ void Widget::render(sf::RenderTarget& target) {
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->render(target);
 	}
-}
-
-void Widget::addChild(std::unique_ptr<Widget> child) {
-	child->parent = this;
-	children.add(std::move(child));
 }
 
 sf::Vector2f Widget::anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size) {
@@ -288,6 +296,10 @@ void ShapeWidget::setOutlineThickness(float thickness) {
 
 RectangleWidget::RectangleWidget() { }
 
+RectangleWidget::RectangleWidget(WidgetList* widget_list) {
+	this->widget_list = widget_list;
+}
+
 void RectangleWidget::setSize(const sf::Vector2f& size) {
 	rect.setSize(size);
 	setOrigin(origin_anchor);
@@ -315,6 +327,12 @@ sf::Shape& RectangleWidget::getShape() {
 
 const sf::Shape& RectangleWidget::getShape() const {
 	return rect;
+}
+
+TextWidget::TextWidget() { }
+
+TextWidget::TextWidget(WidgetList* widget_list) {
+	this->widget_list = widget_list;
 }
 
 sf::FloatRect TextWidget::getLocalBounds() const {
@@ -371,7 +389,11 @@ const sf::Transformable& TextWidget::getTransformable() const {
 	return text;
 }
 
-ContainerWidget::ContainerWidget() : RectangleWidget() { }
+ContainerWidget::ContainerWidget() { }
+
+ContainerWidget::ContainerWidget(WidgetList* widget_list) {
+	this->widget_list = widget_list;
+}
 
 void ContainerWidget::setAutoResize(bool value) {
 	this->auto_resize = value;
@@ -479,17 +501,19 @@ void WidgetTransform::recalcInverseGlobalTransform() const {
 	inv_global_transform_valid = true;
 }
 
-CheckboxWidget::CheckboxWidget() {
+CheckboxWidget::CheckboxWidget() { }
+
+CheckboxWidget::CheckboxWidget(WidgetList* widget_list) {
+	this->widget_list = widget_list;
 	setSize(DEFAULT_SIZE);
 	RectangleWidget::setFillColor(background_fill_color);
-	std::unique_ptr<RectangleWidget> check_widget_uptr = std::make_unique<RectangleWidget>();
-	check_widget = check_widget_uptr.get();
+	check_widget = widget_list->createWidget<RectangleWidget>();
 	check_widget->setVisible(checked);
 	check_widget->setSize(rect.getSize() * check_size);
 	check_widget->setFillColor(check_fill_color);
 	check_widget->setOrigin(CENTER);
 	check_widget->setParentAnchor(CENTER);
-	addChild(std::move(check_widget_uptr));
+	check_widget->setParent(this);
 }
 
 bool CheckboxWidget::isChecked() const {
@@ -545,3 +569,40 @@ void CheckboxWidget::internalOnMouseExit(const sf::Vector2f& pos) {
 void CheckboxWidget::toggleChecked() {
 	setChecked(!checked);
 }
+
+WidgetList::WidgetList() {
+	root_widget = createWidget<RectangleWidget>();
+	root_widget->setFillColor(sf::Color::Transparent);
+}
+
+bool WidgetList::isClickBlocked() const {
+	return click_blocked;
+}
+
+bool WidgetList::isReleaseBlocked() const {
+	return release_blocked;
+}
+
+Widget* WidgetList::getRootWidget() {
+	return root_widget;
+}
+
+void WidgetList::processClick(const sf::Vector2f pos) {
+	root_widget->processClick(pos);
+}
+
+void WidgetList::processRelease(const sf::Vector2f pos) {
+	root_widget->processRelease(pos);
+}
+
+void WidgetList::render() {
+	root_widget->render();
+}
+
+void WidgetList::reset(const sf::Vector2f& root_size) {
+	root_widget->setSize(root_size);
+	root_widget->updateMouseState();
+	click_blocked = false;
+	release_blocked = false;
+}
+

@@ -253,9 +253,6 @@ void Application::init_ui() {
     load_font(small_font, "verdana.ttf");
     //load_font(small_font, "courbd.ttf");
 
-    root_widget.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
-    root_widget.setFillColor(sf::Color::Transparent);
-
     vertex_text.setFont(ui_font);
     vertex_text.setCharacterSize(20);
     vertex_text.setFillColor(sf::Color::White);
@@ -277,168 +274,136 @@ void Application::init_ui() {
 }
 
 void Application::init_widgets() {
-    {
-        std::unique_ptr<ContainerWidget> toolbox_widget_uptr = std::make_unique<ContainerWidget>();
-        toolbox_widget = toolbox_widget_uptr.get();
-        toolbox_widget->setFillColor(sf::Color(255, 0, 0, 0));
-        toolbox_widget->setOrigin(Widget::TOP_CENTER);
-        toolbox_widget->setParentAnchor(Widget::TOP_CENTER);
-        toolbox_widget->setPadding(TOOLBOX_PADDING);
-        toolbox_widget->setClickThrough(false);
-        for (size_t i = 0; i < tools.size(); i++) {
-            Tool* tool = tools[i];
-            if (!tool->showInToolPanel()) {
-                continue;
-            }
-            std::unique_ptr<RectangleWidget> tool_widget_uptr = std::make_unique<RectangleWidget>();
-            RectangleWidget* tool_widget = tool_widget_uptr.get();
-            tool_widget->setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
-            tool_widget->setFillColor(sf::Color(128, 128, 128));
-            tool_widget->setOutlineColor(sf::Color::Yellow);
-            tool_widget->OnClick = [=](const sf::Vector2f& pos) {
-                try_select_tool(tool);
-            };
-            tool_widget->OnMouseEnter = [=](const sf::Vector2f pos) {
-                tool_widget->setOutlineThickness(-1.0f);
-            };
-            tool_widget->OnMouseExit = [=](const sf::Vector2f pos) {
-                tool_widget->setOutlineThickness(0.0f);
-            };
-            {
-                std::unique_ptr<TextWidget> text_widget_uptr = std::make_unique<TextWidget>();
-                TextWidget* text_widget = text_widget_uptr.get();
-                text_widget->setFont(ui_font);
-                text_widget->setCharacterSize(TOOL_TEXT_SIZE);
-                text_widget->setString(tools[i]->name);
-                text_widget->setFillColor(sf::Color::Black);
-                text_widget->setOriginToTextCenter();
-                text_widget->setParentAnchor(Widget::CENTER);
-                tool_widget->addChild(std::move(text_widget_uptr));
-            }
-            tool->widget = tool_widget;
-            tools_in_tool_panel.push_back(tool);
-            toolbox_widget->addChild(std::move(tool_widget_uptr));
+
+    // toolbox
+    toolbox_widget = widgets.createWidget<ContainerWidget>();
+    toolbox_widget->setFillColor(sf::Color(255, 0, 0, 0));
+    toolbox_widget->setOrigin(Widget::TOP_CENTER);
+    toolbox_widget->setParentAnchor(Widget::TOP_CENTER);
+    toolbox_widget->setPadding(TOOLBOX_PADDING);
+    toolbox_widget->setClickThrough(false);
+    for (size_t i = 0; i < tools.size(); i++) {
+        Tool* tool = tools[i];
+        if (!tool->showInToolPanel()) {
+            continue;
         }
-        root_widget.addChild(std::move(toolbox_widget_uptr));
+        RectangleWidget* tool_widget = widgets.createWidget<RectangleWidget>();
+        tool_widget->setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
+        tool_widget->setFillColor(sf::Color(128, 128, 128));
+        tool_widget->setOutlineColor(sf::Color::Yellow);
+        tool_widget->OnClick = [=](const sf::Vector2f& pos) {
+            try_select_tool(tool);
+        };
+        tool_widget->OnMouseEnter = [=](const sf::Vector2f pos) {
+            tool_widget->setOutlineThickness(-1.0f);
+        };
+        tool_widget->OnMouseExit = [=](const sf::Vector2f pos) {
+            tool_widget->setOutlineThickness(0.0f);
+        };
+        TextWidget* text_widget = widgets.createWidget<TextWidget>();
+        text_widget->setFont(ui_font);
+        text_widget->setCharacterSize(TOOL_TEXT_SIZE);
+        text_widget->setString(tools[i]->name);
+        text_widget->setFillColor(sf::Color::Black);
+        text_widget->setOriginToTextCenter();
+        text_widget->setParentAnchor(Widget::CENTER);
+        text_widget->setParent(tool_widget);
+        tool->widget = tool_widget;
+        tools_in_tool_panel.push_back(tool);
+        tool_widget->setParent(toolbox_widget);
     }
-    {
-        std::unique_ptr<ContainerWidget> edit_window_widget_uptr = std::make_unique<ContainerWidget>();
-        ContainerWidget* edit_window_widget = edit_window_widget_uptr.get();
-        edit_window_widget->setVisible(false);
-        edit_window_widget->setSize(sf::Vector2f(100.0f, 200.0f));
-        edit_window_widget->setFillColor(sf::Color(128, 128, 128));
-        edit_window_widget->setOrigin(Widget::TOP_RIGHT);
-        edit_window_widget->setParentAnchor(Widget::TOP_RIGHT);
-        edit_window_widget->setAnchorOffset(-20.0f, 20.0f);
-        edit_window_widget->setPadding(TOOLBOX_PADDING);
-        edit_window_widget->setClickThrough(false);
-        edit_window_widget->setAutoResize(false);
-        edit_tool.edit_window_widget = edit_window_widget;
-        {
-            std::unique_ptr<CheckboxWidget> checkbox_widget_uptr = std::make_unique<CheckboxWidget>();
-            CheckboxWidget* checkbox_widget = checkbox_widget_uptr.get();
-            checkbox_widget->setOrigin(Widget::TOP_LEFT);
-            checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));
-            edit_window_widget->addChild(std::move(checkbox_widget_uptr));
-        }
-        root_widget.addChild(std::move(edit_window_widget_uptr));
+
+    // edit window
+    ContainerWidget* edit_window_widget = widgets.createWidget<ContainerWidget>();
+    edit_window_widget->setVisible(false);
+    edit_window_widget->setSize(sf::Vector2f(100.0f, 200.0f));
+    edit_window_widget->setFillColor(sf::Color(128, 128, 128));
+    edit_window_widget->setOrigin(Widget::TOP_RIGHT);
+    edit_window_widget->setParentAnchor(Widget::TOP_RIGHT);
+    edit_window_widget->setAnchorOffset(-20.0f, 20.0f);
+    edit_window_widget->setPadding(TOOLBOX_PADDING);
+    edit_window_widget->setClickThrough(false);
+    edit_window_widget->setAutoResize(false);
+    edit_tool.edit_window_widget = edit_window_widget;
+    CheckboxWidget* checkbox_widget = widgets.createWidget<CheckboxWidget>();
+    checkbox_widget->setOrigin(Widget::TOP_LEFT);
+    checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));
+    checkbox_widget->setParent(edit_window_widget);
+
+    // create panel
+    ContainerWidget* create_panel_widget = widgets.createWidget<ContainerWidget>();
+    create_panel_widget->setFillColor(sf::Color(255, 0, 0, 0));
+    create_panel_widget->setOrigin(Widget::CENTER_LEFT);
+    create_panel_widget->setParentAnchor(Widget::CENTER_LEFT);
+    create_panel_widget->setHorizontal(false);
+    create_panel_widget->setPadding(CREATE_PANEL_PADDING);
+    create_panel_widget->setClickThrough(false);
+    for (int i = 0; i < CreateTool::mode_count; i++) {
+        RectangleWidget* button_widget = widgets.createWidget<RectangleWidget>();
+        button_widget->setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
+        button_widget->setFillColor(sf::Color(128, 128, 128));
+        button_widget->setOutlineColor(sf::Color(0, 175, 255));
+        button_widget->OnClick = [=](const sf::Vector2f& pos) {
+            select_create_type(i);
+        };
+        button_widget->OnMouseEnter = [=](const sf::Vector2f pos) {
+            button_widget->setOutlineThickness(-1.0f);
+        };
+        button_widget->OnMouseExit = [=](const sf::Vector2f pos) {
+            button_widget->setOutlineThickness(0.0f);
+        };
+        TextWidget* text_widget = widgets.createWidget<TextWidget>();
+        text_widget->setFont(ui_font);
+        text_widget->setCharacterSize(TOOL_TEXT_SIZE);
+        text_widget->setString(CreateTool::create_type_name(static_cast<CreateTool::ObjectType>(i)));
+        text_widget->setFillColor(sf::Color::Black);
+        text_widget->setOriginToTextCenter();
+        text_widget->setParentAnchor(Widget::CENTER);
+        text_widget->setParent(button_widget);
+        create_tool.create_buttons.push_back(button_widget);
+        create_tool.create_panel_widget = create_panel_widget;
+        button_widget->setParent(create_panel_widget);
     }
-    {
-        std::unique_ptr<ContainerWidget> create_panel_widget_uptr = std::make_unique<ContainerWidget>();
-        ContainerWidget* create_panel_widget = create_panel_widget_uptr.get();
-        create_panel_widget->setFillColor(sf::Color(255, 0, 0, 0));
-        create_panel_widget->setOrigin(Widget::CENTER_LEFT);
-        create_panel_widget->setParentAnchor(Widget::CENTER_LEFT);
-        create_panel_widget->setHorizontal(false);
-        create_panel_widget->setPadding(CREATE_PANEL_PADDING);
-        create_panel_widget->setClickThrough(false);
-        for (int i = 0; i < CreateTool::mode_count; i++) {
-            std::unique_ptr<RectangleWidget> button_widget_uptr = std::make_unique<RectangleWidget>();
-            RectangleWidget* button_widget = button_widget_uptr.get();
-            button_widget->setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
-            button_widget->setFillColor(sf::Color(128, 128, 128));
-            button_widget->setOutlineColor(sf::Color(0, 175, 255));
-            button_widget->OnClick = [=](const sf::Vector2f& pos) {
-                select_create_type(i);
-            };
-            button_widget->OnMouseEnter = [=](const sf::Vector2f pos) {
-                button_widget->setOutlineThickness(-1.0f);
-            };
-            button_widget->OnMouseExit = [=](const sf::Vector2f pos) {
-                button_widget->setOutlineThickness(0.0f);
-            };
-            {
-                std::unique_ptr<TextWidget> text_widget_uptr = std::make_unique<TextWidget>();
-                TextWidget* text_widget = text_widget_uptr.get();
-                text_widget->setFont(ui_font);
-                text_widget->setCharacterSize(TOOL_TEXT_SIZE);
-                text_widget->setString(CreateTool::create_type_name(static_cast<CreateTool::ObjectType>(i)));
-                text_widget->setFillColor(sf::Color::Black);
-                text_widget->setOriginToTextCenter();
-                text_widget->setParentAnchor(Widget::CENTER);
-                button_widget->addChild(std::move(text_widget_uptr));
-            }
-            create_tool.create_buttons.push_back(button_widget);
-            create_tool.create_panel_widget = create_panel_widget;
-            create_panel_widget->addChild(std::move(button_widget_uptr));
-        }
-        root_widget.addChild(std::move(create_panel_widget_uptr));
-    }
-    {
-        std::unique_ptr<ContainerWidget> paused_rect_uptr = std::make_unique<ContainerWidget>();
-        paused_rect_widget = paused_rect_uptr.get();
-        paused_rect_widget->setFillColor(sf::Color(0, 0, 0, 128));
-        paused_rect_widget->setOrigin(Widget::TOP_LEFT);
-        paused_rect_widget->setPadding(10.0f);
-        {
-            std::unique_ptr<TextWidget> paused_text_uptr = std::make_unique<TextWidget>();
-            TextWidget* paused_text_widget = paused_text_uptr.get();
-            paused_text_widget->setFont(ui_font);
-            paused_text_widget->setString("PAUSED");
-            paused_text_widget->setCharacterSize(24);
-            paused_text_widget->setFillColor(sf::Color::Yellow);
-            paused_text_widget->setOrigin(Widget::TOP_LEFT);
-            paused_rect_widget->addChild(std::move(paused_text_uptr));
-        }
-        root_widget.addChild(std::move(paused_rect_uptr));
-    }
-    {
-        std::unique_ptr<ContainerWidget> fps_uptr = std::make_unique<ContainerWidget>();
-        fps_widget = fps_uptr.get();
-        fps_widget->setFillColor(sf::Color::Yellow);
-        fps_widget->setOrigin(Widget::TOP_LEFT);
-        fps_widget->setPosition(120.0f, 0.0f);
-        fps_widget->setPadding(0.0f);
-        {
-            std::unique_ptr<TextWidget> fps_text_uptr = std::make_unique<TextWidget>();
-            fps_text_widget = fps_text_uptr.get();
-            fps_text_widget->setFont(fps_font);
-            fps_text_widget->setCharacterSize(32);
-            fps_text_widget->setFillColor(sf::Color::Black);
-            fps_text_widget->setOrigin(Widget::TOP_LEFT);
-            fps_widget->addChild(std::move(fps_text_uptr));
-        }
-        root_widget.addChild(std::move(fps_uptr));
-    }
-    {
-        std::unique_ptr<RectangleWidget> logger_uptr = std::make_unique<RectangleWidget>();
-        logger_widget = logger_uptr.get();
-        logger_widget->setFillColor(sf::Color(0, 0, 0));
-        logger_widget->setSize(sf::Vector2f(500.0f, 20.0f));
-        logger_widget->setOrigin(Widget::BOTTOM_LEFT);
-        logger_widget->setParentAnchor(Widget::BOTTOM_LEFT);
-        {
-            std::unique_ptr<TextWidget> logger_text_uptr = std::make_unique<TextWidget>();
-            logger_text_widget = logger_text_uptr.get();
-            logger_text_widget->setFont(console_font);
-            logger_text_widget->setCharacterSize(15);
-            logger_text_widget->setFillColor(sf::Color::White);
-            logger_text_widget->setOrigin(Widget::TOP_LEFT);
-            logger_text_widget->setString("Logger message");
-            logger_widget->addChild(std::move(logger_text_uptr));
-        }
-        root_widget.addChild(std::move(logger_uptr));
-    }
+
+    // pause widget
+    paused_rect_widget = widgets.createWidget<ContainerWidget>();
+    paused_rect_widget->setFillColor(sf::Color(0, 0, 0, 128));
+    paused_rect_widget->setOrigin(Widget::TOP_LEFT);
+    paused_rect_widget->setPadding(10.0f);
+    TextWidget* paused_text_widget = widgets.createWidget<TextWidget>();
+    paused_text_widget->setFont(ui_font);
+    paused_text_widget->setString("PAUSED");
+    paused_text_widget->setCharacterSize(24);
+    paused_text_widget->setFillColor(sf::Color::Yellow);
+    paused_text_widget->setOrigin(Widget::TOP_LEFT);
+    paused_text_widget->setParent(paused_rect_widget);
+
+    // fps
+    fps_widget = widgets.createWidget<ContainerWidget>();
+    fps_widget->setFillColor(sf::Color::Yellow);
+    fps_widget->setOrigin(Widget::TOP_LEFT);
+    fps_widget->setPosition(120.0f, 0.0f);
+    fps_widget->setPadding(0.0f);
+    fps_text_widget = widgets.createWidget<TextWidget>();
+    fps_text_widget->setFont(fps_font);
+    fps_text_widget->setCharacterSize(32);
+    fps_text_widget->setFillColor(sf::Color::Black);
+    fps_text_widget->setOrigin(Widget::TOP_LEFT);
+    fps_text_widget->setParent(fps_widget);
+
+    // logger
+    logger_widget = widgets.createWidget<RectangleWidget>();
+    logger_widget->setFillColor(sf::Color(0, 0, 0));
+    logger_widget->setSize(sf::Vector2f(500.0f, 20.0f));
+    logger_widget->setOrigin(Widget::BOTTOM_LEFT);
+    logger_widget->setParentAnchor(Widget::BOTTOM_LEFT);
+    logger_text_widget = widgets.createWidget<TextWidget>();
+    logger_text_widget->setFont(console_font);
+    logger_text_widget->setCharacterSize(15);
+    logger_text_widget->setFillColor(sf::Color::White);
+    logger_text_widget->setOrigin(Widget::TOP_LEFT);
+    logger_text_widget->setString("Logger message");
+    logger_text_widget->setParent(logger_widget);
 }
 
 void Application::main_loop() {
@@ -463,10 +428,7 @@ void Application::resetView() {
 }
 
 void Application::process_widgets() {
-    root_widget.setSize(sf::Vector2f(ui_texture.getSize().x, ui_texture.getSize().y));
-    root_widget.updateMouseState();
-    Widget::click_blocked = false;
-    Widget::release_blocked = false;
+    widgets.reset(sf::Vector2f(ui_texture.getSize().x, ui_texture.getSize().y));
 }
 
 void Application::process_input() {
@@ -771,8 +733,8 @@ void Application::process_mouse() {
 
 void Application::process_left_click() {
     if (leftButtonProcessWidgetsOnPress) {
-        root_widget.processClick(mousePosf);
-        if (Widget::click_blocked) {
+        widgets.processClick(mousePosf);
+        if (widgets.isClickBlocked()) {
             return;
         }
     }
@@ -865,8 +827,8 @@ void Application::process_left_release() {
         return;
     }
     if (leftButtonProcessWidgetsOnRelease) {
-        root_widget.processRelease(mousePosf);
-        if (Widget::release_blocked) {
+        widgets.processRelease(mousePosf);
+        if (widgets.isReleaseBlocked()) {
             return;
         }
     }
@@ -1086,7 +1048,7 @@ void Application::render_ui() {
         }
     }
 
-    root_widget.render();
+    widgets.render();
     ui_texture.display();
     sf::Sprite ui_sprite(ui_texture.getTexture());
     window.draw(ui_sprite);

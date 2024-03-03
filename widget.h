@@ -17,6 +17,7 @@ struct WidgetVisibility {
 };
 
 class Widget;
+class WidgetList;
 
 class WidgetTransform {
 public:
@@ -63,13 +64,12 @@ public:
 	std::function<void(const sf::Vector2f& pos)> OnMouseEnter = [](const sf::Vector2f& pos) { };
 	std::function<void(const sf::Vector2f& pos)> OnMouseExit = [](const sf::Vector2f& pos) { };
 
-	static bool click_blocked;
-	static bool release_blocked;
-	WidgetVisibility checkVisibility() const;
 	bool isMouseOver() const;
 	void updateMouseState();
+	WidgetVisibility checkVisibility() const;
 	void processClick(const sf::Vector2f& pos);
 	void processRelease(const sf::Vector2f& pos);
+	Widget* getParent() const;
 	const CompoundVector<Widget*>& getChildren() const;
 	virtual sf::FloatRect getLocalBounds() const = 0;
 	virtual sf::FloatRect getParentLocalBounds() const = 0;
@@ -99,15 +99,17 @@ public:
 	void setRotation(float angle);
 	void setVisible(bool value);
 	void setClickThrough(bool value);
+	void setParent(Widget* new_parent);
 	void render();
 	virtual void render(sf::RenderTarget& target);
-	void addChild(std::unique_ptr<Widget> child);
 
 protected:
+	friend class WidgetList;
 	friend class WidgetTransform;
+	WidgetList* widget_list = nullptr;
 	WidgetTransform transforms = WidgetTransform(this);
 	Widget* parent = nullptr;
-	CompoundVectorUptr<Widget> children;
+	CompoundVector<Widget*> children;
 	Anchor origin_anchor = CUSTOM;
 	Anchor parent_anchor = CUSTOM;
 	sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);
@@ -151,6 +153,7 @@ protected:
 class RectangleWidget : public ShapeWidget {
 public:
 	RectangleWidget();
+	RectangleWidget(WidgetList* widget_list);
 	void setSize(const sf::Vector2f& size);
 
 protected:
@@ -170,6 +173,7 @@ private:
 class ContainerWidget : public RectangleWidget {
 public:
 	ContainerWidget();
+	ContainerWidget(WidgetList* widget_list);
 	void setAutoResize(bool value);
 	void setHorizontal(bool value);
 	void setPadding(float padding);
@@ -187,6 +191,7 @@ private:
 class CheckboxWidget : public RectangleWidget {
 public:
 	CheckboxWidget();
+	CheckboxWidget(WidgetList* widget_list);
 	bool isChecked() const;
 	const sf::Color& getFillColor() const override;
 	const sf::Color& getHighlightFillColor() const;
@@ -206,7 +211,7 @@ private:
 	bool checked = false;
 	const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(20.0f, 20.0f);
 	float check_size = 0.6f;
-	RectangleWidget* check_widget;
+	RectangleWidget* check_widget = nullptr;
 	sf::Color background_fill_color = sf::Color(50, 50, 50);
 	sf::Color highlight_fill_color = sf::Color(128, 128, 128);
 	sf::Color check_fill_color = sf::Color(255, 128, 0);
@@ -216,6 +221,8 @@ private:
 
 class TextWidget : public Widget {
 public:
+	TextWidget();
+	TextWidget(WidgetList* widget_list);
 	sf::FloatRect getLocalBounds() const override;
 	sf::FloatRect getParentLocalBounds() const override;
 	sf::FloatRect getGlobalBounds() const override;
@@ -237,4 +244,38 @@ private:
 
 };
 
-extern RectangleWidget root_widget;
+class WidgetList {
+public:
+	WidgetList();
+	bool isClickBlocked() const;
+	bool isReleaseBlocked() const;
+	Widget* getRootWidget();
+	template<typename T>
+	requires std::derived_from<T, Widget>
+	T* createWidget();
+	void processClick(const sf::Vector2f pos);
+	void processRelease(const sf::Vector2f pos);
+	void render();
+	void reset(const sf::Vector2f& root_size);
+
+private:
+	friend class Widget;
+	bool click_blocked = false;
+	bool release_blocked = false;
+	CompoundVectorUptr<Widget> widgets;
+	RectangleWidget* root_widget;
+
+};
+
+template<typename T>
+requires std::derived_from<T, Widget>
+inline T* WidgetList::createWidget() {
+	std::unique_ptr<T> uptr = std::make_unique<T>(this);
+	T* ptr = uptr.get();
+	ptr->widget_list = this;
+	if (root_widget) {
+		ptr->setParent(root_widget);
+	}
+	widgets.add(std::move(uptr));
+	return ptr;
+}
