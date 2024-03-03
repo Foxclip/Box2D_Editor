@@ -338,6 +338,7 @@ void Application::init_widgets() {
             std::unique_ptr<CheckboxWidget> checkbox_widget_uptr = std::make_unique<CheckboxWidget>();
             CheckboxWidget* checkbox_widget = checkbox_widget_uptr.get();
             checkbox_widget->setOrigin(Widget::TOP_LEFT);
+            checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));
             edit_window_widget->addChild(std::move(checkbox_widget_uptr));
         }
         root_widget.addChild(std::move(edit_window_widget_uptr));
@@ -843,6 +844,7 @@ void Application::process_left_click() {
                 if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     active_object->deselectAllVertices();
                 }
+                leftButtonProcessWidgetsOnRelease = false;
             }
         } else if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             if (edit_tool.edge_vertex == 0) {
