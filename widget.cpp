@@ -414,14 +414,19 @@ TextWidget::TextWidget(WidgetList* widget_list) {
 }
 
 sf::FloatRect TextWidget::getLocalBounds() const {
+	sf::FloatRect result;
+	sf::FloatRect local_bounds = getExactLocalBounds();
 	if (adjust_local_bounds) {
-		float width = text.getLocalBounds().width;
+		float width = local_bounds.width;
 		float height = text.getCharacterSize();
-		sf::FloatRect bounds(sf::Vector2f(), sf::Vector2f(width, height));
-		return bounds;
+		result = sf::FloatRect(sf::Vector2f(), sf::Vector2f(width, height));
 	} else {
-		return getExactLocalBounds();
+		result = local_bounds;
+		sf::Vector2f pos = result.getPosition() - calcPositionOffset();
+		result.left = pos.x;
+		result.top = pos.y;
 	}
+	return result;
 }
 
 sf::FloatRect TextWidget::getParentLocalBounds() const {
