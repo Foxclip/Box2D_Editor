@@ -219,6 +219,10 @@ void Widget::setName(const std::string& name) {
 	updateFullName();
 }
 
+sf::Transform Widget::getRenderTransform() const {
+	return sf::Transform::Identity;
+}
+
 void Widget::update() {
 	sf::Vector2f parent_size;
 	if (parent) {
@@ -259,7 +263,10 @@ void Widget::render(sf::RenderTarget& target) {
 		return;
 	}
 	update();
-	target.draw(getDrawable(), getParentGlobalTransform());
+	sf::Transform render_transform = getRenderTransform();
+	sf::Transform parent_transform = getParentGlobalTransform();
+	sf::Transform combined = render_transform * parent_transform;
+	target.draw(getDrawable(), combined);
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->render(target);
 	}
@@ -430,34 +437,8 @@ sf::FloatRect TextWidget::getExactLocalBounds() const {
 	return text.getLocalBounds();
 }
 
-const sf::Vector2f& TextWidget::getPosition() const {
-	if (adjust_local_bounds) {
-		return transforms.getPosition();
-	} else {
-		sf::Vector2f shape_pos = transforms.getPosition();
-		sf::FloatRect bounds = getExactLocalBounds();
-		sf::Vector2f transform_pos = shape_pos + bounds.getPosition();
-		return transform_pos;
-	}
-}
-
 const sf::Color& TextWidget::getFillColor() const {
 	return text.getFillColor();
-}
-
-void TextWidget::setPosition(float x, float y) {
-	sf::Vector2f position(x, y);
-	setPosition(position);
-}
-
-void TextWidget::setPosition(const sf::Vector2f& position) {
-	if (adjust_local_bounds) {
-		transforms.setPosition(position);
-	} else {
-		sf::FloatRect bounds = getExactLocalBounds();
-		sf::Vector2f new_pos = position - bounds.getPosition();
-		transforms.setPosition(new_pos);
-	}
 }
 
 void TextWidget::setFont(const sf::Font& font) {
@@ -494,6 +475,22 @@ sf::Transformable& TextWidget::getTransformable() {
 
 const sf::Transformable& TextWidget::getTransformable() const {
 	return text;
+}
+
+sf::Transform TextWidget::getRenderTransform() const {
+	sf::Vector2f offset = calcPositionOffset();
+	sf::Transform result = sf::Transform::Identity;
+	result.translate(-offset);
+	return result;
+}
+
+sf::Vector2f TextWidget::calcPositionOffset() const {
+	sf::FloatRect bounds = getExactLocalBounds();
+	if (adjust_local_bounds) {
+		return sf::Vector2f(bounds.getPosition().x, 0.0f);
+	} else {
+		return bounds.getPosition();
+	}
 }
 
 ContainerWidget::ContainerWidget() { }

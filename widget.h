@@ -135,6 +135,7 @@ protected:
 	virtual const sf::Drawable& getDrawable() const = 0;
 	virtual sf::Transformable& getTransformable() = 0;
 	virtual const sf::Transformable& getTransformable() const = 0;
+	virtual sf::Transform getRenderTransform() const;
 	virtual void update();
 	virtual void internalOnClick(const sf::Vector2f& pos);
 	virtual void internalOnMouseEnter(const sf::Vector2f& pos);
@@ -242,10 +243,7 @@ public:
 	sf::FloatRect getParentLocalBounds() const override;
 	sf::FloatRect getGlobalBounds() const override;
 	sf::FloatRect getExactLocalBounds() const;
-	const sf::Vector2f& getPosition() const override;
 	const sf::Color& getFillColor() const override;
-	void setPosition(float x, float y) override;
-	void setPosition(const sf::Vector2f& position) override;
 	void setFont(const sf::Font& font);
 	void setString(const std::string& string);
 	void setCharacterSize(unsigned int size);
@@ -259,9 +257,11 @@ protected:
 	const sf::Drawable& getDrawable() const override;
 	sf::Transformable& getTransformable() override;
 	const sf::Transformable& getTransformable() const override;
+	sf::Transform getRenderTransform() const;
 
 private:
 	sf::Text text;
+	sf::Vector2f calcPositionOffset() const;
 
 };
 

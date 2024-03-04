@@ -409,12 +409,15 @@ void Application::init_widgets() {
     logger_widget->setParentAnchor(Widget::BOTTOM_LEFT);
     logger_widget->setName("logger");
     logger_text_widget = widgets.createWidget<TextWidget>();
-    logger_text_widget->setFont(ui_font);
+    logger_text_widget->setFont(console_font);
     logger_text_widget->setCharacterSize(15);
     logger_text_widget->setFillColor(sf::Color::White);
     logger_text_widget->setOrigin(Widget::TOP_LEFT);
+    logger_text_widget->setParentAnchor(Widget::TOP_LEFT);
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
+    //logger_text_widget->setAdjustLocalBounds(false);
+    logger_text_widget->debug_id = 0;
 }
 
 void Application::main_loop() {
