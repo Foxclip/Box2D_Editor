@@ -60,6 +60,7 @@ public:
 		BOTTOM_RIGHT,
 	};
 	ptrdiff_t debug_id = -1;
+	std::string name = "<unnamed>";
 
 	std::function<void(const sf::Vector2f& pos)> OnClick = [](const sf::Vector2f& pos) { };
 	std::function<void(const sf::Vector2f& pos)> OnRelease = [](const sf::Vector2f& pos) { };
@@ -103,6 +104,8 @@ public:
 	void setClickThrough(bool value);
 	void setParent(Widget* new_parent);
 	virtual void render(sf::RenderTarget& target);
+	void renderBounds(sf::RenderTarget& target);
+	void renderOrigin(sf::RenderTarget& target);
 
 protected:
 	friend class WidgetList;
@@ -272,8 +275,10 @@ private:
 	friend class Widget;
 	bool click_blocked = false;
 	bool release_blocked = false;
-	bool render_bounds = true;
+	bool debug_render = true;
+	float render_origin_size = 10.0f;
 	sf::Color render_bounds_color = sf::Color::Green;
+	sf::Color render_origin_color = sf::Color::Red;
 	CompoundVectorUptr<Widget> widgets;
 	RectangleWidget* root_widget;
 

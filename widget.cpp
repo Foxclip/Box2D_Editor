@@ -214,21 +214,38 @@ void Widget::render(sf::RenderTarget& target) {
 	}
 	update();
 	target.draw(getDrawable(), getParentGlobalTransform());
-	if (widget_list->render_bounds) {
-		sf::Color origin_color = sf::Color::Red;
-		float offset = 10.0f;
-		sf::Vector2f hoffset = sf::Vector2f(offset, 0.0f);
-		sf::Vector2f voffset = sf::Vector2f(0.0f, offset);
-		drawLine(target, getGlobalPosition() - hoffset, getGlobalPosition() + hoffset, origin_color);
-		drawLine(target, getGlobalPosition() - voffset, getGlobalPosition() + voffset, origin_color);
-		sf::Color bounds_color = widget_list->render_bounds_color;
-		drawLine(target, getTopRight(), getTopLeft(), bounds_color);
-		drawLine(target, getTopLeft(), getBottomLeft(), bounds_color);
-		drawLine(target, getBottomLeft(), getBottomRight(), bounds_color);
-		drawLine(target, getBottomRight(), getTopRight(), bounds_color);
-	}
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->render(target);
+	}
+}
+
+void Widget::renderBounds(sf::RenderTarget& target) {
+	if (!visible) {
+		return;
+	}
+	sf::Color bounds_color = widget_list->render_bounds_color;
+	drawLine(target, getTopRight(), getTopLeft(), bounds_color);
+	drawLine(target, getTopLeft(), getBottomLeft(), bounds_color);
+	drawLine(target, getBottomLeft(), getBottomRight(), bounds_color);
+	drawLine(target, getBottomRight(), getTopRight(), bounds_color);
+	for (size_t i = 0; i < children.size(); i++) {
+		children[i]->renderBounds(target);
+	}
+}
+
+void Widget::renderOrigin(sf::RenderTarget& target) {
+	if (!visible) {
+		return;
+	}
+	sf::Color origin_color = widget_list->render_origin_color;
+	float offset = widget_list->render_origin_size;
+	sf::Vector2f hoffset = sf::Vector2f(offset, 0.0f);
+	sf::Vector2f voffset = sf::Vector2f(0.0f, offset);
+	sf::Vector2f pos = getGlobalPosition();
+	drawLine(target, pos - hoffset, pos + hoffset, origin_color);
+	drawLine(target, pos - voffset, pos + voffset, origin_color);
+	for (size_t i = 0; i < children.size(); i++) {
+		children[i]->renderOrigin(target);
 	}
 }
 
@@ -570,6 +587,7 @@ CheckboxWidget::CheckboxWidget(WidgetList* widget_list) {
 	check_widget->setOrigin(CENTER);
 	check_widget->setParentAnchor(CENTER);
 	check_widget->setParent(this);
+	check_widget->name = "check";
 }
 
 bool CheckboxWidget::isChecked() const {
@@ -629,6 +647,7 @@ void CheckboxWidget::toggleChecked() {
 WidgetList::WidgetList() {
 	root_widget = createWidget<RectangleWidget>();
 	root_widget->setFillColor(sf::Color::Transparent);
+	root_widget->name = "root";
 }
 
 bool WidgetList::isClickBlocked() const {
@@ -653,6 +672,10 @@ void WidgetList::processRelease(const sf::Vector2f pos) {
 
 void WidgetList::render(sf::RenderTarget& target) {
 	root_widget->render(target);
+	if (debug_render) {
+		root_widget->renderBounds(target);
+		root_widget->renderOrigin(target);
+	}
 }
 
 void WidgetList::reset(const sf::Vector2f& root_size) {
