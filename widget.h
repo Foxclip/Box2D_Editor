@@ -177,6 +177,8 @@ public:
 	void setAutoResize(bool value);
 	void setHorizontal(bool value);
 	void setPadding(float padding);
+	void setHorizontalPadding(float padding);
+	void setVerticalPadding(float padding);
 
 protected:
 	void update() override;
@@ -184,7 +186,8 @@ protected:
 private:
 	bool auto_resize = true;
 	bool horizontal = true;
-	float padding = 0.0f;
+	float horizontal_padding = 0.0f;
+	float vertical_padding = 0.0f;
 
 };
 

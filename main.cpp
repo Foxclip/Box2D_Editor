@@ -31,8 +31,8 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: checkbox widget
     // TODO: set whether object is static or dynamic in edit mode
+    // TODO: delay editing polygons with many vertices
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars
     // TODO: edit and simulate modes

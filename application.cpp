@@ -308,9 +308,9 @@ void Application::init_widgets() {
         text_widget->setOriginToTextCenter();
         text_widget->setParentAnchor(Widget::CENTER);
         text_widget->setParent(tool_widget);
+        tool_widget->setParent(toolbox_widget);
         tool->widget = tool_widget;
         tools_in_tool_panel.push_back(tool);
-        tool_widget->setParent(toolbox_widget);
     }
 
     // edit window
@@ -323,12 +323,21 @@ void Application::init_widgets() {
     edit_window_widget->setAnchorOffset(-20.0f, 20.0f);
     edit_window_widget->setPadding(TOOLBOX_PADDING);
     edit_window_widget->setClickThrough(false);
-    edit_window_widget->setAutoResize(false);
+    //edit_window_widget->setAutoResize(false);
     edit_tool.edit_window_widget = edit_window_widget;
+    ContainerWidget* dynamic_parameter_widget = widgets.createWidget<ContainerWidget>();
+    dynamic_parameter_widget->setFillColor(sf::Color::Transparent);
+    dynamic_parameter_widget->setVerticalPadding(10.0f);
+    dynamic_parameter_widget->setParent(edit_window_widget);
+    TextWidget* dynamic_parameter_text_widget = widgets.createWidget<TextWidget>();
+    dynamic_parameter_text_widget->setFont(ui_font);
+    dynamic_parameter_text_widget->setCharacterSize(15);
+    dynamic_parameter_text_widget->setString("Dynamic:");
+    dynamic_parameter_text_widget->setParent(dynamic_parameter_widget);
     CheckboxWidget* checkbox_widget = widgets.createWidget<CheckboxWidget>();
     checkbox_widget->setOrigin(Widget::TOP_LEFT);
     checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));
-    checkbox_widget->setParent(edit_window_widget);
+    checkbox_widget->setParent(dynamic_parameter_widget);
 
     // create panel
     ContainerWidget* create_panel_widget = widgets.createWidget<ContainerWidget>();

@@ -404,26 +404,35 @@ void ContainerWidget::setHorizontal(bool value) {
 }
 
 void ContainerWidget::setPadding(float padding) {
-	this->padding = padding;
+	this->horizontal_padding = padding;
+	this->vertical_padding = padding;
+}
+
+void ContainerWidget::setHorizontalPadding(float padding) {
+	this->horizontal_padding = padding;
+}
+
+void ContainerWidget::setVerticalPadding(float padding) {
+	this->vertical_padding = padding;
 }
 
 void ContainerWidget::update() {
 	Widget::update();
 	sf::FloatRect container_bounds = sf::FloatRect();
-	float next_x = padding, next_y = padding;
+	float next_x = horizontal_padding, next_y = vertical_padding;
 	for (size_t i = 0; i < children.size(); i++) {
 		Widget* child = children[i];
 		child->setAdjustedPosition(next_x, next_y);
 		sf::FloatRect child_bounds = sf::FloatRect(next_x, next_y, child->getWidth(), child->getHeight());
 		utils::extend_bounds(container_bounds, child_bounds);
 		if (horizontal) {
-			next_x += child->getWidth() + padding;
+			next_x += child->getWidth() + horizontal_padding;
 		} else {
-			next_y += child->getHeight() + padding;
+			next_y += child->getHeight() + vertical_padding;
 		}
 	}
 	if (auto_resize) {
-		setSize(sf::Vector2f(container_bounds.width + padding, container_bounds.height + padding));
+		setSize(sf::Vector2f(container_bounds.width + horizontal_padding, container_bounds.height + vertical_padding));
 	}
 }
 
