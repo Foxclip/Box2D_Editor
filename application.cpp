@@ -274,7 +274,7 @@ void Application::init_widgets() {
     toolbox_widget->setParentAnchor(Widget::TOP_CENTER);
     toolbox_widget->setPadding(TOOLBOX_PADDING);
     toolbox_widget->setClickThrough(false);
-    toolbox_widget->name = "toolbox";
+    toolbox_widget->setName("toolbox");
     for (size_t i = 0; i < tools.size(); i++) {
         Tool* tool = tools[i];
         if (!tool->showInToolPanel()) {
@@ -294,7 +294,7 @@ void Application::init_widgets() {
             tool_widget->setOutlineThickness(0.0f);
         };
         tool_widget->setParent(toolbox_widget);
-        tool_widget->name = "tool " + tool->name;
+        tool_widget->setName("tool " + tool->name);
         TextWidget* text_widget = widgets.createWidget<TextWidget>();
         text_widget->setFont(ui_font);
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
@@ -303,7 +303,6 @@ void Application::init_widgets() {
         text_widget->setOrigin(Widget::CENTER);
         text_widget->setParentAnchor(Widget::CENTER);
         text_widget->setParent(tool_widget);
-        text_widget->name = tool_widget->name + " text";
         tool->widget = tool_widget;
         tools_in_tool_panel.push_back(tool);
     }
@@ -319,24 +318,22 @@ void Application::init_widgets() {
     edit_window_widget->setPadding(TOOLBOX_PADDING);
     edit_window_widget->setClickThrough(false);
     //edit_window_widget->setAutoResize(false);
-    edit_window_widget->name = "edit window";
+    edit_window_widget->setName("edit window");
     edit_tool.edit_window_widget = edit_window_widget;
     ContainerWidget* dynamic_parameter_widget = widgets.createWidget<ContainerWidget>();
     dynamic_parameter_widget->setFillColor(sf::Color::Transparent);
     dynamic_parameter_widget->setVerticalPadding(10.0f);
     dynamic_parameter_widget->setParent(edit_window_widget);
-    dynamic_parameter_widget->name = "dynamic parameter";
+    dynamic_parameter_widget->setName("dynamic parameter");
     TextWidget* dynamic_parameter_text_widget = widgets.createWidget<TextWidget>();
     dynamic_parameter_text_widget->setFont(ui_font);
     dynamic_parameter_text_widget->setCharacterSize(15);
     dynamic_parameter_text_widget->setString("Dynamic:");
     dynamic_parameter_text_widget->setParent(dynamic_parameter_widget);
-    dynamic_parameter_text_widget->name = dynamic_parameter_widget->name + " text";
     CheckboxWidget* checkbox_widget = widgets.createWidget<CheckboxWidget>();
     checkbox_widget->setOrigin(Widget::TOP_LEFT);
     checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));
     checkbox_widget->setParent(dynamic_parameter_widget);
-    checkbox_widget->name = dynamic_parameter_widget->name + " checkbox";
 
     // create panel
     ContainerWidget* create_panel_widget = widgets.createWidget<ContainerWidget>();
@@ -346,7 +343,7 @@ void Application::init_widgets() {
     create_panel_widget->setHorizontal(false);
     create_panel_widget->setPadding(CREATE_PANEL_PADDING);
     create_panel_widget->setClickThrough(false);
-    create_panel_widget->name = "create panel";
+    create_panel_widget->setName("create panel");
     for (size_t i = 0; i < CreateTool::mode_count; i++) {
         RectangleWidget* button_widget = widgets.createWidget<RectangleWidget>();
         button_widget->setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
@@ -361,7 +358,7 @@ void Application::init_widgets() {
         button_widget->OnMouseExit = [=](const sf::Vector2f pos) {
             button_widget->setOutlineThickness(0.0f);
         };
-        button_widget->name = create_panel_widget->name + " button " + std::to_string(i);
+        button_widget->setName("button " + std::to_string(i));
         TextWidget* text_widget = widgets.createWidget<TextWidget>();
         text_widget->setFont(ui_font);
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
@@ -370,7 +367,6 @@ void Application::init_widgets() {
         text_widget->setOrigin(Widget::CENTER);
         text_widget->setParentAnchor(Widget::CENTER);
         text_widget->setParent(button_widget);
-        text_widget->name = button_widget->name + " text";
         create_tool.create_buttons.push_back(button_widget);
         create_tool.create_panel_widget = create_panel_widget;
         button_widget->setParent(create_panel_widget);
@@ -381,7 +377,7 @@ void Application::init_widgets() {
     paused_rect_widget->setFillColor(sf::Color(0, 0, 0, 128));
     paused_rect_widget->setOrigin(Widget::TOP_LEFT);
     paused_rect_widget->setPadding(10.0f);
-    paused_rect_widget->name = "paused rect";
+    paused_rect_widget->setName("paused rect");
     TextWidget* paused_text_widget = widgets.createWidget<TextWidget>();
     paused_text_widget->setFont(ui_font);
     paused_text_widget->setString("PAUSED");
@@ -389,7 +385,6 @@ void Application::init_widgets() {
     paused_text_widget->setFillColor(sf::Color::Yellow);
     paused_text_widget->setOrigin(Widget::TOP_LEFT);
     paused_text_widget->setParent(paused_rect_widget);
-    paused_text_widget->name = paused_rect_widget->name + " text";
 
     // fps
     fps_widget = widgets.createWidget<ContainerWidget>();
@@ -397,7 +392,7 @@ void Application::init_widgets() {
     fps_widget->setOrigin(Widget::TOP_LEFT);
     fps_widget->setPosition(120.0f, 0.0f);
     fps_widget->setPadding(0.0f);
-    fps_widget->name = "fps";
+    fps_widget->setName("fps");
     fps_text_widget = widgets.createWidget<TextWidget>();
     fps_text_widget->setFont(fps_font);
     fps_text_widget->setCharacterSize(32);
@@ -405,7 +400,6 @@ void Application::init_widgets() {
     fps_text_widget->setOrigin(Widget::TOP_LEFT);
     fps_text_widget->setAdjustLocalBounds(false);
     fps_text_widget->setParent(fps_widget);
-    fps_text_widget->name = fps_widget->name + " text";
 
     // logger
     logger_widget = widgets.createWidget<RectangleWidget>();
@@ -413,7 +407,7 @@ void Application::init_widgets() {
     logger_widget->setSize(sf::Vector2f(500.0f, 20.0f));
     logger_widget->setOrigin(Widget::BOTTOM_LEFT);
     logger_widget->setParentAnchor(Widget::BOTTOM_LEFT);
-    logger_widget->name = "logger";
+    logger_widget->setName("logger");
     logger_text_widget = widgets.createWidget<TextWidget>();
     logger_text_widget->setFont(ui_font);
     logger_text_widget->setCharacterSize(15);
@@ -421,7 +415,6 @@ void Application::init_widgets() {
     logger_text_widget->setOrigin(Widget::TOP_LEFT);
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
-    logger_text_widget->name = logger_widget->name + " text";
 }
 
 void Application::main_loop() {

@@ -60,7 +60,6 @@ public:
 		BOTTOM_RIGHT,
 	};
 	ptrdiff_t debug_id = -1;
-	std::string name = "<unnamed>";
 
 	std::function<void(const sf::Vector2f& pos)> OnClick = [](const sf::Vector2f& pos) { };
 	std::function<void(const sf::Vector2f& pos)> OnRelease = [](const sf::Vector2f& pos) { };
@@ -72,7 +71,10 @@ public:
 	WidgetVisibility checkVisibility() const;
 	void processClick(const sf::Vector2f& pos);
 	void processRelease(const sf::Vector2f& pos);
+	const std::string& getName() const;
+	const std::string& getFullName() const;
 	Widget* getParent() const;
+	std::vector<Widget*> getParentChain() const;
 	const CompoundVector<Widget*>& getChildren() const;
 	virtual sf::FloatRect getLocalBounds() const = 0;
 	virtual sf::FloatRect getParentLocalBounds() const = 0;
@@ -103,6 +105,7 @@ public:
 	void setVisible(bool value);
 	void setClickThrough(bool value);
 	void setParent(Widget* new_parent);
+	void setName(const std::string& name);
 	virtual void render(sf::RenderTarget& target);
 	void renderBounds(sf::RenderTarget& target);
 	void renderOrigin(sf::RenderTarget& target);
@@ -110,6 +113,8 @@ public:
 protected:
 	friend class WidgetList;
 	friend class WidgetTransform;
+	std::string name = "<unnamed>";
+	std::string full_name;
 	WidgetList* widget_list = nullptr;
 	WidgetTransform transforms = WidgetTransform(this);
 	Widget* parent = nullptr;
@@ -136,6 +141,9 @@ protected:
 	virtual void internalOnMouseExit(const sf::Vector2f& pos);
 
 private:
+
+	std::string calcFullName() const;
+	void updateFullName();
 
 };
 

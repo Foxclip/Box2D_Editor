@@ -70,8 +70,30 @@ void Widget::processRelease(const sf::Vector2f& pos) {
 	}
 }
 
+const std::string& Widget::getName() const {
+	return name;
+}
+
+const std::string& Widget::getFullName() const {
+	return full_name;
+}
+
 Widget* Widget::getParent() const {
 	return parent;
+}
+
+std::vector<Widget*> Widget::getParentChain() const {
+	const Widget* cur_obj = this;
+	std::vector<Widget*> result;
+	while (cur_obj) {
+		if (cur_obj->parent) {
+			result.push_back(cur_obj->parent);
+			cur_obj = cur_obj->parent;
+		} else {
+			break;
+		}
+	}
+	return result;
 }
 
 const CompoundVector<Widget*>& Widget::getChildren() const {
@@ -189,6 +211,12 @@ void Widget::setParent(Widget* new_parent) {
 	new_parent->children.add(this);
 	this->parent = new_parent;
 	transforms.invalidateGlobalTransform();
+	updateFullName();
+}
+
+void Widget::setName(const std::string& name) {
+	this->name = name;
+	updateFullName();
 }
 
 void Widget::update() {
@@ -207,6 +235,24 @@ void Widget::internalOnClick(const sf::Vector2f& pos) { }
 void Widget::internalOnMouseEnter(const sf::Vector2f& pos) { }
 
 void Widget::internalOnMouseExit(const sf::Vector2f& pos) { }
+
+std::string Widget::calcFullName() const {
+	std::vector<Widget*> parents = getParentChain();
+	std::string result;
+	for (ptrdiff_t i = parents.size() - 1; i >= 0; i--) {
+		result += parents[i]->name;
+		result += "|";
+	}
+	result += getName();
+	return result;
+}
+
+void Widget::updateFullName() {
+	full_name = calcFullName();
+	for (size_t i = 0; i < children.size(); i++) {
+		children[i]->updateFullName();
+	}
+}
 
 void Widget::render(sf::RenderTarget& target) {
 	if (!visible) {
@@ -321,6 +367,7 @@ RectangleWidget::RectangleWidget() { }
 
 RectangleWidget::RectangleWidget(WidgetList* widget_list) {
 	this->widget_list = widget_list;
+	setName("rectangle");
 }
 
 void RectangleWidget::setSize(const sf::Vector2f& size) {
@@ -356,6 +403,7 @@ TextWidget::TextWidget() { }
 
 TextWidget::TextWidget(WidgetList* widget_list) {
 	this->widget_list = widget_list;
+	setName("text");
 }
 
 sf::FloatRect TextWidget::getLocalBounds() const {
@@ -452,6 +500,7 @@ ContainerWidget::ContainerWidget() { }
 
 ContainerWidget::ContainerWidget(WidgetList* widget_list) {
 	this->widget_list = widget_list;
+	setName("container");
 }
 
 void ContainerWidget::setAutoResize(bool value) {
@@ -580,6 +629,7 @@ CheckboxWidget::CheckboxWidget(WidgetList* widget_list) {
 	this->widget_list = widget_list;
 	setSize(DEFAULT_SIZE);
 	RectangleWidget::setFillColor(background_fill_color);
+	setName("checkbox");
 	check_widget = widget_list->createWidget<RectangleWidget>();
 	check_widget->setVisible(checked);
 	check_widget->setSize(rect.getSize() * check_size);
@@ -587,7 +637,7 @@ CheckboxWidget::CheckboxWidget(WidgetList* widget_list) {
 	check_widget->setOrigin(CENTER);
 	check_widget->setParentAnchor(CENTER);
 	check_widget->setParent(this);
-	check_widget->name = "check";
+	check_widget->setName("check");
 }
 
 bool CheckboxWidget::isChecked() const {
@@ -647,7 +697,7 @@ void CheckboxWidget::toggleChecked() {
 WidgetList::WidgetList() {
 	root_widget = createWidget<RectangleWidget>();
 	root_widget->setFillColor(sf::Color::Transparent);
-	root_widget->name = "root";
+	root_widget->setName("root");
 }
 
 bool WidgetList::isClickBlocked() const {
