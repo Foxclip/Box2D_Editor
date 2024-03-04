@@ -211,10 +211,6 @@ void Widget::internalOnMouseEnter(const sf::Vector2f& pos) { }
 
 void Widget::internalOnMouseExit(const sf::Vector2f& pos) { }
 
-void Widget::render() {
-	render(ui_texture);
-}
-
 void Widget::render(sf::RenderTarget& target) {
 	if (!visible) {
 		return;
@@ -604,8 +600,8 @@ void WidgetList::processRelease(const sf::Vector2f pos) {
 	root_widget->processRelease(pos);
 }
 
-void WidgetList::render() {
-	root_widget->render();
+void WidgetList::render(sf::RenderTarget& target) {
+	root_widget->render(target);
 }
 
 void WidgetList::reset(const sf::Vector2f& root_size) {

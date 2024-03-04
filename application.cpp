@@ -1057,7 +1057,7 @@ void Application::render_ui() {
         }
     }
 
-    widgets.render();
+    widgets.render(ui_texture);
     ui_texture.display();
     sf::Sprite ui_sprite(ui_texture.getTexture());
     window.draw(ui_sprite);

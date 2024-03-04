@@ -100,7 +100,6 @@ public:
 	void setVisible(bool value);
 	void setClickThrough(bool value);
 	void setParent(Widget* new_parent);
-	void render();
 	virtual void render(sf::RenderTarget& target);
 
 protected:
@@ -258,7 +257,7 @@ public:
 	T* createWidget();
 	void processClick(const sf::Vector2f pos);
 	void processRelease(const sf::Vector2f pos);
-	void render();
+	void render(sf::RenderTarget& target);
 	void reset(const sf::Vector2f& root_size);
 
 private:
