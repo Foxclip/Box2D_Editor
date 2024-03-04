@@ -9,14 +9,6 @@ const auto tosf = utils::tosf;
 const auto to2i = utils::to2i;
 const auto to2f = utils::to2f;
 
-Logger& operator<<(Logger& lg, const b2Vec2& value) {
-    return lg << "(" << value.x << " " << value.y << ")";
-}
-
-Logger& operator<<(Logger& lg, const sf::Vector2f& value) {
-    return lg << "(" << value.x << " " << value.y << ")";
-}
-
 bool QueryCallback::ReportFixture(b2Fixture* fixture) {
     fixtures.push_back(fixture);
     return true;
@@ -305,7 +297,7 @@ void Application::init_widgets() {
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
         text_widget->setString(tools[i]->name);
         text_widget->setFillColor(sf::Color::Black);
-        text_widget->setOriginToTextCenter();
+        text_widget->setOrigin(Widget::CENTER);
         text_widget->setParentAnchor(Widget::CENTER);
         text_widget->setParent(tool_widget);
         tool_widget->setParent(toolbox_widget);
@@ -366,7 +358,7 @@ void Application::init_widgets() {
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
         text_widget->setString(CreateTool::create_type_name(static_cast<CreateTool::ObjectType>(i)));
         text_widget->setFillColor(sf::Color::Black);
-        text_widget->setOriginToTextCenter();
+        text_widget->setOrigin(Widget::CENTER);
         text_widget->setParentAnchor(Widget::CENTER);
         text_widget->setParent(button_widget);
         create_tool.create_buttons.push_back(button_widget);
@@ -398,6 +390,7 @@ void Application::init_widgets() {
     fps_text_widget->setCharacterSize(32);
     fps_text_widget->setFillColor(sf::Color::Black);
     fps_text_widget->setOrigin(Widget::TOP_LEFT);
+    fps_text_widget->setAdjustLocalBounds(false);
     fps_text_widget->setParent(fps_widget);
 
     // logger

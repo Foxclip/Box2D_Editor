@@ -9,6 +9,14 @@ sf::RenderTexture ui_texture;
 sf::RenderTexture selection_mask;
 sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
 
+Logger& operator<<(Logger& lg, const b2Vec2& value) {
+	return lg << "(" << value.x << " " << value.y << ")";
+}
+
+Logger& operator<<(Logger& lg, const sf::Vector2f& value) {
+	return lg << "(" << value.x << " " << value.y << ")";
+}
+
 sf::Vector2f sfScreenToWorld(const sf::Vector2i& screen_pos) {
 	sf::Vector2f pos = window.mapPixelToCoords(screen_pos, world_view);
 	return pos;

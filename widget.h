@@ -59,6 +59,8 @@ public:
 		BOTTOM_CENTER,
 		BOTTOM_RIGHT,
 	};
+	ptrdiff_t debug_id = -1;
+
 	std::function<void(const sf::Vector2f& pos)> OnClick = [](const sf::Vector2f& pos) { };
 	std::function<void(const sf::Vector2f& pos)> OnRelease = [](const sf::Vector2f& pos) { };
 	std::function<void(const sf::Vector2f& pos)> OnMouseEnter = [](const sf::Vector2f& pos) { };
@@ -74,12 +76,14 @@ public:
 	virtual sf::FloatRect getLocalBounds() const = 0;
 	virtual sf::FloatRect getParentLocalBounds() const = 0;
 	virtual sf::FloatRect getGlobalBounds() const = 0;
+	const sf::Vector2f& toGlobal(const sf::Vector2f& pos) const;
+	const sf::Vector2f& toLocal(const sf::Vector2f& pos) const;
 	sf::Vector2f getSize() const;
 	float getWidth() const;
 	float getHeight() const;
 	const sf::Vector2f& getOrigin() const;
-	const sf::Vector2f& getPosition() const;
-	sf::Vector2f getGlobalPosition() const;
+	virtual const sf::Vector2f& getPosition() const;
+	virtual const sf::Vector2f& getGlobalPosition() const;
 	const sf::Vector2f getTopLeft() const;
 	const sf::Vector2f getTopRight() const;
 	const sf::Vector2f getBottomLeft() const;
@@ -92,10 +96,8 @@ public:
 	void setAnchorOffset(float x, float y);
 	void setAnchorOffset(const sf::Vector2f& offset);
 	virtual void setFillColor(const sf::Color& color) = 0;
-	void setPosition(float x, float y);
-	void setPosition(const sf::Vector2f& position);
-	void setAdjustedPosition(float x, float y);
-	void setAdjustedPosition(const sf::Vector2f& position);
+	virtual void setPosition(float x, float y);
+	virtual void setPosition(const sf::Vector2f& position);
 	void setRotation(float angle);
 	void setVisible(bool value);
 	void setClickThrough(bool value);
@@ -228,14 +230,20 @@ public:
 	sf::FloatRect getLocalBounds() const override;
 	sf::FloatRect getParentLocalBounds() const override;
 	sf::FloatRect getGlobalBounds() const override;
+	sf::FloatRect getExactLocalBounds() const;
+	const sf::Vector2f& getPosition() const override;
 	const sf::Color& getFillColor() const override;
+	void setPosition(float x, float y) override;
+	void setPosition(const sf::Vector2f& position) override;
 	void setFont(const sf::Font& font);
 	void setString(const std::string& string);
 	void setCharacterSize(unsigned int size);
 	void setFillColor(const sf::Color& color) override;
-	void setOriginToTextCenter();
+	void setAdjustLocalBounds(bool value);
 
 protected:
+	bool adjust_local_bounds = true;
+
 	sf::Drawable& getDrawable() override;
 	const sf::Drawable& getDrawable() const override;
 	sf::Transformable& getTransformable() override;
@@ -264,6 +272,8 @@ private:
 	friend class Widget;
 	bool click_blocked = false;
 	bool release_blocked = false;
+	bool render_bounds = true;
+	sf::Color render_bounds_color = sf::Color::Green;
 	CompoundVectorUptr<Widget> widgets;
 	RectangleWidget* root_widget;
 

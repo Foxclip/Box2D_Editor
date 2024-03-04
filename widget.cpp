@@ -78,6 +78,14 @@ const CompoundVector<Widget*>& Widget::getChildren() const {
 	return children;
 }
 
+const sf::Vector2f& Widget::toGlobal(const sf::Vector2f& pos) const {
+	return getGlobalTransform().transformPoint(pos);
+}
+
+const sf::Vector2f& Widget::toLocal(const sf::Vector2f& pos) const {
+	return getInverseGlobalTransform().transformPoint(pos);
+}
+
 sf::Vector2f Widget::getSize() const {
 	return getLocalBounds().getSize();
 }
@@ -98,9 +106,8 @@ const sf::Vector2f& Widget::getPosition() const {
 	return transforms.getPosition();
 }
 
-sf::Vector2f Widget::getGlobalPosition() const {
-	sf::Vector2f pos = getGlobalTransform().transformPoint(sf::Vector2f());
-	return pos;
+const sf::Vector2f& Widget::getGlobalPosition() const {
+	return toGlobal(sf::Vector2f());
 }
 
 const sf::Vector2f Widget::getTopLeft() const {
@@ -159,16 +166,6 @@ void Widget::setPosition(const sf::Vector2f& position) {
 	transforms.setPosition(position);
 }
 
-void Widget::setAdjustedPosition(float x, float y) {
-	sf::FloatRect bounds = getLocalBounds();
-	transforms.setPosition(sf::Vector2f(x - bounds.left, y - bounds.top));
-}
-
-void Widget::setAdjustedPosition(const sf::Vector2f& position) {
-	sf::FloatRect bounds = getLocalBounds();
-	transforms.setPosition(position - bounds.getPosition());
-}
-
 void Widget::setRotation(float angle) {
 	transforms.setRotation(angle);
 }
@@ -217,6 +214,19 @@ void Widget::render(sf::RenderTarget& target) {
 	}
 	update();
 	target.draw(getDrawable(), getParentGlobalTransform());
+	if (widget_list->render_bounds) {
+		sf::Color origin_color = sf::Color::Red;
+		float offset = 10.0f;
+		sf::Vector2f hoffset = sf::Vector2f(offset, 0.0f);
+		sf::Vector2f voffset = sf::Vector2f(0.0f, offset);
+		drawLine(target, getGlobalPosition() - hoffset, getGlobalPosition() + hoffset, origin_color);
+		drawLine(target, getGlobalPosition() - voffset, getGlobalPosition() + voffset, origin_color);
+		sf::Color bounds_color = widget_list->render_bounds_color;
+		drawLine(target, getTopRight(), getTopLeft(), bounds_color);
+		drawLine(target, getTopLeft(), getBottomLeft(), bounds_color);
+		drawLine(target, getBottomLeft(), getBottomRight(), bounds_color);
+		drawLine(target, getBottomRight(), getTopRight(), bounds_color);
+	}
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->render(target);
 	}
@@ -332,19 +342,57 @@ TextWidget::TextWidget(WidgetList* widget_list) {
 }
 
 sf::FloatRect TextWidget::getLocalBounds() const {
-	return text.getLocalBounds();
+	if (adjust_local_bounds) {
+		float width = text.getLocalBounds().width;
+		float height = text.getCharacterSize();
+		sf::FloatRect bounds(sf::Vector2f(), sf::Vector2f(width, height));
+		return bounds;
+	} else {
+		return getExactLocalBounds();
+	}
 }
 
 sf::FloatRect TextWidget::getParentLocalBounds() const {
-	return text.getGlobalBounds();
+	sf::FloatRect local_bounds = getLocalBounds();
+	return getTransformable().getTransform().transformRect(local_bounds);
 }
 
 sf::FloatRect TextWidget::getGlobalBounds() const {
-	return getParentGlobalTransform().transformRect(text.getGlobalBounds());
+	return getParentGlobalTransform().transformRect(getParentLocalBounds());
+}
+
+sf::FloatRect TextWidget::getExactLocalBounds() const {
+	return text.getLocalBounds();
+}
+
+const sf::Vector2f& TextWidget::getPosition() const {
+	if (adjust_local_bounds) {
+		return transforms.getPosition();
+	} else {
+		sf::Vector2f shape_pos = transforms.getPosition();
+		sf::FloatRect bounds = getExactLocalBounds();
+		sf::Vector2f transform_pos = shape_pos + bounds.getPosition();
+		return transform_pos;
+	}
 }
 
 const sf::Color& TextWidget::getFillColor() const {
 	return text.getFillColor();
+}
+
+void TextWidget::setPosition(float x, float y) {
+	sf::Vector2f position(x, y);
+	setPosition(position);
+}
+
+void TextWidget::setPosition(const sf::Vector2f& position) {
+	if (adjust_local_bounds) {
+		transforms.setPosition(position);
+	} else {
+		sf::FloatRect bounds = getExactLocalBounds();
+		sf::Vector2f new_pos = position - bounds.getPosition();
+		transforms.setPosition(new_pos);
+	}
 }
 
 void TextWidget::setFont(const sf::Font& font) {
@@ -363,10 +411,8 @@ void TextWidget::setFillColor(const sf::Color& color) {
 	text.setFillColor(color);
 }
 
-void TextWidget::setOriginToTextCenter() {
-	float x = text.getLocalBounds().width / 2.0f;
-	float y = text.getCharacterSize() / 2.0f;
-	text.setOrigin(x, y);
+void TextWidget::setAdjustLocalBounds(bool value) {
+	adjust_local_bounds = value;
 }
 
 sf::Drawable& TextWidget::getDrawable() {
@@ -418,8 +464,10 @@ void ContainerWidget::update() {
 	float next_x = horizontal_padding, next_y = vertical_padding;
 	for (size_t i = 0; i < children.size(); i++) {
 		Widget* child = children[i];
-		child->setAdjustedPosition(next_x, next_y);
-		sf::FloatRect child_bounds = sf::FloatRect(next_x, next_y, child->getWidth(), child->getHeight());
+		child->setPosition(next_x, next_y);
+		sf::FloatRect child_bounds = sf::FloatRect(
+			next_x, next_y, child->getWidth(), child->getHeight()
+		);
 		utils::extend_bounds(container_bounds, child_bounds);
 		if (horizontal) {
 			next_x += child->getWidth() + horizontal_padding;
@@ -428,7 +476,10 @@ void ContainerWidget::update() {
 		}
 	}
 	if (auto_resize) {
-		setSize(sf::Vector2f(container_bounds.width + horizontal_padding, container_bounds.height + vertical_padding));
+		setSize(sf::Vector2f(
+			container_bounds.width + horizontal_padding,
+			container_bounds.height + vertical_padding
+		));
 	}
 }
 
