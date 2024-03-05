@@ -323,6 +323,7 @@ void Application::init_widgets() {
     ContainerWidget* dynamic_parameter_widget = widgets.createWidget<ContainerWidget>();
     dynamic_parameter_widget->setFillColor(sf::Color::Transparent);
     dynamic_parameter_widget->setVerticalPadding(10.0f);
+    dynamic_parameter_widget->setVerticalAlignment(Widget::ALIGN_CENTER);
     dynamic_parameter_widget->setParent(edit_window_widget);
     dynamic_parameter_widget->setName("dynamic parameter");
     TextWidget* dynamic_parameter_text_widget = widgets.createWidget<TextWidget>();
@@ -330,6 +331,11 @@ void Application::init_widgets() {
     dynamic_parameter_text_widget->setCharacterSize(15);
     dynamic_parameter_text_widget->setString("Dynamic:");
     dynamic_parameter_text_widget->setParent(dynamic_parameter_widget);
+    RectangleWidget* spacing_widget = widgets.createWidget<RectangleWidget>();
+    spacing_widget->setSize(sf::Vector2f(10.0f, 1.0f));
+    spacing_widget->setFillColor(sf::Color::Transparent);
+    spacing_widget->setParent(dynamic_parameter_widget);
+    spacing_widget->setName("spacing");
     CheckboxWidget* checkbox_widget = widgets.createWidget<CheckboxWidget>();
     checkbox_widget->setOrigin(Widget::TOP_LEFT);
     checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));

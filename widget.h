@@ -59,6 +59,13 @@ public:
 		BOTTOM_CENTER,
 		BOTTOM_RIGHT,
 	};
+	enum Alignment {
+		ALIGN_TOP,
+		ALIGN_CENTER,
+		ALIGN_BOTTOM,
+		ALIGN_LEFT,
+		ALIGN_RIGHT
+	};
 	ptrdiff_t debug_id = -1;
 
 	std::function<void(const sf::Vector2f& pos)> OnClick = [](const sf::Vector2f& pos) { };
@@ -192,15 +199,21 @@ public:
 	void setPadding(float padding);
 	void setHorizontalPadding(float padding);
 	void setVerticalPadding(float padding);
+	void setVerticalAlignment(Alignment alignment);
+	void setHorizontalAlignment(Alignment alignment);
 
 protected:
 	void update() override;
+	Anchor alignmentToAnchor(Alignment alignment) const;
+	float alignmentToOffset(Alignment alignment, float max_size) const;
 
 private:
 	bool auto_resize = true;
 	bool horizontal = true;
 	float horizontal_padding = 0.0f;
 	float vertical_padding = 0.0f;
+	Alignment vertical_alignment = ALIGN_TOP;
+	Alignment horizontal_alignment = ALIGN_LEFT;
 
 };
 
@@ -283,7 +296,7 @@ private:
 	friend class Widget;
 	bool click_blocked = false;
 	bool release_blocked = false;
-	bool debug_render = true;
+	bool debug_render = false;
 	float render_origin_size = 10.0f;
 	sf::Color render_bounds_color = sf::Color::Green;
 	sf::Color render_origin_color = sf::Color::Red;
