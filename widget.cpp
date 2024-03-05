@@ -100,6 +100,21 @@ const CompoundVector<Widget*>& Widget::getChildren() const {
 	return children;
 }
 
+Widget* Widget::find(const std::string& name) const {
+	for (size_t i = 0; i < children.size(); i++) {
+		if (children[i]->name == name) {
+			return children[i];
+		}
+	}
+	for (size_t i = 0; i < children.size(); i++) {
+		Widget* result = children[i]->find(name);
+		if (result) {
+			return result;
+		}
+	}
+	return nullptr;
+}
+
 const sf::Vector2f& Widget::toGlobal(const sf::Vector2f& pos) const {
 	return getGlobalTransform().transformPoint(pos);
 }
@@ -725,13 +740,18 @@ void CheckboxWidget::setCheckFillColor(const sf::Color& color) {
 	check_fill_color = color;
 }
 
-void CheckboxWidget::setChecked(bool value) {
+void CheckboxWidget::setCheckedSilent(bool value) {
 	checked = value;
 	check_widget->setVisible(value);
 }
 
+void CheckboxWidget::setChecked(bool value) {
+	setCheckedSilent(value);
+	OnToggle(value);
+}
+
 void CheckboxWidget::toggleChecked() {
-	setChecked(!checked);
+	setCheckedSilent(!checked);
 	OnToggle(checked);
 }
 

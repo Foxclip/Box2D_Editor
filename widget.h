@@ -83,6 +83,7 @@ public:
 	Widget* getParent() const;
 	std::vector<Widget*> getParentChain() const;
 	const CompoundVector<Widget*>& getChildren() const;
+	Widget* find(const std::string& name) const;
 	virtual sf::FloatRect getLocalBounds() const = 0;
 	virtual sf::FloatRect getParentLocalBounds() const = 0;
 	virtual sf::FloatRect getGlobalBounds() const = 0;
@@ -230,6 +231,7 @@ public:
 	void setFillColor(const sf::Color& color) override;
 	void setHighlightFillColor(const sf::Color& color);
 	void setCheckFillColor(const sf::Color& color);
+	void setCheckedSilent(bool value);
 	void setChecked(bool value);
 	void toggleChecked();
 

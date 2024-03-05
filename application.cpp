@@ -232,7 +232,14 @@ void Application::init_tools() {
         create_tool.create_panel_widget->setVisible(value);
     };
     edit_tool.OnSetSelected = [&](bool value) {
-        edit_tool.edit_window_widget->setVisible(value);
+        assert(active_object);
+        Widget* window_widget = edit_tool.edit_window_widget;
+        window_widget->setVisible(value);
+        Widget* parameter = window_widget->find("dynamic parameter");
+        assert(parameter);
+        CheckboxWidget* checkbox = dynamic_cast<CheckboxWidget*>(parameter->find("checkbox"));
+        assert(checkbox);
+        checkbox->setCheckedSilent(active_object->getType() == b2_dynamicBody);
     };
 }
 
