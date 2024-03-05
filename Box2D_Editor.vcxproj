@@ -144,6 +144,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="objectlist.cpp" />
     <ClCompile Include="polygon.cpp" />
+    <ClCompile Include="searchindex.cpp" />
     <ClCompile Include="serializer.cpp" />
     <ClCompile Include="tools.cpp" />
     <ClCompile Include="utils.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="objectlist.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="scenes.h" />
+    <ClInclude Include="searchindex.h" />
     <ClInclude Include="serializer.h" />
     <ClInclude Include="tools.h" />
     <ClInclude Include="utils.h" />

@@ -2,29 +2,7 @@
 
 #include "gameobject.h"
 #include "compvector.h"
-
-template<typename T>
-struct ObjectData {
-public:
-	T data;
-	const GameObject* ptr = nullptr;
-
-	ObjectData(T data, const GameObject* ptr) {
-		this->data = data;
-		this->ptr = ptr;
-	}
-	bool operator<(const ObjectData& other) const {
-		return data < other.data;
-	}
-
-private:
-};
-
-template<typename TSet, typename TData>
-concept is_object_data_set = requires {
-	std::same_as<TSet, std::set<ObjectData<TData>>>
-	|| std::same_as<TSet, std::multiset<ObjectData<TData>>>;
-};
+#include "searchindex.h"
 
 class GameObjectList {
 public:
@@ -57,25 +35,10 @@ private:
 	CompoundVectorUptr<GameObject> all_objects;
 	CompoundVector<GameObject*> top_objects;
 	CompoundVectorUptr<Joint> joints;
-	std::set<ObjectData<size_t>> ids;
-	std::multiset<ObjectData<std::string>> names;
+	SearchIndexUnique<size_t, GameObject> ids;
+	SearchIndexMultiple<std::string, GameObject> names;
 
-	template<typename TSet, typename TData>
-	requires is_object_data_set<TSet, TData>
-	GameObject* getByData(
-		const TSet& set, const TData& data
-	) const;
 	GameObject* duplicateObject(const GameObject* object);
 	Joint* duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b);
 
 };
-
-template<typename TSet, typename TData>
-requires is_object_data_set<TSet, TData>
-inline GameObject* GameObjectList::getByData(const TSet& set, const TData& data) const {
-	auto it = set.find(ObjectData<TData>(data, nullptr));
-	if (it != set.end()) {
-		return const_cast<GameObject*>((*it).ptr);
-	}
-	return nullptr;
-}

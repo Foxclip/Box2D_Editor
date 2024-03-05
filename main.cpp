@@ -7,8 +7,8 @@
 void execute_app() {
     Application app;
     app.init();
-    scene1(app);
-    //app.load("level.txt");
+    //scene1(app);
+    app.load("level.txt");
     //ground_transform(app);
     //single_box(app);
     //single_ball(app);
@@ -31,7 +31,7 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: set whether object is static or dynamic in edit mode
+    // TODO: change (*it). to it->
     // TODO: delay editing polygons with many vertices
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars
