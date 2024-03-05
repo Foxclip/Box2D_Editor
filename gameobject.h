@@ -119,6 +119,7 @@ public:
 	const std::string& getName() const;
 	virtual sf::Drawable* getDrawable() const = 0;
 	virtual sf::Transformable* getTransformable() const = 0;
+	b2BodyType getType() const;
 	const b2Vec2& getPosition() const;
 	float getRotation() const;
 	const b2Vec2& getGlobalPosition() const;

@@ -39,6 +39,8 @@ class Tool {
 public:
 	std::string name;
 	Widget* widget = nullptr;
+	std::function<void(bool)> OnSetSelected = [](bool value) { };
+
 	virtual bool showInToolPanel() const = 0;
 
 	Tool();

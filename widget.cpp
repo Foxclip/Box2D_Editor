@@ -730,6 +730,11 @@ void CheckboxWidget::setChecked(bool value) {
 	check_widget->setVisible(value);
 }
 
+void CheckboxWidget::toggleChecked() {
+	setChecked(!checked);
+	OnToggle(checked);
+}
+
 void CheckboxWidget::update() {
 	Widget::update();
 	check_widget->setSize(rect.getSize() * check_size);
@@ -745,10 +750,6 @@ void CheckboxWidget::internalOnMouseEnter(const sf::Vector2f& pos) {
 
 void CheckboxWidget::internalOnMouseExit(const sf::Vector2f& pos) {
 	RectangleWidget::setFillColor(background_fill_color);
-}
-
-void CheckboxWidget::toggleChecked() {
-	setChecked(!checked);
 }
 
 WidgetList::WidgetList() {

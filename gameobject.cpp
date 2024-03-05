@@ -21,6 +21,10 @@ const std::string& GameObject::getName() const {
 	return name;
 }
 
+b2BodyType GameObject::getType() const {
+	return rigid_body->GetType();
+}
+
 const b2Vec2& GameObject::getPosition() const {
 	return getTransform().p;
 }

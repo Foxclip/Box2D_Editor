@@ -228,6 +228,12 @@ void Application::init_tools() {
     for (size_t i = 0; i < tools.size(); i++) {
         tools[i]->reset();
     }
+    create_tool.OnSetSelected = [&](bool value) {
+        create_tool.create_panel_widget->setVisible(value);
+    };
+    edit_tool.OnSetSelected = [&](bool value) {
+        edit_tool.edit_window_widget->setVisible(value);
+    };
 }
 
 void Application::init_world() {
@@ -258,9 +264,9 @@ void Application::init_ui() {
     id_text.setCharacterSize(10);
     id_text.setOrigin(sf::Vector2f(0.0f, id_text.getCharacterSize()));
     id_text.setFillColor(sf::Color::White);
-    name_text.setFont(small_font);
-    name_text.setCharacterSize(10);
-    name_text.setFillColor(sf::Color::White);
+    object_info_text.setFont(small_font);
+    object_info_text.setCharacterSize(10);
+    object_info_text.setFillColor(sf::Color::White);
 
     init_widgets();
 }
@@ -339,10 +345,16 @@ void Application::init_widgets() {
     CheckboxWidget* checkbox_widget = widgets.createWidget<CheckboxWidget>();
     checkbox_widget->setOrigin(Widget::TOP_LEFT);
     checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));
+    checkbox_widget->OnToggle = [&](bool value) {
+        assert(active_object);
+        b2BodyType type = value ? b2_dynamicBody : b2_staticBody;
+        active_object->setType(type, false);
+    };
     checkbox_widget->setParent(dynamic_parameter_widget);
 
     // create panel
     ContainerWidget* create_panel_widget = widgets.createWidget<ContainerWidget>();
+    create_panel_widget->setVisible(false);
     create_panel_widget->setFillColor(sf::Color(255, 0, 0, 0));
     create_panel_widget->setOrigin(Widget::CENTER_LEFT);
     create_panel_widget->setParentAnchor(Widget::CENTER_LEFT);
@@ -962,21 +974,26 @@ void Application::render_ui() {
             origin_shape.setPosition(world_to_screen(gameobject->getGlobalPosition()));
             target.draw(origin_shape);
         }
-        // names
+        // object info
         for (size_t i = 0; i < game_objects.getAllSize(); i++) {
             GameObject* gameobject = game_objects.getFromAll(i);
-            // rounding coordinates so letters don't wobble around
-            sf::Vector2f pos = world_to_screen(gameobject->getGlobalPosition());
-            sf::Vector2f rounded_pos = sf::Vector2f(std::round(pos.x), std::round(pos.y));
-            id_text.setPosition(rounded_pos);
-            id_text.setString("id: " + std::to_string(gameobject->id));
-            name_text.setPosition(rounded_pos);
-            name_text.setString(gameobject->getName());
-            // rendering twice so it is more opaque
-            target.draw(id_text);
-            target.draw(id_text);
-            target.draw(name_text);
-            target.draw(name_text);
+            size_t info_index = 0;
+            auto render_info = [&](const std::string& str) {
+                sf::Vector2f object_screen_pos = world_to_screen(gameobject->getGlobalPosition());
+                sf::Vector2f offset = sf::Vector2f(0.0f, info_index * object_info_text.getCharacterSize());
+                sf::Vector2f pos = object_screen_pos + offset;
+                // rounding coordinates so letters don't wobble around
+                sf::Vector2f rounded_pos = sf::Vector2f(std::round(pos.x), std::round(pos.y));
+                object_info_text.setPosition(rounded_pos);
+                object_info_text.setString(str);
+                // rendering twice so it is more opaque
+                target.draw(object_info_text);
+                target.draw(object_info_text);
+                info_index++;
+            };
+            render_info("id: " + std::to_string(gameobject->id));
+            render_info(gameobject->getName());
+            render_info(utils::body_type_to_str(gameobject->getType()));
         }
         // indices
         for (size_t i = 0; i < game_objects.getAllSize(); i++) {
@@ -1250,9 +1267,14 @@ Tool* Application::try_select_tool_by_index(size_t index) {
 }
 
 Tool* Application::try_select_tool(Tool* tool) {
+    if (tool == selected_tool) {
+        return tool;
+    }
+    if (selected_tool) {
+        selected_tool->OnSetSelected(false);
+    }
     selected_tool = tool;
-    create_tool.create_panel_widget->setVisible(tool == &create_tool);
-    edit_tool.edit_window_widget->setVisible(tool == &edit_tool);
+    tool->OnSetSelected(true);
     for (size_t i = 0; i < tools_in_tool_panel.size(); i++) {
         tools_in_tool_panel[i]->widget->setFillColor(sf::Color(128, 128, 128));
     }

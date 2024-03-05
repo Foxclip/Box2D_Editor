@@ -219,6 +219,8 @@ private:
 
 class CheckboxWidget : public RectangleWidget {
 public:
+	std::function<void(bool)> OnToggle = [](bool new_value) { };
+
 	CheckboxWidget();
 	CheckboxWidget(WidgetList* widget_list);
 	bool isChecked() const;
@@ -229,6 +231,7 @@ public:
 	void setHighlightFillColor(const sf::Color& color);
 	void setCheckFillColor(const sf::Color& color);
 	void setChecked(bool value);
+	void toggleChecked();
 
 protected:
 	void update() override;
@@ -245,7 +248,6 @@ private:
 	sf::Color highlight_fill_color = sf::Color(128, 128, 128);
 	sf::Color check_fill_color = sf::Color(255, 128, 0);
 
-	void toggleChecked();
 };
 
 class TextWidget : public Widget {

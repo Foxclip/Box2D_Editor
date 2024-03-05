@@ -124,7 +124,7 @@ private:
 	sf::Font console_font;
 	sf::CircleShape origin_shape;
 	sf::Font small_font;
-	sf::Text name_text;
+	sf::Text object_info_text;
 	sf::Text id_text;
 	WidgetList widgets;
 
