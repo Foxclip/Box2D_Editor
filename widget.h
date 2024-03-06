@@ -100,6 +100,10 @@ public:
 	const sf::Vector2f getTopRight() const;
 	const sf::Vector2f getBottomLeft() const;
 	const sf::Vector2f getBottomRight() const;
+	const sf::Vector2f getGlobalTopLeft() const;
+	const sf::Vector2f getGlobalTopRight() const;
+	const sf::Vector2f getGlobalBottomLeft() const;
+	const sf::Vector2f getGlobalBottomRight() const;
 	virtual const sf::Color& getFillColor() const = 0;
 	void setOrigin(Anchor anchor);
 	void setOrigin(float x, float y);

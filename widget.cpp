@@ -149,21 +149,41 @@ const sf::Vector2f& Widget::getGlobalPosition() const {
 }
 
 const sf::Vector2f Widget::getTopLeft() const {
-	sf::FloatRect bounds = getGlobalBounds();
+	sf::FloatRect bounds = getParentLocalBounds();
 	return sf::Vector2f(bounds.left, bounds.top);
 }
 
 const sf::Vector2f Widget::getTopRight() const {
-	sf::FloatRect bounds = getGlobalBounds();
+	sf::FloatRect bounds = getParentLocalBounds();
 	return sf::Vector2f(bounds.left + bounds.width, bounds.top);
 }
 
 const sf::Vector2f Widget::getBottomLeft() const {
-	sf::FloatRect bounds = getGlobalBounds();
+	sf::FloatRect bounds = getParentLocalBounds();
 	return sf::Vector2f(bounds.left, bounds.top + bounds.height);
 }
 
 const sf::Vector2f Widget::getBottomRight() const {
+	sf::FloatRect bounds = getParentLocalBounds();
+	return sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height);
+}
+
+const sf::Vector2f Widget::getGlobalTopLeft() const {
+	sf::FloatRect bounds = getGlobalBounds();
+	return sf::Vector2f(bounds.left, bounds.top);
+}
+
+const sf::Vector2f Widget::getGlobalTopRight() const {
+	sf::FloatRect bounds = getGlobalBounds();
+	return sf::Vector2f(bounds.left + bounds.width, bounds.top);
+}
+
+const sf::Vector2f Widget::getGlobalBottomLeft() const {
+	sf::FloatRect bounds = getGlobalBounds();
+	return sf::Vector2f(bounds.left, bounds.top + bounds.height);
+}
+
+const sf::Vector2f Widget::getGlobalBottomRight() const {
 	sf::FloatRect bounds = getGlobalBounds();
 	return sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height);
 }
@@ -305,10 +325,10 @@ void Widget::renderBounds(sf::RenderTarget& target) {
 		return;
 	}
 	sf::Color bounds_color = widget_list->render_bounds_color;
-	drawLine(target, getTopRight(), getTopLeft(), bounds_color);
-	drawLine(target, getTopLeft(), getBottomLeft(), bounds_color);
-	drawLine(target, getBottomLeft(), getBottomRight(), bounds_color);
-	drawLine(target, getBottomRight(), getTopRight(), bounds_color);
+	drawLine(target, getGlobalTopRight(), getGlobalTopLeft(), bounds_color);
+	drawLine(target, getGlobalTopLeft(), getGlobalBottomLeft(), bounds_color);
+	drawLine(target, getGlobalBottomLeft(), getGlobalBottomRight(), bounds_color);
+	drawLine(target, getGlobalBottomRight(), getGlobalTopRight(), bounds_color);
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->renderBounds(target);
 	}
