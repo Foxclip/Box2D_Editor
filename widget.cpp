@@ -24,13 +24,14 @@ void Widget::updateMouseState() {
 WidgetVisibility Widget::checkVisibility() const {
 	WidgetVisibility v;
 	sf::FloatRect global_bounds = getGlobalBounds();
-	const Widget* current = this;
-	while (current) {
-		if (current == widget_list->getRootWidget()) {
-			v.addedToRoot = true;
+	CompoundVector<Widget*> parents = getParentChain();
+	v.addedToRoot = parents.contains(widget_list->root_widget);
+	v.allParentsVisible = true;
+	for (size_t i = 0; i < parents.size(); i++) {
+		if (!parents[i]->visible) {
+			v.allParentsVisible = false;
 			break;
 		}
-		current = parent;
 	}
 	v.visibleSetting = visible;
 	v.onScreen = widget_list->getRootWidget()->getGlobalBounds().intersects(global_bounds);
@@ -215,9 +216,9 @@ void Widget::setClickThrough(bool value) {
 	this->click_through = value;
 }
 
-void Widget::setParent(Widget* new_parent) {
+void Widget::setParentSilent(Widget* new_parent) {
 	if (!new_parent) {
-		return setParent(widget_list->root_widget);
+		return setParentSilent(widget_list->root_widget);
 	}
 	Widget* old_parent = this->parent;
 	if (old_parent) {
@@ -227,6 +228,11 @@ void Widget::setParent(Widget* new_parent) {
 	this->parent = new_parent;
 	transforms.invalidateGlobalTransform();
 	updateFullName();
+}
+
+void Widget::setParent(Widget* new_parent) {
+	setParentSilent(new_parent);
+	internalOnSetParent(new_parent);
 }
 
 void Widget::setName(const std::string& name) {
@@ -247,7 +253,10 @@ void Widget::update() {
 	}
 	sf::Vector2f anchored_pos = anchorToPos(parent_anchor, getPosition(), parent_size);
 	setPosition(anchored_pos + anchor_offset);
+	setOrigin(origin_anchor);
 }
+
+void Widget::internalOnSetParent(Widget* parent) { }
 
 void Widget::internalOnClick(const sf::Vector2f& pos) { }
 
@@ -271,6 +280,10 @@ void Widget::updateFullName() {
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->updateFullName();
 	}
+}
+
+void Widget::updateVisibility() {
+	visibility = checkVisibility();
 }
 
 void Widget::render(sf::RenderTarget& target) {
@@ -816,6 +829,11 @@ void WidgetList::render(sf::RenderTarget& target) {
 		root_widget->renderBounds(target);
 		root_widget->renderOrigin(target);
 	}
+#ifndef NDEBUG
+	for (size_t i = 0; i < widgets.size(); i++) {
+		widgets[i]->updateVisibility();
+	}
+#endif
 }
 
 void WidgetList::reset(const sf::Vector2f& root_size) {
@@ -830,20 +848,22 @@ TextBoxWidget::TextBoxWidget() { }
 TextBoxWidget::TextBoxWidget(WidgetList* widget_list) {
 	this->widget_list = widget_list;
 	setSize(DEFAULT_SIZE);
-	setFillColor(background_color);
 	setName("textbox");
 	text_widget = widget_list->createWidget<TextWidget>();
 	text_widget->setFillColor(text_color);
 	text_widget->setParentAnchor(CENTER_LEFT);
+	text_widget->setOrigin(CENTER_LEFT);
 	text_widget->setParent(this);
 	cursor_widget = widget_list->createWidget<RectangleWidget>();
-	cursor_widget->setFillColor(edit_text_color);
+	cursor_widget->setFillColor(editor_text_color);
 	cursor_widget->setSize(sf::Vector2f(1.0f, text_widget->getCharacterSize()));
 	cursor_widget->setParent(this);
 	cursor_widget->setName("cursor");
+	setValueSilent("Text");
+	updateColors();
 }
 
-const sf::Color& TextBoxWidget::getBackgroundColor() const {
+const sf::Color& TextBoxWidget::getFillColor() const {
 	return background_color;
 }
 
@@ -856,11 +876,11 @@ const sf::Color& TextBoxWidget::getTextColor() const {
 }
 
 const sf::Color& TextBoxWidget::getEditorColor() const {
-	return edit_color;
+	return editor_color;
 }
 
 const sf::Color& TextBoxWidget::getEditorTextColor() const {
-	return edit_text_color;
+	return editor_text_color;
 }
 
 const sf::Font* TextBoxWidget::getFont() const {
@@ -875,24 +895,29 @@ const std::string& TextBoxWidget::getValue() const {
 	return text_widget->getString();
 }
 
-void TextBoxWidget::setBackgroundColor(const sf::Color& color) {
+void TextBoxWidget::setFillColor(const sf::Color& color) {
 	this->background_color = color;
+	updateColors();
 }
 
 void TextBoxWidget::setHighlightColor(const sf::Color& color) {
 	this->highlight_color = color;
+	updateColors();
 }
 
 void TextBoxWidget::setTextColor(const sf::Color& color) {
 	this->text_color = color;
+	updateColors();
 }
 
 void TextBoxWidget::setEditorColor(const sf::Color& color) {
-	this->edit_color = color;
+	this->editor_color = color;
+	updateColors();
 }
 
 void TextBoxWidget::setEditorTextColor(const sf::Color& color) {
-	this->edit_text_color = color;
+	this->editor_text_color = color;
+	updateColors();
 }
 
 void TextBoxWidget::setValueSilent(const std::string& value) {
@@ -922,21 +947,53 @@ void TextBoxWidget::update() {
 	cursor_widget->setPosition(cursor_pos);
 }
 
+void TextBoxWidget::updateColors() {
+	sf::Color rect_col;
+	sf::Color text_col;
+	if (edit_mode) {
+		rect_col = editor_color;
+		text_col = editor_text_color;
+	} else {
+		if (highlighted) {
+			rect_col = highlight_color;
+		} else {
+			rect_col = background_color;
+		}
+		text_col = text_color;
+	}
+	RectangleWidget::setFillColor(rect_col);
+	text_widget->setFillColor(text_col);
+	cursor_widget->setFillColor(text_col);
+}
+
+void TextBoxWidget::internalOnSetParent(Widget* parent) {
+	if (!getFont()) {
+		logger << "WARNING: font is not set for " + full_name + "\n";
+	}
+}
+
+void TextBoxWidget::internalOnEditModeToggle(bool value) {
+	updateColors();
+}
+
 void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
 	if (!edit_mode) {
 		edit_mode = true;
+		internalOnEditModeToggle(true);
 		OnEditModeToggle(true);
 	}
 }
 
 void TextBoxWidget::internalOnMouseEnter(const sf::Vector2f& pos) {
+	highlighted = true;
 	if (!edit_mode) {
-		setFillColor(highlight_color);
+		updateColors();
 	}
 }
 
 void TextBoxWidget::internalOnMouseExit(const sf::Vector2f& pos) {
+	highlighted = false;
 	if (!edit_mode) {
-		setFillColor(background_color);
+		updateColors();
 	}
 }

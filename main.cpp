@@ -34,6 +34,7 @@ int main() {
     // TODO: text box widget
     // TODO: change (*it). to it->
     // TODO: SearchIndex for widget children
+    // TODO: replace toVec in CompoundVector with implicit conversion
     // TODO: delay editing polygons with many vertices
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars

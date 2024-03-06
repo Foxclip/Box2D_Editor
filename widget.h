@@ -9,6 +9,7 @@
 
 struct WidgetVisibility {
 	bool addedToRoot = false;
+	bool allParentsVisible = false;
 	bool visibleSetting = false;
 	bool onScreen = false;
 	bool nonZeroSize = false;
@@ -112,6 +113,7 @@ public:
 	void setRotation(float angle);
 	void setVisible(bool value);
 	void setClickThrough(bool value);
+	void setParentSilent(Widget* new_parent);
 	void setParent(Widget* new_parent);
 	void setName(const std::string& name);
 	virtual void render(sf::RenderTarget& target);
@@ -145,14 +147,17 @@ protected:
 	virtual const sf::Transformable& getTransformable() const = 0;
 	virtual sf::Transform getRenderTransform() const;
 	virtual void update();
+	virtual void internalOnSetParent(Widget* parent);
 	virtual void internalOnClick(const sf::Vector2f& pos);
 	virtual void internalOnMouseEnter(const sf::Vector2f& pos);
 	virtual void internalOnMouseExit(const sf::Vector2f& pos);
 
 private:
+	WidgetVisibility visibility;
 
 	std::string calcFullName() const;
 	void updateFullName();
+	void updateVisibility();
 
 };
 
@@ -292,7 +297,7 @@ public:
 
 	TextBoxWidget();
 	TextBoxWidget(WidgetList* widget_list);
-	const sf::Color& getBackgroundColor() const;
+	const sf::Color& getFillColor() const override;
 	const sf::Color& getHighlightColor() const;
 	const sf::Color& getTextColor() const;
 	const sf::Color& getEditorColor() const;
@@ -300,7 +305,7 @@ public:
 	const sf::Font* getFont() const;
 	unsigned int getCharacterSize() const;
 	const std::string& getValue() const;
-	void setBackgroundColor(const sf::Color& color);
+	void setFillColor(const sf::Color& color) override;
 	void setHighlightColor(const sf::Color& color);
 	void setTextColor(const sf::Color& color);
 	void setEditorColor(const sf::Color& color);
@@ -313,6 +318,9 @@ public:
 
 protected:
 	void update() override;
+	void updateColors();
+	void internalOnSetParent(Widget* parent) override;
+	void internalOnEditModeToggle(bool value);
 	void internalOnClick(const sf::Vector2f& pos) override;
 	void internalOnMouseEnter(const sf::Vector2f& pos) override;
 	void internalOnMouseExit(const sf::Vector2f& pos) override;
@@ -323,11 +331,12 @@ private:
 	RectangleWidget* cursor_widget = nullptr;
 	sf::Vector2f cursor_offset = sf::Vector2f(1.0f, 0.0f);
 	bool edit_mode = false;
+	bool highlighted = false;
 	sf::Color background_color = sf::Color(50, 50, 50);
 	sf::Color highlight_color = sf::Color(128, 128, 128);
 	sf::Color text_color = sf::Color(255, 255, 255);
-	sf::Color edit_color = sf::Color(255, 255, 255);
-	sf::Color edit_text_color = sf::Color(0, 0, 0);
+	sf::Color editor_color = sf::Color(255, 255, 255);
+	sf::Color editor_text_color = sf::Color(0, 0, 0);
 };
 
 class WidgetList {
@@ -365,7 +374,7 @@ inline T* WidgetList::createWidget() {
 	T* ptr = uptr.get();
 	ptr->widget_list = this;
 	if (root_widget) {
-		ptr->setParent(root_widget);
+		ptr->setParentSilent(root_widget);
 	}
 	widgets.add(std::move(uptr));
 	return ptr;
