@@ -260,6 +260,9 @@ public:
 	sf::FloatRect getParentLocalBounds() const override;
 	sf::FloatRect getGlobalBounds() const override;
 	sf::FloatRect getExactLocalBounds() const;
+	const sf::Font* getFont() const;
+	const std::string& getString() const;
+	unsigned int getCharacterSize() const;
 	const sf::Color& getFillColor() const override;
 	void setFont(const sf::Font& font);
 	void setString(const std::string& string);
@@ -282,8 +285,55 @@ private:
 
 };
 
+class TextBoxWidget : public RectangleWidget {
+public:
+	std::function<void(bool)> OnEditModeToggle = [](bool new_value) { };
+	std::function<void(const std::string&)> OnTextChanged = [](const std::string& new_value) { };
+
+	TextBoxWidget();
+	TextBoxWidget(WidgetList* widget_list);
+	const sf::Color& getBackgroundColor() const;
+	const sf::Color& getHighlightColor() const;
+	const sf::Color& getTextColor() const;
+	const sf::Color& getEditorColor() const;
+	const sf::Color& getEditorTextColor() const;
+	const sf::Font* getFont() const;
+	unsigned int getCharacterSize() const;
+	const std::string& getValue() const;
+	void setBackgroundColor(const sf::Color& color);
+	void setHighlightColor(const sf::Color& color);
+	void setTextColor(const sf::Color& color);
+	void setEditorColor(const sf::Color& color);
+	void setEditorTextColor(const sf::Color& color);
+	void setValueSilent(const std::string& value);
+	void setValue(const std::string& value);
+	void setFont(const sf::Font& font);
+	void setCharacterSize(unsigned int size);
+	void processKeyboardEvent(const sf::Event& event);
+
+protected:
+	void update() override;
+	void internalOnClick(const sf::Vector2f& pos) override;
+	void internalOnMouseEnter(const sf::Vector2f& pos) override;
+	void internalOnMouseExit(const sf::Vector2f& pos) override;
+
+private:
+	const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(40.0f, 20.0f);
+	TextWidget* text_widget = nullptr;
+	RectangleWidget* cursor_widget = nullptr;
+	sf::Vector2f cursor_offset = sf::Vector2f(1.0f, 0.0f);
+	bool edit_mode = false;
+	sf::Color background_color = sf::Color(50, 50, 50);
+	sf::Color highlight_color = sf::Color(128, 128, 128);
+	sf::Color text_color = sf::Color(255, 255, 255);
+	sf::Color edit_color = sf::Color(255, 255, 255);
+	sf::Color edit_text_color = sf::Color(0, 0, 0);
+};
+
 class WidgetList {
 public:
+	bool debug_render = false;
+
 	WidgetList();
 	bool isClickBlocked() const;
 	bool isReleaseBlocked() const;
@@ -300,7 +350,6 @@ private:
 	friend class Widget;
 	bool click_blocked = false;
 	bool release_blocked = false;
-	bool debug_render = false;
 	float render_origin_size = 10.0f;
 	sf::Color render_bounds_color = sf::Color::Green;
 	sf::Color render_origin_color = sf::Color::Red;

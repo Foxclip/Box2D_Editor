@@ -457,6 +457,18 @@ sf::FloatRect TextWidget::getExactLocalBounds() const {
 	return text.getLocalBounds();
 }
 
+const sf::Font* TextWidget::getFont() const {
+	return text.getFont();
+}
+
+const std::string& TextWidget::getString() const {
+	return text.getString();
+}
+
+unsigned int TextWidget::getCharacterSize() const {
+	return text.getCharacterSize();
+}
+
 const sf::Color& TextWidget::getFillColor() const {
 	return text.getFillColor();
 }
@@ -813,3 +825,118 @@ void WidgetList::reset(const sf::Vector2f& root_size) {
 	release_blocked = false;
 }
 
+TextBoxWidget::TextBoxWidget() { }
+
+TextBoxWidget::TextBoxWidget(WidgetList* widget_list) {
+	this->widget_list = widget_list;
+	setSize(DEFAULT_SIZE);
+	setFillColor(background_color);
+	setName("textbox");
+	text_widget = widget_list->createWidget<TextWidget>();
+	text_widget->setFillColor(text_color);
+	text_widget->setParentAnchor(CENTER_LEFT);
+	text_widget->setParent(this);
+	cursor_widget = widget_list->createWidget<RectangleWidget>();
+	cursor_widget->setFillColor(edit_text_color);
+	cursor_widget->setSize(sf::Vector2f(1.0f, text_widget->getCharacterSize()));
+	cursor_widget->setParent(this);
+	cursor_widget->setName("cursor");
+}
+
+const sf::Color& TextBoxWidget::getBackgroundColor() const {
+	return background_color;
+}
+
+const sf::Color& TextBoxWidget::getHighlightColor() const {
+	return highlight_color;
+}
+
+const sf::Color& TextBoxWidget::getTextColor() const {
+	return text_color;
+}
+
+const sf::Color& TextBoxWidget::getEditorColor() const {
+	return edit_color;
+}
+
+const sf::Color& TextBoxWidget::getEditorTextColor() const {
+	return edit_text_color;
+}
+
+const sf::Font* TextBoxWidget::getFont() const {
+	return text_widget->getFont();
+}
+
+unsigned int TextBoxWidget::getCharacterSize() const {
+	return text_widget->getCharacterSize();
+}
+
+const std::string& TextBoxWidget::getValue() const {
+	return text_widget->getString();
+}
+
+void TextBoxWidget::setBackgroundColor(const sf::Color& color) {
+	this->background_color = color;
+}
+
+void TextBoxWidget::setHighlightColor(const sf::Color& color) {
+	this->highlight_color = color;
+}
+
+void TextBoxWidget::setTextColor(const sf::Color& color) {
+	this->text_color = color;
+}
+
+void TextBoxWidget::setEditorColor(const sf::Color& color) {
+	this->edit_color = color;
+}
+
+void TextBoxWidget::setEditorTextColor(const sf::Color& color) {
+	this->edit_text_color = color;
+}
+
+void TextBoxWidget::setValueSilent(const std::string& value) {
+	text_widget->setString(value);
+}
+
+void TextBoxWidget::setValue(const std::string& value) {
+	setValueSilent(value);
+	OnTextChanged(value);
+}
+
+void TextBoxWidget::setFont(const sf::Font& font) {
+	text_widget->setFont(font);
+}
+
+void TextBoxWidget::setCharacterSize(unsigned int size) {
+	text_widget->setCharacterSize(size);
+	cursor_widget->setSize(sf::Vector2f(1.0f, size));
+}
+
+void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
+}
+
+void TextBoxWidget::update() {
+	Widget::update();
+	sf::Vector2f cursor_pos = text_widget->getTopRight() + cursor_offset;
+	cursor_widget->setPosition(cursor_pos);
+}
+
+void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
+	if (!edit_mode) {
+		edit_mode = true;
+		OnEditModeToggle(true);
+	}
+}
+
+void TextBoxWidget::internalOnMouseEnter(const sf::Vector2f& pos) {
+	if (!edit_mode) {
+		setFillColor(highlight_color);
+	}
+}
+
+void TextBoxWidget::internalOnMouseExit(const sf::Vector2f& pos) {
+	if (!edit_mode) {
+		setFillColor(background_color);
+	}
+}

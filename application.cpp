@@ -324,40 +324,50 @@ void Application::init_widgets() {
     ContainerWidget* edit_window_widget = widgets.createWidget<ContainerWidget>();
     edit_window_widget->setVisible(false);
     edit_window_widget->setSize(sf::Vector2f(100.0f, 200.0f));
+    edit_window_widget->setHorizontal(false);
     edit_window_widget->setFillColor(sf::Color(128, 128, 128));
     edit_window_widget->setOrigin(Widget::TOP_RIGHT);
     edit_window_widget->setParentAnchor(Widget::TOP_RIGHT);
     edit_window_widget->setAnchorOffset(-20.0f, 20.0f);
     edit_window_widget->setPadding(TOOLBOX_PADDING);
     edit_window_widget->setClickThrough(false);
-    //edit_window_widget->setAutoResize(false);
     edit_window_widget->setName("edit window");
     edit_tool.edit_window_widget = edit_window_widget;
-    ContainerWidget* dynamic_parameter_widget = widgets.createWidget<ContainerWidget>();
-    dynamic_parameter_widget->setFillColor(sf::Color::Transparent);
-    dynamic_parameter_widget->setVerticalPadding(10.0f);
-    dynamic_parameter_widget->setVerticalAlignment(Widget::ALIGN_CENTER);
-    dynamic_parameter_widget->setParent(edit_window_widget);
-    dynamic_parameter_widget->setName("dynamic parameter");
-    TextWidget* dynamic_parameter_text_widget = widgets.createWidget<TextWidget>();
-    dynamic_parameter_text_widget->setFont(ui_font);
-    dynamic_parameter_text_widget->setCharacterSize(15);
-    dynamic_parameter_text_widget->setString("Dynamic:");
-    dynamic_parameter_text_widget->setParent(dynamic_parameter_widget);
-    RectangleWidget* spacing_widget = widgets.createWidget<RectangleWidget>();
-    spacing_widget->setSize(sf::Vector2f(10.0f, 1.0f));
-    spacing_widget->setFillColor(sf::Color::Transparent);
-    spacing_widget->setParent(dynamic_parameter_widget);
-    spacing_widget->setName("spacing");
-    CheckboxWidget* checkbox_widget = widgets.createWidget<CheckboxWidget>();
-    checkbox_widget->setOrigin(Widget::TOP_LEFT);
-    checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));
-    checkbox_widget->OnToggle = [&](bool value) {
-        assert(active_object);
-        b2BodyType type = value ? b2_dynamicBody : b2_staticBody;
-        active_object->setType(type, false);
+    auto create_parameter_widget = [&](const std::string& name, const std::string& text) {
+        ContainerWidget* parameter_widget = widgets.createWidget<ContainerWidget>();
+        parameter_widget->setFillColor(sf::Color::Transparent);
+        parameter_widget->setVerticalAlignment(Widget::ALIGN_CENTER);
+        parameter_widget->setParent(edit_window_widget);
+        parameter_widget->setName(name);
+        TextWidget* parameter_text_widget = widgets.createWidget<TextWidget>();
+        parameter_text_widget->setFont(ui_font);
+        parameter_text_widget->setCharacterSize(15);
+        parameter_text_widget->setString(text);
+        parameter_text_widget->setParent(parameter_widget);
+        RectangleWidget* spacing_widget = widgets.createWidget<RectangleWidget>();
+        spacing_widget->setSize(sf::Vector2f(10.0f, 1.0f));
+        spacing_widget->setFillColor(sf::Color::Transparent);
+        spacing_widget->setParent(parameter_widget);
+        spacing_widget->setName("spacing");
+        return parameter_widget;
     };
-    checkbox_widget->setParent(dynamic_parameter_widget);
+    {
+        ContainerWidget* dynamic_parameter_widget = create_parameter_widget("dynamic parameter", "Dynamic:");
+        CheckboxWidget* checkbox_widget = widgets.createWidget<CheckboxWidget>();
+        checkbox_widget->setOrigin(Widget::TOP_LEFT);
+        checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));
+        checkbox_widget->OnToggle = [&](bool value) {
+            assert(active_object);
+            b2BodyType type = value ? b2_dynamicBody : b2_staticBody;
+            active_object->setType(type, false);
+        };
+        checkbox_widget->setParent(dynamic_parameter_widget);
+    }
+    {
+        ContainerWidget* name_parameter_widget = create_parameter_widget("name parameter", "Name:");
+        TextBoxWidget* textbox_widget = widgets.createWidget<TextBoxWidget>();
+        textbox_widget->setParent(name_parameter_widget);
+    }
 
     // create panel
     ContainerWidget* create_panel_widget = widgets.createWidget<ContainerWidget>();
@@ -623,6 +633,8 @@ void Application::process_keyboard_event(const sf::Event& event) {
                         commit_action = true;
                         leftButtonProcessWidgetsOnPress = false;
                     }
+                } else {
+                    widgets.debug_render = !widgets.debug_render;
                 }
                 break;
             case sf::Keyboard::I:
