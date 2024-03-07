@@ -38,15 +38,17 @@ void test_CompoundVector() {
 		assert(vec == std::vector<int>({ 1, 2, 3 }));
 	}
 	{
+		// compare to vector
+		CompoundVector<int> cvec = { 1, 2, 3 };
+		std::vector<int> vec = { 1, 2, 3 };
+		assert(cvec == vec);
+		assert(vec == cvec);
+	}
+	{
 		// from vector
 		std::vector<int> vec = { 1, 2, 3 };
 		CompoundVector<int> cvec(vec);
-		assert(vec.size() == 3);
-		assert(vec[0] == 1);
-		assert(vec[1] == 2);
-		assert(vec[2] == 3);
-		assert(vec.front() == 1);
-		assert(vec.back() == 3);
+		assert(vec == std::vector<int>({ 1, 2, 3 }));
 	}
 	{
 		// add method
@@ -54,52 +56,39 @@ void test_CompoundVector() {
 		vec.add(1);
 		vec.add(2);
 		vec.add(3);
-		assert(vec.size() == 3);
-		assert(vec[0] == 1);
-		assert(vec[1] == 2);
-		assert(vec[2] == 3);
-		assert(vec.front() == 1);
-		assert(vec.back() == 3);
+		assert(vec == std::vector<int>({ 1, 2, 3 }));
 	}
 	{
 		// insert method (value)
 		CompoundVector<int> vec = { 1, 2, 3 };
 		vec.insert(vec.begin() + 2, 5);
-		assert(vec.getVector() == std::vector<int>({ 1, 2, 5, 3 }));
+		assert(vec == std::vector<int>({ 1, 2, 5, 3 }));
 		vec.insert(vec.begin() + 2, 5);
-		assert(vec.getVector() == std::vector<int>({ 1, 2, 5, 3 }));
+		assert(vec == std::vector<int>({ 1, 2, 5, 3 }));
 	}
 	{
 		// insert method (range)
 		CompoundVector<int> vec = { 1, 2, 3 };
 		std::set<int> set1 = { 5, 6, 7 };
 		vec.insert(vec.begin() + 2, set1.begin(), set1.end());
-		assert(vec.getVector() == std::vector<int>({ 1, 2, 5, 6, 7, 3 }));
+		assert(vec == std::vector<int>({ 1, 2, 5, 6, 7, 3 }));
 		vec.insert(vec.begin() + 2, set1.begin(), set1.end());
-		assert(vec.getVector() == std::vector<int>({ 1, 2, 5, 6, 7, 3 }));
+		assert(vec == std::vector<int>({ 1, 2, 5, 6, 7, 3 }));
 		std::set<int> set2 = { 7, 8, 9 };
 		vec.insert(vec.begin(), set2.begin(), set2.end());
-		assert(vec.getVector() == std::vector<int>({ 8, 9, 1, 2, 5, 6, 7, 3 }));
+		assert(vec == std::vector<int>({ 8, 9, 1, 2, 5, 6, 7, 3 }));
 	}
 	{
 		// remove method
 		CompoundVector<int> vec = { 1, 2, 3 };
 		vec.remove(2);
-		assert(vec.size() == 2);
-		assert(vec[0] == 1);
-		assert(vec[1] == 3);
-		assert(vec.front() == 1);
-		assert(vec.back() == 3);
+		assert(vec == std::vector<int>({ 1, 3 }));
 	}
 	{
 		// removeAt method
 		CompoundVector<int> vec = { 1, 2, 3 };
 		vec.removeAt(1);
-		assert(vec.size() == 2);
-		assert(vec[0] == 1);
-		assert(vec[1] == 3);
-		assert(vec.front() == 1);
-		assert(vec.back() == 3);
+		assert(vec == std::vector<int>({ 1, 3 }));
 	}
 	{
 		// iterators
@@ -245,6 +234,16 @@ void test_CompoundVectorUptr() {
 		assert(vec == std::vector<int*>({ ptr1, ptr2, ptr3 }));
 	}
 	{
+		// compare to vector
+		int* ptr1 = new int(1);
+		int* ptr2 = new int(2);
+		int* ptr3 = new int(3);
+		CompoundVectorUptr<int> cvec = { ptr1, ptr2, ptr3 };
+		std::vector<int*> vec = { ptr1, ptr2, ptr3 };
+		assert(cvec == vec);
+		assert(vec == cvec);
+	}
+	{
 		// add method
 		CompoundVectorUptr<int> vec;
 		vec.add(1);
@@ -267,9 +266,9 @@ void test_CompoundVectorUptr() {
 		std::unique_ptr<int> uptr5(ptr5);
 		std::unique_ptr<int> uptr5_another(ptr5);
 		vec.insert(vec.begin() + 2, std::move(uptr5));
-		assert(vec.getVector() == std::vector<int*>({ ptr1, ptr2, ptr5, ptr3 }));
+		assert(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr3 }));
 		vec.insert(vec.begin() + 2, std::move(uptr5_another));
-		assert(vec.getVector() == std::vector<int*>({ ptr1, ptr2, ptr5, ptr3 }));
+		assert(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr3 }));
 		uptr5_another.release();
 	}
 	{
@@ -299,9 +298,9 @@ void test_CompoundVectorUptr() {
 		vec1_another.push_back(std::move(uptr6_another));
 		vec1_another.push_back(std::move(uptr7_another));
 		vec.insert(vec.begin() + 2, vec1.begin(), vec1.end());
-		assert(vec.getVector() == std::vector<int*>({ ptr1, ptr2, ptr5, ptr6, ptr7, ptr3 }));
+		assert(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr6, ptr7, ptr3 }));
 		vec.insert(vec.begin() + 2, vec1_another.begin(), vec1_another.end());
-		assert(vec.getVector() == std::vector<int*>({ ptr1, ptr2, ptr5, ptr6, ptr7, ptr3 }));
+		assert(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr6, ptr7, ptr3 }));
 		std::unique_ptr<int> uptr7_2(ptr7);
 		std::unique_ptr<int> uptr8(ptr8);
 		std::unique_ptr<int> uptr9(ptr9);
@@ -310,7 +309,7 @@ void test_CompoundVectorUptr() {
 		vec2.push_back(std::move(uptr8));
 		vec2.push_back(std::move(uptr9));
 		vec.insert(vec.begin(), vec2.begin(), vec2.end());
-		assert(vec.getVector() == std::vector<int*>({ ptr8, ptr9, ptr1, ptr2, ptr5, ptr6, ptr7, ptr3 }));
+		assert(vec == std::vector<int*>({ ptr8, ptr9, ptr1, ptr2, ptr5, ptr6, ptr7, ptr3 }));
 		uptr5_another.release();
 		uptr6_another.release();
 		uptr7_another.release();

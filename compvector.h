@@ -4,6 +4,18 @@
 #include <set>
 #include <memory>
 
+template<typename T, typename U>
+concept NotSameAs = !std::same_as<T, U>;
+
+template<typename T>
+concept Vectorlike = requires(T x, size_t i) {
+	{ x.size() } -> std::convertible_to<size_t>;
+	{ x[i] } -> NotSameAs<void>;
+};
+
+template<Vectorlike TLeft, Vectorlike TRight>
+bool compare(const TLeft& left, const TRight& right);
+
 template<typename T>
 class CompoundVector {
 public:
@@ -44,12 +56,12 @@ public:
 	bool contains(const T& value) const;
 	void clear();
 	operator std::vector<T>() const;
-	bool operator==(const CompoundVector<T>& other) const;
+	template<Vectorlike TCont>
+	bool operator==(const TCont& other) const;
 
 private:
 	std::vector<T> vector;
 	std::set<T> set;
-
 };
 
 template<typename T>
@@ -96,12 +108,27 @@ public:
 	bool contains(const T* value) const;
 	void clear();
 	operator std::vector<T*>() const;
+	template<Vectorlike TCont>
+	bool operator==(const TCont& other) const;
 
 private:
 	std::vector<std::unique_ptr<T>> uptrs;
 	CompoundVector<T*> comp;
 
 };
+
+template<Vectorlike TLeft, Vectorlike TRight>
+inline bool compare(const TLeft& left, const TRight& right) {
+	if (left.size() != right.size()) {
+		return false;
+	}
+	for (size_t i = 0; i < left.size(); i++) {
+		if (left[i] != right[i]) {
+			return false;
+		}
+	}
+	return true;
+}
 
 template<typename T>
 inline CompoundVector<T>::CompoundVector() { }
@@ -281,16 +308,9 @@ inline CompoundVector<T>::operator std::vector<T>() const {
 }
 
 template<typename T>
-inline bool CompoundVector<T>::operator==(const CompoundVector<T>& other) const {
-	if (size() != other.size()) {
-		return false;
-	}
-	for (size_t i = 0; i < size(); i++) {
-		if (other[i] != at(i)) {
-			return false;
-		}
-	}
-	return true;
+template<Vectorlike TCont>
+inline bool CompoundVector<T>::operator==(const TCont& other) const {
+	return compare(*this, other);
 }
 
 template<typename T>
@@ -386,6 +406,11 @@ inline size_t CompoundVectorUptr<T>::insert(std::vector<T*>::const_iterator wher
 	return inserted_count;
 }
 
+template<typename T>
+template<Vectorlike TCont>
+inline bool CompoundVectorUptr<T>::operator==(const TCont& other) const {
+	return compare(*this, other);
+}
 
 template<typename T>
 inline ptrdiff_t CompoundVectorUptr<T>::remove(T* value) {
