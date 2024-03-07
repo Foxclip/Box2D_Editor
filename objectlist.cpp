@@ -62,8 +62,12 @@ GameObject* GameObjectList::add(std::unique_ptr<GameObject> object, bool assign_
             throw std::runtime_error("Invalid object id: " + std::to_string(object->id));
         }
         GameObject* parent = nullptr;
+        bool inserted = ids.add(ptr->id, ptr);
+        if (!inserted) {
+            throw std::runtime_error("Duplicate object id: " + std::to_string(ptr->id));
+        }
         if (ptr->parent_id >= 0) {
-            GameObject* parent = ids.find(ptr->parent_id);
+            parent = ids.find(ptr->parent_id);
             if (!parent) {
                 throw std::runtime_error(
                     "Parent not found: id: "
@@ -72,15 +76,9 @@ GameObject* GameObjectList::add(std::unique_ptr<GameObject> object, bool assign_
                     + std::to_string(ptr->parent_id)
                 );
             }
-        }
-        if (parent) {
             ptr->setParent(parent);
         } else {
             top_objects.add(ptr);
-        }
-        bool inserted = ids.add(ptr->id, ptr);
-        if (!inserted) {
-            throw std::runtime_error("Duplicate object id: " + std::to_string(ptr->id));
         }
         names.add(ptr->name, ptr);
         all_objects.add(std::move(object));
