@@ -31,10 +31,13 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
+    // TODO: replace toVec in CompoundVector with implicit conversion
+    // TODO: compare CompoundVector to vector
+    // TODO: prohibit parent loops in game objects
+    // TODO: prohibit parent loops in widgets
     // TODO: text box widget
     // TODO: change (*it). to it->
     // TODO: SearchIndex for widget children
-    // TODO: replace toVec in CompoundVector with implicit conversion
     // TODO: render polygon indices
     // TODO: delay editing polygons with many vertices
     // TODO: evolving cars

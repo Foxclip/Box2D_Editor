@@ -24,7 +24,7 @@ public:
 	template<std::incrementable TIter>
 	size_t insert(std::vector<T>::const_iterator where, TIter first, TIter last);
 	ptrdiff_t remove(const T& value);
-	void removeByIndex(size_t index);
+	void removeAt(size_t index);
 	std::vector<T>::const_iterator begin() const;
 	std::vector<T>::const_iterator end() const;
 	std::vector<T>::const_reverse_iterator rbegin() const;
@@ -69,6 +69,9 @@ public:
 	bool add(const T& value);
 	bool add(const T* ptr);
 	bool add(std::unique_ptr<T> value);
+	bool insert(std::vector<T*>::const_iterator where, std::unique_ptr<T> value);
+	template<std::incrementable TIter>
+	size_t insert(std::vector<T*>::const_iterator where, TIter first, TIter last);
 	ptrdiff_t remove(T* value);
 	void removeByIndex(size_t index);
 	std::vector<T*>::const_iterator begin() const;
@@ -168,7 +171,7 @@ inline ptrdiff_t CompoundVector<T>::remove(const T& value) {
 }
 
 template<typename T>
-inline void CompoundVector<T>::removeByIndex(size_t index) {
+inline void CompoundVector<T>::removeAt(size_t index) {
 	T value = vector[index];
 	vector.erase(vector.begin() + index);
 	set.erase(value);
@@ -349,6 +352,35 @@ inline bool CompoundVectorUptr<T>::add(std::unique_ptr<T> value) {
 }
 
 template<typename T>
+inline bool CompoundVectorUptr<T>::insert(std::vector<T*>::const_iterator where, std::unique_ptr<T> value) {
+	size_t offset = where - comp.begin();
+	bool inserted = comp.insert(where, value.get());
+	if (inserted) {
+		uptrs.insert(uptrs.begin() + offset, std::move(value));
+		return true;
+	}
+	value.release();
+	return false;
+}
+
+template<typename T>
+template<std::incrementable TIter>
+inline size_t CompoundVectorUptr<T>::insert(std::vector<T*>::const_iterator where, TIter first, TIter last) {
+	size_t offset = where - comp.begin();
+	TIter iter_other(first);
+	size_t inserted_count = 0;
+	while (iter_other != last) {
+		if (insert(comp.begin() + offset, std::move(const_cast<std::unique_ptr<T>&>(*iter_other)))) {
+			inserted_count++;
+			offset++;
+		}
+		iter_other++;
+	}
+	return inserted_count;
+}
+
+
+template<typename T>
 inline ptrdiff_t CompoundVectorUptr<T>::remove(T* value) {
 	ptrdiff_t removed_index = comp.remove(value);
 	if (removed_index >= 0) {
@@ -361,7 +393,7 @@ inline ptrdiff_t CompoundVectorUptr<T>::remove(T* value) {
 template<typename T>
 inline void CompoundVectorUptr<T>::removeByIndex(size_t index) {
 	uptrs.erase(uptrs.begin() + index);
-	comp.removeByIndex(index);
+	comp.removeAt(index);
 }
 
 template<typename T>
