@@ -56,6 +56,26 @@ void test_CompoundVector() {
 		assert(vec.back() == 3);
 	}
 	{
+		// insert method (value)
+		CompoundVector<int> vec = { 1, 2, 3 };
+		vec.insert(vec.begin() + 2, 5);
+		assert(vec.getVector() == std::vector<int>({ 1, 2, 5, 3 }));
+		vec.insert(vec.begin() + 2, 5);
+		assert(vec.getVector() == std::vector<int>({ 1, 2, 5, 3 }));
+	}
+	{
+		// insert method (range)
+		CompoundVector<int> vec = { 1, 2, 3 };
+		std::set<int> set1 = { 5, 6, 7 };
+		vec.insert(vec.begin() + 2, set1.begin(), set1.end());
+		assert(vec.getVector() == std::vector<int>({ 1, 2, 5, 6, 7, 3 }));
+		vec.insert(vec.begin() + 2, set1.begin(), set1.end());
+		assert(vec.getVector() == std::vector<int>({ 1, 2, 5, 6, 7, 3 }));
+		std::set<int> set2 = { 7, 8, 9 };
+		vec.insert(vec.begin(), set2.begin(), set2.end());
+		assert(vec.getVector() == std::vector<int>({ 8, 9, 1, 2, 5, 6, 7, 3 }));
+	}
+	{
 		// remove method
 		CompoundVector<int> vec = { 1, 2, 3 };
 		vec.remove(2);

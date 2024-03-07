@@ -20,6 +20,9 @@ public:
 	CompoundVector(const std::vector<T>& vec);
 	size_t size() const;
 	bool add(const T& value);
+	bool insert(std::vector<T>::const_iterator where, const T& value);
+	template<std::incrementable TIter>
+	size_t insert(std::vector<T>::const_iterator where, TIter first, TIter last);
 	ptrdiff_t remove(const T& value);
 	void removeByIndex(size_t index);
 	std::vector<T>::const_iterator begin() const;
@@ -125,6 +128,33 @@ inline bool CompoundVector<T>::add(const T& value) {
 	}
 	return false;
 }
+
+template<typename T>
+inline bool CompoundVector<T>::insert(std::vector<T>::const_iterator where, const T& value) {
+	auto inserted = set.insert(value);
+	if (inserted.second) {
+		vector.insert(where, value);
+		return true;
+	}
+	return false;
+}
+
+template<typename T>
+template<std::incrementable TIter>
+inline size_t CompoundVector<T>::insert(std::vector<T>::const_iterator where, TIter first, TIter last) {
+	size_t offset = where - vector.begin();
+	TIter iter_other(first);
+	size_t inserted_count = 0;
+	while (iter_other != last) {
+		if (insert(vector.begin() + offset, *iter_other)) {
+			inserted_count++;
+			offset++;
+		}
+		iter_other++;
+	}
+	return inserted_count;
+}
+
 
 template<typename T>
 inline ptrdiff_t CompoundVector<T>::remove(const T& value) {

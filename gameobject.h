@@ -62,7 +62,7 @@ public:
 	~Joint();
 
 protected:
-	b2Joint* joint;
+	b2Joint* joint = nullptr;
 };
 
 class RevoluteJoint : public Joint {
