@@ -43,11 +43,13 @@ public:
 	std::set<T>::iterator find(const T& value) const;
 	bool contains(const T& value) const;
 	void clear();
+	operator std::vector<T>() const;
 	bool operator==(const CompoundVector<T>& other) const;
 
 private:
 	std::vector<T> vector;
 	std::set<T> set;
+
 };
 
 template<typename T>
@@ -93,6 +95,7 @@ public:
 	std::set<T*>::iterator find(const T* value) const;
 	bool contains(const T* value) const;
 	void clear();
+	operator std::vector<T*>() const;
 
 private:
 	std::vector<std::unique_ptr<T>> uptrs;
@@ -157,7 +160,6 @@ inline size_t CompoundVector<T>::insert(std::vector<T>::const_iterator where, TI
 	}
 	return inserted_count;
 }
-
 
 template<typename T>
 inline ptrdiff_t CompoundVector<T>::remove(const T& value) {
@@ -271,6 +273,11 @@ template<typename T>
 inline void CompoundVector<T>::clear() {
 	vector = std::vector<T>();
 	set = std::set<T>();
+}
+
+template<typename T>
+inline CompoundVector<T>::operator std::vector<T>() const {
+	return vector;
 }
 
 template<typename T>
@@ -495,6 +502,11 @@ template<typename T>
 inline void CompoundVectorUptr<T>::clear() {
 	uptrs = std::vector<std::unique_ptr<T>>();
 	comp.clear();
+}
+
+template<typename T>
+inline CompoundVectorUptr<T>::operator std::vector<T*>() const {
+	return comp.getVector();
 }
 
 #ifndef NDEBUG

@@ -32,6 +32,12 @@ void test_CompoundVector() {
 		assert(vec.back() == 3);
 	}
 	{
+		// convert to vector
+		CompoundVector<int> cvec = { 1, 2, 3 };
+		std::vector<int> vec = cvec;
+		assert(vec == std::vector<int>({ 1, 2, 3 }));
+	}
+	{
 		// from vector
 		std::vector<int> vec = { 1, 2, 3 };
 		CompoundVector<int> cvec(vec);
@@ -228,6 +234,15 @@ void test_CompoundVectorUptr() {
 		assert(*vec[2] == 3);
 		assert(*vec.front() == 1);
 		assert(*vec.back() == 3);
+	}
+	{
+		// convert to vector
+		int* ptr1 = new int(1);
+		int* ptr2 = new int(2);
+		int* ptr3 = new int(3);
+		CompoundVectorUptr<int> cvec = { ptr1, ptr2, ptr3 };
+		std::vector<int*> vec = cvec;
+		assert(vec == std::vector<int*>({ ptr1, ptr2, ptr3 }));
 	}
 	{
 		// add method
