@@ -185,16 +185,33 @@ Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_a, Gam
 }
 
 void GameObjectList::setParent(GameObject* child, GameObject* new_parent) {
-    assert(child);
-    assert(all_objects.contains(child));
-    if (new_parent) {
-        assert(all_objects.contains(new_parent));
-    }
-    child->setParent(new_parent);
-    if (new_parent) {
-        top_objects.remove(child);
-    } else {
-        top_objects.add(child);
+    try {
+        assert(child);
+        if (new_parent == child) {
+            throw std::runtime_error("Cannot parent object to itself: id " + std::to_string(child->id));
+        }
+        assert(all_objects.contains(child));
+        CompoundVector<GameObject*> parent_chain = new_parent->getParentChain();
+        if (parent_chain.contains(child)) {
+            std::string chain_str;
+            chain_str += std::to_string(new_parent->id);
+            for (size_t i = 0; i < parent_chain.size(); i++) {
+                chain_str += " -> " + std::to_string(parent_chain[i]->id);
+            }
+            chain_str += " -> " + std::to_string(new_parent->id);
+            throw std::runtime_error("Loop in parent hierarchy: " + chain_str);
+        }
+        if (new_parent) {
+            assert(all_objects.contains(new_parent));
+        }
+        child->setParent(new_parent);
+        if (new_parent) {
+            top_objects.remove(child);
+        } else {
+            top_objects.add(child);
+        }
+    } catch (std::exception exc) {
+        throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
     }
 }
 

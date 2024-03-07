@@ -190,3 +190,23 @@ void duplication(Application& app) {
     car_copy->setGlobalPosition(car->getGlobalPosition() + b2Vec2(0.0f, 2.0f));
     logger << "Car copy pos: " << car_copy->getPosition() << "\n";
 }
+
+void parent_loop(Application& app) {
+    GameObject* box0 = app.create_box(
+        "box0",
+        b2Vec2(0.0f, 0.0f),
+        utils::to_radians(0.0f),
+        b2Vec2(1.0f, 1.0f),
+        sf::Color(0, 255, 0)
+    );
+    GameObject* box1 = app.create_box(
+        "box1",
+        b2Vec2(2.0f, 0.0f),
+        utils::to_radians(0.0f),
+        b2Vec2(1.0f, 1.0f),
+        sf::Color(0, 255, 0)
+    );
+    GameObjectList& game_objects = app.getObjectList();
+    game_objects.setParent(box0, box1);
+    game_objects.setParent(box1, box0);
+}

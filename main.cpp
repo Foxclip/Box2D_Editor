@@ -6,33 +6,34 @@
 
 void execute_app() {
     Application app;
-    app.init();
-    //scene1(app);
-    app.load("level.txt");
-    //ground_transform(app);
-    //single_box(app);
-    //single_ball(app);
-    //single_car(app);
-    //multiple_chains(app);
-    //polygon(app);
-    //box_parent(app);
-    //convex_polygon(app);
-    //duplication(app);
-    app.start();
-}
-
-int main() {
-    
     try {
-        execute_app();
+        app.init();
+        //scene1(app);
+        //app.load("level.txt");
+        //ground_transform(app);
+        //single_box(app);
+        //single_ball(app);
+        //single_car(app);
+        //multiple_chains(app);
+        //polygon(app);
+        //box_parent(app);
+        //convex_polygon(app);
+        //duplication(app);
+        parent_loop(app);
+        app.start();
     } catch (std::string msg) {
         logger << "ERROR: " << msg << "\n";
     } catch (std::exception exc) {
         logger << "ERROR: " << exc.what() << "\n";
     }
+}
 
-    // TODO: prohibit parent loops in game objects
+int main() {
+
+    execute_app();
+
     // TODO: prohibit parent loops in widgets
+    // TODO: move setParent and setName methods from GameObjectList to GameObject
     // TODO: text box widget
     // TODO: change (*it). to it->
     // TODO: SearchIndex for widget children

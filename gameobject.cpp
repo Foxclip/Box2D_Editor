@@ -130,6 +130,7 @@ ptrdiff_t GameObject::getChildIndex(const GameObject* object) const {
 }
 
 void GameObject::setParent(GameObject* new_parent) {
+	assert(new_parent != this);
 	GameObject* old_parent = this->parent;
 	if (old_parent) {
 		old_parent->children.remove(this);
