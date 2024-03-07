@@ -16,12 +16,30 @@ extern sf::VertexArray line_primitive;
 Logger& operator<<(Logger& lg, const b2Vec2& value);
 Logger& operator<<(Logger& lg, const sf::Vector2f& value);
 
-sf::Vector2f sfScreenToWorld(const sf::Vector2i& screen_pos);
-sf::Vector2f world_to_screen(sf::Vector2f world_pos);
-void drawLine(
+void draw_line(
+	sf::RenderTarget& target,
+	const sf::Vector2f& v1,
+	const sf::Vector2f& v2,
+	const sf::Color& color
+);
+
+void draw_line(
 	sf::RenderTarget& target,
 	const sf::Vector2f& v1,
 	const sf::Vector2f& v2,
 	const sf::Color& color,
-	const sf::Transform& transform = sf::Transform::Identity
+	const sf::Transform& transform
+);
+
+void draw_wire_rect(
+	sf::RenderTarget& target,
+	const sf::FloatRect& bounds,
+	const sf::Color& color
+);
+
+void draw_wire_rect(
+	sf::RenderTarget& target,
+	const sf::FloatRect& bounds,
+	const sf::Color& color,
+	const sf::Transform& transform
 );

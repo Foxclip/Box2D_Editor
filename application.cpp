@@ -984,7 +984,7 @@ void Application::render_ui() {
             for (GameObject* child : object->getChildren()) {
                 sf::Vector2f v1 = world_to_screen(object->getGlobalPosition());
                 sf::Vector2f v2 = world_to_screen(child->getGlobalPosition());
-                drawLine(target, v1, v2, sf::Color(128, 128, 128));
+                draw_line(target, v1, v2, sf::Color(128, 128, 128));
             }
         }
         // object origin circles
@@ -1003,9 +1003,7 @@ void Application::render_ui() {
                 sf::Vector2f object_screen_pos = world_to_screen(gameobject->getGlobalPosition());
                 sf::Vector2f offset = sf::Vector2f(0.0f, info_index * object_info_text.getCharacterSize());
                 sf::Vector2f pos = object_screen_pos + offset;
-                // rounding coordinates so letters don't wobble around
-                sf::Vector2f rounded_pos = sf::Vector2f(std::round(pos.x), std::round(pos.y));
-                object_info_text.setPosition(rounded_pos);
+                object_info_text.setPosition(pos);
                 object_info_text.setString(str);
                 // rendering twice so it is more opaque
                 target.draw(object_info_text);
@@ -1020,7 +1018,7 @@ void Application::render_ui() {
         for (size_t i = 0; i < game_objects.getAllSize(); i++) {
             if (PolygonObject* polygon_object = dynamic_cast<PolygonObject*>(game_objects.getFromAll(i))) {
                 if (polygon_object->draw_indices) {
-                    polygon_object->getSplittablePolygon()->drawIndices(target, sf::Color::White, 20, false);
+                    // TODO: render indices
                 }
             }
         }
@@ -1548,14 +1546,6 @@ void Application::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& 
     sf::Vector2f edge_dir = utils::normalize(v2f - v1f);
     sf::Vector2f norm_dir = utils::rot90CW(edge_dir);
     norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
-}
-
-void Application::draw_line(sf::RenderTarget& target, const sf::Vector2f& v1, const sf::Vector2f& v2, const sf::Color& color) {
-    line_primitive[0].position = v1;
-    line_primitive[0].color = color;
-    line_primitive[1].position = v2;
-    line_primitive[1].color = color;
-    target.draw(line_primitive);
 }
 
 bool Application::is_parent_selected(const GameObject* object) const {

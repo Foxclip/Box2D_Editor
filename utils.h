@@ -222,6 +222,11 @@ namespace utils {
 		return acos(dl);
 	}
 
+	template <typename TVec2>
+	TVec2 quantize(const TVec2& vec) {
+		return TVec2(floor(vec.x) + 0.5f, floor(vec.y) + 0.5f);
+	}
+
 	template <typename T>
 	T neg_mod(T a, T b) {
 		return (a % b + b) % b;

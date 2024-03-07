@@ -65,12 +65,6 @@ public:
 	void setPoint(size_t index, const sf::Vector2f& point);
 	void setLineColor(const sf::Color& color);
 	void setFillColor(const sf::Color& color);
-	void drawIndices(
-		sf::RenderTarget& target,
-		const sf::Color& color,
-		unsigned int size,
-		bool include_convex = false
-	) const;
 	void calcPotentialCuts(bool consider_convex_vertices);
 	size_t getPotentialCutsCount() const;
 	void drawPotentialCuts(sf::RenderTarget& target);

@@ -325,10 +325,7 @@ void Widget::renderBounds(sf::RenderTarget& target) {
 		return;
 	}
 	sf::Color bounds_color = widget_list->render_bounds_color;
-	drawLine(target, getGlobalTopRight(), getGlobalTopLeft(), bounds_color);
-	drawLine(target, getGlobalTopLeft(), getGlobalBottomLeft(), bounds_color);
-	drawLine(target, getGlobalBottomLeft(), getGlobalBottomRight(), bounds_color);
-	drawLine(target, getGlobalBottomRight(), getGlobalTopRight(), bounds_color);
+	draw_wire_rect(target, getGlobalBounds(), bounds_color);
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->renderBounds(target);
 	}
@@ -343,8 +340,8 @@ void Widget::renderOrigin(sf::RenderTarget& target) {
 	sf::Vector2f hoffset = sf::Vector2f(offset, 0.0f);
 	sf::Vector2f voffset = sf::Vector2f(0.0f, offset);
 	sf::Vector2f pos = getGlobalPosition();
-	drawLine(target, pos - hoffset, pos + hoffset, origin_color);
-	drawLine(target, pos - voffset, pos + voffset, origin_color);
+	draw_line(target, pos - hoffset, pos + hoffset, origin_color);
+	draw_line(target, pos - voffset, pos + voffset, origin_color);
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->renderOrigin(target);
 	}
