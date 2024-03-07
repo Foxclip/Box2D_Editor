@@ -59,7 +59,7 @@ public:
 	bool showInToolPanel() const override;
 	size_t selectedCount() const;
 	const CompoundVector<GameObject*>& getSelectedObjects() const;
-	void setSelected(const std::vector<GameObject*> vec);
+	void setSelected(const CompoundVector<GameObject*> vec);
 	void selectObject(GameObject* object, bool with_children = false);
 	void deselectObject(GameObject* object, bool with_children = false);
 	void toggleSelect(GameObject* object, bool with_children = false);
@@ -90,7 +90,7 @@ private:
 class MoveTool : public Tool {
 public:
 	b2Vec2 orig_cursor_pos = b2Vec2(0.0f, 0.0f);
-	std::vector<GameObject*> moving_objects;
+	CompoundVector<GameObject*> moving_objects;
 
 	MoveTool();
 	bool showInToolPanel() const override;
@@ -103,7 +103,7 @@ class RotateTool : public Tool {
 public:
 	b2Vec2 pivot_pos = b2Vec2(0.0f, 0.0f);
 	b2Vec2 orig_cursor_pos = b2Vec2(0.0f, 0.0f);
-	std::vector<GameObject*> rotating_objects;
+	CompoundVector<GameObject*> rotating_objects;
 	float orig_mouse_angle = 0.0f;
 
 	RotateTool();

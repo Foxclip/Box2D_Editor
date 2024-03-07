@@ -31,8 +31,6 @@ int main() {
         logger << "ERROR: " << exc.what() << "\n";
     }
 
-    // TODO: replace toVec in CompoundVector with implicit conversion
-    // TODO: compare CompoundVector to vector
     // TODO: prohibit parent loops in game objects
     // TODO: prohibit parent loops in widgets
     // TODO: text box widget

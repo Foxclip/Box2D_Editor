@@ -63,12 +63,12 @@ GameObject* GameObject::getParent() const {
 	return parent;
 }
 
-std::vector<GameObject*> GameObject::getParentChain() const {
+CompoundVector<GameObject*> GameObject::getParentChain() const {
 	const GameObject* cur_obj = this;
-	std::vector<GameObject*> result;
+	CompoundVector<GameObject*> result;
 	while (cur_obj) {
 		if (cur_obj->parent) {
-			result.push_back(cur_obj->parent);
+			result.add(cur_obj->parent);
 			cur_obj = cur_obj->parent;
 		} else {
 			break;
@@ -77,15 +77,15 @@ std::vector<GameObject*> GameObject::getParentChain() const {
 	return result;
 }
 
-const std::vector<GameObject*>& GameObject::getChildren() const {
-	return children.getVector();
+const CompoundVector<GameObject*>& GameObject::getChildren() const {
+	return children;
 }
 
-std::vector<GameObject*> GameObject::getAllChildren() const {
-	std::vector<GameObject*> result;
+CompoundVector<GameObject*> GameObject::getAllChildren() const {
+	CompoundVector<GameObject*> result;
 	result.insert(result.end(), children.begin(), children.end());
 	for (size_t i = 0; i < children.size(); i++) {
-		const std::vector<GameObject*>& child_children = children[i]->getAllChildren();
+		const CompoundVector<GameObject*>& child_children = children[i]->getAllChildren();
 		result.insert(result.end(), child_children.begin(), child_children.end());
 	}
 	return result;

@@ -128,9 +128,9 @@ public:
 	const b2Transform& getGlobalTransform() const;
 	const b2Transform& getParentGlobalTransform() const;
 	GameObject* getParent() const;
-	std::vector<GameObject*> getParentChain() const;
-	const std::vector<GameObject*>& getChildren() const;
-	std::vector<GameObject*> getAllChildren() const;
+	CompoundVector<GameObject*> getParentChain() const;
+	const CompoundVector<GameObject*>& getChildren() const;
+	CompoundVector<GameObject*> getAllChildren() const;
 	GameObject* getChild(size_t index) const;
 	b2Vec2 toGlobal(const b2Vec2& pos);
 	b2Vec2 toLocal(const b2Vec2& pos);

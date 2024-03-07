@@ -17,13 +17,13 @@ public:
 	GameObject* getByName(const std::string& name) const;
 	ptrdiff_t getTopIndex(GameObject* object) const;
 	Joint* getJoint(size_t i) const;
-	const std::vector<GameObject*>& getTopVector() const;
-	const std::vector<GameObject*>& getAllVector() const;
+	const CompoundVector<GameObject*>& getTopVector() const;
+	const CompoundVector<GameObject*>& getAllVector() const;
 	ptrdiff_t getMaxId() const;
 	GameObject* add(std::unique_ptr<GameObject> object, bool assign_new_id);
 	Joint* addJoint(std::unique_ptr<Joint> joint);
 	GameObject* duplicate(const GameObject* object, bool with_children = false);
-	std::vector<GameObject*> duplicate(const CompoundVector<GameObject*>& old_objects);
+	CompoundVector<GameObject*> duplicate(const CompoundVector<GameObject*>& old_objects);
 	void setParent(GameObject* child, GameObject* new_parent);
 	void setName(GameObject* object, const std::string& new_name);
 	void transformFromRigidbody();

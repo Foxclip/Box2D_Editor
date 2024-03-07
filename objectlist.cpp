@@ -36,12 +36,12 @@ Joint* GameObjectList::getJoint(size_t i) const {
     return joints[i];
 }
 
-const std::vector<GameObject*>& GameObjectList::getTopVector() const {
-    return top_objects.getVector();
+const CompoundVector<GameObject*>& GameObjectList::getTopVector() const {
+    return top_objects;
 }
 
-const std::vector<GameObject*>& GameObjectList::getAllVector() const {
-    return all_objects.getVector();
+const CompoundVector<GameObject*>& GameObjectList::getAllVector() const {
+    return all_objects.getCompVector();
 }
 
 ptrdiff_t GameObjectList::getMaxId() const {
@@ -97,10 +97,10 @@ Joint* GameObjectList::addJoint(std::unique_ptr<Joint> joint) {
 
 GameObject* GameObjectList::duplicate(const GameObject* object, bool with_children) {
     if (with_children) {
-        std::vector<GameObject*> objects = { const_cast<GameObject*>(object) };
-        std::vector<GameObject*> all_children = object->getAllChildren();
+        CompoundVector<GameObject*> objects = { const_cast<GameObject*>(object) };
+        CompoundVector<GameObject*> all_children = object->getAllChildren();
         objects.insert(objects.end(), all_children.begin(), all_children.end());
-        std::vector<GameObject*> new_objects = duplicate(objects);
+        CompoundVector<GameObject*> new_objects = duplicate(objects);
         GameObject* new_object = getById(object->new_id);
         return new_object;
     } else {
@@ -109,16 +109,14 @@ GameObject* GameObjectList::duplicate(const GameObject* object, bool with_childr
     }
 }
 
-std::vector<GameObject*> GameObjectList::duplicate(const CompoundVector<GameObject*>& old_objects) {
-    std::vector<GameObject*> new_objects;
-    std::vector<Joint*> new_joints;
-    std::set<Joint*> duplicated_joints;
+CompoundVector<GameObject*> GameObjectList::duplicate(const CompoundVector<GameObject*>& old_objects) {
+    CompoundVector<GameObject*> new_objects;
     std::set<Joint*> checked_joints;
     // copy objects
     for (GameObject* obj : old_objects) {
         GameObject* copy = duplicateObject(obj);
         obj->new_id = copy->id;
-        new_objects.push_back(copy);
+        new_objects.add(copy);
     }
     // set parents
     for (GameObject* old_obj : old_objects) {
@@ -141,8 +139,6 @@ std::vector<GameObject*> GameObjectList::duplicate(const CompoundVector<GameObje
                 GameObject* new_object_1 = getById((*it1)->new_id);
                 GameObject* new_object_2 = getById((*it2)->new_id);
                 Joint* new_joint = duplicateJoint(joint, new_object_1, new_object_2);
-                new_joints.push_back(new_joint);
-                duplicated_joints.insert(new_joint);
             }
             checked_joints.insert(joint);
         }
@@ -228,7 +224,7 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
         removeJoint(joint);
     }
     setParent(object, nullptr);
-    std::vector<GameObject*> children_copy = object->getChildren();
+    CompoundVector<GameObject*> children_copy = object->getChildren();
     if (remove_children) {
         for (size_t i = 0; i < children_copy.size(); i++) {
             GameObject* child = children_copy[i];
