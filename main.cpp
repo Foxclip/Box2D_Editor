@@ -32,7 +32,6 @@ int main() {
 
     execute_app();
 
-    // TODO: move setParent and setName methods from GameObjectList to GameObject
     // TODO: text box widget
     // TODO: change (*it). to it->
     // TODO: SearchIndex for widget children

@@ -131,20 +131,62 @@ ptrdiff_t GameObject::getChildIndex(const GameObject* object) const {
 }
 
 void GameObject::setParent(GameObject* new_parent) {
-	assert(new_parent != this);
-	GameObject* old_parent = this->parent;
-	if (old_parent) {
-		old_parent->children.remove(this);
+	try {
+		if (new_parent == this) {
+			throw std::runtime_error("Cannot parent object to itself: id " + std::to_string(id));
+		}
+		CompoundVector<GameObject*> parent_chain = new_parent->getParentChain();
+		if (parent_chain.contains(this)) {
+			std::string chain_str;
+			chain_str += std::to_string(id);
+			chain_str += " -> " + std::to_string(new_parent->id);
+			for (size_t i = 0; i < parent_chain.size(); i++) {
+				chain_str += " -> " + std::to_string(parent_chain[i]->id);
+				if (parent_chain[i] == this) {
+					break;
+				}
+			}
+			throw std::runtime_error("Loop in parent hierarchy: " + chain_str);
+		}
+		if (new_parent && object_list) {
+			assert(object_list->contains(new_parent));
+		}
+		GameObject* old_parent = this->parent;
+		if (old_parent) {
+			old_parent->children.remove(this);
+		}
+		if (new_parent) {
+			new_parent->children.add(this);
+			parent_id = new_parent->id;
+		} else {
+			parent_id = -1;
+		}
+		b2Transform global_transform = getGlobalTransform();
+		this->parent = new_parent;
+		setGlobalTransform(global_transform);
+		if (object_list) {
+			if (new_parent) {
+				object_list->top_objects.remove(this);
+			} else {
+				object_list->top_objects.add(this);
+			}
+		}
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
 	}
-	if (new_parent) {
-		new_parent->children.add(this);
-		parent_id = new_parent->id;
-	} else {
-		parent_id = -1;
+}
+
+void GameObject::setName(const std::string& new_name) {
+	if (new_name == name) {
+		return;
 	}
-	b2Transform global_transform = getGlobalTransform();
-	this->parent = new_parent;
-	setGlobalTransform(global_transform);
+	if (object_list) {
+		object_list->names.remove(name, this);
+	}
+	this->name = new_name;
+	if (object_list) {
+		object_list->names.add(new_name, this);
+	}
 }
 
 void GameObject::updateVisual() {
@@ -502,6 +544,7 @@ GameObject* GameObject::getGameobject(b2Body* body) {
 }
 
 BoxObject::BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, sf::Color color) {
+	this->object_list = object_list;
 	this->color = color;
 	rigid_body = object_list->world->CreateBody(&def);
 	vertices.push_back(EditableVertex(0.5f * size));
@@ -607,6 +650,7 @@ void BoxObject::syncVertices() {
 }
 
 BallObject::BallObject(GameObjectList* object_list, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color) {
+	this->object_list = object_list;
 	this->radius = radius;
 	this->color = color;
 	this->notch_color = notch_color;
@@ -751,6 +795,7 @@ PolygonObject::PolygonObject(
 	const std::vector<b2Vec2>& vertices,
 	const sf::Color& color
 ) {
+	this->object_list = object_list;
 	this->color = color;
 	rigid_body = object_list->world->CreateBody(&def);
 	for (size_t i = 0; i < vertices.size(); i++) {
@@ -938,6 +983,7 @@ void CircleNotchShape::drawMask(sf::RenderTarget& mask, sf::RenderStates states)
 }
 
 ChainObject::ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color) {
+	this->object_list = object_list;
 	this->color = color;
 	rigid_body = object_list->world->CreateBody(&def);
 	sf::VertexArray drawable_vertices(sf::LinesStrip, p_vertices.size());

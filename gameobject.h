@@ -97,6 +97,8 @@ private:
 
 };
 
+class GameObjectList;
+
 class GameObject {
 public:
 	ptrdiff_t id = -1;
@@ -142,6 +144,8 @@ public:
 	void updateVisual();
 	virtual void render(sf::RenderTarget& target);
 	void renderMask(sf::RenderTarget& mask);
+	void setParent(GameObject* new_parent);
+	void setName(const std::string& new_name);
 	void setEnabled(bool enabled, bool include_children);
 	void setGlobalTransform(const b2Transform& transform);
 	void setGlobalPosition(const b2Vec2& pos);
@@ -179,6 +183,7 @@ public:
 	static GameObject* getGameobject(b2Body* body);
 
 protected:
+	GameObjectList* object_list = nullptr;
 	std::string name = "<unnamed>";
 	std::vector<EditableVertex> vertices;
 	GameObject* parent = nullptr;
@@ -193,12 +198,9 @@ protected:
 private:
 	friend class GameObjectList;
 	friend class GameObjectTransforms;
-	GameObjectList* object_list = nullptr;
 	ptrdiff_t new_id = -1;
 	CompoundVector<GameObject*> children;
 	GameObjectTransforms transforms = GameObjectTransforms(this);
-
-	void setParent(GameObject* parent);
 
 };
 

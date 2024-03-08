@@ -28,6 +28,10 @@ GameObject* GameObjectList::getByName(const std::string& name) const {
     return names.find(name);
 }
 
+bool GameObjectList::contains(GameObject* object) const {
+    return all_objects.contains(object);
+}
+
 ptrdiff_t GameObjectList::getTopIndex(GameObject* object) const {
     return top_objects.getIndex(object);
 }
@@ -124,7 +128,7 @@ CompoundVector<GameObject*> GameObjectList::duplicate(const CompoundVector<GameO
             GameObject* new_obj = getById(old_obj->new_id);
             size_t new_parent_id = old_obj->getParent()->new_id;
             GameObject* new_parent = getById(new_parent_id);
-            setParent(new_obj, new_parent);
+            new_obj->setParent(new_parent);
         }
     }
     // copy joints
@@ -184,50 +188,6 @@ Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_a, Gam
     return ptr;
 }
 
-void GameObjectList::setParent(GameObject* child, GameObject* new_parent) {
-    try {
-        assert(child);
-        if (new_parent == child) {
-            throw std::runtime_error("Cannot parent object to itself: id " + std::to_string(child->id));
-        }
-        assert(all_objects.contains(child));
-        CompoundVector<GameObject*> parent_chain = new_parent->getParentChain();
-        if (parent_chain.contains(child)) {
-            std::string chain_str;
-            chain_str += std::to_string(child->id);
-            chain_str += " -> " + std::to_string(new_parent->id);
-            for (size_t i = 0; i < parent_chain.size(); i++) {
-                chain_str += " -> " + std::to_string(parent_chain[i]->id);
-                if (parent_chain[i] == child) {
-                    break;
-                }
-            }
-            throw std::runtime_error("Loop in parent hierarchy: " + chain_str);
-        }
-        if (new_parent) {
-            assert(all_objects.contains(new_parent));
-        }
-        child->setParent(new_parent);
-        if (new_parent) {
-            top_objects.remove(child);
-        } else {
-            top_objects.add(child);
-        }
-    } catch (std::exception exc) {
-        throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
-    }
-}
-
-void GameObjectList::setName(GameObject* object, const std::string& new_name) {
-    if (new_name == object->name) {
-        return;
-    }
-    assert(all_objects.contains(object));
-    names.remove(object->name, object);
-    object->name = new_name;
-    names.add(new_name, object);
-}
-
 void GameObjectList::transformFromRigidbody() {
     for (size_t i = 0; i < top_objects.size(); i++) {
         GameObject* object = top_objects[i];
@@ -237,13 +197,12 @@ void GameObjectList::transformFromRigidbody() {
 
 void GameObjectList::remove(GameObject* object, bool remove_children) {
     assert(object);
-    ptrdiff_t index = all_objects.getIndex(object);
-    assert(index >= 0);
+    assert(all_objects.contains(object));
     std::vector<Joint*> joints_copy = object->joints.getVector();
     for (Joint* joint : joints_copy) {
         removeJoint(joint);
     }
-    setParent(object, nullptr);
+    object->setParent(nullptr);
     CompoundVector<GameObject*> children_copy = object->getChildren();
     if (remove_children) {
         for (size_t i = 0; i < children_copy.size(); i++) {
@@ -253,13 +212,13 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
     } else {
         for (size_t i = 0; i < children_copy.size(); i++) {
             GameObject* child = children_copy[i];
-            setParent(child, nullptr);
+            child->setParent(nullptr);
         }
     }
     top_objects.remove(object);
     ids.remove(object->id);
     names.remove(object->name, object);
-    all_objects.removeByIndex(index);
+    all_objects.remove(object);
 }
 
 void GameObjectList::removeJoint(Joint* joint) {

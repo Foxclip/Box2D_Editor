@@ -156,9 +156,8 @@ void box_parent(Application& app) {
         sf::Color(0, 255, 0)
     );
     GameObjectList& objects = app.getObjectList();
-    objects.setParent(child, parent);
-    objects.setParent(another_child, child);
-    //parent->setGlobalAngle(utils::to_radians(45.0f));
+    child->setParent(parent);
+    another_child->setParent(child);
     parent->setGlobalPosition(b2Vec2(1.0f, 0.0f));
     app.setCameraPos(0.0f, 0.0f);
     app.setCameraZoom(200.0f);
@@ -207,6 +206,6 @@ void parent_loop(Application& app) {
         sf::Color(0, 255, 0)
     );
     GameObjectList& game_objects = app.getObjectList();
-    game_objects.setParent(box0, box1);
-    game_objects.setParent(box1, box0);
+    box0->setParent(box1);
+    box1->setParent(box0);
 }

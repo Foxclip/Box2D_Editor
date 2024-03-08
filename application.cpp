@@ -95,8 +95,8 @@ BoxObject* Application::create_box(
         &game_objects, def, size, color
     );
     BoxObject* ptr = uptr.get();
+    ptr->setName(name);
     game_objects.add(std::move(uptr), true);
-    game_objects.setName(ptr, name);
     return ptr;
 }
 
@@ -114,8 +114,8 @@ BallObject* Application::create_ball(
         &game_objects, def, radius, color, notch_color
     );
     BallObject* ptr = uptr.get();
+    ptr->setName(name);
     game_objects.add(std::move(uptr), true);
-    game_objects.setName(ptr, name);
     return ptr;
 }
 
@@ -134,8 +134,8 @@ PolygonObject* Application::create_polygon(
         &game_objects, def, vertices, color
     );
     PolygonObject* ptr = uptr.get();
+    ptr->setName(name);
     game_objects.add(std::move(uptr), true);
-    game_objects.setName(ptr, name);
     return ptr;
 }
 
@@ -158,8 +158,8 @@ PolygonObject* Application::create_car(
         &game_objects, def, vertices, color
     );
     PolygonObject* car_ptr = uptr.get();
+    car_ptr->setName(name);
     game_objects.add(std::move(uptr), true);
-    game_objects.setName(car_ptr, name);
     size_t wheel_count = 0;
 
     for (size_t i = 0; i < wheels.size(); i++) {
@@ -183,10 +183,10 @@ PolygonObject* Application::create_car(
             wheel_ptr->setDensity(1.0f, false);
             wheel_ptr->setFriction(0.3f, false);
             wheel_ptr->setRestitution(0.5f, false);
-            game_objects.add(std::move(wheel), true);
             std::string wheel_name = car_ptr->getName() + " wheel" + std::to_string(wheel_count);
-            game_objects.setName(wheel_ptr, wheel_name);
-            game_objects.setParent(wheel_ptr, car_ptr);
+            wheel_ptr->setName(wheel_name);
+            wheel_ptr->setParent(car_ptr);
+            game_objects.add(std::move(wheel), true);
         }
         b2RevoluteJointDef wheel_joint_def;
         {
@@ -219,8 +219,8 @@ ChainObject* Application::create_chain(
         &game_objects, def, vertices, color
     );
     ChainObject* ptr = uptr.get();
+    ptr->setName(name);
     game_objects.add(std::move(uptr), true);
-    game_objects.setName(ptr, name);
     return ptr;
 }
 

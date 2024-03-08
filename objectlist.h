@@ -15,6 +15,7 @@ public:
 	GameObject* getFromAll(size_t i) const;
 	GameObject* getById(size_t id) const;
 	GameObject* getByName(const std::string& name) const;
+	bool contains(GameObject* object) const;
 	ptrdiff_t getTopIndex(GameObject* object) const;
 	Joint* getJoint(size_t i) const;
 	const CompoundVector<GameObject*>& getTopVector() const;
@@ -24,14 +25,13 @@ public:
 	Joint* addJoint(std::unique_ptr<Joint> joint);
 	GameObject* duplicate(const GameObject* object, bool with_children = false);
 	CompoundVector<GameObject*> duplicate(const CompoundVector<GameObject*>& old_objects);
-	void setParent(GameObject* child, GameObject* new_parent);
-	void setName(GameObject* object, const std::string& new_name);
 	void transformFromRigidbody();
 	void remove(GameObject* object, bool remove_children);
 	void removeJoint(Joint* joint);
 	void clear();
 
 private:
+	friend class GameObject;
 	CompoundVectorUptr<GameObject> all_objects;
 	CompoundVector<GameObject*> top_objects;
 	CompoundVectorUptr<Joint> joints;
