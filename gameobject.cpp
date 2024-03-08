@@ -1,5 +1,6 @@
 #include <numbers>
 #include "gameobject.h"
+#include "objectlist.h"
 #include "utils.h"
 
 const auto tob2 = utils::tob2;
@@ -500,9 +501,9 @@ GameObject* GameObject::getGameobject(b2Body* body) {
 	return reinterpret_cast<GameObject*>(body->GetUserData().pointer);
 }
 
-BoxObject::BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color) {
+BoxObject::BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, sf::Color color) {
 	this->color = color;
-	rigid_body = world->CreateBody(&def);
+	rigid_body = object_list->world->CreateBody(&def);
 	vertices.push_back(EditableVertex(0.5f * size));
 	syncVertices();
 	transformFromRigidbody();
@@ -545,7 +546,7 @@ TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* world) {
+std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -578,7 +579,7 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, b2World* worl
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<BoxObject> box = std::make_unique<BoxObject>(world, bdef, size, color);
+		std::unique_ptr<BoxObject> box = std::make_unique<BoxObject>(object_list, bdef, size, color);
 		box->id = id;
 		box->parent_id = parent_id;
 		box->name = name;
@@ -605,11 +606,11 @@ void BoxObject::syncVertices() {
 	rect_shape->setFillColor(color);
 }
 
-BallObject::BallObject(b2World* world, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color) {
+BallObject::BallObject(GameObjectList* object_list, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color) {
 	this->radius = radius;
 	this->color = color;
 	this->notch_color = notch_color;
-	rigid_body = world->CreateBody(&def);
+	rigid_body = object_list->world->CreateBody(&def);
 	vertices.push_back(EditableVertex(b2Vec2(radius, 0.0f)));
 	syncVertices();
 	transformFromRigidbody();
@@ -650,7 +651,7 @@ TokenWriter& BallObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* world) {
+std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -691,7 +692,7 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, b2World* wo
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<BallObject> ball = std::make_unique<BallObject>(world, bdef, radius, color, notch_color);
+		std::unique_ptr<BallObject> ball = std::make_unique<BallObject>(object_list, bdef, radius, color, notch_color);
 		ball->id = id;
 		ball->parent_id = parent_id;
 		ball->name = name;
@@ -745,13 +746,13 @@ void LineStripShape::draw(sf::RenderTarget& target, sf::RenderStates states) con
 }
 
 PolygonObject::PolygonObject(
-	b2World* world,
+	GameObjectList* object_list,
 	b2BodyDef def,
 	const std::vector<b2Vec2>& vertices,
 	const sf::Color& color
 ) {
 	this->color = color;
-	rigid_body = world->CreateBody(&def);
+	rigid_body = object_list->world->CreateBody(&def);
 	for (size_t i = 0; i < vertices.size(); i++) {
 		this->vertices.push_back(EditableVertex(vertices[i]));
 	}
@@ -811,7 +812,7 @@ TokenWriter& PolygonObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, b2World* world) {
+std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -845,7 +846,7 @@ std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, b2Wor
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<PolygonObject> car = std::make_unique<PolygonObject>(world, bdef, vertices, color);
+		std::unique_ptr<PolygonObject> car = std::make_unique<PolygonObject>(object_list, bdef, vertices, color);
 		car->id = id;
 		car->parent_id = parent_id;
 		car->name = name;
@@ -936,9 +937,9 @@ void CircleNotchShape::drawMask(sf::RenderTarget& mask, sf::RenderStates states)
 	setCircleColor(orig_color);
 }
 
-ChainObject::ChainObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color) {
+ChainObject::ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color) {
 	this->color = color;
-	rigid_body = world->CreateBody(&def);
+	rigid_body = object_list->world->CreateBody(&def);
 	sf::VertexArray drawable_vertices(sf::LinesStrip, p_vertices.size());
 	for (size_t i = 0; i < p_vertices.size(); i++) {
 		drawable_vertices[i].position = tosf(p_vertices[i]);
@@ -990,7 +991,7 @@ TokenWriter& ChainObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, b2World* world) {
+std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -1023,7 +1024,7 @@ std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, b2World* 
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<ChainObject> chain = std::make_unique<ChainObject>(world, bdef, vertices, color);
+		std::unique_ptr<ChainObject> chain = std::make_unique<ChainObject>(object_list, bdef, vertices, color);
 		chain->id = id;
 		chain->parent_id = parent_id;
 		chain->name = name;

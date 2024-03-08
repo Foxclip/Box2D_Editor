@@ -92,7 +92,7 @@ BoxObject* Application::create_box(
     def.position = pos;
     def.angle = angle;
     std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(
-        world.get(), def, size, color
+        &game_objects, def, size, color
     );
     BoxObject* ptr = uptr.get();
     game_objects.add(std::move(uptr), true);
@@ -111,7 +111,7 @@ BallObject* Application::create_ball(
     def.type = b2_dynamicBody;
     def.position = pos;
     std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(
-        world.get(), def, radius, color, notch_color
+        &game_objects, def, radius, color, notch_color
     );
     BallObject* ptr = uptr.get();
     game_objects.add(std::move(uptr), true);
@@ -131,7 +131,7 @@ PolygonObject* Application::create_polygon(
     def.position = pos;
     def.angle = angle;
     std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(
-        world.get(), def, vertices, color
+        &game_objects, def, vertices, color
     );
     PolygonObject* ptr = uptr.get();
     game_objects.add(std::move(uptr), true);
@@ -155,7 +155,7 @@ PolygonObject* Application::create_car(
         vertices.push_back(pos);
     }
     std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(
-        world.get(), def, vertices, color
+        &game_objects, def, vertices, color
     );
     PolygonObject* car_ptr = uptr.get();
     game_objects.add(std::move(uptr), true);
@@ -176,7 +176,7 @@ PolygonObject* Application::create_car(
             wheel_body_def.position = anchor_pos_world;
         }
         std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
-            world.get(), wheel_body_def, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
+            &game_objects, wheel_body_def, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
         );
         BallObject* wheel_ptr = wheel.get();
         {
@@ -216,7 +216,7 @@ ChainObject* Application::create_chain(
     def.position = pos;
     def.angle = angle;
     std::unique_ptr<ChainObject> uptr = std::make_unique<ChainObject>(
-        world.get(), def, vertices, color
+        &game_objects, def, vertices, color
     );
     ChainObject* ptr = uptr.get();
     game_objects.add(std::move(uptr), true);
@@ -1210,13 +1210,13 @@ void Application::deserialize(const std::string& str, bool set_camera) {
                 std::unique_ptr<GameObject> gameobject;
                 std::string type = tr.readString();
                 if (type == "box") {
-                    gameobject = BoxObject::deserialize(tr, world.get());
+                    gameobject = BoxObject::deserialize(tr, &game_objects);
                 } else if (type == "ball") {
-                    gameobject = BallObject::deserialize(tr, world.get());
+                    gameobject = BallObject::deserialize(tr, &game_objects);
                 } else if (type == "polygon") {
-                    gameobject = PolygonObject::deserialize(tr, world.get());
+                    gameobject = PolygonObject::deserialize(tr, &game_objects);
                 } else if (type == "chain") {
-                    gameobject = ChainObject::deserialize(tr, world.get());
+                    gameobject = ChainObject::deserialize(tr, &game_objects);
                 } else {
                     throw std::runtime_error("Unknown object type: " + type);
                 }

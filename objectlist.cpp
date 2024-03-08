@@ -152,13 +152,13 @@ GameObject* GameObjectList::duplicateObject(const GameObject* object) {
     TokenReader tr(str);
     std::unique_ptr<GameObject> new_object;
     if (dynamic_cast<const BoxObject*>(object)) {
-        new_object = BoxObject::deserialize(tr, world);
+        new_object = BoxObject::deserialize(tr, this);
     } else if (dynamic_cast<const BallObject*>(object)) {
-        new_object = BallObject::deserialize(tr, world);
+        new_object = BallObject::deserialize(tr, this);
     } else if (dynamic_cast<const PolygonObject*>(object)) {
-        new_object = PolygonObject::deserialize(tr, world);
+        new_object = PolygonObject::deserialize(tr, this);
     } else if (dynamic_cast<const ChainObject*>(object)) {
-        new_object = ChainObject::deserialize(tr, world);
+        new_object = ChainObject::deserialize(tr, this);
     } else {
         assert(false, "Unknown object type");
     }

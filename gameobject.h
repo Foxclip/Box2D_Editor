@@ -193,6 +193,7 @@ protected:
 private:
 	friend class GameObjectList;
 	friend class GameObjectTransforms;
+	GameObjectList* object_list = nullptr;
 	ptrdiff_t new_id = -1;
 	CompoundVector<GameObject*> children;
 	GameObjectTransforms transforms = GameObjectTransforms(this);
@@ -205,13 +206,13 @@ class BoxObject : public GameObject {
 public:
 	b2Vec2 size = b2Vec2();
 
-	BoxObject(b2World* world, b2BodyDef def, b2Vec2 size, sf::Color color);
+	BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, sf::Color color);
 	bool isClosed() const override;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, b2World* world);
+	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void syncVertices() override;
 
 private:
@@ -222,13 +223,19 @@ class BallObject : public GameObject {
 public:
 	float radius = 0.0f;
 
-	BallObject(b2World* world, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color = sf::Color::Transparent);
+	BallObject(
+		GameObjectList* object_list,
+		b2BodyDef def,
+		float radius,
+		sf::Color color,
+		sf::Color notch_color = sf::Color::Transparent
+	);
 	bool isClosed() const override;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, b2World* world);
+	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void syncVertices() override;
 
 private:
@@ -240,7 +247,7 @@ private:
 class PolygonObject : public GameObject {
 public:
 	PolygonObject(
-		b2World* world,
+		GameObjectList* object_list,
 		b2BodyDef def,
 		const std::vector<b2Vec2>& vertices,
 		const sf::Color& color
@@ -252,7 +259,7 @@ public:
 	void render(sf::RenderTarget& target) override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static std::unique_ptr<PolygonObject> deserialize(TokenReader& tr, b2World* world);
+	static std::unique_ptr<PolygonObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void syncVertices() override;
 
 private:
@@ -261,13 +268,13 @@ private:
 
 class ChainObject : public GameObject {
 public:
-	ChainObject(b2World* world, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
+	ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
 	bool isClosed() const override;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static std::unique_ptr<ChainObject> deserialize(TokenReader& tr, b2World* world);
+	static std::unique_ptr<ChainObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void syncVertices() override;
 
 private:
