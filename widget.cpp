@@ -240,6 +240,25 @@ void Widget::setParentSilent(Widget* new_parent) {
 	if (!new_parent) {
 		return setParentSilent(widget_list->root_widget);
 	}
+	if (new_parent == this) {
+		updateFullName();
+		throw std::runtime_error("Cannot parent object to itself: " + full_name);
+	}
+	if (new_parent) {
+		CompoundVector<Widget*> parent_chain = new_parent->getParentChain();
+		if (parent_chain.contains(this)) {
+			std::string chain_str;
+			chain_str += name;
+			chain_str += " -> " + new_parent->name;
+			for (size_t i = 0; i < parent_chain.size(); i++) {
+				chain_str += " -> " + parent_chain[i]->name;
+				if (parent_chain[i] == this) {
+					break;
+				}
+			}
+			throw std::runtime_error("Loop in widget parent hierarchy: " + chain_str);
+		}
+	}
 	Widget* old_parent = this->parent;
 	if (old_parent) {
 		old_parent->children.remove(this);
@@ -818,6 +837,10 @@ WidgetList::WidgetList() {
 	root_widget = createWidget<RectangleWidget>();
 	root_widget->setFillColor(sf::Color::Transparent);
 	root_widget->setName("root");
+}
+
+bool WidgetList::contains(const Widget* widget) {
+	return widgets.contains(widget);
 }
 
 bool WidgetList::isClickBlocked() const {

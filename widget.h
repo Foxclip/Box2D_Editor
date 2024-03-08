@@ -348,6 +348,7 @@ public:
 	bool debug_render = false;
 
 	WidgetList();
+	bool contains(const Widget* widget);
 	bool isClickBlocked() const;
 	bool isReleaseBlocked() const;
 	Widget* getRootWidget();
