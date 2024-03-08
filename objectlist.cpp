@@ -194,11 +194,14 @@ void GameObjectList::setParent(GameObject* child, GameObject* new_parent) {
         CompoundVector<GameObject*> parent_chain = new_parent->getParentChain();
         if (parent_chain.contains(child)) {
             std::string chain_str;
-            chain_str += std::to_string(new_parent->id);
+            chain_str += std::to_string(child->id);
+            chain_str += " -> " + std::to_string(new_parent->id);
             for (size_t i = 0; i < parent_chain.size(); i++) {
                 chain_str += " -> " + std::to_string(parent_chain[i]->id);
+                if (parent_chain[i] == child) {
+                    break;
+                }
             }
-            chain_str += " -> " + std::to_string(new_parent->id);
             throw std::runtime_error("Loop in parent hierarchy: " + chain_str);
         }
         if (new_parent) {
