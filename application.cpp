@@ -515,6 +515,10 @@ void Application::process_input() {
 }
 
 void Application::process_keyboard_event(const sf::Event& event) {
+    if (widgets.getFocusedWidget()) {
+        widgets.processKeyboardEvent(event);
+        return;
+    }
     if (event.type == sf::Event::KeyPressed) {
         switch (event.key.code) {
             case sf::Keyboard::Escape:

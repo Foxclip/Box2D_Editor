@@ -123,6 +123,7 @@ public:
 	void setParentSilent(Widget* new_parent);
 	void setParent(Widget* new_parent);
 	void setName(const std::string& name);
+	virtual void processKeyboardEvent(const sf::Event& event);
 	virtual void render(sf::RenderTarget& target);
 	void renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children);
 	void renderOrigin(sf::RenderTarget& target);
@@ -366,6 +367,7 @@ public:
 	T* createWidget();
 	void processClick(const sf::Vector2f pos);
 	void processRelease(const sf::Vector2f pos);
+	void processKeyboardEvent(const sf::Event& event);
 	void render(sf::RenderTarget& target);
 	void reset(const sf::Vector2f& root_size);
 	void setFocusedWidget(Widget* widget);
@@ -380,6 +382,7 @@ private:
 	sf::Color focused_widget_bounds_color = sf::Color(0, 200, 255);
 	CompoundVectorUptr<Widget> widgets;
 	RectangleWidget* root_widget = nullptr;
+	Widget* focused_widget_temp = nullptr;
 	Widget* focused_widget = nullptr;
 
 };

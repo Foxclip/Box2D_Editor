@@ -48,8 +48,8 @@ void Widget::processClick(const sf::Vector2f& pos) {
 		if (!click_through) {
 			widget_list->click_blocked = true;
 		}
-		if (isFocusable() && !widget_list->focused_widget) {
-			widget_list->focused_widget = this;
+		if (isFocusable() && !widget_list->focused_widget_temp) {
+			widget_list->focused_widget_temp = this;
 		}
 		internalOnClick(pos);
 		OnClick(pos);
@@ -285,6 +285,8 @@ void Widget::setName(const std::string& name) {
 	this->name = name;
 	updateFullName();
 }
+
+void Widget::processKeyboardEvent(const sf::Event& event) { }
 
 sf::Transform Widget::getRenderTransform() const {
 	return sf::Transform::Identity;
@@ -885,23 +887,19 @@ Widget* WidgetList::getFocusedWidget() const {
 }
 
 void WidgetList::processClick(const sf::Vector2f pos) {
-	Widget* old_focused_widget = focused_widget;
-	focused_widget = nullptr;
+	focused_widget_temp = nullptr;
 	root_widget->processClick(pos);
-	if (focused_widget != old_focused_widget) {
-		if (focused_widget) {
-			focused_widget->internalOnFocused();
-			focused_widget->OnFocused();
-		}
-		if (old_focused_widget) {
-			old_focused_widget->internalOnFocusLost();
-			old_focused_widget->OnFocusLost();
-		}
-	}
+	setFocusedWidget(focused_widget_temp);
 }
 
 void WidgetList::processRelease(const sf::Vector2f pos) {
 	root_widget->processRelease(pos);
+}
+
+void WidgetList::processKeyboardEvent(const sf::Event& event) {
+	if (focused_widget) {
+		focused_widget->processKeyboardEvent(event);
+	}
 }
 
 void WidgetList::render(sf::RenderTarget& target) {
@@ -928,9 +926,25 @@ void WidgetList::reset(const sf::Vector2f& root_size) {
 }
 
 void WidgetList::setFocusedWidget(Widget* widget) {
-	assert(widgets.contains(widget));
-	if (widget->isFocusable()) {
-		this->focused_widget = widget;
+	if (widget == focused_widget) {
+		return;
+	}
+	if (widget) {
+		if (!widget->isFocusable()) {
+			return;
+		}
+		assert(widgets.contains(widget));
+	}
+	if (focused_widget) {
+		logger << focused_widget->getFullName() << " lost focus\n";
+		focused_widget->internalOnFocusLost();
+		focused_widget->OnFocusLost();
+	}
+	focused_widget = widget;
+	if (focused_widget) {
+		logger << focused_widget->getFullName() << " is focused\n";
+		focused_widget->internalOnFocused();
+		focused_widget->OnFocused();
 	}
 }
 
@@ -1034,6 +1048,13 @@ void TextBoxWidget::setCharacterSize(unsigned int size) {
 }
 
 void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
+	if (event.type == sf::Event::KeyPressed) {
+		switch (event.key.code) {
+			case sf::Keyboard::Escape:
+				widget_list->setFocusedWidget(nullptr);
+				break;
+		}
+	}
 }
 
 void TextBoxWidget::update() {
