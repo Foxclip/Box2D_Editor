@@ -79,6 +79,7 @@ public:
 	WidgetVisibility checkVisibility() const;
 	void processClick(const sf::Vector2f& pos);
 	void processRelease(const sf::Vector2f& pos);
+	virtual bool isFocusable() const;
 	const std::string& getName() const;
 	const std::string& getFullName() const;
 	Widget* getParent() const;
@@ -121,7 +122,7 @@ public:
 	void setParent(Widget* new_parent);
 	void setName(const std::string& name);
 	virtual void render(sf::RenderTarget& target);
-	void renderBounds(sf::RenderTarget& target);
+	void renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children);
 	void renderOrigin(sf::RenderTarget& target);
 
 protected:
@@ -233,6 +234,7 @@ public:
 
 	CheckboxWidget();
 	CheckboxWidget(WidgetList* widget_list);
+	bool isFocusable() const override;
 	bool isChecked() const;
 	const sf::Color& getFillColor() const override;
 	const sf::Color& getHighlightFillColor() const;
@@ -301,6 +303,7 @@ public:
 
 	TextBoxWidget();
 	TextBoxWidget(WidgetList* widget_list);
+	bool isFocusable() const override;
 	const sf::Color& getFillColor() const override;
 	const sf::Color& getHighlightColor() const;
 	const sf::Color& getTextColor() const;
@@ -369,6 +372,7 @@ private:
 	sf::Color render_origin_color = sf::Color::Red;
 	CompoundVectorUptr<Widget> widgets;
 	RectangleWidget* root_widget;
+	Widget* focused_widget = nullptr;
 
 };
 

@@ -48,6 +48,9 @@ void Widget::processClick(const sf::Vector2f& pos) {
 		if (!click_through) {
 			widget_list->click_blocked = true;
 		}
+		if (isFocusable() && !widget_list->focused_widget) {
+			widget_list->focused_widget = this;
+		}
 		internalOnClick(pos);
 		OnClick(pos);
 	}
@@ -69,6 +72,10 @@ void Widget::processRelease(const sf::Vector2f& pos) {
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->processRelease(pos);
 	}
+}
+
+bool Widget::isFocusable() const {
+	return false;
 }
 
 const std::string& Widget::getName() const {
@@ -339,14 +346,15 @@ void Widget::render(sf::RenderTarget& target) {
 	}
 }
 
-void Widget::renderBounds(sf::RenderTarget& target) {
+void Widget::renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children) {
 	if (!visible) {
 		return;
 	}
-	sf::Color bounds_color = widget_list->render_bounds_color;
-	draw_wire_rect(target, getGlobalBounds(), bounds_color);
-	for (size_t i = 0; i < children.size(); i++) {
-		children[i]->renderBounds(target);
+	draw_wire_rect(target, getGlobalBounds(), color);
+	if (include_children) {
+		for (size_t i = 0; i < children.size(); i++) {
+			children[i]->renderBounds(target, color, true);
+		}
 	}
 }
 
@@ -782,6 +790,10 @@ CheckboxWidget::CheckboxWidget(WidgetList* widget_list) {
 	check_widget->setName("check");
 }
 
+bool CheckboxWidget::isFocusable() const {
+	return true;
+}
+
 bool CheckboxWidget::isChecked() const {
 	return checked;
 }
@@ -865,6 +877,7 @@ Widget* WidgetList::getRootWidget() {
 }
 
 void WidgetList::processClick(const sf::Vector2f pos) {
+	focused_widget = nullptr;
 	root_widget->processClick(pos);
 }
 
@@ -875,8 +888,11 @@ void WidgetList::processRelease(const sf::Vector2f pos) {
 void WidgetList::render(sf::RenderTarget& target) {
 	root_widget->render(target);
 	if (debug_render) {
-		root_widget->renderBounds(target);
+		root_widget->renderBounds(target, sf::Color::Green, true);
 		root_widget->renderOrigin(target);
+	}
+	if (focused_widget) {
+		focused_widget->renderBounds(target, sf::Color(0, 200, 255), false);
 	}
 #ifndef NDEBUG
 	for (size_t i = 0; i < widgets.size(); i++) {
@@ -910,6 +926,10 @@ TextBoxWidget::TextBoxWidget(WidgetList* widget_list) {
 	cursor_widget->setName("cursor");
 	setValueSilent("Text");
 	updateColors();
+}
+
+bool TextBoxWidget::isFocusable() const {
+	return true;
 }
 
 const sf::Color& TextBoxWidget::getFillColor() const {
