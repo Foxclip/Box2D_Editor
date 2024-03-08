@@ -255,7 +255,7 @@ void Application::init_ui() {
     load_font(ui_font, "STAN0757.TTF");
     load_font(fps_font, "fraps.ttf");
     load_font(console_font, "courbd.ttf");
-    load_font(small_font, "verdana.ttf");
+    load_font(small_font, "HelvetiPixel.ttf");
     load_font(textbox_font, "courbd.ttf");
 
     vertex_text.setFont(ui_font);
@@ -267,12 +267,8 @@ void Application::init_ui() {
     origin_shape.setOutlineColor(sf::Color::Black);
     origin_shape.setOutlineThickness(1.0f);
 
-    id_text.setFont(small_font);
-    id_text.setCharacterSize(10);
-    id_text.setOrigin(sf::Vector2f(0.0f, id_text.getCharacterSize()));
-    id_text.setFillColor(sf::Color::White);
     object_info_text.setFont(small_font);
-    object_info_text.setCharacterSize(10);
+    object_info_text.setCharacterSize(16);
     object_info_text.setFillColor(sf::Color::White);
 
     init_widgets();
@@ -1001,12 +997,11 @@ void Application::render_ui() {
             size_t info_index = 0;
             auto render_info = [&](const std::string& str) {
                 sf::Vector2f object_screen_pos = world_to_screen(gameobject->getGlobalPosition());
-                sf::Vector2f offset = sf::Vector2f(0.0f, info_index * object_info_text.getCharacterSize());
+                float line_scaling = 3.0f / 4.0f;
+                sf::Vector2f offset = sf::Vector2f(0.0f, info_index * object_info_text.getCharacterSize() * line_scaling);
                 sf::Vector2f pos = object_screen_pos + offset;
-                object_info_text.setPosition(pos);
+                object_info_text.setPosition(utils::quantize(pos));
                 object_info_text.setString(str);
-                // rendering twice so it is more opaque
-                target.draw(object_info_text);
                 target.draw(object_info_text);
                 info_index++;
             };
@@ -1316,11 +1311,11 @@ void Application::toggle_pause() {
     paused_rect_widget->setVisible(paused);
 }
 
-void Application::load_font(sf::Font& font, const std::string& filename) {
+void Application::load_font(sf::Font& font, const std::string& filename, bool smooth) {
     if (!font.loadFromFile(filename)) {
         throw std::runtime_error("Font loading error (" + filename + ")");
     }
-    font.setSmooth(false);
+    font.setSmooth(smooth);
 }
 
 sf::Vector2f Application::screen_to_world(const sf::Vector2f& screen_pos) {

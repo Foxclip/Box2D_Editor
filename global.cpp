@@ -23,9 +23,9 @@ void draw_line(
 	const sf::Vector2f& v2,
 	const sf::Color& color
 ) {
-	line_primitive[0].position = utils::quantize(v1);
+	line_primitive[0].position = utils::quantize_and_offset(v1);
 	line_primitive[0].color = color;
-	line_primitive[1].position = utils::quantize(v2);
+	line_primitive[1].position = utils::quantize_and_offset(v2);
 	line_primitive[1].color = color;
 	target.draw(line_primitive);
 }
@@ -37,9 +37,9 @@ void draw_line(
 	const sf::Color& color,
 	const sf::Transform& transform
 ) {
-	line_primitive[0].position = utils::quantize(transform.transformPoint(v1));
+	line_primitive[0].position = utils::quantize_and_offset(transform.transformPoint(v1));
 	line_primitive[0].color = color;
-	line_primitive[1].position = utils::quantize(transform.transformPoint(v2));
+	line_primitive[1].position = utils::quantize_and_offset(transform.transformPoint(v2));
 	line_primitive[1].color = color;
 	target.draw(line_primitive);
 }

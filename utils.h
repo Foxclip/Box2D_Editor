@@ -224,6 +224,11 @@ namespace utils {
 
 	template <typename TVec2>
 	TVec2 quantize(const TVec2& vec) {
+		return TVec2(floor(vec.x), floor(vec.y));
+	}
+
+	template <typename TVec2>
+	TVec2 quantize_and_offset(const TVec2& vec) {
 		return TVec2(floor(vec.x) + 0.5f, floor(vec.y) + 0.5f);
 	}
 
