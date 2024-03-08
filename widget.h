@@ -73,6 +73,8 @@ public:
 	std::function<void(const sf::Vector2f& pos)> OnRelease = [](const sf::Vector2f& pos) { };
 	std::function<void(const sf::Vector2f& pos)> OnMouseEnter = [](const sf::Vector2f& pos) { };
 	std::function<void(const sf::Vector2f& pos)> OnMouseExit = [](const sf::Vector2f& pos) { };
+	std::function<void()> OnFocused = []() { };
+	std::function<void()> OnFocusLost = []() { };
 
 	bool isMouseOver() const;
 	void updateMouseState();
@@ -156,6 +158,8 @@ protected:
 	virtual void internalOnClick(const sf::Vector2f& pos);
 	virtual void internalOnMouseEnter(const sf::Vector2f& pos);
 	virtual void internalOnMouseExit(const sf::Vector2f& pos);
+	virtual void internalOnFocused();
+	virtual void internalOnFocusLost();
 
 private:
 	WidgetVisibility visibility;
@@ -328,7 +332,8 @@ protected:
 	void updateColors();
 	void internalOnSetParent(Widget* parent) override;
 	void internalOnEditModeToggle(bool value);
-	void internalOnClick(const sf::Vector2f& pos) override;
+	void internalOnFocused() override;
+	void internalOnFocusLost() override;
 	void internalOnMouseEnter(const sf::Vector2f& pos) override;
 	void internalOnMouseExit(const sf::Vector2f& pos) override;
 
@@ -354,7 +359,8 @@ public:
 	bool contains(const Widget* widget);
 	bool isClickBlocked() const;
 	bool isReleaseBlocked() const;
-	Widget* getRootWidget();
+	Widget* getRootWidget() const;
+	Widget* getFocusedWidget() const;
 	template<typename T>
 	requires std::derived_from<T, Widget>
 	T* createWidget();
@@ -362,6 +368,7 @@ public:
 	void processRelease(const sf::Vector2f pos);
 	void render(sf::RenderTarget& target);
 	void reset(const sf::Vector2f& root_size);
+	void setFocusedWidget(Widget* widget);
 
 private:
 	friend class Widget;
@@ -370,8 +377,9 @@ private:
 	float render_origin_size = 10.0f;
 	sf::Color render_bounds_color = sf::Color::Green;
 	sf::Color render_origin_color = sf::Color::Red;
+	sf::Color focused_widget_bounds_color = sf::Color(0, 200, 255);
 	CompoundVectorUptr<Widget> widgets;
-	RectangleWidget* root_widget;
+	RectangleWidget* root_widget = nullptr;
 	Widget* focused_widget = nullptr;
 
 };

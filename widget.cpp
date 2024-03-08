@@ -310,6 +310,10 @@ void Widget::internalOnMouseEnter(const sf::Vector2f& pos) { }
 
 void Widget::internalOnMouseExit(const sf::Vector2f& pos) { }
 
+void Widget::internalOnFocused() { }
+
+void Widget::internalOnFocusLost() { }
+
 std::string Widget::calcFullName() const {
 	CompoundVector<Widget*> parents = getParentChain();
 	std::string result;
@@ -872,13 +876,28 @@ bool WidgetList::isReleaseBlocked() const {
 	return release_blocked;
 }
 
-Widget* WidgetList::getRootWidget() {
+Widget* WidgetList::getRootWidget() const {
 	return root_widget;
 }
 
+Widget* WidgetList::getFocusedWidget() const {
+	return focused_widget;
+}
+
 void WidgetList::processClick(const sf::Vector2f pos) {
+	Widget* old_focused_widget = focused_widget;
 	focused_widget = nullptr;
 	root_widget->processClick(pos);
+	if (focused_widget != old_focused_widget) {
+		if (focused_widget) {
+			focused_widget->internalOnFocused();
+			focused_widget->OnFocused();
+		}
+		if (old_focused_widget) {
+			old_focused_widget->internalOnFocusLost();
+			old_focused_widget->OnFocusLost();
+		}
+	}
 }
 
 void WidgetList::processRelease(const sf::Vector2f pos) {
@@ -892,7 +911,7 @@ void WidgetList::render(sf::RenderTarget& target) {
 		root_widget->renderOrigin(target);
 	}
 	if (focused_widget) {
-		focused_widget->renderBounds(target, sf::Color(0, 200, 255), false);
+		focused_widget->renderBounds(target, focused_widget_bounds_color, false);
 	}
 #ifndef NDEBUG
 	for (size_t i = 0; i < widgets.size(); i++) {
@@ -906,6 +925,13 @@ void WidgetList::reset(const sf::Vector2f& root_size) {
 	root_widget->updateMouseState();
 	click_blocked = false;
 	release_blocked = false;
+}
+
+void WidgetList::setFocusedWidget(Widget* widget) {
+	assert(widgets.contains(widget));
+	if (widget->isFocusable()) {
+		this->focused_widget = widget;
+	}
 }
 
 TextBoxWidget::TextBoxWidget() { }
@@ -1045,12 +1071,16 @@ void TextBoxWidget::internalOnEditModeToggle(bool value) {
 	updateColors();
 }
 
-void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
-	if (!edit_mode) {
-		edit_mode = true;
-		internalOnEditModeToggle(true);
-		OnEditModeToggle(true);
-	}
+void TextBoxWidget::internalOnFocused() {
+	edit_mode = true;
+	internalOnEditModeToggle(true);
+	OnEditModeToggle(true);
+}
+
+void TextBoxWidget::internalOnFocusLost() {
+	edit_mode = false;
+	internalOnEditModeToggle(false);
+	OnEditModeToggle(false);
 }
 
 void TextBoxWidget::internalOnMouseEnter(const sf::Vector2f& pos) {
