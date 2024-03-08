@@ -154,7 +154,7 @@ public:
 		mode_count,
 	};
 	ObjectType type = BOX;
-	std::vector<Widget*> create_buttons;
+	CompoundVector<Widget*> create_buttons;
 	ContainerWidget* create_panel_widget = nullptr;
 
 	CreateTool();

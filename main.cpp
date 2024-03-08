@@ -9,7 +9,7 @@ void execute_app() {
     try {
         app.init();
         //scene1(app);
-        //app.load("level.txt");
+        app.load("level.txt");
         //ground_transform(app);
         //single_box(app);
         //single_ball(app);
@@ -19,7 +19,7 @@ void execute_app() {
         //box_parent(app);
         //convex_polygon(app);
         //duplication(app);
-        parent_loop(app);
+        //parent_loop(app);
         app.start();
     } catch (std::string msg) {
         logger << "ERROR: " << msg << "\n";
@@ -42,6 +42,7 @@ int main() {
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars
     // TODO: edit and simulate modes
+    // TODO: create tests with keyboard and mouse event recording
 
     return 0;
 }

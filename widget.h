@@ -82,7 +82,7 @@ public:
 	const std::string& getName() const;
 	const std::string& getFullName() const;
 	Widget* getParent() const;
-	std::vector<Widget*> getParentChain() const;
+	CompoundVector<Widget*> getParentChain() const;
 	const CompoundVector<Widget*>& getChildren() const;
 	Widget* find(const std::string& name) const;
 	virtual sf::FloatRect getLocalBounds() const = 0;

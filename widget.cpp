@@ -83,12 +83,12 @@ Widget* Widget::getParent() const {
 	return parent;
 }
 
-std::vector<Widget*> Widget::getParentChain() const {
+CompoundVector<Widget*> Widget::getParentChain() const {
 	const Widget* cur_obj = this;
-	std::vector<Widget*> result;
+	CompoundVector<Widget*> result;
 	while (cur_obj) {
 		if (cur_obj->parent) {
-			result.push_back(cur_obj->parent);
+			result.add(cur_obj->parent);
 			cur_obj = cur_obj->parent;
 		} else {
 			break;
@@ -285,7 +285,7 @@ void Widget::internalOnMouseEnter(const sf::Vector2f& pos) { }
 void Widget::internalOnMouseExit(const sf::Vector2f& pos) { }
 
 std::string Widget::calcFullName() const {
-	std::vector<Widget*> parents = getParentChain();
+	CompoundVector<Widget*> parents = getParentChain();
 	std::string result;
 	for (ptrdiff_t i = parents.size() - 1; i >= 0; i--) {
 		result += parents[i]->name;

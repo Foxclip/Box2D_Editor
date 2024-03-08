@@ -404,7 +404,7 @@ void Application::init_widgets() {
         text_widget->setOrigin(Widget::CENTER);
         text_widget->setParentAnchor(Widget::CENTER);
         text_widget->setParent(button_widget);
-        create_tool.create_buttons.push_back(button_widget);
+        create_tool.create_buttons.add(button_widget);
         create_tool.create_panel_widget = create_panel_widget;
         button_widget->setParent(create_panel_widget);
     }
