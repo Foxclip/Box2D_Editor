@@ -559,9 +559,18 @@ const sf::Transformable& TextWidget::getTransformable() const {
 }
 
 sf::Transform TextWidget::getRenderTransform() const {
+	// local bounds can be offset from origin
 	sf::Vector2f offset = calcPositionOffset();
 	sf::Transform result = sf::Transform::Identity;
 	result.translate(-offset);
+	// quantize pixel coordinates so letters are not dancing even without smoothiing
+	sf::Transform global_tr = getGlobalTransform();
+	float x_pos = global_tr.getMatrix()[12];
+	float y_pos = global_tr.getMatrix()[13];
+	float x_offset = x_pos - floor(x_pos);
+	float y_offset = y_pos - floor(y_pos);
+	sf::Vector2f subpixel_offset = sf::Vector2f(x_offset, y_offset);
+	result.translate(-subpixel_offset);
 	return result;
 }
 

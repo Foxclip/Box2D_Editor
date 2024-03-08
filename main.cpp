@@ -41,6 +41,7 @@ int main() {
     // TODO: rename project to EvolvingCars
     // TODO: edit and simulate modes
     // TODO: create tests with keyboard and mouse event recording
+    // TODO: joint editor
 
     return 0;
 }
