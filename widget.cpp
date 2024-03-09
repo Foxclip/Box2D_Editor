@@ -389,9 +389,6 @@ void Widget::updateVisibility() {
 }
 
 void Widget::updateRenderTexture() {
-	//if (name == "test text") {
-	//	std::cout << "";
-	//}
 	sf::FloatRect bounds = getExactGlobalBounds();
 	sf::Vector2f topLeft = bounds.getPosition();
 	sf::Vector2f bottomRight = bounds.getPosition() + bounds.getSize();
@@ -400,7 +397,9 @@ void Widget::updateRenderTexture() {
 	float quantized_width = quantized_bottom_right.x - quantized_top_left.x;
 	float quantized_height = quantized_bottom_right.y - quantized_top_left.y;
 	sf::FloatRect texture_bounds = sf::FloatRect(quantized_top_left, sf::Vector2f(quantized_width, quantized_height));
-	if (texture_bounds.width != render_texture.getSize().x || texture_bounds.height != render_texture.getSize().y) {
+	bool non_zero = texture_bounds.width > 0 && texture_bounds.height > 0;
+	bool not_same = texture_bounds.width != render_texture.getSize().x || texture_bounds.height != render_texture.getSize().y;
+	if (non_zero && not_same) {
 		render_texture.create(texture_bounds.width, texture_bounds.height);
 	}
 	sf::Transform transform = getTransformable().getTransform();
@@ -594,14 +593,16 @@ sf::FloatRect TextWidget::getGlobalBounds() const {
 
 sf::FloatRect TextWidget::getExactLocalBounds() const {
 	sf::FloatRect result = text.getLocalBounds();
-	sf::Vector2f pos = result.getPosition() - calcPositionOffset();
-	result.left = pos.x;
-	result.top = pos.y;
+	if (!adjust_local_bounds) {
+		sf::Vector2f pos = result.getPosition() - calcPositionOffset();
+		result.left = pos.x;
+		result.top = pos.y;
+	}
 	return result;
 }
 
 sf::FloatRect TextWidget::getExactParentLocalBounds() const {
-	return text.getGlobalBounds();
+	return getTransformable().getTransform().transformRect(getExactLocalBounds());
 }
 
 sf::FloatRect TextWidget::getExactGlobalBounds() const {
