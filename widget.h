@@ -82,6 +82,7 @@ public:
 	void processClick(const sf::Vector2f& pos);
 	void processRelease(const sf::Vector2f& pos);
 	virtual bool isFocusable() const;
+	bool isFocused() const;
 	const std::string& getName() const;
 	const std::string& getFullName() const;
 	Widget* getParent() const;
@@ -123,6 +124,7 @@ public:
 	void setParentSilent(Widget* new_parent);
 	void setParent(Widget* new_parent);
 	void setName(const std::string& name);
+	void removeFocus();
 	virtual void processKeyboardEvent(const sf::Event& event);
 	virtual void render(sf::RenderTarget& target);
 	void renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children);
@@ -340,12 +342,14 @@ public:
 protected:
 	void update() override;
 	void updateColors();
+	void internalOnClick(const sf::Vector2f& pos) override;
 	void internalOnSetParent(Widget* parent) override;
 	void internalOnEditModeToggle(bool value);
 	void internalOnFocused() override;
 	void internalOnFocusLost() override;
 	void internalOnMouseEnter(const sf::Vector2f& pos) override;
 	void internalOnMouseExit(const sf::Vector2f& pos) override;
+	void setEditMode(bool value);
 	void setValueSilent(const sf::String& value);
 	void insertSilent(size_t pos, const sf::String& str);
 	void eraseSilent(size_t index_first, size_t count);

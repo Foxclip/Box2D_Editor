@@ -78,6 +78,10 @@ bool Widget::isFocusable() const {
 	return false;
 }
 
+bool Widget::isFocused() const {
+	return widget_list->focused_widget == this;
+}
+
 const std::string& Widget::getName() const {
 	return name;
 }
@@ -284,6 +288,12 @@ void Widget::setParent(Widget* new_parent) {
 void Widget::setName(const std::string& name) {
 	this->name = name;
 	updateFullName();
+}
+
+void Widget::removeFocus() {
+	if (isFocused()) {
+		widget_list->setFocusedWidget(nullptr);
+	}
 }
 
 void Widget::processKeyboardEvent(const sf::Event& event) { }
@@ -1103,34 +1113,39 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		switch (event.key.code) {
 			case sf::Keyboard::Escape:
-				widget_list->setFocusedWidget(nullptr);
+				removeFocus();
+				break;
+			case sf::Keyboard::Enter:
+				setEditMode(!edit_mode);
 				break;
 			case sf::Keyboard::Left:
-				if (cursor_pos > 0) {
-					cursor_pos--;
+				if (edit_mode && cursor_pos > 0) {
+					setCursorPos(cursor_pos - 1);
 				}
 				break;
 			case sf::Keyboard::Right:
-				if (cursor_pos < getStringSize()) {
-					cursor_pos++;
+				if (edit_mode && cursor_pos < getStringSize()) {
+					setCursorPos(cursor_pos + 1);
 				}
 				break;
 		}
 	} else if (event.type == sf::Event::TextEntered) {
 		sf::Uint32 code = event.text.unicode;
-		logger << "TextEntered: " << code << "\n";
 		switch (code) {
-			case '\b':
-				if (cursor_pos > 0) {
-					erase(cursor_pos - 1, 1);
-					cursor_pos--;
-				}
-				break;
+			case '\n':
 			case '\r':
 				break;
+			case '\b':
+				if (edit_mode && cursor_pos > 0) {
+					erase(cursor_pos - 1, 1);
+					setCursorPos(cursor_pos - 1);
+				}
+				break;
 			default:
-				insert(cursor_pos, sf::String(code));
-				cursor_pos++;
+				if (edit_mode) {
+					insert(cursor_pos, sf::String(code));
+					setCursorPos(cursor_pos + 1);
+				}
 				break;
 		}
 	}
@@ -1161,6 +1176,10 @@ void TextBoxWidget::updateColors() {
 	cursor_widget->setFillColor(text_col);
 }
 
+void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
+	setEditMode(true);
+}
+
 void TextBoxWidget::internalOnSetParent(Widget* parent) {
 	if (!getFont()) {
 		logger << "WARNING: font is not set for " + full_name + "\n";
@@ -1173,15 +1192,11 @@ void TextBoxWidget::internalOnEditModeToggle(bool value) {
 }
 
 void TextBoxWidget::internalOnFocused() {
-	edit_mode = true;
-	internalOnEditModeToggle(true);
-	OnEditModeToggle(true);
+	setEditMode(true);
 }
 
 void TextBoxWidget::internalOnFocusLost() {
-	edit_mode = false;
-	internalOnEditModeToggle(false);
-	OnEditModeToggle(false);
+	setEditMode(false);
 }
 
 void TextBoxWidget::internalOnMouseEnter(const sf::Vector2f& pos) {
@@ -1196,6 +1211,15 @@ void TextBoxWidget::internalOnMouseExit(const sf::Vector2f& pos) {
 	if (!edit_mode) {
 		updateColors();
 	}
+}
+
+void TextBoxWidget::setEditMode(bool value) {
+	if (edit_mode == value) {
+		return;
+	}
+	edit_mode = value;
+	internalOnEditModeToggle(value);
+	OnEditModeToggle(value);
 }
 
 void TextBoxWidget::setValueSilent(const sf::String& value) {
