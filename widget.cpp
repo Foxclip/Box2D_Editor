@@ -358,14 +358,23 @@ void Widget::updateVisibility() {
 
 void Widget::updateRenderTexture() {
 	sf::FloatRect bounds = getGlobalBounds();
-	if (bounds.width != render_texture.getSize().x || bounds.height != render_texture.getSize().y) {
-		render_texture.create(bounds.width, bounds.height);
+	sf::Vector2f topLeft = bounds.getPosition();
+	sf::Vector2f bottomRight = bounds.getPosition() + bounds.getSize();
+	sf::Vector2f quantized_top_left = sf::Vector2f(floor(bounds.left), floor(bounds.top));
+	sf::Vector2f quantized_bottom_right = sf::Vector2f(ceil(bounds.left + bounds.width), ceil(bounds.top + bounds.height));
+	float quantized_width = quantized_bottom_right.x - quantized_top_left.x;
+	float quantized_height = quantized_bottom_right.y - quantized_top_left.y;
+	sf::FloatRect texture_bounds = sf::FloatRect(quantized_top_left, sf::Vector2f(quantized_width, quantized_height));
+	if (texture_bounds.width != render_texture.getSize().x || texture_bounds.height != render_texture.getSize().y) {
+		render_texture.create(texture_bounds.width, texture_bounds.height);
 	}
+	sf::Transform transform = getTransformable().getTransform();
 	sf::Transform render_transform = getRenderTransform();
 	sf::Transform parent_transform = getParentGlobalTransform();
 	sf::Transform combined = render_transform * parent_transform;
-	render_view.setSize(bounds.getSize());
-	render_view.setCenter(bounds.getPosition() + bounds.getSize() / 2.0f);
+	render_view.setSize(texture_bounds.getSize());
+	sf::Vector2f texture_bounds_center = texture_bounds.getPosition() + texture_bounds.getSize() / 2.0f;
+	render_view.setCenter(texture_bounds_center);
 	render_texture.setView(render_view);
 	render_texture.clear(sf::Color::Transparent);
 	render_texture.draw(getDrawable(), combined);
@@ -379,8 +388,7 @@ void Widget::render(sf::RenderTarget& target) {
 	update();
 	updateRenderTexture();
 	sf::Sprite sprite(render_texture.getTexture());
-	sf::Vector2f sprite_pos = getGlobalTopLeft();
-	//sf::Vector2f sprite_pos = sf::Vector2f();
+	sf::Vector2f sprite_pos = utils::quantize(getGlobalTopLeft());
 	sprite.setPosition(sprite_pos);
 	target.draw(sprite);
 	for (size_t i = 0; i < children.size(); i++) {

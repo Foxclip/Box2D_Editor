@@ -457,6 +457,13 @@ void Application::init_widgets() {
     //rect->setName("red rect");
     //rect->debug_id = 0;
 
+    //TextWidget* text = widgets.createWidget<TextWidget>();
+    //text->setCharacterSize(15);
+    //text->setFont(textbox_font);
+    //text->setString("Text");
+    //text->setPosition(0.0f, 0.0f);
+    //text->setName("text");
+
 }
 
 void Application::main_loop() {
