@@ -554,6 +554,19 @@ sf::Vector2f TextWidget::getCharPos(size_t index) const {
 	return text.findCharacterPos(index);
 }
 
+size_t TextWidget::getCharAt(const sf::Vector2f& pos) const {
+	ptrdiff_t result = 0;
+	for (size_t i = 0; i <= getStringSize(); i++) {
+		sf::Vector2f parent_local_char_pos = text.findCharacterPos(i);
+		sf::Vector2f global_char_pos = getParentGlobalTransform() * parent_local_char_pos;
+		sf::Vector2f local_char_pos = toLocal(global_char_pos);
+		if (pos.x >= local_char_pos.x) {
+			result = i;
+		}
+	}
+	return result;
+}
+
 void TextWidget::setFont(const sf::Font& font) {
 	text.setFont(font);
 }
@@ -1178,6 +1191,9 @@ void TextBoxWidget::updateColors() {
 
 void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
 	setEditMode(true);
+	sf::Vector2f local_pos = text_widget->toLocal(pos);
+	size_t cursor_pos = text_widget->getCharAt(local_pos);
+	setCursorPos(cursor_pos);
 }
 
 void TextBoxWidget::internalOnSetParent(Widget* parent) {

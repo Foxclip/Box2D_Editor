@@ -284,6 +284,7 @@ public:
 	const sf::Color& getFillColor() const override;
 	const sf::String& getString() const;
 	sf::Vector2f getCharPos(size_t index) const;
+	size_t getCharAt(const sf::Vector2f& pos) const;
 	void setFont(const sf::Font& font);
 	void setCharacterSize(unsigned int size);
 	void setFillColor(const sf::Color& color) override;
