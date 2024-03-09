@@ -147,6 +147,14 @@ float Widget::getHeight() const {
 	return getLocalBounds().height;
 }
 
+float Widget::getGlobalWidth() const {
+	return getGlobalBounds().width;
+}
+
+float Widget::getGlobalHeight() const {
+	return getGlobalBounds().height;
+}
+
 const sf::Vector2f& Widget::getOrigin() const {
 	return getTransformable().getOrigin();
 }
@@ -348,15 +356,33 @@ void Widget::updateVisibility() {
 	visibility = checkVisibility();
 }
 
+void Widget::updateRenderTexture() {
+	sf::FloatRect bounds = getGlobalBounds();
+	if (bounds.width != render_texture.getSize().x || bounds.height != render_texture.getSize().y) {
+		render_texture.create(bounds.width, bounds.height);
+	}
+	sf::Transform render_transform = getRenderTransform();
+	sf::Transform parent_transform = getParentGlobalTransform();
+	sf::Transform combined = render_transform * parent_transform;
+	render_view.setSize(bounds.getSize());
+	render_view.setCenter(bounds.getPosition() + bounds.getSize() / 2.0f);
+	render_texture.setView(render_view);
+	render_texture.clear(sf::Color::Transparent);
+	render_texture.draw(getDrawable(), combined);
+	render_texture.display();
+}
+
 void Widget::render(sf::RenderTarget& target) {
 	if (!visible) {
 		return;
 	}
 	update();
-	sf::Transform render_transform = getRenderTransform();
-	sf::Transform parent_transform = getParentGlobalTransform();
-	sf::Transform combined = render_transform * parent_transform;
-	target.draw(getDrawable(), combined);
+	updateRenderTexture();
+	sf::Sprite sprite(render_texture.getTexture());
+	sf::Vector2f sprite_pos = getGlobalTopLeft();
+	//sf::Vector2f sprite_pos = sf::Vector2f();
+	sprite.setPosition(sprite_pos);
+	target.draw(sprite);
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->render(target);
 	}

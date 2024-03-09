@@ -449,6 +449,14 @@ void Application::init_widgets() {
     logger_text_widget->setParentAnchor(Widget::TOP_LEFT);
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
+
+    //RectangleWidget* rect = widgets.createWidget<RectangleWidget>();
+    //rect->setFillColor(sf::Color::Red);
+    //rect->setSize(sf::Vector2f(100.0f, 100.0f));
+    //rect->setPosition(0.2f, 0.0f);
+    //rect->setName("red rect");
+    //rect->debug_id = 0;
+
 }
 
 void Application::main_loop() {

@@ -97,6 +97,8 @@ public:
 	sf::Vector2f getSize() const;
 	float getWidth() const;
 	float getHeight() const;
+	float getGlobalWidth() const;
+	float getGlobalHeight() const;
 	const sf::Vector2f& getOrigin() const;
 	virtual const sf::Vector2f& getPosition() const;
 	virtual const sf::Vector2f& getGlobalPosition() const;
@@ -126,7 +128,7 @@ public:
 	void setName(const std::string& name);
 	void removeFocus();
 	virtual void processKeyboardEvent(const sf::Event& event);
-	virtual void render(sf::RenderTarget& target);
+	void render(sf::RenderTarget& target);
 	void renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children);
 	void renderOrigin(sf::RenderTarget& target);
 
@@ -166,10 +168,13 @@ protected:
 
 private:
 	WidgetVisibility visibility;
+	sf::RenderTexture render_texture;
+	sf::View render_view;
 
 	std::string calcFullName() const;
 	void updateFullName();
 	void updateVisibility();
+	void updateRenderTexture();
 
 };
 
