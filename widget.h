@@ -352,9 +352,10 @@ protected:
 
 private:
 	const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(40.0f, 20.0f);
+	const sf::Vector2f TEXT_OFFSET = sf::Vector2f(2.0f, 0.0f);
+	const sf::Vector2f CURSOR_OFFSET = sf::Vector2f(0.0f, 0.0f);
 	TextWidget* text_widget = nullptr;
 	RectangleWidget* cursor_widget = nullptr;
-	sf::Vector2f cursor_offset = sf::Vector2f(1.0f, 0.0f);
 	size_t cursor_pos = 0;
 	bool edit_mode = false;
 	bool highlighted = false;

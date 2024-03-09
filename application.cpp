@@ -322,8 +322,8 @@ void Application::init_widgets() {
     edit_window_widget->setSize(sf::Vector2f(100.0f, 200.0f));
     edit_window_widget->setHorizontal(false);
     edit_window_widget->setFillColor(sf::Color(128, 128, 128));
-    edit_window_widget->setOrigin(Widget::TOP_RIGHT);
-    edit_window_widget->setParentAnchor(Widget::TOP_RIGHT);
+    edit_window_widget->setOrigin(Widget::CENTER);
+    edit_window_widget->setParentAnchor(Widget::CENTER);
     edit_window_widget->setAnchorOffset(-20.0f, 20.0f);
     edit_window_widget->setPadding(TOOLBOX_PADDING);
     edit_window_widget->setClickThrough(false);
@@ -449,8 +449,6 @@ void Application::init_widgets() {
     logger_text_widget->setParentAnchor(Widget::TOP_LEFT);
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
-    //logger_text_widget->setAdjustLocalBounds(false);
-    logger_text_widget->debug_id = 0;
 }
 
 void Application::main_loop() {

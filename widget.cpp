@@ -983,9 +983,11 @@ TextBoxWidget::TextBoxWidget(WidgetList* widget_list) {
 	text_widget = widget_list->createWidget<TextWidget>();
 	text_widget->setFillColor(text_color);
 	text_widget->setParentAnchor(CENTER_LEFT);
+	text_widget->setAnchorOffset(TEXT_OFFSET);
 	text_widget->setOrigin(CENTER_LEFT);
 	text_widget->setParent(this);
 	cursor_widget = widget_list->createWidget<RectangleWidget>();
+	cursor_widget->setVisible(false);
 	cursor_widget->setFillColor(editor_text_color);
 	cursor_widget->setSize(sf::Vector2f(1.0f, text_widget->getCharacterSize()));
 	cursor_widget->setParent(this);
@@ -1137,7 +1139,7 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 void TextBoxWidget::update() {
 	Widget::update();
 	sf::Vector2f cursor_widget_pos = getCharPos(cursor_pos);
-	cursor_widget->setPosition(cursor_widget_pos);
+	cursor_widget->setPosition(cursor_widget_pos + CURSOR_OFFSET);
 }
 
 void TextBoxWidget::updateColors() {
@@ -1166,6 +1168,7 @@ void TextBoxWidget::internalOnSetParent(Widget* parent) {
 }
 
 void TextBoxWidget::internalOnEditModeToggle(bool value) {
+	cursor_widget->setVisible(value);
 	updateColors();
 }
 
