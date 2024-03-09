@@ -460,9 +460,9 @@ void Application::init_widgets() {
     //TextWidget* text = widgets.createWidget<TextWidget>();
     //text->setCharacterSize(15);
     //text->setFont(textbox_font);
-    //text->setString("Text");
+    //text->setString("Texty");
     //text->setPosition(0.0f, 0.0f);
-    //text->setName("text");
+    //text->setName("test text");
 
 }
 

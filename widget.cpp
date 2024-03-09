@@ -127,6 +127,18 @@ Widget* Widget::find(const std::string& name) const {
 	return nullptr;
 }
 
+sf::FloatRect Widget::getExactLocalBounds() const {
+	return getLocalBounds();
+}
+
+sf::FloatRect Widget::getExactParentLocalBounds() const {
+	return getParentLocalBounds();
+}
+
+sf::FloatRect Widget::getExactGlobalBounds() const {
+	return getGlobalBounds();
+}
+
 const sf::Vector2f& Widget::toGlobal(const sf::Vector2f& pos) const {
 	return getGlobalTransform().transformPoint(pos);
 }
@@ -204,6 +216,26 @@ const sf::Vector2f Widget::getGlobalBottomLeft() const {
 
 const sf::Vector2f Widget::getGlobalBottomRight() const {
 	sf::FloatRect bounds = getGlobalBounds();
+	return sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height);
+}
+
+const sf::Vector2f Widget::getExactGlobalTopLeft() const {
+	sf::FloatRect bounds = getExactGlobalBounds();
+	return sf::Vector2f(bounds.left, bounds.top);
+}
+
+const sf::Vector2f Widget::getExactGlobalTopRight() const {
+	sf::FloatRect bounds = getExactGlobalBounds();
+	return sf::Vector2f(bounds.left + bounds.width, bounds.top);
+}
+
+const sf::Vector2f Widget::getExactGlobalBottomLeft() const {
+	sf::FloatRect bounds = getExactGlobalBounds();
+	return sf::Vector2f(bounds.left, bounds.top + bounds.height);
+}
+
+const sf::Vector2f Widget::getExactGlobalBottomRight() const {
+	sf::FloatRect bounds = getExactGlobalBounds();
 	return sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height);
 }
 
@@ -357,7 +389,10 @@ void Widget::updateVisibility() {
 }
 
 void Widget::updateRenderTexture() {
-	sf::FloatRect bounds = getGlobalBounds();
+	//if (name == "test text") {
+	//	std::cout << "";
+	//}
+	sf::FloatRect bounds = getExactGlobalBounds();
 	sf::Vector2f topLeft = bounds.getPosition();
 	sf::Vector2f bottomRight = bounds.getPosition() + bounds.getSize();
 	sf::Vector2f quantized_top_left = sf::Vector2f(floor(bounds.left), floor(bounds.top));
@@ -388,7 +423,7 @@ void Widget::render(sf::RenderTarget& target) {
 	update();
 	updateRenderTexture();
 	sf::Sprite sprite(render_texture.getTexture());
-	sf::Vector2f sprite_pos = utils::quantize(getGlobalTopLeft());
+	sf::Vector2f sprite_pos = utils::quantize(getExactGlobalTopLeft());
 	sprite.setPosition(sprite_pos);
 	target.draw(sprite);
 	for (size_t i = 0; i < children.size(); i++) {
@@ -537,16 +572,13 @@ TextWidget::TextWidget(WidgetList* widget_list) {
 
 sf::FloatRect TextWidget::getLocalBounds() const {
 	sf::FloatRect result;
-	sf::FloatRect local_bounds = getExactLocalBounds();
 	if (adjust_local_bounds) {
+		sf::FloatRect local_bounds = text.getLocalBounds();
 		float width = local_bounds.width;
 		float height = text.getCharacterSize();
 		result = sf::FloatRect(sf::Vector2f(), sf::Vector2f(width, height));
 	} else {
-		result = local_bounds;
-		sf::Vector2f pos = result.getPosition() - calcPositionOffset();
-		result.left = pos.x;
-		result.top = pos.y;
+		result = getExactLocalBounds();
 	}
 	return result;
 }
@@ -561,7 +593,19 @@ sf::FloatRect TextWidget::getGlobalBounds() const {
 }
 
 sf::FloatRect TextWidget::getExactLocalBounds() const {
-	return text.getLocalBounds();
+	sf::FloatRect result = text.getLocalBounds();
+	sf::Vector2f pos = result.getPosition() - calcPositionOffset();
+	result.left = pos.x;
+	result.top = pos.y;
+	return result;
+}
+
+sf::FloatRect TextWidget::getExactParentLocalBounds() const {
+	return text.getGlobalBounds();
+}
+
+sf::FloatRect TextWidget::getExactGlobalBounds() const {
+	return getParentGlobalTransform().transformRect(getExactParentLocalBounds());
 }
 
 const sf::Font* TextWidget::getFont() const {
@@ -672,7 +716,7 @@ sf::Transform TextWidget::getRenderTransform() const {
 }
 
 sf::Vector2f TextWidget::calcPositionOffset() const {
-	sf::FloatRect bounds = getExactLocalBounds();
+	sf::FloatRect bounds = text.getLocalBounds();
 	if (adjust_local_bounds) {
 		return sf::Vector2f(bounds.getPosition().x, 0.0f);
 	} else {

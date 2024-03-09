@@ -92,6 +92,9 @@ public:
 	virtual sf::FloatRect getLocalBounds() const = 0;
 	virtual sf::FloatRect getParentLocalBounds() const = 0;
 	virtual sf::FloatRect getGlobalBounds() const = 0;
+	virtual sf::FloatRect getExactLocalBounds() const;
+	virtual sf::FloatRect getExactParentLocalBounds() const;
+	virtual sf::FloatRect getExactGlobalBounds() const;
 	const sf::Vector2f& toGlobal(const sf::Vector2f& pos) const;
 	const sf::Vector2f& toLocal(const sf::Vector2f& pos) const;
 	sf::Vector2f getSize() const;
@@ -110,6 +113,10 @@ public:
 	const sf::Vector2f getGlobalTopRight() const;
 	const sf::Vector2f getGlobalBottomLeft() const;
 	const sf::Vector2f getGlobalBottomRight() const;
+	const sf::Vector2f getExactGlobalTopLeft() const;
+	const sf::Vector2f getExactGlobalTopRight() const;
+	const sf::Vector2f getExactGlobalBottomLeft() const;
+	const sf::Vector2f getExactGlobalBottomRight() const;
 	virtual const sf::Color& getFillColor() const = 0;
 	void setOrigin(Anchor anchor);
 	void setOrigin(float x, float y);
@@ -282,7 +289,9 @@ public:
 	sf::FloatRect getLocalBounds() const override;
 	sf::FloatRect getParentLocalBounds() const override;
 	sf::FloatRect getGlobalBounds() const override;
-	sf::FloatRect getExactLocalBounds() const;
+	sf::FloatRect getExactLocalBounds() const override;
+	sf::FloatRect getExactParentLocalBounds() const override;
+	sf::FloatRect getExactGlobalBounds() const override;
 	const sf::Font* getFont() const;
 	size_t getStringSize() const;
 	unsigned int getCharacterSize() const;
