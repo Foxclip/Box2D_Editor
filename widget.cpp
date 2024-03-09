@@ -524,10 +524,6 @@ const sf::Font* TextWidget::getFont() const {
 	return text.getFont();
 }
 
-const sf::String& TextWidget::getString() const {
-	return text.getString();
-}
-
 size_t TextWidget::getStringSize() const {
 	return text.getString().getSize();
 }
@@ -540,12 +536,16 @@ const sf::Color& TextWidget::getFillColor() const {
 	return text.getFillColor();
 }
 
-void TextWidget::setFont(const sf::Font& font) {
-	text.setFont(font);
+const sf::String& TextWidget::getString() const {
+	return text.getString();
 }
 
-void TextWidget::setString(const sf::String& string) {
-	text.setString(string);
+sf::Vector2f TextWidget::getCharPos(size_t index) const {
+	return text.findCharacterPos(index);
+}
+
+void TextWidget::setFont(const sf::Font& font) {
+	text.setFont(font);
 }
 
 void TextWidget::setCharacterSize(unsigned int size) {
@@ -558,6 +558,10 @@ void TextWidget::setFillColor(const sf::Color& color) {
 
 void TextWidget::setAdjustLocalBounds(bool value) {
 	adjust_local_bounds = value;
+}
+
+void TextWidget::setString(const sf::String& string) {
+	text.setString(string);
 }
 
 void TextWidget::insert(size_t pos, const sf::String& str) {
@@ -987,6 +991,7 @@ TextBoxWidget::TextBoxWidget(WidgetList* widget_list) {
 	cursor_widget->setParent(this);
 	cursor_widget->setName("cursor");
 	setValueSilent("Text");
+	cursor_pos = getStringSize();
 	updateColors();
 }
 
@@ -1022,12 +1027,20 @@ unsigned int TextBoxWidget::getCharacterSize() const {
 	return text_widget->getCharacterSize();
 }
 
-const std::string& TextBoxWidget::getValue() const {
+const sf::String& TextBoxWidget::getValue() const {
 	return text_widget->getString();
 }
 
 size_t TextBoxWidget::getStringSize() const {
 	return text_widget->getStringSize();
+}
+
+size_t TextBoxWidget::getCursorPos() const {
+	return cursor_pos;
+}
+
+sf::Vector2f TextBoxWidget::getCharPos(size_t index) const {
+	return text_widget->getCharPos(index);
 }
 
 void TextBoxWidget::setFillColor(const sf::Color& color) {
@@ -1055,15 +1068,6 @@ void TextBoxWidget::setEditorTextColor(const sf::Color& color) {
 	updateColors();
 }
 
-void TextBoxWidget::setValueSilent(const sf::String& value) {
-	text_widget->setString(value);
-}
-
-void TextBoxWidget::setValue(const sf::String& value) {
-	setValueSilent(value);
-	OnTextChanged(value);
-}
-
 void TextBoxWidget::setFont(const sf::Font& font) {
 	text_widget->setFont(font);
 }
@@ -1073,12 +1077,24 @@ void TextBoxWidget::setCharacterSize(unsigned int size) {
 	cursor_widget->setSize(sf::Vector2f(1.0f, size));
 }
 
+void TextBoxWidget::setValue(const sf::String& value) {
+	setValueSilent(value);
+	OnTextChanged(value);
+}
+
+void TextBoxWidget::setCursorPos(size_t pos) {
+	pos = std::clamp(pos, (size_t)0, getStringSize());
+	this->cursor_pos = pos;
+}
+
 void TextBoxWidget::insert(size_t pos, const sf::String& str) {
-	text_widget->insert(pos, str);
+	insertSilent(pos, str);
+	OnTextChanged(getValue());
 }
 
 void TextBoxWidget::erase(size_t index_first, size_t count) {
-	text_widget->erase(index_first, count);
+	eraseSilent(index_first, count);
+	OnTextChanged(getValue());
 }
 
 void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
@@ -1087,22 +1103,41 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 			case sf::Keyboard::Escape:
 				widget_list->setFocusedWidget(nullptr);
 				break;
+			case sf::Keyboard::Left:
+				if (cursor_pos > 0) {
+					cursor_pos--;
+				}
+				break;
+			case sf::Keyboard::Right:
+				if (cursor_pos < getStringSize()) {
+					cursor_pos++;
+				}
+				break;
 		}
 	} else if (event.type == sf::Event::TextEntered) {
 		sf::Uint32 code = event.text.unicode;
 		logger << "TextEntered: " << code << "\n";
 		switch (code) {
-			case '\b': erase(getStringSize() - 1, 1); break;
-			case '\r': break;
-			default: insert(getStringSize(), sf::String(code)); break;
+			case '\b':
+				if (cursor_pos > 0) {
+					erase(cursor_pos - 1, 1);
+					cursor_pos--;
+				}
+				break;
+			case '\r':
+				break;
+			default:
+				insert(cursor_pos, sf::String(code));
+				cursor_pos++;
+				break;
 		}
 	}
 }
 
 void TextBoxWidget::update() {
 	Widget::update();
-	sf::Vector2f cursor_pos = text_widget->getTopRight() + cursor_offset;
-	cursor_widget->setPosition(cursor_pos);
+	sf::Vector2f cursor_widget_pos = getCharPos(cursor_pos);
+	cursor_widget->setPosition(cursor_widget_pos);
 }
 
 void TextBoxWidget::updateColors() {
@@ -1158,4 +1193,16 @@ void TextBoxWidget::internalOnMouseExit(const sf::Vector2f& pos) {
 	if (!edit_mode) {
 		updateColors();
 	}
+}
+
+void TextBoxWidget::setValueSilent(const sf::String& value) {
+	text_widget->setString(value);
+}
+
+void TextBoxWidget::insertSilent(size_t pos, const sf::String& str) {
+	text_widget->insert(pos, str);
+}
+
+void TextBoxWidget::eraseSilent(size_t index_first, size_t count) {
+	text_widget->erase(index_first, count);
 }

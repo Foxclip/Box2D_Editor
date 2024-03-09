@@ -33,6 +33,7 @@ int main() {
     execute_app();
 
     // TODO: text box widget
+    // TODO: move warning about missing font from internalOnSetParent to onTryRender
     // TODO: change (*it). to it->
     // TODO: SearchIndex for widget children
     // TODO: render polygon indices

@@ -277,15 +277,16 @@ public:
 	sf::FloatRect getGlobalBounds() const override;
 	sf::FloatRect getExactLocalBounds() const;
 	const sf::Font* getFont() const;
-	const sf::String& getString() const;
 	size_t getStringSize() const;
 	unsigned int getCharacterSize() const;
 	const sf::Color& getFillColor() const override;
+	const sf::String& getString() const;
+	sf::Vector2f getCharPos(size_t index) const;
 	void setFont(const sf::Font& font);
-	void setString(const sf::String& string);
 	void setCharacterSize(unsigned int size);
 	void setFillColor(const sf::Color& color) override;
 	void setAdjustLocalBounds(bool value);
+	void setString(const sf::String& string);
 	void insert(size_t pos, const sf::String& str);
 	void erase(size_t index_first, size_t count = 1);
 
@@ -319,17 +320,19 @@ public:
 	const sf::Color& getEditorTextColor() const;
 	const sf::Font* getFont() const;
 	unsigned int getCharacterSize() const;
-	const std::string& getValue() const;
+	const sf::String& getValue() const;
 	size_t getStringSize() const;
+	size_t getCursorPos() const;
+	sf::Vector2f getCharPos(size_t index) const;
 	void setFillColor(const sf::Color& color) override;
 	void setHighlightColor(const sf::Color& color);
 	void setTextColor(const sf::Color& color);
 	void setEditorColor(const sf::Color& color);
 	void setEditorTextColor(const sf::Color& color);
-	void setValueSilent(const sf::String& value);
-	void setValue(const sf::String& value);
 	void setFont(const sf::Font& font);
 	void setCharacterSize(unsigned int size);
+	void setValue(const sf::String& value);
+	void setCursorPos(size_t pos);
 	void insert(size_t pos, const sf::String& str);
 	void erase(size_t index_first, size_t count);
 	void processKeyboardEvent(const sf::Event& event);
@@ -343,12 +346,16 @@ protected:
 	void internalOnFocusLost() override;
 	void internalOnMouseEnter(const sf::Vector2f& pos) override;
 	void internalOnMouseExit(const sf::Vector2f& pos) override;
+	void setValueSilent(const sf::String& value);
+	void insertSilent(size_t pos, const sf::String& str);
+	void eraseSilent(size_t index_first, size_t count);
 
 private:
 	const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(40.0f, 20.0f);
 	TextWidget* text_widget = nullptr;
 	RectangleWidget* cursor_widget = nullptr;
 	sf::Vector2f cursor_offset = sf::Vector2f(1.0f, 0.0f);
+	size_t cursor_pos = 0;
 	bool edit_mode = false;
 	bool highlighted = false;
 	sf::Color background_color = sf::Color(50, 50, 50);
