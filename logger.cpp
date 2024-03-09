@@ -24,6 +24,13 @@ Logger& Logger::operator<<(int value) {
 	return writeInt(value);
 }
 
+Logger& Logger::operator<<(unsigned int value) {
+	if (!logger.is_active) {
+		return *this;
+	}
+	return writeUnsignedInt(value);
+}
+
 Logger& Logger::operator<<(std::size_t value) {
 	if (!logger.is_active) {
 		return *this;
@@ -101,6 +108,10 @@ Logger& Logger::writeNewLine() {
 }
 
 Logger& Logger::writeInt(int value) {
+	return writeString(std::to_string(value));
+}
+
+Logger& Logger::writeUnsignedInt(unsigned int value) {
 	return writeString(std::to_string(value));
 }
 

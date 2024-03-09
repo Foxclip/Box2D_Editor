@@ -524,8 +524,12 @@ const sf::Font* TextWidget::getFont() const {
 	return text.getFont();
 }
 
-const std::string& TextWidget::getString() const {
+const sf::String& TextWidget::getString() const {
 	return text.getString();
+}
+
+size_t TextWidget::getStringSize() const {
+	return text.getString().getSize();
 }
 
 unsigned int TextWidget::getCharacterSize() const {
@@ -540,7 +544,7 @@ void TextWidget::setFont(const sf::Font& font) {
 	text.setFont(font);
 }
 
-void TextWidget::setString(const std::string& string) {
+void TextWidget::setString(const sf::String& string) {
 	text.setString(string);
 }
 
@@ -554,6 +558,24 @@ void TextWidget::setFillColor(const sf::Color& color) {
 
 void TextWidget::setAdjustLocalBounds(bool value) {
 	adjust_local_bounds = value;
+}
+
+void TextWidget::insert(size_t pos, const sf::String& str) {
+	assert(pos >= 0 && pos <= getStringSize());
+	sf::String new_str = text.getString();
+	new_str.insert(pos, str);
+	text.setString(new_str);
+}
+
+void TextWidget::erase(size_t index_first, size_t count) {
+	if (text.getString().isEmpty()) {
+		return;
+	}
+	size_t index_last = index_first + count - 1;
+	assert(index_first >= 0 && index_last < getStringSize());
+	sf::String str = text.getString();
+	str.erase(index_first, count);
+	text.setString(str);
 }
 
 sf::Drawable& TextWidget::getDrawable() {
@@ -1004,6 +1026,10 @@ const std::string& TextBoxWidget::getValue() const {
 	return text_widget->getString();
 }
 
+size_t TextBoxWidget::getStringSize() const {
+	return text_widget->getStringSize();
+}
+
 void TextBoxWidget::setFillColor(const sf::Color& color) {
 	this->background_color = color;
 	updateColors();
@@ -1029,11 +1055,11 @@ void TextBoxWidget::setEditorTextColor(const sf::Color& color) {
 	updateColors();
 }
 
-void TextBoxWidget::setValueSilent(const std::string& value) {
+void TextBoxWidget::setValueSilent(const sf::String& value) {
 	text_widget->setString(value);
 }
 
-void TextBoxWidget::setValue(const std::string& value) {
+void TextBoxWidget::setValue(const sf::String& value) {
 	setValueSilent(value);
 	OnTextChanged(value);
 }
@@ -1047,12 +1073,28 @@ void TextBoxWidget::setCharacterSize(unsigned int size) {
 	cursor_widget->setSize(sf::Vector2f(1.0f, size));
 }
 
+void TextBoxWidget::insert(size_t pos, const sf::String& str) {
+	text_widget->insert(pos, str);
+}
+
+void TextBoxWidget::erase(size_t index_first, size_t count) {
+	text_widget->erase(index_first, count);
+}
+
 void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		switch (event.key.code) {
 			case sf::Keyboard::Escape:
 				widget_list->setFocusedWidget(nullptr);
 				break;
+		}
+	} else if (event.type == sf::Event::TextEntered) {
+		sf::Uint32 code = event.text.unicode;
+		logger << "TextEntered: " << code << "\n";
+		switch (code) {
+			case '\b': erase(getStringSize() - 1, 1); break;
+			case '\r': break;
+			default: insert(getStringSize(), sf::String(code)); break;
 		}
 	}
 }

@@ -277,14 +277,17 @@ public:
 	sf::FloatRect getGlobalBounds() const override;
 	sf::FloatRect getExactLocalBounds() const;
 	const sf::Font* getFont() const;
-	const std::string& getString() const;
+	const sf::String& getString() const;
+	size_t getStringSize() const;
 	unsigned int getCharacterSize() const;
 	const sf::Color& getFillColor() const override;
 	void setFont(const sf::Font& font);
-	void setString(const std::string& string);
+	void setString(const sf::String& string);
 	void setCharacterSize(unsigned int size);
 	void setFillColor(const sf::Color& color) override;
 	void setAdjustLocalBounds(bool value);
+	void insert(size_t pos, const sf::String& str);
+	void erase(size_t index_first, size_t count = 1);
 
 protected:
 	bool adjust_local_bounds = true;
@@ -304,7 +307,7 @@ private:
 class TextBoxWidget : public RectangleWidget {
 public:
 	std::function<void(bool)> OnEditModeToggle = [](bool new_value) { };
-	std::function<void(const std::string&)> OnTextChanged = [](const std::string& new_value) { };
+	std::function<void(const sf::String&)> OnTextChanged = [](const sf::String& new_value) { };
 
 	TextBoxWidget();
 	TextBoxWidget(WidgetList* widget_list);
@@ -317,15 +320,18 @@ public:
 	const sf::Font* getFont() const;
 	unsigned int getCharacterSize() const;
 	const std::string& getValue() const;
+	size_t getStringSize() const;
 	void setFillColor(const sf::Color& color) override;
 	void setHighlightColor(const sf::Color& color);
 	void setTextColor(const sf::Color& color);
 	void setEditorColor(const sf::Color& color);
 	void setEditorTextColor(const sf::Color& color);
-	void setValueSilent(const std::string& value);
-	void setValue(const std::string& value);
+	void setValueSilent(const sf::String& value);
+	void setValue(const sf::String& value);
 	void setFont(const sf::Font& font);
 	void setCharacterSize(unsigned int size);
+	void insert(size_t pos, const sf::String& str);
+	void erase(size_t index_first, size_t count);
 	void processKeyboardEvent(const sf::Event& event);
 
 protected:

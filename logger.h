@@ -11,6 +11,7 @@ public:
 	Logger& operator<<(const char* value);
 	Logger& operator<<(std::string value);
 	Logger& operator<<(int value);
+	Logger& operator<<(unsigned int value);
 	Logger& operator<<(size_t value);
 	Logger& operator<<(ptrdiff_t value);
 	Logger& operator<<(float value);
@@ -31,6 +32,7 @@ private:
 	Logger& writeToLineBuffer(std::string value);
 	Logger& writeNewLine();
 	Logger& writeInt(int value);
+	Logger& writeUnsignedInt(unsigned int value);
 	Logger& writeInt(float value);
 	Logger& writeInt(double value);
 	Logger& writeSizet(size_t value);
