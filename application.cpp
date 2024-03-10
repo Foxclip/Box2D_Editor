@@ -451,18 +451,22 @@ void Application::init_widgets() {
     logger_text_widget->setParent(logger_widget);
 
     //RectangleWidget* rect = widgets.createWidget<RectangleWidget>();
-    //rect->setFillColor(sf::Color::Red);
+    //rect->setFillColor(sf::Color::Black);
     //rect->setSize(sf::Vector2f(100.0f, 100.0f));
-    //rect->setPosition(0.2f, 0.0f);
-    //rect->setName("red rect");
-    //rect->debug_id = 0;
+    //rect->setPosition(0.0f, 0.5f);
+    //rect->setName("black rect");
 
     //TextWidget* text = widgets.createWidget<TextWidget>();
     //text->setCharacterSize(15);
     //text->setFont(textbox_font);
-    //text->setString("Texty");
-    //text->setPosition(0.0f, 0.0f);
+    //text->setString("Text");
+    //text->setParentAnchor(Widget::CENTER_LEFT);
+    //text->setOrigin(0.0f, 7.0f);
+    //text->setAnchorOffset(2.0f, 0.0f);
     //text->setName("test text");
+    ////text->setParent(rect);
+    //Widget* textbox = widgets.find("textbox");
+    //text->setParent(textbox);
 
 }
 

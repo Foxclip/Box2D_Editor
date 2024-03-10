@@ -394,4 +394,13 @@ namespace utils {
 		}
 	}
 
+	void quantize_position(sf::Transform& transform) {
+		float x_pos = transform.getMatrix()[12];
+		float y_pos = transform.getMatrix()[13];
+		float x_offset = x_pos - floor(x_pos);
+		float y_offset = y_pos - floor(y_pos);
+		sf::Vector2f subpixel_offset = sf::Vector2f(x_offset, y_offset);
+		transform.translate(-subpixel_offset);
+	}
+
 }

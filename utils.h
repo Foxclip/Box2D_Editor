@@ -37,6 +37,7 @@ namespace utils {
 	std::string char_to_str(char c);
 	std::string char_to_esc(std::string str);
 	std::string esc_to_char(std::string str);
+	void quantize_position(sf::Transform& transform);
 
 	template <typename TVec2>
 	TVec2 get_circle_vertex(ptrdiff_t index, size_t point_count, float radius, float offset = 0.0f) {

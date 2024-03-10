@@ -21,6 +21,10 @@ void Widget::updateMouseState() {
 	}
 }
 
+bool Widget::isVisualPositionQuantized() const {
+	return false;
+}
+
 WidgetVisibility Widget::checkVisibility() const {
 	WidgetVisibility v;
 	sf::FloatRect global_bounds = getGlobalBounds();
@@ -338,8 +342,8 @@ void Widget::removeFocus() {
 
 void Widget::processKeyboardEvent(const sf::Event& event) { }
 
-sf::Transform Widget::getRenderTransform() const {
-	return sf::Transform::Identity;
+sf::Vector2f Widget::getRenderPositionOffset() const {
+	return sf::Vector2f(0.0f, 0.0f);
 }
 
 void Widget::update() {
@@ -388,12 +392,12 @@ void Widget::updateVisibility() {
 	visibility = checkVisibility();
 }
 
-void Widget::updateRenderTexture() {
+sf::Vector2f Widget::updateRenderTexture() {
 	sf::FloatRect bounds = getExactGlobalBounds();
-	sf::Vector2f topLeft = bounds.getPosition();
-	sf::Vector2f bottomRight = bounds.getPosition() + bounds.getSize();
-	sf::Vector2f quantized_top_left = sf::Vector2f(floor(bounds.left), floor(bounds.top));
-	sf::Vector2f quantized_bottom_right = sf::Vector2f(ceil(bounds.left + bounds.width), ceil(bounds.top + bounds.height));
+	sf::Vector2f top_left = bounds.getPosition();
+	sf::Vector2f bottom_right = top_left + bounds.getSize();
+	sf::Vector2f quantized_top_left = sf::Vector2f(floor(top_left.x), floor(top_left.y));
+	sf::Vector2f quantized_bottom_right = sf::Vector2f(ceil(bottom_right.x), ceil(bottom_right.y));
 	float quantized_width = quantized_bottom_right.x - quantized_top_left.x;
 	float quantized_height = quantized_bottom_right.y - quantized_top_left.y;
 	sf::FloatRect texture_bounds = sf::FloatRect(quantized_top_left, sf::Vector2f(quantized_width, quantized_height));
@@ -402,17 +406,28 @@ void Widget::updateRenderTexture() {
 	if (non_zero && not_same) {
 		render_texture.create(texture_bounds.width, texture_bounds.height);
 	}
-	sf::Transform transform = getTransformable().getTransform();
-	sf::Transform render_transform = getRenderTransform();
 	sf::Transform parent_transform = getParentGlobalTransform();
-	sf::Transform combined = render_transform * parent_transform;
+	sf::Transform combined(parent_transform);
+	sf::Vector2f local_origin = getOrigin();
+	sf::Vector2f global_origin = toGlobal(local_origin);
+	sf::Vector2f global_position = getGlobalPosition();
+	sf::Vector2f global_origin_offset = global_position - global_origin;
+	sf::Vector2f render_position_offset = getRenderPositionOffset();
+	sf::Vector2f position_offset = global_origin_offset + render_position_offset;
+	combined.translate(position_offset);
+	if (isVisualPositionQuantized()) {
+		utils::quantize_position(combined);
+	}
 	render_view.setSize(texture_bounds.getSize());
 	sf::Vector2f texture_bounds_center = texture_bounds.getPosition() + texture_bounds.getSize() / 2.0f;
 	render_view.setCenter(texture_bounds_center);
 	render_texture.setView(render_view);
 	render_texture.clear(sf::Color::Transparent);
+	getTransformable().setOrigin(sf::Vector2f());
 	render_texture.draw(getDrawable(), combined);
+	getTransformable().setOrigin(local_origin);
 	render_texture.display();
+	return texture_bounds.getPosition();
 }
 
 void Widget::render(sf::RenderTarget& target) {
@@ -420,9 +435,8 @@ void Widget::render(sf::RenderTarget& target) {
 		return;
 	}
 	update();
-	updateRenderTexture();
+	sf::Vector2f sprite_pos = updateRenderTexture();
 	sf::Sprite sprite(render_texture.getTexture());
-	sf::Vector2f sprite_pos = utils::quantize(getExactGlobalTopLeft());
 	sprite.setPosition(sprite_pos);
 	target.draw(sprite);
 	for (size_t i = 0; i < children.size(); i++) {
@@ -569,6 +583,10 @@ TextWidget::TextWidget(WidgetList* widget_list) {
 	setName("text");
 }
 
+bool TextWidget::isVisualPositionQuantized() const {
+	return true;
+}
+
 sf::FloatRect TextWidget::getLocalBounds() const {
 	sf::FloatRect result;
 	if (adjust_local_bounds) {
@@ -592,13 +610,11 @@ sf::FloatRect TextWidget::getGlobalBounds() const {
 }
 
 sf::FloatRect TextWidget::getExactLocalBounds() const {
-	sf::FloatRect result = text.getLocalBounds();
-	if (!adjust_local_bounds) {
-		sf::Vector2f pos = result.getPosition() - calcPositionOffset();
-		result.left = pos.x;
-		result.top = pos.y;
-	}
-	return result;
+	sf::FloatRect local_bounds = text.getLocalBounds();
+	sf::Vector2f offset = getRenderPositionOffset();
+	sf::Vector2f offset_pos = local_bounds.getPosition() + offset;
+	sf::FloatRect offset_bounds = sf::FloatRect(offset_pos, local_bounds.getSize());
+	return offset_bounds;
 }
 
 sf::FloatRect TextWidget::getExactParentLocalBounds() const {
@@ -700,29 +716,16 @@ const sf::Transformable& TextWidget::getTransformable() const {
 	return text;
 }
 
-sf::Transform TextWidget::getRenderTransform() const {
+sf::Vector2f TextWidget::getRenderPositionOffset() const {
 	// local bounds can be offset from origin
-	sf::Vector2f offset = calcPositionOffset();
-	sf::Transform result = sf::Transform::Identity;
-	result.translate(-offset);
-	// quantize pixel coordinates so letters are not dancing even without smoothiing
-	sf::Transform global_tr = getGlobalTransform();
-	float x_pos = global_tr.getMatrix()[12];
-	float y_pos = global_tr.getMatrix()[13];
-	float x_offset = x_pos - floor(x_pos);
-	float y_offset = y_pos - floor(y_pos);
-	sf::Vector2f subpixel_offset = sf::Vector2f(x_offset, y_offset);
-	result.translate(-subpixel_offset);
-	return result;
-}
-
-sf::Vector2f TextWidget::calcPositionOffset() const {
+	sf::Vector2f offset;
 	sf::FloatRect bounds = text.getLocalBounds();
 	if (adjust_local_bounds) {
-		return sf::Vector2f(bounds.getPosition().x, 0.0f);
+		offset = sf::Vector2f(bounds.getPosition().x, 0.0f);
 	} else {
-		return bounds.getPosition();
+		offset = bounds.getPosition();
 	}
+	return -offset;
 }
 
 ContainerWidget::ContainerWidget() { }
@@ -1012,6 +1015,10 @@ Widget* WidgetList::getRootWidget() const {
 
 Widget* WidgetList::getFocusedWidget() const {
 	return focused_widget;
+}
+
+Widget* WidgetList::find(const std::string& name) const {
+	return root_widget->find(name);
 }
 
 void WidgetList::processClick(const sf::Vector2f pos) {

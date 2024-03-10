@@ -78,6 +78,7 @@ public:
 
 	bool isMouseOver() const;
 	void updateMouseState();
+	virtual bool isVisualPositionQuantized() const;
 	WidgetVisibility checkVisibility() const;
 	void processClick(const sf::Vector2f& pos);
 	void processRelease(const sf::Vector2f& pos);
@@ -164,7 +165,7 @@ protected:
 	virtual const sf::Drawable& getDrawable() const = 0;
 	virtual sf::Transformable& getTransformable() = 0;
 	virtual const sf::Transformable& getTransformable() const = 0;
-	virtual sf::Transform getRenderTransform() const;
+	virtual sf::Vector2f getRenderPositionOffset() const;
 	virtual void update();
 	virtual void internalOnSetParent(Widget* parent);
 	virtual void internalOnClick(const sf::Vector2f& pos);
@@ -181,7 +182,7 @@ private:
 	std::string calcFullName() const;
 	void updateFullName();
 	void updateVisibility();
-	void updateRenderTexture();
+	sf::Vector2f updateRenderTexture();
 
 };
 
@@ -286,6 +287,7 @@ class TextWidget : public Widget {
 public:
 	TextWidget();
 	TextWidget(WidgetList* widget_list);
+	bool isVisualPositionQuantized() const override;
 	sf::FloatRect getLocalBounds() const override;
 	sf::FloatRect getParentLocalBounds() const override;
 	sf::FloatRect getGlobalBounds() const override;
@@ -314,11 +316,10 @@ protected:
 	const sf::Drawable& getDrawable() const override;
 	sf::Transformable& getTransformable() override;
 	const sf::Transformable& getTransformable() const override;
-	sf::Transform getRenderTransform() const;
+	sf::Vector2f getRenderPositionOffset() const override;
 
 private:
 	sf::Text text;
-	sf::Vector2f calcPositionOffset() const;
 
 };
 
@@ -395,6 +396,7 @@ public:
 	bool isReleaseBlocked() const;
 	Widget* getRootWidget() const;
 	Widget* getFocusedWidget() const;
+	Widget* find(const std::string& name) const;
 	template<typename T>
 	requires std::derived_from<T, Widget>
 	T* createWidget();
