@@ -86,6 +86,7 @@ public:
 	bool isFocused() const;
 	const std::string& getName() const;
 	const std::string& getFullName() const;
+	bool getClipChildren() const;
 	Widget* getParent() const;
 	CompoundVector<Widget*> getParentChain() const;
 	const CompoundVector<Widget*>& getChildren() const;
@@ -134,6 +135,7 @@ public:
 	void setParentSilent(Widget* new_parent);
 	void setParent(Widget* new_parent);
 	void setName(const std::string& name);
+	void setClipChildren(bool value);
 	void removeFocus();
 	virtual void processKeyboardEvent(const sf::Event& event);
 	void render(sf::RenderTarget& target);
@@ -154,6 +156,7 @@ protected:
 	sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);
 	bool visible = true;
 	bool click_through = true;
+	bool clip_children = false;
 	bool mouseIn = false;
 
 	sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size);
@@ -205,6 +208,7 @@ class RectangleWidget : public ShapeWidget {
 public:
 	RectangleWidget();
 	RectangleWidget(WidgetList* widget_list);
+	void setSize(float width, float height);
 	void setSize(const sf::Vector2f& size);
 
 protected:

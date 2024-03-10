@@ -403,4 +403,15 @@ namespace utils {
 		transform.translate(-subpixel_offset);
 	}
 
+	sf::FloatRect quantize_rect(const sf::FloatRect& rect) {
+		sf::Vector2f top_left = rect.getPosition();
+		sf::Vector2f bottom_right = top_left + rect.getSize();
+		sf::Vector2f quantized_top_left = sf::Vector2f(floor(top_left.x), floor(top_left.y));
+		sf::Vector2f quantized_bottom_right = sf::Vector2f(floor(bottom_right.x), floor(bottom_right.y));
+		float quantized_width = quantized_bottom_right.x - quantized_top_left.x;
+		float quantized_height = quantized_bottom_right.y - quantized_top_left.y;
+		sf::FloatRect quantized_bounds(quantized_top_left, sf::Vector2f(quantized_width, quantized_height));
+		return quantized_bounds;
+	}
+
 }

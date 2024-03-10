@@ -94,6 +94,10 @@ const std::string& Widget::getFullName() const {
 	return full_name;
 }
 
+bool Widget::getClipChildren() const {
+	return clip_children;
+}
+
 Widget* Widget::getParent() const {
 	return parent;
 }
@@ -334,6 +338,10 @@ void Widget::setName(const std::string& name) {
 	updateFullName();
 }
 
+void Widget::setClipChildren(bool value) {
+	this->clip_children = value;
+}
+
 void Widget::removeFocus() {
 	if (isFocused()) {
 		widget_list->setFocusedWidget(nullptr);
@@ -394,13 +402,7 @@ void Widget::updateVisibility() {
 
 sf::Vector2f Widget::updateRenderTexture() {
 	sf::FloatRect bounds = getExactGlobalBounds();
-	sf::Vector2f top_left = bounds.getPosition();
-	sf::Vector2f bottom_right = top_left + bounds.getSize();
-	sf::Vector2f quantized_top_left = sf::Vector2f(floor(top_left.x), floor(top_left.y));
-	sf::Vector2f quantized_bottom_right = sf::Vector2f(ceil(bottom_right.x), ceil(bottom_right.y));
-	float quantized_width = quantized_bottom_right.x - quantized_top_left.x;
-	float quantized_height = quantized_bottom_right.y - quantized_top_left.y;
-	sf::FloatRect texture_bounds = sf::FloatRect(quantized_top_left, sf::Vector2f(quantized_width, quantized_height));
+	sf::FloatRect texture_bounds = utils::quantize_rect(bounds);
 	bool non_zero = texture_bounds.width > 0 && texture_bounds.height > 0;
 	bool not_same = texture_bounds.width != render_texture.getSize().x || texture_bounds.height != render_texture.getSize().y;
 	if (non_zero && not_same) {
@@ -436,7 +438,23 @@ void Widget::render(sf::RenderTarget& target) {
 	}
 	update();
 	sf::Vector2f sprite_pos = updateRenderTexture();
-	sf::Sprite sprite(render_texture.getTexture());
+	sf::FloatRect texture_rect;
+	sf::Sprite sprite;
+	if (parent && parent->clip_children) {
+		sf::FloatRect global_bounds = getExactGlobalBounds();
+		sf::FloatRect parent_global_bounds = parent->getExactGlobalBounds();
+		sf::FloatRect intersection;
+		bool intersects = global_bounds.intersects(parent_global_bounds, intersection);
+		if (!intersects) {
+			return;
+		}
+		sf::FloatRect quantized_intersection = utils::quantize_rect(intersection);
+		sf::Vector2f texture_rect_pos = quantized_intersection.getPosition() - sprite_pos;
+		texture_rect = sf::FloatRect(texture_rect_pos, quantized_intersection.getSize());
+		sprite = sf::Sprite(render_texture.getTexture(), sf::IntRect(texture_rect));
+	} else {
+		sprite = sf::Sprite(render_texture.getTexture());
+	}
 	sprite.setPosition(sprite_pos);
 	target.draw(sprite);
 	for (size_t i = 0; i < children.size(); i++) {
@@ -545,6 +563,10 @@ RectangleWidget::RectangleWidget() { }
 RectangleWidget::RectangleWidget(WidgetList* widget_list) {
 	this->widget_list = widget_list;
 	setName("rectangle");
+}
+
+void RectangleWidget::setSize(float width, float height) {
+	setSize(sf::Vector2f(width, height));
 }
 
 void RectangleWidget::setSize(const sf::Vector2f& size) {
@@ -1089,6 +1111,7 @@ TextBoxWidget::TextBoxWidget(WidgetList* widget_list) {
 	this->widget_list = widget_list;
 	setSize(DEFAULT_SIZE);
 	setName("textbox");
+	setClipChildren(true);
 	text_widget = widget_list->createWidget<TextWidget>();
 	text_widget->setFillColor(text_color);
 	text_widget->setParentAnchor(CENTER_LEFT);

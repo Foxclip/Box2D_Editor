@@ -337,7 +337,7 @@ void Application::init_widgets() {
         parameter_widget->setName(name);
         TextWidget* parameter_text_widget = widgets.createWidget<TextWidget>();
         parameter_text_widget->setFont(ui_font);
-        parameter_text_widget->setCharacterSize(15);
+        parameter_text_widget->setCharacterSize(16);
         parameter_text_widget->setString(text);
         parameter_text_widget->setParent(parameter_widget);
         RectangleWidget* spacing_widget = widgets.createWidget<RectangleWidget>();
@@ -363,7 +363,9 @@ void Application::init_widgets() {
         ContainerWidget* name_parameter_widget = create_parameter_widget("name parameter", "Name:");
         TextBoxWidget* textbox_widget = widgets.createWidget<TextBoxWidget>();
         textbox_widget->setFont(textbox_font);
+        textbox_widget->setSize(40.0f, 20.0f);
         textbox_widget->setCharacterSize(15);
+        textbox_widget->setValue("<name>");
         textbox_widget->setParent(name_parameter_widget);
     }
 
@@ -440,6 +442,7 @@ void Application::init_widgets() {
     logger_widget->setSize(sf::Vector2f(500.0f, 20.0f));
     logger_widget->setOrigin(Widget::BOTTOM_LEFT);
     logger_widget->setParentAnchor(Widget::BOTTOM_LEFT);
+    logger_widget->setClipChildren(true);
     logger_widget->setName("logger");
     logger_text_widget = widgets.createWidget<TextWidget>();
     logger_text_widget->setFont(console_font);
