@@ -1217,35 +1217,50 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 			case sf::Keyboard::Enter:
 				setEditMode(!edit_mode);
 				break;
-			case sf::Keyboard::Left:
-				if (edit_mode && cursor_pos > 0) {
-					setCursorPos(cursor_pos - 1);
-				}
-				break;
-			case sf::Keyboard::Right:
-				if (edit_mode && cursor_pos < getStringSize()) {
-					setCursorPos(cursor_pos + 1);
-				}
-				break;
+		}
+		if (edit_mode) {
+			switch (event.key.code) {
+				case sf::Keyboard::Left:
+					if (cursor_pos > 0) {
+						setCursorPos(cursor_pos - 1);
+					}
+					break;
+				case sf::Keyboard::Right:
+					if (cursor_pos < getStringSize()) {
+						setCursorPos(cursor_pos + 1);
+					}
+					break;
+				case sf::Keyboard::Home:
+					setCursorPos(0);
+					break;
+				case sf::Keyboard::End:
+					setCursorPos(getStringSize());
+					break;
+				case sf::Keyboard::Delete:
+					if (cursor_pos < getStringSize()) {
+						erase(cursor_pos, 1);
+					}
+					break;
+			}
 		}
 	} else if (event.type == sf::Event::TextEntered) {
-		sf::Uint32 code = event.text.unicode;
-		switch (code) {
-			case '\n':
-			case '\r':
-				break;
-			case '\b':
-				if (edit_mode && cursor_pos > 0) {
-					erase(cursor_pos - 1, 1);
-					setCursorPos(cursor_pos - 1);
-				}
-				break;
-			default:
-				if (edit_mode) {
+		if (edit_mode) {
+			sf::Uint32 code = event.text.unicode;
+			switch (code) {
+				case '\n':
+				case '\r':
+					break;
+				case '\b':
+					if (cursor_pos > 0) {
+						erase(cursor_pos - 1, 1);
+						setCursorPos(cursor_pos - 1);
+					}
+					break;
+				default:
 					insert(cursor_pos, sf::String(code));
 					setCursorPos(cursor_pos + 1);
-				}
-				break;
+					break;
+			}
 		}
 	}
 }
