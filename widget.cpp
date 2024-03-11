@@ -175,6 +175,10 @@ float Widget::getGlobalHeight() const {
 	return getGlobalBounds().height;
 }
 
+sf::Vector2f Widget::getAnchorOffset() const {
+	return anchor_offset;
+}
+
 const sf::Vector2f& Widget::getOrigin() const {
 	return getTransformable().getOrigin();
 }
@@ -449,13 +453,15 @@ void Widget::render(sf::RenderTarget& target) {
 			return;
 		}
 		sf::FloatRect quantized_intersection = utils::quantize_rect(intersection);
-		sf::Vector2f texture_rect_pos = quantized_intersection.getPosition() - sprite_pos;
+		sf::Vector2f quantized_intersection_pos = quantized_intersection.getPosition();
+		sf::Vector2f texture_rect_pos = quantized_intersection_pos - sprite_pos;
 		texture_rect = sf::FloatRect(texture_rect_pos, quantized_intersection.getSize());
 		sprite = sf::Sprite(render_texture.getTexture(), sf::IntRect(texture_rect));
+		sprite.setPosition(quantized_intersection_pos);
 	} else {
 		sprite = sf::Sprite(render_texture.getTexture());
+		sprite.setPosition(sprite_pos);
 	}
-	sprite.setPosition(sprite_pos);
 	target.draw(sprite);
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->render(target);
@@ -667,8 +673,25 @@ const sf::String& TextWidget::getString() const {
 	return text.getString();
 }
 
-sf::Vector2f TextWidget::getCharPos(size_t index) const {
-	return text.findCharacterPos(index);
+sf::Vector2f TextWidget::getLocalCharPos(size_t index, bool top_aligned) const {
+	sf::Vector2f parent_local_char_pos = text.findCharacterPos(index);
+	sf::Vector2f local_char_pos = getTransformable().getInverseTransform() * parent_local_char_pos;
+	if (top_aligned) {
+		return sf::Vector2f(local_char_pos.x, 0.0f);
+	} else {
+		return local_char_pos;
+	}
+}
+
+sf::Vector2f TextWidget::getParentLocalCharPos(size_t index, bool top_aligned) const {
+	if (top_aligned) {
+		sf::Vector2f local_char_pos = getLocalCharPos(index, true);
+		sf::Vector2f parent_local_char_pos = getTransformable().getTransform() * local_char_pos;
+		return parent_local_char_pos;
+	} else {
+		sf::Vector2f parent_local_char_pos = text.findCharacterPos(index);
+		return parent_local_char_pos;
+	}
 }
 
 size_t TextWidget::getCharAt(const sf::Vector2f& pos) const {
@@ -1115,7 +1138,7 @@ TextBoxWidget::TextBoxWidget(WidgetList* widget_list) {
 	text_widget = widget_list->createWidget<TextWidget>();
 	text_widget->setFillColor(text_color);
 	text_widget->setParentAnchor(CENTER_LEFT);
-	text_widget->setAnchorOffset(TEXT_OFFSET);
+	text_widget->setAnchorOffset(TEXT_VIEW_ZERO_POS);
 	text_widget->setOrigin(CENTER_LEFT);
 	text_widget->setParent(this);
 	cursor_widget = widget_list->createWidget<RectangleWidget>();
@@ -1173,8 +1196,9 @@ size_t TextBoxWidget::getCursorPos() const {
 	return cursor_pos;
 }
 
-sf::Vector2f TextBoxWidget::getCharPos(size_t index) const {
-	return text_widget->getCharPos(index);
+sf::Vector2f TextBoxWidget::getLocalCharPos(size_t index, bool top_aligned) const {
+	sf::Vector2f local_pos = text_widget->getParentLocalCharPos(index, top_aligned);
+	return local_pos;
 }
 
 void TextBoxWidget::setFillColor(const sf::Color& color) {
@@ -1219,6 +1243,18 @@ void TextBoxWidget::setValue(const sf::String& value) {
 void TextBoxWidget::setCursorPos(size_t pos) {
 	pos = std::clamp(pos, (size_t)0, getStringSize());
 	this->cursor_pos = pos;
+	float char_pos = getLocalCharPos(pos, true).x;
+	float cursor_visual_pos = char_pos + CURSOR_OFFSET.x;
+	float left_bound = CURSOR_MOVE_MARGIN;
+	float right_bound = getWidth() - CURSOR_MOVE_MARGIN;
+	float offset_left = cursor_visual_pos - left_bound;
+	float offset_right = cursor_visual_pos - right_bound;
+	if (offset_left < 0) {
+		text_view_pos -= sf::Vector2f(offset_left, 0.0f);
+	}
+	if (offset_right > 0) {
+		text_view_pos -= sf::Vector2f(offset_right, 0.0f);
+	}
 }
 
 void TextBoxWidget::insert(size_t pos, const sf::String& str) {
@@ -1290,8 +1326,9 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 
 void TextBoxWidget::update() {
 	Widget::update();
-	sf::Vector2f cursor_widget_pos = getCharPos(cursor_pos);
-	cursor_widget->setPosition(cursor_widget_pos + CURSOR_OFFSET);
+	text_widget->setAnchorOffset(TEXT_VIEW_ZERO_POS + text_view_pos);
+	sf::Vector2f char_pos = getLocalCharPos(cursor_pos, true);
+	cursor_widget->setPosition(char_pos + CURSOR_OFFSET);
 }
 
 void TextBoxWidget::updateColors() {
@@ -1328,6 +1365,7 @@ void TextBoxWidget::internalOnSetParent(Widget* parent) {
 
 void TextBoxWidget::internalOnEditModeToggle(bool value) {
 	cursor_widget->setVisible(value);
+	setCursorPos(0);
 	updateColors();
 }
 

@@ -104,6 +104,7 @@ public:
 	float getHeight() const;
 	float getGlobalWidth() const;
 	float getGlobalHeight() const;
+	sf::Vector2f getAnchorOffset() const;
 	const sf::Vector2f& getOrigin() const;
 	virtual const sf::Vector2f& getPosition() const;
 	virtual const sf::Vector2f& getGlobalPosition() const;
@@ -303,7 +304,8 @@ public:
 	unsigned int getCharacterSize() const;
 	const sf::Color& getFillColor() const override;
 	const sf::String& getString() const;
-	sf::Vector2f getCharPos(size_t index) const;
+	sf::Vector2f getLocalCharPos(size_t index, bool top_aligned) const;
+	sf::Vector2f getParentLocalCharPos(size_t index, bool top_aligned) const;
 	size_t getCharAt(const sf::Vector2f& pos) const;
 	void setFont(const sf::Font& font);
 	void setCharacterSize(unsigned int size);
@@ -345,7 +347,7 @@ public:
 	const sf::String& getValue() const;
 	size_t getStringSize() const;
 	size_t getCursorPos() const;
-	sf::Vector2f getCharPos(size_t index) const;
+	sf::Vector2f getLocalCharPos(size_t index, bool top_aligned) const;
 	void setFillColor(const sf::Color& color) override;
 	void setHighlightColor(const sf::Color& color);
 	void setTextColor(const sf::Color& color);
@@ -376,13 +378,15 @@ protected:
 
 private:
 	const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(40.0f, 20.0f);
-	const sf::Vector2f TEXT_OFFSET = sf::Vector2f(2.0f, 0.0f);
+	const sf::Vector2f TEXT_VIEW_ZERO_POS = sf::Vector2f(2.0f, 0.0f);
 	const sf::Vector2f CURSOR_OFFSET = sf::Vector2f(0.0f, 0.0f);
+	const float CURSOR_MOVE_MARGIN = 2.0f;
 	TextWidget* text_widget = nullptr;
 	RectangleWidget* cursor_widget = nullptr;
 	size_t cursor_pos = 0;
 	bool edit_mode = false;
 	bool highlighted = false;
+	sf::Vector2f text_view_pos;
 	sf::Color background_color = sf::Color(50, 50, 50);
 	sf::Color highlight_color = sf::Color(128, 128, 128);
 	sf::Color text_color = sf::Color(255, 255, 255);

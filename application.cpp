@@ -256,7 +256,7 @@ void Application::init_ui() {
     load_font(fps_font, "fraps.ttf");
     load_font(console_font, "courbd.ttf");
     load_font(small_font, "HelvetiPixel.ttf");
-    load_font(textbox_font, "courbd.ttf");
+    load_font(textbox_font, "verdana.ttf");
 
     vertex_text.setFont(ui_font);
     vertex_text.setCharacterSize(20);
@@ -364,7 +364,7 @@ void Application::init_widgets() {
         TextBoxWidget* textbox_widget = widgets.createWidget<TextBoxWidget>();
         textbox_widget->setFont(textbox_font);
         textbox_widget->setSize(40.0f, 20.0f);
-        textbox_widget->setCharacterSize(15);
+        textbox_widget->setCharacterSize(12);
         textbox_widget->setValue("<name>");
         textbox_widget->setParent(name_parameter_widget);
     }
