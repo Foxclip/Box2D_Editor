@@ -91,6 +91,12 @@ void test_CompoundVector() {
 		assert(vec == std::vector<int>({ 1, 3 }));
 	}
 	{
+		// reverse method
+		CompoundVector<int> vec = { 1, 2, 3 };
+		vec.reverse();
+		assert(vec == std::vector<int>({ 3, 2, 1 }));
+	}
+	{
 		// iterators
 		CompoundVector<int> vec = { 1, 2, 3 };
 		{
@@ -332,12 +338,23 @@ void test_CompoundVectorUptr() {
 	{
 		// removeAt method
 		CompoundVectorUptr<int> vec = { 1, 2, 3 };
-		vec.removeByIndex(1);
+		vec.removeAt(1);
 		assert(vec.size() == 2);
 		assert(*vec[0] == 1);
 		assert(*vec[1] == 3);
 		assert(*vec.front() == 1);
 		assert(*vec.back() == 3);
+	}
+	{
+		// reverse method
+		CompoundVectorUptr<int> vec = { 1, 2, 3 };
+		vec.reverse();
+		assert(vec.size() == 3);
+		assert(*vec[0] == 3);
+		assert(*vec[1] == 2);
+		assert(*vec[2] == 1);
+		assert(*vec.front() == 3);
+		assert(*vec.back() == 1);
 	}
 	{
 		// iterators

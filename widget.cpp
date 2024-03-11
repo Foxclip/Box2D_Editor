@@ -40,6 +40,7 @@ WidgetVisibility Widget::checkVisibility() const {
 	v.visibleSetting = visible;
 	v.onScreen = widget_list->getRootWidget()->getGlobalBounds().intersects(global_bounds);
 	v.nonZeroSize = global_bounds.width > 0 && global_bounds.height > 0;
+	v.hasUnclippedRegion = unclipped_region.isQuantizedNonZero();
 	v.opaque = getFillColor().a > 0;
 	return v;
 }
@@ -147,11 +148,19 @@ sf::FloatRect Widget::getVisualGlobalBounds() const {
 	return getGlobalBounds();
 }
 
-const sf::Vector2f& Widget::toGlobal(const sf::Vector2f& pos) const {
+const sf::FloatRect& Widget::getUnclippedRegion() const {
+	return unclipped_region.get();
+}
+
+const sf::FloatRect& Widget::getQuantizedUnclippedRegion() const {
+	return unclipped_region.getQuantized();
+}
+
+sf::Vector2f Widget::toGlobal(const sf::Vector2f& pos) const {
 	return getGlobalTransform().transformPoint(pos);
 }
 
-const sf::Vector2f& Widget::toLocal(const sf::Vector2f& pos) const {
+sf::Vector2f Widget::toLocal(const sf::Vector2f& pos) const {
 	return getInverseGlobalTransform().transformPoint(pos);
 }
 
@@ -343,6 +352,9 @@ void Widget::setName(const std::string& name) {
 }
 
 void Widget::setClipChildren(bool value) {
+	if (this == widget_list->root_widget && value == false) {
+		assert(false, "Cannot disable clipChildren for root widget");
+	}
 	this->clip_children = value;
 }
 
@@ -359,6 +371,9 @@ sf::Vector2f Widget::getRenderPositionOffset() const {
 }
 
 void Widget::update() {
+	if (!visible) {
+		return;
+	}
 	sf::Vector2f parent_size;
 	if (parent) {
 		parent_size = parent->getLocalBounds().getSize();
@@ -368,6 +383,9 @@ void Widget::update() {
 	sf::Vector2f anchored_pos = anchorToPos(parent_anchor, getPosition(), parent_size);
 	setPosition(anchored_pos + anchor_offset);
 	setOrigin(origin_anchor);
+	for (size_t i = 0; i < children.size(); i++) {
+		children[i]->update();
+	}
 }
 
 void Widget::internalOnSetParent(Widget* parent) { }
@@ -439,26 +457,13 @@ void Widget::render(sf::RenderTarget& target) {
 	if (!visible) {
 		return;
 	}
-	update();
-	sf::FloatRect global_bounds = getVisualGlobalBounds();
-	auto draw = [&](const sf::FloatRect& bounds) {
-		updateRenderTexture(bounds);
-		sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
-		sprite.setPosition(bounds.getPosition());
-		target.draw(sprite);
-	};
-	if (parent && parent->clip_children) {
-		sf::FloatRect parent_global_bounds = parent->getVisualGlobalBounds();
-		sf::FloatRect intersection;
-		bool intersects = global_bounds.intersects(parent_global_bounds, intersection);
-		if (intersects) {
-			sf::FloatRect quantized_intersection = utils::quantize_rect(intersection, true);
-			draw(quantized_intersection);
-		}
-	} else {
-		sf::FloatRect quantized_bounds = utils::quantize_rect(global_bounds, false);
-		draw(quantized_bounds);
+	if (!unclipped_region.isQuantizedNonZero()) {
+		return;
 	}
+	updateRenderTexture(unclipped_region.getQuantized());
+	sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
+	sprite.setPosition(unclipped_region.getQuantized().getPosition());
+	target.draw(sprite);
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->render(target);
 	}
@@ -1086,6 +1091,13 @@ void WidgetList::processKeyboardEvent(const sf::Event& event) {
 }
 
 void WidgetList::render(sf::RenderTarget& target) {
+	root_widget->unclipped_region.invalidate();
+	root_widget->update();
+#ifndef NDEBUG
+	for (size_t i = 0; i < widgets.size(); i++) {
+		widgets[i]->updateVisibility();
+	}
+#endif
 	root_widget->render(target);
 	if (debug_render) {
 		root_widget->renderBounds(target, sf::Color::Green, true);
@@ -1094,11 +1106,6 @@ void WidgetList::render(sf::RenderTarget& target) {
 	if (focused_widget) {
 		focused_widget->renderBounds(target, focused_widget_bounds_color, false);
 	}
-#ifndef NDEBUG
-	for (size_t i = 0; i < widgets.size(); i++) {
-		widgets[i]->updateVisibility();
-	}
-#endif
 }
 
 void WidgetList::reset(const sf::Vector2f& root_size) {
@@ -1382,7 +1389,9 @@ void TextBoxWidget::internalOnSetParent(Widget* parent) {
 
 void TextBoxWidget::internalOnEditModeToggle(bool value) {
 	cursor_widget->setVisible(value);
-	setCursorPos(0);
+	if (!value) {
+		setCursorPos(0);
+	}
 	updateColors();
 }
 
@@ -1427,4 +1436,66 @@ void TextBoxWidget::insertSilent(size_t pos, const sf::String& str) {
 
 void TextBoxWidget::eraseSilent(size_t index_first, size_t count) {
 	text_widget->erase(index_first, count);
+}
+
+WidgetUnclippedRegion::WidgetUnclippedRegion(Widget* widget) {
+	this->widget = widget;
+}
+
+const sf::FloatRect& WidgetUnclippedRegion::get() const {
+	if (!valid) {
+		recalc();
+	}
+	return unclippedRegion;
+}
+
+const sf::FloatRect& WidgetUnclippedRegion::getQuantized() const {
+	if (!valid) {
+		recalc();
+	}
+	return quantizedUnclippedRegion;
+}
+
+bool WidgetUnclippedRegion::isNonZero() const {
+	if (!valid) {
+		recalc();
+	}
+	return unclippedRegion.width > 0 && unclippedRegion.height > 0;
+}
+
+bool WidgetUnclippedRegion::isQuantizedNonZero() const {
+	if (!valid) {
+		recalc();
+	}
+	return quantizedUnclippedRegion.width > 0 && quantizedUnclippedRegion.height > 0;
+}
+
+void WidgetUnclippedRegion::recalc() const {
+	CompoundVector<Widget*> parents = widget->getParentChain();
+	parents.reverse();
+	sf::FloatRect result = widget->getVisualGlobalBounds();
+	for (size_t i = 0; i < parents.size(); i++) {
+		Widget* pwidget = parents[i];
+		if (pwidget->getClipChildren()) {
+			sf::FloatRect parent_unclipped_region = pwidget->getUnclippedRegion();
+			sf::FloatRect intersection;
+			bool intersects = result.intersects(parent_unclipped_region, intersection);
+			if (intersects) {
+				result = intersection;
+			} else {
+				result = sf::FloatRect(widget->getGlobalPosition(), sf::Vector2f());
+				break;
+			}
+		}
+	}
+	unclippedRegion = result;
+	quantizedUnclippedRegion = utils::quantize_rect(result, true);
+	valid = true;
+}
+
+void WidgetUnclippedRegion::invalidate() {
+	valid = false;
+	for (size_t i = 0; i < widget->children.size(); i++) {
+		widget->children[i]->unclipped_region.invalidate();
+	}
 }

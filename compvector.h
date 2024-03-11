@@ -37,6 +37,7 @@ public:
 	size_t insert(std::vector<T>::const_iterator where, TIter first, TIter last);
 	ptrdiff_t remove(const T& value);
 	void removeAt(size_t index);
+	void reverse();
 	std::vector<T>::const_iterator begin() const;
 	std::vector<T>::const_iterator end() const;
 	std::vector<T>::const_reverse_iterator rbegin() const;
@@ -87,7 +88,8 @@ public:
 	template<std::incrementable TIter>
 	size_t insert(std::vector<T*>::const_iterator where, TIter first, TIter last);
 	ptrdiff_t remove(T* value);
-	void removeByIndex(size_t index);
+	void removeAt(size_t index);
+	void reverse();
 	std::vector<T*>::const_iterator begin() const;
 	std::vector<T*>::const_iterator end() const;
 	std::vector<T*>::const_reverse_iterator rbegin() const;
@@ -204,6 +206,11 @@ inline void CompoundVector<T>::removeAt(size_t index) {
 	T value = vector[index];
 	vector.erase(vector.begin() + index);
 	set.erase(value);
+}
+
+template<typename T>
+inline void CompoundVector<T>::reverse() {
+	std::reverse(vector.begin(), vector.end());
 }
 
 template<typename T>
@@ -423,9 +430,15 @@ inline ptrdiff_t CompoundVectorUptr<T>::remove(T* value) {
 }
 
 template<typename T>
-inline void CompoundVectorUptr<T>::removeByIndex(size_t index) {
+inline void CompoundVectorUptr<T>::removeAt(size_t index) {
 	uptrs.erase(uptrs.begin() + index);
 	comp.removeAt(index);
+}
+
+template<typename T>
+inline void CompoundVectorUptr<T>::reverse() {
+	std::reverse(uptrs.begin(), uptrs.end());
+	comp.reverse();
 }
 
 template<typename T>

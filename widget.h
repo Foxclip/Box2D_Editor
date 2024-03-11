@@ -13,6 +13,7 @@ struct WidgetVisibility {
 	bool visibleSetting = false;
 	bool onScreen = false;
 	bool nonZeroSize = false;
+	bool hasUnclippedRegion = false;
 	bool opaque = false;
 	//bool notCovered = false;
 };
@@ -43,6 +44,24 @@ private:
 
 	void recalcGlobalTransform() const;
 	void recalcInverseGlobalTransform() const;
+
+};
+
+class WidgetUnclippedRegion {
+public:
+	WidgetUnclippedRegion(Widget* widget);
+	const sf::FloatRect& get() const;
+	const sf::FloatRect& getQuantized() const;
+	bool isNonZero() const;
+	bool isQuantizedNonZero() const;
+	void recalc() const;
+	void invalidate();
+
+private:
+	Widget* widget = nullptr;
+	mutable sf::FloatRect unclippedRegion;
+	mutable sf::FloatRect quantizedUnclippedRegion;
+	mutable bool valid = false;
 
 };
 
@@ -97,8 +116,10 @@ public:
 	virtual sf::FloatRect getVisualLocalBounds() const;
 	virtual sf::FloatRect getVisualParentLocalBounds() const;
 	virtual sf::FloatRect getVisualGlobalBounds() const;
-	const sf::Vector2f& toGlobal(const sf::Vector2f& pos) const;
-	const sf::Vector2f& toLocal(const sf::Vector2f& pos) const;
+	const sf::FloatRect& getUnclippedRegion() const;
+	const sf::FloatRect& getQuantizedUnclippedRegion() const;
+	sf::Vector2f toGlobal(const sf::Vector2f& pos) const;
+	sf::Vector2f toLocal(const sf::Vector2f& pos) const;
 	sf::Vector2f getSize() const;
 	float getWidth() const;
 	float getHeight() const;
@@ -146,6 +167,7 @@ public:
 protected:
 	friend class WidgetList;
 	friend class WidgetTransform;
+	friend class WidgetUnclippedRegion;
 	std::string name = "<unnamed>";
 	std::string full_name;
 	WidgetList* widget_list = nullptr;
@@ -155,6 +177,7 @@ protected:
 	Anchor origin_anchor = CUSTOM;
 	Anchor parent_anchor = CUSTOM;
 	sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);
+	WidgetUnclippedRegion unclipped_region = WidgetUnclippedRegion(this);
 	bool visible = true;
 	bool click_through = true;
 	bool clip_children = false;
