@@ -135,15 +135,15 @@ Widget* Widget::find(const std::string& name) const {
 	return nullptr;
 }
 
-sf::FloatRect Widget::getExactLocalBounds() const {
+sf::FloatRect Widget::getVisualLocalBounds() const {
 	return getLocalBounds();
 }
 
-sf::FloatRect Widget::getExactParentLocalBounds() const {
+sf::FloatRect Widget::getVisualParentLocalBounds() const {
 	return getParentLocalBounds();
 }
 
-sf::FloatRect Widget::getExactGlobalBounds() const {
+sf::FloatRect Widget::getVisualGlobalBounds() const {
 	return getGlobalBounds();
 }
 
@@ -231,23 +231,23 @@ const sf::Vector2f Widget::getGlobalBottomRight() const {
 	return sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height);
 }
 
-const sf::Vector2f Widget::getExactGlobalTopLeft() const {
-	sf::FloatRect bounds = getExactGlobalBounds();
+const sf::Vector2f Widget::getVisualGlobalTopLeft() const {
+	sf::FloatRect bounds = getVisualGlobalBounds();
 	return sf::Vector2f(bounds.left, bounds.top);
 }
 
-const sf::Vector2f Widget::getExactGlobalTopRight() const {
-	sf::FloatRect bounds = getExactGlobalBounds();
+const sf::Vector2f Widget::getVisualGlobalTopRight() const {
+	sf::FloatRect bounds = getVisualGlobalBounds();
 	return sf::Vector2f(bounds.left + bounds.width, bounds.top);
 }
 
-const sf::Vector2f Widget::getExactGlobalBottomLeft() const {
-	sf::FloatRect bounds = getExactGlobalBounds();
+const sf::Vector2f Widget::getVisualGlobalBottomLeft() const {
+	sf::FloatRect bounds = getVisualGlobalBounds();
 	return sf::Vector2f(bounds.left, bounds.top + bounds.height);
 }
 
-const sf::Vector2f Widget::getExactGlobalBottomRight() const {
-	sf::FloatRect bounds = getExactGlobalBounds();
+const sf::Vector2f Widget::getVisualGlobalBottomRight() const {
+	sf::FloatRect bounds = getVisualGlobalBounds();
 	return sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height);
 }
 
@@ -405,7 +405,7 @@ void Widget::updateVisibility() {
 }
 
 sf::Vector2f Widget::updateRenderTexture() {
-	sf::FloatRect bounds = getExactGlobalBounds();
+	sf::FloatRect bounds = getVisualGlobalBounds();
 	sf::FloatRect texture_bounds = utils::quantize_rect(bounds);
 	bool non_zero = texture_bounds.width > 0 && texture_bounds.height > 0;
 	bool not_same = texture_bounds.width != render_texture.getSize().x || texture_bounds.height != render_texture.getSize().y;
@@ -445,8 +445,8 @@ void Widget::render(sf::RenderTarget& target) {
 	sf::FloatRect texture_rect;
 	sf::Sprite sprite;
 	if (parent && parent->clip_children) {
-		sf::FloatRect global_bounds = getExactGlobalBounds();
-		sf::FloatRect parent_global_bounds = parent->getExactGlobalBounds();
+		sf::FloatRect global_bounds = getVisualGlobalBounds();
+		sf::FloatRect parent_global_bounds = parent->getVisualGlobalBounds();
 		sf::FloatRect intersection;
 		bool intersects = global_bounds.intersects(parent_global_bounds, intersection);
 		if (!intersects) {
@@ -623,7 +623,7 @@ sf::FloatRect TextWidget::getLocalBounds() const {
 		float height = text.getCharacterSize();
 		result = sf::FloatRect(sf::Vector2f(), sf::Vector2f(width, height));
 	} else {
-		result = getExactLocalBounds();
+		result = getVisualLocalBounds();
 	}
 	return result;
 }
@@ -637,7 +637,7 @@ sf::FloatRect TextWidget::getGlobalBounds() const {
 	return getParentGlobalTransform().transformRect(getParentLocalBounds());
 }
 
-sf::FloatRect TextWidget::getExactLocalBounds() const {
+sf::FloatRect TextWidget::getVisualLocalBounds() const {
 	sf::FloatRect local_bounds = text.getLocalBounds();
 	sf::Vector2f offset = getRenderPositionOffset();
 	sf::Vector2f offset_pos = local_bounds.getPosition() + offset;
@@ -645,12 +645,12 @@ sf::FloatRect TextWidget::getExactLocalBounds() const {
 	return offset_bounds;
 }
 
-sf::FloatRect TextWidget::getExactParentLocalBounds() const {
-	return getTransformable().getTransform().transformRect(getExactLocalBounds());
+sf::FloatRect TextWidget::getVisualParentLocalBounds() const {
+	return getTransformable().getTransform().transformRect(getVisualLocalBounds());
 }
 
-sf::FloatRect TextWidget::getExactGlobalBounds() const {
-	return getParentGlobalTransform().transformRect(getExactParentLocalBounds());
+sf::FloatRect TextWidget::getVisualGlobalBounds() const {
+	return getParentGlobalTransform().transformRect(getVisualParentLocalBounds());
 }
 
 const sf::Font* TextWidget::getFont() const {
