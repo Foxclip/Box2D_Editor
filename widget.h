@@ -306,6 +306,7 @@ public:
 	const sf::String& getString() const;
 	sf::Vector2f getLocalCharPos(size_t index, bool top_aligned) const;
 	sf::Vector2f getParentLocalCharPos(size_t index, bool top_aligned) const;
+	sf::Vector2f getGlobalCharPos(size_t index, bool top_aligned) const;
 	size_t getCharAt(const sf::Vector2f& pos) const;
 	void setFont(const sf::Font& font);
 	void setCharacterSize(unsigned int size);
@@ -348,6 +349,7 @@ public:
 	size_t getStringSize() const;
 	size_t getCursorPos() const;
 	sf::Vector2f getLocalCharPos(size_t index, bool top_aligned) const;
+	sf::Vector2f getGlobalCharPos(size_t index, bool top_aligned) const;
 	void setFillColor(const sf::Color& color) override;
 	void setHighlightColor(const sf::Color& color);
 	void setTextColor(const sf::Color& color);

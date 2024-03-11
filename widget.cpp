@@ -694,6 +694,12 @@ sf::Vector2f TextWidget::getParentLocalCharPos(size_t index, bool top_aligned) c
 	}
 }
 
+sf::Vector2f TextWidget::getGlobalCharPos(size_t index, bool top_aligned) const {
+	sf::Vector2f local_pos = getLocalCharPos(index, top_aligned);
+	sf::Vector2f global_pos = toGlobal(local_pos);
+	return global_pos;
+}
+
 size_t TextWidget::getCharAt(const sf::Vector2f& pos) const {
 	ptrdiff_t result = 0;
 	for (size_t i = 0; i <= getStringSize(); i++) {
@@ -1201,6 +1207,10 @@ sf::Vector2f TextBoxWidget::getLocalCharPos(size_t index, bool top_aligned) cons
 	return local_pos;
 }
 
+sf::Vector2f TextBoxWidget::getGlobalCharPos(size_t index, bool top_aligned) const {
+	return text_widget->getGlobalCharPos(index, top_aligned);
+}
+
 void TextBoxWidget::setFillColor(const sf::Color& color) {
 	this->background_color = color;
 	updateColors();
@@ -1353,8 +1363,18 @@ void TextBoxWidget::updateColors() {
 void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
 	setEditMode(true);
 	sf::Vector2f local_pos = text_widget->toLocal(pos);
-	size_t cursor_pos = text_widget->getCharAt(local_pos);
-	setCursorPos(cursor_pos);
+	size_t char_left = text_widget->getCharAt(local_pos);
+	size_t char_right = char_left + 1;
+	sf::Vector2f pos_left = getGlobalCharPos(char_left, false);
+	sf::Vector2f pos_right = getGlobalCharPos(char_right, false);
+	float dist_left = abs(pos.x - pos_left.x);
+	float dist_right = abs(pos.x - pos_right.x);
+	sf::Vector2f cursor_visual_pos;
+	if (dist_left <= dist_right) {
+		setCursorPos(char_left);
+	} else {
+		setCursorPos(char_right);
+	}
 }
 
 void TextBoxWidget::internalOnSetParent(Widget* parent) {
