@@ -186,7 +186,7 @@ private:
 	std::string calcFullName() const;
 	void updateFullName();
 	void updateVisibility();
-	sf::Vector2f updateRenderTexture();
+	void updateRenderTexture(const sf::FloatRect& texture_bounds);
 
 };
 

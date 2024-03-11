@@ -404,12 +404,12 @@ void Widget::updateVisibility() {
 	visibility = checkVisibility();
 }
 
-sf::Vector2f Widget::updateRenderTexture() {
-	sf::FloatRect bounds = getVisualGlobalBounds();
-	sf::FloatRect texture_bounds = utils::quantize_rect(bounds);
-	bool non_zero = texture_bounds.width > 0 && texture_bounds.height > 0;
-	bool not_same = texture_bounds.width != render_texture.getSize().x || texture_bounds.height != render_texture.getSize().y;
-	if (non_zero && not_same) {
+void Widget::updateRenderTexture(const sf::FloatRect& texture_bounds) {
+	if (texture_bounds.width == 0 || texture_bounds.height == 0) {
+		return;
+	}
+	bool size_changed = texture_bounds.width != render_texture.getSize().x || texture_bounds.height != render_texture.getSize().y;
+	if (size_changed) {
 		render_texture.create(texture_bounds.width, texture_bounds.height);
 	}
 	sf::Transform parent_transform = getParentGlobalTransform();
@@ -433,7 +433,6 @@ sf::Vector2f Widget::updateRenderTexture() {
 	render_texture.draw(getDrawable(), combined);
 	getTransformable().setOrigin(local_origin);
 	render_texture.display();
-	return texture_bounds.getPosition();
 }
 
 void Widget::render(sf::RenderTarget& target) {
@@ -441,28 +440,25 @@ void Widget::render(sf::RenderTarget& target) {
 		return;
 	}
 	update();
-	sf::Vector2f sprite_pos = updateRenderTexture();
-	sf::FloatRect texture_rect;
-	sf::Sprite sprite;
+	sf::FloatRect global_bounds = getVisualGlobalBounds();
+	auto draw = [&](const sf::FloatRect& bounds) {
+		updateRenderTexture(bounds);
+		sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
+		sprite.setPosition(bounds.getPosition());
+		target.draw(sprite);
+	};
 	if (parent && parent->clip_children) {
-		sf::FloatRect global_bounds = getVisualGlobalBounds();
 		sf::FloatRect parent_global_bounds = parent->getVisualGlobalBounds();
 		sf::FloatRect intersection;
 		bool intersects = global_bounds.intersects(parent_global_bounds, intersection);
-		if (!intersects) {
-			return;
+		if (intersects) {
+			sf::FloatRect quantized_intersection = utils::quantize_rect(intersection, true);
+			draw(quantized_intersection);
 		}
-		sf::FloatRect quantized_intersection = utils::quantize_rect(intersection);
-		sf::Vector2f quantized_intersection_pos = quantized_intersection.getPosition();
-		sf::Vector2f texture_rect_pos = quantized_intersection_pos - sprite_pos;
-		texture_rect = sf::FloatRect(texture_rect_pos, quantized_intersection.getSize());
-		sprite = sf::Sprite(render_texture.getTexture(), sf::IntRect(texture_rect));
-		sprite.setPosition(quantized_intersection_pos);
 	} else {
-		sprite = sf::Sprite(render_texture.getTexture());
-		sprite.setPosition(sprite_pos);
+		sf::FloatRect quantized_bounds = utils::quantize_rect(global_bounds, false);
+		draw(quantized_bounds);
 	}
-	target.draw(sprite);
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->render(target);
 	}
@@ -1045,6 +1041,7 @@ void CheckboxWidget::internalOnMouseExit(const sf::Vector2f& pos) {
 WidgetList::WidgetList() {
 	root_widget = createWidget<RectangleWidget>();
 	root_widget->setFillColor(sf::Color::Transparent);
+	root_widget->setClipChildren(true);
 	root_widget->setName("root");
 }
 
