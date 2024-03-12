@@ -618,9 +618,8 @@ sf::FloatRect TextWidget::getLocalBounds() const {
 	sf::FloatRect result;
 	if (adjust_local_bounds) {
 		sf::FloatRect local_bounds = text.getLocalBounds();
-		float width = local_bounds.width;
-		float height = text.getCharacterSize();
-		result = sf::FloatRect(sf::Vector2f(), sf::Vector2f(width, height));
+		sf::Vector2f size(local_bounds.left + local_bounds.width, text.getCharacterSize());
+		result = sf::FloatRect(sf::Vector2f(), size);
 	} else {
 		result = getVisualLocalBounds();
 	}
@@ -672,9 +671,22 @@ const sf::String& TextWidget::getString() const {
 	return text.getString();
 }
 
-sf::Vector2f TextWidget::getLocalCharPos(size_t index, bool top_aligned) const {
+float TextWidget::getKerning(size_t index) const {
+	if (index == 0) {
+		return 0.0f;
+	}
+	sf::Uint32 left_char = getString()[index - 1];
+	sf::Uint32 right_char = getString()[index];
+	float kerning = getFont()->getKerning(left_char, right_char, getCharacterSize());
+	return kerning;
+}
+
+sf::Vector2f TextWidget::getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
 	sf::Vector2f parent_local_char_pos = text.findCharacterPos(index);
 	sf::Vector2f local_char_pos = getTransformable().getInverseTransform() * parent_local_char_pos;
+	if (with_kerning) {
+		local_char_pos.x += getKerning(index);
+	}
 	if (top_aligned) {
 		return sf::Vector2f(local_char_pos.x, 0.0f);
 	} else {
@@ -682,19 +694,14 @@ sf::Vector2f TextWidget::getLocalCharPos(size_t index, bool top_aligned) const {
 	}
 }
 
-sf::Vector2f TextWidget::getParentLocalCharPos(size_t index, bool top_aligned) const {
-	if (top_aligned) {
-		sf::Vector2f local_char_pos = getLocalCharPos(index, true);
-		sf::Vector2f parent_local_char_pos = getTransformable().getTransform() * local_char_pos;
-		return parent_local_char_pos;
-	} else {
-		sf::Vector2f parent_local_char_pos = text.findCharacterPos(index);
-		return parent_local_char_pos;
-	}
+sf::Vector2f TextWidget::getParentLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
+	sf::Vector2f local_char_pos = getLocalCharPos(index, top_aligned, with_kerning);
+	sf::Vector2f parent_local_char_pos = getTransformable().getTransform() * local_char_pos;
+	return parent_local_char_pos;
 }
 
-sf::Vector2f TextWidget::getGlobalCharPos(size_t index, bool top_aligned) const {
-	sf::Vector2f local_pos = getLocalCharPos(index, top_aligned);
+sf::Vector2f TextWidget::getGlobalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
+	sf::Vector2f local_pos = getLocalCharPos(index, top_aligned, with_kerning);
 	sf::Vector2f global_pos = toGlobal(local_pos);
 	return global_pos;
 }
@@ -767,13 +774,10 @@ const sf::Transformable& TextWidget::getTransformable() const {
 }
 
 sf::Vector2f TextWidget::getRenderPositionOffset() const {
-	// local bounds can be offset from origin
-	sf::Vector2f offset;
-	sf::FloatRect bounds = text.getLocalBounds();
-	if (adjust_local_bounds) {
-		offset = sf::Vector2f(bounds.getPosition().x, 0.0f);
-	} else {
-		offset = bounds.getPosition();
+	sf::Vector2f offset(0.0f, 0.0f);
+	if (!adjust_local_bounds) {
+		sf::FloatRect bounds = text.getLocalBounds();
+		offset = sf::Vector2f(0.0f, bounds.getPosition().y);
 	}
 	return -offset;
 }
@@ -1204,13 +1208,13 @@ size_t TextBoxWidget::getCursorPos() const {
 	return cursor_pos;
 }
 
-sf::Vector2f TextBoxWidget::getLocalCharPos(size_t index, bool top_aligned) const {
-	sf::Vector2f local_pos = text_widget->getParentLocalCharPos(index, top_aligned);
+sf::Vector2f TextBoxWidget::getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
+	sf::Vector2f local_pos = text_widget->getParentLocalCharPos(index, top_aligned, with_kerning);
 	return local_pos;
 }
 
-sf::Vector2f TextBoxWidget::getGlobalCharPos(size_t index, bool top_aligned) const {
-	return text_widget->getGlobalCharPos(index, top_aligned);
+sf::Vector2f TextBoxWidget::getGlobalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
+	return text_widget->getGlobalCharPos(index, top_aligned, with_kerning);
 }
 
 void TextBoxWidget::setFillColor(const sf::Color& color) {
@@ -1255,7 +1259,7 @@ void TextBoxWidget::setValue(const sf::String& value) {
 void TextBoxWidget::setCursorPos(size_t pos) {
 	pos = std::clamp(pos, (size_t)0, getStringSize());
 	this->cursor_pos = pos;
-	float char_pos = getLocalCharPos(pos, true).x;
+	float char_pos = getLocalCharPos(pos, true, true).x;
 	float cursor_visual_pos = char_pos + CURSOR_OFFSET.x;
 	float left_bound = CURSOR_MOVE_MARGIN;
 	float right_bound = getWidth() - CURSOR_MOVE_MARGIN;
@@ -1339,7 +1343,7 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 void TextBoxWidget::update() {
 	Widget::update();
 	text_widget->setAnchorOffset(TEXT_VIEW_ZERO_POS + text_view_pos);
-	sf::Vector2f char_pos = getLocalCharPos(cursor_pos, true);
+	sf::Vector2f char_pos = getLocalCharPos(cursor_pos, true, true);
 	cursor_widget->setPosition(char_pos + CURSOR_OFFSET);
 }
 
@@ -1367,8 +1371,8 @@ void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
 	sf::Vector2f local_pos = text_widget->toLocal(pos);
 	size_t char_left = text_widget->getCharAt(local_pos);
 	size_t char_right = char_left + 1;
-	sf::Vector2f pos_left = getGlobalCharPos(char_left, false);
-	sf::Vector2f pos_right = getGlobalCharPos(char_right, false);
+	sf::Vector2f pos_left = getGlobalCharPos(char_left, true, true);
+	sf::Vector2f pos_right = getGlobalCharPos(char_right, true, true);
 	float dist_left = abs(pos.x - pos_left.x);
 	float dist_right = abs(pos.x - pos_right.x);
 	sf::Vector2f cursor_visual_pos;
