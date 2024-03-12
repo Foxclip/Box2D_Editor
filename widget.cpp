@@ -1474,18 +1474,15 @@ void WidgetUnclippedRegion::recalc() const {
 	CompoundVector<Widget*> parents = widget->getParentChain();
 	parents.reverse();
 	sf::FloatRect result = widget->getVisualGlobalBounds();
-	for (size_t i = 0; i < parents.size(); i++) {
-		Widget* pwidget = parents[i];
-		if (pwidget->getClipChildren()) {
-			sf::FloatRect parent_unclipped_region = pwidget->getUnclippedRegion();
-			sf::FloatRect intersection;
-			bool intersects = result.intersects(parent_unclipped_region, intersection);
-			if (intersects) {
-				result = intersection;
-			} else {
-				result = sf::FloatRect(widget->getGlobalPosition(), sf::Vector2f());
-				break;
-			}
+	Widget* parent = widget->parent;
+	if (parent && parent->getClipChildren()) {
+		sf::FloatRect parent_unclipped_region = parent->getUnclippedRegion();
+		sf::FloatRect intersection;
+		bool intersects = result.intersects(parent_unclipped_region, intersection);
+		if (intersects) {
+			result = intersection;
+		} else {
+			result = sf::FloatRect(widget->getGlobalPosition(), sf::Vector2f());
 		}
 	}
 	unclippedRegion = result;
