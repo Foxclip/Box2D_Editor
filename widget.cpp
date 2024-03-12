@@ -990,7 +990,7 @@ bool CheckboxWidget::isFocusable() const {
 	return true;
 }
 
-bool CheckboxWidget::isChecked() const {
+bool CheckboxWidget::getValue() const {
 	return checked;
 }
 
@@ -1018,19 +1018,19 @@ void CheckboxWidget::setCheckFillColor(const sf::Color& color) {
 	check_fill_color = color;
 }
 
-void CheckboxWidget::setCheckedSilent(bool value) {
+void CheckboxWidget::setValueSilent(bool value) {
 	checked = value;
 	check_widget->setVisible(value);
 }
 
-void CheckboxWidget::setChecked(bool value) {
-	setCheckedSilent(value);
-	OnToggle(value);
+void CheckboxWidget::setValue(bool value) {
+	setValueSilent(value);
+	OnValueChanged(value);
 }
 
-void CheckboxWidget::toggleChecked() {
-	setCheckedSilent(!checked);
-	OnToggle(checked);
+void CheckboxWidget::toggleValue() {
+	setValueSilent(!checked);
+	OnValueChanged(checked);
 }
 
 void CheckboxWidget::update() {
@@ -1039,7 +1039,7 @@ void CheckboxWidget::update() {
 }
 
 void CheckboxWidget::internalOnClick(const sf::Vector2f& pos) {
-	toggleChecked();
+	toggleValue();
 }
 
 void CheckboxWidget::internalOnMouseEnter(const sf::Vector2f& pos) {

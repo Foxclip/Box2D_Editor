@@ -240,7 +240,7 @@ void Application::init_tools() {
             assert(parameter);
             CheckboxWidget* checkbox = dynamic_cast<CheckboxWidget*>(parameter->find("checkbox"));
             assert(checkbox);
-            checkbox->setCheckedSilent(active_object->getType() == b2_dynamicBody);
+            checkbox->setValueSilent(active_object->getType() == b2_dynamicBody);
         }
         {
             Widget* parameter = window_widget->find("name parameter");
@@ -361,7 +361,7 @@ void Application::init_widgets() {
         CheckboxWidget* checkbox_widget = widgets.createWidget<CheckboxWidget>();
         checkbox_widget->setOrigin(Widget::TOP_LEFT);
         checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));
-        checkbox_widget->OnToggle = [&](bool value) {
+        checkbox_widget->OnValueChanged = [&](bool value) {
             assert(active_object);
             b2BodyType type = value ? b2_dynamicBody : b2_staticBody;
             active_object->setType(type, false);

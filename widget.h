@@ -278,21 +278,21 @@ private:
 
 class CheckboxWidget : public RectangleWidget {
 public:
-	std::function<void(bool)> OnToggle = [](bool new_value) { };
+	std::function<void(bool)> OnValueChanged = [](bool new_value) { };
 
 	CheckboxWidget();
 	CheckboxWidget(WidgetList* widget_list);
 	bool isFocusable() const override;
-	bool isChecked() const;
+	bool getValue() const;
 	const sf::Color& getFillColor() const override;
 	const sf::Color& getHighlightFillColor() const;
 	const sf::Color& getCheckFillColor() const;
 	void setFillColor(const sf::Color& color) override;
 	void setHighlightFillColor(const sf::Color& color);
 	void setCheckFillColor(const sf::Color& color);
-	void setCheckedSilent(bool value);
-	void setChecked(bool value);
-	void toggleChecked();
+	void setValueSilent(bool value);
+	void setValue(bool value);
+	void toggleValue();
 
 protected:
 	void update() override;
