@@ -439,9 +439,7 @@ void Widget::updateRenderTexture(const sf::FloatRect& texture_bounds) {
 	sf::Vector2f render_position_offset = getRenderPositionOffset();
 	sf::Vector2f position_offset = global_origin_offset + render_position_offset;
 	combined.translate(position_offset);
-	if (isVisualPositionQuantized()) {
-		utils::quantize_position(combined);
-	}
+	utils::quantize_position(combined);
 	render_view.setSize(texture_bounds.getSize());
 	sf::Vector2f texture_bounds_center = texture_bounds.getPosition() + texture_bounds.getSize() / 2.0f;
 	render_view.setCenter(texture_bounds_center);
