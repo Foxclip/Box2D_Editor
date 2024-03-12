@@ -235,11 +235,20 @@ void Application::init_tools() {
         assert(active_object);
         Widget* window_widget = edit_tool.edit_window_widget;
         window_widget->setVisible(value);
-        Widget* parameter = window_widget->find("dynamic parameter");
-        assert(parameter);
-        CheckboxWidget* checkbox = dynamic_cast<CheckboxWidget*>(parameter->find("checkbox"));
-        assert(checkbox);
-        checkbox->setCheckedSilent(active_object->getType() == b2_dynamicBody);
+        {
+            Widget* parameter = window_widget->find("dynamic parameter");
+            assert(parameter);
+            CheckboxWidget* checkbox = dynamic_cast<CheckboxWidget*>(parameter->find("checkbox"));
+            assert(checkbox);
+            checkbox->setCheckedSilent(active_object->getType() == b2_dynamicBody);
+        }
+        {
+            Widget* parameter = window_widget->find("name parameter");
+            assert(parameter);
+            TextBoxWidget* textbox = dynamic_cast<TextBoxWidget*>(parameter->find("textbox"));
+            assert(textbox);
+            textbox->setValueSilent(active_object->getName());
+        }
     };
 }
 
@@ -366,6 +375,10 @@ void Application::init_widgets() {
         textbox_widget->setSize(40.0f, 20.0f);
         textbox_widget->setCharacterSize(12);
         textbox_widget->setValue("<name>");
+        textbox_widget->OnValueChanged = [&](const sf::String& str) {
+            assert(active_object);
+            active_object->setName(str);
+        };
         textbox_widget->setParent(name_parameter_widget);
     }
 
@@ -555,8 +568,6 @@ void Application::process_keyboard_event(const sf::Event& event) {
                         obj->setEnabled(obj->was_enabled, true);
                     }
                     try_select_tool(&select_tool);
-                } else {
-                    window.close();
                 }
                 break;
             case sf::Keyboard::Space: toggle_pause(); break;

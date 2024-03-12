@@ -1251,9 +1251,13 @@ void TextBoxWidget::setCharacterSize(unsigned int size) {
 	cursor_widget->setSize(sf::Vector2f(1.0f, size));
 }
 
+void TextBoxWidget::setValueSilent(const sf::String& value) {
+	text_widget->setString(value);
+}
+
 void TextBoxWidget::setValue(const sf::String& value) {
 	setValueSilent(value);
-	OnTextChanged(value);
+	OnValueChanged(value);
 }
 
 void TextBoxWidget::setCursorPos(size_t pos) {
@@ -1275,12 +1279,12 @@ void TextBoxWidget::setCursorPos(size_t pos) {
 
 void TextBoxWidget::insert(size_t pos, const sf::String& str) {
 	insertSilent(pos, str);
-	OnTextChanged(getValue());
+	OnValueChanged(getValue());
 }
 
 void TextBoxWidget::erase(size_t index_first, size_t count) {
 	eraseSilent(index_first, count);
-	OnTextChanged(getValue());
+	OnValueChanged(getValue());
 }
 
 void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
@@ -1370,16 +1374,20 @@ void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
 	setEditMode(true);
 	sf::Vector2f local_pos = text_widget->toLocal(pos);
 	size_t char_left = text_widget->getCharAt(local_pos);
-	size_t char_right = char_left + 1;
-	sf::Vector2f pos_left = getGlobalCharPos(char_left, true, true);
-	sf::Vector2f pos_right = getGlobalCharPos(char_right, true, true);
-	float dist_left = abs(pos.x - pos_left.x);
-	float dist_right = abs(pos.x - pos_right.x);
-	sf::Vector2f cursor_visual_pos;
-	if (dist_left <= dist_right) {
-		setCursorPos(char_left);
+	if (char_left >= getStringSize()) {
+		setCursorPos(getStringSize());
 	} else {
-		setCursorPos(char_right);
+		size_t char_right = char_left + 1;
+		sf::Vector2f pos_left = getGlobalCharPos(char_left, true, true);
+		sf::Vector2f pos_right = getGlobalCharPos(char_right, true, true);
+		float dist_left = abs(pos.x - pos_left.x);
+		float dist_right = abs(pos.x - pos_right.x);
+		sf::Vector2f cursor_visual_pos;
+		if (dist_left <= dist_right) {
+			setCursorPos(char_left);
+		} else {
+			setCursorPos(char_right);
+		}
 	}
 }
 
@@ -1426,10 +1434,6 @@ void TextBoxWidget::setEditMode(bool value) {
 	edit_mode = value;
 	internalOnEditModeToggle(value);
 	OnEditModeToggle(value);
-}
-
-void TextBoxWidget::setValueSilent(const sf::String& value) {
-	text_widget->setString(value);
 }
 
 void TextBoxWidget::insertSilent(size_t pos, const sf::String& str) {

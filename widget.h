@@ -357,7 +357,7 @@ private:
 class TextBoxWidget : public RectangleWidget {
 public:
 	std::function<void(bool)> OnEditModeToggle = [](bool new_value) { };
-	std::function<void(const sf::String&)> OnTextChanged = [](const sf::String& new_value) { };
+	std::function<void(const sf::String&)> OnValueChanged = [](const sf::String& new_value) { };
 
 	TextBoxWidget();
 	TextBoxWidget(WidgetList* widget_list);
@@ -381,6 +381,7 @@ public:
 	void setEditorTextColor(const sf::Color& color);
 	void setFont(const sf::Font& font);
 	void setCharacterSize(unsigned int size);
+	void setValueSilent(const sf::String& value);
 	void setValue(const sf::String& value);
 	void setCursorPos(size_t pos);
 	void insert(size_t pos, const sf::String& str);
@@ -398,7 +399,6 @@ protected:
 	void internalOnMouseEnter(const sf::Vector2f& pos) override;
 	void internalOnMouseExit(const sf::Vector2f& pos) override;
 	void setEditMode(bool value);
-	void setValueSilent(const sf::String& value);
 	void insertSilent(size_t pos, const sf::String& str);
 	void eraseSilent(size_t index_first, size_t count);
 
