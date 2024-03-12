@@ -782,6 +782,13 @@ sf::Vector2f TextWidget::getRenderPositionOffset() const {
 	return -offset;
 }
 
+void TextWidget::update() {
+	if (!getFont()) {
+		assert(false, "Font is not set for " + full_name);
+	}
+	Widget::update();
+}
+
 ContainerWidget::ContainerWidget() { }
 
 ContainerWidget::ContainerWidget(WidgetList* widget_list) {
@@ -1388,12 +1395,6 @@ void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
 		} else {
 			setCursorPos(char_right);
 		}
-	}
-}
-
-void TextBoxWidget::internalOnSetParent(Widget* parent) {
-	if (!getFont()) {
-		logger << "WARNING: font is not set for " + full_name + "\n";
 	}
 }
 

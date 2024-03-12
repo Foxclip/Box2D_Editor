@@ -33,6 +33,7 @@ int main() {
     execute_app();
 
     // TODO: move warning about missing font from internalOnSetParent to onTryRender
+    // TODO: invalidate unclippedRegion in update
     // TODO: use getLocalCharPos in TextWidget::getCharAt
     // TODO: rename CheckboxWidget::OnSetChecked to OnSetValue and rename corresponding methods
     // TODO: change (*it). to it->

@@ -348,6 +348,7 @@ protected:
 	sf::Transformable& getTransformable() override;
 	const sf::Transformable& getTransformable() const override;
 	sf::Vector2f getRenderPositionOffset() const override;
+	void update() override;
 
 private:
 	sf::Text text;
@@ -392,7 +393,6 @@ protected:
 	void update() override;
 	void updateColors();
 	void internalOnClick(const sf::Vector2f& pos) override;
-	void internalOnSetParent(Widget* parent) override;
 	void internalOnEditModeToggle(bool value);
 	void internalOnFocused() override;
 	void internalOnFocusLost() override;
