@@ -905,6 +905,10 @@ std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameO
 }
 
 void PolygonObject::syncVertices() {
+	// velocities are recalculated when fixtures are added,
+	// and might end up being not equal to starting velocities
+	b2Vec2 saved_linear_velocity = rigid_body->GetLinearVelocity();
+	float saved_angular_velocity = rigid_body->GetAngularVelocity();
 	polygon->resetVarray(vertices.size());
 	for (size_t i = 0; i < vertices.size(); i++) {
 		polygon->setPoint(i, tosf(vertices[i].pos));
@@ -926,6 +930,8 @@ void PolygonObject::syncVertices() {
 			rigid_body->CreateFixture(&b2polygon, 1.0f);
 		}
 	}
+	rigid_body->SetLinearVelocity(saved_linear_velocity);
+	rigid_body->SetAngularVelocity(saved_angular_velocity);
 }
 
 CircleNotchShape::CircleNotchShape(float radius, size_t point_count, size_t notch_segment_count) {
