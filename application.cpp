@@ -1146,6 +1146,7 @@ void Application::maximize_window() const {
 }
 
 std::string Application::serialize() const {
+    LoggerDeactivate logger_deactivate;
     logger << __FUNCTION__"\n";
     LoggerIndent serialize_indent;
     TokenWriter tw;
