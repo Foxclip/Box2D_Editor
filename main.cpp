@@ -32,9 +32,9 @@ int main() {
 
     execute_app();
 
-    // TODO: rename CheckboxWidget::OnSetChecked to OnSetValue and rename corresponding methods
     // TODO: change (*it). to it->
     // TODO: SearchIndex for widget children
+    // TODO: edit position and velocities in edit window
     // TODO: render polygon indices
     // TODO: delay editing polygons with many vertices
     // TODO: evolving cars

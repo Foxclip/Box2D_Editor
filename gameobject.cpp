@@ -405,6 +405,20 @@ void GameObject::deselectAllVertices() {
 	}
 }
 
+void GameObject::syncVertices(bool save_velocities) {
+	if (!save_velocities) {
+		internalSyncVertices();
+		return;
+	}
+	// velocities are recalculated when fixtures are added,
+	// and might end up being not equal to starting velocities
+	b2Vec2 saved_linear_velocity = rigid_body->GetLinearVelocity();
+	float saved_angular_velocity = rigid_body->GetAngularVelocity();
+	internalSyncVertices();
+	rigid_body->SetLinearVelocity(saved_linear_velocity);
+	rigid_body->SetAngularVelocity(saved_angular_velocity);
+}
+
 void GameObject::transformFromRigidbody() {
 	transforms.setGlobalTransform(rigid_body->GetTransform());
 	for (size_t i = 0; i < children.size(); i++) {
@@ -548,7 +562,7 @@ BoxObject::BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, sf
 	this->color = color;
 	rigid_body = object_list->world->CreateBody(&def);
 	vertices.push_back(EditableVertex(0.5f * size));
-	syncVertices();
+	syncVertices(true);
 	transformFromRigidbody();
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
@@ -635,7 +649,7 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectLis
 	}
 }
 
-void BoxObject::syncVertices() {
+void BoxObject::internalSyncVertices() {
 	size = b2Vec2(abs(vertices.front().pos.x) * 2.0f, abs(vertices.front().pos.y) * 2.0f);
 	b2Fixture* old_fixture = rigid_body->GetFixtureList();
 	if (old_fixture) {
@@ -656,7 +670,7 @@ BallObject::BallObject(GameObjectList* object_list, b2BodyDef def, float radius,
 	this->notch_color = notch_color;
 	rigid_body = object_list->world->CreateBody(&def);
 	vertices.push_back(EditableVertex(b2Vec2(radius, 0.0f)));
-	syncVertices();
+	syncVertices(true);
 	transformFromRigidbody();
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
@@ -749,7 +763,7 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, GameObjectL
 	}
 }
 
-void BallObject::syncVertices() {
+void BallObject::internalSyncVertices() {
 	radius = vertices.front().pos.Length();
 	b2Fixture* old_fixture = rigid_body->GetFixtureList();
 	if (old_fixture) {
@@ -802,7 +816,7 @@ PolygonObject::PolygonObject(
 		this->vertices.push_back(EditableVertex(vertices[i]));
 	}
 	polygon = std::make_unique<SplittablePolygon>();
-	syncVertices();
+	syncVertices(true);
 	transformFromRigidbody();
 	polygon->setFillColor(color);
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
@@ -904,11 +918,7 @@ std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameO
 	}
 }
 
-void PolygonObject::syncVertices() {
-	// velocities are recalculated when fixtures are added,
-	// and might end up being not equal to starting velocities
-	b2Vec2 saved_linear_velocity = rigid_body->GetLinearVelocity();
-	float saved_angular_velocity = rigid_body->GetAngularVelocity();
+void PolygonObject::internalSyncVertices() {
 	polygon->resetVarray(vertices.size());
 	for (size_t i = 0; i < vertices.size(); i++) {
 		polygon->setPoint(i, tosf(vertices[i].pos));
@@ -930,8 +940,6 @@ void PolygonObject::syncVertices() {
 			rigid_body->CreateFixture(&b2polygon, 1.0f);
 		}
 	}
-	rigid_body->SetLinearVelocity(saved_linear_velocity);
-	rigid_body->SetAngularVelocity(saved_angular_velocity);
 }
 
 CircleNotchShape::CircleNotchShape(float radius, size_t point_count, size_t notch_segment_count) {
@@ -999,7 +1007,7 @@ ChainObject::ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector
 		vertices.push_back(ev);
 	}
 	line_strip_shape = std::make_unique<LineStripShape>(drawable_vertices);
-	syncVertices();
+	syncVertices(true);
 	transformFromRigidbody();
 	line_strip_shape->setLineColor(color);
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
@@ -1093,7 +1101,7 @@ b2ChainShape* ChainObject::getShape() const {
 	return static_cast<b2ChainShape*>(rigid_body->GetFixtureList()->GetShape());
 }
 
-void ChainObject::syncVertices() {
+void ChainObject::internalSyncVertices() {
 	std::vector<b2Vec2> b2vertices = getPositions();
 	b2Fixture* old_fixture = rigid_body->GetFixtureList();
 	if (old_fixture) {

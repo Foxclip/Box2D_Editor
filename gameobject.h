@@ -172,7 +172,7 @@ public:
 	bool isVertexSelected(size_t index) const;
 	void selectAllVertices();
 	void deselectAllVertices();
-	virtual void syncVertices() = 0;
+	virtual void syncVertices(bool save_velocities = false);
 	void transformFromRigidbody();
 	void transformToRigidbody();
 	virtual TokenWriter& serialize(TokenWriter& tw) const = 0;
@@ -194,6 +194,7 @@ protected:
 	void setVisualRotation(float angle);
 	void vertexSet(size_t index, const b2Vec2& new_pos);
 	void destroyFixtures();
+	virtual void internalSyncVertices() = 0;
 
 private:
 	friend class GameObjectList;
@@ -215,7 +216,7 @@ public:
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, GameObjectList* object_list);
-	void syncVertices() override;
+	void internalSyncVertices() override;
 
 private:
 	std::unique_ptr<sf::RectangleShape> rect_shape;
@@ -238,7 +239,7 @@ public:
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, GameObjectList* object_list);
-	void syncVertices() override;
+	void internalSyncVertices() override;
 
 private:
 	std::unique_ptr<CircleNotchShape> circle_notch_shape;
@@ -262,7 +263,7 @@ public:
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<PolygonObject> deserialize(TokenReader& tr, GameObjectList* object_list);
-	void syncVertices() override;
+	void internalSyncVertices() override;
 
 private:
 	std::unique_ptr<SplittablePolygon> polygon;
@@ -277,7 +278,7 @@ public:
 	void drawMask(sf::RenderTarget& mask) override;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<ChainObject> deserialize(TokenReader& tr, GameObjectList* object_list);
-	void syncVertices() override;
+	void internalSyncVertices() override;
 
 private:
 	std::unique_ptr<LineStripShape> line_strip_shape;
