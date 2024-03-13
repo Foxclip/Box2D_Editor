@@ -404,7 +404,8 @@ void SplittablePolygon::recenter() {
 }
 
 void SplittablePolygon::recut() {
-	LoggerDeactivate ld;
+	LoggerDisableTag disable_recut_tag("recut");
+	LoggerTag tag_recut("recut");
 	logger << __FUNCTION__"\n";
 	LoggerIndent recut_indent;
 	convex_polygons = cutIntoConvex(b2_maxPolygonVertices);

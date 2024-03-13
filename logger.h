@@ -5,6 +5,8 @@
 #include <vector>
 #include <functional>
 #include "utils.h"
+#include <stack>
+#include <set>
 
 class Logger {
 public:
@@ -26,7 +28,13 @@ private:
 	size_t indent_level = 0;
 	std::string indent_str;
 	bool autoflush = true;
+	bool active_switch = true;
 	bool is_active = true;
+	bool test_mode = false;
+	bool write_time = true;
+	std::vector<std::string> tags;
+	std::set<std::string> enabled_tags;
+	std::set<std::string> disabled_tags;
 
 	Logger& writeString(std::string value);
 	Logger& writeToLineBuffer(std::string value);
@@ -43,18 +51,24 @@ private:
 	void addIndentLevel(ptrdiff_t level);
 	void updateIndentStr();
 	void flush();
+	void updateAcive();
 	friend class LoggerIndent;
 	friend class LoggerLargeText;
 	friend class LoggerDeactivate;
+	friend class LoggerTag;
+	friend class LoggerEnableTag;
+	friend class LoggerDisableTag;
+	friend class LoggerTest;
 };
 
 extern Logger logger;
 
 class LoggerControl {
 public:
-	virtual void close() = 0;
 
 protected:
+	void close();
+	virtual void internalClose() = 0;
 	bool closed = false;
 };
 
@@ -62,7 +76,7 @@ class LoggerIndent : public LoggerControl {
 public:
 	LoggerIndent(ptrdiff_t indent = 1);
 	~LoggerIndent();
-	void close() override;
+	void internalClose() override;
 
 private:
 	ptrdiff_t indent_level;
@@ -73,7 +87,7 @@ class LoggerLargeText : public LoggerControl {
 public:
 	LoggerLargeText();
 	~LoggerLargeText();
-	void close() override;
+	void internalClose() override;
 
 private:
 	bool autoflush_was_enabled = true;
@@ -84,9 +98,52 @@ class LoggerDeactivate : public LoggerControl {
 public:
 	LoggerDeactivate();
 	~LoggerDeactivate();
-	void close() override;
+	void internalClose() override;
 
 private:
-	bool logger_was_active = true;
 
 };
+
+class LoggerTag : public LoggerControl {
+public:
+	LoggerTag(const std::string& tag);
+	~LoggerTag();
+	void internalClose() override;
+
+private:
+
+};
+
+class LoggerEnableTag : public LoggerControl {
+public:
+	LoggerEnableTag(const std::string& tag);
+	~LoggerEnableTag();
+	void internalClose() override;
+
+private:
+	std::string tag;
+
+};
+
+class LoggerDisableTag : public LoggerControl {
+public:
+	LoggerDisableTag(const std::string& tag);
+	~LoggerDisableTag();
+	void internalClose() override;
+
+private:
+	std::string tag;
+
+};
+
+#ifndef NDEBUG
+
+class LoggerTest {
+public:
+	LoggerTest();
+	void testLogger();
+};
+
+extern LoggerTest logger_test;
+
+#endif // NDEBUG
