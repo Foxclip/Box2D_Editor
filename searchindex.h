@@ -96,7 +96,7 @@ template<typename TData, typename TObject>
 inline TObject* SearchIndexUnique<TData, TObject>::find(const TData& data) const {
 	auto it = set.find(ObjectData<TData, TObject>(data, nullptr));
 	if (it != set.end()) {
-		TObject* ptr = const_cast<TObject*>((*it).ptr);
+		TObject* ptr = const_cast<TObject*>(it->ptr);
 		return ptr;
 	}
 	return nullptr;

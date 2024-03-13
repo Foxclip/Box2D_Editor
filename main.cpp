@@ -32,7 +32,6 @@ int main() {
 
     execute_app();
 
-    // TODO: change (*it). to it->
     // TODO: SearchIndex for widget children
     // TODO: edit position and velocities in edit window
     // TODO: render polygon indices
