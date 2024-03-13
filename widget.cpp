@@ -122,10 +122,9 @@ const CompoundVector<Widget*>& Widget::getChildren() const {
 }
 
 Widget* Widget::find(const std::string& name) const {
-	for (size_t i = 0; i < children.size(); i++) {
-		if (children[i]->name == name) {
-			return children[i];
-		}
+	Widget* widget = children_names.find(name);
+	if (widget) {
+		return widget;
 	}
 	for (size_t i = 0; i < children.size(); i++) {
 		Widget* result = children[i]->find(name);
@@ -334,8 +333,10 @@ void Widget::setParentSilent(Widget* new_parent) {
 	Widget* old_parent = this->parent;
 	if (old_parent) {
 		old_parent->children.remove(this);
+		old_parent->children_names.remove(name, this);
 	}
 	new_parent->children.add(this);
+	new_parent->children_names.add(name, this);
 	this->parent = new_parent;
 	transforms.invalidateGlobalTransform();
 	updateFullName();
@@ -346,8 +347,12 @@ void Widget::setParent(Widget* new_parent) {
 	internalOnSetParent(new_parent);
 }
 
-void Widget::setName(const std::string& name) {
-	this->name = name;
+void Widget::setName(const std::string& new_name) {
+	if (parent) {
+		parent->children_names.remove(this->name, this);
+		parent->children_names.add(new_name, this);
+	}
+	this->name = new_name;
 	updateFullName();
 }
 

@@ -6,6 +6,7 @@
 #include "logger.h"
 #include "global.h"
 #include "compvector.h"
+#include "searchindex.h"
 
 struct WidgetVisibility {
 	bool addedToRoot = false;
@@ -156,7 +157,7 @@ public:
 	void setClickThrough(bool value);
 	void setParentSilent(Widget* new_parent);
 	void setParent(Widget* new_parent);
-	void setName(const std::string& name);
+	void setName(const std::string& new_name);
 	void setClipChildren(bool value);
 	void removeFocus();
 	virtual void processKeyboardEvent(const sf::Event& event);
@@ -174,6 +175,7 @@ protected:
 	WidgetTransform transforms = WidgetTransform(this);
 	Widget* parent = nullptr;
 	CompoundVector<Widget*> children;
+	SearchIndexMultiple<std::string, Widget> children_names;
 	Anchor origin_anchor = CUSTOM;
 	Anchor parent_anchor = CUSTOM;
 	sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);

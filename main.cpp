@@ -32,8 +32,8 @@ int main() {
 
     execute_app();
 
-    // TODO: SearchIndex for widget children
     // TODO: edit position and velocities in edit window
+    // TODO: make SearchIndex not use pointers for TObject type
     // TODO: render polygon indices
     // TODO: delay editing polygons with many vertices
     // TODO: evolving cars
