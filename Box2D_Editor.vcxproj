@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="application.cpp" />
     <ClCompile Include="compvector.cpp" />
+    <ClCompile Include="editwindow.cpp" />
     <ClCompile Include="gameobject.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="history.cpp" />
@@ -153,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="compvector.h" />
+    <ClInclude Include="editwindow.h" />
     <ClInclude Include="gameobject.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="history.h" />

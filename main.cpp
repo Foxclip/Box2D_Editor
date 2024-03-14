@@ -32,14 +32,21 @@ int main() {
 
     execute_app();
 
+    // TODO: remove widget focus logging
+    // TODO: change widget_list pointer in Widget and app in WidgetList to reference
+    // TODO: move complex widgets to separate classes
     // TODO: edit position and velocities in edit window
     // TODO: make SearchIndex not use pointers for TObject type
+    // TODO: Dropdown widget
     // TODO: render polygon indices
+    // TODO: separate Simulation and Application,
+    // interface in Application, physics and object management in Simulation
     // TODO: delay editing polygons with many vertices
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars
     // TODO: edit and simulate modes
     // TODO: create tests with keyboard and mouse event recording
+    // TODO: rotated widgets, masking
     // TODO: joint editor
 
     return 0;

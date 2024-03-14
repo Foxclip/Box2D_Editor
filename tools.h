@@ -2,6 +2,7 @@
 
 #include "gameobject.h"
 #include "widget.h"
+#include "editwindow.h"
 #include <set>
 
 const int TOOL_RECT_WIDTH = 60;
@@ -137,7 +138,7 @@ public:
 	sf::RectangleShape vertex_highlight_rect;
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
-	ContainerWidget* edit_window_widget = nullptr;
+	EditWindow* edit_window_widget = nullptr;
 
 	EditTool();
 	bool showInToolPanel() const override;

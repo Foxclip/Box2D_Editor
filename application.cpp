@@ -326,61 +326,7 @@ void Application::init_widgets() {
     }
 
     // edit window
-    ContainerWidget* edit_window_widget = widgets.createWidget<ContainerWidget>();
-    edit_window_widget->setVisible(false);
-    edit_window_widget->setSize(sf::Vector2f(100.0f, 200.0f));
-    edit_window_widget->setHorizontal(false);
-    edit_window_widget->setFillColor(sf::Color(128, 128, 128));
-    edit_window_widget->setOrigin(Widget::CENTER);
-    edit_window_widget->setParentAnchor(Widget::CENTER);
-    edit_window_widget->setAnchorOffset(-20.0f, 20.0f);
-    edit_window_widget->setPadding(TOOLBOX_PADDING);
-    edit_window_widget->setClickThrough(false);
-    edit_window_widget->setName("edit window");
-    edit_tool.edit_window_widget = edit_window_widget;
-    auto create_parameter_widget = [&](const std::string& name, const std::string& text) {
-        ContainerWidget* parameter_widget = widgets.createWidget<ContainerWidget>();
-        parameter_widget->setFillColor(sf::Color::Transparent);
-        parameter_widget->setVerticalAlignment(Widget::ALIGN_CENTER);
-        parameter_widget->setParent(edit_window_widget);
-        parameter_widget->setName(name);
-        TextWidget* parameter_text_widget = widgets.createWidget<TextWidget>();
-        parameter_text_widget->setFont(ui_font);
-        parameter_text_widget->setCharacterSize(16);
-        parameter_text_widget->setString(text);
-        parameter_text_widget->setParent(parameter_widget);
-        RectangleWidget* spacing_widget = widgets.createWidget<RectangleWidget>();
-        spacing_widget->setSize(sf::Vector2f(10.0f, 1.0f));
-        spacing_widget->setFillColor(sf::Color::Transparent);
-        spacing_widget->setParent(parameter_widget);
-        spacing_widget->setName("spacing");
-        return parameter_widget;
-    };
-    {
-        ContainerWidget* dynamic_parameter_widget = create_parameter_widget("dynamic parameter", "Dynamic:");
-        CheckboxWidget* checkbox_widget = widgets.createWidget<CheckboxWidget>();
-        checkbox_widget->setOrigin(Widget::TOP_LEFT);
-        checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));
-        checkbox_widget->OnValueChanged = [&](bool value) {
-            assert(active_object);
-            b2BodyType type = value ? b2_dynamicBody : b2_staticBody;
-            active_object->setType(type, false);
-        };
-        checkbox_widget->setParent(dynamic_parameter_widget);
-    }
-    {
-        ContainerWidget* name_parameter_widget = create_parameter_widget("name parameter", "Name:");
-        TextBoxWidget* textbox_widget = widgets.createWidget<TextBoxWidget>();
-        textbox_widget->setFont(textbox_font);
-        textbox_widget->setSize(40.0f, 20.0f);
-        textbox_widget->setCharacterSize(12);
-        textbox_widget->setValue("<name>");
-        textbox_widget->OnValueChanged = [&](const sf::String& str) {
-            assert(active_object);
-            active_object->setName(str);
-        };
-        textbox_widget->setParent(name_parameter_widget);
-    }
+    edit_tool.edit_window_widget = widgets.createWidget<EditWindow>();
 
     // create panel
     ContainerWidget* create_panel_widget = widgets.createWidget<ContainerWidget>();

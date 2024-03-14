@@ -422,11 +422,14 @@ private:
 	sf::Color editor_text_color = sf::Color(0, 0, 0);
 };
 
+class Application;
+
 class WidgetList {
 public:
 	bool debug_render = false;
+	Application* app;
 
-	WidgetList();
+	WidgetList(Application* app);
 	bool contains(const Widget* widget);
 	bool isClickBlocked() const;
 	bool isReleaseBlocked() const;

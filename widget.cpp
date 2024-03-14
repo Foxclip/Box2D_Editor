@@ -1,4 +1,5 @@
 #include "widget.h"
+#include "application.h"
 
 bool Widget::isMouseOver() const {
 	return mouseIn;
@@ -1055,7 +1056,7 @@ void CheckboxWidget::internalOnMouseExit(const sf::Vector2f& pos) {
 	RectangleWidget::setFillColor(background_fill_color);
 }
 
-WidgetList::WidgetList() {
+WidgetList::WidgetList(Application* app) : app(app) {
 	root_widget = createWidget<RectangleWidget>();
 	root_widget->setFillColor(sf::Color::Transparent);
 	root_widget->setClipChildren(true);

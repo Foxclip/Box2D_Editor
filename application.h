@@ -10,6 +10,7 @@
 #include "history.h"
 #include "widget.h"
 #include "objectlist.h"
+#include "editwindow.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -96,6 +97,7 @@ public:
 	);
 
 private:
+	friend class EditWindow;
 	sf::Shader desat_shader;
 	sf::Shader selection_shader;
 	sf::Vector2i mousePos;
@@ -127,7 +129,7 @@ private:
 	sf::CircleShape origin_shape;
 	sf::Text object_info_text;
 	sf::Text id_text;
-	WidgetList widgets;
+	WidgetList widgets = WidgetList(this);
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;
