@@ -403,12 +403,14 @@ namespace utils {
 		transform.translate(-subpixel_offset);
 	}
 
-	sf::FloatRect quantize_rect(const sf::FloatRect& rect, bool floor_bottom_right) {
+	sf::FloatRect quantize_rect(const sf::FloatRect& rect, QuantizeMode quantize_mode) {
 		auto rounding_func = [&](float x) {
-			if (floor_bottom_right) {
+			if (quantize_mode == QUANTIZE_MODE_FLOOR) {
 				return floor(x);
+			} else if (quantize_mode == QUANTIZE_MODE_CEIL_SUBTRACT) {
+				return ceil(x) - 1.0f;
 			} else {
-				return ceil(x);
+				assert(false, "Unknown QuantizeMode");
 			}
 		};
 		sf::Vector2f top_left = rect.getPosition();

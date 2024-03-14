@@ -35,8 +35,8 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
-    // TODO: move complex widgets to separate classes
     // TODO: edit position and velocities in edit window
+    // TODO: blinking textbox cursor
     // TODO: make SearchIndex not use pointers for TObject type
     // TODO: Dropdown widget
     // TODO: render polygon indices
