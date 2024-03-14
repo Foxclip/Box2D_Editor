@@ -286,9 +286,9 @@ void Application::init_ui() {
 }
 
 void Application::init_widgets() {
-    toolbox_widget = widgets.createWidget<Toolbox>();
-    edit_tool.edit_window_widget = widgets.createWidget<EditWindow>();
-    create_tool.create_panel_widget = widgets.createWidget<CreatePanel>();
+    toolbox_widget = widgets.createWidget<Toolbox>(*this);
+    edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(*this);
+    create_tool.create_panel_widget = widgets.createWidget<CreatePanel>(*this);
 
     // pause widget
     paused_rect_widget = widgets.createWidget<ContainerWidget>();

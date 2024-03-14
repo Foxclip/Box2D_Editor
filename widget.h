@@ -419,23 +419,20 @@ private:
 	sf::Color editor_text_color = sf::Color(0, 0, 0);
 };
 
-class Application;
-
 class WidgetList {
 public:
 	bool debug_render = false;
-	Application& app;
 
-	WidgetList(Application& app);
+	WidgetList();
 	bool contains(const Widget* widget);
 	bool isClickBlocked() const;
 	bool isReleaseBlocked() const;
 	Widget* getRootWidget() const;
 	Widget* getFocusedWidget() const;
 	Widget* find(const std::string& name) const;
-	template<typename T>
+	template<typename T, typename... Args>
 	requires std::derived_from<T, Widget>
-	T* createWidget();
+	T* createWidget(Args&&... args);
 	void processClick(const sf::Vector2f pos);
 	void processRelease(const sf::Vector2f pos);
 	void processKeyboardEvent(const sf::Event& event);
@@ -458,10 +455,10 @@ private:
 
 };
 
-template<typename T>
+template<typename T, typename... Args>
 requires std::derived_from<T, Widget>
-inline T* WidgetList::createWidget() {
-	std::unique_ptr<T> uptr = std::make_unique<T>(*this);
+inline T* WidgetList::createWidget(Args&&... args) {
+	std::unique_ptr<T> uptr = std::make_unique<T>(*this, args...);
 	T* ptr = uptr.get();
 	if (root_widget) {
 		ptr->setParentSilent(root_widget);

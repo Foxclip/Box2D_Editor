@@ -6,7 +6,7 @@ class Application;
 
 class CreatePanel : public ContainerWidget {
 public:
-	CreatePanel(WidgetList& widget_list);
+	CreatePanel(WidgetList& widget_list, Application& p_app);
 
 private:
 	Application& app;

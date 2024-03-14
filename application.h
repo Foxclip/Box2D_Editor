@@ -131,7 +131,7 @@ private:
 	sf::CircleShape origin_shape;
 	sf::Text object_info_text;
 	sf::Text id_text;
-	WidgetList widgets = WidgetList(*this);
+	WidgetList widgets;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;

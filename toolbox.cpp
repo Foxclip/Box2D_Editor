@@ -1,7 +1,7 @@
 #include "toolbox.h"
 #include "application.h"
 
-Toolbox::Toolbox(WidgetList& widget_list) : ContainerWidget(widget_list), app(widget_list.app) {
+Toolbox::Toolbox(WidgetList& widget_list, Application& p_app) : ContainerWidget(widget_list), app(p_app) {
     setFillColor(sf::Color(255, 0, 0, 0));
     setOrigin(Widget::TOP_CENTER);
     setParentAnchor(Widget::TOP_CENTER);

@@ -37,6 +37,7 @@ int main() {
 
     // TODO: edit position and velocities in edit window
     // TODO: blinking textbox cursor
+    // TODO: change color of textbox mouse highlight
     // TODO: make SearchIndex not use pointers for TObject type
     // TODO: Dropdown widget
     // TODO: render polygon indices
