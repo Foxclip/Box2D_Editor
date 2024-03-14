@@ -1193,6 +1193,14 @@ const sf::Color& TextBoxWidget::getEditorTextColor() const {
 	return editor_text_color;
 }
 
+const sf::Color& TextBoxWidget::getFailFillColor() const {
+	return fail_background_color;
+}
+
+const sf::Color& TextBoxWidget::getEditFailFillColor() const {
+	return editor_fail_background_color;
+}
+
 const sf::Font* TextBoxWidget::getFont() const {
 	return text_widget->getFont();
 }
@@ -1205,8 +1213,28 @@ const sf::String& TextBoxWidget::getValue() const {
 	return text_widget->getString();
 }
 
+bool TextBoxWidget::isValidValue() const {
+	bool result;
+	if (type == TextBoxType::TEXT) {
+		result = true;
+	} else if (type == TextBoxType::INTEGER) {
+		long long number;
+		result = utils::parseLL(getValue(), number);
+	} else if (type == TextBoxType::FLOAT) {
+		float number;
+		result = utils::parseFloat(getValue(), number);
+	} else {
+		assert(false, "Unknown TextBoxType");
+	}
+	return result;
+}
+
 size_t TextBoxWidget::getStringSize() const {
 	return text_widget->getStringSize();
+}
+
+TextBoxWidget::TextBoxType TextBoxWidget::getType() const {
+	return type;
 }
 
 size_t TextBoxWidget::getCursorPos() const {
@@ -1247,6 +1275,14 @@ void TextBoxWidget::setEditorTextColor(const sf::Color& color) {
 	updateColors();
 }
 
+void TextBoxWidget::setFailFillColor(const sf::Color& color) {
+	this->fail_background_color = color;
+}
+
+void TextBoxWidget::setEditFailFillColor(const sf::Color& color) {
+	this->editor_fail_background_color = color;
+}
+
 void TextBoxWidget::setFont(const sf::Font& font) {
 	text_widget->setFont(font);
 }
@@ -1258,11 +1294,18 @@ void TextBoxWidget::setCharacterSize(unsigned int size) {
 
 void TextBoxWidget::setValueSilent(const sf::String& value) {
 	text_widget->setString(value);
+	setCursorPos(cursor_pos);
 }
 
 void TextBoxWidget::setValue(const sf::String& value) {
 	setValueSilent(value);
+	internalOnValueChanged(value);
 	OnValueChanged(value);
+}
+
+void TextBoxWidget::setType(TextBoxType type) {
+	this->type = type;
+	updateValid();
 }
 
 void TextBoxWidget::setCursorPos(size_t pos) {
@@ -1282,13 +1325,29 @@ void TextBoxWidget::setCursorPos(size_t pos) {
 	}
 }
 
+void TextBoxWidget::typeChar(sf::Uint32 code) {
+	if (type == TextBoxType::INTEGER) {
+		if (VALID_INTEGER_CHARS.find(code) == -1) {
+			return;
+		}
+	} else if (type == TextBoxType::FLOAT) {
+		if (VALID_FLOAT_CHARS.find(code) == -1) {
+			return;
+		}
+	}
+	insert(cursor_pos, sf::String(code));
+	setCursorPos(cursor_pos + 1);
+}
+
 void TextBoxWidget::insert(size_t pos, const sf::String& str) {
 	insertSilent(pos, str);
+	internalOnValueChanged(getValue());
 	OnValueChanged(getValue());
 }
 
 void TextBoxWidget::erase(size_t index_first, size_t count) {
 	eraseSilent(index_first, count);
+	internalOnValueChanged(getValue());
 	OnValueChanged(getValue());
 }
 
@@ -1296,9 +1355,13 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		switch (event.key.code) {
 			case sf::Keyboard::Escape:
+				internalOnCancel();
+				OnCancel();
 				removeFocus();
 				break;
 			case sf::Keyboard::Enter:
+				internalOnConfirm(getValue());
+				OnConfirm(getValue());
 				setEditMode(!edit_mode);
 				break;
 		}
@@ -1341,8 +1404,7 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 					}
 					break;
 				default:
-					insert(cursor_pos, sf::String(code));
-					setCursorPos(cursor_pos + 1);
+					typeChar(code);
 					break;
 			}
 		}
@@ -1360,13 +1422,26 @@ void TextBoxWidget::updateColors() {
 	sf::Color rect_col;
 	sf::Color text_col;
 	if (edit_mode) {
-		rect_col = editor_color;
-		text_col = editor_text_color;
+		if (fail_state) {
+			rect_col = editor_fail_background_color;
+			text_col = editor_text_color;
+		} else {
+			rect_col = editor_color;
+			text_col = editor_text_color;
+		}
 	} else {
 		if (highlighted) {
-			rect_col = highlight_color;
+			if (fail_state) {
+				rect_col = highlight_color;
+			} else {
+				rect_col = highlight_color;
+			}
 		} else {
-			rect_col = background_color;
+			if (fail_state) {
+				rect_col = fail_background_color;
+			} else {
+				rect_col = background_color;
+			}
 		}
 		text_col = text_color;
 	}
@@ -1424,6 +1499,19 @@ void TextBoxWidget::internalOnMouseExit(const sf::Vector2f& pos) {
 	if (!edit_mode) {
 		updateColors();
 	}
+}
+
+void TextBoxWidget::internalOnValueChanged(const sf::String& new_value) {
+	updateValid();
+}
+
+void TextBoxWidget::internalOnConfirm(const sf::String& value) { }
+
+void TextBoxWidget::internalOnCancel() { }
+
+void TextBoxWidget::updateValid() {
+	fail_state = !isValidValue();
+	updateColors();
 }
 
 void TextBoxWidget::setEditMode(bool value) {

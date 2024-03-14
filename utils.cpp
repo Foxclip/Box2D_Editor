@@ -423,4 +423,32 @@ namespace utils {
 		return quantized_bounds;
 	}
 
+	bool parseLL(const std::string& str, long long& result) {
+		const char* start = str.c_str();
+		char* end;
+		result = std::strtoll(start, &end, 10);
+		if (end == start) {
+			result = 0;
+			return false;
+		}
+		return true;
+	}
+
+	bool parseFloat(const std::string& str, float& result) {
+		const char* start = str.c_str();
+		char* end;
+		result = std::strtof(start, &end);
+		if (end == start) {
+			result = 0.0f;
+			return false;
+		}
+		return true;
+	}
+
+	std::string floatToStr(float value, size_t precision) {
+		std::stringstream ss;
+		ss << std::setprecision(9) << value;
+		return ss.str();
+	}
+
 }

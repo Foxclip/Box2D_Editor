@@ -10,5 +10,6 @@ public:
 
 private:
 	ContainerWidget* createParameterWidget(const std::string& name, const std::string& text);
+	TextBoxWidget* createTextBoxWidget();
 	Application& app;
 };

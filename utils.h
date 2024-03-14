@@ -43,6 +43,9 @@ namespace utils {
 		QUANTIZE_MODE_CEIL_SUBTRACT,
 	};
 	sf::FloatRect quantize_rect(const sf::FloatRect& rect, QuantizeMode quantize_mode);
+	bool parseLL(const std::string& str, long long& result);
+	bool parseFloat(const std::string& str, float& result);
+	std::string floatToStr(float value, size_t precision = 9);
 
 	template <typename TVec2>
 	TVec2 get_circle_vertex(ptrdiff_t index, size_t point_count, float radius, float offset = 0.0f) {

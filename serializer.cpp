@@ -336,9 +336,7 @@ TokenWriter& TokenWriter::writePtrdifft(ptrdiff_t value) {
 }
 
 TokenWriter& TokenWriter::writeFloat(float value) {
-	std::stringstream ss;
-	ss << std::setprecision(9) << value;
-	writeString(ss.str());
+	writeString(utils::floatToStr(value, 9));
 	return *this;
 }
 

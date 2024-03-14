@@ -251,6 +251,22 @@ void Application::init_tools() {
             assert(textbox);
             textbox->setValueSilent(active_object->getName());
         }
+        {
+            Widget* parameter = window_widget->find("position x parameter");
+            assert(parameter);
+            TextBoxWidget* textbox = dynamic_cast<TextBoxWidget*>(parameter->find("textbox"));
+            assert(textbox);
+            std::string str = utils::floatToStr(active_object->getGlobalPosition().x, 9);
+            textbox->setValueSilent(str);
+        }
+        {
+            Widget* parameter = window_widget->find("position y parameter");
+            assert(parameter);
+            TextBoxWidget* textbox = dynamic_cast<TextBoxWidget*>(parameter->find("textbox"));
+            assert(textbox);
+            std::string str = utils::floatToStr(active_object->getGlobalPosition().y, 9);
+            textbox->setValueSilent(str);
+        }
     };
 }
 

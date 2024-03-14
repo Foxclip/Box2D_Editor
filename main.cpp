@@ -35,7 +35,9 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
-    // TODO: edit position and velocities in edit window
+    // TODO: edit velocities in edit window
+    // TODO: don't move cursor to beginning after pressing enter or esc
+    // TODO: close edit mode with esc key
     // TODO: blinking textbox cursor
     // TODO: change color of textbox mouse highlight
     // TODO: make SearchIndex not use pointers for TObject type
