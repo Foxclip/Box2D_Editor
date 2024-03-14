@@ -71,6 +71,9 @@
     <ClCompile Include="toolbox.cpp">
       <Filter>UI\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="create_panel.cpp">
+      <Filter>UI\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h">
@@ -119,6 +122,9 @@
       <Filter>UI\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="toolbox.h">
+      <Filter>UI\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="create_panel.h">
       <Filter>UI\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

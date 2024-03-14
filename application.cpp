@@ -4,6 +4,7 @@
 #include <iostream>
 #include <ranges>
 #include "toolbox.h"
+#include "create_panel.h"
 
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
@@ -285,50 +286,9 @@ void Application::init_ui() {
 }
 
 void Application::init_widgets() {
-
-    // toolbox
     toolbox_widget = widgets.createWidget<Toolbox>();
-
-    // edit window
     edit_tool.edit_window_widget = widgets.createWidget<EditWindow>();
-
-    // create panel
-    ContainerWidget* create_panel_widget = widgets.createWidget<ContainerWidget>();
-    create_panel_widget->setVisible(false);
-    create_panel_widget->setFillColor(sf::Color(255, 0, 0, 0));
-    create_panel_widget->setOrigin(Widget::CENTER_LEFT);
-    create_panel_widget->setParentAnchor(Widget::CENTER_LEFT);
-    create_panel_widget->setHorizontal(false);
-    create_panel_widget->setPadding(CREATE_PANEL_PADDING);
-    create_panel_widget->setClickThrough(false);
-    create_panel_widget->setName("create panel");
-    for (size_t i = 0; i < CreateTool::mode_count; i++) {
-        RectangleWidget* button_widget = widgets.createWidget<RectangleWidget>();
-        button_widget->setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
-        button_widget->setFillColor(sf::Color(128, 128, 128));
-        button_widget->setOutlineColor(sf::Color(0, 175, 255));
-        button_widget->OnClick = [=](const sf::Vector2f& pos) {
-            select_create_type(i);
-        };
-        button_widget->OnMouseEnter = [=](const sf::Vector2f pos) {
-            button_widget->setOutlineThickness(-1.0f);
-        };
-        button_widget->OnMouseExit = [=](const sf::Vector2f pos) {
-            button_widget->setOutlineThickness(0.0f);
-        };
-        button_widget->setName("button " + std::to_string(i));
-        TextWidget* text_widget = widgets.createWidget<TextWidget>();
-        text_widget->setFont(ui_font);
-        text_widget->setCharacterSize(TOOL_TEXT_SIZE);
-        text_widget->setString(CreateTool::create_type_name(static_cast<CreateTool::ObjectType>(i)));
-        text_widget->setFillColor(sf::Color::Black);
-        text_widget->setOrigin(Widget::CENTER);
-        text_widget->setParentAnchor(Widget::CENTER);
-        text_widget->setParent(button_widget);
-        create_tool.create_buttons.add(button_widget);
-        create_tool.create_panel_widget = create_panel_widget;
-        button_widget->setParent(create_panel_widget);
-    }
+    create_tool.create_panel_widget = widgets.createWidget<CreatePanel>();
 
     // pause widget
     paused_rect_widget = widgets.createWidget<ContainerWidget>();
