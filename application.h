@@ -98,6 +98,7 @@ public:
 
 private:
 	friend class EditWindow;
+	friend class Toolbox;
 	sf::Shader desat_shader;
 	sf::Shader selection_shader;
 	sf::Vector2i mousePos;

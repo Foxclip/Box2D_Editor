@@ -3,6 +3,7 @@
 #include <numbers>
 #include <iostream>
 #include <ranges>
+#include "toolbox.h"
 
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
@@ -286,44 +287,7 @@ void Application::init_ui() {
 void Application::init_widgets() {
 
     // toolbox
-    toolbox_widget = widgets.createWidget<ContainerWidget>();
-    toolbox_widget->setFillColor(sf::Color(255, 0, 0, 0));
-    toolbox_widget->setOrigin(Widget::TOP_CENTER);
-    toolbox_widget->setParentAnchor(Widget::TOP_CENTER);
-    toolbox_widget->setPadding(TOOLBOX_PADDING);
-    toolbox_widget->setClickThrough(false);
-    toolbox_widget->setName("toolbox");
-    for (size_t i = 0; i < tools.size(); i++) {
-        Tool* tool = tools[i];
-        if (!tool->showInToolPanel()) {
-            continue;
-        }
-        RectangleWidget* tool_widget = widgets.createWidget<RectangleWidget>();
-        tool_widget->setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
-        tool_widget->setFillColor(sf::Color(128, 128, 128));
-        tool_widget->setOutlineColor(sf::Color::Yellow);
-        tool_widget->OnClick = [=](const sf::Vector2f& pos) {
-            try_select_tool(tool);
-        };
-        tool_widget->OnMouseEnter = [=](const sf::Vector2f pos) {
-            tool_widget->setOutlineThickness(-1.0f);
-        };
-        tool_widget->OnMouseExit = [=](const sf::Vector2f pos) {
-            tool_widget->setOutlineThickness(0.0f);
-        };
-        tool_widget->setParent(toolbox_widget);
-        tool_widget->setName("tool " + tool->name);
-        TextWidget* text_widget = widgets.createWidget<TextWidget>();
-        text_widget->setFont(ui_font);
-        text_widget->setCharacterSize(TOOL_TEXT_SIZE);
-        text_widget->setString(tools[i]->name);
-        text_widget->setFillColor(sf::Color::Black);
-        text_widget->setOrigin(Widget::CENTER);
-        text_widget->setParentAnchor(Widget::CENTER);
-        text_widget->setParent(tool_widget);
-        tool->widget = tool_widget;
-        tools_in_tool_panel.push_back(tool);
-    }
+    toolbox_widget = widgets.createWidget<Toolbox>();
 
     // edit window
     edit_tool.edit_window_widget = widgets.createWidget<EditWindow>();
