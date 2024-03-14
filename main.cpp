@@ -35,8 +35,6 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
-    // TODO: remove widget focus logging
-    // TODO: change widget_list pointer in Widget and app in WidgetList to reference
     // TODO: move complex widgets to separate classes
     // TODO: edit position and velocities in edit window
     // TODO: make SearchIndex not use pointers for TObject type

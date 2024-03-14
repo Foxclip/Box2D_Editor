@@ -1,6 +1,8 @@
 #include "widget.h"
 #include "application.h"
 
+Widget::Widget(WidgetList& widget_list) : widget_list(widget_list) { }
+
 bool Widget::isMouseOver() const {
 	return mouseIn;
 }
@@ -30,7 +32,7 @@ WidgetVisibility Widget::checkVisibility() const {
 	WidgetVisibility v;
 	sf::FloatRect global_bounds = getGlobalBounds();
 	CompoundVector<Widget*> parents = getParentChain();
-	v.addedToRoot = parents.contains(widget_list->root_widget);
+	v.addedToRoot = parents.contains(widget_list.root_widget);
 	v.allParentsVisible = true;
 	for (size_t i = 0; i < parents.size(); i++) {
 		if (!parents[i]->visible) {
@@ -39,7 +41,7 @@ WidgetVisibility Widget::checkVisibility() const {
 		}
 	}
 	v.visibleSetting = visible;
-	v.onScreen = widget_list->getRootWidget()->getGlobalBounds().intersects(global_bounds);
+	v.onScreen = widget_list.getRootWidget()->getGlobalBounds().intersects(global_bounds);
 	v.nonZeroSize = global_bounds.width > 0 && global_bounds.height > 0;
 	v.hasUnclippedRegion = unclipped_region.isQuantizedNonZero();
 	v.opaque = getFillColor().a > 0;
@@ -52,10 +54,10 @@ void Widget::processClick(const sf::Vector2f& pos) {
 	}
 	if (mouseIn) {
 		if (!click_through) {
-			widget_list->click_blocked = true;
+			widget_list.click_blocked = true;
 		}
-		if (isFocusable() && !widget_list->focused_widget_temp) {
-			widget_list->focused_widget_temp = this;
+		if (isFocusable() && !widget_list.focused_widget_temp) {
+			widget_list.focused_widget_temp = this;
 		}
 		internalOnClick(pos);
 		OnClick(pos);
@@ -71,7 +73,7 @@ void Widget::processRelease(const sf::Vector2f& pos) {
 	}
 	if (mouseIn) {
 		if (!click_through) {
-			widget_list->release_blocked = true;
+			widget_list.release_blocked = true;
 		}
 		OnRelease(pos);
 	}
@@ -85,7 +87,7 @@ bool Widget::isFocusable() const {
 }
 
 bool Widget::isFocused() const {
-	return widget_list->focused_widget == this;
+	return widget_list.focused_widget == this;
 }
 
 const std::string& Widget::getName() const {
@@ -310,7 +312,7 @@ void Widget::setClickThrough(bool value) {
 
 void Widget::setParentSilent(Widget* new_parent) {
 	if (!new_parent) {
-		return setParentSilent(widget_list->root_widget);
+		return setParentSilent(widget_list.root_widget);
 	}
 	if (new_parent == this) {
 		updateFullName();
@@ -358,7 +360,7 @@ void Widget::setName(const std::string& new_name) {
 }
 
 void Widget::setClipChildren(bool value) {
-	if (this == widget_list->root_widget && value == false) {
+	if (this == widget_list.root_widget && value == false) {
 		assert(false, "Cannot disable clipChildren for root widget");
 	}
 	this->clip_children = value;
@@ -366,7 +368,7 @@ void Widget::setClipChildren(bool value) {
 
 void Widget::removeFocus() {
 	if (isFocused()) {
-		widget_list->setFocusedWidget(nullptr);
+		widget_list.setFocusedWidget(nullptr);
 	}
 }
 
@@ -489,8 +491,8 @@ void Widget::renderOrigin(sf::RenderTarget& target) {
 	if (!visible) {
 		return;
 	}
-	sf::Color origin_color = widget_list->render_origin_color;
-	float offset = widget_list->render_origin_size;
+	sf::Color origin_color = widget_list.render_origin_color;
+	float offset = widget_list.render_origin_size;
 	sf::Vector2f hoffset = sf::Vector2f(offset, 0.0f);
 	sf::Vector2f voffset = sf::Vector2f(0.0f, offset);
 	sf::Vector2f pos = getGlobalPosition();
@@ -541,6 +543,8 @@ const sf::Transform& Widget::getInverseParentGlobalTransform() const {
 	}
 }
 
+ShapeWidget::ShapeWidget(WidgetList& widget_list) : Widget(widget_list) { }
+
 sf::FloatRect ShapeWidget::getLocalBounds() const {
 	return getShape().getLocalBounds();
 }
@@ -569,10 +573,7 @@ void ShapeWidget::setOutlineThickness(float thickness) {
 	getShape().setOutlineThickness(thickness);
 }
 
-RectangleWidget::RectangleWidget() { }
-
-RectangleWidget::RectangleWidget(WidgetList* widget_list) {
-	this->widget_list = widget_list;
+RectangleWidget::RectangleWidget(WidgetList& widget_list) : ShapeWidget(widget_list) {
 	setName("rectangle");
 }
 
@@ -609,10 +610,7 @@ const sf::Shape& RectangleWidget::getShape() const {
 	return rect;
 }
 
-TextWidget::TextWidget() { }
-
-TextWidget::TextWidget(WidgetList* widget_list) {
-	this->widget_list = widget_list;
+TextWidget::TextWidget(WidgetList& widget_list) : Widget(widget_list) {
 	setName("text");
 }
 
@@ -793,10 +791,7 @@ void TextWidget::update() {
 	Widget::update();
 }
 
-ContainerWidget::ContainerWidget() { }
-
-ContainerWidget::ContainerWidget(WidgetList* widget_list) {
-	this->widget_list = widget_list;
+ContainerWidget::ContainerWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
 	setName("container");
 }
 
@@ -975,14 +970,11 @@ void WidgetTransform::recalcInverseGlobalTransform() const {
 	inv_global_transform_valid = true;
 }
 
-CheckboxWidget::CheckboxWidget() { }
-
-CheckboxWidget::CheckboxWidget(WidgetList* widget_list) {
-	this->widget_list = widget_list;
+CheckboxWidget::CheckboxWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
 	setSize(DEFAULT_SIZE);
 	RectangleWidget::setFillColor(background_fill_color);
 	setName("checkbox");
-	check_widget = widget_list->createWidget<RectangleWidget>();
+	check_widget = widget_list.createWidget<RectangleWidget>();
 	check_widget->setVisible(checked);
 	check_widget->setSize(rect.getSize() * check_size);
 	check_widget->setFillColor(check_fill_color);
@@ -1056,7 +1048,7 @@ void CheckboxWidget::internalOnMouseExit(const sf::Vector2f& pos) {
 	RectangleWidget::setFillColor(background_fill_color);
 }
 
-WidgetList::WidgetList(Application* app) : app(app) {
+WidgetList::WidgetList(Application& app) : app(app) {
 	root_widget = createWidget<RectangleWidget>();
 	root_widget->setFillColor(sf::Color::Transparent);
 	root_widget->setClipChildren(true);
@@ -1152,20 +1144,17 @@ void WidgetList::setFocusedWidget(Widget* widget) {
 	}
 }
 
-TextBoxWidget::TextBoxWidget() { }
-
-TextBoxWidget::TextBoxWidget(WidgetList* widget_list) {
-	this->widget_list = widget_list;
+TextBoxWidget::TextBoxWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
 	setSize(DEFAULT_SIZE);
 	setName("textbox");
 	setClipChildren(true);
-	text_widget = widget_list->createWidget<TextWidget>();
+	text_widget = widget_list.createWidget<TextWidget>();
 	text_widget->setFillColor(text_color);
 	text_widget->setParentAnchor(CENTER_LEFT);
 	text_widget->setAnchorOffset(TEXT_VIEW_ZERO_POS);
 	text_widget->setOrigin(CENTER_LEFT);
 	text_widget->setParent(this);
-	cursor_widget = widget_list->createWidget<RectangleWidget>();
+	cursor_widget = widget_list.createWidget<RectangleWidget>();
 	cursor_widget->setVisible(false);
 	cursor_widget->setFillColor(editor_text_color);
 	cursor_widget->setSize(sf::Vector2f(1.0f, text_widget->getCharacterSize()));

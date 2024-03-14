@@ -1,8 +1,7 @@
 #include "editwindow.h"
 #include "application.h"
 
-EditWindow::EditWindow(WidgetList* widget_list) : app(*widget_list->app) {
-    this->widget_list = widget_list;
+EditWindow::EditWindow(WidgetList& widget_list) : ContainerWidget(widget_list), app(widget_list.app) {
     setVisible(false);
     setSize(sf::Vector2f(100.0f, 200.0f));
     setHorizontal(false);

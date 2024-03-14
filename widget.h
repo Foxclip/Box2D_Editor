@@ -96,6 +96,7 @@ public:
 	std::function<void()> OnFocused = []() { };
 	std::function<void()> OnFocusLost = []() { };
 
+	Widget(WidgetList& list);
 	bool isMouseOver() const;
 	void updateMouseState();
 	virtual bool isVisualPositionQuantized() const;
@@ -171,7 +172,7 @@ protected:
 	friend class WidgetUnclippedRegion;
 	std::string name = "<unnamed>";
 	std::string full_name;
-	WidgetList* widget_list = nullptr;
+	WidgetList& widget_list;
 	WidgetTransform transforms = WidgetTransform(this);
 	Widget* parent = nullptr;
 	CompoundVector<Widget*> children;
@@ -217,6 +218,7 @@ private:
 
 class ShapeWidget : public Widget {
 public:
+	ShapeWidget(WidgetList& widget_list);
 	sf::FloatRect getLocalBounds() const override;
 	sf::FloatRect getParentLocalBounds() const override;
 	sf::FloatRect getGlobalBounds() const override;
@@ -232,8 +234,7 @@ protected:
 
 class RectangleWidget : public ShapeWidget {
 public:
-	RectangleWidget();
-	RectangleWidget(WidgetList* widget_list);
+	RectangleWidget(WidgetList& widget_list);
 	void setSize(float width, float height);
 	void setSize(const sf::Vector2f& size);
 
@@ -253,8 +254,7 @@ private:
 
 class ContainerWidget : public RectangleWidget {
 public:
-	ContainerWidget();
-	ContainerWidget(WidgetList* widget_list);
+	ContainerWidget(WidgetList& widget_list);
 	void setAutoResize(bool value);
 	void setHorizontal(bool value);
 	void setPadding(float padding);
@@ -282,8 +282,7 @@ class CheckboxWidget : public RectangleWidget {
 public:
 	std::function<void(bool)> OnValueChanged = [](bool new_value) { };
 
-	CheckboxWidget();
-	CheckboxWidget(WidgetList* widget_list);
+	CheckboxWidget(WidgetList& widget_list);
 	bool isFocusable() const override;
 	bool getValue() const;
 	const sf::Color& getFillColor() const override;
@@ -315,8 +314,7 @@ private:
 
 class TextWidget : public Widget {
 public:
-	TextWidget();
-	TextWidget(WidgetList* widget_list);
+	TextWidget(WidgetList& widget_list);
 	bool isVisualPositionQuantized() const override;
 	sf::FloatRect getLocalBounds() const override;
 	sf::FloatRect getParentLocalBounds() const override;
@@ -362,8 +360,7 @@ public:
 	std::function<void(bool)> OnEditModeToggle = [](bool new_value) { };
 	std::function<void(const sf::String&)> OnValueChanged = [](const sf::String& new_value) { };
 
-	TextBoxWidget();
-	TextBoxWidget(WidgetList* widget_list);
+	TextBoxWidget(WidgetList& widget_list);
 	bool isFocusable() const override;
 	const sf::Color& getFillColor() const override;
 	const sf::Color& getHighlightColor() const;
@@ -427,9 +424,9 @@ class Application;
 class WidgetList {
 public:
 	bool debug_render = false;
-	Application* app;
+	Application& app;
 
-	WidgetList(Application* app);
+	WidgetList(Application& app);
 	bool contains(const Widget* widget);
 	bool isClickBlocked() const;
 	bool isReleaseBlocked() const;
@@ -464,9 +461,8 @@ private:
 template<typename T>
 requires std::derived_from<T, Widget>
 inline T* WidgetList::createWidget() {
-	std::unique_ptr<T> uptr = std::make_unique<T>(this);
+	std::unique_ptr<T> uptr = std::make_unique<T>(*this);
 	T* ptr = uptr.get();
-	ptr->widget_list = this;
 	if (root_widget) {
 		ptr->setParentSilent(root_widget);
 	}
