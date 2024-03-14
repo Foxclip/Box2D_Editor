@@ -404,7 +404,6 @@ void SplittablePolygon::recenter() {
 }
 
 void SplittablePolygon::recut() {
-	LoggerDisableTag disable_recut_tag("recut");
 	LoggerTag tag_recut("recut");
 	logger << __FUNCTION__"\n";
 	LoggerIndent recut_indent;

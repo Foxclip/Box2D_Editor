@@ -1129,6 +1129,7 @@ void WidgetList::reset(const sf::Vector2f& root_size) {
 }
 
 void WidgetList::setFocusedWidget(Widget* widget) {
+	LoggerTag tag_set_focused_widget("setFocusedWidget");
 	if (widget == focused_widget) {
 		return;
 	}

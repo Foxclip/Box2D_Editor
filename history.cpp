@@ -13,6 +13,7 @@ size_t History::size() {
 }
 
 void History::save(HistoryEntry::Type type) {
+    LoggerTag tag_history("history");
     if (current < history.size()) {
         history.erase(history.begin() + current + 1, history.end());
     }
@@ -24,6 +25,7 @@ void History::save(HistoryEntry::Type type) {
 }
 
 void History::undo() {
+    LoggerTag tag_history("history");
     if (current > 0) {
         current--;
         std::string state = history[current].str;
@@ -35,6 +37,7 @@ void History::undo() {
 }
 
 void History::redo() {
+    LoggerTag tag_history("history");
     if (current < history.size() - 1) {
         current++;
         std::string state = history[current].str;

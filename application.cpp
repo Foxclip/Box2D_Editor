@@ -1092,7 +1092,6 @@ void Application::maximize_window() const {
 }
 
 std::string Application::serialize() const {
-    LoggerDisableTag disable_serialize_tag("serialize");
     LoggerTag tag_serialize("serialize");
     logger << __FUNCTION__"\n";
     LoggerIndent serialize_indent;
@@ -1221,6 +1220,7 @@ void Application::deserialize(const std::string& str, bool set_camera) {
 }
 
 void Application::save_to_file(const std::string& filename) const {
+    LoggerTag tag_saveload("saveload");
     std::string str = serialize();
     utils::str_to_file(str, filename);
     logger << "Saved to " << filename << "\n";
@@ -1232,6 +1232,7 @@ void Application::load_action(const std::string& filename) {
 }
 
 void Application::load_from_file(const std::string& filename) {
+    LoggerTag tag_saveload("saveload");
     try {
         std::string str = utils::file_to_str(filename);
         deserialize(str, true);
@@ -1242,11 +1243,13 @@ void Application::load_from_file(const std::string& filename) {
 }
 
 void Application::quicksave() {
+    LoggerTag tag_saveload("saveload");
     quicksave_str = serialize();
     logger << "Quicksave\n";
 }
 
 void Application::quickload() {
+    LoggerTag tag_saveload("saveload");
     if (quicksave_str.size() > 0) {
         deserialize(quicksave_str, true);
         logger << "Quickload\n";

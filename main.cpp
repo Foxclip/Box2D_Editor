@@ -30,6 +30,9 @@ void execute_app() {
 
 int main() {
 
+    LoggerDisableTag disable_serialize_tag("serialize");
+    LoggerDisableTag disable_recut_tag("recut");
+    LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
     // TODO: remove widget focus logging
