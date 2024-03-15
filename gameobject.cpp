@@ -30,6 +30,14 @@ const b2Vec2& GameObject::getPosition() const {
 	return getTransform().p;
 }
 
+const b2Vec2& GameObject::getLinearVelocity() const {
+	return rigid_body->GetLinearVelocity();
+}
+
+float GameObject::getAngularVelocity() const {
+	return rigid_body->GetAngularVelocity();
+}
+
 float GameObject::getRotation() const {
 	return getTransform().q.GetAngle();
 }

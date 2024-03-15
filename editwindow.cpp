@@ -77,6 +77,40 @@ void EditWindow::createParameters() {
             app.active_object->setGlobalAngle(utils::to_radians(value));
         }
     );
+    createParameter<FloatParameter>(
+        "velocity x parameter",
+        "Velocity x:",
+        [=]() {
+            return app.active_object->getLinearVelocity().x;
+        },
+        [=](float value) {
+            b2Vec2 old_vel = app.active_object->getLinearVelocity();
+            b2Vec2 new_vel = b2Vec2(value, old_vel.y);
+            app.active_object->setLinearVelocity(new_vel, false);
+        }
+    );
+    createParameter<FloatParameter>(
+        "velocity y parameter",
+        "Velocity y:",
+        [=]() {
+            return app.active_object->getLinearVelocity().y;
+        },
+        [=](float value) {
+            b2Vec2 old_vel = app.active_object->getLinearVelocity();
+            b2Vec2 new_vel = b2Vec2(old_vel.x, value);
+            app.active_object->setLinearVelocity(new_vel, false);
+        }
+    );
+    createParameter<FloatParameter>(
+        "angular velocity parameter",
+        "Angular velocity:",
+        [=]() {
+            return utils::to_degrees(app.active_object->getAngularVelocity());
+        },
+        [=](float value) {
+            app.active_object->setAngularVelocity(utils::to_radians(value), false);
+        }
+    );
 }
 
 EditWindowParameter::EditWindowParameter(EditWindow& p_edit_window)

@@ -123,6 +123,8 @@ public:
 	virtual sf::Transformable* getTransformable() const = 0;
 	b2BodyType getType() const;
 	const b2Vec2& getPosition() const;
+	const b2Vec2& getLinearVelocity() const;
+	float getAngularVelocity() const;
 	float getRotation() const;
 	const b2Vec2& getGlobalPosition() const;
 	float getGlobalRotation() const;

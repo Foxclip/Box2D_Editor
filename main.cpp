@@ -35,8 +35,8 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
-    // TODO: createBoolParameter and createStringParameter in EditWindow
-    // TODO: edit velocities, angle and angular velocity in edit window
+    // TODO: undoable EditWindow parameters
+    // TODO: dynamic update of parameters in EditWindow
     // TODO: text selection in textbox
     // TODO: select text in texbox on click
     // TODO: don't move cursor to beginning after pressing enter or esc
