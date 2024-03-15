@@ -31,6 +31,7 @@ void EditWindow::createParameters() {
         [=](bool value) {
             b2BodyType type = value ? b2_dynamicBody : b2_staticBody;
             app.active_object->setType(type, false);
+            app.commit_action = true;
         }
     );
     createParameter<TextParameter>(
@@ -41,6 +42,7 @@ void EditWindow::createParameters() {
         },
         [=](const sf::String& str) {
             app.active_object->setName(str);
+            app.commit_action = true;
         }
     );
     createParameter<FloatParameter>(
@@ -53,6 +55,7 @@ void EditWindow::createParameters() {
             b2Vec2 old_pos = app.active_object->getGlobalPosition();
             b2Vec2 new_pos = b2Vec2(value, old_pos.y);
             app.active_object->setGlobalPosition(new_pos);
+            app.commit_action = true;
         }
     );
     createParameter<FloatParameter>(
@@ -65,6 +68,7 @@ void EditWindow::createParameters() {
             b2Vec2 old_pos = app.active_object->getGlobalPosition();
             b2Vec2 new_pos = b2Vec2(old_pos.x, value);
             app.active_object->setGlobalPosition(new_pos);
+            app.commit_action = true;
         }
     );
     createParameter<FloatParameter>(
@@ -75,6 +79,7 @@ void EditWindow::createParameters() {
         },
         [=](float value) {
             app.active_object->setGlobalAngle(utils::to_radians(value));
+            app.commit_action = true;
         }
     );
     createParameter<FloatParameter>(
@@ -87,6 +92,7 @@ void EditWindow::createParameters() {
             b2Vec2 old_vel = app.active_object->getLinearVelocity();
             b2Vec2 new_vel = b2Vec2(value, old_vel.y);
             app.active_object->setLinearVelocity(new_vel, false);
+            app.commit_action = true;
         }
     );
     createParameter<FloatParameter>(
@@ -99,6 +105,7 @@ void EditWindow::createParameters() {
             b2Vec2 old_vel = app.active_object->getLinearVelocity();
             b2Vec2 new_vel = b2Vec2(old_vel.x, value);
             app.active_object->setLinearVelocity(new_vel, false);
+            app.commit_action = true;
         }
     );
     createParameter<FloatParameter>(
@@ -109,6 +116,7 @@ void EditWindow::createParameters() {
         },
         [=](float value) {
             app.active_object->setAngularVelocity(utils::to_radians(value), false);
+            app.commit_action = true;
         }
     );
 }

@@ -184,6 +184,7 @@ private:
 	void load_from_file(const std::string& filename);
 	void quicksave();
 	void quickload();
+	void setActiveObject(GameObject* object);
 	Tool* try_select_tool_by_index(size_t index);
 	Tool* try_select_tool(Tool* tool);
 	void select_create_type(int type);

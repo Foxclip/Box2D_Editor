@@ -235,6 +235,7 @@ void Application::init_tools() {
     };
     edit_tool.OnSetSelected = [&](bool value) {
         if (value) {
+            assert(active_object);
             edit_tool.edit_window_widget->updateParameters();
         }
         edit_tool.edit_window_widget->setVisible(value);
@@ -776,7 +777,7 @@ void Application::process_left_release() {
     if (selected_tool == &select_tool) {
         if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
             GameObject* object = get_object_at(mousePosf);
-            active_object = object;
+            setActiveObject(object);
             bool with_children = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                 select_tool.toggleSelect(object, with_children);
@@ -1063,7 +1064,10 @@ std::string Application::serialize() const {
 }
 
 void Application::deserialize(const std::string& str, bool set_camera) {
-    active_object = nullptr;
+    ptrdiff_t active_object_id = -1;
+    if (active_object) {
+        active_object_id = active_object->id;
+    }
     game_objects.clear();
     init_tools();
     init_world();
@@ -1125,6 +1129,10 @@ void Application::deserialize(const std::string& str, bool set_camera) {
                 throw std::runtime_error("Unknown entity type: " + entity);
             }
         }
+        if (active_object_id >= 0) {
+            GameObject* object = game_objects.getById(active_object_id);
+            setActiveObject(object);
+        }
     } catch (std::exception exc) {
         throw std::runtime_error("Line " + std::to_string(tr.getLine(-1)) + ": " + exc.what());
     }
@@ -1166,6 +1174,17 @@ void Application::quickload() {
         logger << "Quickload\n";
     } else {
         logger << "Can't quickload\n";
+    }
+}
+
+void Application::setActiveObject(GameObject* object) {
+    active_object = object;
+    if (selected_tool == &edit_tool) {
+        if (object) {
+            edit_tool.edit_window_widget->updateParameters();
+        } else {
+            try_select_tool(&select_tool);
+        }
     }
 }
 
@@ -1497,7 +1516,7 @@ void Application::delete_object(GameObject* object, bool remove_children) {
         return;
     }
     if (object == active_object) {
-        active_object = nullptr;
+        setActiveObject(nullptr);
     }
     select_tool.deselectObject(object);
     game_objects.remove(object, remove_children);
