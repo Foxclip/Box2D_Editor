@@ -307,7 +307,7 @@ private:
 	float check_size = 0.6f;
 	RectangleWidget* check_widget = nullptr;
 	sf::Color background_fill_color = sf::Color(50, 50, 50);
-	sf::Color highlight_fill_color = sf::Color(128, 128, 128);
+	sf::Color highlight_fill_color = sf::Color(100, 100, 100);
 	sf::Color check_fill_color = sf::Color(255, 128, 0);
 
 };
@@ -438,7 +438,7 @@ private:
 	bool fail_state = false;
 	sf::Vector2f text_view_pos;
 	sf::Color background_color = sf::Color(50, 50, 50);
-	sf::Color highlight_color = sf::Color(128, 128, 128);
+	sf::Color highlight_color = sf::Color(100, 100, 100);
 	sf::Color text_color = sf::Color(255, 255, 255);
 	sf::Color editor_color = sf::Color(255, 255, 255);
 	sf::Color editor_text_color = sf::Color(0, 0, 0);

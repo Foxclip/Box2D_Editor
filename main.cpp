@@ -35,8 +35,12 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
-    // TODO: edit velocities in edit window
+    // TODO: edit velocities, angle and angular velocity in edit window
+    // TODO: text selection in textbox
+    // TODO: select text in texbox on click
     // TODO: don't move cursor to beginning after pressing enter or esc
+    // TDOO: ctrl-z in textbox
+    // TODO: restore text in textbox when losing focus without confirmation
     // TODO: close edit mode with esc key
     // TODO: blinking textbox cursor
     // TODO: change color of textbox mouse highlight

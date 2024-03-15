@@ -1,6 +1,7 @@
 #pragma once
 
 #include "widget.h"
+#include <functional>
 
 class Application;
 
@@ -11,5 +12,10 @@ public:
 private:
 	ContainerWidget* createParameterWidget(const std::string& name, const std::string& text);
 	TextBoxWidget* createTextBoxWidget();
+	ContainerWidget* createFloatParameter(
+		const std::string& name,
+		const std::string& text,
+		std::function<void(float)> set_value
+	);
 	Application& app;
 };

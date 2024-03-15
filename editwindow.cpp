@@ -13,10 +13,11 @@ EditWindow::EditWindow(WidgetList& widget_list, Application& p_app) : ContainerW
     setClickThrough(false);
     setName("edit window");
     {
-        ContainerWidget* dynamic_parameter_widget = createParameterWidget("dynamic parameter", "Dynamic:");
+        ContainerWidget* dynamic_parameter_widget = createParameterWidget(
+            "dynamic parameter", "Dynamic:"
+        );
         CheckboxWidget* checkbox_widget = app.widgets.createWidget<CheckboxWidget>();
         checkbox_widget->setOrigin(Widget::TOP_LEFT);
-        checkbox_widget->setHighlightFillColor(sf::Color(100, 100, 100));
         checkbox_widget->OnValueChanged = [&](bool value) {
             assert(app.active_object);
             b2BodyType type = value ? b2_dynamicBody : b2_staticBody;
@@ -25,7 +26,9 @@ EditWindow::EditWindow(WidgetList& widget_list, Application& p_app) : ContainerW
         checkbox_widget->setParent(dynamic_parameter_widget);
     }
     {
-        ContainerWidget* name_parameter_widget = createParameterWidget("name parameter", "Name:");
+        ContainerWidget* name_parameter_widget = createParameterWidget(
+            "name parameter", "Name:"
+        );
         TextBoxWidget* textbox_widget = createTextBoxWidget();
         textbox_widget->setValue("<name>");
         textbox_widget->OnValueChanged = [=](const sf::String& str) {
@@ -35,36 +38,24 @@ EditWindow::EditWindow(WidgetList& widget_list, Application& p_app) : ContainerW
         textbox_widget->setParent(name_parameter_widget);
     }
     {
-        ContainerWidget* position_x_parameter_widget = createParameterWidget("position x parameter", "Position x:");
-        TextBoxWidget* textbox_widget = createTextBoxWidget();
-        textbox_widget->setType(TextBoxWidget::TextBoxType::FLOAT);
-        textbox_widget->setValue("0.0");
-        textbox_widget->OnConfirm = [=](const sf::String& str) {
-            assert(app.active_object);
-            if (textbox_widget->isValidValue()) {
-                float value = std::stof(textbox_widget->getValue().toAnsiString());
-                b2Vec2 old_pos = app.active_object->getGlobalPosition();
-                b2Vec2 new_pos = b2Vec2(value, old_pos.y);
-                app.active_object->setGlobalPosition(new_pos);
-            }
+        auto set_value = [=](float value) {
+            b2Vec2 old_pos = app.active_object->getGlobalPosition();
+            b2Vec2 new_pos = b2Vec2(value, old_pos.y);
+            app.active_object->setGlobalPosition(new_pos);
         };
-        textbox_widget->setParent(position_x_parameter_widget);
+        ContainerWidget* position_x_parameter = createFloatParameter(
+            "position x parameter", "Position x:", set_value
+        );
     }
     {
-        ContainerWidget* position_y_parameter_widget = createParameterWidget("position y parameter", "Position y:");
-        TextBoxWidget* textbox_widget = createTextBoxWidget();
-        textbox_widget->setType(TextBoxWidget::TextBoxType::FLOAT);
-        textbox_widget->setValue("0.0");
-        textbox_widget->OnConfirm = [=](const sf::String& str) {
-            assert(app.active_object);
-            if (textbox_widget->isValidValue()) {
-                float value = std::stof(textbox_widget->getValue().toAnsiString());
-                b2Vec2 old_pos = app.active_object->getGlobalPosition();
-                b2Vec2 new_pos = b2Vec2(old_pos.x, value);
-                app.active_object->setGlobalPosition(new_pos);
-            }
+        auto set_value = [=](float value) {
+            b2Vec2 old_pos = app.active_object->getGlobalPosition();
+            b2Vec2 new_pos = b2Vec2(old_pos.x, value);
+            app.active_object->setGlobalPosition(new_pos);
         };
-        textbox_widget->setParent(position_y_parameter_widget);
+        ContainerWidget* position_y_parameter = createFloatParameter(
+            "position y parameter", "Position y:", set_value
+        );
     }
 }
 
@@ -90,7 +81,27 @@ ContainerWidget* EditWindow::createParameterWidget(const std::string& name, cons
 TextBoxWidget* EditWindow::createTextBoxWidget() {
     TextBoxWidget* textbox_widget = app.widgets.createWidget<TextBoxWidget>();
     textbox_widget->setFont(app.textbox_font);
-    textbox_widget->setSize(40.0f, 20.0f);
+    textbox_widget->setSize(100.0f, 20.0f);
     textbox_widget->setCharacterSize(12);
     return textbox_widget;
+}
+
+ContainerWidget* EditWindow::createFloatParameter(
+    const std::string& name,
+    const std::string& text,
+    std::function<void(float value)> set_value
+) {
+    ContainerWidget* parameter_widget = createParameterWidget(name, text);
+    TextBoxWidget* textbox_widget = createTextBoxWidget();
+    textbox_widget->setType(TextBoxWidget::TextBoxType::FLOAT);
+    textbox_widget->setValue("0.0");
+    textbox_widget->OnConfirm = [=](const sf::String& str) {
+        assert(app.active_object);
+        if (textbox_widget->isValidValue()) { 
+            float value = std::stof(textbox_widget->getValue().toAnsiString());
+            set_value(value);
+        }
+    };
+    textbox_widget->setParent(parameter_widget);
+    return parameter_widget;
 }
