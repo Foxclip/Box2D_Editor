@@ -1295,11 +1295,11 @@ void TextBoxWidget::setCharacterSize(unsigned int size) {
 void TextBoxWidget::setValueSilent(const sf::String& value) {
 	text_widget->setString(value);
 	setCursorPos(cursor_pos);
+	internalOnValueChanged(value);
 }
 
 void TextBoxWidget::setValue(const sf::String& value) {
 	setValueSilent(value);
-	internalOnValueChanged(value);
 	OnValueChanged(value);
 }
 

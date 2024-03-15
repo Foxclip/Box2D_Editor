@@ -98,6 +98,10 @@ public:
 
 private:
 	friend class EditWindow;
+	friend class EditWindowParameter;
+	friend class TextParameter;
+	friend class BoolParameter;
+	friend class FloatParameter;
 	friend class Toolbox;
 	friend class CreatePanel;
 	sf::Shader desat_shader;
