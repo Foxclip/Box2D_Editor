@@ -59,7 +59,7 @@ EditWindow::EditWindow(WidgetList& widget_list, Application& p_app) : ContainerW
     }
     {
         auto set_value = [=](float value) {
-            app.active_object->setGlobalAngle(value);
+            app.active_object->setGlobalAngle(utils::to_radians(value));
         };
         ContainerWidget* position_y_parameter = createFloatParameter(
             "angle parameter", "Angle:", set_value
@@ -73,7 +73,7 @@ void EditWindow::updateParameters() {
     setTextBoxValue("name parameter", app.active_object->getName());
     setFloatValue("position x parameter", app.active_object->getGlobalPosition().x);
     setFloatValue("position y parameter", app.active_object->getGlobalPosition().y);
-    setFloatValue("angle parameter", app.active_object->getGlobalRotation());
+    setFloatValue("angle parameter", utils::to_degrees(app.active_object->getGlobalRotation()));
 }
 
 ContainerWidget* EditWindow::createParameterWidget(const std::string& name, const std::string& text) {

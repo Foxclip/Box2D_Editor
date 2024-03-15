@@ -35,7 +35,7 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
-    // TODO: set angle in degrees instead of radians
+    // TODO: focused widget bounds with CEIL_SUBTRACT mode
     // TODO: createBoolParameter and createStringParameter in EditWindow
     // TODO: edit velocities, angle and angular velocity in edit window
     // TODO: text selection in textbox
