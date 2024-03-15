@@ -407,6 +407,8 @@ namespace utils {
 		auto rounding_func = [&](float x) {
 			if (quantize_mode == QUANTIZE_MODE_FLOOR) {
 				return floor(x);
+			} else if (quantize_mode == QUANTIZE_MODE_FLOOR_SUBTRACT) {
+				return floor(x) - 1.0f;
 			} else if (quantize_mode == QUANTIZE_MODE_CEIL_SUBTRACT) {
 				return ceil(x) - 1.0f;
 			} else {

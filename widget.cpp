@@ -481,7 +481,7 @@ void Widget::renderBounds(sf::RenderTarget& target, const sf::Color& color, bool
 	}
 	sf::FloatRect quantized_bounds = utils::quantize_rect(
 		getGlobalBounds(),
-		utils::QUANTIZE_MODE_CEIL_SUBTRACT
+		utils::QUANTIZE_MODE_FLOOR_SUBTRACT
 	);
 	draw_wire_rect(target, quantized_bounds, color);
 	if (include_children) {

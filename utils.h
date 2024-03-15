@@ -40,6 +40,7 @@ namespace utils {
 	void quantize_position(sf::Transform& transform);
 	enum QuantizeMode {
 		QUANTIZE_MODE_FLOOR,
+		QUANTIZE_MODE_FLOOR_SUBTRACT,
 		QUANTIZE_MODE_CEIL_SUBTRACT,
 	};
 	sf::FloatRect quantize_rect(const sf::FloatRect& rect, QuantizeMode quantize_mode);
