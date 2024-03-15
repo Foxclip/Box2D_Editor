@@ -13,8 +13,14 @@ public:
 private:
 	Application& app;
 
+	void createParameters();
 	ContainerWidget* createParameterWidget(const std::string& name, const std::string& text);
 	TextBoxWidget* createTextBoxWidget();
+	ContainerWidget* createTextParameter(
+		const std::string& name,
+		const std::string& text,
+		std::function<void(const sf::String&)> set_value
+	);
 	ContainerWidget* createBoolParameter(
 		const std::string& name,
 		const std::string& text,

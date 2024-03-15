@@ -12,56 +12,7 @@ EditWindow::EditWindow(WidgetList& widget_list, Application& p_app) : ContainerW
     setPadding(TOOLBOX_PADDING);
     setClickThrough(false);
     setName("edit window");
-    {
-        auto set_value = [=](bool value) {
-            assert(app.active_object);
-            b2BodyType type = value ? b2_dynamicBody : b2_staticBody;
-            app.active_object->setType(type, false);
-        };
-        ContainerWidget* dynamic_parameter_widget = createBoolParameter(
-            "dynamic parameter", "Dynamic:", set_value
-        );
-    }
-    {
-        ContainerWidget* name_parameter_widget = createParameterWidget(
-            "name parameter", "Name:"
-        );
-        TextBoxWidget* textbox_widget = createTextBoxWidget();
-        textbox_widget->setValue("<name>");
-        textbox_widget->OnValueChanged = [=](const sf::String& str) {
-            assert(app.active_object);
-            app.active_object->setName(str);
-        };
-        textbox_widget->setParent(name_parameter_widget);
-    }
-    {
-        auto set_value = [=](float value) {
-            b2Vec2 old_pos = app.active_object->getGlobalPosition();
-            b2Vec2 new_pos = b2Vec2(value, old_pos.y);
-            app.active_object->setGlobalPosition(new_pos);
-        };
-        ContainerWidget* position_x_parameter = createFloatParameter(
-            "position x parameter", "Position x:", set_value
-        );
-    }
-    {
-        auto set_value = [=](float value) {
-            b2Vec2 old_pos = app.active_object->getGlobalPosition();
-            b2Vec2 new_pos = b2Vec2(old_pos.x, value);
-            app.active_object->setGlobalPosition(new_pos);
-        };
-        ContainerWidget* position_y_parameter = createFloatParameter(
-            "position y parameter", "Position y:", set_value
-        );
-    }
-    {
-        auto set_value = [=](float value) {
-            app.active_object->setGlobalAngle(utils::to_radians(value));
-        };
-        ContainerWidget* position_y_parameter = createFloatParameter(
-            "angle parameter", "Angle:", set_value
-        );
-    }
+    createParameters();
 }
 
 void EditWindow::updateParameters() {
@@ -71,6 +22,49 @@ void EditWindow::updateParameters() {
     setFloatValue("position x parameter", app.active_object->getGlobalPosition().x);
     setFloatValue("position y parameter", app.active_object->getGlobalPosition().y);
     setFloatValue("angle parameter", utils::to_degrees(app.active_object->getGlobalRotation()));
+}
+
+void EditWindow::createParameters() {
+    createBoolParameter(
+        "dynamic parameter", "Dynamic:",
+        [=](bool value) {
+            assert(app.active_object);
+            b2BodyType type = value ? b2_dynamicBody : b2_staticBody;
+            app.active_object->setType(type, false);
+        }
+    );
+    createTextParameter(
+        "name parameter", "Name:",
+        [=](const sf::String& str) {
+            assert(app.active_object);
+            app.active_object->setName(str);
+        }
+    );
+    createFloatParameter(
+        "position x parameter", "Position x:",
+        [=](float value) {
+            assert(app.active_object);
+            b2Vec2 old_pos = app.active_object->getGlobalPosition();
+            b2Vec2 new_pos = b2Vec2(value, old_pos.y);
+            app.active_object->setGlobalPosition(new_pos);
+        }
+    );
+    createFloatParameter(
+        "position y parameter", "Position y:",
+        [=](float value) {
+            assert(app.active_object);
+            b2Vec2 old_pos = app.active_object->getGlobalPosition();
+            b2Vec2 new_pos = b2Vec2(old_pos.x, value);
+            app.active_object->setGlobalPosition(new_pos);
+        }
+    );
+    createFloatParameter(
+        "angle parameter", "Angle:",
+        [=](float value) {
+            assert(app.active_object);
+            app.active_object->setGlobalAngle(utils::to_radians(value));
+        }
+    );
 }
 
 ContainerWidget* EditWindow::createParameterWidget(const std::string& name, const std::string& text) {
@@ -100,6 +94,18 @@ TextBoxWidget* EditWindow::createTextBoxWidget() {
     return textbox_widget;
 }
 
+ContainerWidget* EditWindow::createTextParameter(
+    const std::string& name,
+    const std::string& text,
+    std::function<void(const sf::String&)> set_value
+) {
+    ContainerWidget* parameter_widget = createParameterWidget(name, text);
+    TextBoxWidget* textbox_widget = createTextBoxWidget();
+    textbox_widget->OnConfirm = set_value;
+    textbox_widget->setParent(parameter_widget);
+    return parameter_widget;
+}
+
 ContainerWidget* EditWindow::createBoolParameter(
     const std::string& name,
     const std::string& text,
@@ -107,9 +113,7 @@ ContainerWidget* EditWindow::createBoolParameter(
 ) {
     ContainerWidget* parameter_widget = createParameterWidget(name, text);
     CheckboxWidget* checkbox_widget = app.widgets.createWidget<CheckboxWidget>();
-    checkbox_widget->OnValueChanged = [=](bool value) {
-        set_value(value);
-    };
+    checkbox_widget->OnValueChanged = set_value;
     checkbox_widget->setParent(parameter_widget);
     return parameter_widget;
 }
@@ -124,7 +128,6 @@ ContainerWidget* EditWindow::createFloatParameter(
     textbox_widget->setType(TextBoxWidget::TextBoxType::FLOAT);
     textbox_widget->setValue("0.0");
     textbox_widget->OnConfirm = [=](const sf::String& str) {
-        assert(app.active_object);
         if (textbox_widget->isValidValue()) { 
             float value = std::stof(str.toAnsiString());
             set_value(value);
