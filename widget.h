@@ -380,8 +380,6 @@ public:
 	unsigned int getCharacterSize() const;
 	const sf::String& getValue() const;
 	bool isValidValue() const;
-	long long getLLValue() const;
-	float getFloatValue() const;
 	size_t getStringSize() const;
 	TextBoxType getType() const;
 	size_t getCursorPos() const;
