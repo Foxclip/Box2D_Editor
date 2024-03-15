@@ -367,6 +367,9 @@ void Application::resetView() {
 
 void Application::process_widgets() {
     widgets.reset(sf::Vector2f(ui_texture.getSize().x, ui_texture.getSize().y));
+    if (edit_tool.edit_window_widget->isVisible() && active_object) {
+        edit_tool.edit_window_widget->updateParameters();
+    }
 }
 
 void Application::process_input() {

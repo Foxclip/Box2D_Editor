@@ -28,6 +28,10 @@ bool Widget::isVisualPositionQuantized() const {
 	return false;
 }
 
+bool Widget::isVisible() const {
+	return visible;
+}
+
 WidgetVisibility Widget::checkVisibility() const {
 	WidgetVisibility v;
 	sf::FloatRect global_bounds = getGlobalBounds();
@@ -1239,6 +1243,10 @@ TextBoxWidget::TextBoxType TextBoxWidget::getType() const {
 
 size_t TextBoxWidget::getCursorPos() const {
 	return cursor_pos;
+}
+
+bool TextBoxWidget::isEditMode() const {
+	return edit_mode;
 }
 
 sf::Vector2f TextBoxWidget::getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {

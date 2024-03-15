@@ -100,6 +100,7 @@ public:
 	bool isMouseOver() const;
 	void updateMouseState();
 	virtual bool isVisualPositionQuantized() const;
+	bool isVisible() const;
 	WidgetVisibility checkVisibility() const;
 	void processClick(const sf::Vector2f& pos);
 	void processRelease(const sf::Vector2f& pos);
@@ -383,6 +384,7 @@ public:
 	size_t getStringSize() const;
 	TextBoxType getType() const;
 	size_t getCursorPos() const;
+	bool isEditMode() const;
 	sf::Vector2f getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const;
 	sf::Vector2f getGlobalCharPos(size_t index, bool top_aligned, bool with_kerning) const;
 	void setFillColor(const sf::Color& color) override;

@@ -171,7 +171,9 @@ TextParameter::TextParameter(
 }
 
 void TextParameter::getValue() const {
-    textbox_widget->setValueSilent(get_value());
+    if (!textbox_widget->isEditMode()) {
+        textbox_widget->setValueSilent(get_value());
+    }
 }
 
 BoolParameter::BoolParameter(
@@ -215,6 +217,8 @@ FloatParameter::FloatParameter(
 }
 
 void FloatParameter::getValue() const {
-    std::string str = utils::floatToStr(get_value(), 9);
-    this->textbox_widget->setValueSilent(str);
+    if (!textbox_widget->isEditMode()) {
+        std::string str = utils::floatToStr(get_value(), 9);
+        this->textbox_widget->setValueSilent(str);
+    }
 }
