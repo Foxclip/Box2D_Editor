@@ -15,6 +15,11 @@ private:
 
 	ContainerWidget* createParameterWidget(const std::string& name, const std::string& text);
 	TextBoxWidget* createTextBoxWidget();
+	ContainerWidget* createBoolParameter(
+		const std::string& name,
+		const std::string& text,
+		std::function<void(bool)> set_value
+	);
 	ContainerWidget* createFloatParameter(
 		const std::string& name,
 		const std::string& text,

@@ -13,17 +13,14 @@ EditWindow::EditWindow(WidgetList& widget_list, Application& p_app) : ContainerW
     setClickThrough(false);
     setName("edit window");
     {
-        ContainerWidget* dynamic_parameter_widget = createParameterWidget(
-            "dynamic parameter", "Dynamic:"
-        );
-        CheckboxWidget* checkbox_widget = app.widgets.createWidget<CheckboxWidget>();
-        checkbox_widget->setOrigin(Widget::TOP_LEFT);
-        checkbox_widget->OnValueChanged = [&](bool value) {
+        auto set_value = [=](bool value) {
             assert(app.active_object);
             b2BodyType type = value ? b2_dynamicBody : b2_staticBody;
             app.active_object->setType(type, false);
         };
-        checkbox_widget->setParent(dynamic_parameter_widget);
+        ContainerWidget* dynamic_parameter_widget = createBoolParameter(
+            "dynamic parameter", "Dynamic:", set_value
+        );
     }
     {
         ContainerWidget* name_parameter_widget = createParameterWidget(
@@ -103,6 +100,20 @@ TextBoxWidget* EditWindow::createTextBoxWidget() {
     return textbox_widget;
 }
 
+ContainerWidget* EditWindow::createBoolParameter(
+    const std::string& name,
+    const std::string& text,
+    std::function<void(bool)> set_value
+) {
+    ContainerWidget* parameter_widget = createParameterWidget(name, text);
+    CheckboxWidget* checkbox_widget = app.widgets.createWidget<CheckboxWidget>();
+    checkbox_widget->OnValueChanged = [=](bool value) {
+        set_value(value);
+    };
+    checkbox_widget->setParent(parameter_widget);
+    return parameter_widget;
+}
+
 ContainerWidget* EditWindow::createFloatParameter(
     const std::string& name,
     const std::string& text,
@@ -115,7 +126,7 @@ ContainerWidget* EditWindow::createFloatParameter(
     textbox_widget->OnConfirm = [=](const sf::String& str) {
         assert(app.active_object);
         if (textbox_widget->isValidValue()) { 
-            float value = std::stof(textbox_widget->getValue().toAnsiString());
+            float value = std::stof(str.toAnsiString());
             set_value(value);
         }
     };
