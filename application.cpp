@@ -234,39 +234,10 @@ void Application::init_tools() {
         create_tool.create_panel_widget->setVisible(value);
     };
     edit_tool.OnSetSelected = [&](bool value) {
-        assert(active_object);
-        Widget* window_widget = edit_tool.edit_window_widget;
-        window_widget->setVisible(value);
-        {
-            Widget* parameter = window_widget->find("dynamic parameter");
-            assert(parameter);
-            CheckboxWidget* checkbox = dynamic_cast<CheckboxWidget*>(parameter->find("checkbox"));
-            assert(checkbox);
-            checkbox->setValueSilent(active_object->getType() == b2_dynamicBody);
+        if (value) {
+            edit_tool.edit_window_widget->updateParameters();
         }
-        {
-            Widget* parameter = window_widget->find("name parameter");
-            assert(parameter);
-            TextBoxWidget* textbox = dynamic_cast<TextBoxWidget*>(parameter->find("textbox"));
-            assert(textbox);
-            textbox->setValueSilent(active_object->getName());
-        }
-        {
-            Widget* parameter = window_widget->find("position x parameter");
-            assert(parameter);
-            TextBoxWidget* textbox = dynamic_cast<TextBoxWidget*>(parameter->find("textbox"));
-            assert(textbox);
-            std::string str = utils::floatToStr(active_object->getGlobalPosition().x, 9);
-            textbox->setValueSilent(str);
-        }
-        {
-            Widget* parameter = window_widget->find("position y parameter");
-            assert(parameter);
-            TextBoxWidget* textbox = dynamic_cast<TextBoxWidget*>(parameter->find("textbox"));
-            assert(textbox);
-            std::string str = utils::floatToStr(active_object->getGlobalPosition().y, 9);
-            textbox->setValueSilent(str);
-        }
+        edit_tool.edit_window_widget->setVisible(value);
     };
 }
 

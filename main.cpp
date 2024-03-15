@@ -35,6 +35,8 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
+    // TODO: set angle in degrees instead of radians
+    // TODO: createBoolParameter and createStringParameter in EditWindow
     // TODO: edit velocities, angle and angular velocity in edit window
     // TODO: text selection in textbox
     // TODO: select text in texbox on click
@@ -46,6 +48,7 @@ int main() {
     // TODO: change color of textbox mouse highlight
     // TODO: make SearchIndex not use pointers for TObject type
     // TODO: Dropdown widget
+    // TODO: object list window
     // TODO: render polygon indices
     // TODO: separate Simulation and Application,
     // interface in Application, physics and object management in Simulation

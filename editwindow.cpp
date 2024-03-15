@@ -57,6 +57,23 @@ EditWindow::EditWindow(WidgetList& widget_list, Application& p_app) : ContainerW
             "position y parameter", "Position y:", set_value
         );
     }
+    {
+        auto set_value = [=](float value) {
+            app.active_object->setGlobalAngle(value);
+        };
+        ContainerWidget* position_y_parameter = createFloatParameter(
+            "angle parameter", "Angle:", set_value
+        );
+    }
+}
+
+void EditWindow::updateParameters() {
+    assert(app.active_object);
+    setCheckBoxValue("dynamic parameter", app.active_object->getType() == b2_dynamicBody);
+    setTextBoxValue("name parameter", app.active_object->getName());
+    setFloatValue("position x parameter", app.active_object->getGlobalPosition().x);
+    setFloatValue("position y parameter", app.active_object->getGlobalPosition().y);
+    setFloatValue("angle parameter", app.active_object->getGlobalRotation());
 }
 
 ContainerWidget* EditWindow::createParameterWidget(const std::string& name, const std::string& text) {
@@ -104,4 +121,24 @@ ContainerWidget* EditWindow::createFloatParameter(
     };
     textbox_widget->setParent(parameter_widget);
     return parameter_widget;
+}
+
+void EditWindow::setCheckBoxValue(const std::string& name, bool value) {
+    Widget* parameter = find(name);
+    assert(parameter);
+    CheckboxWidget* checkbox = dynamic_cast<CheckboxWidget*>(find("checkbox"));
+    assert(checkbox);
+    checkbox->setValueSilent(value);
+}
+
+void EditWindow::setTextBoxValue(const std::string& name, const sf::String& value) {
+    Widget* parameter = find(name);
+    assert(parameter);
+    TextBoxWidget* textbox = dynamic_cast<TextBoxWidget*>(parameter->find("textbox"));
+    assert(textbox);
+    textbox->setValueSilent(value);
+}
+
+void EditWindow::setFloatValue(const std::string& name, float value) {
+    setTextBoxValue(name, utils::floatToStr(value, 9));
 }

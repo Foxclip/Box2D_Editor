@@ -1355,13 +1355,17 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		switch (event.key.code) {
 			case sf::Keyboard::Escape:
-				internalOnCancel();
-				OnCancel();
+				if (edit_mode) {
+					internalOnCancel();
+					OnCancel();
+				}
 				removeFocus();
 				break;
 			case sf::Keyboard::Enter:
-				internalOnConfirm(getValue());
-				OnConfirm(getValue());
+				if (edit_mode) {
+					internalOnConfirm(getValue());
+					OnConfirm(getValue());
+				}
 				setEditMode(!edit_mode);
 				break;
 		}
