@@ -2,7 +2,7 @@
 
 #include "gameobject.h"
 #include "widget.h"
-#include "editwindow.h"
+#include "edit_window.h"
 #include <set>
 
 const int TOOL_RECT_WIDTH = 60;

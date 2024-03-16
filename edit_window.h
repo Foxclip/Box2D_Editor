@@ -1,7 +1,7 @@
 #pragma once
 
-#include "widget.h"
 #include <functional>
+#include "widgets.h"
 
 class Application;
 class EditWindow;

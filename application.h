@@ -10,7 +10,7 @@
 #include "history.h"
 #include "widget.h"
 #include "objectlist.h"
-#include "editwindow.h"
+#include "edit_window.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;

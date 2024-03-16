@@ -136,9 +136,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
+    <ClCompile Include="checkbox_widget.cpp" />
     <ClCompile Include="compvector.cpp" />
+    <ClCompile Include="container_widget.cpp" />
     <ClCompile Include="create_panel.cpp" />
-    <ClCompile Include="editwindow.cpp" />
+    <ClCompile Include="edit_window.cpp" />
     <ClCompile Include="gameobject.cpp" />
     <ClCompile Include="global.cpp" />
     <ClCompile Include="history.cpp" />
@@ -146,31 +148,49 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="objectlist.cpp" />
     <ClCompile Include="polygon.cpp" />
+    <ClCompile Include="rectangle_widget.cpp" />
     <ClCompile Include="searchindex.cpp" />
     <ClCompile Include="serializer.cpp" />
+    <ClCompile Include="shape_widget.cpp" />
+    <ClCompile Include="textbox_widget.cpp" />
+    <ClCompile Include="text_widget.cpp" />
     <ClCompile Include="toolbox.cpp" />
     <ClCompile Include="tools.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="widget.cpp" />
+    <ClCompile Include="widget_list.cpp" />
+    <ClCompile Include="widget_transform.cpp" />
+    <ClCompile Include="widget_unclipped_region.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
+    <ClInclude Include="checkbox_widget.h" />
     <ClInclude Include="compvector.h" />
+    <ClInclude Include="container_widget.h" />
     <ClInclude Include="create_panel.h" />
-    <ClInclude Include="editwindow.h" />
+    <ClInclude Include="edit_window.h" />
     <ClInclude Include="gameobject.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="history.h" />
     <ClInclude Include="logger.h" />
+    <ClInclude Include="main.h" />
     <ClInclude Include="objectlist.h" />
     <ClInclude Include="polygon.h" />
+    <ClInclude Include="rectangle_widget.h" />
     <ClInclude Include="scenes.h" />
     <ClInclude Include="searchindex.h" />
     <ClInclude Include="serializer.h" />
+    <ClInclude Include="shape_widget.h" />
+    <ClInclude Include="textbox_widget.h" />
+    <ClInclude Include="text_widget.h" />
     <ClInclude Include="toolbox.h" />
     <ClInclude Include="tools.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="widget.h" />
+    <ClInclude Include="widgets.h" />
+    <ClInclude Include="widget_list.h" />
+    <ClInclude Include="widget_transform.h" />
+    <ClInclude Include="widget_unclipped_region.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

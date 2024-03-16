@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <iostream>
+#include "main.h"
 #include "application.h"
 #include "logger.h"
 #include "scenes.h"
