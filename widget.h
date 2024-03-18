@@ -46,7 +46,7 @@ public:
 	};
 	enum RenderLayer {
 		BASE,
-		TOP,
+		TEXTBOX_TEXT,
 	};
 	ptrdiff_t debug_id = -1;
 
