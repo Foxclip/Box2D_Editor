@@ -448,6 +448,7 @@ void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
 			setCursorPos(char_right);
 		}
 	}
+	deselectAll();
 	setEditMode(true);
 }
 
