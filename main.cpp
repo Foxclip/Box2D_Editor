@@ -39,6 +39,7 @@ int main() {
     // TODO: text selection in textbox
     // TODO: select text in texbox on click
     // TODO: don't move cursor to beginning after pressing enter or esc
+    // TODO: change cursor when hovering over textbox
     // TDOO: ctrl-z in textbox
     // TODO: restore text in textbox when losing focus without confirmation
     // TODO: close edit mode with esc key

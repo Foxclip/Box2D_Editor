@@ -44,6 +44,10 @@ public:
 		ALIGN_LEFT,
 		ALIGN_RIGHT
 	};
+	enum RenderLayer {
+		BASE,
+		TOP,
+	};
 	ptrdiff_t debug_id = -1;
 
 	std::function<void(const sf::Vector2f& pos)> OnClick = [](const sf::Vector2f& pos) { };
@@ -66,9 +70,11 @@ public:
 	const std::string& getName() const;
 	const std::string& getFullName() const;
 	bool getClipChildren() const;
+	RenderLayer getRenderLayer() const;
 	Widget* getParent() const;
 	CompoundVector<Widget*> getParentChain() const;
 	const CompoundVector<Widget*>& getChildren() const;
+	Widget* getChild(size_t index) const;
 	Widget* find(const std::string& name) const;
 	virtual sf::FloatRect getLocalBounds() const = 0;
 	virtual sf::FloatRect getParentLocalBounds() const = 0;
@@ -118,6 +124,7 @@ public:
 	void setParent(Widget* new_parent);
 	void setName(const std::string& new_name);
 	void setClipChildren(bool value);
+	void setRenderLayer(RenderLayer layer);
 	void removeFocus();
 	virtual void processKeyboardEvent(const sf::Event& event);
 	void render(sf::RenderTarget& target);
@@ -135,6 +142,7 @@ protected:
 	Widget* parent = nullptr;
 	CompoundVector<Widget*> children;
 	SearchIndexMultiple<std::string, Widget> children_names;
+	RenderLayer layer = RenderLayer::BASE;
 	Anchor origin_anchor = CUSTOM;
 	Anchor parent_anchor = CUSTOM;
 	sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);

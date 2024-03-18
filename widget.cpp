@@ -107,6 +107,10 @@ bool Widget::getClipChildren() const {
 	return clip_children;
 }
 
+Widget::RenderLayer Widget::getRenderLayer() const {
+	return layer;
+}
+
 Widget* Widget::getParent() const {
 	return parent;
 }
@@ -127,6 +131,10 @@ CompoundVector<Widget*> Widget::getParentChain() const {
 
 const CompoundVector<Widget*>& Widget::getChildren() const {
 	return children;
+}
+
+Widget* Widget::getChild(size_t index) const {
+	return children[index];
 }
 
 Widget* Widget::find(const std::string& name) const {
@@ -371,6 +379,10 @@ void Widget::setClipChildren(bool value) {
 	this->clip_children = value;
 }
 
+void Widget::setRenderLayer(RenderLayer layer) {
+	this->layer = layer;
+}
+
 void Widget::removeFocus() {
 	if (isFocused()) {
 		widget_list.setFocusedWidget(nullptr);
@@ -475,9 +487,6 @@ void Widget::render(sf::RenderTarget& target) {
 	sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
 	sprite.setPosition(unclipped_region.getQuantized().getPosition());
 	target.draw(sprite);
-	for (size_t i = 0; i < children.size(); i++) {
-		children[i]->render(target);
-	}
 }
 
 void Widget::renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children) {

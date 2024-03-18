@@ -3,6 +3,13 @@
 #include "widget.h"
 #include "rectangle_widget.h"
 
+struct RenderQueueLayer {
+	Widget::RenderLayer layer;
+	CompoundVector<Widget*> widgets;
+	RenderQueueLayer(Widget::RenderLayer layer);
+	bool operator<(const RenderQueueLayer& other) const;
+};
+
 class WidgetList {
 public:
 	bool debug_render = false;
@@ -36,6 +43,9 @@ private:
 	RectangleWidget* root_widget = nullptr;
 	Widget* focused_widget_temp = nullptr;
 	Widget* focused_widget = nullptr;
+	std::set<RenderQueueLayer> render_queue;
+	
+	void updateRenderQueue();
 
 };
 

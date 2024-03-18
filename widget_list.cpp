@@ -56,7 +56,13 @@ void WidgetList::render(sf::RenderTarget& target) {
 		widgets[i]->updateVisibility();
 	}
 #endif
-	root_widget->render(target);
+	updateRenderQueue();
+	for (RenderQueueLayer layer : render_queue) {
+		for (size_t widget_i = 0; widget_i < layer.widgets.size(); widget_i++) {
+			Widget* widget = layer.widgets[widget_i];
+			widget->render(target);
+		}
+	}
 	if (debug_render) {
 		root_widget->renderBounds(target, sf::Color::Green, true);
 		root_widget->renderOrigin(target);
@@ -95,4 +101,34 @@ void WidgetList::setFocusedWidget(Widget* widget) {
 		focused_widget->internalOnFocused();
 		focused_widget->OnFocused();
 	}
+}
+
+void WidgetList::updateRenderQueue() {
+	render_queue.clear();
+	std::function<void(Widget*)> add_widget = [&](Widget* widget) {
+		if (!widget->isVisible()) {
+			return;
+		}
+		auto it = render_queue.find(RenderQueueLayer(widget->getRenderLayer()));
+		if (it != render_queue.end()) {
+			RenderQueueLayer* layer = const_cast<RenderQueueLayer*>(&*it);
+			layer->widgets.add(widget);
+		} else {
+			RenderQueueLayer layer(widget->getRenderLayer());
+			layer.widgets.add(widget);
+			render_queue.insert(layer);
+		}
+		for (size_t i = 0; i < widget->getChildren().size(); i++) {
+			add_widget(widget->getChild(i));
+		}
+	};
+	add_widget(root_widget);
+}
+
+RenderQueueLayer::RenderQueueLayer(Widget::RenderLayer layer) {
+	this->layer = layer;
+}
+
+bool RenderQueueLayer::operator<(const RenderQueueLayer& other) const {
+	return layer < other.layer;
 }
