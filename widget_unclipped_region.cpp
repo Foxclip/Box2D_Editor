@@ -38,15 +38,18 @@ void WidgetUnclippedRegion::recalc() const {
 	parents.reverse();
 	sf::FloatRect result = widget->getVisualGlobalBounds();
 	Widget* parent = widget->parent;
-	if (parent && parent->getClipChildren()) {
-		sf::FloatRect parent_unclipped_region = parent->getUnclippedRegion();
-		sf::FloatRect intersection;
-		bool intersects = result.intersects(parent_unclipped_region, intersection);
-		if (intersects) {
-			result = intersection;
-		} else {
-			result = sf::FloatRect(widget->getGlobalPosition(), sf::Vector2f());
+	while (parent) {
+		if (parent->getClipChildren()) {
+			sf::FloatRect parent_unclipped_region = parent->getUnclippedRegion();
+			sf::FloatRect intersection;
+			bool intersects = result.intersects(parent_unclipped_region, intersection);
+			if (intersects) {
+				result = intersection;
+			} else {
+				result = sf::FloatRect(widget->getGlobalPosition(), sf::Vector2f());
+			}
 		}
+		parent = parent->parent;
 	}
 	unclippedRegion = result;
 	quantizedUnclippedRegion = utils::quantize_rect(result, utils::QUANTIZE_MODE_FLOOR);
