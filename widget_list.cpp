@@ -39,7 +39,13 @@ void WidgetList::processClick(const sf::Vector2f pos) {
 }
 
 void WidgetList::processRelease(const sf::Vector2f pos) {
-	root_widget->processRelease(pos);
+	if (focused_widget) {
+		focused_widget->processRelease(pos);
+	}
+}
+
+void WidgetList::processMouse(const sf::Vector2f pos) {
+	root_widget->processMouse(pos);
 }
 
 void WidgetList::processKeyboardEvent(const sf::Event& event) {

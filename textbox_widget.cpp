@@ -16,12 +16,14 @@ TextBoxWidget::TextBoxWidget(WidgetList& widget_list) : RectangleWidget(widget_l
 	cursor_widget->setVisible(false);
 	cursor_widget->setFillColor(editor_text_color);
 	cursor_widget->setSize(sf::Vector2f(1.0f, text_widget->getCharacterSize()));
+	cursor_widget->setRenderLayer(RenderLayer::TEXTBOX_CURSOR);
 	cursor_widget->setParent(text_widget);
 	cursor_widget->setName("cursor");
 	selection_widget = widget_list.createWidget<RectangleWidget>();
 	selection_widget->setVisible(false);
 	selection_widget->setFillColor(selection_color);
 	selection_widget->setSize(sf::Vector2f());
+	selection_widget->setRenderLayer(RenderLayer::TEXTBOX_SELECTION);
 	selection_widget->setParent(text_widget);
 	selection_widget->setName("selection");
 	setValueSilent("Text");
@@ -419,25 +421,17 @@ void TextBoxWidget::updateColors() {
 }
 
 void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
-	sf::Vector2f local_pos = text_widget->toLocal(pos);
-	size_t char_left = text_widget->getCharAt(local_pos);
-	if (char_left >= getStringSize()) {
-		setCursorPos(getStringSize());
-	} else {
-		size_t char_right = char_left + 1;
-		sf::Vector2f pos_left = getGlobalCharPos(char_left, true, true);
-		sf::Vector2f pos_right = getGlobalCharPos(char_right, true, true);
-		float dist_left = abs(pos.x - pos_left.x);
-		float dist_right = abs(pos.x - pos_right.x);
-		sf::Vector2f cursor_visual_pos;
-		if (dist_left <= dist_right) {
-			setCursorPos(char_left);
-		} else {
-			setCursorPos(char_right);
-		}
-	}
+	drag_start_pos = pos;
+	left_button_pressed = true;
+	trySetCursor(pos);
+	dragging_start_char = cursor_pos;
 	deselectAll();
 	setEditMode(true);
+}
+
+void TextBoxWidget::internalOnRelease(const sf::Vector2f& pos) {
+	left_button_pressed = false;
+	dragging_begun = false;
 }
 
 void TextBoxWidget::internalOnEditModeToggle(bool value) {
@@ -457,6 +451,22 @@ void TextBoxWidget::internalOnFocused() {
 
 void TextBoxWidget::internalOnFocusLost() {
 	setEditMode(false);
+}
+
+void TextBoxWidget::internalProcessMouse(const sf::Vector2f& pos) {
+	if (left_button_pressed) {
+		if (dragging_begun) {
+			trySetCursor(pos);
+			setSelection(dragging_start_char);
+		} else {
+			size_t new_cursor_pos = calcCursorPos(pos);
+			if (new_cursor_pos != dragging_start_char) {
+				dragging_begun = true;
+				setCursorPos(new_cursor_pos);
+				setSelection(dragging_start_char);
+			}
+		}
+	}
 }
 
 void TextBoxWidget::internalOnMouseEnter(const sf::Vector2f& pos) {
@@ -541,6 +551,31 @@ void TextBoxWidget::setSelection(ptrdiff_t pos) {
 	if (selection_pos == cursor_pos) {
 		selection_pos = -1;
 	}
+}
+
+size_t TextBoxWidget::calcCursorPos(const sf::Vector2f& pos) {
+	sf::Vector2f local_pos = text_widget->toLocal(pos);
+	size_t char_left = text_widget->getCharAt(local_pos);
+	if (char_left >= getStringSize()) {
+		return getStringSize();
+	} else {
+		size_t char_right = char_left + 1;
+		sf::Vector2f pos_left = getGlobalCharPos(char_left, true, true);
+		sf::Vector2f pos_right = getGlobalCharPos(char_right, true, true);
+		float dist_left = abs(pos.x - pos_left.x);
+		float dist_right = abs(pos.x - pos_right.x);
+		sf::Vector2f cursor_visual_pos;
+		if (dist_left <= dist_right) {
+			return char_left;
+		} else {
+			return char_right;
+		}
+	}
+}
+
+void TextBoxWidget::trySetCursor(const sf::Vector2f& pos) {
+	size_t new_pos = calcCursorPos(pos);
+	setCursorPos(new_pos);
 }
 
 void TextBoxWidget::selectAll() {

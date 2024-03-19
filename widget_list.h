@@ -26,6 +26,7 @@ public:
 	T* createWidget(Args&&... args);
 	void processClick(const sf::Vector2f pos);
 	void processRelease(const sf::Vector2f pos);
+	void processMouse(const sf::Vector2f pos);
 	void processKeyboardEvent(const sf::Event& event);
 	void render(sf::RenderTarget& target);
 	void reset(const sf::Vector2f& root_size);

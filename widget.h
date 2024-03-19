@@ -46,7 +46,9 @@ public:
 	};
 	enum RenderLayer {
 		BASE,
+		TEXTBOX_SELECTION,
 		TEXTBOX_TEXT,
+		TEXTBOX_CURSOR,
 	};
 	ptrdiff_t debug_id = -1;
 
@@ -65,6 +67,7 @@ public:
 	WidgetVisibility checkVisibility() const;
 	void processClick(const sf::Vector2f& pos);
 	void processRelease(const sf::Vector2f& pos);
+	void processMouse(const sf::Vector2f& pos);
 	virtual bool isFocusable() const;
 	bool isFocused() const;
 	const std::string& getName() const;
@@ -166,6 +169,8 @@ protected:
 	virtual void update();
 	virtual void internalOnSetParent(Widget* parent);
 	virtual void internalOnClick(const sf::Vector2f& pos);
+	virtual void internalOnRelease(const sf::Vector2f& pos);
+	virtual void internalProcessMouse(const sf::Vector2f& pos);
 	virtual void internalOnMouseEnter(const sf::Vector2f& pos);
 	virtual void internalOnMouseExit(const sf::Vector2f& pos);
 	virtual void internalOnFocused();

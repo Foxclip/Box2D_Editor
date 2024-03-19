@@ -76,14 +76,23 @@ void Widget::processRelease(const sf::Vector2f& pos) {
 	if (!visible) {
 		return;
 	}
-	if (mouseIn) {
-		if (!click_through) {
-			widget_list.release_blocked = true;
-		}
-		OnRelease(pos);
+	if (!click_through) {
+		widget_list.release_blocked = true;
 	}
+	internalOnRelease(pos);
+	OnRelease(pos);
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->processRelease(pos);
+	}
+}
+
+void Widget::processMouse(const sf::Vector2f& pos) {
+	if (!visible) {
+		return;
+	}
+	internalProcessMouse(pos);
+	for (size_t i = 0; i < children.size(); i++) {
+		children[i]->processMouse(pos);
 	}
 }
 
@@ -426,6 +435,10 @@ void Widget::update() {
 void Widget::internalOnSetParent(Widget* parent) { }
 
 void Widget::internalOnClick(const sf::Vector2f& pos) { }
+
+void Widget::internalOnRelease(const sf::Vector2f& pos) { }
+
+void Widget::internalProcessMouse(const sf::Vector2f& pos) { }
 
 void Widget::internalOnMouseEnter(const sf::Vector2f& pos) { }
 

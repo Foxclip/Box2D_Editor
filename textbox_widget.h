@@ -64,9 +64,11 @@ protected:
 	void update() override;
 	void updateColors();
 	void internalOnClick(const sf::Vector2f& pos) override;
+	void internalOnRelease(const sf::Vector2f& pos) override;
 	void internalOnEditModeToggle(bool value);
 	void internalOnFocused() override;
 	void internalOnFocusLost() override;
+	void internalProcessMouse(const sf::Vector2f& pos) override;
 	void internalOnMouseEnter(const sf::Vector2f& pos) override;
 	void internalOnMouseExit(const sf::Vector2f& pos) override;
 	void internalOnValueChanged(const sf::String& new_value);
@@ -79,6 +81,8 @@ protected:
 	void updateVisualCursorPos();
 	void updateSelection();
 	void setSelection(ptrdiff_t pos);
+	size_t calcCursorPos(const sf::Vector2f& pos);
+	void trySetCursor(const sf::Vector2f& pos);
 	void selectAll();
 	void deselectAll();
 
@@ -95,8 +99,12 @@ private:
 	TextBoxType type = TextBoxType::TEXT;
 	size_t cursor_pos = 0;
 	ptrdiff_t selection_pos = -1;
+	sf::Vector2f drag_start_pos;
+	size_t dragging_start_char = 0;
 	bool edit_mode = false;
 	bool highlighted = false;
+	bool left_button_pressed = false;
+	bool dragging_begun = false;
 	bool fail_state = false;
 	bool process_text_entered_event = true;
 	sf::Color background_color = sf::Color(50, 50, 50);

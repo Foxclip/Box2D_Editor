@@ -596,6 +596,7 @@ void Application::process_keyboard() {
 }
 
 void Application::process_mouse() {
+    widgets.processMouse(mousePosf);
     if (selected_tool == &select_tool) {
         {
             GameObject* old_hover = select_tool.hover_object;
@@ -771,7 +772,7 @@ void Application::process_left_release() {
     if (!leftButtonPressGesture) {
         return;
     }
-    if (leftButtonProcessWidgetsOnRelease) {
+    if (leftButtonProcessWidgetsOnRelease && widgets.getFocusedWidget()) {
         widgets.processRelease(mousePosf);
         if (widgets.isReleaseBlocked()) {
             return;
