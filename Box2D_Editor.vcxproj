@@ -18,6 +18,67 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\application.h" />
+    <ClInclude Include="include\compvector.h" />
+    <ClInclude Include="include\gameobject.h" />
+    <ClInclude Include="include\global.h" />
+    <ClInclude Include="include\history.h" />
+    <ClInclude Include="include\logger.h" />
+    <ClInclude Include="include\main.h" />
+    <ClInclude Include="include\objectlist.h" />
+    <ClInclude Include="include\polygon.h" />
+    <ClInclude Include="include\scenes.h" />
+    <ClInclude Include="include\searchindex.h" />
+    <ClInclude Include="include\serializer.h" />
+    <ClInclude Include="include\tools.h" />
+    <ClInclude Include="include\UI\create_panel.h" />
+    <ClInclude Include="include\UI\edit_window.h" />
+    <ClInclude Include="include\UI\toolbox.h" />
+    <ClInclude Include="include\utils.h" />
+    <ClInclude Include="include\widgets\checkbox_widget.h" />
+    <ClInclude Include="include\widgets\container_widget.h" />
+    <ClInclude Include="include\widgets\rectangle_widget.h" />
+    <ClInclude Include="include\widgets\shape_widget.h" />
+    <ClInclude Include="include\widgets\textbox_widget.h" />
+    <ClInclude Include="include\widgets\text_widget.h" />
+    <ClInclude Include="include\widgets\widget.h" />
+    <ClInclude Include="include\widgets\widgets.h" />
+    <ClInclude Include="include\widgets\widget_list.h" />
+    <ClInclude Include="include\widgets\widget_transform.h" />
+    <ClInclude Include="include\widgets\widget_unclipped_region.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\application.cpp" />
+    <ClCompile Include="src\compvector.cpp" />
+    <ClCompile Include="src\gameobject.cpp" />
+    <ClCompile Include="src\global.cpp" />
+    <ClCompile Include="src\history.cpp" />
+    <ClCompile Include="src\logger.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\objectlist.cpp" />
+    <ClCompile Include="src\polygon.cpp" />
+    <ClCompile Include="src\searchindex.cpp" />
+    <ClCompile Include="src\serializer.cpp" />
+    <ClCompile Include="src\tools.cpp" />
+    <ClCompile Include="src\UI\create_panel.cpp" />
+    <ClCompile Include="src\UI\edit_window.cpp" />
+    <ClCompile Include="src\UI\toolbox.cpp" />
+    <ClCompile Include="src\utils.cpp" />
+    <ClCompile Include="src\widgets\checkbox_widget.cpp" />
+    <ClCompile Include="src\widgets\container_widget.cpp" />
+    <ClCompile Include="src\widgets\rectangle_widget.cpp" />
+    <ClCompile Include="src\widgets\shape_widget.cpp" />
+    <ClCompile Include="src\widgets\textbox_widget.cpp" />
+    <ClCompile Include="src\widgets\text_widget.cpp" />
+    <ClCompile Include="src\widgets\widget.cpp" />
+    <ClCompile Include="src\widgets\widget_list.cpp" />
+    <ClCompile Include="src\widgets\widget_transform.cpp" />
+    <ClCompile Include="src\widgets\widget_unclipped_region.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -134,64 +195,6 @@
       <AdditionalDependencies>sfml-system.lib;sfml-graphics.lib;sfml-window.lib;box2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="application.cpp" />
-    <ClCompile Include="checkbox_widget.cpp" />
-    <ClCompile Include="compvector.cpp" />
-    <ClCompile Include="container_widget.cpp" />
-    <ClCompile Include="create_panel.cpp" />
-    <ClCompile Include="edit_window.cpp" />
-    <ClCompile Include="gameobject.cpp" />
-    <ClCompile Include="global.cpp" />
-    <ClCompile Include="history.cpp" />
-    <ClCompile Include="logger.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="objectlist.cpp" />
-    <ClCompile Include="polygon.cpp" />
-    <ClCompile Include="rectangle_widget.cpp" />
-    <ClCompile Include="searchindex.cpp" />
-    <ClCompile Include="serializer.cpp" />
-    <ClCompile Include="shape_widget.cpp" />
-    <ClCompile Include="textbox_widget.cpp" />
-    <ClCompile Include="text_widget.cpp" />
-    <ClCompile Include="toolbox.cpp" />
-    <ClCompile Include="tools.cpp" />
-    <ClCompile Include="utils.cpp" />
-    <ClCompile Include="widget.cpp" />
-    <ClCompile Include="widget_list.cpp" />
-    <ClCompile Include="widget_transform.cpp" />
-    <ClCompile Include="widget_unclipped_region.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="application.h" />
-    <ClInclude Include="checkbox_widget.h" />
-    <ClInclude Include="compvector.h" />
-    <ClInclude Include="container_widget.h" />
-    <ClInclude Include="create_panel.h" />
-    <ClInclude Include="edit_window.h" />
-    <ClInclude Include="gameobject.h" />
-    <ClInclude Include="global.h" />
-    <ClInclude Include="history.h" />
-    <ClInclude Include="logger.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="objectlist.h" />
-    <ClInclude Include="polygon.h" />
-    <ClInclude Include="rectangle_widget.h" />
-    <ClInclude Include="scenes.h" />
-    <ClInclude Include="searchindex.h" />
-    <ClInclude Include="serializer.h" />
-    <ClInclude Include="shape_widget.h" />
-    <ClInclude Include="textbox_widget.h" />
-    <ClInclude Include="text_widget.h" />
-    <ClInclude Include="toolbox.h" />
-    <ClInclude Include="tools.h" />
-    <ClInclude Include="utils.h" />
-    <ClInclude Include="widget.h" />
-    <ClInclude Include="widgets.h" />
-    <ClInclude Include="widget_list.h" />
-    <ClInclude Include="widget_transform.h" />
-    <ClInclude Include="widget_unclipped_region.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
