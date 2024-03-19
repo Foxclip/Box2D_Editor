@@ -279,28 +279,34 @@ void Widget::setOrigin(Anchor anchor) {
 	sf::Vector2f origin_pos = anchorToPos(anchor, getOrigin(), getSize());
 	setOrigin(origin_pos);
 	this->origin_anchor = anchor;
+	updateAnchoredPosition();
 }
 
 void Widget::setOrigin(float x, float y) {
 	getTransformable().setOrigin(x, y);
 	this->origin_anchor = CUSTOM;
+	updateAnchoredPosition();
 }
 
 void Widget::setOrigin(const sf::Vector2f& origin) {
 	getTransformable().setOrigin(origin);
 	this->origin_anchor = CUSTOM;
+	updateAnchoredPosition();
 }
 
 void Widget::setParentAnchor(Anchor anchor) {
 	this->parent_anchor = anchor;
+	updateAnchoredPosition();
 }
 
 void Widget::setAnchorOffset(float x, float y) {
 	this->anchor_offset = sf::Vector2f(x, y);
+	updateAnchoredPosition();
 }
 
 void Widget::setAnchorOffset(const sf::Vector2f& offset) {
 	this->anchor_offset = offset;
+	updateAnchoredPosition();
 }
 
 void Widget::setPosition(float x, float y) {
@@ -395,10 +401,7 @@ sf::Vector2f Widget::getRenderPositionOffset() const {
 	return sf::Vector2f(0.0f, 0.0f);
 }
 
-void Widget::update() {
-	if (!visible) {
-		return;
-	}
+void Widget::updateAnchoredPosition() {
 	sf::Vector2f parent_size;
 	if (parent) {
 		parent_size = parent->getLocalBounds().getSize();
@@ -407,6 +410,13 @@ void Widget::update() {
 	}
 	sf::Vector2f anchored_pos = anchorToPos(parent_anchor, getPosition(), parent_size);
 	setPosition(anchored_pos + anchor_offset);
+}
+
+void Widget::update() {
+	if (!visible) {
+		return;
+	}
+	updateAnchoredPosition();
 	setOrigin(origin_anchor);
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->update();

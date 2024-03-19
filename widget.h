@@ -162,6 +162,7 @@ protected:
 	virtual sf::Transformable& getTransformable() = 0;
 	virtual const sf::Transformable& getTransformable() const = 0;
 	virtual sf::Vector2f getRenderPositionOffset() const;
+	void updateAnchoredPosition();
 	virtual void update();
 	virtual void internalOnSetParent(Widget* parent);
 	virtual void internalOnClick(const sf::Vector2f& pos);

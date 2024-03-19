@@ -77,6 +77,7 @@ float TextWidget::getKerning(size_t index) const {
 }
 
 sf::Vector2f TextWidget::getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
+	assert(getFont());
 	sf::Vector2f parent_local_char_pos = text.findCharacterPos(index);
 	sf::Vector2f local_char_pos = getTransformable().getInverseTransform() * parent_local_char_pos;
 	if (with_kerning) {

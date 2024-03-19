@@ -16,7 +16,7 @@ TextBoxWidget::TextBoxWidget(WidgetList& widget_list) : RectangleWidget(widget_l
 	cursor_widget->setVisible(false);
 	cursor_widget->setFillColor(editor_text_color);
 	cursor_widget->setSize(sf::Vector2f(1.0f, text_widget->getCharacterSize()));
-	cursor_widget->setParent(this);
+	cursor_widget->setParent(text_widget);
 	cursor_widget->setName("cursor");
 	selection_widget = widget_list.createWidget<RectangleWidget>();
 	selection_widget->setVisible(false);
@@ -204,18 +204,7 @@ void TextBoxWidget::setType(TextBoxType type) {
 void TextBoxWidget::setCursorPos(size_t pos) {
 	pos = std::clamp(pos, (size_t)0, getStringSize());
 	this->cursor_pos = pos;
-	float char_pos = getLocalCharPos(pos, true, true).x;
-	float cursor_visual_pos = char_pos + CURSOR_OFFSET.x;
-	float left_bound = CURSOR_MOVE_MARGIN;
-	float right_bound = getWidth() - CURSOR_MOVE_MARGIN;
-	float offset_left = cursor_visual_pos - left_bound;
-	float offset_right = cursor_visual_pos - right_bound;
-	if (offset_left < 0) {
-		text_view_pos -= sf::Vector2f(offset_left, 0.0f);
-	}
-	if (offset_right > 0) {
-		text_view_pos -= sf::Vector2f(offset_right, 0.0f);
-	}
+	updateVisualCursorPos();
 	if (cursor_pos == selection_pos) {
 		selection_pos = -1;
 	}
@@ -388,8 +377,7 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 
 void TextBoxWidget::update() {
 	Widget::update();
-	text_widget->setAnchorOffset(TEXT_VIEW_ZERO_POS + text_view_pos);
-	sf::Vector2f char_pos = getLocalCharPos(cursor_pos, true, true);
+	sf::Vector2f char_pos = text_widget->getLocalCharPos(cursor_pos, true, true);
 	cursor_widget->setPosition(char_pos + CURSOR_OFFSET);
 	updateSelection();
 	process_text_entered_event = true;
@@ -513,6 +501,25 @@ void TextBoxWidget::insertSilent(size_t pos, const sf::String& str) {
 
 void TextBoxWidget::eraseSilent(size_t index_first, size_t count) {
 	text_widget->erase(index_first, count);
+}
+
+void TextBoxWidget::updateVisualCursorPos() {
+	if (!getFont()) {
+		return;
+	}
+	float char_pos = getLocalCharPos(cursor_pos, true, true).x;
+	float cursor_visual_pos = char_pos + CURSOR_OFFSET.x;
+	float left_bound = CURSOR_MOVE_MARGIN;
+	float right_bound = getWidth() - CURSOR_MOVE_MARGIN;
+	float offset_left = cursor_visual_pos - left_bound;
+	float offset_right = cursor_visual_pos - right_bound;
+	if (offset_left < 0) {
+		sf::Vector2f anchor_offset = text_widget->getAnchorOffset() - sf::Vector2f(offset_left, 0.0f);
+		text_widget->setAnchorOffset(anchor_offset);
+	} else if (offset_right > 0) {
+		sf::Vector2f anchor_offset = text_widget->getAnchorOffset() - sf::Vector2f(offset_right, 0.0f);
+		text_widget->setAnchorOffset(anchor_offset);
+	}
 }
 
 void TextBoxWidget::updateSelection() {

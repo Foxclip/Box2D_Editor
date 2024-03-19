@@ -76,6 +76,7 @@ protected:
 	void setEditMode(bool value);
 	void insertSilent(size_t pos, const sf::String& str);
 	void eraseSilent(size_t index_first, size_t count);
+	void updateVisualCursorPos();
 	void updateSelection();
 	void setSelection(ptrdiff_t pos);
 	void selectAll();
@@ -98,7 +99,6 @@ private:
 	bool highlighted = false;
 	bool fail_state = false;
 	bool process_text_entered_event = true;
-	sf::Vector2f text_view_pos;
 	sf::Color background_color = sf::Color(50, 50, 50);
 	sf::Color highlight_color = sf::Color(100, 100, 100);
 	sf::Color text_color = sf::Color(255, 255, 255);

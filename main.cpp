@@ -36,7 +36,6 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
-    // TODO: fix selection widget clipping
     // TODO: select text when dragging mouse in textbox
     // TODO: don't move cursor to beginning after pressing enter or esc
     // TODO: change cursor when hovering over textbox
