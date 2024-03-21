@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.10)
+project(Box2D_Editor LANGUAGES CXX)
+set (CMAKE_CXX_STANDARD 20)
+add_subdirectory(src)
+add_executable(Box2D_Editor src/main.cpp)
+target_link_libraries(Box2D_Editor PUBLIC src_lib)
+target_link_libraries(Box2D_Editor PUBLIC "E:/Libs/SFML-2.6.0/lib/sfml-system-d.lib")
+target_link_libraries(Box2D_Editor PUBLIC "E:/Libs/SFML-2.6.0/lib/sfml-graphics-d.lib")
+target_link_libraries(Box2D_Editor PUBLIC "E:/Libs/SFML-2.6.0/lib/sfml-window-d.lib")
+target_link_libraries(Box2D_Editor PUBLIC "E:/Libs/box2d-main/build/bin/Debug/box2d.lib")
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Box2D_Editor)
+add_custom_target(copy_assets
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/copy-assets.cmake
+    SOURCES copy-assets.cmake
+)
+add_dependencies(Box2D_Editor copy_assets)
