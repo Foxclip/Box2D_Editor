@@ -1,18 +1,27 @@
 cmake_minimum_required(VERSION 3.10)
 project(Box2D_Editor LANGUAGES CXX)
+
 set (CMAKE_CXX_STANDARD 20)
+set(BOX2D_BUILD_UNIT_TESTS OFF CACHE INTERNAL "" FORCE)
+set(BOX2D_BUILD_TESTBED OFF CACHE INTERNAL "" FORCE)
+set(BOX2D_BUILD_DOCS OFF CACHE INTERNAL "" FORCE)
+set(BOX2D_USER_SETTINGS OFF CACHE INTERNAL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
+
+add_subdirectory(box2d)
 add_subdirectory(src)
 add_executable(Box2D_Editor src/main.cpp)
+
 target_link_libraries(Box2D_Editor PUBLIC src_lib)
 target_link_libraries(Box2D_Editor PUBLIC debug "E:/Libs/SFML-2.6.0/lib/sfml-system-d.lib")
 target_link_libraries(Box2D_Editor PUBLIC debug "E:/Libs/SFML-2.6.0/lib/sfml-graphics-d.lib")
 target_link_libraries(Box2D_Editor PUBLIC debug "E:/Libs/SFML-2.6.0/lib/sfml-window-d.lib")
-target_link_libraries(Box2D_Editor PUBLIC debug "E:/Libs/box2d-main/build/bin/Debug/box2d.lib")
 target_link_libraries(Box2D_Editor PUBLIC optimized "E:/Libs/SFML-2.6.0/lib/sfml-system.lib")
 target_link_libraries(Box2D_Editor PUBLIC optimized "E:/Libs/SFML-2.6.0/lib/sfml-graphics.lib")
 target_link_libraries(Box2D_Editor PUBLIC optimized "E:/Libs/SFML-2.6.0/lib/sfml-window.lib")
-target_link_libraries(Box2D_Editor PUBLIC optimized "E:/Libs/box2d-main/build/bin/Release/box2d.lib")
+
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Box2D_Editor)
+
 add_custom_target(copy_assets
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/copy-assets.cmake
     SOURCES copy-assets.cmake

@@ -35,6 +35,7 @@ target_sources(src_lib PRIVATE
 )
 target_include_directories(src_lib PRIVATE "${CMAKE_SOURCE_DIR}/include")
 target_include_directories(src_lib PUBLIC "E:/Libs/SFML-2.6.0/include/")
-target_include_directories(src_lib PUBLIC "E:/Libs/box2d-main/include/")
+target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
+target_link_libraries(src_lib PRIVATE box2d)
 target_link_libraries(src_lib PRIVATE ui_lib)
 target_link_libraries(src_lib PRIVATE widgets_lib)
