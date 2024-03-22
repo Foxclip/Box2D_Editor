@@ -8,9 +8,8 @@ bool Widget::isMouseOver() const {
 	return mouseIn;
 }
 
-void Widget::updateMouseState() {
+void Widget::updateMouseState(const sf::Vector2f& mouse_pos) {
 	sf::FloatRect bounds = getGlobalBounds();
-	sf::Vector2f mouse_pos = utils::to2f(sf::Mouse::getPosition(window));
 	bool is_over = utils::contains_point(bounds, mouse_pos);
 	if (is_over && !mouseIn) {
 		internalOnMouseEnter(mouse_pos);
@@ -21,7 +20,7 @@ void Widget::updateMouseState() {
 	}
 	mouseIn = is_over;
 	for (size_t i = 0; i < children.size(); i++) {
-		children[i]->updateMouseState();
+		children[i]->updateMouseState(mouse_pos);
 	}
 }
 
@@ -414,8 +413,6 @@ void Widget::updateAnchoredPosition() {
 	sf::Vector2f parent_size;
 	if (parent) {
 		parent_size = parent->getLocalBounds().getSize();
-	} else {
-		parent_size = sf::Vector2f(window.getSize());
 	}
 	sf::Vector2f anchored_pos = anchorToPos(parent_anchor, getPosition(), parent_size);
 	setPosition(anchored_pos + anchor_offset);

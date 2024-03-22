@@ -61,7 +61,7 @@ public:
 
 	Widget(WidgetList& list);
 	bool isMouseOver() const;
-	void updateMouseState();
+	void updateMouseState(const sf::Vector2f& mouse_pos);
 	virtual bool isVisualPositionQuantized() const;
 	bool isVisible() const;
 	WidgetVisibility checkVisibility() const;

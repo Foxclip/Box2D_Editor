@@ -4,13 +4,6 @@
 #include "utils.h"
 #include "logger.h"
 
-extern sf::RenderWindow window;
-extern sf::View window_view;
-extern sf::View world_view;
-extern sf::View ui_view;
-extern sf::RenderTexture world_texture;
-extern sf::RenderTexture ui_texture;
-extern sf::RenderTexture selection_mask;
 extern sf::VertexArray line_primitive;
 
 Logger& operator<<(Logger& lg, const b2Vec2& value);

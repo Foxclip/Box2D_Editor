@@ -78,9 +78,9 @@ void WidgetList::render(sf::RenderTarget& target) {
 	}
 }
 
-void WidgetList::reset(const sf::Vector2f& root_size) {
+void WidgetList::reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_pos) {
 	root_widget->setSize(root_size);
-	root_widget->updateMouseState();
+	root_widget->updateMouseState(mouse_pos);
 	click_blocked = false;
 	release_blocked = false;
 }

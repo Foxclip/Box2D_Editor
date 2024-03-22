@@ -8,17 +8,12 @@ set(BOX2D_BUILD_DOCS OFF CACHE INTERNAL "" FORCE)
 set(BOX2D_USER_SETTINGS OFF CACHE INTERNAL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
 
+add_subdirectory(sfml)
 add_subdirectory(box2d)
 add_subdirectory(src)
 add_executable(Box2D_Editor src/main.cpp)
 
 target_link_libraries(Box2D_Editor PUBLIC src_lib)
-target_link_libraries(Box2D_Editor PUBLIC debug "E:/Libs/SFML-2.6.0/lib/sfml-system-d.lib")
-target_link_libraries(Box2D_Editor PUBLIC debug "E:/Libs/SFML-2.6.0/lib/sfml-graphics-d.lib")
-target_link_libraries(Box2D_Editor PUBLIC debug "E:/Libs/SFML-2.6.0/lib/sfml-window-d.lib")
-target_link_libraries(Box2D_Editor PUBLIC optimized "E:/Libs/SFML-2.6.0/lib/sfml-system.lib")
-target_link_libraries(Box2D_Editor PUBLIC optimized "E:/Libs/SFML-2.6.0/lib/sfml-graphics.lib")
-target_link_libraries(Box2D_Editor PUBLIC optimized "E:/Libs/SFML-2.6.0/lib/sfml-window.lib")
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Box2D_Editor)
 

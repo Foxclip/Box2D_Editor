@@ -1,12 +1,5 @@
 #include "../include/global.h"
 
-sf::RenderWindow window;
-sf::View window_view;
-sf::View world_view;
-sf::View ui_view;
-sf::RenderTexture world_texture;
-sf::RenderTexture ui_texture;
-sf::RenderTexture selection_mask;
 sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
 
 Logger& operator<<(Logger& lg, const b2Vec2& value) {

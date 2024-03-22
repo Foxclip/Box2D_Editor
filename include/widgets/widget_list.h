@@ -29,7 +29,7 @@ public:
 	void processMouse(const sf::Vector2f pos);
 	void processKeyboardEvent(const sf::Event& event);
 	void render(sf::RenderTarget& target);
-	void reset(const sf::Vector2f& root_size);
+	void reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_pos);
 	void setFocusedWidget(Widget* widget);
 
 private:

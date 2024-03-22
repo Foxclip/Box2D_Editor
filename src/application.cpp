@@ -366,7 +366,7 @@ void Application::resetView() {
 }
 
 void Application::process_widgets() {
-    widgets.reset(sf::Vector2f(ui_texture.getSize().x, ui_texture.getSize().y));
+    widgets.reset(sf::Vector2f(ui_texture.getSize().x, ui_texture.getSize().y), mousePosf);
     if (edit_tool.edit_window_widget->isVisible() && active_object) {
         edit_tool.edit_window_widget->updateParameters();
     }
@@ -1238,35 +1238,35 @@ void Application::load_font(sf::Font& font, const std::string& filename, bool sm
     font.setSmooth(smooth);
 }
 
-sf::Vector2f Application::screen_to_world(const sf::Vector2f& screen_pos) {
+sf::Vector2f Application::screen_to_world(const sf::Vector2f& screen_pos) const {
     sf::Transform combined = world_view.getInverseTransform() * ui_view.getTransform();
     sf::Vector2f result = combined.transformPoint(screen_pos);
     return result;
 }
 
-sf::Vector2f Application::pixel_to_world(const sf::Vector2i& screen_pos) {
+sf::Vector2f Application::pixel_to_world(const sf::Vector2i& screen_pos) const {
     return screen_to_world(to2f(screen_pos) + sf::Vector2f(0.5f, 0.5f));
 }
 
-sf::Vector2f Application::world_to_screen(const sf::Vector2f& world_pos) {
+sf::Vector2f Application::world_to_screen(const sf::Vector2f& world_pos) const {
     sf::Transform combined = ui_view.getInverseTransform() * world_view.getTransform();
     sf::Vector2f result = combined.transformPoint(world_pos);
     return result;
 }
 
-sf::Vector2f Application::world_to_screen(const b2Vec2& world_pos) {
+sf::Vector2f Application::world_to_screen(const b2Vec2& world_pos) const {
     return world_to_screen(tosf(world_pos));
 }
 
-sf::Vector2i Application::world_to_pixel(const sf::Vector2f& world_pos) {
+sf::Vector2i Application::world_to_pixel(const sf::Vector2f& world_pos) const {
     return to2i(world_to_screen(world_pos));
 }
 
-sf::Vector2i Application::world_to_pixel(const b2Vec2& world_pos) {
+sf::Vector2i Application::world_to_pixel(const b2Vec2& world_pos) const {
     return to2i(world_to_screen(tosf(world_pos)));
 }
 
-sf::Vector2f Application::world_dir_to_screenf(const b2Vec2& world_dir) {
+sf::Vector2f Application::world_dir_to_screenf(const b2Vec2& world_dir) const {
     //TODO: calculate new direction using an actual sf::View
     return sf::Vector2f(world_dir.x, -world_dir.y);
 }
