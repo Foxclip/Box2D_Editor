@@ -1,22 +1,24 @@
+set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
+
 add_subdirectory(UI)
 add_subdirectory(widgets)
 
 add_library(src_lib)
 target_sources(src_lib PRIVATE
-    ../include/application.h
-    ../include/compvector.h
-    ../include/gameobject.h
-    ../include/global.h
-    ../include/history.h
-    ../include/logger.h
-    ../include/main.h
-    ../include/objectlist.h
-    ../include/polygon.h
-    ../include/scenes.h
-    ../include/searchindex.h
-    ../include/serializer.h
-    ../include/tools.h
-    ../include/utils.h
+    "${INCLUDE_DIR}/application.h"
+    "${INCLUDE_DIR}/compvector.h"
+    "${INCLUDE_DIR}/gameobject.h"
+    "${INCLUDE_DIR}/global.h"
+    "${INCLUDE_DIR}/history.h"
+    "${INCLUDE_DIR}/logger.h"
+    "${INCLUDE_DIR}/main.h"
+    "${INCLUDE_DIR}/objectlist.h"
+    "${INCLUDE_DIR}/polygon.h"
+    "${INCLUDE_DIR}/scenes.h"
+    "${INCLUDE_DIR}/searchindex.h"
+    "${INCLUDE_DIR}/serializer.h"
+    "${INCLUDE_DIR}/tools.h"
+    "${INCLUDE_DIR}/utils.h"
 )
 target_sources(src_lib PRIVATE
     application.cpp
@@ -33,7 +35,7 @@ target_sources(src_lib PRIVATE
     tools.cpp
     utils.cpp
 )
-target_include_directories(src_lib PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_include_directories(src_lib PUBLIC "${INCLUDE_DIR}")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
 target_link_libraries(src_lib PUBLIC sfml-graphics sfml-system sfml-window)

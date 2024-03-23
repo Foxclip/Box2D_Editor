@@ -1,16 +1,16 @@
 add_library(widgets_lib)
 target_sources(widgets_lib PRIVATE
-    ../../include/widgets/checkbox_widget.h
-    ../../include/widgets/container_widget.h
-    ../../include/widgets/rectangle_widget.h
-    ../../include/widgets/shape_widget.h
-    ../../include/widgets/text_widget.h
-    ../../include/widgets/textbox_widget.h
-    ../../include/widgets/widget.h
-    ../../include/widgets/widget_list.h
-    ../../include/widgets/widget_transform.h
-    ../../include/widgets/widget_unclipped_region.h
-    ../../include/widgets/widgets.h
+    "${INCLUDE_DIR}/widgets/checkbox_widget.h"
+    "${INCLUDE_DIR}/widgets/container_widget.h"
+    "${INCLUDE_DIR}/widgets/rectangle_widget.h"
+    "${INCLUDE_DIR}/widgets/shape_widget.h"
+    "${INCLUDE_DIR}/widgets/text_widget.h"
+    "${INCLUDE_DIR}/widgets/textbox_widget.h"
+    "${INCLUDE_DIR}/widgets/widget.h"
+    "${INCLUDE_DIR}/widgets/widget_list.h"
+    "${INCLUDE_DIR}/widgets/widget_transform.h"
+    "${INCLUDE_DIR}/widgets/widget_unclipped_region.h"
+    "${INCLUDE_DIR}/widgets/widgets.h"
 )
 target_sources(widgets_lib PRIVATE
     checkbox_widget.cpp
@@ -24,6 +24,6 @@ target_sources(widgets_lib PRIVATE
     widget_transform.cpp
     widget_unclipped_region.cpp
 )
-target_include_directories(widgets_lib PRIVATE "${CMAKE_SOURCE_DIR}/include/widgets")
+target_include_directories(widgets_lib PRIVATE "${INCLUDE_DIR}/widgets")
 target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")

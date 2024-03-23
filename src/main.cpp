@@ -1,9 +1,9 @@
 #include <cstdio>
 #include <iostream>
-#include "../include/main.h"
-#include "../include/application.h"
-#include "../include/logger.h"
-#include "../include/scenes.h"
+#include "main.h"
+#include "application.h"
+#include "logger.h"
+#include "scenes.h"
 
 void execute_app() {
     Application app;
@@ -37,6 +37,7 @@ int main() {
     execute_app();
 
     // TODO: copy and paste text in textbox
+    // TODO: make includes use INCLUDE_DIR
     // TODO: wider selection widget in textbox
     // TODO: don't move cursor to beginning after pressing enter or esc
     // TODO: change cursor when hovering over textbox
