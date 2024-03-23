@@ -24,6 +24,6 @@ target_sources(widgets_lib PRIVATE
     widget_transform.cpp
     widget_unclipped_region.cpp
 )
-target_include_directories(widgets_lib PRIVATE "${INCLUDE_DIR}/widgets")
+target_include_directories(widgets_lib PRIVATE "${INCLUDE_DIR}")
 target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")

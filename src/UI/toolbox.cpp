@@ -1,5 +1,5 @@
-#include "../../include/UI/toolbox.h"
-#include "../../include/application.h"
+#include "UI/toolbox.h"
+#include "application.h"
 
 Toolbox::Toolbox(WidgetList& widget_list, Application& p_app) : ContainerWidget(widget_list), app(p_app) {
     setFillColor(sf::Color(255, 0, 0, 0));

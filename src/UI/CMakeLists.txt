@@ -9,6 +9,6 @@ target_sources(ui_lib PRIVATE
     edit_window.cpp
     toolbox.cpp
 )
-target_include_directories(ui_lib PRIVATE "${INCLUDE_DIR}/UI")
+target_include_directories(ui_lib PRIVATE "${INCLUDE_DIR}")
 target_include_directories(ui_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(ui_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")

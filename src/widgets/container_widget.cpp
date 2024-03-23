@@ -1,5 +1,5 @@
-#include "../../include/widgets/container_widget.h"
-#include "../../include/widgets/widget_list.h"
+#include "widgets/container_widget.h"
+#include "widgets/widget_list.h"
 
 ContainerWidget::ContainerWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
 	setName("container");

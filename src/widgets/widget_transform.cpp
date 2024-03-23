@@ -1,5 +1,5 @@
-#include "../../include/widgets/widget_transform.h"
-#include "../../include/widgets/widget.h"
+#include "widgets/widget_transform.h"
+#include "widgets/widget.h"
 
 WidgetTransform::WidgetTransform(Widget* widget) {
 	this->widget = widget;

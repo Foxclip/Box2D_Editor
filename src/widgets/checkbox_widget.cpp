@@ -1,5 +1,5 @@
-#include "../../include/widgets/checkbox_widget.h"
-#include "../../include/widgets/widget_list.h"
+#include "widgets/checkbox_widget.h"
+#include "widgets/widget_list.h"
 
 CheckboxWidget::CheckboxWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
 	setSize(DEFAULT_SIZE);

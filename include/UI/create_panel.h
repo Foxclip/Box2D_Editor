@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../widgets/widgets.h"
+#include "widgets/widgets.h"
 
 class Application;
 

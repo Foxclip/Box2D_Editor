@@ -1,6 +1,6 @@
-#include "../../include/widgets/widget.h"
-#include "../../include/widgets/widget_list.h"
-#include "../../include/application.h"
+#include "widgets/widget.h"
+#include "widgets/widget_list.h"
+#include "application.h"
 
 Widget::Widget(WidgetList& widget_list) : widget_list(widget_list) { }
 

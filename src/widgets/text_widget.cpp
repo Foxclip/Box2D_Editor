@@ -1,5 +1,5 @@
-#include "../../include/widgets/text_widget.h"
-#include "../../include/widgets/widget_list.h"
+#include "widgets/text_widget.h"
+#include "widgets/widget_list.h"
 
 TextWidget::TextWidget(WidgetList& widget_list) : Widget(widget_list) {
 	setName("text");

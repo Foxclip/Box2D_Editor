@@ -1,5 +1,5 @@
-#include "../../include/UI/edit_window.h"
-#include "../../include/application.h"
+#include "UI/edit_window.h"
+#include "application.h"
 
 EditWindow::EditWindow(WidgetList& widget_list, Application& p_app) : ContainerWidget(widget_list), app(p_app) {
     setVisible(false);

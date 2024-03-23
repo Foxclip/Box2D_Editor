@@ -1,5 +1,5 @@
-#include "../../include/widgets/shape_widget.h"
-#include "../../include/widgets/widget_list.h"
+#include "widgets/shape_widget.h"
+#include "widgets/widget_list.h"
 
 ShapeWidget::ShapeWidget(WidgetList& widget_list) : Widget(widget_list) { }
 

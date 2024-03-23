@@ -1,5 +1,5 @@
-#include "../../include/widgets/textbox_widget.h"
-#include "../../include/widgets/widget_list.h"
+#include "widgets/textbox_widget.h"
+#include "widgets/widget_list.h"
 
 TextBoxWidget::TextBoxWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
 	setSize(DEFAULT_SIZE);

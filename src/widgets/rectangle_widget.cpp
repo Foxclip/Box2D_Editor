@@ -1,5 +1,5 @@
-#include "../../include/widgets/rectangle_widget.h"
-#include "../../include/widgets/widget_list.h"
+#include "widgets/rectangle_widget.h"
+#include "widgets/widget_list.h"
 
 RectangleWidget::RectangleWidget(WidgetList& widget_list) : ShapeWidget(widget_list) {
 	setName("rectangle");

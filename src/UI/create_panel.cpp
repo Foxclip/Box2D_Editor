@@ -1,5 +1,5 @@
-#include "../../include/UI/create_panel.h"
-#include "../../include/application.h"
+#include "UI/create_panel.h"
+#include "application.h"
 
 CreatePanel::CreatePanel(WidgetList& widget_list, Application& p_app) : ContainerWidget(widget_list), app(p_app) {
     setVisible(false);

@@ -1,5 +1,5 @@
-#include "../../include/widgets/widget_unclipped_region.h"
-#include "../../include/widgets/widget.h"
+#include "widgets/widget_unclipped_region.h"
+#include "widgets/widget.h"
 
 WidgetUnclippedRegion::WidgetUnclippedRegion(Widget* widget) {
 	this->widget = widget;
