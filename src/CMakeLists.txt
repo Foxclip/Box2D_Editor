@@ -36,6 +36,7 @@ target_sources(src_lib PRIVATE
     utils.cpp
 )
 target_include_directories(src_lib PUBLIC "${INCLUDE_DIR}")
+target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
 target_link_libraries(src_lib PUBLIC sfml-graphics sfml-system sfml-window)

@@ -80,6 +80,16 @@ const sf::String& TextBoxWidget::getValue() const {
 	return text_widget->getString();
 }
 
+const sf::String TextBoxWidget::getSelectedText() const {
+	if (!isSelectionActive()) {
+		return "";
+	}
+	size_t left_char = getSelectionLeft();
+	size_t count = getSelectionRight() - getSelectionLeft();
+	sf::String str = getValue().substring(left_char, count);
+	return str;
+}
+
 bool TextBoxWidget::isValidValue() const {
 	bool result;
 	if (type == TextBoxType::TEXT) {
@@ -113,7 +123,7 @@ bool TextBoxWidget::isEditMode() const {
 }
 
 bool TextBoxWidget::isSelectionActive() const {
-	return selection_pos >= 0;
+	return selection_pos >= 0 && selection_pos != cursor_pos;
 }
 
 sf::Vector2f TextBoxWidget::getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
@@ -239,6 +249,9 @@ void TextBoxWidget::erase(size_t index_first, size_t count) {
 }
 
 void TextBoxWidget::eraseSelection() {
+	if (!isSelectionActive()) {
+		return;
+	}
 	size_t left_char = getSelectionLeft();
 	size_t count = getSelectionRight() - getSelectionLeft();
 	erase(left_char, count);
@@ -247,133 +260,164 @@ void TextBoxWidget::eraseSelection() {
 }
 
 void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
-	bool shift_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
-	bool ctrl_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
-	if (event.type == sf::Event::KeyPressed) {
-		switch (event.key.code) {
-			case sf::Keyboard::Escape:
-				if (edit_mode) {
-					internalOnCancel();
-					OnCancel();
-				}
-				removeFocus();
-				break;
-			case sf::Keyboard::Enter:
-				if (edit_mode) {
-					internalOnConfirm(getValue());
-					OnConfirm(getValue());
-				}
-				setEditMode(!edit_mode);
-				break;
-		}
-		if (edit_mode) {
+	try {
+		bool shift_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
+		bool ctrl_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
+		if (event.type == sf::Event::KeyPressed) {
 			switch (event.key.code) {
-				case sf::Keyboard::Left:
-					if (!isSelectionActive() && !shift_pressed) {
-						if (cursor_pos > 0) {
-							setCursorPos(cursor_pos - 1);
-						}
-					} else if (isSelectionActive() && !shift_pressed) {
-						setCursorPos(getSelectionLeft());
-						deselectAll();
-					} else if (!isSelectionActive() && shift_pressed) {
-						if (cursor_pos > 0) {
-							size_t sel_pos = cursor_pos;
-							setCursorPos(cursor_pos - 1);
-							setSelection(sel_pos);
-						}
-					} else if (isSelectionActive() && shift_pressed) {
-						if (cursor_pos > 0) {
-							setCursorPos(cursor_pos - 1);
-						}
+				case sf::Keyboard::Escape:
+					if (edit_mode) {
+						internalOnCancel();
+						OnCancel();
 					}
+					removeFocus();
 					break;
-				case sf::Keyboard::Right:
-					if (!isSelectionActive() && !shift_pressed) {
-						if (cursor_pos < getStringSize()) {
-							setCursorPos(cursor_pos + 1);
-						}
-					} else if (isSelectionActive() && !shift_pressed) {
-						setCursorPos(getSelectionRight());
-						deselectAll();
-					} else if (!isSelectionActive() && shift_pressed) {
-						if (cursor_pos < getStringSize()) {
-							size_t sel_pos = cursor_pos;
-							setCursorPos(cursor_pos + 1);
-							setSelection(sel_pos);
-						}
-					} else if (isSelectionActive() && shift_pressed) {
-						if (cursor_pos < getStringSize()) {
-							setCursorPos(cursor_pos + 1);
-						}
+				case sf::Keyboard::Enter:
+					if (edit_mode) {
+						internalOnConfirm(getValue());
+						OnConfirm(getValue());
 					}
-					break;
-				case sf::Keyboard::Home:
-					if (!isSelectionActive() && !shift_pressed) {
-						setCursorPos(0);
-					} else if (isSelectionActive() && !shift_pressed) {
-						setCursorPos(0);
-						deselectAll();
-					} else if (!isSelectionActive() && shift_pressed) {
-						size_t sel_pos = cursor_pos;
-						setCursorPos(0);
-						setSelection(sel_pos);
-					} else if (isSelectionActive() && shift_pressed) {
-						setCursorPos(0);
-					}
-					break;
-				case sf::Keyboard::End:
-					if (!isSelectionActive() && !shift_pressed) {
-						setCursorPos(getStringSize());
-					} else if (isSelectionActive() && !shift_pressed) {
-						setCursorPos(getStringSize());
-						deselectAll();
-					} else if (!isSelectionActive() && shift_pressed) {
-						size_t sel_pos = cursor_pos;
-						setCursorPos(getStringSize());
-						setSelection(sel_pos);
-					} else if (isSelectionActive() && shift_pressed) {
-						setCursorPos(getStringSize());
-					}
-					break;
-				case sf::Keyboard::Delete:
-					if (isSelectionActive()) {
-						eraseSelection();
-					} else if (cursor_pos < getStringSize()) {
-						erase(cursor_pos, 1);
-					}
-					break;
-				case sf::Keyboard::A:
-					if (ctrl_pressed) {
-						selectAll();
-						process_text_entered_event = false;
-					}
+					setEditMode(!edit_mode);
 					break;
 			}
-		}
-	} else if (event.type == sf::Event::TextEntered) {
-		if (process_text_entered_event && edit_mode) {
-			sf::Uint32 code = event.text.unicode;
-			switch (code) {
-				case '\n':
-				case '\r':
-					break;
-				case '\b':
-					if (isSelectionActive()) {
+			if (edit_mode) {
+				switch (event.key.code) {
+					case sf::Keyboard::Left:
+						if (!isSelectionActive() && !shift_pressed) {
+							if (cursor_pos > 0) {
+								setCursorPos(cursor_pos - 1);
+							}
+						} else if (isSelectionActive() && !shift_pressed) {
+							setCursorPos(getSelectionLeft());
+							deselectAll();
+						} else if (!isSelectionActive() && shift_pressed) {
+							if (cursor_pos > 0) {
+								size_t sel_pos = cursor_pos;
+								setCursorPos(cursor_pos - 1);
+								setSelection(sel_pos);
+							}
+						} else if (isSelectionActive() && shift_pressed) {
+							if (cursor_pos > 0) {
+								setCursorPos(cursor_pos - 1);
+							}
+						}
+						break;
+					case sf::Keyboard::Right:
+						if (!isSelectionActive() && !shift_pressed) {
+							if (cursor_pos < getStringSize()) {
+								setCursorPos(cursor_pos + 1);
+							}
+						} else if (isSelectionActive() && !shift_pressed) {
+							setCursorPos(getSelectionRight());
+							deselectAll();
+						} else if (!isSelectionActive() && shift_pressed) {
+							if (cursor_pos < getStringSize()) {
+								size_t sel_pos = cursor_pos;
+								setCursorPos(cursor_pos + 1);
+								setSelection(sel_pos);
+							}
+						} else if (isSelectionActive() && shift_pressed) {
+							if (cursor_pos < getStringSize()) {
+								setCursorPos(cursor_pos + 1);
+							}
+						}
+						break;
+					case sf::Keyboard::Home:
+						if (!isSelectionActive() && !shift_pressed) {
+							setCursorPos(0);
+						} else if (isSelectionActive() && !shift_pressed) {
+							setCursorPos(0);
+							deselectAll();
+						} else if (!isSelectionActive() && shift_pressed) {
+							size_t sel_pos = cursor_pos;
+							setCursorPos(0);
+							setSelection(sel_pos);
+						} else if (isSelectionActive() && shift_pressed) {
+							setCursorPos(0);
+						}
+						break;
+					case sf::Keyboard::End:
+						if (!isSelectionActive() && !shift_pressed) {
+							setCursorPos(getStringSize());
+						} else if (isSelectionActive() && !shift_pressed) {
+							setCursorPos(getStringSize());
+							deselectAll();
+						} else if (!isSelectionActive() && shift_pressed) {
+							size_t sel_pos = cursor_pos;
+							setCursorPos(getStringSize());
+							setSelection(sel_pos);
+						} else if (isSelectionActive() && shift_pressed) {
+							setCursorPos(getStringSize());
+						}
+						break;
+					case sf::Keyboard::Delete:
+						if (isSelectionActive()) {
+							eraseSelection();
+						} else if (cursor_pos < getStringSize()) {
+							erase(cursor_pos, 1);
+						}
+						break;
+					case sf::Keyboard::A:
+						if (ctrl_pressed) {
+							selectAll();
+							process_text_entered_event = false;
+						}
+						break;
+					case sf::Keyboard::C:
+						if (ctrl_pressed) {
+							if (!clip::set_text(getSelectedText())) {
+								throw std::runtime_error("Unable to copy text to clipboard");
+							}
+							process_text_entered_event = false;
+						}
+						break;
+					case sf::Keyboard::V:
+						if (ctrl_pressed) {
+							std::string value;
+							if (!clip::get_text(value)) {
+								throw std::runtime_error("Unable to paste text from clipboard");
+							}
+							eraseSelection();
+							insert(cursor_pos, value);
+							setCursorPos(cursor_pos + value.size());
+							process_text_entered_event = false;
+						}
+						break;
+					case sf::Keyboard::X:
+						if (ctrl_pressed) {
+							if (!clip::set_text(getSelectedText())) {
+								throw std::runtime_error("Unable to copy text to clipboard");
+							}
+							eraseSelection();
+							process_text_entered_event = false;
+						}
+						break;
+				}
+			}
+		} else if (event.type == sf::Event::TextEntered) {
+			if (process_text_entered_event && edit_mode) {
+				sf::Uint32 code = event.text.unicode;
+				switch (code) {
+					case '\n':
+					case '\r':
+						break;
+					case '\b':
+						if (isSelectionActive()) {
+							eraseSelection();
+						} else if (cursor_pos > 0) {
+							erase(cursor_pos - 1, 1);
+							setCursorPos(cursor_pos - 1);
+						}
+						break;
+					default:
 						eraseSelection();
-					} else if (cursor_pos > 0) {
-						erase(cursor_pos - 1, 1);
-						setCursorPos(cursor_pos - 1);
-					}
-					break;
-				default:
-					if (isSelectionActive()) {
-						eraseSelection();
-					}
-					typeChar(code);
-					break;
+						typeChar(code);
+						break;
+				}
 			}
 		}
+	} catch (std::exception exc) {
+		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
 	}
 }
 

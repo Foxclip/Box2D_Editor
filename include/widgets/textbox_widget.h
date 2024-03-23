@@ -2,6 +2,7 @@
 
 #include "rectangle_widget.h"
 #include "text_widget.h"
+#include "clip/clip.h"
 
 class WidgetList;
 
@@ -30,6 +31,7 @@ public:
 	const sf::Font* getFont() const;
 	unsigned int getCharacterSize() const;
 	const sf::String& getValue() const;
+	const sf::String getSelectedText() const;
 	bool isValidValue() const;
 	size_t getStringSize() const;
 	TextBoxType getType() const;
