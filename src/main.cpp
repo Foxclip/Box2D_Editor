@@ -36,7 +36,6 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
-    // TODO: use clip library
     // TODO: copy and paste text in textbox
     // TODO: wider selection widget in textbox
     // TODO: don't move cursor to beginning after pressing enter or esc

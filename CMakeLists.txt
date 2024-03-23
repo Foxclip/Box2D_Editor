@@ -26,6 +26,13 @@ set(BOX2D_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(BOX2D_USER_SETTINGS OFF CACHE BOOL "" FORCE)
 add_subdirectory(box2d)
 
+set(CLIP_ENABLE_IMAGE OFF CACHE BOOL "" FORCE)
+set(CLIP_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(CLIP_SUPPORT_WINXP OFF CACHE BOOL "" FORCE)
+set(CLIP_TESTS OFF CACHE BOOL "" FORCE)
+set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
+add_subdirectory(clip)
+
 add_subdirectory(src)
 
 add_executable(Box2D_Editor src/main.cpp)
