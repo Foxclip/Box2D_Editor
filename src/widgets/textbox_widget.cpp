@@ -266,18 +266,15 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 		if (event.type == sf::Event::KeyPressed) {
 			switch (event.key.code) {
 				case sf::Keyboard::Escape:
-					if (edit_mode) {
-						internalOnCancel();
-						OnCancel();
-					}
+					disableEditMode(false);
 					removeFocus();
 					break;
 				case sf::Keyboard::Enter:
 					if (edit_mode) {
-						internalOnConfirm(getValue());
-						OnConfirm(getValue());
+						disableEditMode(true);
+					} else {
+						enableEditMode();
 					}
-					setEditMode(!edit_mode);
 					break;
 			}
 			if (edit_mode) {
@@ -470,7 +467,7 @@ void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
 	trySetCursor(pos);
 	dragging_start_char = cursor_pos;
 	deselectAll();
-	setEditMode(true);
+	enableEditMode();
 }
 
 void TextBoxWidget::internalOnRelease(const sf::Vector2f& pos) {
@@ -490,11 +487,11 @@ void TextBoxWidget::internalOnEditModeToggle(bool value) {
 }
 
 void TextBoxWidget::internalOnFocused() {
-	setEditMode(true);
+	enableEditMode();
 }
 
 void TextBoxWidget::internalOnFocusLost() {
-	setEditMode(false);
+	disableEditMode(true);
 }
 
 void TextBoxWidget::internalProcessMouse(const sf::Vector2f& pos) {
@@ -540,13 +537,34 @@ void TextBoxWidget::updateValid() {
 	updateColors();
 }
 
-void TextBoxWidget::setEditMode(bool value) {
+void TextBoxWidget::_setEditMode(bool value) {
 	if (edit_mode == value) {
 		return;
 	}
 	edit_mode = value;
 	internalOnEditModeToggle(value);
 	OnEditModeToggle(value);
+}
+
+void TextBoxWidget::enableEditMode() {
+	if (edit_mode) {
+		return;
+	}
+	_setEditMode(true);
+}
+
+void TextBoxWidget::disableEditMode(bool confirm) {
+	if (!edit_mode) {
+		return;
+	}
+	if (confirm) {
+		internalOnConfirm(getValue());
+		OnConfirm(getValue());
+	} else {
+		internalOnCancel();
+		OnCancel();
+	}
+	_setEditMode(false);
 }
 
 void TextBoxWidget::insertSilent(size_t pos, const sf::String& str) {

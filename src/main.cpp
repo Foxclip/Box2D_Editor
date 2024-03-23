@@ -36,9 +36,8 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
-    // TODO: copy and paste text in textbox
+    // TODO: fix selection after clicking on text when it does not fit in the textbox
     // TODO: wider selection widget in textbox
-    // TODO: don't move cursor to beginning after pressing enter or esc
     // TODO: change cursor when hovering over textbox
     // TDOO: ctrl-z in textbox
     // TODO: restore text in textbox when losing focus without confirmation

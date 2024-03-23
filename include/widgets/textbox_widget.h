@@ -77,7 +77,8 @@ protected:
 	void internalOnConfirm(const sf::String& value);
 	void internalOnCancel();
 	void updateValid();
-	void setEditMode(bool value);
+	void enableEditMode();
+	void disableEditMode(bool confirm);
 	void insertSilent(size_t pos, const sf::String& str);
 	void eraseSilent(size_t index_first, size_t count);
 	void updateVisualCursorPos();
@@ -117,4 +118,6 @@ private:
 	sf::Color selection_color = sf::Color(128, 200, 255);
 	sf::Color fail_background_color = sf::Color(128, 0, 0);
 	sf::Color editor_fail_background_color = sf::Color(255, 128, 128);
+
+	void _setEditMode(bool value);
 };
