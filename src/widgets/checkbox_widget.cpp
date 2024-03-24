@@ -3,6 +3,7 @@
 
 CheckboxWidget::CheckboxWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
 	setSize(DEFAULT_SIZE);
+	setClickThrough(false);
 	RectangleWidget::setFillColor(background_fill_color);
 	setName("checkbox");
 	check_widget = widget_list.createWidget<RectangleWidget>();

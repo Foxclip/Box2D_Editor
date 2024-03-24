@@ -36,17 +36,14 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
-    // TODO: fix selection after clicking on text when it does not fit in the textbox
     // TODO: wider selection widget in textbox
     // TODO: change cursor when hovering over textbox
     // TDOO: ctrl-z in textbox
-    // TODO: restore text in textbox when losing focus without confirmation
-    // TODO: close edit mode with esc key
+    // TODO: remove dependency on Application from UI classes
     // TODO: blinking textbox cursor
-    // TODO: change color of textbox mouse highlight
     // TODO: make SearchIndex not use pointers for TObject type
     // TODO: Dropdown widget
-    // TODO: object list window
+    // TODO: object list window (outliner)
     // TODO: render polygon indices
     // TODO: separate Simulation and Application,
     // interface in Application, physics and object management in Simulation

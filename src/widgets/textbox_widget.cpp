@@ -5,6 +5,7 @@ TextBoxWidget::TextBoxWidget(WidgetList& widget_list) : RectangleWidget(widget_l
 	setSize(DEFAULT_SIZE);
 	setName("textbox");
 	setClipChildren(true);
+	setClickThrough(false);
 	text_widget = widget_list.createWidget<TextWidget>();
 	text_widget->setFillColor(text_color);
 	text_widget->setParentAnchor(CENTER_LEFT);
@@ -465,9 +466,10 @@ void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
 	drag_start_pos = pos;
 	left_button_pressed = true;
 	trySetCursor(pos);
-	dragging_start_char = cursor_pos;
 	deselectAll();
 	enableEditMode();
+	size_t new_cursor_pos = calcCursorPos(pos);
+	dragging_start_char = new_cursor_pos;
 }
 
 void TextBoxWidget::internalOnRelease(const sf::Vector2f& pos) {
