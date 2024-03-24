@@ -59,6 +59,7 @@ public:
 	void setCameraPos(float x, float y);
 	void setCameraZoom(float zoom);
 	GameObjectList& getObjectList();
+	WidgetList& getWidgetList();
 	void selectSingleObject(GameObject* object, bool with_children = false);
 	BoxObject* create_box(
 		const std::string& name,

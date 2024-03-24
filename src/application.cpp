@@ -78,6 +78,10 @@ GameObjectList& Application::getObjectList() {
     return game_objects;
 }
 
+WidgetList& Application::getWidgetList() {
+    return widgets;
+}
+
 void Application::selectSingleObject(GameObject* object, bool with_children) {
     select_tool.selectSingleObject(object, with_children);
 }
