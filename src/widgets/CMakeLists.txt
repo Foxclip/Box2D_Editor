@@ -8,6 +8,7 @@ target_sources(widgets_lib PRIVATE
     "${INCLUDE_DIR}/widgets/textbox_widget.h"
     "${INCLUDE_DIR}/widgets/widget.h"
     "${INCLUDE_DIR}/widgets/widget_list.h"
+    "${INCLUDE_DIR}/widgets/widget_render_queue.h"
     "${INCLUDE_DIR}/widgets/widget_transform.h"
     "${INCLUDE_DIR}/widgets/widget_unclipped_region.h"
     "${INCLUDE_DIR}/widgets/widgets.h"
@@ -21,6 +22,7 @@ target_sources(widgets_lib PRIVATE
     textbox_widget.cpp
     widget.cpp
     widget_list.cpp
+    widget_render_queue.cpp
     widget_transform.cpp
     widget_unclipped_region.cpp
 )

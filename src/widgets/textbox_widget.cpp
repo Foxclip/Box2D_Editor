@@ -127,6 +127,10 @@ bool TextBoxWidget::isSelectionActive() const {
 	return selection_pos >= 0 && selection_pos != cursor_pos;
 }
 
+sf::Cursor::Type TextBoxWidget::getCursorType() const {
+	return sf::Cursor::Text;
+}
+
 sf::Vector2f TextBoxWidget::getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
 	sf::Vector2f local_pos = text_widget->getParentLocalCharPos(index, top_aligned, with_kerning);
 	return local_pos;
@@ -260,7 +264,84 @@ void TextBoxWidget::eraseSelection() {
 	deselectAll();
 }
 
-void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
+void TextBoxWidget::update() {
+	Widget::update();
+	sf::Vector2f char_pos = text_widget->getLocalCharPos(cursor_pos, true, true);
+	cursor_widget->setPosition(char_pos - sf::Vector2f(0.0f, CURSOR_MARGIN) + CURSOR_OFFSET);
+	updateSelection();
+	process_text_entered_event = true;
+}
+
+void TextBoxWidget::updateColors() {
+	sf::Color rect_col;
+	sf::Color text_col;
+	sf::Color slct_col;
+	if (edit_mode) {
+		if (fail_state) {
+			rect_col = editor_fail_background_color;
+			text_col = editor_text_color;
+		} else {
+			rect_col = editor_color;
+			text_col = editor_text_color;
+		}
+	} else {
+		if (highlighted) {
+			if (fail_state) {
+				rect_col = highlight_color;
+			} else {
+				rect_col = highlight_color;
+			}
+		} else {
+			if (fail_state) {
+				rect_col = fail_background_color;
+			} else {
+				rect_col = background_color;
+			}
+		}
+		text_col = text_color;
+	}
+	slct_col = selection_color;
+	RectangleWidget::setFillColor(rect_col);
+	text_widget->setFillColor(text_col);
+	cursor_widget->setFillColor(text_col);
+	selection_widget->setFillColor(slct_col);
+}
+
+void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
+	drag_start_pos = pos;
+	left_button_pressed = true;
+	trySetCursor(pos);
+	deselectAll();
+	enableEditMode();
+	size_t new_cursor_pos = calcCursorPos(pos);
+	dragging_start_char = new_cursor_pos;
+}
+
+void TextBoxWidget::internalOnRelease(const sf::Vector2f& pos) {
+	left_button_pressed = false;
+	dragging_begun = false;
+}
+
+void TextBoxWidget::internalOnEditModeToggle(bool value) {
+	cursor_widget->setVisible(value);
+	if (value) {
+		selectAll();
+	} else {
+		setCursorPos(0);
+		deselectAll();
+	}
+	updateColors();
+}
+
+void TextBoxWidget::internalOnFocused() {
+	enableEditMode();
+}
+
+void TextBoxWidget::internalOnFocusLost() {
+	disableEditMode(true);
+}
+
+void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 	try {
 		bool shift_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
 		bool ctrl_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
@@ -417,83 +498,6 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
 	}
-}
-
-void TextBoxWidget::update() {
-	Widget::update();
-	sf::Vector2f char_pos = text_widget->getLocalCharPos(cursor_pos, true, true);
-	cursor_widget->setPosition(char_pos - sf::Vector2f(0.0f, CURSOR_MARGIN) + CURSOR_OFFSET);
-	updateSelection();
-	process_text_entered_event = true;
-}
-
-void TextBoxWidget::updateColors() {
-	sf::Color rect_col;
-	sf::Color text_col;
-	sf::Color slct_col;
-	if (edit_mode) {
-		if (fail_state) {
-			rect_col = editor_fail_background_color;
-			text_col = editor_text_color;
-		} else {
-			rect_col = editor_color;
-			text_col = editor_text_color;
-		}
-	} else {
-		if (highlighted) {
-			if (fail_state) {
-				rect_col = highlight_color;
-			} else {
-				rect_col = highlight_color;
-			}
-		} else {
-			if (fail_state) {
-				rect_col = fail_background_color;
-			} else {
-				rect_col = background_color;
-			}
-		}
-		text_col = text_color;
-	}
-	slct_col = selection_color;
-	RectangleWidget::setFillColor(rect_col);
-	text_widget->setFillColor(text_col);
-	cursor_widget->setFillColor(text_col);
-	selection_widget->setFillColor(slct_col);
-}
-
-void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
-	drag_start_pos = pos;
-	left_button_pressed = true;
-	trySetCursor(pos);
-	deselectAll();
-	enableEditMode();
-	size_t new_cursor_pos = calcCursorPos(pos);
-	dragging_start_char = new_cursor_pos;
-}
-
-void TextBoxWidget::internalOnRelease(const sf::Vector2f& pos) {
-	left_button_pressed = false;
-	dragging_begun = false;
-}
-
-void TextBoxWidget::internalOnEditModeToggle(bool value) {
-	cursor_widget->setVisible(value);
-	if (value) {
-		selectAll();
-	} else {
-		setCursorPos(0);
-		deselectAll();
-	}
-	updateColors();
-}
-
-void TextBoxWidget::internalOnFocused() {
-	enableEditMode();
-}
-
-void TextBoxWidget::internalOnFocusLost() {
-	disableEditMode(true);
 }
 
 void TextBoxWidget::internalProcessMouse(const sf::Vector2f& pos) {

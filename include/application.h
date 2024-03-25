@@ -144,6 +144,8 @@ private:
 	sf::Text object_info_text;
 	sf::Text id_text;
 	WidgetList widgets;
+	sf::Cursor arrow_cursor;
+	sf::Cursor text_cursor;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;
@@ -171,7 +173,6 @@ private:
 	void init_ui();
 	void init_widgets();
 	void main_loop();
-	void resetView();
 	void process_widgets();
 	void process_input();
 	void process_keyboard_event(const sf::Event& event);

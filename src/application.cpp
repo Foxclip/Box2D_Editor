@@ -261,6 +261,10 @@ void Application::init_ui() {
     load_font(small_font, "fonts/HelvetiPixel.ttf");
     load_font(textbox_font, "fonts/verdana.ttf");
 
+    arrow_cursor.loadFromSystem(sf::Cursor::Arrow);
+    text_cursor.loadFromSystem(sf::Cursor::Text);
+    window.setMouseCursor(arrow_cursor);
+
     vertex_text.setFont(ui_font);
     vertex_text.setCharacterSize(20);
     vertex_text.setFillColor(sf::Color::White);
@@ -363,13 +367,8 @@ void Application::main_loop() {
     }
 }
 
-void Application::resetView() {
-    viewCenterX = 0.0f;
-    viewCenterY = 0.0f;
-    zoomFactor = 1.0f;
-}
-
 void Application::process_widgets() {
+    widgets.unlock();
     widgets.reset(sf::Vector2f(ui_texture.getSize().x, ui_texture.getSize().y), mousePosf);
     if (edit_tool.edit_window_widget->isVisible() && active_object) {
         edit_tool.edit_window_widget->updateParameters();
@@ -410,6 +409,9 @@ void Application::process_input() {
         history.save(HistoryEntry::LOAD);
         load_request.requested = false;
     }
+    widgets.updateWidgets();
+    widgets.updateRenderQueue();
+    widgets.lock();
 }
 
 void Application::process_keyboard_event(const sf::Event& event) {
@@ -601,6 +603,14 @@ void Application::process_keyboard() {
 
 void Application::process_mouse() {
     widgets.processMouse(mousePosf);
+    Widget* widget = widgets.getTopWidgetUnderCursor();
+    if (widget) {
+        switch (widget->getCursorType()) {
+            case sf::Cursor::Arrow: window.setMouseCursor(arrow_cursor); break;
+            case sf::Cursor::Text: window.setMouseCursor(text_cursor); break;
+            default: window.setMouseCursor(arrow_cursor); break;
+        }
+    }
     if (selected_tool == &select_tool) {
         {
             GameObject* old_hover = select_tool.hover_object;

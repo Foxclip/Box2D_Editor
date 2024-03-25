@@ -8,6 +8,7 @@
 #include "compvector.h"
 #include "searchindex.h"
 #include "widget_transform.h"
+#include "widget_render_queue.h"
 #include "widget_unclipped_region.h"
 
 struct WidgetVisibility {
@@ -22,6 +23,12 @@ struct WidgetVisibility {
 };
 
 class WidgetList;
+
+// Adding methods:
+// If method changes widget, check this:
+// assert(!widget_list.isLocked());
+// And if if changes render queue:
+// widget_list.render_queue.invalidate();
 
 class Widget {
 public:
@@ -44,12 +51,6 @@ public:
 		ALIGN_LEFT,
 		ALIGN_RIGHT
 	};
-	enum RenderLayer {
-		BASE,
-		TEXTBOX_SELECTION,
-		TEXTBOX_TEXT,
-		TEXTBOX_CURSOR,
-	};
 	ptrdiff_t debug_id = -1;
 
 	std::function<void(const sf::Vector2f& pos)> OnClick = [](const sf::Vector2f& pos) { };
@@ -64,12 +65,14 @@ public:
 	void updateMouseState(const sf::Vector2f& mouse_pos);
 	virtual bool isVisualPositionQuantized() const;
 	bool isVisible() const;
+	bool isClickThrough() const;
 	WidgetVisibility checkVisibility() const;
 	void processClick(const sf::Vector2f& pos);
 	void processRelease(const sf::Vector2f& pos);
 	void processMouse(const sf::Vector2f& pos);
 	virtual bool isFocusable() const;
 	bool isFocused() const;
+	virtual sf::Cursor::Type getCursorType() const;
 	const std::string& getName() const;
 	const std::string& getFullName() const;
 	bool getClipChildren() const;
@@ -129,7 +132,7 @@ public:
 	void setClipChildren(bool value);
 	void setRenderLayer(RenderLayer layer);
 	void removeFocus();
-	virtual void processKeyboardEvent(const sf::Event& event);
+	void processKeyboardEvent(const sf::Event& event);
 	void render(sf::RenderTarget& target);
 	void renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children);
 	void renderOrigin(sf::RenderTarget& target);
@@ -170,6 +173,7 @@ protected:
 	virtual void internalOnSetParent(Widget* parent);
 	virtual void internalOnClick(const sf::Vector2f& pos);
 	virtual void internalOnRelease(const sf::Vector2f& pos);
+	virtual void internalProcessKeyboardEvent(const sf::Event& event);
 	virtual void internalProcessMouse(const sf::Vector2f& pos);
 	virtual void internalOnMouseEnter(const sf::Vector2f& pos);
 	virtual void internalOnMouseExit(const sf::Vector2f& pos);

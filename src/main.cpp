@@ -36,8 +36,10 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     execute_app();
 
-    // TODO: wider selection widget in textbox
-    // TODO: change cursor when hovering over textbox
+    // TODO: set text cursor when hovering over textbox text
+    // TODO: add custom search lambda to compvector and use it in WidgetRenderQueue::update
+    // TODO: save hitory when editing text in TextBox only when text is different
+    // TODO: remove global.h include from widgets
     // TDOO: ctrl-z in textbox
     // TODO: remove dependency on Application from UI classes
     // TODO: blinking textbox cursor

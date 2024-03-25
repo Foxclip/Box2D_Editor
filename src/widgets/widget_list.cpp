@@ -1,5 +1,6 @@
 #include "widgets/widget_list.h"
 #include "widgets/rectangle_widget.h"
+#include <ranges>
 
 WidgetList::WidgetList() {
 	root_widget = createWidget<RectangleWidget>();
@@ -28,42 +29,113 @@ Widget* WidgetList::getFocusedWidget() const {
 	return focused_widget;
 }
 
+Widget* WidgetList::getTopWidgetUnderCursor() const {
+	// getSilent because render_queue is from previous frame
+	for (RenderQueueLayer layer : render_queue.getSilent() | std::views::reverse) {
+		for (Widget* widget : layer.widgets | std::views::reverse) {
+			if (widget->isMouseOver()) {
+				return widget;
+			}
+		}
+	}
+	return nullptr;
+}
+
+CompoundVector<Widget*> WidgetList::getWidgetsUnderCursor(bool can_block, bool& blocked) const {
+	CompoundVector<Widget*> result;
+	for (RenderQueueLayer layer : render_queue.getSilent() | std::views::reverse) {
+		for (Widget* widget : layer.widgets | std::views::reverse) {
+			if (widget->isMouseOver()) {
+				result.add(widget);
+				if (can_block && !widget->isClickThrough()) {
+					blocked = true;
+					break;
+				}
+			}
+		}
+		if (blocked) {
+			break;
+		}
+	}
+	return result;
+}
+
 Widget* WidgetList::find(const std::string& name) const {
 	return root_widget->find(name);
 }
 
+bool WidgetList::isLocked() const {
+	return locked;
+}
+
+void WidgetList::lock() {
+	locked = true;
+}
+
+void WidgetList::unlock() {
+	locked = false;
+}
+
 void WidgetList::processClick(const sf::Vector2f pos) {
-	focused_widget_temp = nullptr;
-	root_widget->processClick(pos);
-	setFocusedWidget(focused_widget_temp);
+	assert(!isLocked());
+	CompoundVector<Widget*> widgets = getWidgetsUnderCursor(true, click_blocked);
+	Widget* focused = nullptr;
+	for (size_t i = 0; i < widgets.size(); i++) {
+		Widget* widget = widgets[i];
+		widget->processClick(pos);
+		if (!focused && widget->isFocusable()) {
+			focused = widget;
+		}
+		render_queue.invalidate();
+	}
+	setFocusedWidget(focused);
 }
 
 void WidgetList::processRelease(const sf::Vector2f pos) {
-	if (focused_widget) {
-		focused_widget->processRelease(pos);
+	assert(!isLocked());
+	CompoundVector<Widget*> widgets = getWidgetsUnderCursor(true, release_blocked);
+	for (size_t i = 0; i < widgets.size(); i++) {
+		Widget* widget = widgets[i];
+		widget->processRelease(pos);
+		render_queue.invalidate();
 	}
 }
 
 void WidgetList::processMouse(const sf::Vector2f pos) {
+	assert(!isLocked());
 	root_widget->processMouse(pos);
+	render_queue.invalidate();
 }
 
 void WidgetList::processKeyboardEvent(const sf::Event& event) {
+	assert(!isLocked());
 	if (focused_widget) {
 		focused_widget->processKeyboardEvent(event);
+		render_queue.invalidate();
 	}
 }
 
-void WidgetList::render(sf::RenderTarget& target) {
-	root_widget->unclipped_region.invalidate();
+void WidgetList::updateRenderQueue() {
+	assert(!isLocked());
+	render_queue.update();
+}
+
+void WidgetList::updateWidgets() {
+	assert(!isLocked());
 	root_widget->update();
+	render_queue.invalidate();
+}
+
+void WidgetList::render(sf::RenderTarget& target) {
+	assert(isLocked());
+	root_widget->unclipped_region.invalidate();
 #ifndef NDEBUG
 	for (size_t i = 0; i < widgets.size(); i++) {
 		widgets[i]->updateVisibility();
 	}
 #endif
-	updateRenderQueue();
-	for (RenderQueueLayer layer : render_queue) {
+	const std::set<RenderQueueLayer>& layers = render_queue.get();
+	for (RenderQueueLayer layer : layers) {
 		for (size_t widget_i = 0; widget_i < layer.widgets.size(); widget_i++) {
 			Widget* widget = layer.widgets[widget_i];
 			widget->render(target);
@@ -79,13 +151,17 @@ void WidgetList::render(sf::RenderTarget& target) {
 }
 
 void WidgetList::reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_pos) {
+	assert(!isLocked());
 	root_widget->setSize(root_size);
 	root_widget->updateMouseState(mouse_pos);
 	click_blocked = false;
 	release_blocked = false;
+	//root_widget->unclipped_region.invalidate();
+	//render_queue.invalidate();
 }
 
 void WidgetList::setFocusedWidget(Widget* widget) {
+	assert(!isLocked());
 	LoggerTag tag_set_focused_widget("setFocusedWidget");
 	if (widget == focused_widget) {
 		return;
@@ -100,41 +176,13 @@ void WidgetList::setFocusedWidget(Widget* widget) {
 		logger << focused_widget->getFullName() << " lost focus\n";
 		focused_widget->internalOnFocusLost();
 		focused_widget->OnFocusLost();
+		render_queue.invalidate();
 	}
 	focused_widget = widget;
 	if (focused_widget) {
 		logger << focused_widget->getFullName() << " is focused\n";
 		focused_widget->internalOnFocused();
 		focused_widget->OnFocused();
+		render_queue.invalidate();
 	}
-}
-
-void WidgetList::updateRenderQueue() {
-	render_queue.clear();
-	std::function<void(Widget*)> add_widget = [&](Widget* widget) {
-		if (!widget->isVisible()) {
-			return;
-		}
-		auto it = render_queue.find(RenderQueueLayer(widget->getRenderLayer()));
-		if (it != render_queue.end()) {
-			RenderQueueLayer* layer = const_cast<RenderQueueLayer*>(&*it);
-			layer->widgets.add(widget);
-		} else {
-			RenderQueueLayer layer(widget->getRenderLayer());
-			layer.widgets.add(widget);
-			render_queue.insert(layer);
-		}
-		for (size_t i = 0; i < widget->getChildren().size(); i++) {
-			add_widget(widget->getChild(i));
-		}
-	};
-	add_widget(root_widget);
-}
-
-RenderQueueLayer::RenderQueueLayer(Widget::RenderLayer layer) {
-	this->layer = layer;
-}
-
-bool RenderQueueLayer::operator<(const RenderQueueLayer& other) const {
-	return layer < other.layer;
 }

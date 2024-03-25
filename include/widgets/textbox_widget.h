@@ -38,6 +38,7 @@ public:
 	size_t getCursorPos() const;
 	bool isEditMode() const;
 	bool isSelectionActive() const;
+	sf::Cursor::Type getCursorType() const override;
 	sf::Vector2f getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const;
 	sf::Vector2f getGlobalCharPos(size_t index, bool top_aligned, bool with_kerning) const;
 	ptrdiff_t getSelectionLeft() const;
@@ -60,7 +61,6 @@ public:
 	void insert(size_t pos, const sf::String& str);
 	void erase(size_t index_first, size_t count);
 	void eraseSelection();
-	void processKeyboardEvent(const sf::Event& event);
 
 protected:
 	void update() override;
@@ -70,6 +70,7 @@ protected:
 	void internalOnEditModeToggle(bool value);
 	void internalOnFocused() override;
 	void internalOnFocusLost() override;
+	void internalProcessKeyboardEvent(const sf::Event& event) override;
 	void internalProcessMouse(const sf::Vector2f& pos) override;
 	void internalOnMouseEnter(const sf::Vector2f& pos) override;
 	void internalOnMouseExit(const sf::Vector2f& pos) override;

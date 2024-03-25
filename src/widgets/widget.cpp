@@ -32,6 +32,10 @@ bool Widget::isVisible() const {
 	return visible;
 }
 
+bool Widget::isClickThrough() const {
+	return click_through;
+}
+
 WidgetVisibility Widget::checkVisibility() const {
 	WidgetVisibility v;
 	sf::FloatRect global_bounds = getGlobalBounds();
@@ -53,36 +57,13 @@ WidgetVisibility Widget::checkVisibility() const {
 }
 
 void Widget::processClick(const sf::Vector2f& pos) {
-	if (!visible) {
-		return;
-	}
-	if (mouseIn) {
-		if (!click_through) {
-			widget_list.click_blocked = true;
-		}
-		if (isFocusable() && !widget_list.focused_widget_temp) {
-			widget_list.focused_widget_temp = this;
-		}
-		internalOnClick(pos);
-		OnClick(pos);
-	}
-	for (size_t i = 0; i < children.size(); i++) {
-		children[i]->processClick(pos);
-	}
+	internalOnClick(pos);
+	OnClick(pos);
 }
 
 void Widget::processRelease(const sf::Vector2f& pos) {
-	if (!visible) {
-		return;
-	}
-	if (!click_through) {
-		widget_list.release_blocked = true;
-	}
 	internalOnRelease(pos);
 	OnRelease(pos);
-	for (size_t i = 0; i < children.size(); i++) {
-		children[i]->processRelease(pos);
-	}
 }
 
 void Widget::processMouse(const sf::Vector2f& pos) {
@@ -103,6 +84,10 @@ bool Widget::isFocused() const {
 	return widget_list.focused_widget == this;
 }
 
+sf::Cursor::Type Widget::getCursorType() const {
+	return sf::Cursor::Arrow;
+}
+
 const std::string& Widget::getName() const {
 	return name;
 }
@@ -115,7 +100,7 @@ bool Widget::getClipChildren() const {
 	return clip_children;
 }
 
-Widget::RenderLayer Widget::getRenderLayer() const {
+RenderLayer Widget::getRenderLayer() const {
 	return layer;
 }
 
@@ -284,6 +269,7 @@ sf::Vector2f Widget::getVisualGlobalBottomRight() const {
 }
 
 void Widget::setOrigin(Anchor anchor) {
+	assert(!widget_list.isLocked());
 	sf::Vector2f origin_pos = anchorToPos(anchor, getOrigin(), getSize());
 	setOrigin(origin_pos);
 	this->origin_anchor = anchor;
@@ -291,49 +277,60 @@ void Widget::setOrigin(Anchor anchor) {
 }
 
 void Widget::setOrigin(float x, float y) {
+	assert(!widget_list.isLocked());
 	getTransformable().setOrigin(x, y);
 	this->origin_anchor = CUSTOM;
 	updateAnchoredPosition();
 }
 
 void Widget::setOrigin(const sf::Vector2f& origin) {
+	assert(!widget_list.isLocked());
 	getTransformable().setOrigin(origin);
 	this->origin_anchor = CUSTOM;
 	updateAnchoredPosition();
 }
 
 void Widget::setParentAnchor(Anchor anchor) {
+	assert(!widget_list.isLocked());
 	this->parent_anchor = anchor;
 	updateAnchoredPosition();
 }
 
 void Widget::setAnchorOffset(float x, float y) {
+	assert(!widget_list.isLocked());
 	this->anchor_offset = sf::Vector2f(x, y);
 	updateAnchoredPosition();
 }
 
 void Widget::setAnchorOffset(const sf::Vector2f& offset) {
+	assert(!widget_list.isLocked());
 	this->anchor_offset = offset;
 	updateAnchoredPosition();
 }
 
 void Widget::setPosition(float x, float y) {
+	assert(!widget_list.isLocked());
 	transforms.setPosition(sf::Vector2f(x, y));
 }
 
 void Widget::setPosition(const sf::Vector2f& position) {
+	assert(!widget_list.isLocked());
 	transforms.setPosition(position);
 }
 
 void Widget::setRotation(float angle) {
+	assert(!widget_list.isLocked());
 	transforms.setRotation(angle);
 }
 
 void Widget::setVisible(bool value) {
+	assert(!widget_list.isLocked());
 	this->visible = value;
+	widget_list.render_queue.invalidate();
 }
 
 void Widget::setClickThrough(bool value) {
+	assert(!widget_list.isLocked());
 	this->click_through = value;
 }
 
@@ -370,14 +367,17 @@ void Widget::setParentSilent(Widget* new_parent) {
 	this->parent = new_parent;
 	transforms.invalidateGlobalTransform();
 	updateFullName();
+	widget_list.render_queue.invalidate();
 }
 
 void Widget::setParent(Widget* new_parent) {
+	assert(!widget_list.isLocked());
 	setParentSilent(new_parent);
 	internalOnSetParent(new_parent);
 }
 
 void Widget::setName(const std::string& new_name) {
+	assert(!widget_list.isLocked());
 	if (parent) {
 		parent->children_names.remove(this->name, this);
 		parent->children_names.add(new_name, this);
@@ -387,6 +387,7 @@ void Widget::setName(const std::string& new_name) {
 }
 
 void Widget::setClipChildren(bool value) {
+	assert(!widget_list.isLocked());
 	if (this == widget_list.root_widget && value == false) {
 		assert(false, "Cannot disable clipChildren for root widget");
 	}
@@ -394,22 +395,29 @@ void Widget::setClipChildren(bool value) {
 }
 
 void Widget::setRenderLayer(RenderLayer layer) {
+	assert(!widget_list.isLocked());
 	this->layer = layer;
+	widget_list.render_queue.invalidate();
 }
 
 void Widget::removeFocus() {
+	assert(!widget_list.isLocked());
 	if (isFocused()) {
 		widget_list.setFocusedWidget(nullptr);
 	}
 }
 
-void Widget::processKeyboardEvent(const sf::Event& event) { }
+void Widget::processKeyboardEvent(const sf::Event& event) {
+	assert(!widget_list.isLocked());
+	internalProcessKeyboardEvent(event);
+}
 
 sf::Vector2f Widget::getRenderPositionOffset() const {
 	return sf::Vector2f(0.0f, 0.0f);
 }
 
 void Widget::updateAnchoredPosition() {
+	assert(!widget_list.isLocked());
 	sf::Vector2f parent_size;
 	if (parent) {
 		parent_size = parent->getLocalBounds().getSize();
@@ -419,6 +427,7 @@ void Widget::updateAnchoredPosition() {
 }
 
 void Widget::update() {
+	assert(!widget_list.isLocked());
 	if (!visible) {
 		return;
 	}
@@ -427,6 +436,7 @@ void Widget::update() {
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->update();
 	}
+	widget_list.render_queue.invalidate();
 }
 
 void Widget::internalOnSetParent(Widget* parent) { }
@@ -434,6 +444,8 @@ void Widget::internalOnSetParent(Widget* parent) { }
 void Widget::internalOnClick(const sf::Vector2f& pos) { }
 
 void Widget::internalOnRelease(const sf::Vector2f& pos) { }
+
+void Widget::internalProcessKeyboardEvent(const sf::Event& event) { }
 
 void Widget::internalProcessMouse(const sf::Vector2f& pos) { }
 
@@ -457,6 +469,7 @@ std::string Widget::calcFullName() const {
 }
 
 void Widget::updateFullName() {
+	assert(!widget_list.isLocked());
 	full_name = calcFullName();
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->updateFullName();
@@ -471,7 +484,9 @@ void Widget::updateRenderTexture(const sf::FloatRect& texture_bounds) {
 	if (texture_bounds.width == 0 || texture_bounds.height == 0) {
 		return;
 	}
-	bool size_changed = texture_bounds.width != render_texture.getSize().x || texture_bounds.height != render_texture.getSize().y;
+	bool size_changed =
+		texture_bounds.width != render_texture.getSize().x
+		|| texture_bounds.height != render_texture.getSize().y;
 	if (size_changed) {
 		render_texture.create(texture_bounds.width, texture_bounds.height);
 	}
