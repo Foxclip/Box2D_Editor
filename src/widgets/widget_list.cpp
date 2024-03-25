@@ -93,10 +93,8 @@ void WidgetList::processClick(const sf::Vector2f pos) {
 
 void WidgetList::processRelease(const sf::Vector2f pos) {
 	assert(!isLocked());
-	CompoundVector<Widget*> widgets = getWidgetsUnderCursor(true, release_blocked);
-	for (size_t i = 0; i < widgets.size(); i++) {
-		Widget* widget = widgets[i];
-		widget->processRelease(pos);
+	if (focused_widget) {
+		focused_widget->processRelease(pos);
 		render_queue.invalidate();
 	}
 }
