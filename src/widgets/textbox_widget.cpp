@@ -16,7 +16,7 @@ TextBoxWidget::TextBoxWidget(WidgetList& widget_list) : RectangleWidget(widget_l
 	cursor_widget = widget_list.createWidget<RectangleWidget>();
 	cursor_widget->setVisible(false);
 	cursor_widget->setFillColor(editor_text_color);
-	cursor_widget->setSize(sf::Vector2f(1.0f, text_widget->getCharacterSize()));
+	updateCursorSize();
 	cursor_widget->setRenderLayer(RenderLayer::TEXTBOX_CURSOR);
 	cursor_widget->setParent(text_widget);
 	cursor_widget->setName("cursor");
@@ -194,7 +194,7 @@ void TextBoxWidget::setFont(const sf::Font& font) {
 
 void TextBoxWidget::setCharacterSize(unsigned int size) {
 	text_widget->setCharacterSize(size);
-	cursor_widget->setSize(sf::Vector2f(1.0f, size));
+	updateCursorSize();
 }
 
 void TextBoxWidget::setValueSilent(const sf::String& value) {
@@ -217,7 +217,7 @@ void TextBoxWidget::setType(TextBoxType type) {
 void TextBoxWidget::setCursorPos(size_t pos) {
 	pos = std::clamp(pos, (size_t)0, getStringSize());
 	this->cursor_pos = pos;
-	updateVisualCursorPos();
+	updateTextScroll();
 	if (cursor_pos == selection_pos) {
 		selection_pos = -1;
 	}
@@ -422,7 +422,7 @@ void TextBoxWidget::processKeyboardEvent(const sf::Event& event) {
 void TextBoxWidget::update() {
 	Widget::update();
 	sf::Vector2f char_pos = text_widget->getLocalCharPos(cursor_pos, true, true);
-	cursor_widget->setPosition(char_pos + CURSOR_OFFSET);
+	cursor_widget->setPosition(char_pos - sf::Vector2f(0.0f, CURSOR_MARGIN) + CURSOR_OFFSET);
 	updateSelection();
 	process_text_entered_event = true;
 }
@@ -577,7 +577,7 @@ void TextBoxWidget::eraseSilent(size_t index_first, size_t count) {
 	text_widget->erase(index_first, count);
 }
 
-void TextBoxWidget::updateVisualCursorPos() {
+void TextBoxWidget::updateTextScroll() {
 	if (!getFont()) {
 		return;
 	}
@@ -596,6 +596,11 @@ void TextBoxWidget::updateVisualCursorPos() {
 	}
 }
 
+void TextBoxWidget::updateCursorSize() {
+	float cursor_height = text_widget->getCharacterSize() + CURSOR_MARGIN * 2;
+	cursor_widget->setSize(sf::Vector2f(1.0f, cursor_height));
+}
+
 void TextBoxWidget::updateSelection() {
 	if (selection_pos < 0 || selection_pos > getStringSize() || cursor_pos - selection_pos == 0) {
 		selection_widget->setSize(sf::Vector2f());
@@ -604,9 +609,11 @@ void TextBoxWidget::updateSelection() {
 	}
 	sf::Vector2f left_pos = text_widget->getLocalCharPos(getSelectionLeft(), true, true);
 	sf::Vector2f right_pos = text_widget->getLocalCharPos(getSelectionRight(), true, true);
+	sf::Vector2f selection_widget_pos = left_pos - sf::Vector2f(0.0f, SELECTION_MARGIN);
+	selection_widget->setPosition(selection_widget_pos);
 	float width = right_pos.x - left_pos.x;
-	selection_widget->setPosition(left_pos);
-	selection_widget->setSize(width, getCharacterSize());
+	float height = getCharacterSize() + SELECTION_MARGIN * 2;
+	selection_widget->setSize(width, height);
 	selection_widget->setVisible(true);
 }
 

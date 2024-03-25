@@ -81,7 +81,8 @@ protected:
 	void disableEditMode(bool confirm);
 	void insertSilent(size_t pos, const sf::String& str);
 	void eraseSilent(size_t index_first, size_t count);
-	void updateVisualCursorPos();
+	void updateTextScroll();
+	void updateCursorSize();
 	void updateSelection();
 	void setSelection(ptrdiff_t pos);
 	size_t calcCursorPos(const sf::Vector2f& pos);
@@ -93,6 +94,8 @@ private:
 	const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(40.0f, 20.0f);
 	const sf::Vector2f TEXT_VIEW_ZERO_POS = sf::Vector2f(2.0f, 0.0f);
 	const sf::Vector2f CURSOR_OFFSET = sf::Vector2f(0.0f, 0.0f);
+	const float CURSOR_MARGIN = 2.0f;
+	const float SELECTION_MARGIN = 2.0f;
 	const std::string VALID_INTEGER_CHARS = "+-0123456789";
 	const std::string VALID_FLOAT_CHARS = "+-.e0123456789";
 	const float CURSOR_MOVE_MARGIN = 2.0f;
