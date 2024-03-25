@@ -1,10 +1,8 @@
 set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 
-add_subdirectory(UI)
 add_subdirectory(widgets)
 
-add_library(src_lib)
-target_sources(src_lib PRIVATE
+set(SRC_HEADER_FILES
     "${INCLUDE_DIR}/application.h"
     "${INCLUDE_DIR}/compvector.h"
     "${INCLUDE_DIR}/gameobject.h"
@@ -19,8 +17,11 @@ target_sources(src_lib PRIVATE
     "${INCLUDE_DIR}/serializer.h"
     "${INCLUDE_DIR}/tools.h"
     "${INCLUDE_DIR}/utils.h"
+    "${INCLUDE_DIR}/UI/create_panel.h"
+    "${INCLUDE_DIR}/UI/edit_window.h"
+    "${INCLUDE_DIR}/UI/toolbox.h"
 )
-target_sources(src_lib PRIVATE
+set(SRC_SOURCE_FILES
     application.cpp
     compvector.cpp
     gameobject.cpp
@@ -34,13 +35,19 @@ target_sources(src_lib PRIVATE
     serializer.cpp
     tools.cpp
     utils.cpp
+    UI/create_panel.cpp
+    UI/edit_window.cpp
+    UI/toolbox.cpp
 )
+add_library(src_lib ${SRC_HEADER_FILES} ${SRC_SOURCE_FILES})
+source_group(TREE ${INCLUDE_DIR} PREFIX "Header Files" FILES ${SRC_HEADER_FILES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Source Files" FILES ${SRC_SOURCE_FILES})
+
 target_include_directories(src_lib PUBLIC "${INCLUDE_DIR}")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
+target_link_libraries(src_lib PRIVATE widgets_lib)
 target_link_libraries(src_lib PUBLIC sfml-graphics sfml-system sfml-window)
 target_link_libraries(src_lib PRIVATE box2d)
 target_link_libraries(src_lib PRIVATE clip)
-target_link_libraries(src_lib PRIVATE ui_lib)
-target_link_libraries(src_lib PRIVATE widgets_lib)
