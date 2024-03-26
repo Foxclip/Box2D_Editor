@@ -166,7 +166,11 @@ TextParameter::TextParameter(
     this->set_value = set_value;
     this->widget = createParameterWidget(name, text);
     this->textbox_widget = createTextBoxWidget();
-    this->textbox_widget->OnConfirm = set_value;
+    this->textbox_widget->OnConfirm = [&](const sf::String& value) {
+        if (this->get_value() != value) {
+            this->set_value(value);
+        }
+    };
     this->textbox_widget->setParent(widget);
 }
 
@@ -187,7 +191,11 @@ BoolParameter::BoolParameter(
     this->set_value = set_value;
     this->widget = createParameterWidget(name, text);
     this->checkbox_widget = createCheckboxWidget();
-    this->checkbox_widget->OnValueChanged = set_value;
+    this->checkbox_widget->OnValueChanged = [&](bool new_value) {
+        if (this->get_value() != new_value) {
+            this->set_value(new_value);
+        }
+    };
     this->checkbox_widget->setParent(widget);
 }
 
@@ -207,10 +215,12 @@ FloatParameter::FloatParameter(
     this->widget = createParameterWidget(name, text);
     this->textbox_widget = createTextBoxWidget();
     this->textbox_widget->setType(TextBoxWidget::TextBoxType::FLOAT);
-    this->textbox_widget->OnConfirm = [=](const sf::String& str) {
+    this->textbox_widget->OnConfirm = [&](const sf::String& str) {
         if (textbox_widget->isValidValue()) {
-            float value = std::stof(str.toAnsiString());
-            set_value(value);
+            float new_value = std::stof(str.toAnsiString());
+            if (this->get_value() != new_value) {
+                this->set_value(new_value);
+            }
         }
     };
     this->textbox_widget->setParent(widget);
