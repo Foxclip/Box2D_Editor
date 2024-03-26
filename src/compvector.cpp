@@ -5,9 +5,7 @@
 #include <algorithm>
 #include <ranges>
 
-CompoundVectorTest compound_vector_test;
-
-void test_CompoundVector() {
+void CompoundVectorTest::test_CompoundVector() {
 	{
 		// empty vector
 		CompoundVector<int> vec;
@@ -49,6 +47,15 @@ void test_CompoundVector() {
 		std::vector<int> vec = { 1, 2, 3 };
 		CompoundVector<int> cvec(vec);
 		assert(vec == std::vector<int>({ 1, 2, 3 }));
+	}
+	{
+		// custom compare
+		auto cmp = [](int left, int right) {
+			return left > right;
+		};
+		CompoundVector<int, decltype(cmp)> vec = { 1, 2, 3 };
+		std::vector<int> set_vec = std::vector<int>(vec.getSet().begin(), vec.getSet().end());
+		assert(set_vec == std::vector<int>({ 3, 2, 1 }));
 	}
 	{
 		// add method
@@ -206,7 +213,7 @@ void test_CompoundVector() {
 	}
 }
 
-void test_CompoundVectorUptr() {
+void CompoundVectorTest::test_CompoundVectorUptr() {
 	{
 		// empty vector
 		CompoundVectorUptr<int> vec;

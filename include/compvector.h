@@ -16,7 +16,7 @@ concept Vectorlike = requires(T x, size_t i) {
 template<Vectorlike TLeft, Vectorlike TRight>
 bool compare(const TLeft& left, const TRight& right);
 
-template<typename T>
+template<typename T, typename TCmp = std::less<T>>
 class CompoundVector {
 public:
 	using value_type = T;
@@ -50,10 +50,10 @@ public:
 	const T& at(size_t index) const;
 	ptrdiff_t getIndex(const T& value) const;
 	const std::vector<T>& getVector() const;
-	const std::set<T>& getSet() const;
+	const std::set<T, TCmp>& getSet() const;
 	T& operator[](size_t index);
 	const T& operator[](size_t index) const;
-	std::set<T>::iterator find(const T& value) const;
+	std::set<T, TCmp>::iterator find(const T& value) const;
 	bool contains(const T& value) const;
 	void clear();
 	operator std::vector<T>() const;
@@ -62,7 +62,7 @@ public:
 
 private:
 	std::vector<T> vector;
-	std::set<T> set;
+	std::set<T, TCmp> set;
 };
 
 template<typename T>
@@ -132,30 +132,30 @@ inline bool compare(const TLeft& left, const TRight& right) {
 	return true;
 }
 
-template<typename T>
-inline CompoundVector<T>::CompoundVector() { }
+template<typename T, typename TCmp>
+inline CompoundVector<T, TCmp>::CompoundVector() { }
 
-template<typename T>
-inline CompoundVector<T>::CompoundVector(const std::initializer_list<T>& list) {
+template<typename T, typename TCmp>
+inline CompoundVector<T, TCmp>::CompoundVector(const std::initializer_list<T>& list) {
 	for (const T& value : list) {
 		add(value);
 	}
 }
 
-template<typename T>
-inline CompoundVector<T>::CompoundVector(const std::vector<T>& vec) {
+template<typename T, typename TCmp>
+inline CompoundVector<T, TCmp>::CompoundVector(const std::vector<T>& vec) {
 	for (const T& value : vec) {
 		add(value);
 	}
 }
 
-template<typename T>
-inline size_t CompoundVector<T>::size() const {
+template<typename T, typename TCmp>
+inline size_t CompoundVector<T, TCmp>::size() const {
 	return vector.size();
 }
 
-template<typename T>
-inline bool CompoundVector<T>::add(const T& value) {
+template<typename T, typename TCmp>
+inline bool CompoundVector<T, TCmp>::add(const T& value) {
 	auto inserted = set.insert(value);
 	if (inserted.second) {
 		vector.push_back(value);
@@ -164,8 +164,8 @@ inline bool CompoundVector<T>::add(const T& value) {
 	return false;
 }
 
-template<typename T>
-inline bool CompoundVector<T>::insert(std::vector<T>::const_iterator where, const T& value) {
+template<typename T, typename TCmp>
+inline bool CompoundVector<T, TCmp>::insert(std::vector<T>::const_iterator where, const T& value) {
 	auto inserted = set.insert(value);
 	if (inserted.second) {
 		vector.insert(where, value);
@@ -174,9 +174,9 @@ inline bool CompoundVector<T>::insert(std::vector<T>::const_iterator where, cons
 	return false;
 }
 
-template<typename T>
+template<typename T, typename TCmp>
 template<std::incrementable TIter>
-inline size_t CompoundVector<T>::insert(std::vector<T>::const_iterator where, TIter first, TIter last) {
+inline size_t CompoundVector<T, TCmp>::insert(std::vector<T>::const_iterator where, TIter first, TIter last) {
 	size_t offset = where - vector.begin();
 	TIter iter_other(first);
 	size_t inserted_count = 0;
@@ -190,8 +190,8 @@ inline size_t CompoundVector<T>::insert(std::vector<T>::const_iterator where, TI
 	return inserted_count;
 }
 
-template<typename T>
-inline ptrdiff_t CompoundVector<T>::remove(const T& value) {
+template<typename T, typename TCmp>
+inline ptrdiff_t CompoundVector<T, TCmp>::remove(const T& value) {
 	size_t removed = set.erase(value);
 	if (removed > 0) {
 		ptrdiff_t index = getIndex(value);
@@ -201,70 +201,70 @@ inline ptrdiff_t CompoundVector<T>::remove(const T& value) {
 	return -1;
 }
 
-template<typename T>
-inline void CompoundVector<T>::removeAt(size_t index) {
+template<typename T, typename TCmp>
+inline void CompoundVector<T, TCmp>::removeAt(size_t index) {
 	T value = vector[index];
 	vector.erase(vector.begin() + index);
 	set.erase(value);
 }
 
-template<typename T>
-inline void CompoundVector<T>::reverse() {
+template<typename T, typename TCmp>
+inline void CompoundVector<T, TCmp>::reverse() {
 	std::reverse(vector.begin(), vector.end());
 }
 
-template<typename T>
-inline std::vector<T>::const_iterator CompoundVector<T>::begin() const {
+template<typename T, typename TCmp>
+inline std::vector<T>::const_iterator CompoundVector<T, TCmp>::begin() const {
 	return vector.begin();
 }
 
-template<typename T>
-inline std::vector<T>::const_iterator CompoundVector<T>::end() const {
+template<typename T, typename TCmp>
+inline std::vector<T>::const_iterator CompoundVector<T, TCmp>::end() const {
 	return vector.end();
 }
 
-template<typename T>
-inline std::vector<T>::const_reverse_iterator CompoundVector<T>::rbegin() const {
+template<typename T, typename TCmp>
+inline std::vector<T>::const_reverse_iterator CompoundVector<T, TCmp>::rbegin() const {
 	return vector.rbegin();
 }
 
-template<typename T>
-inline std::vector<T>::const_reverse_iterator CompoundVector<T>::rend() const {
+template<typename T, typename TCmp>
+inline std::vector<T>::const_reverse_iterator CompoundVector<T, TCmp>::rend() const {
 	return vector.rend();
 }
 
-template<typename T>
-inline T& CompoundVector<T>::front() {
+template<typename T, typename TCmp>
+inline T& CompoundVector<T, TCmp>::front() {
 	return vector.front();
 }
 
-template<typename T>
-inline const T& CompoundVector<T>::front() const {
+template<typename T, typename TCmp>
+inline const T& CompoundVector<T, TCmp>::front() const {
 	return vector.front();
 }
 
-template<typename T>
-inline T& CompoundVector<T>::back() {
+template<typename T, typename TCmp>
+inline T& CompoundVector<T, TCmp>::back() {
 	return vector.back();
 }
 
-template<typename T>
-inline const T& CompoundVector<T>::back() const {
+template<typename T, typename TCmp>
+inline const T& CompoundVector<T, TCmp>::back() const {
 	return vector.back();
 }
 
-template<typename T>
-inline T& CompoundVector<T>::at(size_t index) {
+template<typename T, typename TCmp>
+inline T& CompoundVector<T, TCmp>::at(size_t index) {
 	return vector[index];
 }
 
-template<typename T>
-inline const T& CompoundVector<T>::at(size_t index) const {
+template<typename T, typename TCmp>
+inline const T& CompoundVector<T, TCmp>::at(size_t index) const {
 	return vector[index];
 }
 
-template<typename T>
-inline ptrdiff_t CompoundVector<T>::getIndex(const T& value) const {
+template<typename T, typename TCmp>
+inline ptrdiff_t CompoundVector<T, TCmp>::getIndex(const T& value) const {
 	for (size_t i = 0; i < vector.size(); i++) {
 		if (vector[i] == value) {
 			return i;
@@ -273,50 +273,50 @@ inline ptrdiff_t CompoundVector<T>::getIndex(const T& value) const {
 	return -1;
 }
 
-template<typename T>
-inline const std::vector<T>& CompoundVector<T>::getVector() const {
+template<typename T, typename TCmp>
+inline const std::vector<T>& CompoundVector<T, TCmp>::getVector() const {
 	return vector;
 }
 
-template<typename T>
-inline const std::set<T>& CompoundVector<T>::getSet() const {
+template<typename T, typename TCmp>
+inline const std::set<T, TCmp>& CompoundVector<T, TCmp>::getSet() const {
 	return set;
 }
 
-template<typename T>
-inline T& CompoundVector<T>::operator[](size_t index) {
+template<typename T, typename TCmp>
+inline T& CompoundVector<T, TCmp>::operator[](size_t index) {
 	return at(index);
 }
 
-template<typename T>
-inline const T& CompoundVector<T>::operator[](size_t index) const {
+template<typename T, typename TCmp>
+inline const T& CompoundVector<T, TCmp>::operator[](size_t index) const {
 	return at(index);
 }
 
-template<typename T>
-inline std::set<T>::iterator CompoundVector<T>::find(const T& value) const {
+template<typename T, typename TCmp>
+inline std::set<T, TCmp>::iterator CompoundVector<T, TCmp>::find(const T& value) const {
 	return set.find(value);
 }
 
-template<typename T>
-inline bool CompoundVector<T>::contains(const T& value) const {
+template<typename T, typename TCmp>
+inline bool CompoundVector<T, TCmp>::contains(const T& value) const {
 	return set.contains(value);
 }
 
-template<typename T>
-inline void CompoundVector<T>::clear() {
+template<typename T, typename TCmp>
+inline void CompoundVector<T, TCmp>::clear() {
 	vector = std::vector<T>();
-	set = std::set<T>();
+	set = std::set<T, TCmp>();
 }
 
-template<typename T>
-inline CompoundVector<T>::operator std::vector<T>() const {
+template<typename T, typename TCmp>
+inline CompoundVector<T, TCmp>::operator std::vector<T>() const {
 	return vector;
 }
 
-template<typename T>
+template<typename T, typename TCmp>
 template<Vectorlike TCont>
-inline bool CompoundVector<T>::operator==(const TCont& other) const {
+inline bool CompoundVector<T, TCmp>::operator==(const TCont& other) const {
 	return compare(*this, other);
 }
 
@@ -552,8 +552,8 @@ inline CompoundVectorUptr<T>::operator std::vector<T*>() const {
 class CompoundVectorTest {
 public:
 	CompoundVectorTest();
+	void test_CompoundVector();
+	void test_CompoundVectorUptr();
 };
-
-extern CompoundVectorTest compound_vector_test;
 
 #endif // NDEBUG

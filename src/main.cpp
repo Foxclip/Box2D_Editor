@@ -5,6 +5,13 @@
 #include "logger.h"
 #include "scenes.h"
 
+#ifndef NDEBUG
+void run_tests() {
+    CompoundVectorTest();
+    LoggerTest();
+}
+#endif
+
 void execute_app() {
     Application app;
     try {
@@ -31,12 +38,18 @@ void execute_app() {
 
 int main() {
 
+#ifndef NDEBUG
+    std::cout << "Running tests\n";
+    run_tests();
+#endif
+
     LoggerDisableTag disable_serialize_tag("serialize");
     LoggerDisableTag disable_recut_tag("recut");
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
+
+    std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: set text cursor when hovering over textbox text
     // TODO: add custom search lambda to compvector and use it in WidgetRenderQueue::update
     // TODO: save hitory when editing text in TextBox only when text is different
     // TODO: remove global.h include from widgets

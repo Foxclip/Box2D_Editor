@@ -275,8 +275,6 @@ void LoggerDisableTag::internalClose() {
 
 #ifndef NDEBUG
 
-LoggerTest logger_test;
-
 void LoggerTest::testLogger() {
 	{
 		// simple test

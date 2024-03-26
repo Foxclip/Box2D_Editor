@@ -144,6 +144,4 @@ public:
 	void testLogger();
 };
 
-extern LoggerTest logger_test;
-
 #endif // NDEBUG
