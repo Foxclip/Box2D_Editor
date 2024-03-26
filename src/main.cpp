@@ -50,9 +50,7 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: remove global.h include from widgets
     // TDOO: ctrl-z in textbox
-    // TODO: remove dependency on Application from UI classes
     // TODO: blinking textbox cursor
     // TODO: make SearchIndex not use pointers for TObject type
     // TODO: Dropdown widget

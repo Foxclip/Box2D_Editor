@@ -4,7 +4,6 @@
 #include <functional>
 #include "utils.h"
 #include "logger.h"
-#include "global.h"
 #include "compvector.h"
 #include "searchindex.h"
 #include "widget_transform.h"

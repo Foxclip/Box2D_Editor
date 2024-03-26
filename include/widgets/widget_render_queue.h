@@ -1,6 +1,6 @@
 #pragma once
 
-#include "global.h"
+#include <SFML/Graphics.hpp>
 #include "compvector.h"
 
 class Widget;
