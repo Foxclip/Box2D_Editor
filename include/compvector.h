@@ -65,7 +65,7 @@ private:
 	std::set<T, TCmp> set;
 };
 
-template<typename T>
+template<typename T, typename TCmp = std::less<T*>>
 class CompoundVectorUptr {
 public:
 	using value_type = T*;
@@ -103,10 +103,10 @@ public:
 	ptrdiff_t getIndex(const T* value) const;
 	const CompoundVector<T*>& getCompVector() const;
 	const std::vector<T*>& getVector() const;
-	const std::set<T*>& getSet() const;
+	const std::set<T*, TCmp>& getSet() const;
 	T* operator[](size_t index);
 	T* operator[](size_t index) const;
-	std::set<T*>::iterator find(const T* value) const;
+	std::set<T*, TCmp>::iterator find(const T* value) const;
 	bool contains(const T* value) const;
 	void clear();
 	operator std::vector<T*>() const;
@@ -115,7 +115,7 @@ public:
 
 private:
 	std::vector<std::unique_ptr<T>> uptrs;
-	CompoundVector<T*> comp;
+	CompoundVector<T*, TCmp> comp;
 
 };
 
@@ -320,39 +320,39 @@ inline bool CompoundVector<T, TCmp>::operator==(const TCont& other) const {
 	return compare(*this, other);
 }
 
-template<typename T>
-inline CompoundVectorUptr<T>::CompoundVectorUptr() { }
+template<typename T, typename TCmp>
+inline CompoundVectorUptr<T, TCmp>::CompoundVectorUptr() { }
 
-template<typename T>
-inline CompoundVectorUptr<T>::CompoundVectorUptr(const std::initializer_list<T>& list) {
+template<typename T, typename TCmp>
+inline CompoundVectorUptr<T, TCmp>::CompoundVectorUptr(const std::initializer_list<T>& list) {
 	for (const T& value : list) {
 		std::unique_ptr<T> uptr = std::make_unique<T>(value);
 		add(std::move(uptr));
 	}
 }
 
-template<typename T>
-inline CompoundVectorUptr<T>::CompoundVectorUptr(const std::initializer_list<T*>& list) {
+template<typename T, typename TCmp>
+inline CompoundVectorUptr<T, TCmp>::CompoundVectorUptr(const std::initializer_list<T*>& list) {
 	for (const T* ptr : list) {
 		add(ptr);
 	}
 }
 
-template<typename T>
-inline CompoundVectorUptr<T>::CompoundVectorUptr(const std::vector<T*>& vec) {
+template<typename T, typename TCmp>
+inline CompoundVectorUptr<T, TCmp>::CompoundVectorUptr(const std::vector<T*>& vec) {
 	for (const T* value : vec) {
 		std::unique_ptr<T> uptr = std::unique_ptr<T>(const_cast<T*>(value));
 		add(std::move(uptr));
 	}
 }
 
-template<typename T>
-inline size_t CompoundVectorUptr<T>::size() const {
+template<typename T, typename TCmp>
+inline size_t CompoundVectorUptr<T, TCmp>::size() const {
 	return comp.size();
 }
 
-template<typename T>
-inline bool CompoundVectorUptr<T>::add(const T& value) {
+template<typename T, typename TCmp>
+inline bool CompoundVectorUptr<T, TCmp>::add(const T& value) {
 	const T* ptr = &value;
 	bool added = comp.add(const_cast<T*>(ptr));
 	if (added) {
@@ -363,8 +363,8 @@ inline bool CompoundVectorUptr<T>::add(const T& value) {
 	return false;
 }
 
-template<typename T>
-inline bool CompoundVectorUptr<T>::add(const T* ptr) {
+template<typename T, typename TCmp>
+inline bool CompoundVectorUptr<T, TCmp>::add(const T* ptr) {
 	bool added = comp.add(const_cast<T*>(ptr));
 	if (added) {
 		std::unique_ptr<T> uptr = std::unique_ptr<T>(const_cast<T*>(ptr));
@@ -374,8 +374,8 @@ inline bool CompoundVectorUptr<T>::add(const T* ptr) {
 	return false;
 }
 
-template<typename T>
-inline bool CompoundVectorUptr<T>::add(std::unique_ptr<T> value) {
+template<typename T, typename TCmp>
+inline bool CompoundVectorUptr<T, TCmp>::add(std::unique_ptr<T> value) {
 	T* ptr = value.get();
 	bool added = comp.add(ptr);
 	if (added) {
@@ -385,8 +385,8 @@ inline bool CompoundVectorUptr<T>::add(std::unique_ptr<T> value) {
 	return false;
 }
 
-template<typename T>
-inline bool CompoundVectorUptr<T>::insert(std::vector<T*>::const_iterator where, std::unique_ptr<T> value) {
+template<typename T, typename TCmp>
+inline bool CompoundVectorUptr<T, TCmp>::insert(std::vector<T*>::const_iterator where, std::unique_ptr<T> value) {
 	size_t offset = where - comp.begin();
 	bool inserted = comp.insert(where, value.get());
 	if (inserted) {
@@ -397,9 +397,9 @@ inline bool CompoundVectorUptr<T>::insert(std::vector<T*>::const_iterator where,
 	return false;
 }
 
-template<typename T>
+template<typename T, typename TCmp>
 template<std::incrementable TIter>
-inline size_t CompoundVectorUptr<T>::insert(std::vector<T*>::const_iterator where, TIter first, TIter last) {
+inline size_t CompoundVectorUptr<T, TCmp>::insert(std::vector<T*>::const_iterator where, TIter first, TIter last) {
 	size_t offset = where - comp.begin();
 	TIter iter_other(first);
 	size_t inserted_count = 0;
@@ -413,14 +413,14 @@ inline size_t CompoundVectorUptr<T>::insert(std::vector<T*>::const_iterator wher
 	return inserted_count;
 }
 
-template<typename T>
+template<typename T, typename TCmp>
 template<Vectorlike TCont>
-inline bool CompoundVectorUptr<T>::operator==(const TCont& other) const {
+inline bool CompoundVectorUptr<T, TCmp>::operator==(const TCont& other) const {
 	return compare(*this, other);
 }
 
-template<typename T>
-inline ptrdiff_t CompoundVectorUptr<T>::remove(T* value) {
+template<typename T, typename TCmp>
+inline ptrdiff_t CompoundVectorUptr<T, TCmp>::remove(T* value) {
 	ptrdiff_t removed_index = comp.remove(value);
 	if (removed_index >= 0) {
 		uptrs.erase(uptrs.begin() + removed_index);
@@ -429,70 +429,70 @@ inline ptrdiff_t CompoundVectorUptr<T>::remove(T* value) {
 	return -1;
 }
 
-template<typename T>
-inline void CompoundVectorUptr<T>::removeAt(size_t index) {
+template<typename T, typename TCmp>
+inline void CompoundVectorUptr<T, TCmp>::removeAt(size_t index) {
 	uptrs.erase(uptrs.begin() + index);
 	comp.removeAt(index);
 }
 
-template<typename T>
-inline void CompoundVectorUptr<T>::reverse() {
+template<typename T, typename TCmp>
+inline void CompoundVectorUptr<T, TCmp>::reverse() {
 	std::reverse(uptrs.begin(), uptrs.end());
 	comp.reverse();
 }
 
-template<typename T>
-inline std::vector<T*>::const_iterator CompoundVectorUptr<T>::begin() const {
+template<typename T, typename TCmp>
+inline std::vector<T*>::const_iterator CompoundVectorUptr<T, TCmp>::begin() const {
 	return comp.begin();
 }
 
-template<typename T>
-inline std::vector<T*>::const_iterator CompoundVectorUptr<T>::end() const {
+template<typename T, typename TCmp>
+inline std::vector<T*>::const_iterator CompoundVectorUptr<T, TCmp>::end() const {
 	return comp.end();
 }
 
-template<typename T>
-inline std::vector<T*>::const_reverse_iterator CompoundVectorUptr<T>::rbegin() const {
+template<typename T, typename TCmp>
+inline std::vector<T*>::const_reverse_iterator CompoundVectorUptr<T, TCmp>::rbegin() const {
 	return comp.rbegin();
 }
 
-template<typename T>
-inline std::vector<T*>::const_reverse_iterator CompoundVectorUptr<T>::rend() const {
+template<typename T, typename TCmp>
+inline std::vector<T*>::const_reverse_iterator CompoundVectorUptr<T, TCmp>::rend() const {
 	return comp.rend();
 }
 
-template<typename T>
-inline T* CompoundVectorUptr<T>::front() {
+template<typename T, typename TCmp>
+inline T* CompoundVectorUptr<T, TCmp>::front() {
 	return comp.front();
 }
 
-template<typename T>
-inline T* CompoundVectorUptr<T>::front() const {
+template<typename T, typename TCmp>
+inline T* CompoundVectorUptr<T, TCmp>::front() const {
 	return comp.front();
 }
 
-template<typename T>
-inline T* CompoundVectorUptr<T>::back() {
+template<typename T, typename TCmp>
+inline T* CompoundVectorUptr<T, TCmp>::back() {
 	return comp.back();
 }
 
-template<typename T>
-inline T* CompoundVectorUptr<T>::back() const {
+template<typename T, typename TCmp>
+inline T* CompoundVectorUptr<T, TCmp>::back() const {
 	return comp.back();
 }
 
-template<typename T>
-inline T* CompoundVectorUptr<T>::at(size_t index) {
+template<typename T, typename TCmp>
+inline T* CompoundVectorUptr<T, TCmp>::at(size_t index) {
 	return comp[index];
 }
 
-template<typename T>
-inline T* CompoundVectorUptr<T>::at(size_t index) const {
+template<typename T, typename TCmp>
+inline T* CompoundVectorUptr<T, TCmp>::at(size_t index) const {
 	return comp[index];
 }
 
-template<typename T>
-inline ptrdiff_t CompoundVectorUptr<T>::getIndex(const T* value) const {
+template<typename T, typename TCmp>
+inline ptrdiff_t CompoundVectorUptr<T, TCmp>::getIndex(const T* value) const {
 	for (size_t i = 0; i < comp.size(); i++) {
 		if (comp[i] == value) {
 			return i;
@@ -501,49 +501,49 @@ inline ptrdiff_t CompoundVectorUptr<T>::getIndex(const T* value) const {
 	return -1;
 }
 
-template<typename T>
-inline const CompoundVector<T*>& CompoundVectorUptr<T>::getCompVector() const {
+template<typename T, typename TCmp>
+inline const CompoundVector<T*>& CompoundVectorUptr<T, TCmp>::getCompVector() const {
 	return comp;
 }
 
-template<typename T>
-inline const std::vector<T*>& CompoundVectorUptr<T>::getVector() const {
+template<typename T, typename TCmp>
+inline const std::vector<T*>& CompoundVectorUptr<T, TCmp>::getVector() const {
 	return comp.getVector();
 }
 
-template<typename T>
-inline const std::set<T*>& CompoundVectorUptr<T>::getSet() const {
+template<typename T, typename TCmp>
+inline const std::set<T*, TCmp>& CompoundVectorUptr<T, TCmp>::getSet() const {
 	return comp.getSet();
 }
 
-template<typename T>
-inline T* CompoundVectorUptr<T>::operator[](size_t index) {
+template<typename T, typename TCmp>
+inline T* CompoundVectorUptr<T, TCmp>::operator[](size_t index) {
 	return comp[index];
 }
 
-template<typename T>
-inline T* CompoundVectorUptr<T>::operator[](size_t index) const {
+template<typename T, typename TCmp>
+inline T* CompoundVectorUptr<T, TCmp>::operator[](size_t index) const {
 	return comp[index];
 }
 
-template<typename T>
-inline std::set<T*>::iterator CompoundVectorUptr<T>::find(const T* value) const {
+template<typename T, typename TCmp>
+inline std::set<T*, TCmp>::iterator CompoundVectorUptr<T, TCmp>::find(const T* value) const {
 	return comp.find(const_cast<T*>(value));
 }
 
-template<typename T>
-inline bool CompoundVectorUptr<T>::contains(const T* value) const {
+template<typename T, typename TCmp>
+inline bool CompoundVectorUptr<T, TCmp>::contains(const T* value) const {
 	return comp.contains(const_cast<T*>(value));
 }
 
-template<typename T>
-inline void CompoundVectorUptr<T>::clear() {
+template<typename T, typename TCmp>
+inline void CompoundVectorUptr<T, TCmp>::clear() {
 	uptrs = std::vector<std::unique_ptr<T>>();
 	comp.clear();
 }
 
-template<typename T>
-inline CompoundVectorUptr<T>::operator std::vector<T*>() const {
+template<typename T, typename TCmp>
+inline CompoundVectorUptr<T, TCmp>::operator std::vector<T*>() const {
 	return comp.getVector();
 }
 

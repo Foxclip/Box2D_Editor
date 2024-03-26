@@ -257,6 +257,19 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		assert(vec == cvec);
 	}
 	{
+		// custom compare
+		auto cmp = [](const int* left, const int* right) {
+			return *left > *right;
+		};
+		CompoundVectorUptr<int, decltype(cmp)> vec = { 1, 2, 3 };
+		std::vector<int*> set_vec = std::vector<int*>(vec.getSet().begin(), vec.getSet().end());
+		std::vector<int> set_values;
+		for (int* ptr : set_vec) {
+			set_values.push_back(*ptr);
+		}
+		assert(set_values == std::vector<int>({ 3, 2, 1 }));
+	}
+	{
 		// add method
 		CompoundVectorUptr<int> vec;
 		vec.add(1);
