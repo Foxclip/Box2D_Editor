@@ -88,6 +88,10 @@ sf::Cursor::Type Widget::getCursorType() const {
 	return sf::Cursor::Arrow;
 }
 
+bool Widget::getForceCustomCursor() const {
+	return force_custom_cursor;
+}
+
 const std::string& Widget::getName() const {
 	return name;
 }
@@ -374,6 +378,11 @@ void Widget::setParent(Widget* new_parent) {
 	assert(!widget_list.isLocked());
 	setParentSilent(new_parent);
 	internalOnSetParent(new_parent);
+}
+
+void Widget::setForceCustomCursor(bool value) {
+	assert(!widget_list.isLocked());
+	this->force_custom_cursor = value;
 }
 
 void Widget::setName(const std::string& new_name) {

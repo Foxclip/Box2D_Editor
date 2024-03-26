@@ -603,13 +603,12 @@ void Application::process_keyboard() {
 
 void Application::process_mouse() {
     widgets.processMouse(mousePosf);
-    Widget* widget = widgets.getTopWidgetUnderCursor();
-    if (widget) {
-        switch (widget->getCursorType()) {
-            case sf::Cursor::Arrow: window.setMouseCursor(arrow_cursor); break;
-            case sf::Cursor::Text: window.setMouseCursor(text_cursor); break;
-            default: window.setMouseCursor(arrow_cursor); break;
-        }
+    sf::Cursor::Type cursor_type = sf::Cursor::Arrow;
+    widgets.getCurrentCursorType(cursor_type);
+    switch (cursor_type) {
+        case sf::Cursor::Arrow: window.setMouseCursor(arrow_cursor); break;
+        case sf::Cursor::Text: window.setMouseCursor(text_cursor); break;
+        default: window.setMouseCursor(arrow_cursor); break;
     }
     if (selected_tool == &select_tool) {
         {

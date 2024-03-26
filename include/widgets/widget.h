@@ -73,6 +73,7 @@ public:
 	virtual bool isFocusable() const;
 	bool isFocused() const;
 	virtual sf::Cursor::Type getCursorType() const;
+	bool getForceCustomCursor() const;
 	const std::string& getName() const;
 	const std::string& getFullName() const;
 	bool getClipChildren() const;
@@ -128,6 +129,7 @@ public:
 	void setClickThrough(bool value);
 	void setParentSilent(Widget* new_parent);
 	void setParent(Widget* new_parent);
+	void setForceCustomCursor(bool value);
 	void setName(const std::string& new_name);
 	void setClipChildren(bool value);
 	void setRenderLayer(RenderLayer layer);
@@ -157,6 +159,7 @@ protected:
 	bool click_through = true;
 	bool clip_children = false;
 	bool mouseIn = false;
+	bool force_custom_cursor = false;
 
 	sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size);
 	const sf::Transform& getGlobalTransform() const;

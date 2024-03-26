@@ -42,6 +42,7 @@ Widget* WidgetList::getTopWidgetUnderCursor() const {
 }
 
 CompoundVector<Widget*> WidgetList::getWidgetsUnderCursor(bool can_block, bool& blocked) const {
+	blocked = false;
 	CompoundVector<Widget*> result;
 	for (RenderQueueLayer layer : render_queue.getSilent() | std::views::reverse) {
 		for (Widget* widget : layer.widgets | std::views::reverse) {
@@ -58,6 +59,19 @@ CompoundVector<Widget*> WidgetList::getWidgetsUnderCursor(bool can_block, bool& 
 		}
 	}
 	return result;
+}
+
+bool WidgetList::getCurrentCursorType(sf::Cursor::Type& result) const {
+	bool blocked;
+	CompoundVector<Widget*> cursor_widgets = getWidgetsUnderCursor(true, blocked);
+	sf::Cursor::Type cursor_type = sf::Cursor::Arrow;
+	for (size_t i = 0; i < cursor_widgets.size(); i++) {
+		if (cursor_widgets[i]->getForceCustomCursor()) {
+			result = cursor_widgets[i]->getCursorType();
+			return true;
+		}
+	}
+	return false;
 }
 
 Widget* WidgetList::find(const std::string& name) const {

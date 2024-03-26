@@ -20,6 +20,7 @@ public:
 
 	TextBoxWidget(WidgetList& widget_list);
 	bool isFocusable() const override;
+	sf::Cursor::Type getCursorType() const override;
 	const sf::Color& getFillColor() const override;
 	const sf::Color& getHighlightColor() const;
 	const sf::Color& getTextColor() const;
@@ -38,7 +39,6 @@ public:
 	size_t getCursorPos() const;
 	bool isEditMode() const;
 	bool isSelectionActive() const;
-	sf::Cursor::Type getCursorType() const override;
 	sf::Vector2f getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const;
 	sf::Vector2f getGlobalCharPos(size_t index, bool top_aligned, bool with_kerning) const;
 	ptrdiff_t getSelectionLeft() const;

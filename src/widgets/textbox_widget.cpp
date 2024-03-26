@@ -6,6 +6,7 @@ TextBoxWidget::TextBoxWidget(WidgetList& widget_list) : RectangleWidget(widget_l
 	setName("textbox");
 	setClipChildren(true);
 	setClickThrough(false);
+	setForceCustomCursor(true);
 	text_widget = widget_list.createWidget<TextWidget>();
 	text_widget->setFillColor(text_color);
 	text_widget->setParentAnchor(CENTER_LEFT);
@@ -35,6 +36,10 @@ TextBoxWidget::TextBoxWidget(WidgetList& widget_list) : RectangleWidget(widget_l
 
 bool TextBoxWidget::isFocusable() const {
 	return true;
+}
+
+sf::Cursor::Type TextBoxWidget::getCursorType() const {
+	return sf::Cursor::Text;
 }
 
 const sf::Color& TextBoxWidget::getFillColor() const {
@@ -125,10 +130,6 @@ bool TextBoxWidget::isEditMode() const {
 
 bool TextBoxWidget::isSelectionActive() const {
 	return selection_pos >= 0 && selection_pos != cursor_pos;
-}
-
-sf::Cursor::Type TextBoxWidget::getCursorType() const {
-	return sf::Cursor::Text;
 }
 
 sf::Vector2f TextBoxWidget::getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
