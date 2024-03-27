@@ -47,7 +47,7 @@ void Application::init() {
     maximize_window();
     auto getter = [&]() { return serialize(); };
     auto setter = [&](std::string str) { deserialize(str, false); };
-    history = History(getter, setter);
+    history = History("Editor", getter, setter);
 
     assert(tools.size() > 0);
     assert(selected_tool);
@@ -354,7 +354,7 @@ void Application::init_widgets() {
 
 void Application::main_loop() {
     history.clear();
-    history.save(HistoryEntry::BASE);
+    history.save("Base");
     fps_counter.init();
     while (window.isOpen()) {
         fps_counter.frameBegin();
@@ -394,19 +394,19 @@ void Application::process_input() {
     process_keyboard();
     process_mouse();
     if (commit_action) {
-        history.save(HistoryEntry::NORMAL);
+        history.save("Normal");
         commit_action = false;
     }
     if (quickload_requested) {
         quickload();
-        if (history.getCurrent().type != HistoryEntry::QUICKLOAD) {
-            history.save(HistoryEntry::QUICKLOAD);
+        if (history.getCurrent().tag != "Quickload") {
+            history.save("Quickload");
         }
         quickload_requested = false;
     }
     if (load_request.requested) {
         load_from_file(load_request.filename);
-        history.save(HistoryEntry::LOAD);
+        history.save("Load");
         load_request.requested = false;
     }
     widgets.updateWidgets();

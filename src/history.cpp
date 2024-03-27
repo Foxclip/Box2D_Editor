@@ -2,7 +2,12 @@
 
 History::History() {}
 
-History::History(std::function<std::string(void)> get, std::function<void(std::string)> set) {
+History::History(
+    const std::string& name,
+    std::function<std::string(void)> get,
+    std::function<void(std::string)> set
+) {
+    this->name = name;
     this->get = get;
     this->set = set;
     current = -1;
@@ -12,16 +17,30 @@ size_t History::size() {
     return history.size();
 }
 
-void History::save(HistoryEntry::Type type) {
+void History::save(const std::string& tag) {
     LoggerTag tag_history("history");
     if (current < history.size()) {
         history.erase(history.begin() + current + 1, history.end());
     }
     std::string state = get();
-    HistoryEntry entry(state, type);
+    HistoryEntry entry(state, tag);
     history.push_back(entry);
     current++;
-    logger << "Save " << HistoryEntry::typeToStr(type) << ", current: " << current << ", size : " << history.size() << "\n";
+    logger << "History " << name << ": save " << tag << ", current: " << current << ", size : " << history.size() << "\n";
+}
+
+void History::updateLast(const std::string& tag) {
+    LoggerTag tag_history("history");
+    logger << "History " << name << ": updateLast " << tag << "\n";
+    LoggerIndent update_last_indent;
+    if (current > 0) {
+        std::string state = get();
+        HistoryEntry entry(state, tag);
+        history[current] = entry;
+        logger << "History " << name << ": updateLast " << tag << ", current: " << current << ", size : " << history.size() << "\n";
+    } else {
+        save(tag);
+    }
 }
 
 void History::undo() {
@@ -30,9 +49,9 @@ void History::undo() {
         current--;
         std::string state = history[current].str;
         set(state);
-        logger << "Undo, current: " << current << ", size: " << history.size() << "\n";
+        logger << "History " << name << ": undo, current: " << current << ", size: " << history.size() << "\n";
     } else {
-        logger << "Can't undo\n";
+        logger << "History " << name << ": can't undo\n";
     }
 }
 
@@ -42,9 +61,9 @@ void History::redo() {
         current++;
         std::string state = history[current].str;
         set(state);
-        logger << "Redo, current: " << current << ", size: " << history.size() << "\n";
+        logger << "History " << name << ": redo, current: " << current << ", size: " << history.size() << "\n";
     } else {
-        logger << "Can't redo\n";
+        logger << "History " << name << ": can't redo\n";
     }
 }
 
@@ -58,17 +77,7 @@ HistoryEntry& History::getCurrent() {
     return history[current];
 }
 
-std::string HistoryEntry::typeToStr(Type type) {
-    switch (type) {
-        case HistoryEntry::BASE: return "base";
-        case HistoryEntry::NORMAL: return "normal";
-        case HistoryEntry::LOAD: return "load";
-        case HistoryEntry::QUICKLOAD: return "quickload";
-        default: return "Unknown";
-    }
-}
-
-HistoryEntry::HistoryEntry(std::string str, Type type) {
+HistoryEntry::HistoryEntry(const std::string& str, const std::string& tag) {
     this->str = str;
-    this->type = type;
+    this->tag = tag;
 }

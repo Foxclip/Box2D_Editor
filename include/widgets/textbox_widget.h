@@ -3,6 +3,7 @@
 #include "rectangle_widget.h"
 #include "text_widget.h"
 #include "clip/clip.h"
+#include "history.h"
 
 class WidgetList;
 
@@ -104,6 +105,7 @@ private:
 	RectangleWidget* cursor_widget = nullptr;
 	RectangleWidget* selection_widget = nullptr;
 	TextBoxType type = TextBoxType::TEXT;
+	History history;
 	size_t cursor_pos = 0;
 	ptrdiff_t selection_pos = -1;
 	sf::Vector2f drag_start_pos;
@@ -123,5 +125,4 @@ private:
 	sf::Color fail_background_color = sf::Color(128, 0, 0);
 	sf::Color editor_fail_background_color = sf::Color(255, 128, 128);
 
-	void _setEditMode(bool value);
 };

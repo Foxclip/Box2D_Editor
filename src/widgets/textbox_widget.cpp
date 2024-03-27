@@ -433,8 +433,10 @@ void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 					case sf::Keyboard::Delete:
 						if (isSelectionActive()) {
 							eraseSelection();
+							history.save("Delete");
 						} else if (cursor_pos < getStringSize()) {
 							erase(cursor_pos, 1);
+							history.save("Delete");
 						}
 						break;
 					case sf::Keyboard::A:
@@ -453,13 +455,17 @@ void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 						break;
 					case sf::Keyboard::V:
 						if (ctrl_pressed) {
-							std::string value;
-							if (!clip::get_text(value)) {
+							std::string pasted_text;
+							if (!clip::get_text(pasted_text)) {
 								throw std::runtime_error("Unable to paste text from clipboard");
 							}
+							std::string prev_value = getValue();
 							eraseSelection();
-							insert(cursor_pos, value);
-							setCursorPos(cursor_pos + value.size());
+							insert(cursor_pos, pasted_text);
+							setCursorPos(cursor_pos + pasted_text.size());
+							if (getValue() != prev_value) {
+								history.save("Paste");
+							}
 							process_text_entered_event = false;
 						}
 						break;
@@ -469,6 +475,16 @@ void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 								throw std::runtime_error("Unable to copy text to clipboard");
 							}
 							eraseSelection();
+							history.save("Cut");
+							process_text_entered_event = false;
+						}
+						break;
+					case sf::Keyboard::Z:
+						if (ctrl_pressed && !shift_pressed) {
+							history.undo();
+							process_text_entered_event = false;
+						} else if (ctrl_pressed && shift_pressed) {
+							history.redo();
 							process_text_entered_event = false;
 						}
 						break;
@@ -484,14 +500,17 @@ void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 					case '\b':
 						if (isSelectionActive()) {
 							eraseSelection();
+							history.save("Backspace");
 						} else if (cursor_pos > 0) {
 							erase(cursor_pos - 1, 1);
 							setCursorPos(cursor_pos - 1);
+							history.save("Backspace");
 						}
 						break;
 					default:
 						eraseSelection();
 						typeChar(code);
+						history.save("Type");
 						break;
 				}
 			}
@@ -544,20 +563,21 @@ void TextBoxWidget::updateValid() {
 	updateColors();
 }
 
-void TextBoxWidget::_setEditMode(bool value) {
-	if (edit_mode == value) {
-		return;
-	}
-	edit_mode = value;
-	internalOnEditModeToggle(value);
-	OnEditModeToggle(value);
-}
-
 void TextBoxWidget::enableEditMode() {
 	if (edit_mode) {
 		return;
 	}
-	_setEditMode(true);
+	auto history_get = [&]() {
+		return getValue();
+	};
+	auto history_set = [&](std::string value) {
+		setValue(value);
+	};
+	history = History("Textbox", history_get, history_set);
+	history.save("Base");
+	edit_mode = true;
+	internalOnEditModeToggle(true);
+	OnEditModeToggle(true);
 }
 
 void TextBoxWidget::disableEditMode(bool confirm) {
@@ -571,7 +591,9 @@ void TextBoxWidget::disableEditMode(bool confirm) {
 		internalOnCancel();
 		OnCancel();
 	}
-	_setEditMode(false);
+	edit_mode = false;
+	internalOnEditModeToggle(false);
+	OnEditModeToggle(false);
 }
 
 void TextBoxWidget::insertSilent(size_t pos, const sf::String& str) {

@@ -50,9 +50,11 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
-    // TDOO: ctrl-z in textbox
+    // TODO: fix RectangleSelection not rendering
+    // TODO: save cursor position and selection in textbox history
     // TODO: blinking textbox cursor
     // TODO: make SearchIndex not use pointers for TObject type
+    // TODO: align textboxes in EditWindow to the right
     // TODO: Dropdown widget
     // TODO: object list window (outliner)
     // TODO: render polygon indices
