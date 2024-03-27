@@ -316,6 +316,7 @@ void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
 	enableEditMode();
 	size_t new_cursor_pos = calcCursorPos(pos);
 	dragging_start_char = new_cursor_pos;
+	history.updateCurrent();
 }
 
 void TextBoxWidget::internalOnRelease(const sf::Vector2f& pos) {
@@ -381,6 +382,7 @@ void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 								setCursorPos(cursor_pos - 1);
 							}
 						}
+						history.updateCurrent();
 						break;
 					case sf::Keyboard::Right:
 						if (!isSelectionActive() && !shift_pressed) {
@@ -401,6 +403,7 @@ void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 								setCursorPos(cursor_pos + 1);
 							}
 						}
+						history.updateCurrent();
 						break;
 					case sf::Keyboard::Home:
 						if (!isSelectionActive() && !shift_pressed) {
@@ -415,6 +418,7 @@ void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 						} else if (isSelectionActive() && shift_pressed) {
 							setCursorPos(0);
 						}
+						history.updateCurrent();
 						break;
 					case sf::Keyboard::End:
 						if (!isSelectionActive() && !shift_pressed) {
@@ -429,6 +433,7 @@ void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 						} else if (isSelectionActive() && shift_pressed) {
 							setCursorPos(getStringSize());
 						}
+						history.updateCurrent();
 						break;
 					case sf::Keyboard::Delete:
 						if (isSelectionActive()) {
@@ -444,6 +449,7 @@ void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 							selectAll();
 							process_text_entered_event = false;
 						}
+						history.updateCurrent();
 						break;
 					case sf::Keyboard::C:
 						if (ctrl_pressed) {
@@ -523,14 +529,20 @@ void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 void TextBoxWidget::internalProcessMouse(const sf::Vector2f& pos) {
 	if (left_button_pressed) {
 		if (dragging_begun) {
+			size_t cursor_before = cursor_pos;
 			trySetCursor(pos);
 			setSelection(dragging_start_char);
+			size_t cursor_after = cursor_pos;
+			if (cursor_after != cursor_before) {
+				history.updateCurrent();
+			}
 		} else {
 			size_t new_cursor_pos = calcCursorPos(pos);
 			if (new_cursor_pos != dragging_start_char) {
 				dragging_begun = true;
 				setCursorPos(new_cursor_pos);
 				setSelection(dragging_start_char);
+				history.updateCurrent();
 			}
 		}
 	}
@@ -567,17 +579,23 @@ void TextBoxWidget::enableEditMode() {
 	if (edit_mode) {
 		return;
 	}
-	auto history_get = [&]() {
-		return getValue();
-	};
-	auto history_set = [&](std::string value) {
-		setValue(value);
-	};
-	history = History<std::string>("Textbox", history_get, history_set);
-	history.save("Base");
 	edit_mode = true;
 	internalOnEditModeToggle(true);
 	OnEditModeToggle(true);
+	auto history_get = [&]() {
+		TextBoxHistoryEntry entry;
+		entry.str = getValue();
+		entry.cursor_pos = cursor_pos;
+		entry.selection_pos = selection_pos;
+		return entry;
+	};
+	auto history_set = [&](const TextBoxHistoryEntry& value) {
+		setValue(value.str);
+		setCursorPos(value.cursor_pos);
+		setSelection(value.selection_pos);
+	};
+	history = History<TextBoxHistoryEntry>("Textbox", history_get, history_set);
+	history.save("Base");
 }
 
 void TextBoxWidget::disableEditMode(bool confirm) {

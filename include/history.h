@@ -24,7 +24,8 @@ public:
 	);
 	size_t size() const;
 	void save(const std::string& tag);
-	void updateLast(const std::string& tag);
+    void updateCurrent();
+	void updateCurrent(const std::string& tag);
 	void undo();
 	void redo();
 	void clear();
@@ -79,18 +80,17 @@ void History<T>::save(const std::string& tag) {
 }
 
 template<typename T>
-void History<T>::updateLast(const std::string& tag) {
+void History<T>::updateCurrent() {
+    updateCurrent(getCurrent().tag);
+}
+
+template<typename T>
+void History<T>::updateCurrent(const std::string& tag) {
     LoggerTag tag_history("history");
-    logger << "History " << name << ": updateLast " << tag << "\n";
-    LoggerIndent update_last_indent;
-    if (current > 0) {
-        T state = get();
-        HistoryEntry entry(state, tag);
-        history[current] = entry;
-        logger << "History " << name << ": updateLast " << tag << ", current: " << current << ", size : " << history.size() << "\n";
-    } else {
-        save(tag);
-    }
+    T state = get();
+    HistoryEntry entry(state, tag);
+    history[current] = entry;
+    logger << "History " << name << ": updateCurrent " << tag << ", current: " << current << ", size : " << history.size() << "\n";
 }
 
 template<typename T>
