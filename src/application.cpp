@@ -47,7 +47,7 @@ void Application::init() {
     maximize_window();
     auto getter = [&]() { return serialize(); };
     auto setter = [&](std::string str) { deserialize(str, false); };
-    history = History("Editor", getter, setter);
+    history = History<std::string>("Editor", getter, setter);
 
     assert(tools.size() > 0);
     assert(selected_tool);

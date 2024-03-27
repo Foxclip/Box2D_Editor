@@ -105,7 +105,7 @@ private:
 	RectangleWidget* cursor_widget = nullptr;
 	RectangleWidget* selection_widget = nullptr;
 	TextBoxType type = TextBoxType::TEXT;
-	History history;
+	History<std::string> history;
 	size_t cursor_pos = 0;
 	ptrdiff_t selection_pos = -1;
 	sf::Vector2f drag_start_pos;

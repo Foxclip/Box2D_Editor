@@ -573,7 +573,7 @@ void TextBoxWidget::enableEditMode() {
 	auto history_set = [&](std::string value) {
 		setValue(value);
 	};
-	history = History("Textbox", history_get, history_set);
+	history = History<std::string>("Textbox", history_get, history_set);
 	history.save("Base");
 	edit_mode = true;
 	internalOnEditModeToggle(true);

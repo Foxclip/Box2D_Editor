@@ -26,7 +26,6 @@ set(SRC_SOURCE_FILES
     compvector.cpp
     gameobject.cpp
     global.cpp
-    history.cpp
     logger.cpp
     main.cpp
     objectlist.cpp

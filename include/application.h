@@ -172,7 +172,7 @@ private:
 	GameObject* active_object = nullptr;
 	GameObjectList game_objects;
 
-	History history;
+	History<std::string> history;
 	bool commit_action = false;
 	struct LoadRequest {
 		bool requested = false;
