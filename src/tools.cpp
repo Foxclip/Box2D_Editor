@@ -1,13 +1,5 @@
 #include "../include/tools.h"
 
-SelectTool select_tool;
-CreateTool create_tool;
-DragTool drag_tool;
-MoveTool move_tool;
-RotateTool rotate_tool;
-EditTool edit_tool;
-std::vector<Tool*> tools = { &select_tool, &drag_tool, &move_tool, &rotate_tool, &edit_tool, &create_tool, };
-
 Tool::Tool() { }
 
 void CreateTool::reset() { }

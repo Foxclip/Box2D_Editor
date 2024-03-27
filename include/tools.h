@@ -163,12 +163,3 @@ public:
 	void reset() override;
 	static std::string create_type_name(ObjectType type);
 };
-
-extern SelectTool select_tool;
-extern DragTool drag_tool;
-extern MoveTool move_tool;
-extern RotateTool rotate_tool;
-extern EditTool edit_tool;
-extern CreateTool create_tool;
-extern std::vector<Tool*> tools;
-

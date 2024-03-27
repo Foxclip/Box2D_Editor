@@ -33,7 +33,7 @@ CreatePanel::CreatePanel(WidgetList& widget_list, Application& p_app) : Containe
         text_widget->setOrigin(Widget::CENTER);
         text_widget->setParentAnchor(Widget::CENTER);
         text_widget->setParent(button_widget);
-        create_tool.create_buttons.add(button_widget);
+        app.create_tool.create_buttons.add(button_widget);
         button_widget->setParent(this);
     }
 }

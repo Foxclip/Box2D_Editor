@@ -126,6 +126,20 @@ private:
 	bool leftButtonProcessWidgetsOnRelease = true;
 	float zoomFactor = 30.0f;
 	float viewCenterX = 0.0f, viewCenterY = 5.0f;
+	SelectTool select_tool;
+	CreateTool create_tool;
+	DragTool drag_tool;
+	MoveTool move_tool;
+	RotateTool rotate_tool;
+	EditTool edit_tool;
+	std::vector<Tool*> tools = {
+		&select_tool,
+		&drag_tool,
+		&move_tool,
+		&rotate_tool,
+		&edit_tool,
+		&create_tool,
+	};
 	sf::Font ui_font;
 	sf::Font fps_font;
 	sf::Font console_font;
@@ -167,6 +181,7 @@ private:
 	LoadRequest load_request;
 	std::string quicksave_str;
 	bool quickload_requested = false;
+	bool debug_break = false;
 
 	void init_tools();
 	void init_world();
@@ -221,5 +236,6 @@ private:
 	void grab_selected();
 	void rotate_selected();
 	void delete_object(GameObject* object, bool remove_children);
+	void check_debugbreak();
 
 };

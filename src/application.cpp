@@ -540,6 +540,9 @@ void Application::process_keyboard_event(const sf::Event& event) {
             case sf::Keyboard::I:
                 render_object_info = !render_object_info;
                 break;
+            case sf::Keyboard::B:
+                debug_break = true;
+                break;
         }
     }
     if (event.type == sf::Event::KeyReleased) {
@@ -1537,6 +1540,13 @@ void Application::delete_object(GameObject* object, bool remove_children) {
     }
     select_tool.deselectObject(object);
     game_objects.remove(object, remove_children);
+}
+
+void Application::check_debugbreak() {
+    if (debug_break) {
+        __debugbreak();
+        debug_break = false;
+    }
 }
 
 void FpsCounter::init() {

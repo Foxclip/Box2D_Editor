@@ -8,8 +8,8 @@ Toolbox::Toolbox(WidgetList& widget_list, Application& p_app) : ContainerWidget(
     setPadding(TOOLBOX_PADDING);
     setClickThrough(false);
     setName("toolbox");
-    for (size_t i = 0; i < tools.size(); i++) {
-        Tool* tool = tools[i];
+    for (size_t i = 0; i < app.tools.size(); i++) {
+        Tool* tool = app.tools[i];
         if (!tool->showInToolPanel()) {
             continue;
         }
@@ -31,7 +31,7 @@ Toolbox::Toolbox(WidgetList& widget_list, Application& p_app) : ContainerWidget(
         TextWidget* text_widget = app.widgets.createWidget<TextWidget>();
         text_widget->setFont(app.ui_font);
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
-        text_widget->setString(tools[i]->name);
+        text_widget->setString(app.tools[i]->name);
         text_widget->setFillColor(sf::Color::Black);
         text_widget->setOrigin(Widget::CENTER);
         text_widget->setParentAnchor(Widget::CENTER);
