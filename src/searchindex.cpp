@@ -1,6 +1,6 @@
 #ifndef NDEBUG
 
-#include "../include/searchindex.h"
+#include "searchindex.h"
 #include <vector>
 #include <cassert>
 

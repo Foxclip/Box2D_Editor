@@ -1,4 +1,4 @@
-#include "../include/global.h"
+#include "global.h"
 
 sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
 

@@ -1,7 +1,7 @@
 #include <numbers>
-#include "../include/gameobject.h"
-#include "../include/objectlist.h"
-#include "../include/utils.h"
+#include "gameobject.h"
+#include "objectlist.h"
+#include "utils.h"
 
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;

@@ -50,7 +50,8 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: simplify includes in src_lib cpp files
+    // TODO: add SearchIndex test to main.cpp
+    // TODO: move some parts of Editor to Application
     // TODO: fix cutting empty text
     // TODO: blinking textbox cursor
     // TODO: remove global.h

@@ -1,10 +1,10 @@
-#include "../include/editor.h"
-#include "../include/utils.h"
+#include "editor.h"
+#include "utils.h"
 #include <numbers>
 #include <iostream>
 #include <ranges>
-#include "../include/UI/toolbox.h"
-#include "../include/UI/create_panel.h"
+#include "UI/toolbox.h"
+#include "UI/create_panel.h"
 
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;

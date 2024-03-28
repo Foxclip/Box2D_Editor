@@ -1,4 +1,4 @@
-#include "../include/objectlist.h"
+#include "objectlist.h"
 
 size_t GameObjectList::getTopSize() const {
     return top_objects.size();

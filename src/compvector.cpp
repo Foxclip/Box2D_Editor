@@ -1,6 +1,6 @@
 #ifndef NDEBUG
 
-#include "../include/compvector.h"
+#include "compvector.h"
 #include <cassert>
 #include <algorithm>
 #include <ranges>

@@ -1,4 +1,4 @@
-#include "../include/serializer.h"
+#include "serializer.h"
 
 WordToken::WordToken() { }
 
