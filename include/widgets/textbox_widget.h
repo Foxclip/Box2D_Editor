@@ -71,6 +71,8 @@ protected:
 	void internalOnEditModeToggle(bool value);
 	void internalOnFocused() override;
 	void internalOnFocusLost() override;
+	void processKeyPressedEvent(const sf::Event& event);
+	void processTextEnteredEvent(const sf::Event& event);
 	void internalProcessKeyboardEvent(const sf::Event& event) override;
 	void internalProcessMouse(const sf::Vector2f& pos) override;
 	void internalOnMouseEnter(const sf::Vector2f& pos) override;
@@ -91,6 +93,9 @@ protected:
 	void trySetCursor(const sf::Vector2f& pos);
 	void selectAll();
 	void deselectAll();
+	void doNormalAction(const std::string& tag, const std::function<void()>& action);
+	void doCursorAction(const std::function<void()>& action);
+	void doGroupAction(const std::string& tag, const std::function<void()>& action);
 
 private:
 	const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(40.0f, 20.0f);
@@ -108,10 +113,14 @@ private:
 	struct TextBoxHistoryEntry {
 		sf::String str;
 		size_t cursor_pos = 0;
+		ptrdiff_t last_action_pos = -1;
+		std::string last_action_tag;
 		ptrdiff_t selection_pos = -1;
 	};
 	History<TextBoxHistoryEntry> history;
 	size_t cursor_pos = 0;
+	ptrdiff_t last_action_pos = -1;
+	std::string last_action_tag;
 	ptrdiff_t selection_pos = -1;
 	sf::Vector2f drag_start_pos;
 	size_t dragging_start_char = 0;

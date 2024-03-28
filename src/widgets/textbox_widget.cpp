@@ -343,183 +343,207 @@ void TextBoxWidget::internalOnFocusLost() {
 	disableEditMode(true);
 }
 
+void TextBoxWidget::processKeyPressedEvent(const sf::Event& event) {
+	bool shift_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
+	bool ctrl_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
+	if (event.key.code == sf::Keyboard::Escape) {
+		disableEditMode(false);
+		removeFocus();
+	} else if (event.key.code == sf::Keyboard::Enter) {
+		if (edit_mode) {
+			disableEditMode(true);
+		} else {
+			enableEditMode();
+		}
+	}
+	if (edit_mode) {
+		if (event.key.code == sf::Keyboard::Left) {
+			if (!isSelectionActive() && !shift_pressed) {
+				if (cursor_pos > 0) {
+					doCursorAction([&]() {
+						setCursorPos(cursor_pos - 1);
+					});
+				}
+			} else if (isSelectionActive() && !shift_pressed) {
+				doCursorAction([&]() {
+					setCursorPos(getSelectionLeft());
+					deselectAll();
+				});
+			} else if (!isSelectionActive() && shift_pressed) {
+				if (cursor_pos > 0) {
+					size_t sel_pos = cursor_pos;
+					doCursorAction([&]() {
+						setCursorPos(cursor_pos - 1);
+						setSelection(sel_pos);
+					});
+				}
+			} else if (isSelectionActive() && shift_pressed) {
+				if (cursor_pos > 0) {
+					doCursorAction([&]() {
+						setCursorPos(cursor_pos - 1);
+					});
+				}
+			}
+		} else if (event.key.code == sf::Keyboard::Right) {
+			if (!isSelectionActive() && !shift_pressed) {
+				if (cursor_pos < getStringSize()) {
+					doCursorAction([&]() {
+						setCursorPos(cursor_pos + 1);
+					});
+				}
+			} else if (isSelectionActive() && !shift_pressed) {
+				doCursorAction([&]() {
+					setCursorPos(getSelectionRight());
+					deselectAll();
+				});
+			} else if (!isSelectionActive() && shift_pressed) {
+				if (cursor_pos < getStringSize()) {
+					size_t sel_pos = cursor_pos;
+					doCursorAction([&]() {
+						setCursorPos(cursor_pos + 1);
+						setSelection(sel_pos);
+					});
+				}
+			} else if (isSelectionActive() && shift_pressed) {
+				if (cursor_pos < getStringSize()) {
+					doCursorAction([&]() {
+						setCursorPos(cursor_pos + 1);
+					});
+				}
+			}
+		} else if (event.key.code == sf::Keyboard::Home) {
+			if (!isSelectionActive() && !shift_pressed) {
+				doCursorAction([&]() {
+					setCursorPos(0);
+				});
+			} else if (isSelectionActive() && !shift_pressed) {
+				doCursorAction([&]() {
+					setCursorPos(0);
+					deselectAll();
+				});
+			} else if (!isSelectionActive() && shift_pressed) {
+				size_t sel_pos = cursor_pos;
+				doCursorAction([&]() {
+					setCursorPos(0);
+					setSelection(sel_pos);
+				});
+			} else if (isSelectionActive() && shift_pressed) {
+				doCursorAction([&]() {
+					setCursorPos(0);
+				});
+			}
+		} else if (event.key.code == sf::Keyboard::End) {
+			if (!isSelectionActive() && !shift_pressed) {
+				doCursorAction([&]() {
+					setCursorPos(getStringSize());
+				});
+			} else if (isSelectionActive() && !shift_pressed) {
+				doCursorAction([&]() {
+					setCursorPos(getStringSize());
+					deselectAll();
+				});
+			} else if (!isSelectionActive() && shift_pressed) {
+				size_t sel_pos = cursor_pos;
+				doCursorAction([&]() {
+					setCursorPos(getStringSize());
+					setSelection(sel_pos);
+				});
+			} else if (isSelectionActive() && shift_pressed) {
+				doCursorAction([&]() {
+					setCursorPos(getStringSize());
+				});
+			}
+		} else if (event.key.code == sf::Keyboard::Delete) {
+			if (isSelectionActive()) {
+				doGroupAction("Delete", [&]() {
+					eraseSelection();
+				});
+			} else if (cursor_pos < getStringSize()) {
+				doGroupAction("Delete", [&]() {
+					erase(cursor_pos, 1);
+				});
+			}
+		} else if (event.key.code == sf::Keyboard::A) {
+			if (ctrl_pressed) {
+				doCursorAction([&]() {
+					selectAll();
+				});
+				process_text_entered_event = false;
+			}
+		} else if (event.key.code == sf::Keyboard::C) {
+			if (ctrl_pressed) {
+				if (!clip::set_text(getSelectedText())) {
+					throw std::runtime_error("Unable to copy text to clipboard");
+				}
+				process_text_entered_event = false;
+			}
+		} else if (event.key.code == sf::Keyboard::V) {
+			if (ctrl_pressed) {
+				std::string pasted_text;
+				if (!clip::get_text(pasted_text)) {
+					throw std::runtime_error("Unable to paste text from clipboard");
+				}
+				std::string prev_value = getValue();
+				doNormalAction("Paste", [&]() {
+					eraseSelection();
+					insert(cursor_pos, pasted_text);
+					setCursorPos(cursor_pos + pasted_text.size());
+				});
+				process_text_entered_event = false;
+			}
+		} else if (event.key.code == sf::Keyboard::X) {
+			if (ctrl_pressed) {
+				if (!clip::set_text(getSelectedText())) {
+					throw std::runtime_error("Unable to copy text to clipboard");
+				}
+				doNormalAction("Cut", [&]() {
+					eraseSelection();
+				});
+				process_text_entered_event = false;
+			}
+		} else if (event.key.code == sf::Keyboard::Z) {
+			if (ctrl_pressed && !shift_pressed) {
+				history.undo();
+				process_text_entered_event = false;
+			} else if (ctrl_pressed && shift_pressed) {
+				history.redo();
+				process_text_entered_event = false;
+			}
+		}
+	}
+}
+
+void TextBoxWidget::processTextEnteredEvent(const sf::Event& event) {
+	if (process_text_entered_event && edit_mode) {
+		sf::Uint32 code = event.text.unicode;
+		if (code == '\n' || code == '\r') {
+			//skip
+		} else if (code == '\b') {
+			if (isSelectionActive()) {
+				doGroupAction("Backspace", [&]() {
+					eraseSelection();
+				});
+			} else if (cursor_pos > 0) {
+				doGroupAction("Backspace", [&]() {
+					erase(cursor_pos - 1, 1);
+					setCursorPos(cursor_pos - 1);
+				});
+			}
+		} else {
+			doGroupAction("Type", [&]() {
+				eraseSelection();
+				typeChar(code);
+			});
+		}
+	}
+}
+
 void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 	try {
-		bool shift_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
-		bool ctrl_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
 		if (event.type == sf::Event::KeyPressed) {
-			switch (event.key.code) {
-				case sf::Keyboard::Escape:
-					disableEditMode(false);
-					removeFocus();
-					break;
-				case sf::Keyboard::Enter:
-					if (edit_mode) {
-						disableEditMode(true);
-					} else {
-						enableEditMode();
-					}
-					break;
-			}
-			if (edit_mode) {
-				switch (event.key.code) {
-					case sf::Keyboard::Left:
-						if (!isSelectionActive() && !shift_pressed) {
-							if (cursor_pos > 0) {
-								setCursorPos(cursor_pos - 1);
-							}
-						} else if (isSelectionActive() && !shift_pressed) {
-							setCursorPos(getSelectionLeft());
-							deselectAll();
-						} else if (!isSelectionActive() && shift_pressed) {
-							if (cursor_pos > 0) {
-								size_t sel_pos = cursor_pos;
-								setCursorPos(cursor_pos - 1);
-								setSelection(sel_pos);
-							}
-						} else if (isSelectionActive() && shift_pressed) {
-							if (cursor_pos > 0) {
-								setCursorPos(cursor_pos - 1);
-							}
-						}
-						history.updateCurrent();
-						break;
-					case sf::Keyboard::Right:
-						if (!isSelectionActive() && !shift_pressed) {
-							if (cursor_pos < getStringSize()) {
-								setCursorPos(cursor_pos + 1);
-							}
-						} else if (isSelectionActive() && !shift_pressed) {
-							setCursorPos(getSelectionRight());
-							deselectAll();
-						} else if (!isSelectionActive() && shift_pressed) {
-							if (cursor_pos < getStringSize()) {
-								size_t sel_pos = cursor_pos;
-								setCursorPos(cursor_pos + 1);
-								setSelection(sel_pos);
-							}
-						} else if (isSelectionActive() && shift_pressed) {
-							if (cursor_pos < getStringSize()) {
-								setCursorPos(cursor_pos + 1);
-							}
-						}
-						history.updateCurrent();
-						break;
-					case sf::Keyboard::Home:
-						if (!isSelectionActive() && !shift_pressed) {
-							setCursorPos(0);
-						} else if (isSelectionActive() && !shift_pressed) {
-							setCursorPos(0);
-							deselectAll();
-						} else if (!isSelectionActive() && shift_pressed) {
-							size_t sel_pos = cursor_pos;
-							setCursorPos(0);
-							setSelection(sel_pos);
-						} else if (isSelectionActive() && shift_pressed) {
-							setCursorPos(0);
-						}
-						history.updateCurrent();
-						break;
-					case sf::Keyboard::End:
-						if (!isSelectionActive() && !shift_pressed) {
-							setCursorPos(getStringSize());
-						} else if (isSelectionActive() && !shift_pressed) {
-							setCursorPos(getStringSize());
-							deselectAll();
-						} else if (!isSelectionActive() && shift_pressed) {
-							size_t sel_pos = cursor_pos;
-							setCursorPos(getStringSize());
-							setSelection(sel_pos);
-						} else if (isSelectionActive() && shift_pressed) {
-							setCursorPos(getStringSize());
-						}
-						history.updateCurrent();
-						break;
-					case sf::Keyboard::Delete:
-						if (isSelectionActive()) {
-							eraseSelection();
-							history.save("Delete");
-						} else if (cursor_pos < getStringSize()) {
-							erase(cursor_pos, 1);
-							history.save("Delete");
-						}
-						break;
-					case sf::Keyboard::A:
-						if (ctrl_pressed) {
-							selectAll();
-							process_text_entered_event = false;
-						}
-						history.updateCurrent();
-						break;
-					case sf::Keyboard::C:
-						if (ctrl_pressed) {
-							if (!clip::set_text(getSelectedText())) {
-								throw std::runtime_error("Unable to copy text to clipboard");
-							}
-							process_text_entered_event = false;
-						}
-						break;
-					case sf::Keyboard::V:
-						if (ctrl_pressed) {
-							std::string pasted_text;
-							if (!clip::get_text(pasted_text)) {
-								throw std::runtime_error("Unable to paste text from clipboard");
-							}
-							std::string prev_value = getValue();
-							eraseSelection();
-							insert(cursor_pos, pasted_text);
-							setCursorPos(cursor_pos + pasted_text.size());
-							if (getValue() != prev_value) {
-								history.save("Paste");
-							}
-							process_text_entered_event = false;
-						}
-						break;
-					case sf::Keyboard::X:
-						if (ctrl_pressed) {
-							if (!clip::set_text(getSelectedText())) {
-								throw std::runtime_error("Unable to copy text to clipboard");
-							}
-							eraseSelection();
-							history.save("Cut");
-							process_text_entered_event = false;
-						}
-						break;
-					case sf::Keyboard::Z:
-						if (ctrl_pressed && !shift_pressed) {
-							history.undo();
-							process_text_entered_event = false;
-						} else if (ctrl_pressed && shift_pressed) {
-							history.redo();
-							process_text_entered_event = false;
-						}
-						break;
-				}
-			}
+			processKeyPressedEvent(event);
 		} else if (event.type == sf::Event::TextEntered) {
-			if (process_text_entered_event && edit_mode) {
-				sf::Uint32 code = event.text.unicode;
-				switch (code) {
-					case '\n':
-					case '\r':
-						break;
-					case '\b':
-						if (isSelectionActive()) {
-							eraseSelection();
-							history.save("Backspace");
-						} else if (cursor_pos > 0) {
-							erase(cursor_pos - 1, 1);
-							setCursorPos(cursor_pos - 1);
-							history.save("Backspace");
-						}
-						break;
-					default:
-						eraseSelection();
-						typeChar(code);
-						history.save("Type");
-						break;
-				}
-			}
+			processTextEnteredEvent(event);
 		}
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
@@ -529,20 +553,22 @@ void TextBoxWidget::internalProcessKeyboardEvent(const sf::Event& event) {
 void TextBoxWidget::internalProcessMouse(const sf::Vector2f& pos) {
 	if (left_button_pressed) {
 		if (dragging_begun) {
-			size_t cursor_before = cursor_pos;
-			trySetCursor(pos);
-			setSelection(dragging_start_char);
-			size_t cursor_after = cursor_pos;
-			if (cursor_after != cursor_before) {
-				history.updateCurrent();
+			size_t old_cursor_pos = cursor_pos;
+			size_t new_cursor_pos = calcCursorPos(pos);
+			if (new_cursor_pos != old_cursor_pos) {
+				doCursorAction([&]() {
+					trySetCursor(pos);
+					setSelection(dragging_start_char);
+				});
 			}
 		} else {
 			size_t new_cursor_pos = calcCursorPos(pos);
 			if (new_cursor_pos != dragging_start_char) {
 				dragging_begun = true;
-				setCursorPos(new_cursor_pos);
-				setSelection(dragging_start_char);
-				history.updateCurrent();
+				doCursorAction([&]() {
+					setCursorPos(new_cursor_pos);
+					setSelection(dragging_start_char);
+				});
 			}
 		}
 	}
@@ -586,14 +612,18 @@ void TextBoxWidget::enableEditMode() {
 		TextBoxHistoryEntry entry;
 		entry.str = getValue();
 		entry.cursor_pos = cursor_pos;
+		entry.last_action_pos = last_action_pos;
 		entry.selection_pos = selection_pos;
 		return entry;
 	};
 	auto history_set = [&](const TextBoxHistoryEntry& value) {
 		setValue(value.str);
 		setCursorPos(value.cursor_pos);
+		last_action_pos = value.last_action_pos;
 		setSelection(value.selection_pos);
 	};
+	last_action_pos = -1;
+	last_action_tag = "";
 	history = History<TextBoxHistoryEntry>("Textbox", history_get, history_set);
 	history.save("Base");
 }
@@ -701,4 +731,28 @@ void TextBoxWidget::selectAll() {
 
 void TextBoxWidget::deselectAll() {
 	setSelection(-1);
+}
+
+void TextBoxWidget::doNormalAction(const std::string& tag, const std::function<void()>& action) {
+	action();
+	last_action_pos = cursor_pos;
+	last_action_tag = tag;
+	history.save(tag);
+}
+
+void TextBoxWidget::doCursorAction(const std::function<void()>& action) {
+	action();
+	history.updateCurrent();
+}
+
+void TextBoxWidget::doGroupAction(const std::string& tag, const std::function<void()>& action) {
+	bool do_update = cursor_pos == last_action_pos && tag == last_action_tag;
+	action();
+	last_action_pos = cursor_pos;
+	last_action_tag = tag;
+	if (do_update) {
+		history.updateCurrent();
+	} else {
+		history.save(tag);
+	}
 }

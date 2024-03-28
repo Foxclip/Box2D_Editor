@@ -50,14 +50,15 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: save cursor position and selection in textbox history
-    // TODO: group actions in textbox history
+    // TODO: fix cutting empty text
     // TODO: blinking textbox cursor
     // TODO: make SearchIndex not use pointers for TObject type
     // TODO: align textboxes in EditWindow to the right
     // TODO: Dropdown widget
     // TODO: object list window (outliner)
     // TODO: render polygon indices
+    // TODO: make widgets a separate library
+    // TODO: EventRecorder for ui tests
     // TODO: separate Simulation and Application,
     // interface in Application, physics and object management in Simulation
     // TODO: delay editing polygons with many vertices

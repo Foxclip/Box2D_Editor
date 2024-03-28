@@ -8,7 +8,7 @@ template<typename T>
 class HistoryEntry {
 public:
 	std::string tag;
-	T value;
+    T value;
 
 	HistoryEntry(const T& value, const std::string& tag);
 };
@@ -23,9 +23,10 @@ public:
 		std::function<void(const T&)> set
 	);
 	size_t size() const;
-	void save(const std::string& tag);
+    bool isAtBase() const;
     void updateCurrent();
 	void updateCurrent(const std::string& tag);
+	void save(const std::string& tag);
 	void undo();
 	void redo();
 	void clear();
@@ -67,16 +68,8 @@ size_t History<T>::size() const {
 }
 
 template<typename T>
-void History<T>::save(const std::string& tag) {
-    LoggerTag tag_history("history");
-    if (current < history.size()) {
-        history.erase(history.begin() + current + 1, history.end());
-    }
-    T state = get();
-    HistoryEntry entry(state, tag);
-    history.push_back(entry);
-    current++;
-    logger << "History " << name << ": save " << tag << ", current: " << current << ", size : " << history.size() << "\n";
+inline bool History<T>::isAtBase() const {
+    return current == 0;
 }
 
 template<typename T>
@@ -88,9 +81,21 @@ template<typename T>
 void History<T>::updateCurrent(const std::string& tag) {
     LoggerTag tag_history("history");
     T state = get();
-    HistoryEntry entry(state, tag);
-    history[current] = entry;
+    history[current].value = state;
     logger << "History " << name << ": updateCurrent " << tag << ", current: " << current << ", size : " << history.size() << "\n";
+}
+
+template<typename T>
+void History<T>::save(const std::string& tag) {
+    LoggerTag tag_history("history");
+    if (current < history.size()) {
+        history.erase(history.begin() + current + 1, history.end());
+    }
+    T state = get();
+    HistoryEntry entry(state, tag);
+    history.push_back(entry);
+    current++;
+    logger << "History " << name << ": save " << tag << ", current: " << current << ", size : " << history.size() << "\n";
 }
 
 template<typename T>
