@@ -8,13 +8,11 @@
 #include "logger.h"
 #include "tools.h"
 #include "history.h"
+#include "application.h"
 #include "widgets/widget.h"
 #include "objectlist.h"
 #include "UI/edit_window.h"
 
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
-const int ANTIALIASING = 0;
 const float MOUSE_SCROLL_ZOOM = 1.2f;
 const int FPS = 60;
 const float WORLD_SATURATION = 0.75f;
@@ -50,11 +48,8 @@ private:
 	int fps = 0;
 };
 
-class Editor {
-
+class Editor : public Application {
 public:
-	void init();
-	void start();
 	void load(const std::string& filename);
 	void setCameraPos(float x, float y);
 	void setCameraZoom(float zoom);
@@ -105,8 +100,6 @@ private:
 	friend class FloatParameter;
 	friend class Toolbox;
 	friend class CreatePanel;
-	sf::RenderWindow window;
-	sf::View window_view;
 	sf::View world_view;
 	sf::View ui_view;
 	sf::RenderTexture world_texture;
@@ -114,16 +107,7 @@ private:
 	sf::RenderTexture selection_mask;
 	sf::Shader desat_shader;
 	sf::Shader selection_shader;
-	sf::Vector2i mousePos;
-	sf::Vector2f mousePosf;
 	sf::Vector2f sfMousePosWorld;
-	sf::Vector2i mousePrevPos;
-	sf::Vector2f mousePressPosf;
-	bool leftButtonPressed = false;
-	bool rightButtonPressed = false;
-	bool leftButtonPressGesture = false;
-	bool leftButtonProcessWidgetsOnPress = true;
-	bool leftButtonProcessWidgetsOnRelease = true;
 	float zoomFactor = 30.0f;
 	float viewCenterX = 0.0f, viewCenterY = 5.0f;
 	SelectTool select_tool;
@@ -157,9 +141,6 @@ private:
 	sf::CircleShape origin_shape;
 	sf::Text object_info_text;
 	sf::Text id_text;
-	WidgetList widgets;
-	sf::Cursor arrow_cursor;
-	sf::Cursor text_cursor;
 
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;
@@ -183,21 +164,24 @@ private:
 	bool quickload_requested = false;
 	bool debug_break = false;
 
+	void onInit() override;
+	void onStart() override;
+	void onFrameBegin() override;
+	void onFrameEnd() override;
+	void onProcessWidgets() override;
+	void onProcessWindowEvent(const sf::Event& event) override;
+	void onProcessKeyboardEvent(const sf::Event& event) override;
+	void onProcessMouseScroll(const sf::Event& event) override;
+	void onProcessLeftClick() override;
+	void onProcessLeftRelease() override;
+	void onProcessMouse() override;
+	void afterProcessInput() override;
+	void onProcessWorld() override;
+	void onRender() override;
 	void init_tools();
 	void init_world();
 	void init_ui();
 	void init_widgets();
-	void main_loop();
-	void process_widgets();
-	void process_input();
-	void process_keyboard_event(const sf::Event& event);
-	void process_mouse_event(const sf::Event& event);
-	void process_keyboard();
-	void process_mouse();
-	void process_left_click();
-	void process_left_release();
-	void process_world();
-	void render();
 	void render_world();
 	void render_ui();
 	void maximize_window() const;

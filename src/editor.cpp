@@ -16,51 +16,6 @@ bool QueryCallback::ReportFixture(b2Fixture* fixture) {
     return true;
 }
 
-void Editor::init() {
-    sf::ContextSettings cs_window;
-    cs_window.antialiasingLevel = ANTIALIASING;
-    window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs_window);
-    window.setVerticalSyncEnabled(true);
-    sf::ContextSettings cs_world;
-    world_texture.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_world);
-    sf::ContextSettings cs_ui;
-    ui_texture.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_ui);
-    sf::ContextSettings cs_mask;
-    selection_mask.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_mask);
-    window_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
-    world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
-    ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
-    if (!desat_shader.loadFromFile("shaders/desat.frag", sf::Shader::Fragment)) {
-        throw std::runtime_error("Shader loading error");
-    }
-    if (!selection_shader.loadFromFile("shaders/selection.frag", sf::Shader::Fragment)) {
-        throw std::runtime_error("Shader loading error");
-    }
-    init_tools();
-    init_world();
-    init_ui();
-    logger.OnLineWrite = [&](std::string line) { // should be after init_ui and preferably before any logging
-        logger_text_widget->setString(line);
-    };
-    try_select_tool_by_index(0); // should be after init_tools and init_ui
-    select_create_type(0);
-    maximize_window();
-    auto getter = [&]() { return serialize(); };
-    auto setter = [&](std::string str) { deserialize(str, false); };
-    history = History<std::string>("Editor", getter, setter);
-
-    assert(tools.size() > 0);
-    assert(selected_tool);
-    for (size_t i = 0; i < tools_in_tool_panel.size(); i++) {
-        assert(tools_in_tool_panel[i]->widget);
-    }
-    assert(game_objects.world);
-}
-
-void Editor::start() {
-    main_loop();
-}
-
 void Editor::load(const std::string& filename) {
     load_from_file(filename);
 }
@@ -230,6 +185,77 @@ ChainObject* Editor::create_chain(
     return ptr;
 }
 
+void Editor::onInit() {
+    sf::ContextSettings cs_world;
+    world_texture.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_world);
+    sf::ContextSettings cs_ui;
+    ui_texture.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_ui);
+    sf::ContextSettings cs_mask;
+    selection_mask.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_mask);
+    window_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
+    world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
+    ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
+    if (!desat_shader.loadFromFile("shaders/desat.frag", sf::Shader::Fragment)) {
+        throw std::runtime_error("Shader loading error");
+    }
+    if (!selection_shader.loadFromFile("shaders/selection.frag", sf::Shader::Fragment)) {
+        throw std::runtime_error("Shader loading error");
+    }
+    init_tools();
+    init_world();
+    init_ui();
+    logger.OnLineWrite = [&](std::string line) { // should be after init_ui and preferably before any logging
+        logger_text_widget->setString(line);
+    };
+    try_select_tool_by_index(0); // should be after init_tools and init_ui
+    select_create_type(0);
+    maximize_window();
+    auto getter = [&]() { return serialize(); };
+    auto setter = [&](std::string str) { deserialize(str, false); };
+    history = History<std::string>("Editor", getter, setter);
+
+    assert(tools.size() > 0);
+    assert(selected_tool);
+    for (size_t i = 0; i < tools_in_tool_panel.size(); i++) {
+        assert(tools_in_tool_panel[i]->widget);
+    }
+    assert(game_objects.world);
+}
+
+void Editor::onStart() {
+    history.clear();
+    history.save("Base");
+    fps_counter.init();
+}
+
+void Editor::onFrameBegin() {
+    fps_counter.frameBegin();
+}
+
+void Editor::onFrameEnd() {
+    int fps = fps_counter.frameEnd();
+    fps_text_widget->setString(std::to_string(fps));
+}
+
+void Editor::onProcessWidgets() {
+    if (edit_tool.edit_window_widget->isVisible() && active_object) {
+        edit_tool.edit_window_widget->updateParameters();
+    }
+}
+
+void Editor::onProcessWindowEvent(const sf::Event& event) {
+    if (event.type == sf::Event::Closed) {
+        window.close();
+    } else if (event.type == sf::Event::Resized) {
+        sf::ContextSettings cs_world;
+        world_texture.create(event.size.width, event.size.height, cs_world);
+        sf::ContextSettings cs_ui;
+        ui_texture.create(event.size.width, event.size.height, cs_ui);
+        sf::ContextSettings cs_mask;
+        selection_mask.create(event.size.width, event.size.height, cs_mask);
+    }
+}
+
 void Editor::init_tools() {
     for (size_t i = 0; i < tools.size(); i++) {
         tools[i]->reset();
@@ -352,73 +378,7 @@ void Editor::init_widgets() {
 
 }
 
-void Editor::main_loop() {
-    history.clear();
-    history.save("Base");
-    fps_counter.init();
-    while (window.isOpen()) {
-        fps_counter.frameBegin();
-        process_widgets();
-        process_input();
-        process_world();
-        render();
-        int fps = fps_counter.frameEnd();
-        fps_text_widget->setString(std::to_string(fps));
-    }
-}
-
-void Editor::process_widgets() {
-    widgets.unlock();
-    widgets.reset(sf::Vector2f(ui_texture.getSize().x, ui_texture.getSize().y), mousePosf);
-    if (edit_tool.edit_window_widget->isVisible() && active_object) {
-        edit_tool.edit_window_widget->updateParameters();
-    }
-}
-
-void Editor::process_input() {
-    sf::Event event;
-    while (window.pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
-            window.close();
-        } else if (event.type == sf::Event::Resized) {
-            sf::ContextSettings cs_world;
-            world_texture.create(event.size.width, event.size.height, cs_world);
-            sf::ContextSettings cs_ui;
-            ui_texture.create(event.size.width, event.size.height, cs_ui);
-            sf::ContextSettings cs_mask;
-            selection_mask.create(event.size.width, event.size.height, cs_mask);
-        }
-        process_keyboard_event(event);
-        process_mouse_event(event);
-    }
-    process_keyboard();
-    process_mouse();
-    if (commit_action) {
-        history.save("Normal");
-        commit_action = false;
-    }
-    if (quickload_requested) {
-        quickload();
-        if (history.getCurrent().tag != "Quickload") {
-            history.save("Quickload");
-        }
-        quickload_requested = false;
-    }
-    if (load_request.requested) {
-        load_from_file(load_request.filename);
-        history.save("Load");
-        load_request.requested = false;
-    }
-    widgets.updateWidgets();
-    widgets.updateRenderQueue();
-    widgets.lock();
-}
-
-void Editor::process_keyboard_event(const sf::Event& event) {
-    if (widgets.getFocusedWidget()) {
-        widgets.processKeyboardEvent(event);
-        return;
-    }
+void Editor::onProcessKeyboardEvent(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
         switch (event.key.code) {
             case sf::Keyboard::Escape:
@@ -561,145 +521,13 @@ void Editor::process_keyboard_event(const sf::Event& event) {
     }
 }
 
-void Editor::process_mouse_event(const sf::Event& event) {
-    mousePos = sf::Mouse::getPosition(window);
-    mousePosf = to2f(mousePos);
-    sfMousePosWorld = pixel_to_world(mousePos);
-    b2MousePosWorld = tob2(sfMousePosWorld);
-    if (event.type == sf::Event::MouseButtonPressed) {
-        switch (event.mouseButton.button) {
-            case sf::Mouse::Left:
-                leftButtonPressed = true;
-                leftButtonPressGesture = true;
-                leftButtonProcessWidgetsOnRelease = true;
-                mousePressPosf = mousePosf;
-                process_left_click();
-                leftButtonProcessWidgetsOnPress = true;
-                break;
-            case sf::Mouse::Right:
-                rightButtonPressed = true;
-                mousePrevPos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-                break;
-        }
-    }
-    if (event.type == sf::Event::MouseButtonReleased) {
-        switch (event.mouseButton.button) {
-            case sf::Mouse::Left:
-                leftButtonPressed = false;
-                process_left_release();
-                leftButtonPressGesture = false;
-                break;
-            case sf::Mouse::Right:
-                rightButtonPressed = false;
-                break;
-        }
-    }
-    if (event.type == sf::Event::MouseWheelScrolled) {
-        if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
-            zoomFactor *= pow(MOUSE_SCROLL_ZOOM, event.mouseWheelScroll.delta);
-        }
+void Editor::onProcessMouseScroll(const sf::Event& event) {
+    if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
+        zoomFactor *= pow(MOUSE_SCROLL_ZOOM, event.mouseWheelScroll.delta);
     }
 }
 
-void Editor::process_keyboard() {
-}
-
-void Editor::process_mouse() {
-    widgets.processMouse(mousePosf);
-    sf::Cursor::Type cursor_type = sf::Cursor::Arrow;
-    widgets.getCurrentCursorType(cursor_type);
-    switch (cursor_type) {
-        case sf::Cursor::Arrow: window.setMouseCursor(arrow_cursor); break;
-        case sf::Cursor::Text: window.setMouseCursor(text_cursor); break;
-        default: window.setMouseCursor(arrow_cursor); break;
-    }
-    if (selected_tool == &select_tool) {
-        {
-            GameObject* old_hover = select_tool.hover_object;
-            GameObject* new_hover = get_object_at(mousePosf);
-            if (old_hover) {
-                old_hover->hover = false;
-            }
-            if (new_hover) {
-                new_hover->hover = true;
-            }
-            select_tool.hover_object = new_hover;
-        }
-    } else if (selected_tool == &edit_tool) {
-        if (edit_tool.mode == EditTool::HOVER) {
-            edit_tool.highlighted_vertex = mouse_get_object_vertex();
-        } else if (edit_tool.mode == EditTool::ADD) {
-            edit_tool.edge_vertex = mouse_get_edge_vertex();
-        } else if (edit_tool.mode == EditTool::INSERT) {
-            edit_tool.highlighted_edge = mouse_get_object_edge();
-            if (edit_tool.highlighted_edge != -1) {
-                b2Vec2 v1 = active_object->getGlobalVertexPos(edit_tool.highlighted_edge);
-                b2Vec2 v2 = active_object->getGlobalVertexPos(active_object->indexLoop(edit_tool.highlighted_edge + 1));
-                edit_tool.insertVertexPos = utils::line_project(b2MousePosWorld, v1, v2);
-            }
-        }
-    } else if (selected_tool == &move_tool) {
-        for (GameObject* obj : move_tool.moving_objects) {
-            obj->setGlobalPosition(b2MousePosWorld + obj->cursor_offset);
-        }
-    } else if (selected_tool == &rotate_tool) {
-        for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
-            GameObject* obj = rotate_tool.rotating_objects[i];
-            b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.pivot_pos;
-            float current_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
-            float offset = current_mouse_angle - rotate_tool.orig_mouse_angle;
-            b2Vec2 new_pos = utils::rotate_point(obj->orig_pos, rotate_tool.pivot_pos, offset);
-            obj->setGlobalPosition(new_pos);
-            obj->setGlobalAngle(obj->orig_angle + offset);
-        }
-    }
-    if (leftButtonPressed) {
-        if (selected_tool == &select_tool) {
-            if (select_tool.rectangle_select.active) {
-                select_objects_in_rect(select_tool.rectangle_select);
-            } else if (utils::length(mousePosf - mousePressPosf) >= MOUSE_DRAG_THRESHOLD) {
-                select_tool.rectangle_select.active = true;
-                select_tool.rectangle_select.select_origin = screen_to_world(mousePressPosf);
-                if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
-                    select_tool.clearSelected();
-                }
-            }
-        } else if (selected_tool == &drag_tool) {
-            if (drag_tool.mouse_joint) {
-                drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
-            }
-        } else if (selected_tool == &edit_tool) {
-            if (edit_tool.mode == EditTool::SELECT) {
-                if (edit_tool.rectangle_select.active) {
-                    select_vertices_in_rect(edit_tool.rectangle_select);
-                }
-            } else if (edit_tool.mode == EditTool::MOVE) {
-                if (edit_tool.grabbed_vertex != -1) {
-                    ptrdiff_t index = edit_tool.grabbed_vertex;
-                    const EditableVertex& vertex = active_object->getVertex(index);
-                    b2Vec2 offset = active_object->toLocal(b2MousePosWorld) + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
-                    active_object->offsetVertex(index, offset, false);
-                    active_object->offsetSelected(offset, false);
-                    active_object->syncVertices();
-                }
-            }
-        }
-    }
-    if (rightButtonPressed) {
-        sf::Vector2i mouseDelta = mousePrevPos - mousePos;
-        viewCenterX += mouseDelta.x / zoomFactor;
-        viewCenterY += -mouseDelta.y / zoomFactor;
-    }
-    mousePrevPos = mousePos;
-}
-
-void Editor::process_left_click() {
-    if (leftButtonProcessWidgetsOnPress) {
-        widgets.processClick(mousePosf);
-        if (widgets.isClickBlocked()) {
-            return;
-        }
-    }
+void Editor::onProcessLeftClick() {
     if (selected_tool == &select_tool) {
         leftButtonProcessWidgetsOnRelease = false;
     } else if (selected_tool == &create_tool) {
@@ -784,16 +612,7 @@ void Editor::process_left_click() {
     }
 }
 
-void Editor::process_left_release() {
-    if (!leftButtonPressGesture) {
-        return;
-    }
-    if (leftButtonProcessWidgetsOnRelease && widgets.getFocusedWidget()) {
-        widgets.processRelease(mousePosf);
-        if (widgets.isReleaseBlocked()) {
-            return;
-        }
-    }
+void Editor::onProcessLeftRelease() {
     if (selected_tool == &select_tool) {
         if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
             GameObject* object = get_object_at(mousePosf);
@@ -826,21 +645,115 @@ void Editor::process_left_release() {
     }
 }
 
-void Editor::process_world() {
+void Editor::onProcessMouse() {
+    if (selected_tool == &select_tool) {
+        {
+            GameObject* old_hover = select_tool.hover_object;
+            GameObject* new_hover = get_object_at(mousePosf);
+            if (old_hover) {
+                old_hover->hover = false;
+            }
+            if (new_hover) {
+                new_hover->hover = true;
+            }
+            select_tool.hover_object = new_hover;
+        }
+    } else if (selected_tool == &edit_tool) {
+        if (edit_tool.mode == EditTool::HOVER) {
+            edit_tool.highlighted_vertex = mouse_get_object_vertex();
+        } else if (edit_tool.mode == EditTool::ADD) {
+            edit_tool.edge_vertex = mouse_get_edge_vertex();
+        } else if (edit_tool.mode == EditTool::INSERT) {
+            edit_tool.highlighted_edge = mouse_get_object_edge();
+            if (edit_tool.highlighted_edge != -1) {
+                b2Vec2 v1 = active_object->getGlobalVertexPos(edit_tool.highlighted_edge);
+                b2Vec2 v2 = active_object->getGlobalVertexPos(active_object->indexLoop(edit_tool.highlighted_edge + 1));
+                edit_tool.insertVertexPos = utils::line_project(b2MousePosWorld, v1, v2);
+            }
+        }
+    } else if (selected_tool == &move_tool) {
+        for (GameObject* obj : move_tool.moving_objects) {
+            obj->setGlobalPosition(b2MousePosWorld + obj->cursor_offset);
+        }
+    } else if (selected_tool == &rotate_tool) {
+        for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
+            GameObject* obj = rotate_tool.rotating_objects[i];
+            b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.pivot_pos;
+            float current_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
+            float offset = current_mouse_angle - rotate_tool.orig_mouse_angle;
+            b2Vec2 new_pos = utils::rotate_point(obj->orig_pos, rotate_tool.pivot_pos, offset);
+            obj->setGlobalPosition(new_pos);
+            obj->setGlobalAngle(obj->orig_angle + offset);
+        }
+    }
+    if (leftButtonPressed) {
+        if (selected_tool == &select_tool) {
+            if (select_tool.rectangle_select.active) {
+                select_objects_in_rect(select_tool.rectangle_select);
+            } else if (utils::length(mousePosf - mousePressPosf) >= MOUSE_DRAG_THRESHOLD) {
+                select_tool.rectangle_select.active = true;
+                select_tool.rectangle_select.select_origin = screen_to_world(mousePressPosf);
+                if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                    select_tool.clearSelected();
+                }
+            }
+        } else if (selected_tool == &drag_tool) {
+            if (drag_tool.mouse_joint) {
+                drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
+            }
+        } else if (selected_tool == &edit_tool) {
+            if (edit_tool.mode == EditTool::SELECT) {
+                if (edit_tool.rectangle_select.active) {
+                    select_vertices_in_rect(edit_tool.rectangle_select);
+                }
+            } else if (edit_tool.mode == EditTool::MOVE) {
+                if (edit_tool.grabbed_vertex != -1) {
+                    ptrdiff_t index = edit_tool.grabbed_vertex;
+                    const EditableVertex& vertex = active_object->getVertex(index);
+                    b2Vec2 offset = active_object->toLocal(b2MousePosWorld) + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
+                    active_object->offsetVertex(index, offset, false);
+                    active_object->offsetSelected(offset, false);
+                    active_object->syncVertices();
+                }
+            }
+        }
+    }
+    if (rightButtonPressed) {
+        sf::Vector2i mouseDelta = mousePrevPos - mousePos;
+        viewCenterX += mouseDelta.x / zoomFactor;
+        viewCenterY += -mouseDelta.y / zoomFactor;
+    }
+}
+
+void Editor::afterProcessInput() {
+    if (commit_action) {
+        history.save("Normal");
+        commit_action = false;
+    }
+    if (quickload_requested) {
+        quickload();
+        if (history.getCurrent().tag != "Quickload") {
+            history.save("Quickload");
+        }
+        quickload_requested = false;
+    }
+    if (load_request.requested) {
+        load_from_file(load_request.filename);
+        history.save("Load");
+        load_request.requested = false;
+    }
+}
+
+void Editor::onProcessWorld() {
     if (!paused) {
         world->Step(timeStep, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
         game_objects.transformFromRigidbody();
     }
 }
 
-void Editor::render() {
-    window.clear(sf::Color(0, 0, 0));
-    window_view.setCenter(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
-    window_view.setSize(window.getSize().x, window.getSize().y);
-    window.setView(window_view);
+void Editor::onRender() {
     render_world();
     render_ui();
-    window.display();
 }
 
 void Editor::render_world() {
@@ -1012,7 +925,6 @@ void Editor::render_ui() {
         }
     }
 
-    widgets.render(ui_texture);
     ui_texture.display();
     sf::Sprite ui_sprite(ui_texture.getTexture());
     window.draw(ui_sprite);

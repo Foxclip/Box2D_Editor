@@ -56,6 +56,8 @@ int main() {
     // TODO: fix cutting empty text
     // TODO: blinking textbox cursor
     // TODO: remove global.h
+    // TODO: don't fill window with black color in Application::Render
+    // TODO: CanvasWidget as a replacement to screen textures
     // TODO: EventRecorder for ui tests
     // TODO: make SearchIndex not use pointers for TObject type
     // TODO: align textboxes in EditWindow to the right
