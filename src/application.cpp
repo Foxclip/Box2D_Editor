@@ -73,8 +73,8 @@ void Application::processInput() {
         processKeyboardEvent(event);
         processMouseEvent(event);
     }
-    onProcessKeyboard();
-    onProcessMouse();
+    processKeyboard();
+    processMouse();
     afterProcessInput();
     widgets.updateWidgets();
     widgets.updateRenderQueue();
