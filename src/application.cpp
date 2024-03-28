@@ -27,6 +27,8 @@ void Application::onProcessWindowEvent(const sf::Event& event) { }
 
 void Application::onProcessKeyboardEvent(const sf::Event& event) { }
 
+void Application::beforeProcessMouseEvent(const sf::Event& event) { }
+
 void Application::onProcessMouseEvent(const sf::Event& event) { }
 
 void Application::onProcessLeftClick() { }
@@ -92,6 +94,7 @@ void Application::processKeyboardEvent(const sf::Event& event) {
 }
 
 void Application::processMouseEvent(const sf::Event& event) {
+    beforeProcessMouseEvent(event);
     if (event.type == sf::Event::MouseButtonPressed) {
         switch (event.mouseButton.button) {
             case sf::Mouse::Left:

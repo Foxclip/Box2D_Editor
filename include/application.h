@@ -32,6 +32,7 @@ protected:
 	virtual void onProcessWidgets();
 	virtual void onProcessWindowEvent(const sf::Event& event);
 	virtual void onProcessKeyboardEvent(const sf::Event& event);
+	virtual void beforeProcessMouseEvent(const sf::Event& event);
 	virtual void onProcessMouseEvent(const sf::Event& event);
 	virtual void onProcessLeftClick();
 	virtual void onProcessLeftRelease();

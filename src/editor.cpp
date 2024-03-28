@@ -521,6 +521,11 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
     }
 }
 
+void Editor::beforeProcessMouseEvent(const sf::Event& event) {
+    sfMousePosWorld = pixel_to_world(mousePos);
+    b2MousePosWorld = tob2(sfMousePosWorld);
+}
+
 void Editor::onProcessMouseScroll(const sf::Event& event) {
     if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
         zoomFactor *= pow(MOUSE_SCROLL_ZOOM, event.mouseWheelScroll.delta);
