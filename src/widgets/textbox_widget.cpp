@@ -455,11 +455,11 @@ void TextBoxWidget::processKeyPressedEvent(const sf::Event& event) {
 			}
 		} else if (event.key.code == sf::Keyboard::Delete) {
 			if (isSelectionActive()) {
-				doGroupAction("Delete", [&]() {
+				doGroupAction(ActionType::ACTION_DELETE, [&]() {
 					eraseSelection();
 				});
 			} else if (cursor_pos < getStringSize()) {
-				doGroupAction("Delete", [&]() {
+				doGroupAction(ActionType::ACTION_DELETE, [&]() {
 					erase(cursor_pos, 1);
 				});
 			}
@@ -484,7 +484,7 @@ void TextBoxWidget::processKeyPressedEvent(const sf::Event& event) {
 					throw std::runtime_error("Unable to paste text from clipboard");
 				}
 				std::string prev_value = getValue();
-				doNormalAction("Paste", [&]() {
+				doNormalAction(ActionType::ACTION_PASTE, [&]() {
 					eraseSelection();
 					insert(cursor_pos, pasted_text);
 					setCursorPos(cursor_pos + pasted_text.size());
@@ -496,7 +496,7 @@ void TextBoxWidget::processKeyPressedEvent(const sf::Event& event) {
 				if (!clip::set_text(getSelectedText())) {
 					throw std::runtime_error("Unable to copy text to clipboard");
 				}
-				doNormalAction("Cut", [&]() {
+				doNormalAction(ActionType::ACTION_CUT, [&]() {
 					eraseSelection();
 				});
 				process_text_entered_event = false;
@@ -520,17 +520,17 @@ void TextBoxWidget::processTextEnteredEvent(const sf::Event& event) {
 			//skip
 		} else if (code == '\b') {
 			if (isSelectionActive()) {
-				doGroupAction("Backspace", [&]() {
+				doGroupAction(ActionType::ACTION_BACKSPACE, [&]() {
 					eraseSelection();
 				});
 			} else if (cursor_pos > 0) {
-				doGroupAction("Backspace", [&]() {
+				doGroupAction(ActionType::ACTION_BACKSPACE, [&]() {
 					erase(cursor_pos - 1, 1);
 					setCursorPos(cursor_pos - 1);
 				});
 			}
 		} else {
-			doGroupAction("Type", [&]() {
+			doGroupAction(ActionType::ACTION_TYPE, [&]() {
 				eraseSelection();
 				typeChar(code);
 			});
@@ -733,7 +733,19 @@ void TextBoxWidget::deselectAll() {
 	setSelection(-1);
 }
 
-void TextBoxWidget::doNormalAction(const std::string& tag, const std::function<void()>& action) {
+std::string TextBoxWidget::getActionTag(ActionType action_type) {
+	switch (action_type) {
+		case ActionType::ACTION_DELETE: return "Delete";
+		case ActionType::ACTION_PASTE: return "Paste";
+		case ActionType::ACTION_CUT: return "Cut";
+		case ActionType::ACTION_BACKSPACE: return "Backspace";
+		case ActionType::ACTION_TYPE: return "Type";
+		default: assert(false, "Unknown action_type: " + std::to_string(action_type));
+	}
+}
+
+void TextBoxWidget::doNormalAction(ActionType action_type, const std::function<void()>& action) {
+	std::string tag = getActionTag(action_type);
 	action();
 	last_action_pos = cursor_pos;
 	last_action_tag = tag;
@@ -745,7 +757,8 @@ void TextBoxWidget::doCursorAction(const std::function<void()>& action) {
 	history.updateCurrent();
 }
 
-void TextBoxWidget::doGroupAction(const std::string& tag, const std::function<void()>& action) {
+void TextBoxWidget::doGroupAction(ActionType action_type, const std::function<void()>& action) {
+	std::string tag = getActionTag(action_type);
 	bool do_update = cursor_pos == last_action_pos && tag == last_action_tag;
 	action();
 	last_action_pos = cursor_pos;

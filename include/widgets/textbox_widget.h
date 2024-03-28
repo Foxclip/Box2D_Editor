@@ -64,6 +64,13 @@ public:
 	void eraseSelection();
 
 protected:
+	enum ActionType {
+		ACTION_DELETE,
+		ACTION_PASTE,
+		ACTION_CUT,
+		ACTION_BACKSPACE,
+		ACTION_TYPE,
+	};
 	void update() override;
 	void updateColors();
 	void internalOnClick(const sf::Vector2f& pos) override;
@@ -93,9 +100,10 @@ protected:
 	void trySetCursor(const sf::Vector2f& pos);
 	void selectAll();
 	void deselectAll();
-	void doNormalAction(const std::string& tag, const std::function<void()>& action);
+	std::string getActionTag(ActionType action_type);
+	void doNormalAction(ActionType action_type, const std::function<void()>& action);
 	void doCursorAction(const std::function<void()>& action);
-	void doGroupAction(const std::string& tag, const std::function<void()>& action);
+	void doGroupAction(ActionType action_type, const std::function<void()>& action);
 
 private:
 	const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(40.0f, 20.0f);
