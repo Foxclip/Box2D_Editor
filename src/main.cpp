@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <iostream>
 #include "main.h"
-#include "application.h"
+#include "editor.h"
 #include "logger.h"
 #include "scenes.h"
 
@@ -50,8 +50,10 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
+    // TODO: simplify includes in src_lib cpp files
     // TODO: fix cutting empty text
     // TODO: blinking textbox cursor
+    // TODO: remove global.h
     // TODO: EventRecorder for ui tests
     // TODO: make SearchIndex not use pointers for TObject type
     // TODO: align textboxes in EditWindow to the right

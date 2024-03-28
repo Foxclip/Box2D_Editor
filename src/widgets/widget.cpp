@@ -1,6 +1,5 @@
 #include "widgets/widget.h"
 #include "widgets/widget_list.h"
-#include "application.h"
 
 Widget::Widget(WidgetList& widget_list) : widget_list(widget_list) { }
 

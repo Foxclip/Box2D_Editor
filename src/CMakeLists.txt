@@ -5,6 +5,7 @@ add_subdirectory(widgets)
 set(SRC_HEADER_FILES
     "${INCLUDE_DIR}/application.h"
     "${INCLUDE_DIR}/compvector.h"
+    "${INCLUDE_DIR}/editor.h"
     "${INCLUDE_DIR}/gameobject.h"
     "${INCLUDE_DIR}/global.h"
     "${INCLUDE_DIR}/history.h"
@@ -24,6 +25,7 @@ set(SRC_HEADER_FILES
 set(SRC_SOURCE_FILES
     application.cpp
     compvector.cpp
+    editor.cpp
     gameobject.cpp
     global.cpp
     logger.cpp

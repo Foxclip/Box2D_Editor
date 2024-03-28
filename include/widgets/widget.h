@@ -6,6 +6,7 @@
 #include "logger.h"
 #include "compvector.h"
 #include "searchindex.h"
+#include "drawing.h"
 #include "widget_transform.h"
 #include "widget_render_queue.h"
 #include "widget_unclipped_region.h"

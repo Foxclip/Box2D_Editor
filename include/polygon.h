@@ -6,8 +6,6 @@
 
 extern sf::Text vertex_text;
 
-Logger& operator<<(Logger& logger, const sf::Vector2f& value);
-
 struct CutInfo {
 	size_t from;
 	size_t to;
