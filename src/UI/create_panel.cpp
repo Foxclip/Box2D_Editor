@@ -1,7 +1,7 @@
 #include "UI/create_panel.h"
 #include "editor.h"
 
-CreatePanel::CreatePanel(WidgetList& widget_list, Application& p_app) : ContainerWidget(widget_list), app(p_app) {
+CreatePanel::CreatePanel(WidgetList& widget_list, Editor& p_app) : ContainerWidget(widget_list), app(p_app) {
     setVisible(false);
     setFillColor(sf::Color(255, 0, 0, 0));
     setOrigin(Widget::CENTER_LEFT);

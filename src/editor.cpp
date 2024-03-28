@@ -16,7 +16,7 @@ bool QueryCallback::ReportFixture(b2Fixture* fixture) {
     return true;
 }
 
-void Application::init() {
+void Editor::init() {
     sf::ContextSettings cs_window;
     cs_window.antialiasingLevel = ANTIALIASING;
     window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML", sf::Style::Default, cs_window);
@@ -57,36 +57,36 @@ void Application::init() {
     assert(game_objects.world);
 }
 
-void Application::start() {
+void Editor::start() {
     main_loop();
 }
 
-void Application::load(const std::string& filename) {
+void Editor::load(const std::string& filename) {
     load_from_file(filename);
 }
 
-void Application::setCameraPos(float x, float y) {
+void Editor::setCameraPos(float x, float y) {
     viewCenterX = x;
     viewCenterY = y;
 }
 
-void Application::setCameraZoom(float zoom) {
+void Editor::setCameraZoom(float zoom) {
     zoomFactor = zoom;
 }
 
-GameObjectList& Application::getObjectList() {
+GameObjectList& Editor::getObjectList() {
     return game_objects;
 }
 
-WidgetList& Application::getWidgetList() {
+WidgetList& Editor::getWidgetList() {
     return widgets;
 }
 
-void Application::selectSingleObject(GameObject* object, bool with_children) {
+void Editor::selectSingleObject(GameObject* object, bool with_children) {
     select_tool.selectSingleObject(object, with_children);
 }
 
-BoxObject* Application::create_box(
+BoxObject* Editor::create_box(
     const std::string& name,
     const b2Vec2& pos,
     float angle,
@@ -106,7 +106,7 @@ BoxObject* Application::create_box(
     return ptr;
 }
 
-BallObject* Application::create_ball(
+BallObject* Editor::create_ball(
     const std::string& name,
     const b2Vec2& pos,
     float radius,
@@ -125,7 +125,7 @@ BallObject* Application::create_ball(
     return ptr;
 }
 
-PolygonObject* Application::create_polygon(
+PolygonObject* Editor::create_polygon(
     const std::string& name,
     const b2Vec2& pos,
     float angle,
@@ -145,7 +145,7 @@ PolygonObject* Application::create_polygon(
     return ptr;
 }
 
-PolygonObject* Application::create_car(
+PolygonObject* Editor::create_car(
     const std::string& name,
     const b2Vec2& pos,
     const std::vector<float>& lengths,
@@ -211,7 +211,7 @@ PolygonObject* Application::create_car(
     return car_ptr;
 }
 
-ChainObject* Application::create_chain(
+ChainObject* Editor::create_chain(
     const std::string& name,
     const b2Vec2& pos,
     float angle,
@@ -230,7 +230,7 @@ ChainObject* Application::create_chain(
     return ptr;
 }
 
-void Application::init_tools() {
+void Editor::init_tools() {
     for (size_t i = 0; i < tools.size(); i++) {
         tools[i]->reset();
     }
@@ -246,7 +246,7 @@ void Application::init_tools() {
     };
 }
 
-void Application::init_world() {
+void Editor::init_world() {
     b2Vec2 gravity(0.0f, -9.8f);
     world = std::make_unique<b2World>(gravity);
     b2BodyDef mouse_body_def;
@@ -254,7 +254,7 @@ void Application::init_world() {
     game_objects.world = world.get();
 }
 
-void Application::init_ui() {
+void Editor::init_ui() {
     load_font(ui_font, "fonts/STAN0757.TTF");
     load_font(fps_font, "fonts/fraps.ttf");
     load_font(console_font, "fonts/courbd.ttf");
@@ -281,7 +281,7 @@ void Application::init_ui() {
     init_widgets();
 }
 
-void Application::init_widgets() {
+void Editor::init_widgets() {
     toolbox_widget = widgets.createWidget<Toolbox>(*this);
     edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(*this);
     create_tool.create_panel_widget = widgets.createWidget<CreatePanel>(*this);
@@ -352,7 +352,7 @@ void Application::init_widgets() {
 
 }
 
-void Application::main_loop() {
+void Editor::main_loop() {
     history.clear();
     history.save("Base");
     fps_counter.init();
@@ -367,7 +367,7 @@ void Application::main_loop() {
     }
 }
 
-void Application::process_widgets() {
+void Editor::process_widgets() {
     widgets.unlock();
     widgets.reset(sf::Vector2f(ui_texture.getSize().x, ui_texture.getSize().y), mousePosf);
     if (edit_tool.edit_window_widget->isVisible() && active_object) {
@@ -375,7 +375,7 @@ void Application::process_widgets() {
     }
 }
 
-void Application::process_input() {
+void Editor::process_input() {
     sf::Event event;
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
@@ -414,7 +414,7 @@ void Application::process_input() {
     widgets.lock();
 }
 
-void Application::process_keyboard_event(const sf::Event& event) {
+void Editor::process_keyboard_event(const sf::Event& event) {
     if (widgets.getFocusedWidget()) {
         widgets.processKeyboardEvent(event);
         return;
@@ -561,7 +561,7 @@ void Application::process_keyboard_event(const sf::Event& event) {
     }
 }
 
-void Application::process_mouse_event(const sf::Event& event) {
+void Editor::process_mouse_event(const sf::Event& event) {
     mousePos = sf::Mouse::getPosition(window);
     mousePosf = to2f(mousePos);
     sfMousePosWorld = pixel_to_world(mousePos);
@@ -601,10 +601,10 @@ void Application::process_mouse_event(const sf::Event& event) {
     }
 }
 
-void Application::process_keyboard() {
+void Editor::process_keyboard() {
 }
 
-void Application::process_mouse() {
+void Editor::process_mouse() {
     widgets.processMouse(mousePosf);
     sf::Cursor::Type cursor_type = sf::Cursor::Arrow;
     widgets.getCurrentCursorType(cursor_type);
@@ -693,7 +693,7 @@ void Application::process_mouse() {
     mousePrevPos = mousePos;
 }
 
-void Application::process_left_click() {
+void Editor::process_left_click() {
     if (leftButtonProcessWidgetsOnPress) {
         widgets.processClick(mousePosf);
         if (widgets.isClickBlocked()) {
@@ -784,7 +784,7 @@ void Application::process_left_click() {
     }
 }
 
-void Application::process_left_release() {
+void Editor::process_left_release() {
     if (!leftButtonPressGesture) {
         return;
     }
@@ -826,14 +826,14 @@ void Application::process_left_release() {
     }
 }
 
-void Application::process_world() {
+void Editor::process_world() {
     if (!paused) {
         world->Step(timeStep, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
         game_objects.transformFromRigidbody();
     }
 }
 
-void Application::render() {
+void Editor::render() {
     window.clear(sf::Color(0, 0, 0));
     window_view.setCenter(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
     window_view.setSize(window.getSize().x, window.getSize().y);
@@ -843,7 +843,7 @@ void Application::render() {
     window.display();
 }
 
-void Application::render_world() {
+void Editor::render_world() {
     world_texture.clear(sf::Color(0, 0, 0));
     world_view.setCenter(viewCenterX, viewCenterY);
     world_view.setSize(world_texture.getSize().x / zoomFactor, -1.0f * world_texture.getSize().y / zoomFactor);
@@ -880,7 +880,7 @@ void Application::render_world() {
     window.draw(selection_sprite, &selection_shader);
 }
 
-void Application::render_ui() {
+void Editor::render_ui() {
     ui_texture.clear(sf::Color(0, 0, 0, 0));
     ui_view.setCenter(ui_texture.getSize().x / 2.0f, ui_texture.getSize().y / 2.0f);
     ui_view.setSize(ui_texture.getSize().x, ui_texture.getSize().y);
@@ -1018,12 +1018,12 @@ void Application::render_ui() {
     window.draw(ui_sprite);
 }
 
-void Application::maximize_window() const {
+void Editor::maximize_window() const {
     sf::WindowHandle windowHandle = window.getSystemHandle();
     ShowWindow(windowHandle, SW_MAXIMIZE);
 }
 
-std::string Application::serialize() const {
+std::string Editor::serialize() const {
     LoggerTag tag_serialize("serialize");
     logger << __FUNCTION__"\n";
     LoggerIndent serialize_indent;
@@ -1083,7 +1083,7 @@ std::string Application::serialize() const {
     return tw.toStr();
 }
 
-void Application::deserialize(const std::string& str, bool set_camera) {
+void Editor::deserialize(const std::string& str, bool set_camera) {
     ptrdiff_t active_object_id = -1;
     if (active_object) {
         active_object_id = active_object->id;
@@ -1158,19 +1158,19 @@ void Application::deserialize(const std::string& str, bool set_camera) {
     }
 }
 
-void Application::save_to_file(const std::string& filename) const {
+void Editor::save_to_file(const std::string& filename) const {
     LoggerTag tag_saveload("saveload");
     std::string str = serialize();
     utils::str_to_file(str, filename);
     logger << "Saved to " << filename << "\n";
 }
 
-void Application::load_action(const std::string& filename) {
+void Editor::load_action(const std::string& filename) {
     load_request.requested = true;
     load_request.filename = filename;
 }
 
-void Application::load_from_file(const std::string& filename) {
+void Editor::load_from_file(const std::string& filename) {
     LoggerTag tag_saveload("saveload");
     try {
         std::string str = utils::file_to_str(filename);
@@ -1181,13 +1181,13 @@ void Application::load_from_file(const std::string& filename) {
     }
 }
 
-void Application::quicksave() {
+void Editor::quicksave() {
     LoggerTag tag_saveload("saveload");
     quicksave_str = serialize();
     logger << "Quicksave\n";
 }
 
-void Application::quickload() {
+void Editor::quickload() {
     LoggerTag tag_saveload("saveload");
     if (quicksave_str.size() > 0) {
         deserialize(quicksave_str, true);
@@ -1197,7 +1197,7 @@ void Application::quickload() {
     }
 }
 
-void Application::setActiveObject(GameObject* object) {
+void Editor::setActiveObject(GameObject* object) {
     active_object = object;
     if (selected_tool == &edit_tool) {
         if (object) {
@@ -1208,7 +1208,7 @@ void Application::setActiveObject(GameObject* object) {
     }
 }
 
-Tool* Application::try_select_tool_by_index(size_t index) {
+Tool* Editor::try_select_tool_by_index(size_t index) {
     if (tools_in_tool_panel.size() > index) {
         Tool* tool = tools_in_tool_panel[index];
         try_select_tool(tool);
@@ -1216,7 +1216,7 @@ Tool* Application::try_select_tool_by_index(size_t index) {
     return nullptr;
 }
 
-Tool* Application::try_select_tool(Tool* tool) {
+Tool* Editor::try_select_tool(Tool* tool) {
     if (tool == selected_tool) {
         return tool;
     }
@@ -1234,7 +1234,7 @@ Tool* Application::try_select_tool(Tool* tool) {
     return tool;
 }
 
-void Application::select_create_type(int type) {
+void Editor::select_create_type(int type) {
     create_tool.type = static_cast<CreateTool::ObjectType>(type);
     for (size_t j = 0; j < create_tool.create_buttons.size(); j++) {
         create_tool.create_buttons[j]->setFillColor(sf::Color(128, 128, 128));
@@ -1242,52 +1242,52 @@ void Application::select_create_type(int type) {
     create_tool.create_buttons[type]->setFillColor(sf::Color(0, 175, 255));
 }
 
-void Application::toggle_pause() {
+void Editor::toggle_pause() {
     paused = !paused;
     paused_rect_widget->setVisible(paused);
 }
 
-void Application::load_font(sf::Font& font, const std::string& filename, bool smooth) {
+void Editor::load_font(sf::Font& font, const std::string& filename, bool smooth) {
     if (!font.loadFromFile(filename)) {
         throw std::runtime_error("Font loading error (" + filename + ")");
     }
     font.setSmooth(smooth);
 }
 
-sf::Vector2f Application::screen_to_world(const sf::Vector2f& screen_pos) const {
+sf::Vector2f Editor::screen_to_world(const sf::Vector2f& screen_pos) const {
     sf::Transform combined = world_view.getInverseTransform() * ui_view.getTransform();
     sf::Vector2f result = combined.transformPoint(screen_pos);
     return result;
 }
 
-sf::Vector2f Application::pixel_to_world(const sf::Vector2i& screen_pos) const {
+sf::Vector2f Editor::pixel_to_world(const sf::Vector2i& screen_pos) const {
     return screen_to_world(to2f(screen_pos) + sf::Vector2f(0.5f, 0.5f));
 }
 
-sf::Vector2f Application::world_to_screen(const sf::Vector2f& world_pos) const {
+sf::Vector2f Editor::world_to_screen(const sf::Vector2f& world_pos) const {
     sf::Transform combined = ui_view.getInverseTransform() * world_view.getTransform();
     sf::Vector2f result = combined.transformPoint(world_pos);
     return result;
 }
 
-sf::Vector2f Application::world_to_screen(const b2Vec2& world_pos) const {
+sf::Vector2f Editor::world_to_screen(const b2Vec2& world_pos) const {
     return world_to_screen(tosf(world_pos));
 }
 
-sf::Vector2i Application::world_to_pixel(const sf::Vector2f& world_pos) const {
+sf::Vector2i Editor::world_to_pixel(const sf::Vector2f& world_pos) const {
     return to2i(world_to_screen(world_pos));
 }
 
-sf::Vector2i Application::world_to_pixel(const b2Vec2& world_pos) const {
+sf::Vector2i Editor::world_to_pixel(const b2Vec2& world_pos) const {
     return to2i(world_to_screen(tosf(world_pos)));
 }
 
-sf::Vector2f Application::world_dir_to_screenf(const b2Vec2& world_dir) const {
+sf::Vector2f Editor::world_dir_to_screenf(const b2Vec2& world_dir) const {
     //TODO: calculate new direction using an actual sf::View
     return sf::Vector2f(world_dir.x, -world_dir.y);
 }
 
-ptrdiff_t Application::mouse_get_chain_edge(const b2Fixture* fixture) const {
+ptrdiff_t Editor::mouse_get_chain_edge(const b2Fixture* fixture) const {
     const b2ChainShape* shape = dynamic_cast<const b2ChainShape*>(fixture->GetShape());
     const b2Body* body = fixture->GetBody();
     for (size_t i = 0; i < shape->m_count - 1; i++) {
@@ -1315,7 +1315,7 @@ ptrdiff_t Application::mouse_get_chain_edge(const b2Fixture* fixture) const {
     return -1;
 }
 
-b2Fixture* Application::get_fixture_at(const sf::Vector2f& screen_pos) const {
+b2Fixture* Editor::get_fixture_at(const sf::Vector2f& screen_pos) const {
     b2Vec2 world_pos = tob2(screen_to_world(screen_pos));
     b2Vec2 world_pos_next = tob2(screen_to_world(screen_pos + sf::Vector2f(1.0f, 1.0f)));
     b2Vec2 midpoint = 0.5f * (world_pos + world_pos_next);
@@ -1337,7 +1337,7 @@ b2Fixture* Application::get_fixture_at(const sf::Vector2f& screen_pos) const {
     return nullptr;
 }
 
-GameObject* Application::get_object_at(const sf::Vector2f& screen_pos) const {
+GameObject* Editor::get_object_at(const sf::Vector2f& screen_pos) const {
     GameObject* result = nullptr;
     b2Fixture* fixture = get_fixture_at(mousePosf);
     if (fixture) {
@@ -1347,7 +1347,7 @@ GameObject* Application::get_object_at(const sf::Vector2f& screen_pos) const {
     return result;
 }
 
-ptrdiff_t Application::mouse_get_object_vertex() const {
+ptrdiff_t Editor::mouse_get_object_vertex() const {
     if (!active_object) {
         return -1;
     }
@@ -1369,7 +1369,7 @@ ptrdiff_t Application::mouse_get_object_vertex() const {
     return -1;
 }
 
-ptrdiff_t Application::mouse_get_object_edge() const {
+ptrdiff_t Editor::mouse_get_object_edge() const {
     if (!active_object) {
         return -1;
     }
@@ -1398,7 +1398,7 @@ ptrdiff_t Application::mouse_get_object_edge() const {
     return -1;
 }
 
-ptrdiff_t Application::mouse_get_edge_vertex() const {
+ptrdiff_t Editor::mouse_get_edge_vertex() const {
     if (!active_object) {
         return -1;
     }
@@ -1418,7 +1418,7 @@ ptrdiff_t Application::mouse_get_edge_vertex() const {
     }
 }
 
-void Application::select_vertices_in_rect(const RectangleSelect& rectangle_select) {
+void Editor::select_vertices_in_rect(const RectangleSelect& rectangle_select) {
     sf::Vector2f mpos = sfMousePosWorld;
     sf::Vector2f origin = rectangle_select.select_origin;
     float left = std::min(mpos.x, origin.x);
@@ -1435,7 +1435,7 @@ void Application::select_vertices_in_rect(const RectangleSelect& rectangle_selec
     }
 }
 
-void Application::select_objects_in_rect(const RectangleSelect& rectangle_select) {
+void Editor::select_objects_in_rect(const RectangleSelect& rectangle_select) {
     select_tool.clearRectSelected();
     b2AABB aabb;
     float lower_x = std::min(rectangle_select.select_origin.x, sfMousePosWorld.x);
@@ -1454,14 +1454,14 @@ void Application::select_objects_in_rect(const RectangleSelect& rectangle_select
     }
 }
 
-void Application::render_rectangle_select(sf::RenderTarget& target, RectangleSelect& rectangle_select) {
+void Editor::render_rectangle_select(sf::RenderTarget& target, RectangleSelect& rectangle_select) {
     sf::Vector2f pos = world_to_screen(rectangle_select.select_origin);
     rectangle_select.select_rect.setPosition(pos);
     rectangle_select.select_rect.setSize(mousePosf - pos);
     target.draw(rectangle_select.select_rect);
 }
 
-void Application::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
+void Editor::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
     b2Vec2 midpoint = 0.5f * (v1 + v2);
     norm_v1 = world_to_screen(midpoint);
     sf::Vector2f edge_dir = utils::normalize(world_dir_to_screenf(v2 - v1));
@@ -1469,7 +1469,7 @@ void Application::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vect
     norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
 }
 
-void Application::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
+void Editor::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
     sf::Vector2f v1f = to2f(v1);
     sf::Vector2f v2f = to2f(v2);
     sf::Vector2f midpoint = (v1f + v2f) / 2.0f;
@@ -1479,7 +1479,7 @@ void Application::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& 
     norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
 }
 
-bool Application::is_parent_selected(const GameObject* object) const {
+bool Editor::is_parent_selected(const GameObject* object) const {
     CompoundVector<GameObject*> parents = object->getParentChain();
     for (size_t i = 0; i < parents.size(); i++) {
         auto it = select_tool.getSelectedObjects().find(parents[i]);
@@ -1490,7 +1490,7 @@ bool Application::is_parent_selected(const GameObject* object) const {
     return false;
 }
 
-void Application::grab_selected() {
+void Editor::grab_selected() {
     move_tool.orig_cursor_pos = b2MousePosWorld;
     move_tool.moving_objects = CompoundVector<GameObject*>();
     for (GameObject* obj : select_tool.getSelectedObjects()) {
@@ -1507,7 +1507,7 @@ void Application::grab_selected() {
     }
 }
 
-void Application::rotate_selected() {
+void Editor::rotate_selected() {
     rotate_tool.orig_cursor_pos = b2MousePosWorld;
     rotate_tool.rotating_objects = CompoundVector<GameObject*>();
     for (GameObject* obj : select_tool.getSelectedObjects()) {
@@ -1531,7 +1531,7 @@ void Application::rotate_selected() {
     rotate_tool.orig_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
 }
 
-void Application::delete_object(GameObject* object, bool remove_children) {
+void Editor::delete_object(GameObject* object, bool remove_children) {
     if (!object) {
         return;
     }
@@ -1542,7 +1542,7 @@ void Application::delete_object(GameObject* object, bool remove_children) {
     game_objects.remove(object, remove_children);
 }
 
-void Application::check_debugbreak() {
+void Editor::check_debugbreak() {
     if (debug_break) {
         __debugbreak();
         debug_break = false;

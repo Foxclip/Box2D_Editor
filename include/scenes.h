@@ -2,7 +2,7 @@
 
 #include "editor.h"
 
-void scene1(Application& app) {
+void scene1(Editor& app) {
     std::vector<b2Vec2> ground_vertices = {
         b2Vec2(25.0f, 8.0f),
         b2Vec2(15.0f, 2.0f),
@@ -38,7 +38,7 @@ void scene1(Application& app) {
     app.setCameraZoom(30.0f);
 }
 
-void single_box(Application& app) {
+void single_box(Editor& app) {
     GameObject* box0 = app.create_box(
         "box0",
         b2Vec2(0.0f, 0.0f),
@@ -50,7 +50,7 @@ void single_box(Application& app) {
     app.setCameraZoom(200.0f);
 }
 
-void single_ball(Application& app) {
+void single_ball(Editor& app) {
     GameObject* ball = app.create_ball(
         "ball0",
         b2Vec2(0.0f, 0.0f),
@@ -62,7 +62,7 @@ void single_ball(Application& app) {
     app.setCameraZoom(200.0f);
 }
 
-void ground_transform(Application& app) {
+void ground_transform(Editor& app) {
     std::vector<b2Vec2> ground_vertices = {
         b2Vec2(25.0f, 8.0f),
         b2Vec2(15.0f, 2.0f),
@@ -82,7 +82,7 @@ void ground_transform(Application& app) {
     app.setCameraZoom(30.0f);
 }
 
-void single_car(Application& app) {
+void single_car(Editor& app) {
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
     std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
     GameObject* car = app.create_car("car0", b2Vec2(0.0f, 0.0f), lengths, wheels, sf::Color(255, 0, 0));
@@ -94,7 +94,7 @@ void single_car(Application& app) {
     app.setCameraZoom(50.0f);
 }
 
-void multiple_chains(Application& app) {
+void multiple_chains(Editor& app) {
     std::vector<b2Vec2> ground_vertices = {
         b2Vec2(25.0f, 8.0f),
         b2Vec2(15.0f, 2.0f),
@@ -121,7 +121,7 @@ void multiple_chains(Application& app) {
     app.setCameraZoom(30.0f);
 }
 
-void polygon(Application& app) {
+void polygon(Editor& app) {
     std::vector<float> lengths = { 5.0f, 5.0f, 5.0f, 5.0f };
     std::vector<float> wheels = { 0.0f, 0.0f, 0.0f, 0.0f };
     GameObject* car = app.create_car("polygon0", b2Vec2(0.0f, 0.0f), lengths, wheels, sf::Color(255, 0, 0));
@@ -133,7 +133,7 @@ void polygon(Application& app) {
     app.setCameraZoom(50.0f);
 }
 
-void box_parent(Application& app) {
+void box_parent(Editor& app) {
     GameObject* parent = app.create_box(
         "parent",
         b2Vec2(0.0f, 0.0f),
@@ -163,7 +163,7 @@ void box_parent(Application& app) {
     app.setCameraZoom(200.0f);
 }
 
-void convex_polygon(Application& app) {
+void convex_polygon(Editor& app) {
     std::vector<b2Vec2> vertices;
     const size_t VERTEX_COUNT = 50;
     for (size_t i = 0; i < VERTEX_COUNT; i++) {
@@ -180,7 +180,7 @@ void convex_polygon(Application& app) {
     app.setCameraZoom(50.0f);
 }
 
-void duplication(Application& app) {
+void duplication(Editor& app) {
     app.load("level.txt");
     GameObjectList& objects = app.getObjectList();
     GameObject* car = objects.getByName("car0");
@@ -190,7 +190,7 @@ void duplication(Application& app) {
     logger << "Car copy pos: " << car_copy->getPosition() << "\n";
 }
 
-void parent_loop(Application& app) {
+void parent_loop(Editor& app) {
     GameObject* box0 = app.create_box(
         "box0",
         b2Vec2(0.0f, 0.0f),

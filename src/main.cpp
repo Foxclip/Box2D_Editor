@@ -14,7 +14,7 @@ void run_tests() {
 #endif
 
 void execute_app() {
-    Application app;
+    Editor app;
     try {
         app.init();
         //scene1(app);

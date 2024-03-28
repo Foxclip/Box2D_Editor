@@ -3,7 +3,7 @@
 #include <functional>
 #include "widgets/widgets.h"
 
-class Application;
+class Editor;
 class EditWindow;
 
 class EditWindowParameter {
@@ -14,7 +14,7 @@ public:
 	virtual void getValue() const = 0;
 
 protected:
-	Application& app;
+	Editor& app;
 	ContainerWidget* widget = nullptr;
 
 	ContainerWidget* createParameterWidget(
@@ -81,12 +81,12 @@ private:
 
 class EditWindow : public ContainerWidget {
 public:
-	EditWindow(WidgetList& widget_list, Application& p_app);
+	EditWindow(WidgetList& widget_list, Editor& p_app);
 	void updateParameters();
 
 private:
 	friend class EditWindowParameter;
-	Application& app;
+	Editor& app;
 	CompoundVectorUptr<EditWindowParameter> parameters;
 
 	void createParameters();

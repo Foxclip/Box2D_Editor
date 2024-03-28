@@ -2,12 +2,12 @@
 
 #include "widgets/widgets.h"
 
-class Application;
+class Editor;
 
 class CreatePanel : public ContainerWidget {
 public:
-	CreatePanel(WidgetList& widget_list, Application& p_app);
+	CreatePanel(WidgetList& widget_list, Editor& p_app);
 
 private:
-	Application& app;
+	Editor& app;
 };

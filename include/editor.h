@@ -50,7 +50,7 @@ private:
 	int fps = 0;
 };
 
-class Application {
+class Editor {
 
 public:
 	void init();

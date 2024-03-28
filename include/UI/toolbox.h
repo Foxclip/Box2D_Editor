@@ -2,12 +2,12 @@
 
 #include "widgets/widgets.h"
 
-class Application;
+class Editor;
 
 class Toolbox : public ContainerWidget {
 public:
-	Toolbox(WidgetList& widget_list, Application& p_app);
+	Toolbox(WidgetList& widget_list, Editor& p_app);
 
 private:
-	Application& app;
+	Editor& app;
 };

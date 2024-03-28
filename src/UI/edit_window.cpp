@@ -1,7 +1,7 @@
 #include "UI/edit_window.h"
 #include "editor.h"
 
-EditWindow::EditWindow(WidgetList& widget_list, Application& p_app) : ContainerWidget(widget_list), app(p_app) {
+EditWindow::EditWindow(WidgetList& widget_list, Editor& p_app) : ContainerWidget(widget_list), app(p_app) {
     setVisible(false);
     setSize(sf::Vector2f(100.0f, 200.0f));
     setHorizontal(false);
