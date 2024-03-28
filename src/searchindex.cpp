@@ -4,8 +4,6 @@
 #include <vector>
 #include <cassert>
 
-SearchIndexTest search_index_test;
-
 class MyClass { };
 
 void test_SearchIndexUnique() {

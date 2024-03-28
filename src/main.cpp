@@ -9,6 +9,7 @@
 void run_tests() {
     CompoundVectorTest();
     LoggerTest();
+    SearchIndexTest();
 }
 #endif
 
@@ -50,8 +51,8 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: add SearchIndex test to main.cpp
     // TODO: move some parts of Editor to Application
+    // TODO: rename CompoundVector to CompVector
     // TODO: fix cutting empty text
     // TODO: blinking textbox cursor
     // TODO: remove global.h

@@ -208,6 +208,4 @@ public:
 	SearchIndexTest();
 };
 
-extern SearchIndexTest search_index_test;
-
 #endif // NDEBUG
