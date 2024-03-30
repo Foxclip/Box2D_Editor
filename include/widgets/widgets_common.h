@@ -18,7 +18,7 @@ namespace fw {
 
 #else
 
-#define wAssert(value)
+#define wAssert(value, ...)
 
 #endif // !NDEBUG
 

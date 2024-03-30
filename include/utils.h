@@ -19,7 +19,7 @@ void _print_msg(const std::string& message);
 
 #else
 
-#define mAssert(value)
+#define mAssert(value, ...)
 
 #endif // !NDEBUG
 

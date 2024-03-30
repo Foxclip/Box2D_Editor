@@ -19,7 +19,7 @@ void _loggerAssert_print_msg(bool value, const std::string& message) {
 
 #else
 
-#define loggerAssert(value)
+#define loggerAssert(value, ...)
 
 #endif // !NDEBUG
 
