@@ -103,7 +103,7 @@ namespace fw {
 		sf::Vector2f getAnchorOffset() const;
 		const sf::Vector2f& getOrigin() const;
 		virtual const sf::Vector2f& getPosition() const;
-		virtual const sf::Vector2f& getGlobalPosition() const;
+		virtual sf::Vector2f getGlobalPosition() const;
 		sf::Vector2f getTopLeft() const;
 		sf::Vector2f getTopRight() const;
 		sf::Vector2f getBottomLeft() const;

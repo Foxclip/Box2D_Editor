@@ -67,7 +67,7 @@ namespace fw {
 
     void Application::processWidgets() {
         widgets.unlock();
-        widgets.reset(sf::Vector2f(window.getSize().x, window.getSize().y), mousePosf);
+        widgets.reset(sf::Vector2f((float)window.getSize().x, (float)window.getSize().y), mousePosf);
         onProcessWidgets();
     }
 
@@ -183,7 +183,7 @@ namespace fw {
     void Application::render() {
         window.clear(sf::Color(0, 0, 0));
         window_view.setCenter(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
-        window_view.setSize(window.getSize().x, window.getSize().y);
+        window_view.setSize((float)window.getSize().x, (float)window.getSize().y);
         window.setView(window_view);
         onRender();
         widgets.render(window);

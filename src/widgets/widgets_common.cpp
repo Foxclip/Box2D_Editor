@@ -13,11 +13,11 @@ namespace fw {
 #endif // !NDEBUG
 
 	sf::Vector2i to2i(const sf::Vector2f& vec) {
-		return sf::Vector2i(vec.x, vec.y);
+		return sf::Vector2i((int)vec.x, (int)vec.y);
 	}
 
 	sf::Vector2f to2f(const sf::Vector2i& vec) {
-		return sf::Vector2f(vec.x, vec.y);
+		return sf::Vector2f((float)vec.x, (float)vec.y);
 	}
 
 	void extend_bounds(sf::FloatRect& rect1, const sf::FloatRect& rect2) {
@@ -92,7 +92,7 @@ namespace fw {
 			} else if (quantize_mode == QUANTIZE_MODE_CEIL_SUBTRACT) {
 				return ceil(x) - 1.0f;
 			} else {
-				assert(false, "Unknown QuantizeMode");
+				wAssert(false, "Unknown QuantizeMode"); return floor(x);
 			}
 		};
 		sf::Vector2f top_left = rect.getPosition();

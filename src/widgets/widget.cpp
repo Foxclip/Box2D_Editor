@@ -209,7 +209,7 @@ namespace fw {
 		return transforms.getPosition();
 	}
 
-	const sf::Vector2f& Widget::getGlobalPosition() const {
+	sf::Vector2f Widget::getGlobalPosition() const {
 		return toGlobal(sf::Vector2f());
 	}
 
@@ -498,7 +498,7 @@ namespace fw {
 			texture_bounds.width != render_texture.getSize().x
 			|| texture_bounds.height != render_texture.getSize().y;
 		if (size_changed) {
-			render_texture.create(texture_bounds.width, texture_bounds.height);
+			render_texture.create((unsigned int)texture_bounds.width, (unsigned int)texture_bounds.height);
 		}
 		sf::Transform parent_transform = getParentGlobalTransform();
 		sf::Transform combined(parent_transform);

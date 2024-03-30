@@ -88,7 +88,7 @@ namespace fw {
 			case Widget::ALIGN_BOTTOM: return BOTTOM_LEFT;
 			case Widget::ALIGN_LEFT: return TOP_LEFT;
 			case Widget::ALIGN_RIGHT: return TOP_RIGHT;
-			default: wAssert(false, "Unknown alignment: " + std::to_string(alignment));
+			default: wAssert(false, "Unknown alignment: " + std::to_string(alignment)); return Widget::TOP_LEFT;
 		}
 	}
 
@@ -98,12 +98,14 @@ namespace fw {
 				case ALIGN_TOP: return 0.0f;
 				case ALIGN_CENTER: return max_size / 2.0f;
 				case ALIGN_BOTTOM: return max_size;
+				default: return 0.0f;
 			}
 		} else {
 			switch (horizontal_alignment) {
 				case ALIGN_LEFT: return 0.0f;
 				case ALIGN_CENTER: return max_size / 2.0f;
 				case ALIGN_RIGHT: return max_size;
+				default: return 0.0f;
 			}
 		}
 	}

@@ -683,7 +683,7 @@ namespace fw {
 	}
 
 	void TextBoxWidget::updateSelection() {
-		if (selection_pos < 0 || selection_pos > getStringSize() || cursor_pos - selection_pos == 0) {
+		if (selection_pos < 0 || selection_pos > (ptrdiff_t)getStringSize() || cursor_pos - selection_pos == 0) {
 			selection_widget->setSize(sf::Vector2f());
 			selection_widget->setVisible(false);
 			return;
@@ -746,7 +746,7 @@ namespace fw {
 			case ActionType::ACTION_CUT: return "Cut";
 			case ActionType::ACTION_BACKSPACE: return "Backspace";
 			case ActionType::ACTION_TYPE: return "Type";
-			default: wAssert(false, "Unknown action_type: " + std::to_string(action_type));
+			default: wAssert(false, "Unknown action_type: " + std::to_string(action_type)); return "Unknown";
 		}
 	}
 

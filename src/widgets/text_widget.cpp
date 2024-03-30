@@ -15,7 +15,7 @@ namespace fw {
 		sf::FloatRect result;
 		if (adjust_local_bounds) {
 			sf::FloatRect local_bounds = text.getLocalBounds();
-			sf::Vector2f size(local_bounds.left + local_bounds.width, text.getCharacterSize());
+			sf::Vector2f size(local_bounds.left + local_bounds.width, (float)text.getCharacterSize());
 			result = sf::FloatRect(sf::Vector2f(), size);
 		} else {
 			result = getVisualLocalBounds();

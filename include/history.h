@@ -88,7 +88,7 @@ void History<T>::updateCurrent(const std::string& tag) {
 template<typename T>
 void History<T>::save(const std::string& tag) {
     LoggerTag tag_history("history");
-    if (current < history.size()) {
+    if (current >= 0 && current < (ptrdiff_t)history.size()) {
         history.erase(history.begin() + current + 1, history.end());
     }
     T state = get();
@@ -114,7 +114,7 @@ void History<T>::undo() {
 template<typename T>
 void History<T>::redo() {
     LoggerTag tag_history("history");
-    if (current < history.size() - 1) {
+    if (current < (ptrdiff_t)history.size() - 1) {
         current++;
         T state = history[current].value;
         set(state);
