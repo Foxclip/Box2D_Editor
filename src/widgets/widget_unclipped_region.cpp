@@ -34,7 +34,7 @@ bool WidgetUnclippedRegion::isQuantizedNonZero() const {
 }
 
 void WidgetUnclippedRegion::recalc() const {
-	CompoundVector<Widget*> parents = widget->getParentChain();
+	CompVector<Widget*> parents = widget->getParentChain();
 	parents.reverse();
 	sf::FloatRect result = widget->getVisualGlobalBounds();
 	Widget* parent = widget->parent;

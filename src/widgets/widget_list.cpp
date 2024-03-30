@@ -41,9 +41,9 @@ Widget* WidgetList::getTopWidgetUnderCursor() const {
 	return nullptr;
 }
 
-CompoundVector<Widget*> WidgetList::getWidgetsUnderCursor(bool can_block, bool& blocked) const {
+CompVector<Widget*> WidgetList::getWidgetsUnderCursor(bool can_block, bool& blocked) const {
 	blocked = false;
-	CompoundVector<Widget*> result;
+	CompVector<Widget*> result;
 	for (RenderQueueLayer layer : render_queue.getSilent() | std::views::reverse) {
 		for (Widget* widget : layer.widgets | std::views::reverse) {
 			if (widget->isMouseOver()) {
@@ -63,7 +63,7 @@ CompoundVector<Widget*> WidgetList::getWidgetsUnderCursor(bool can_block, bool& 
 
 bool WidgetList::getCurrentCursorType(sf::Cursor::Type& result) const {
 	bool blocked;
-	CompoundVector<Widget*> cursor_widgets = getWidgetsUnderCursor(true, blocked);
+	CompVector<Widget*> cursor_widgets = getWidgetsUnderCursor(true, blocked);
 	sf::Cursor::Type cursor_type = sf::Cursor::Arrow;
 	for (size_t i = 0; i < cursor_widgets.size(); i++) {
 		if (cursor_widgets[i]->getForceCustomCursor()) {
@@ -92,7 +92,7 @@ void WidgetList::unlock() {
 
 void WidgetList::processClick(const sf::Vector2f pos) {
 	assert(!isLocked());
-	CompoundVector<Widget*> widgets = getWidgetsUnderCursor(true, click_blocked);
+	CompVector<Widget*> widgets = getWidgetsUnderCursor(true, click_blocked);
 	Widget* focused = nullptr;
 	for (size_t i = 0; i < widgets.size(); i++) {
 		Widget* widget = widgets[i];

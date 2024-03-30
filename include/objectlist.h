@@ -18,13 +18,13 @@ public:
 	bool contains(GameObject* object) const;
 	ptrdiff_t getTopIndex(GameObject* object) const;
 	Joint* getJoint(size_t i) const;
-	const CompoundVector<GameObject*>& getTopVector() const;
-	const CompoundVector<GameObject*>& getAllVector() const;
+	const CompVector<GameObject*>& getTopVector() const;
+	const CompVector<GameObject*>& getAllVector() const;
 	ptrdiff_t getMaxId() const;
 	GameObject* add(std::unique_ptr<GameObject> object, bool assign_new_id);
 	Joint* addJoint(std::unique_ptr<Joint> joint);
 	GameObject* duplicate(const GameObject* object, bool with_children = false);
-	CompoundVector<GameObject*> duplicate(const CompoundVector<GameObject*>& old_objects);
+	CompVector<GameObject*> duplicate(const CompVector<GameObject*>& old_objects);
 	void transformFromRigidbody();
 	void remove(GameObject* object, bool remove_children);
 	void removeJoint(Joint* joint);
@@ -33,7 +33,7 @@ public:
 private:
 	friend class GameObject;
 	CompoundVectorUptr<GameObject> all_objects;
-	CompoundVector<GameObject*> top_objects;
+	CompVector<GameObject*> top_objects;
 	CompoundVectorUptr<Joint> joints;
 	SearchIndexUnique<size_t, GameObject> ids;
 	SearchIndexMultiple<std::string, GameObject> names;

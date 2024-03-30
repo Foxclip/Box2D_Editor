@@ -42,7 +42,7 @@ bool MoveTool::showInToolPanel() const {
 
 void MoveTool::reset() {
     orig_cursor_pos = b2Vec2(0.0f, 0.0f);
-    moving_objects = CompoundVector<GameObject*>();
+    moving_objects = CompVector<GameObject*>();
 }
 
 RotateTool::RotateTool() : Tool() {
@@ -56,7 +56,7 @@ bool RotateTool::showInToolPanel() const {
 void RotateTool::reset() {
     pivot_pos = b2Vec2(0.0f, 0.0f);
     orig_cursor_pos = b2Vec2(0.0f, 0.0f);
-    rotating_objects = CompoundVector<GameObject*>();
+    rotating_objects = CompVector<GameObject*>();
     orig_mouse_angle = 0.0f;
 }
 
@@ -114,11 +114,11 @@ size_t SelectTool::selectedCount() const {
     return selected_objects.size();
 }
 
-const CompoundVector<GameObject*>& SelectTool::getSelectedObjects() const {
+const CompVector<GameObject*>& SelectTool::getSelectedObjects() const {
     return selected_objects;
 }
 
-void SelectTool::setSelected(const CompoundVector<GameObject*> vec) {
+void SelectTool::setSelected(const CompVector<GameObject*> vec) {
     clearSelected();
     for (size_t i = 0; i < vec.size(); i++) {
         selected_objects.add(vec[i]);

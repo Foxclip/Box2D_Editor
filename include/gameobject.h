@@ -113,7 +113,7 @@ public:
 	b2Vec2 orig_pos = b2Vec2_zero;
 	float orig_angle = 0.0f;
 	bool was_enabled = true;
-	CompoundVector<Joint*> joints;
+	CompVector<Joint*> joints;
 
 	GameObject();
 	~GameObject();
@@ -132,9 +132,9 @@ public:
 	const b2Transform& getGlobalTransform() const;
 	const b2Transform& getParentGlobalTransform() const;
 	GameObject* getParent() const;
-	CompoundVector<GameObject*> getParentChain() const;
-	const CompoundVector<GameObject*>& getChildren() const;
-	CompoundVector<GameObject*> getAllChildren() const;
+	CompVector<GameObject*> getParentChain() const;
+	const CompVector<GameObject*>& getChildren() const;
+	CompVector<GameObject*> getAllChildren() const;
 	GameObject* getChild(size_t index) const;
 	b2Vec2 toGlobal(const b2Vec2& pos);
 	b2Vec2 toLocal(const b2Vec2& pos);
@@ -202,7 +202,7 @@ private:
 	friend class GameObjectList;
 	friend class GameObjectTransforms;
 	ptrdiff_t new_id = -1;
-	CompoundVector<GameObject*> children;
+	CompVector<GameObject*> children;
 	GameObjectTransforms transforms = GameObjectTransforms(this);
 
 };

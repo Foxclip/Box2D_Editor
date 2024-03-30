@@ -40,11 +40,11 @@ Joint* GameObjectList::getJoint(size_t i) const {
     return joints[i];
 }
 
-const CompoundVector<GameObject*>& GameObjectList::getTopVector() const {
+const CompVector<GameObject*>& GameObjectList::getTopVector() const {
     return top_objects;
 }
 
-const CompoundVector<GameObject*>& GameObjectList::getAllVector() const {
+const CompVector<GameObject*>& GameObjectList::getAllVector() const {
     return all_objects.getCompVector();
 }
 
@@ -101,10 +101,10 @@ Joint* GameObjectList::addJoint(std::unique_ptr<Joint> joint) {
 
 GameObject* GameObjectList::duplicate(const GameObject* object, bool with_children) {
     if (with_children) {
-        CompoundVector<GameObject*> objects = { const_cast<GameObject*>(object) };
-        CompoundVector<GameObject*> all_children = object->getAllChildren();
+        CompVector<GameObject*> objects = { const_cast<GameObject*>(object) };
+        CompVector<GameObject*> all_children = object->getAllChildren();
         objects.insert(objects.end(), all_children.begin(), all_children.end());
-        CompoundVector<GameObject*> new_objects = duplicate(objects);
+        CompVector<GameObject*> new_objects = duplicate(objects);
         GameObject* new_object = getById(object->new_id);
         return new_object;
     } else {
@@ -113,8 +113,8 @@ GameObject* GameObjectList::duplicate(const GameObject* object, bool with_childr
     }
 }
 
-CompoundVector<GameObject*> GameObjectList::duplicate(const CompoundVector<GameObject*>& old_objects) {
-    CompoundVector<GameObject*> new_objects;
+CompVector<GameObject*> GameObjectList::duplicate(const CompVector<GameObject*>& old_objects) {
+    CompVector<GameObject*> new_objects;
     std::set<Joint*> checked_joints;
     // copy objects
     for (GameObject* obj : old_objects) {
@@ -203,7 +203,7 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
         removeJoint(joint);
     }
     object->setParent(nullptr);
-    CompoundVector<GameObject*> children_copy = object->getChildren();
+    CompVector<GameObject*> children_copy = object->getChildren();
     if (remove_children) {
         for (size_t i = 0; i < children_copy.size(); i++) {
             GameObject* child = children_copy[i];

@@ -79,8 +79,8 @@ public:
 	bool getClipChildren() const;
 	RenderLayer getRenderLayer() const;
 	Widget* getParent() const;
-	CompoundVector<Widget*> getParentChain() const;
-	const CompoundVector<Widget*>& getChildren() const;
+	CompVector<Widget*> getParentChain() const;
+	const CompVector<Widget*>& getChildren() const;
 	Widget* getChild(size_t index) const;
 	Widget* find(const std::string& name) const;
 	virtual sf::FloatRect getLocalBounds() const = 0;
@@ -148,7 +148,7 @@ protected:
 	WidgetList& widget_list;
 	WidgetTransform transforms = WidgetTransform(this);
 	Widget* parent = nullptr;
-	CompoundVector<Widget*> children;
+	CompVector<Widget*> children;
 	SearchIndexMultiple<std::string, Widget> children_names;
 	RenderLayer layer = RenderLayer::BASE;
 	Anchor origin_anchor = CUSTOM;

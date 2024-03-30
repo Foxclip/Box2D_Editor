@@ -15,7 +15,7 @@ enum RenderLayer {
 
 struct RenderQueueLayer {
 	RenderLayer layer;
-	CompoundVector<Widget*> widgets;
+	CompVector<Widget*> widgets;
 	RenderQueueLayer(RenderLayer layer);
 	bool operator<(const RenderQueueLayer& other) const;
 	bool operator==(const RenderQueueLayer& other) const;

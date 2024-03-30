@@ -21,7 +21,7 @@ public:
 	Widget* getRootWidget() const;
 	Widget* getFocusedWidget() const;
 	Widget* getTopWidgetUnderCursor() const;
-	CompoundVector<Widget*> getWidgetsUnderCursor(bool can_block, bool& blocked) const;
+	CompVector<Widget*> getWidgetsUnderCursor(bool can_block, bool& blocked) const;
 	bool getCurrentCursorType(sf::Cursor::Type& result) const;
 	Widget* find(const std::string& name) const;
 	template<typename T, typename... Args>

@@ -72,9 +72,9 @@ GameObject* GameObject::getParent() const {
 	return parent;
 }
 
-CompoundVector<GameObject*> GameObject::getParentChain() const {
+CompVector<GameObject*> GameObject::getParentChain() const {
 	const GameObject* cur_obj = this;
-	CompoundVector<GameObject*> result;
+	CompVector<GameObject*> result;
 	while (cur_obj) {
 		if (cur_obj->parent) {
 			result.add(cur_obj->parent);
@@ -86,15 +86,15 @@ CompoundVector<GameObject*> GameObject::getParentChain() const {
 	return result;
 }
 
-const CompoundVector<GameObject*>& GameObject::getChildren() const {
+const CompVector<GameObject*>& GameObject::getChildren() const {
 	return children;
 }
 
-CompoundVector<GameObject*> GameObject::getAllChildren() const {
-	CompoundVector<GameObject*> result;
+CompVector<GameObject*> GameObject::getAllChildren() const {
+	CompVector<GameObject*> result;
 	result.insert(result.end(), children.begin(), children.end());
 	for (size_t i = 0; i < children.size(); i++) {
-		const CompoundVector<GameObject*>& child_children = children[i]->getAllChildren();
+		const CompVector<GameObject*>& child_children = children[i]->getAllChildren();
 		result.insert(result.end(), child_children.begin(), child_children.end());
 	}
 	return result;
@@ -143,7 +143,7 @@ void GameObject::setParent(GameObject* new_parent) {
 		if (new_parent == this) {
 			throw std::runtime_error("Cannot parent object to itself: id " + std::to_string(id));
 		}
-		CompoundVector<GameObject*> parent_chain = new_parent->getParentChain();
+		CompVector<GameObject*> parent_chain = new_parent->getParentChain();
 		if (parent_chain.contains(this)) {
 			std::string chain_str;
 			chain_str += std::to_string(id);

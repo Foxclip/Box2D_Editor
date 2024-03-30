@@ -38,7 +38,7 @@ bool Widget::isClickThrough() const {
 WidgetVisibility Widget::checkVisibility() const {
 	WidgetVisibility v;
 	sf::FloatRect global_bounds = getGlobalBounds();
-	CompoundVector<Widget*> parents = getParentChain();
+	CompVector<Widget*> parents = getParentChain();
 	v.addedToRoot = parents.contains(widget_list.root_widget);
 	v.allParentsVisible = true;
 	for (size_t i = 0; i < parents.size(); i++) {
@@ -111,9 +111,9 @@ Widget* Widget::getParent() const {
 	return parent;
 }
 
-CompoundVector<Widget*> Widget::getParentChain() const {
+CompVector<Widget*> Widget::getParentChain() const {
 	const Widget* cur_obj = this;
-	CompoundVector<Widget*> result;
+	CompVector<Widget*> result;
 	while (cur_obj) {
 		if (cur_obj->parent) {
 			result.add(cur_obj->parent);
@@ -125,7 +125,7 @@ CompoundVector<Widget*> Widget::getParentChain() const {
 	return result;
 }
 
-const CompoundVector<Widget*>& Widget::getChildren() const {
+const CompVector<Widget*>& Widget::getChildren() const {
 	return children;
 }
 
@@ -346,7 +346,7 @@ void Widget::setParentSilent(Widget* new_parent) {
 		throw std::runtime_error("Cannot parent object to itself: " + full_name);
 	}
 	if (new_parent) {
-		CompoundVector<Widget*> parent_chain = new_parent->getParentChain();
+		CompVector<Widget*> parent_chain = new_parent->getParentChain();
 		if (parent_chain.contains(this)) {
 			std::string chain_str;
 			chain_str += name;
@@ -466,7 +466,7 @@ void Widget::internalOnFocused() { }
 void Widget::internalOnFocusLost() { }
 
 std::string Widget::calcFullName() const {
-	CompoundVector<Widget*> parents = getParentChain();
+	CompVector<Widget*> parents = getParentChain();
 	std::string result;
 	for (ptrdiff_t i = parents.size() - 1; i >= 0; i--) {
 		result += parents[i]->name;

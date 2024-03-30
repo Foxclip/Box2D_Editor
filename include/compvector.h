@@ -17,7 +17,7 @@ template<Vectorlike TLeft, Vectorlike TRight>
 bool compare(const TLeft& left, const TRight& right);
 
 template<typename T, typename TCmp = std::less<T>>
-class CompoundVector {
+class CompVector {
 public:
 	using value_type = T;
 	using pointer = T*;
@@ -27,9 +27,9 @@ public:
 	using size_type = size_t;
 	using difference_type = ptrdiff_t;
 
-	CompoundVector();
-	CompoundVector(const std::initializer_list<T>& list);
-	CompoundVector(const std::vector<T>& vec);
+	CompVector();
+	CompVector(const std::initializer_list<T>& list);
+	CompVector(const std::vector<T>& vec);
 	size_t size() const;
 	bool add(const T& value);
 	bool insert(std::vector<T>::const_iterator where, const T& value);
@@ -101,7 +101,7 @@ public:
 	T* at(size_t index);
 	T* at(size_t index) const;
 	ptrdiff_t getIndex(const T* value) const;
-	const CompoundVector<T*>& getCompVector() const;
+	const CompVector<T*>& getCompVector() const;
 	const std::vector<T*>& getVector() const;
 	const std::set<T*, TCmp>& getSet() const;
 	T* operator[](size_t index);
@@ -115,7 +115,7 @@ public:
 
 private:
 	std::vector<std::unique_ptr<T>> uptrs;
-	CompoundVector<T*, TCmp> comp;
+	CompVector<T*, TCmp> comp;
 
 };
 
@@ -133,29 +133,29 @@ inline bool compare(const TLeft& left, const TRight& right) {
 }
 
 template<typename T, typename TCmp>
-inline CompoundVector<T, TCmp>::CompoundVector() { }
+inline CompVector<T, TCmp>::CompVector() { }
 
 template<typename T, typename TCmp>
-inline CompoundVector<T, TCmp>::CompoundVector(const std::initializer_list<T>& list) {
+inline CompVector<T, TCmp>::CompVector(const std::initializer_list<T>& list) {
 	for (const T& value : list) {
 		add(value);
 	}
 }
 
 template<typename T, typename TCmp>
-inline CompoundVector<T, TCmp>::CompoundVector(const std::vector<T>& vec) {
+inline CompVector<T, TCmp>::CompVector(const std::vector<T>& vec) {
 	for (const T& value : vec) {
 		add(value);
 	}
 }
 
 template<typename T, typename TCmp>
-inline size_t CompoundVector<T, TCmp>::size() const {
+inline size_t CompVector<T, TCmp>::size() const {
 	return vector.size();
 }
 
 template<typename T, typename TCmp>
-inline bool CompoundVector<T, TCmp>::add(const T& value) {
+inline bool CompVector<T, TCmp>::add(const T& value) {
 	auto inserted = set.insert(value);
 	if (inserted.second) {
 		vector.push_back(value);
@@ -165,7 +165,7 @@ inline bool CompoundVector<T, TCmp>::add(const T& value) {
 }
 
 template<typename T, typename TCmp>
-inline bool CompoundVector<T, TCmp>::insert(std::vector<T>::const_iterator where, const T& value) {
+inline bool CompVector<T, TCmp>::insert(std::vector<T>::const_iterator where, const T& value) {
 	auto inserted = set.insert(value);
 	if (inserted.second) {
 		vector.insert(where, value);
@@ -176,7 +176,7 @@ inline bool CompoundVector<T, TCmp>::insert(std::vector<T>::const_iterator where
 
 template<typename T, typename TCmp>
 template<std::incrementable TIter>
-inline size_t CompoundVector<T, TCmp>::insert(std::vector<T>::const_iterator where, TIter first, TIter last) {
+inline size_t CompVector<T, TCmp>::insert(std::vector<T>::const_iterator where, TIter first, TIter last) {
 	size_t offset = where - vector.begin();
 	TIter iter_other(first);
 	size_t inserted_count = 0;
@@ -191,7 +191,7 @@ inline size_t CompoundVector<T, TCmp>::insert(std::vector<T>::const_iterator whe
 }
 
 template<typename T, typename TCmp>
-inline ptrdiff_t CompoundVector<T, TCmp>::remove(const T& value) {
+inline ptrdiff_t CompVector<T, TCmp>::remove(const T& value) {
 	size_t removed = set.erase(value);
 	if (removed > 0) {
 		ptrdiff_t index = getIndex(value);
@@ -202,69 +202,69 @@ inline ptrdiff_t CompoundVector<T, TCmp>::remove(const T& value) {
 }
 
 template<typename T, typename TCmp>
-inline void CompoundVector<T, TCmp>::removeAt(size_t index) {
+inline void CompVector<T, TCmp>::removeAt(size_t index) {
 	T value = vector[index];
 	vector.erase(vector.begin() + index);
 	set.erase(value);
 }
 
 template<typename T, typename TCmp>
-inline void CompoundVector<T, TCmp>::reverse() {
+inline void CompVector<T, TCmp>::reverse() {
 	std::reverse(vector.begin(), vector.end());
 }
 
 template<typename T, typename TCmp>
-inline std::vector<T>::const_iterator CompoundVector<T, TCmp>::begin() const {
+inline std::vector<T>::const_iterator CompVector<T, TCmp>::begin() const {
 	return vector.begin();
 }
 
 template<typename T, typename TCmp>
-inline std::vector<T>::const_iterator CompoundVector<T, TCmp>::end() const {
+inline std::vector<T>::const_iterator CompVector<T, TCmp>::end() const {
 	return vector.end();
 }
 
 template<typename T, typename TCmp>
-inline std::vector<T>::const_reverse_iterator CompoundVector<T, TCmp>::rbegin() const {
+inline std::vector<T>::const_reverse_iterator CompVector<T, TCmp>::rbegin() const {
 	return vector.rbegin();
 }
 
 template<typename T, typename TCmp>
-inline std::vector<T>::const_reverse_iterator CompoundVector<T, TCmp>::rend() const {
+inline std::vector<T>::const_reverse_iterator CompVector<T, TCmp>::rend() const {
 	return vector.rend();
 }
 
 template<typename T, typename TCmp>
-inline T& CompoundVector<T, TCmp>::front() {
+inline T& CompVector<T, TCmp>::front() {
 	return vector.front();
 }
 
 template<typename T, typename TCmp>
-inline const T& CompoundVector<T, TCmp>::front() const {
+inline const T& CompVector<T, TCmp>::front() const {
 	return vector.front();
 }
 
 template<typename T, typename TCmp>
-inline T& CompoundVector<T, TCmp>::back() {
+inline T& CompVector<T, TCmp>::back() {
 	return vector.back();
 }
 
 template<typename T, typename TCmp>
-inline const T& CompoundVector<T, TCmp>::back() const {
+inline const T& CompVector<T, TCmp>::back() const {
 	return vector.back();
 }
 
 template<typename T, typename TCmp>
-inline T& CompoundVector<T, TCmp>::at(size_t index) {
+inline T& CompVector<T, TCmp>::at(size_t index) {
 	return vector[index];
 }
 
 template<typename T, typename TCmp>
-inline const T& CompoundVector<T, TCmp>::at(size_t index) const {
+inline const T& CompVector<T, TCmp>::at(size_t index) const {
 	return vector[index];
 }
 
 template<typename T, typename TCmp>
-inline ptrdiff_t CompoundVector<T, TCmp>::getIndex(const T& value) const {
+inline ptrdiff_t CompVector<T, TCmp>::getIndex(const T& value) const {
 	for (size_t i = 0; i < vector.size(); i++) {
 		if (vector[i] == value) {
 			return i;
@@ -274,49 +274,49 @@ inline ptrdiff_t CompoundVector<T, TCmp>::getIndex(const T& value) const {
 }
 
 template<typename T, typename TCmp>
-inline const std::vector<T>& CompoundVector<T, TCmp>::getVector() const {
+inline const std::vector<T>& CompVector<T, TCmp>::getVector() const {
 	return vector;
 }
 
 template<typename T, typename TCmp>
-inline const std::set<T, TCmp>& CompoundVector<T, TCmp>::getSet() const {
+inline const std::set<T, TCmp>& CompVector<T, TCmp>::getSet() const {
 	return set;
 }
 
 template<typename T, typename TCmp>
-inline T& CompoundVector<T, TCmp>::operator[](size_t index) {
+inline T& CompVector<T, TCmp>::operator[](size_t index) {
 	return at(index);
 }
 
 template<typename T, typename TCmp>
-inline const T& CompoundVector<T, TCmp>::operator[](size_t index) const {
+inline const T& CompVector<T, TCmp>::operator[](size_t index) const {
 	return at(index);
 }
 
 template<typename T, typename TCmp>
-inline std::set<T, TCmp>::iterator CompoundVector<T, TCmp>::find(const T& value) const {
+inline std::set<T, TCmp>::iterator CompVector<T, TCmp>::find(const T& value) const {
 	return set.find(value);
 }
 
 template<typename T, typename TCmp>
-inline bool CompoundVector<T, TCmp>::contains(const T& value) const {
+inline bool CompVector<T, TCmp>::contains(const T& value) const {
 	return set.contains(value);
 }
 
 template<typename T, typename TCmp>
-inline void CompoundVector<T, TCmp>::clear() {
+inline void CompVector<T, TCmp>::clear() {
 	vector = std::vector<T>();
 	set = std::set<T, TCmp>();
 }
 
 template<typename T, typename TCmp>
-inline CompoundVector<T, TCmp>::operator std::vector<T>() const {
+inline CompVector<T, TCmp>::operator std::vector<T>() const {
 	return vector;
 }
 
 template<typename T, typename TCmp>
 template<Vectorlike TCont>
-inline bool CompoundVector<T, TCmp>::operator==(const TCont& other) const {
+inline bool CompVector<T, TCmp>::operator==(const TCont& other) const {
 	return compare(*this, other);
 }
 
@@ -502,7 +502,7 @@ inline ptrdiff_t CompoundVectorUptr<T, TCmp>::getIndex(const T* value) const {
 }
 
 template<typename T, typename TCmp>
-inline const CompoundVector<T*>& CompoundVectorUptr<T, TCmp>::getCompVector() const {
+inline const CompVector<T*>& CompoundVectorUptr<T, TCmp>::getCompVector() const {
 	return comp;
 }
 

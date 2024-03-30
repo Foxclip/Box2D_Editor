@@ -8,12 +8,12 @@
 void CompoundVectorTest::test_CompoundVector() {
 	{
 		// empty vector
-		CompoundVector<int> vec;
+		CompVector<int> vec;
 		assert(vec.size() == 0);
 	}
 	{
 		// one value
-		CompoundVector<int> vec = { 5 };
+		CompVector<int> vec = { 5 };
 		assert(vec.size() == 1);
 		assert(vec[0] == 5);
 		assert(vec.front() == 5);
@@ -21,7 +21,7 @@ void CompoundVectorTest::test_CompoundVector() {
 	}
 	{
 		// multiple values
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		assert(vec.size() == 3);
 		assert(vec[0] == 1);
 		assert(vec[1] == 2);
@@ -31,13 +31,13 @@ void CompoundVectorTest::test_CompoundVector() {
 	}
 	{
 		// convert to vector
-		CompoundVector<int> cvec = { 1, 2, 3 };
+		CompVector<int> cvec = { 1, 2, 3 };
 		std::vector<int> vec = cvec;
 		assert(vec == std::vector<int>({ 1, 2, 3 }));
 	}
 	{
 		// compare to vector
-		CompoundVector<int> cvec = { 1, 2, 3 };
+		CompVector<int> cvec = { 1, 2, 3 };
 		std::vector<int> vec = { 1, 2, 3 };
 		assert(cvec == vec);
 		assert(vec == cvec);
@@ -45,7 +45,7 @@ void CompoundVectorTest::test_CompoundVector() {
 	{
 		// from vector
 		std::vector<int> vec = { 1, 2, 3 };
-		CompoundVector<int> cvec(vec);
+		CompVector<int> cvec(vec);
 		assert(vec == std::vector<int>({ 1, 2, 3 }));
 	}
 	{
@@ -53,13 +53,13 @@ void CompoundVectorTest::test_CompoundVector() {
 		auto cmp = [](int left, int right) {
 			return left > right;
 		};
-		CompoundVector<int, decltype(cmp)> vec = { 1, 2, 3 };
+		CompVector<int, decltype(cmp)> vec = { 1, 2, 3 };
 		std::vector<int> set_vec = std::vector<int>(vec.getSet().begin(), vec.getSet().end());
 		assert(set_vec == std::vector<int>({ 3, 2, 1 }));
 	}
 	{
 		// add method
-		CompoundVector<int> vec;
+		CompVector<int> vec;
 		vec.add(1);
 		vec.add(2);
 		vec.add(3);
@@ -67,7 +67,7 @@ void CompoundVectorTest::test_CompoundVector() {
 	}
 	{
 		// insert method (value)
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		vec.insert(vec.begin() + 2, 5);
 		assert(vec == std::vector<int>({ 1, 2, 5, 3 }));
 		vec.insert(vec.begin() + 2, 5);
@@ -75,7 +75,7 @@ void CompoundVectorTest::test_CompoundVector() {
 	}
 	{
 		// insert method (range)
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		std::set<int> set1 = { 5, 6, 7 };
 		vec.insert(vec.begin() + 2, set1.begin(), set1.end());
 		assert(vec == std::vector<int>({ 1, 2, 5, 6, 7, 3 }));
@@ -87,25 +87,25 @@ void CompoundVectorTest::test_CompoundVector() {
 	}
 	{
 		// remove method
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		vec.remove(2);
 		assert(vec == std::vector<int>({ 1, 3 }));
 	}
 	{
 		// removeAt method
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		vec.removeAt(1);
 		assert(vec == std::vector<int>({ 1, 3 }));
 	}
 	{
 		// reverse method
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		vec.reverse();
 		assert(vec == std::vector<int>({ 3, 2, 1 }));
 	}
 	{
 		// iterators
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		{
 			auto it = vec.begin();
 			assert(*it == 1);
@@ -145,71 +145,71 @@ void CompoundVectorTest::test_CompoundVector() {
 	}
 	{
 		// at method
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		assert(vec.at(1) == 2);
 	}
 	{
 		// getIndex method
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		assert(vec.getIndex(2) == 1);
 	}
 	{
 		// getVector method
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		assert(vec.getVector() == std::vector<int>({ 1, 2, 3 }));
 	}
 	{
 		// getSet method
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		assert(vec.getSet() == std::set<int>({ 1, 2, 3 }));
 	}
 	{
 		// operator []
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		assert(vec[1] == 2);
 	}
 	{
 		// find method
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		assert(*vec.find(2) == 2);
 		assert(vec.find(5) == vec.getSet().end());
 	}
 	{
 		// contains method
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		assert(vec.contains(2));
 		assert(!vec.contains(5));
 	}
 	{
 		// clear method
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		vec.clear();
 		assert(vec.size() == 0);
 	}
 	{
 		// operator ==
-		CompoundVector<int> vec = { 1, 2, 3 };
-		assert(vec == CompoundVector<int>({ 1, 2, 3 }));
-		assert(vec != CompoundVector<int>({ 1, 2 }));
-		assert(vec != CompoundVector<int>({ 1, 2, 3, 4 }));
-		assert(vec != CompoundVector<int>({ 1, 5, 3 }));
+		CompVector<int> vec = { 1, 2, 3 };
+		assert(vec == CompVector<int>({ 1, 2, 3 }));
+		assert(vec != CompVector<int>({ 1, 2 }));
+		assert(vec != CompVector<int>({ 1, 2, 3, 4 }));
+		assert(vec != CompVector<int>({ 1, 5, 3 }));
 	}
 	{
 		// no duplicates
-		CompoundVector<int> vec = { 1, 2, 2, 3 };
-		assert(vec == CompoundVector<int>({ 1, 2, 3 }));
+		CompVector<int> vec = { 1, 2, 2, 3 };
+		assert(vec == CompVector<int>({ 1, 2, 3 }));
 	}
 	{
 		// removing missing
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		vec.remove(5);
-		assert(vec == CompoundVector<int>({ 1, 2, 3 }));
+		assert(vec == CompVector<int>({ 1, 2, 3 }));
 	}
 	{
 		// value modification
-		CompoundVector<int> vec = { 1, 2, 3 };
+		CompVector<int> vec = { 1, 2, 3 };
 		vec[1] = 5;
-		assert(vec == CompoundVector<int>({ 1, 5, 3 }));
+		assert(vec == CompVector<int>({ 1, 5, 3 }));
 	}
 }
 

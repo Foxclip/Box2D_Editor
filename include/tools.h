@@ -54,13 +54,13 @@ class SelectTool : public Tool {
 public:
 	GameObject* hover_object = nullptr;
 	RectangleSelect rectangle_select;
-	CompoundVector<GameObject*> objects_in_rect;
+	CompVector<GameObject*> objects_in_rect;
 
 	SelectTool();
 	bool showInToolPanel() const override;
 	size_t selectedCount() const;
-	const CompoundVector<GameObject*>& getSelectedObjects() const;
-	void setSelected(const CompoundVector<GameObject*> vec);
+	const CompVector<GameObject*>& getSelectedObjects() const;
+	void setSelected(const CompVector<GameObject*> vec);
 	void selectObject(GameObject* object, bool with_children = false);
 	void deselectObject(GameObject* object, bool with_children = false);
 	void toggleSelect(GameObject* object, bool with_children = false);
@@ -72,7 +72,7 @@ public:
 	void reset() override;
 
 private:
-	CompoundVector<GameObject*> selected_objects;
+	CompVector<GameObject*> selected_objects;
 
 };
 
@@ -91,7 +91,7 @@ private:
 class MoveTool : public Tool {
 public:
 	b2Vec2 orig_cursor_pos = b2Vec2(0.0f, 0.0f);
-	CompoundVector<GameObject*> moving_objects;
+	CompVector<GameObject*> moving_objects;
 
 	MoveTool();
 	bool showInToolPanel() const override;
@@ -104,7 +104,7 @@ class RotateTool : public Tool {
 public:
 	b2Vec2 pivot_pos = b2Vec2(0.0f, 0.0f);
 	b2Vec2 orig_cursor_pos = b2Vec2(0.0f, 0.0f);
-	CompoundVector<GameObject*> rotating_objects;
+	CompVector<GameObject*> rotating_objects;
 	float orig_mouse_angle = 0.0f;
 
 	RotateTool();
@@ -155,7 +155,7 @@ public:
 		mode_count,
 	};
 	ObjectType type = BOX;
-	CompoundVector<Widget*> create_buttons;
+	CompVector<Widget*> create_buttons;
 	ContainerWidget* create_panel_widget = nullptr;
 
 	CreateTool();

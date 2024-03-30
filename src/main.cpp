@@ -51,9 +51,10 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: move some parts of Editor to Application
     // TODO: rename CompoundVector to CompVector
     // TODO: fix cutting empty text
+    // TODO: separate Simulation and Application,
+    // interface in Application, physics and object management in Simulation
     // TODO: blinking textbox cursor
     // TODO: remove global.h
     // TODO: don't fill window with black color in Application::Render
@@ -65,8 +66,6 @@ int main() {
     // TODO: object list window (outliner)
     // TODO: render polygon indices
     // TODO: make widgets a separate library
-    // TODO: separate Simulation and Application,
-    // interface in Application, physics and object management in Simulation
     // TODO: delay editing polygons with many vertices
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars
