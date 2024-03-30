@@ -1,7 +1,8 @@
 #include "UI/edit_window.h"
 #include "editor.h"
 
-EditWindow::EditWindow(WidgetList& widget_list, Editor& p_app) : ContainerWidget(widget_list), app(p_app) {
+EditWindow::EditWindow(fw::WidgetList& widget_list, Editor& p_app)
+    : fw::ContainerWidget(widget_list), app(p_app) {
     setVisible(false);
     setSize(sf::Vector2f(100.0f, 200.0f));
     setHorizontal(false);
@@ -124,18 +125,18 @@ void EditWindow::createParameters() {
 EditWindowParameter::EditWindowParameter(EditWindow& p_edit_window)
     : edit_window(p_edit_window), app(p_edit_window.app) { }
 
-ContainerWidget* EditWindowParameter::createParameterWidget(const std::string& name, const std::string& text) {
-    ContainerWidget* parameter_widget = app.widgets.createWidget<ContainerWidget>();
+fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::string& name, const std::string& text) {
+    fw::ContainerWidget* parameter_widget = app.widgets.createWidget<fw::ContainerWidget>();
     parameter_widget->setFillColor(sf::Color::Transparent);
-    parameter_widget->setVerticalAlignment(Widget::ALIGN_CENTER);
+    parameter_widget->setVerticalAlignment(fw::Widget::ALIGN_CENTER);
     parameter_widget->setParent(&edit_window);
     parameter_widget->setName(name);
-    TextWidget* parameter_text_widget = app.widgets.createWidget<TextWidget>();
+    fw::TextWidget* parameter_text_widget = app.widgets.createWidget<fw::TextWidget>();
     parameter_text_widget->setFont(app.ui_font);
     parameter_text_widget->setCharacterSize(16);
     parameter_text_widget->setString(text);
     parameter_text_widget->setParent(parameter_widget);
-    RectangleWidget* spacing_widget = app.widgets.createWidget<RectangleWidget>();
+    fw::RectangleWidget* spacing_widget = app.widgets.createWidget<fw::RectangleWidget>();
     spacing_widget->setSize(sf::Vector2f(10.0f, 1.0f));
     spacing_widget->setFillColor(sf::Color::Transparent);
     spacing_widget->setParent(parameter_widget);
@@ -143,16 +144,16 @@ ContainerWidget* EditWindowParameter::createParameterWidget(const std::string& n
     return parameter_widget;
 }
 
-TextBoxWidget* EditWindowParameter::createTextBoxWidget() {
-    TextBoxWidget* textbox_widget = app.widgets.createWidget<TextBoxWidget>();
+fw::TextBoxWidget* EditWindowParameter::createTextBoxWidget() {
+    fw::TextBoxWidget* textbox_widget = app.widgets.createWidget<fw::TextBoxWidget>();
     textbox_widget->setFont(app.textbox_font);
     textbox_widget->setSize(100.0f, 20.0f);
     textbox_widget->setCharacterSize(12);
     return textbox_widget;
 }
 
-CheckboxWidget* EditWindowParameter::createCheckboxWidget() {
-    return app.widgets.createWidget<CheckboxWidget>();
+fw::CheckboxWidget* EditWindowParameter::createCheckboxWidget() {
+    return app.widgets.createWidget<fw::CheckboxWidget>();
 }
 
 TextParameter::TextParameter(
@@ -214,7 +215,7 @@ FloatParameter::FloatParameter(
     this->set_value = set_value;
     this->widget = createParameterWidget(name, text);
     this->textbox_widget = createTextBoxWidget();
-    this->textbox_widget->setType(TextBoxWidget::TextBoxType::FLOAT);
+    this->textbox_widget->setType(fw::TextBoxWidget::TextBoxType::FLOAT);
     this->textbox_widget->OnConfirm = [&](const sf::String& str) {
         if (textbox_widget->isValidValue()) {
             float new_value = std::stof(str.toAnsiString());

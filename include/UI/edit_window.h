@@ -15,14 +15,14 @@ public:
 
 protected:
 	Editor& app;
-	ContainerWidget* widget = nullptr;
+	fw::ContainerWidget* widget = nullptr;
 
-	ContainerWidget* createParameterWidget(
+	fw::ContainerWidget* createParameterWidget(
 		const std::string& name,
 		const std::string& text
 	);
-	TextBoxWidget* createTextBoxWidget();
-	CheckboxWidget* createCheckboxWidget();
+	fw::TextBoxWidget* createTextBoxWidget();
+	fw::CheckboxWidget* createCheckboxWidget();
 
 private:
 	EditWindow& edit_window;
@@ -42,7 +42,7 @@ public:
 private:
 	std::function<sf::String(void)> get_value;
 	std::function<void(const sf::String&)> set_value;
-	TextBoxWidget* textbox_widget = nullptr;
+	fw::TextBoxWidget* textbox_widget = nullptr;
 };
 
 class BoolParameter : public EditWindowParameter {
@@ -59,7 +59,7 @@ public:
 private:
 	std::function<bool(void)> get_value;
 	std::function<void(bool)> set_value;
-	CheckboxWidget* checkbox_widget = nullptr;
+	fw::CheckboxWidget* checkbox_widget = nullptr;
 };
 
 class FloatParameter : public EditWindowParameter {
@@ -76,12 +76,12 @@ public:
 private:
 	std::function<float(void)> get_value;
 	std::function<void(float)> set_value;
-	TextBoxWidget* textbox_widget = nullptr;
+	fw::TextBoxWidget* textbox_widget = nullptr;
 };
 
-class EditWindow : public ContainerWidget {
+class EditWindow : public fw::ContainerWidget {
 public:
-	EditWindow(WidgetList& widget_list, Editor& p_app);
+	EditWindow(fw::WidgetList& widget_list, Editor& p_app);
 	void updateParameters();
 
 private:

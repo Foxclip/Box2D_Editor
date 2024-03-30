@@ -52,6 +52,7 @@ int main() {
     execute_app();
 
     // TODO: fix all warnings
+    // TODO: move maximizeWindow to Application
     // TODO: separate Simulation and Application,
     // interface in Application, physics and object management in Simulation
     // TODO: blinking textbox cursor

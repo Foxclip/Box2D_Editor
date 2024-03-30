@@ -4,9 +4,9 @@
 
 class Editor;
 
-class Toolbox : public ContainerWidget {
+class Toolbox : public fw::ContainerWidget {
 public:
-	Toolbox(WidgetList& widget_list, Editor& p_app);
+	Toolbox(fw::WidgetList& widget_list, Editor& p_app);
 
 private:
 	Editor& app;

@@ -24,14 +24,6 @@ namespace utils {
 		return sf::Vector2f(vec.x, vec.y);
 	}
 
-	sf::Vector2i to2i(const sf::Vector2f& vec) {
-		return sf::Vector2i(vec.x, vec.y);
-	}
-
-	sf::Vector2f to2f(const sf::Vector2i& vec) {
-		return sf::Vector2f(vec.x, vec.y);
-	}
-
 	int get_max_offset(const sf::Vector2i& v1, const sf::Vector2i& v2) {
 		float offset_x = abs(v1.x - v2.x);
 		float offset_y = abs(v1.y - v2.y);
@@ -401,28 +393,6 @@ namespace utils {
 		float y_offset = y_pos - floor(y_pos);
 		sf::Vector2f subpixel_offset = sf::Vector2f(x_offset, y_offset);
 		transform.translate(-subpixel_offset);
-	}
-
-	sf::FloatRect quantize_rect(const sf::FloatRect& rect, QuantizeMode quantize_mode) {
-		auto rounding_func = [&](float x) {
-			if (quantize_mode == QUANTIZE_MODE_FLOOR) {
-				return floor(x);
-			} else if (quantize_mode == QUANTIZE_MODE_FLOOR_SUBTRACT) {
-				return floor(x) - 1.0f;
-			} else if (quantize_mode == QUANTIZE_MODE_CEIL_SUBTRACT) {
-				return ceil(x) - 1.0f;
-			} else {
-				assert(false, "Unknown QuantizeMode");
-			}
-		};
-		sf::Vector2f top_left = rect.getPosition();
-		sf::Vector2f bottom_right = top_left + rect.getSize();
-		sf::Vector2f quantized_top_left = sf::Vector2f(floor(top_left.x), floor(top_left.y));
-		sf::Vector2f quantized_bottom_right = sf::Vector2f(rounding_func(bottom_right.x), rounding_func(bottom_right.y));
-		float quantized_width = quantized_bottom_right.x - quantized_top_left.x;
-		float quantized_height = quantized_bottom_right.y - quantized_top_left.y;
-		sf::FloatRect quantized_bounds(quantized_top_left, sf::Vector2f(quantized_width, quantized_height));
-		return quantized_bounds;
 	}
 
 	bool parseLL(const std::string& str, long long& result) {

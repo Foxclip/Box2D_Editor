@@ -4,9 +4,9 @@
 
 class Editor;
 
-class CreatePanel : public ContainerWidget {
+class CreatePanel : public fw::ContainerWidget {
 public:
-	CreatePanel(WidgetList& widget_list, Editor& p_app);
+	CreatePanel(fw::WidgetList& widget_list, Editor& p_app);
 
 private:
 	Editor& app;

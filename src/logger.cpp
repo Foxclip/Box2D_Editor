@@ -1,5 +1,7 @@
 ﻿#include "logger.h"
 #include <cassert>
+#include <sstream>
+#include <iomanip>
 
 Logger logger;
 
@@ -66,13 +68,54 @@ Logger& Logger::operator<<(bool value) {
 	return writeBool(value);
 }
 
+std::vector<std::string> Logger::splitString(const std::string& str) {
+	std::vector<std::string> results;
+	std::string current_word;
+	for (size_t i = 0; i < str.size() + 1; i++) {
+		char c;
+		if (i < str.size()) {
+			c = str[i];
+		} else {
+			c = EOF;
+		}
+		if (c == '\n' || c == EOF) {
+			if (current_word.size() > 0) {
+				results.push_back(current_word);
+			}
+			if (c == '\n') {
+				results.push_back("\n");
+			}
+			current_word = "";
+		} else {
+			current_word += c;
+		}
+	}
+	return results;
+}
+
+std::string Logger::currentTime() {
+	time_t t;
+	std::time(&t);
+	tm l;
+	localtime_s(&l, &t);
+	std::stringstream ss;
+	ss << std::setw(2) << std::setfill('0') << l.tm_hour;
+	ss << ":" << std::setw(2) << std::setfill('0') << l.tm_min;
+	ss << ":" << std::setw(2) << std::setfill('0') << l.tm_sec;
+	return ss.str();
+}
+
+std::string Logger::boolToStr(bool value) {
+	return value ? "true" : "false";
+}
+
 void Logger::addIndentLevel(ptrdiff_t level) {
 	indent_level += level;
 	updateIndentStr();
 }
 
 Logger& Logger::writeString(std::string value) {
-	std::vector<std::string> lines = utils::splitString(value);
+	std::vector<std::string> lines = splitString(value);
 	for (size_t i = 0; i < lines.size(); i++) {
 		std::string line = lines[i];
 		if (line == "\n") {
@@ -96,7 +139,7 @@ Logger& Logger::writeToLineBuffer(std::string value) {
 Logger& Logger::writeNewLine() {
 	std::string line;
 	if (write_time) {
-		std::string current_time = utils::current_time();
+		std::string current_time = currentTime();
 		line += "[" + current_time + "] ";
 	}
 	line += line_buffer;
@@ -146,7 +189,7 @@ Logger& Logger::writeDouble(double value) {
 }
 
 Logger& Logger::writeBool(bool value) {
-	return writeString(utils::bool_to_str(value));
+	return writeString(boolToStr(value));
 }
 
 void Logger::updateIndentStr() {

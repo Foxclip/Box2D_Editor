@@ -2,30 +2,34 @@
 
 #include <SFML/Graphics.hpp>
 
-class Widget;
+namespace fw {
 
-class WidgetTransform {
-public:
-	WidgetTransform(Widget* widget);
-	const sf::Transform& getTransform() const;
-	const sf::Transform& getGlobalTransform() const;
-	const sf::Transform& getInverseGlobalTransform() const;
-	const sf::Vector2f& getPosition() const;
-	float getRotation() const;
-	const sf::Vector2f& getScale() const;
-	void invalidateGlobalTransform();
-	void setPosition(const sf::Vector2f& position);
-	void setRotation(float angle);
-	void setScale(const sf::Vector2f& scale);
+	class Widget;
 
-private:
-	Widget* widget = nullptr;
-	mutable sf::Transform global_transform;
-	mutable sf::Transform inv_global_transform;
-	mutable bool global_transform_valid = false;
-	mutable bool inv_global_transform_valid = false;
+	class WidgetTransform {
+	public:
+		WidgetTransform(Widget* widget);
+		const sf::Transform& getTransform() const;
+		const sf::Transform& getGlobalTransform() const;
+		const sf::Transform& getInverseGlobalTransform() const;
+		const sf::Vector2f& getPosition() const;
+		float getRotation() const;
+		const sf::Vector2f& getScale() const;
+		void invalidateGlobalTransform();
+		void setPosition(const sf::Vector2f& position);
+		void setRotation(float angle);
+		void setScale(const sf::Vector2f& scale);
 
-	void recalcGlobalTransform() const;
-	void recalcInverseGlobalTransform() const;
+	private:
+		Widget* widget = nullptr;
+		mutable sf::Transform global_transform;
+		mutable sf::Transform inv_global_transform;
+		mutable bool global_transform_valid = false;
+		mutable bool inv_global_transform_valid = false;
 
-};
+		void recalcGlobalTransform() const;
+		void recalcInverseGlobalTransform() const;
+
+	};
+
+}

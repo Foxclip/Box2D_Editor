@@ -1,7 +1,8 @@
 #include "UI/create_panel.h"
 #include "editor.h"
 
-CreatePanel::CreatePanel(WidgetList& widget_list, Editor& p_app) : ContainerWidget(widget_list), app(p_app) {
+CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
+    : fw::ContainerWidget(widget_list), app(p_app) {
     setVisible(false);
     setFillColor(sf::Color(255, 0, 0, 0));
     setOrigin(Widget::CENTER_LEFT);
@@ -25,7 +26,7 @@ CreatePanel::CreatePanel(WidgetList& widget_list, Editor& p_app) : ContainerWidg
             button_widget->setOutlineThickness(0.0f);
         };
         button_widget->setName("button " + std::to_string(i));
-        TextWidget* text_widget = widget_list.createWidget<TextWidget>();
+        fw::TextWidget* text_widget = widget_list.createWidget<fw::TextWidget>();
         text_widget->setFont(app.ui_font);
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
         text_widget->setString(CreateTool::create_type_name(static_cast<CreateTool::ObjectType>(i)));

@@ -8,11 +8,14 @@
 #include "logger.h"
 #include "tools.h"
 #include "history.h"
-#include "application.h"
-#include "widgets/widget.h"
+#include "widgets/widgets.h"
 #include "objectlist.h"
 #include "UI/edit_window.h"
 
+const sf::String WINDOW_TITLE = "Box2D Editor";
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
+const int ANTIALIASING = 0;
 const float MOUSE_SCROLL_ZOOM = 1.2f;
 const int FPS = 60;
 const float WORLD_SATURATION = 0.75f;
@@ -48,13 +51,14 @@ private:
 	int fps = 0;
 };
 
-class Editor : public Application {
+class Editor : public fw::Application {
 public:
+	void init();
 	void load(const std::string& filename);
 	void setCameraPos(float x, float y);
 	void setCameraZoom(float zoom);
 	GameObjectList& getObjectList();
-	WidgetList& getWidgetList();
+	fw::WidgetList& getWidgetList();
 	void selectSingleObject(GameObject* object, bool with_children = false);
 	BoxObject* create_box(
 		const std::string& name,
@@ -129,15 +133,15 @@ private:
 	sf::Font console_font;
 	sf::Font small_font;
 	sf::Font textbox_font;
-	ContainerWidget* paused_rect_widget;
-	ContainerWidget* toolbox_widget;
+	fw::ContainerWidget* paused_rect_widget;
+	fw::ContainerWidget* toolbox_widget;
 	Tool* selected_tool = nullptr;
 	std::vector<Tool*> tools_in_tool_panel;
 	FpsCounter fps_counter;
-	ContainerWidget* fps_widget;
-	TextWidget* fps_text_widget;
-	RectangleWidget* logger_widget;
-	TextWidget* logger_text_widget;
+	fw::ContainerWidget* fps_widget;
+	fw::TextWidget* fps_text_widget;
+	fw::RectangleWidget* logger_widget;
+	fw::TextWidget* logger_text_widget;
 	sf::CircleShape origin_shape;
 	sf::Text object_info_text;
 	sf::Text id_text;

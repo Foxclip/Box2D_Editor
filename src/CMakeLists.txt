@@ -3,7 +3,6 @@ set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 add_subdirectory(widgets)
 
 set(SRC_HEADER_FILES
-    "${INCLUDE_DIR}/application.h"
     "${INCLUDE_DIR}/compvector.h"
     "${INCLUDE_DIR}/editor.h"
     "${INCLUDE_DIR}/gameobject.h"
@@ -23,7 +22,6 @@ set(SRC_HEADER_FILES
     "${INCLUDE_DIR}/UI/toolbox.h"
 )
 set(SRC_SOURCE_FILES
-    application.cpp
     compvector.cpp
     editor.cpp
     gameobject.cpp

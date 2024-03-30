@@ -1,5 +1,6 @@
 add_library(widgets_lib)
 target_sources(widgets_lib PRIVATE
+    "${INCLUDE_DIR}/widgets/application.h"
     "${INCLUDE_DIR}/widgets/checkbox_widget.h"
     "${INCLUDE_DIR}/widgets/container_widget.h"
     "${INCLUDE_DIR}/widgets/drawing.h"
@@ -16,6 +17,7 @@ target_sources(widgets_lib PRIVATE
     "${INCLUDE_DIR}/widgets/widgets_common.h"
 )
 target_sources(widgets_lib PRIVATE
+    application.cpp
     checkbox_widget.cpp
     container_widget.cpp
     drawing.cpp
@@ -33,4 +35,4 @@ target_sources(widgets_lib PRIVATE
 target_include_directories(widgets_lib PRIVATE "${INCLUDE_DIR}")
 target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}")
 target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
-target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
+target_link_libraries(widgets_lib PUBLIC sfml-window)

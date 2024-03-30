@@ -1,5 +1,6 @@
 #pragma once
 
+#include "application.h"
 #include "widget.h"
 #include "widget_transform.h"
 #include "widget_unclipped_region.h"

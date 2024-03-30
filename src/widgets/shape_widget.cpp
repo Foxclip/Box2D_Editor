@@ -1,32 +1,36 @@
 #include "widgets/shape_widget.h"
 #include "widgets/widget_list.h"
 
-ShapeWidget::ShapeWidget(WidgetList& widget_list) : Widget(widget_list) { }
+namespace fw {
 
-sf::FloatRect ShapeWidget::getLocalBounds() const {
-	return getShape().getLocalBounds();
-}
+	ShapeWidget::ShapeWidget(WidgetList& widget_list) : Widget(widget_list) { }
 
-sf::FloatRect ShapeWidget::getParentLocalBounds() const {
-	return getShape().getGlobalBounds();
-}
+	sf::FloatRect ShapeWidget::getLocalBounds() const {
+		return getShape().getLocalBounds();
+	}
 
-sf::FloatRect ShapeWidget::getGlobalBounds() const {
-	return getParentGlobalTransform().transformRect(getShape().getGlobalBounds());
-}
+	sf::FloatRect ShapeWidget::getParentLocalBounds() const {
+		return getShape().getGlobalBounds();
+	}
 
-const sf::Color& ShapeWidget::getFillColor() const {
-	return getShape().getFillColor();
-}
+	sf::FloatRect ShapeWidget::getGlobalBounds() const {
+		return getParentGlobalTransform().transformRect(getShape().getGlobalBounds());
+	}
 
-void ShapeWidget::setFillColor(const sf::Color& color) {
-	getShape().setFillColor(color);
-}
+	const sf::Color& ShapeWidget::getFillColor() const {
+		return getShape().getFillColor();
+	}
 
-void ShapeWidget::setOutlineColor(const sf::Color& color) {
-	getShape().setOutlineColor(color);
-}
+	void ShapeWidget::setFillColor(const sf::Color& color) {
+		getShape().setFillColor(color);
+	}
 
-void ShapeWidget::setOutlineThickness(float thickness) {
-	getShape().setOutlineThickness(thickness);
+	void ShapeWidget::setOutlineColor(const sf::Color& color) {
+		getShape().setOutlineColor(color);
+	}
+
+	void ShapeWidget::setOutlineThickness(float thickness) {
+		getShape().setOutlineThickness(thickness);
+	}
+
 }

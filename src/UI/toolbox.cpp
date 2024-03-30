@@ -1,7 +1,8 @@
 #include "UI/toolbox.h"
 #include "editor.h"
 
-Toolbox::Toolbox(WidgetList& widget_list, Editor& p_app) : ContainerWidget(widget_list), app(p_app) {
+Toolbox::Toolbox(fw::WidgetList& widget_list, Editor& p_app)
+    : fw::ContainerWidget(widget_list), app(p_app) {
     setFillColor(sf::Color(255, 0, 0, 0));
     setOrigin(Widget::TOP_CENTER);
     setParentAnchor(Widget::TOP_CENTER);
@@ -28,7 +29,7 @@ Toolbox::Toolbox(WidgetList& widget_list, Editor& p_app) : ContainerWidget(widge
         };
         tool_widget->setParent(this);
         tool_widget->setName("tool " + tool->name);
-        TextWidget* text_widget = app.widgets.createWidget<TextWidget>();
+        fw::TextWidget* text_widget = app.widgets.createWidget<fw::TextWidget>();
         text_widget->setFont(app.ui_font);
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
         text_widget->setString(app.tools[i]->name);

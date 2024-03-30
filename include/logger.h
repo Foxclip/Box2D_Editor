@@ -4,7 +4,6 @@
 #include <iostream>
 #include <vector>
 #include <functional>
-#include "utils.h"
 #include <stack>
 #include <set>
 
@@ -36,6 +35,9 @@ private:
 	std::set<std::string> enabled_tags;
 	std::set<std::string> disabled_tags;
 
+	std::vector<std::string> splitString(const std::string& str);
+	std::string currentTime();
+	std::string boolToStr(bool value);
 	Logger& writeString(std::string value);
 	Logger& writeToLineBuffer(std::string value);
 	Logger& writeNewLine();

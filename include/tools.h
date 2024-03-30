@@ -39,7 +39,7 @@ public:
 class Tool {
 public:
 	std::string name;
-	Widget* widget = nullptr;
+	fw::Widget* widget = nullptr;
 	std::function<void(bool)> OnSetSelected = [](bool value) { };
 
 	virtual bool showInToolPanel() const = 0;
@@ -155,8 +155,8 @@ public:
 		mode_count,
 	};
 	ObjectType type = BOX;
-	CompVector<Widget*> create_buttons;
-	ContainerWidget* create_panel_widget = nullptr;
+	CompVector<fw::Widget*> create_buttons;
+	fw::ContainerWidget* create_panel_widget = nullptr;
 
 	CreateTool();
 	bool showInToolPanel() const override;
