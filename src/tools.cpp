@@ -14,8 +14,9 @@ bool CreateTool::showInToolPanel() const {
 
 std::string CreateTool::create_type_name(ObjectType type) {
     switch (type) {
-        case CreateTool::BOX: return "box"; break;
-        case CreateTool::BALL: return "ball"; break;
+        case CreateTool::BOX: return "box";
+        case CreateTool::BALL: return "ball";
+        default: mAssert(false, "Unknown create object type"); return "unknown";
     }
 }
 
@@ -66,7 +67,7 @@ EditTool::EditTool() : Tool() {
     vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
     vertex_rect.setFillColor(sf::Color::Red);
     vertex_rect.setOrigin(vertex_rect.getSize() / 2.0f);
-    int vertex_distance = VERTEX_HIGHLIGHT_DISTANCE * 2 + 1;
+    float vertex_distance = VERTEX_HIGHLIGHT_DISTANCE * 2.0f + 1.0f;
     vertex_highlight_rect.setSize(sf::Vector2f(vertex_distance, vertex_distance));
     vertex_highlight_rect.setFillColor(sf::Color::Transparent);
     vertex_highlight_rect.setOutlineThickness(-1.0f);

@@ -3,6 +3,7 @@
 #include "gameobject.h"
 #include "compvector.h"
 #include "searchindex.h"
+#include "utils.h"
 
 class GameObjectList {
 public:

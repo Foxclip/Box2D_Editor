@@ -8,13 +8,28 @@
 #include <vector>
 #include <numbers>
 
+#ifndef NDEBUG
+
+void _print_msg();
+void _print_msg(const std::string& message);
+
+#define mAssert(value, ...) \
+	_print_msg(__VA_ARGS__); \
+	assert(value);
+
+#else
+
+#define mAssert(value)
+
+#endif // !NDEBUG
+
 namespace utils {
 
 	float to_degrees(float angle);
 	float to_radians(float angle);
 	b2Vec2 tob2(const sf::Vector2f& vec);
 	sf::Vector2f tosf(const b2Vec2& vec);
-	int get_max_offset(const sf::Vector2i& v1, const sf::Vector2i& v2);
+	float get_max_offset(const sf::Vector2i& v1, const sf::Vector2i& v2);
 	void set_origin_to_center_normal(sf::Text& text);
 	void set_origin_to_center_bounds(sf::Text& text);
 	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point);
@@ -42,7 +57,7 @@ namespace utils {
 
 	template <typename TVec2>
 	TVec2 get_circle_vertex(ptrdiff_t index, size_t point_count, float radius, float offset = 0.0f) {
-		float angle = (float)index / point_count * 2 * std::numbers::pi + offset;
+		float angle = (float)((float)index / point_count * 2 * std::numbers::pi + offset);
 		float x = std::cos(angle) * radius;
 		float y = std::sin(angle) * radius;
 		return TVec2(x, y);
@@ -52,7 +67,7 @@ namespace utils {
 	TVec2 get_pos(const std::vector<float>& lengths, ptrdiff_t i) {
 		float angle = (float)i / lengths.size() * 2 * b2_pi;
 		TVec2 vector = TVec2(std::cos(angle), std::sin(angle));
-		size_t index = i < lengths.size() ? i : i % lengths.size();
+		size_t index = i < (ptrdiff_t)lengths.size() ? i : i % lengths.size();
 		TVec2 pos = lengths[index] * vector;
 		return pos;
 	}

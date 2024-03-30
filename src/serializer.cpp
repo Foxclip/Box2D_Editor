@@ -139,10 +139,10 @@ sf::Color TokenReader::readColor() {
 		return sf::Color();
 	}
 	sf::Color color;
-	color.r = readLL();
-	color.g = readLL();
-	color.b = readLL();
-	color.a = readLL();
+	color.r = (sf::Uint8)readLL();
+	color.g = (sf::Uint8)readLL();
+	color.b = (sf::Uint8)readLL();
+	color.a = (sf::Uint8)readLL();
 	return color;
 }
 
@@ -281,7 +281,7 @@ std::vector<WordToken> TokenReader::tokenize(const std::string& str) const {
 }
 
 bool TokenReader::isValidPos(ptrdiff_t position) const {
-	return position >= 0 && position < tokens->size();
+	return position >= 0 && position < (ptrdiff_t)tokens->size();
 }
 
 TokenWriter::TokenWriter(int indent_level) {

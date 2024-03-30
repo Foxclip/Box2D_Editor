@@ -3,6 +3,26 @@
 #include <sstream>
 #include <iomanip>
 
+#ifndef NDEBUG
+
+void _loggerAssert_print_msg(bool value) { }
+
+void _loggerAssert_print_msg(bool value, const std::string& message) {
+	if (!value) {
+		std::cout << message << "\n";
+	}
+}
+
+#define loggerAssert(value, ...) \
+	_loggerAssert_print_msg(value, __VA_ARGS__); \
+	assert(value);
+
+#else
+
+#define loggerAssert(value)
+
+#endif // !NDEBUG
+
 Logger logger;
 
 Logger& Logger::operator<<(const char* value) {
@@ -259,8 +279,8 @@ void LoggerLargeText::internalClose() {
 }
 
 LoggerDeactivate::LoggerDeactivate() {
-	assert(logger.active_switch, "Not allowed to deactivate logger twice");
-	assert(logger.tags.size() == 0, "LoggerDeactivate must be outside of all LoggerTags");
+	loggerAssert(logger.active_switch, "Not allowed to deactivate logger twice");
+	loggerAssert(logger.tags.size() == 0, "LoggerDeactivate must be outside of all LoggerTags");
 	logger.active_switch = false;
 }
 

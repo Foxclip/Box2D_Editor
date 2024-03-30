@@ -133,7 +133,7 @@ public:
 	float getGlobalRotation() const;
 	const b2Transform& getTransform() const;
 	const b2Transform& getGlobalTransform() const;
-	const b2Transform& getParentGlobalTransform() const;
+	b2Transform getParentGlobalTransform() const;
 	GameObject* getParent() const;
 	CompVector<GameObject*> getParentChain() const;
 	const CompVector<GameObject*>& getChildren() const;

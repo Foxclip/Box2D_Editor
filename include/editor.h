@@ -200,7 +200,7 @@ private:
 	void setActiveObject(GameObject* object);
 	Tool* try_select_tool_by_index(size_t index);
 	Tool* try_select_tool(Tool* tool);
-	void select_create_type(int type);
+	void select_create_type(size_t type);
 	void toggle_pause();
 	void load_font(sf::Font& font, const std::string& filename, bool smooth = false);
 	sf::Vector2f screen_to_world(const sf::Vector2f& screen_pos) const;

@@ -301,7 +301,8 @@ CutInfo SplittablePolygon::getBestCut(BestCutCriterion criterion) const {
 			} else if (criterion == BestCutCriterion::MIN_ANGLE) {
 				return left.angle_diff_sum < right.angle_diff_sum;
 			} else {
-				assert(false, "Unknown BestCutCriterion: " + std::to_string(criterion));
+				mAssert(false, "Unknown BestCutCriterion: " + std::to_string(criterion));
+				return false;
 			}
 		}
 	};

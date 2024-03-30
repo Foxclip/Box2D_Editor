@@ -805,7 +805,7 @@ void Editor::render_world() {
 void Editor::render_ui() {
     ui_texture.clear(sf::Color(0, 0, 0, 0));
     ui_view.setCenter(ui_texture.getSize().x / 2.0f, ui_texture.getSize().y / 2.0f);
-    ui_view.setSize(ui_texture.getSize().x, ui_texture.getSize().y);
+    ui_view.setSize((float)ui_texture.getSize().x, (float)ui_texture.getSize().y);
     ui_texture.setView(ui_view);
     sf::RenderTarget& target = ui_texture;
 
@@ -1155,7 +1155,7 @@ Tool* Editor::try_select_tool(Tool* tool) {
     return tool;
 }
 
-void Editor::select_create_type(int type) {
+void Editor::select_create_type(size_t type) {
     create_tool.type = static_cast<CreateTool::ObjectType>(type);
     for (size_t j = 0; j < create_tool.create_buttons.size(); j++) {
         create_tool.create_buttons[j]->setFillColor(sf::Color(128, 128, 128));
@@ -1274,10 +1274,10 @@ ptrdiff_t Editor::mouse_get_object_vertex() const {
     }
     ptrdiff_t closest_vertex_i = 0;
     sf::Vector2i closest_vertex_pos = world_to_pixel(active_object->getGlobalVertexPos(0));
-    int closest_vertex_offset = utils::get_max_offset(closest_vertex_pos, mousePos);
+    float closest_vertex_offset = utils::get_max_offset(closest_vertex_pos, mousePos);
     for (size_t i = 1; i < active_object->getVertexCount(); i++) {
         sf::Vector2i vertex_pos = world_to_pixel(active_object->getGlobalVertexPos(i));
-        float offset = utils::get_max_offset(vertex_pos, mousePos);
+        float offset = (float)utils::get_max_offset(vertex_pos, mousePos);
         if (offset < closest_vertex_offset) {
             closest_vertex_i = i;
             closest_vertex_pos = vertex_pos;
@@ -1485,7 +1485,7 @@ int FpsCounter::frameEnd() {
     if (fps_time.count() >= 1.0) {
         if (frame_times.size() > 0) {
             double average_frame_time = utils::average(frame_times);
-            fps = 1.0 / average_frame_time;
+            fps = (int)(1.0 / average_frame_time);
             frame_times.clear();
         }
         last_fps_time = t2;

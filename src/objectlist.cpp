@@ -86,6 +86,7 @@ GameObject* GameObjectList::add(std::unique_ptr<GameObject> object, bool assign_
         }
         names.add(ptr->name, ptr);
         all_objects.add(std::move(object));
+        return ptr;
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
     }
@@ -164,7 +165,7 @@ GameObject* GameObjectList::duplicateObject(const GameObject* object) {
     } else if (dynamic_cast<const ChainObject*>(object)) {
         new_object = ChainObject::deserialize(tr, this);
     } else {
-        assert(false, "Unknown object type");
+        mAssert(false, "Unknown object type");
     }
     GameObject* ptr = new_object.get();
     add(std::move(new_object), true);
@@ -181,7 +182,7 @@ Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_a, Gam
         b2RevoluteJointDef def = RevoluteJoint::deserialize(tr, body_a, body_b);
         new_joint = std::make_unique<RevoluteJoint>(def, world, new_a, new_b);
     } else {
-        assert(false, "Unknown joint type");
+        mAssert(false, "Unknown joint type");
     }
     Joint* ptr = new_joint.get();
     addJoint(std::move(new_joint));
@@ -196,8 +197,8 @@ void GameObjectList::transformFromRigidbody() {
 }
 
 void GameObjectList::remove(GameObject* object, bool remove_children) {
-    assert(object);
-    assert(all_objects.contains(object));
+    mAssert(object);
+    mAssert(all_objects.contains(object));
     std::vector<Joint*> joints_copy = object->joints.getVector();
     for (Joint* joint : joints_copy) {
         removeJoint(joint);
@@ -222,7 +223,7 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
 }
 
 void GameObjectList::removeJoint(Joint* joint) {
-    assert(joint);
+    mAssert(joint);
     joint->object1->joints.remove(joint);
     joint->object2->joints.remove(joint);
     joints.remove(joint);

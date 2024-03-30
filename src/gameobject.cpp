@@ -58,7 +58,7 @@ const b2Transform& GameObject::getGlobalTransform() const {
 	return transforms.getGlobalTransform();
 }
 
-const b2Transform& GameObject::getParentGlobalTransform() const {
+b2Transform GameObject::getParentGlobalTransform() const {
 	if (parent) {
 		return parent->getGlobalTransform();
 	} else {
@@ -943,7 +943,7 @@ void PolygonObject::internalSyncVertices() {
 			b2points.push_back(tob2(point));
 		}
 		b2PolygonShape b2polygon;
-		bool valid = b2polygon.Set(b2points.data(), b2points.size());
+		bool valid = b2polygon.Set(b2points.data(), (int32)b2points.size());
 		if (valid) {
 			rigid_body->CreateFixture(&b2polygon, 1.0f);
 		}
@@ -953,7 +953,7 @@ void PolygonObject::internalSyncVertices() {
 CircleNotchShape::CircleNotchShape(float radius, size_t point_count, size_t notch_segment_count) {
 	varray_circle = sf::VertexArray(sf::TriangleFan, point_count + 1);
 	varray_notch = sf::VertexArray(sf::TriangleFan, notch_segment_count + 2);
-	float segment_angle = 2 * std::numbers::pi / (float)point_count;
+	float segment_angle = (float)(2 * std::numbers::pi / (float)point_count);
 	float notch_angle = segment_angle * notch_segment_count;
 	float angle_offset = -notch_angle / 2.0f;
 	varray_circle[0] = sf::Vertex(sf::Vector2f(0.0f, 0.0f));
@@ -1116,7 +1116,7 @@ void ChainObject::internalSyncVertices() {
 		rigid_body->DestroyFixture(old_fixture);
 	}
 	b2ChainShape new_chain;
-	new_chain.CreateChain(b2vertices.data(), b2vertices.size(), b2vertices.front(), b2vertices.back());
+	new_chain.CreateChain(b2vertices.data(), (int32)b2vertices.size(), b2vertices.front(), b2vertices.back());
 	b2Fixture* new_fixture = rigid_body->CreateFixture(&new_chain, 1.0f);
 	line_strip_shape->varray = sf::VertexArray(sf::LinesStrip, b2vertices.size());
 	for (size_t i = 0; i < b2vertices.size(); i++) {

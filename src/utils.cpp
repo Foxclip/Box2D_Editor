@@ -3,10 +3,20 @@
 #include <cmath>
 #include <iostream>
 
+#ifndef NDEBUG
+
+void _print_msg() { }
+
+void _print_msg(const std::string& message) {
+	std::cout << message << "\n";
+}
+
+#endif // !NDEBUG
+
 namespace utils {
 
-	const float DEG_IN_RAD = 180.0f / std::numbers::pi;
-	const float RAD_IN_DEG = std::numbers::pi / 180.0f;
+	const float DEG_IN_RAD = (float)(180.0f / std::numbers::pi);
+	const float RAD_IN_DEG = (float)(std::numbers::pi / 180.0f);
 
 	float to_degrees(float angle) {
 		return DEG_IN_RAD * angle;
@@ -24,9 +34,9 @@ namespace utils {
 		return sf::Vector2f(vec.x, vec.y);
 	}
 
-	int get_max_offset(const sf::Vector2i& v1, const sf::Vector2i& v2) {
-		float offset_x = abs(v1.x - v2.x);
-		float offset_y = abs(v1.y - v2.y);
+	float get_max_offset(const sf::Vector2i& v1, const sf::Vector2i& v2) {
+		float offset_x = (float)abs(v1.x - v2.x);
+		float offset_y = (float)abs(v1.y - v2.y);
 		return std::max(offset_x, offset_y);
 	}
 
@@ -59,6 +69,7 @@ namespace utils {
 			case b2_staticBody: return "static";
 			case b2_kinematicBody: return "kinematic";
 			case b2_dynamicBody: return "dynamic";
+			default: mAssert(false, "Unknown b2BodyType"); return "unknown";
 		}
 	}
 
@@ -71,7 +82,8 @@ namespace utils {
 			} else if (str == "dynamic") {
 				return b2_dynamicBody;
 			} else {
-				throw std::runtime_error("Unknown body type: " + str);
+				mAssert(false, "Can't parse b2BodyType: " + str);
+				return b2_staticBody;
 			}
 		} catch (std::exception exc) {
 			throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
