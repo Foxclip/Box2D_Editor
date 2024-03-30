@@ -216,12 +216,12 @@ void CompoundVectorTest::test_CompoundVector() {
 void CompoundVectorTest::test_CompoundVectorUptr() {
 	{
 		// empty vector
-		CompoundVectorUptr<int> vec;
+		CompVectorUptr<int> vec;
 		assert(vec.size() == 0);
 	}
 	{
 		// one value
-		CompoundVectorUptr<int> vec = { 5 };
+		CompVectorUptr<int> vec = { 5 };
 		assert(vec.size() == 1);
 		assert(*vec[0] == 5);
 		assert(*vec.front() == 5);
@@ -229,7 +229,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 	}
 	{
 		// multiple values
-		CompoundVectorUptr<int> vec = { 1, 2, 3 };
+		CompVectorUptr<int> vec = { 1, 2, 3 };
 		assert(vec.size() == 3);
 		assert(*vec[0] == 1);
 		assert(*vec[1] == 2);
@@ -242,7 +242,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		int* ptr1 = new int(1);
 		int* ptr2 = new int(2);
 		int* ptr3 = new int(3);
-		CompoundVectorUptr<int> cvec = { ptr1, ptr2, ptr3 };
+		CompVectorUptr<int> cvec = { ptr1, ptr2, ptr3 };
 		std::vector<int*> vec = cvec;
 		assert(vec == std::vector<int*>({ ptr1, ptr2, ptr3 }));
 	}
@@ -251,7 +251,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		int* ptr1 = new int(1);
 		int* ptr2 = new int(2);
 		int* ptr3 = new int(3);
-		CompoundVectorUptr<int> cvec = { ptr1, ptr2, ptr3 };
+		CompVectorUptr<int> cvec = { ptr1, ptr2, ptr3 };
 		std::vector<int*> vec = { ptr1, ptr2, ptr3 };
 		assert(cvec == vec);
 		assert(vec == cvec);
@@ -261,7 +261,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		auto cmp = [](const int* left, const int* right) {
 			return *left > *right;
 		};
-		CompoundVectorUptr<int, decltype(cmp)> vec = { 1, 2, 3 };
+		CompVectorUptr<int, decltype(cmp)> vec = { 1, 2, 3 };
 		std::vector<int*> set_vec = std::vector<int*>(vec.getSet().begin(), vec.getSet().end());
 		std::vector<int> set_values;
 		for (int* ptr : set_vec) {
@@ -271,7 +271,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 	}
 	{
 		// add method
-		CompoundVectorUptr<int> vec;
+		CompVectorUptr<int> vec;
 		vec.add(1);
 		vec.add(2);
 		vec.add(3);
@@ -288,7 +288,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		int* ptr2 = new int(2);
 		int* ptr3 = new int(3);
 		int* ptr5 = new int(5);
-		CompoundVectorUptr<int> vec = { ptr1, ptr2, ptr3 };
+		CompVectorUptr<int> vec = { ptr1, ptr2, ptr3 };
 		std::unique_ptr<int> uptr5(ptr5);
 		std::unique_ptr<int> uptr5_another(ptr5);
 		vec.insert(vec.begin() + 2, std::move(uptr5));
@@ -308,7 +308,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		int* ptr7 = new int(7);
 		int* ptr8 = new int(8);
 		int* ptr9 = new int(9);
-		CompoundVectorUptr<int> vec = { ptr1, ptr2, ptr3 };
+		CompVectorUptr<int> vec = { ptr1, ptr2, ptr3 };
 		std::unique_ptr<int> uptr5(ptr5);
 		std::unique_ptr<int> uptr6(ptr6);
 		std::unique_ptr<int> uptr7(ptr7);
@@ -347,7 +347,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		int* ptr2 = new int(2);
 		int* ptr3 = new int(3);
 		int* ptr5 = new int(5);
-		CompoundVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
+		CompVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
 		vec.remove(ptr2);
 		assert(vec.size() == 2);
 		assert(*vec[0] == 1);
@@ -357,7 +357,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 	}
 	{
 		// removeAt method
-		CompoundVectorUptr<int> vec = { 1, 2, 3 };
+		CompVectorUptr<int> vec = { 1, 2, 3 };
 		vec.removeAt(1);
 		assert(vec.size() == 2);
 		assert(*vec[0] == 1);
@@ -367,7 +367,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 	}
 	{
 		// reverse method
-		CompoundVectorUptr<int> vec = { 1, 2, 3 };
+		CompVectorUptr<int> vec = { 1, 2, 3 };
 		vec.reverse();
 		assert(vec.size() == 3);
 		assert(*vec[0] == 3);
@@ -378,7 +378,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 	}
 	{
 		// iterators
-		CompoundVectorUptr<int> vec = { 1, 2, 3 };
+		CompVectorUptr<int> vec = { 1, 2, 3 };
 		{
 			auto it = vec.begin();
 			assert(**it == 1);
@@ -418,7 +418,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 	}
 	{
 		// at method
-		CompoundVectorUptr<int> vec = { 1, 2, 3 };
+		CompVectorUptr<int> vec = { 1, 2, 3 };
 		assert(*vec.at(1) == 2);
 	}
 	{
@@ -426,12 +426,12 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		int* ptr1 = new int(1);
 		int* ptr2 = new int(2);
 		int* ptr3 = new int(3);
-		CompoundVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
+		CompVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
 		assert(vec.getIndex(ptr2) == 1);
 	}
 	{
 		// getVector method
-		CompoundVectorUptr<int> vec = { 1, 2, 3 };
+		CompVectorUptr<int> vec = { 1, 2, 3 };
 		std::vector<int*> get_vec = vec.getVector();
 		std::vector<int> value_vec;
 		for (size_t i = 0; i < get_vec.size(); i++) {
@@ -441,7 +441,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 	}
 	{
 		// getSet method
-		CompoundVectorUptr<int> vec = { 1, 2, 3 };
+		CompVectorUptr<int> vec = { 1, 2, 3 };
 		std::set<int*> get_set = vec.getSet();
 		std::vector<int> value_vec;
 		for (int* ptr : get_set) {
@@ -452,7 +452,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 	}
 	{
 		// operator []
-		CompoundVectorUptr<int> vec = { 1, 2, 3 };
+		CompVectorUptr<int> vec = { 1, 2, 3 };
 		assert(*vec[1] == 2);
 	}
 	{
@@ -461,7 +461,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		int* ptr2 = new int(2);
 		int* ptr3 = new int(3);
 		int* ptr5 = new int(5);
-		CompoundVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
+		CompVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
 		assert(vec.find(ptr2) != vec.getSet().end());
 		assert(vec.find(ptr5) == vec.getSet().end());
 	}
@@ -471,13 +471,13 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		int* ptr2 = new int(2);
 		int* ptr3 = new int(3);
 		int* ptr5 = new int(5);
-		CompoundVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
+		CompVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
 		assert(vec.contains(ptr2));
 		assert(!vec.contains(ptr5));
 	}
 	{
 		// clear method
-		CompoundVectorUptr<int> vec = { 1, 2, 3 };
+		CompVectorUptr<int> vec = { 1, 2, 3 };
 		vec.clear();
 		assert(vec.size() == 0);
 	}
@@ -486,7 +486,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		int* ptr1 = new int(1);
 		int* ptr2 = new int(2);
 		int* ptr3 = new int(3);
-		CompoundVectorUptr<int> vec({ ptr1, ptr2, ptr2, ptr3 });
+		CompVectorUptr<int> vec({ ptr1, ptr2, ptr2, ptr3 });
 		assert(vec.size() == 3);
 		assert(*vec[0] == 1);
 		assert(*vec[1] == 2);
@@ -498,7 +498,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 		int* ptr2 = new int(2);
 		int* ptr3 = new int(3);
 		int* ptr5 = new int(5);
-		CompoundVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
+		CompVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
 		vec.remove(ptr5);
 		assert(vec.size() == 3);
 		assert(*vec[0] == 1);

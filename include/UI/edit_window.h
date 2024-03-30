@@ -87,7 +87,7 @@ public:
 private:
 	friend class EditWindowParameter;
 	Editor& app;
-	CompoundVectorUptr<EditWindowParameter> parameters;
+	CompVectorUptr<EditWindowParameter> parameters;
 
 	void createParameters();
 	template<typename T, typename... Args>

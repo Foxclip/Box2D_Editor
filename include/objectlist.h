@@ -32,9 +32,9 @@ public:
 
 private:
 	friend class GameObject;
-	CompoundVectorUptr<GameObject> all_objects;
+	CompVectorUptr<GameObject> all_objects;
 	CompVector<GameObject*> top_objects;
-	CompoundVectorUptr<Joint> joints;
+	CompVectorUptr<Joint> joints;
 	SearchIndexUnique<size_t, GameObject> ids;
 	SearchIndexMultiple<std::string, GameObject> names;
 

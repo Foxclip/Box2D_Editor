@@ -49,7 +49,7 @@ private:
 	sf::Color render_bounds_color = sf::Color::Green;
 	sf::Color render_origin_color = sf::Color::Red;
 	sf::Color focused_widget_bounds_color = sf::Color(0, 200, 255);
-	CompoundVectorUptr<Widget> widgets;
+	CompVectorUptr<Widget> widgets;
 	RectangleWidget* root_widget = nullptr;
 	Widget* focused_widget = nullptr;
 	WidgetRenderQueue render_queue = WidgetRenderQueue(*this);
