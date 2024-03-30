@@ -9,11 +9,11 @@ namespace fw {
 
 #ifndef NDEBUG
 
-	void _print_msg();
-	void _print_msg(const std::string& message);
+	void _print_msg(bool value);
+	void _print_msg(bool value, const std::string& message);
 
 #define wAssert(value, ...) \
-	_print_msg(__VA_ARGS__); \
+	_print_msg(value, __VA_ARGS__); \
 	assert(value);
 
 #else

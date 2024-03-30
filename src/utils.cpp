@@ -5,10 +5,12 @@
 
 #ifndef NDEBUG
 
-void _print_msg() { }
+void _print_msg(bool value) { }
 
-void _print_msg(const std::string& message) {
-	std::cout << message << "\n";
+void _print_msg(bool value, const std::string& message) {
+	if (!value) {
+		std::cout << message << "\n";
+	}
 }
 
 #endif // !NDEBUG
