@@ -472,8 +472,10 @@ void TextBoxWidget::processKeyPressedEvent(const sf::Event& event) {
 			}
 		} else if (event.key.code == sf::Keyboard::C) {
 			if (ctrl_pressed) {
-				if (!clip::set_text(getSelectedText())) {
-					throw std::runtime_error("Unable to copy text to clipboard");
+				if (getStringSize() > 0) {
+					if (!clip::set_text(getSelectedText())) {
+						throw std::runtime_error("Unable to copy text to clipboard");
+					}
 				}
 				process_text_entered_event = false;
 			}
@@ -493,12 +495,14 @@ void TextBoxWidget::processKeyPressedEvent(const sf::Event& event) {
 			}
 		} else if (event.key.code == sf::Keyboard::X) {
 			if (ctrl_pressed) {
-				if (!clip::set_text(getSelectedText())) {
-					throw std::runtime_error("Unable to copy text to clipboard");
+				if (getStringSize() > 0) {
+					if (!clip::set_text(getSelectedText())) {
+						throw std::runtime_error("Unable to copy text to clipboard");
+					}
+					doNormalAction(ActionType::ACTION_CUT, [&]() {
+						eraseSelection();
+					});
 				}
-				doNormalAction(ActionType::ACTION_CUT, [&]() {
-					eraseSelection();
-				});
 				process_text_entered_event = false;
 			}
 		} else if (event.key.code == sf::Keyboard::Z) {

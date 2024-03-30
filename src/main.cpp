@@ -51,8 +51,7 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: rename CompoundVector to CompVector
-    // TODO: fix cutting empty text
+    // TODO: fix all warnings
     // TODO: separate Simulation and Application,
     // interface in Application, physics and object management in Simulation
     // TODO: blinking textbox cursor
