@@ -6,7 +6,7 @@
 
 // Adding methods:
 // If method changes widgets, check this:
-// assert(!isLocked());
+// wAssert(!isLocked());
 // And if if changes render queue:
 // render_queue.invalidate();
 
@@ -59,7 +59,7 @@ private:
 template<typename T, typename... Args>
 	requires std::derived_from<T, Widget>
 inline T* WidgetList::createWidget(Args&&... args) {
-	assert(!isLocked());
+	wAssert(!isLocked());
 	std::unique_ptr<T> uptr = std::make_unique<T>(*this, args...);
 	T* ptr = uptr.get();
 	if (root_widget) {

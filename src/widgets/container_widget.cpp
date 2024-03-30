@@ -86,7 +86,7 @@ Widget::Anchor ContainerWidget::alignmentToAnchor(Alignment alignment) const {
 		case Widget::ALIGN_BOTTOM: return BOTTOM_LEFT;
 		case Widget::ALIGN_LEFT: return TOP_LEFT;
 		case Widget::ALIGN_RIGHT: return TOP_RIGHT;
-		default: assert(false, "Unknown alignment: " + std::to_string(alignment));
+		default: wAssert(false, "Unknown alignment: " + std::to_string(alignment));
 	}
 }
 

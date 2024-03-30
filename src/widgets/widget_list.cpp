@@ -91,7 +91,7 @@ void WidgetList::unlock() {
 }
 
 void WidgetList::processClick(const sf::Vector2f pos) {
-	assert(!isLocked());
+	wAssert(!isLocked());
 	CompVector<Widget*> widgets = getWidgetsUnderCursor(true, click_blocked);
 	Widget* focused = nullptr;
 	for (size_t i = 0; i < widgets.size(); i++) {
@@ -106,7 +106,7 @@ void WidgetList::processClick(const sf::Vector2f pos) {
 }
 
 void WidgetList::processRelease(const sf::Vector2f pos) {
-	assert(!isLocked());
+	wAssert(!isLocked());
 	if (focused_widget) {
 		focused_widget->processRelease(pos);
 		render_queue.invalidate();
@@ -114,13 +114,13 @@ void WidgetList::processRelease(const sf::Vector2f pos) {
 }
 
 void WidgetList::processMouse(const sf::Vector2f pos) {
-	assert(!isLocked());
+	wAssert(!isLocked());
 	root_widget->processMouse(pos);
 	render_queue.invalidate();
 }
 
 void WidgetList::processKeyboardEvent(const sf::Event& event) {
-	assert(!isLocked());
+	wAssert(!isLocked());
 	if (focused_widget) {
 		focused_widget->processKeyboardEvent(event);
 		render_queue.invalidate();
@@ -128,18 +128,18 @@ void WidgetList::processKeyboardEvent(const sf::Event& event) {
 }
 
 void WidgetList::updateRenderQueue() {
-	assert(!isLocked());
+	wAssert(!isLocked());
 	render_queue.update();
 }
 
 void WidgetList::updateWidgets() {
-	assert(!isLocked());
+	wAssert(!isLocked());
 	root_widget->update();
 	render_queue.invalidate();
 }
 
 void WidgetList::render(sf::RenderTarget& target) {
-	assert(isLocked());
+	wAssert(isLocked());
 	root_widget->unclipped_region.invalidate();
 #ifndef NDEBUG
 	for (size_t i = 0; i < widgets.size(); i++) {
@@ -163,7 +163,7 @@ void WidgetList::render(sf::RenderTarget& target) {
 }
 
 void WidgetList::reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_pos) {
-	assert(!isLocked());
+	wAssert(!isLocked());
 	root_widget->setSize(root_size);
 	root_widget->updateMouseState(mouse_pos);
 	click_blocked = false;
@@ -173,7 +173,7 @@ void WidgetList::reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_
 }
 
 void WidgetList::setFocusedWidget(Widget* widget) {
-	assert(!isLocked());
+	wAssert(!isLocked());
 	LoggerTag tag_set_focused_widget("setFocusedWidget");
 	if (widget == focused_widget) {
 		return;
@@ -182,7 +182,7 @@ void WidgetList::setFocusedWidget(Widget* widget) {
 		if (!widget->isFocusable()) {
 			return;
 		}
-		assert(widgets.contains(widget));
+		wAssert(widgets.contains(widget));
 	}
 	if (focused_widget) {
 		logger << focused_widget->getFullName() << " lost focus\n";

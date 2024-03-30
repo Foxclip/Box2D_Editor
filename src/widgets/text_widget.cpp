@@ -77,7 +77,7 @@ float TextWidget::getKerning(size_t index) const {
 }
 
 sf::Vector2f TextWidget::getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
-	assert(getFont());
+	wAssert(getFont());
 	sf::Vector2f parent_local_char_pos = text.findCharacterPos(index);
 	sf::Vector2f local_char_pos = getTransformable().getInverseTransform() * parent_local_char_pos;
 	if (with_kerning) {
@@ -134,7 +134,7 @@ void TextWidget::setString(const sf::String& string) {
 }
 
 void TextWidget::insert(size_t pos, const sf::String& str) {
-	assert(pos >= 0 && pos <= getStringSize());
+	wAssert(pos >= 0 && pos <= getStringSize());
 	sf::String new_str = text.getString();
 	new_str.insert(pos, str);
 	text.setString(new_str);
@@ -145,7 +145,7 @@ void TextWidget::erase(size_t index_first, size_t count) {
 		return;
 	}
 	size_t index_last = index_first + count - 1;
-	assert(index_first >= 0 && index_last < getStringSize());
+	wAssert(index_first >= 0 && index_last < getStringSize());
 	sf::String str = text.getString();
 	str.erase(index_first, count);
 	text.setString(str);
@@ -178,7 +178,7 @@ sf::Vector2f TextWidget::getRenderPositionOffset() const {
 
 void TextWidget::update() {
 	if (!getFont()) {
-		assert(false, "Font is not set for " + full_name);
+		wAssert(false, "Font is not set for " + full_name);
 	}
 	Widget::update();
 }

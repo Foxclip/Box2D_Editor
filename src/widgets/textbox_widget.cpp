@@ -107,7 +107,7 @@ bool TextBoxWidget::isValidValue() const {
 		float number;
 		result = utils::parseFloat(getValue(), number);
 	} else {
-		assert(false, "Unknown TextBoxType");
+		wAssert(false, "Unknown TextBoxType");
 	}
 	return result;
 }
@@ -744,7 +744,7 @@ std::string TextBoxWidget::getActionTag(ActionType action_type) {
 		case ActionType::ACTION_CUT: return "Cut";
 		case ActionType::ACTION_BACKSPACE: return "Backspace";
 		case ActionType::ACTION_TYPE: return "Type";
-		default: assert(false, "Unknown action_type: " + std::to_string(action_type));
+		default: wAssert(false, "Unknown action_type: " + std::to_string(action_type));
 	}
 }
 

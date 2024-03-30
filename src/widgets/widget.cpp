@@ -272,7 +272,7 @@ sf::Vector2f Widget::getVisualGlobalBottomRight() const {
 }
 
 void Widget::setOrigin(Anchor anchor) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	sf::Vector2f origin_pos = anchorToPos(anchor, getOrigin(), getSize());
 	setOrigin(origin_pos);
 	this->origin_anchor = anchor;
@@ -280,60 +280,60 @@ void Widget::setOrigin(Anchor anchor) {
 }
 
 void Widget::setOrigin(float x, float y) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	getTransformable().setOrigin(x, y);
 	this->origin_anchor = CUSTOM;
 	updateAnchoredPosition();
 }
 
 void Widget::setOrigin(const sf::Vector2f& origin) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	getTransformable().setOrigin(origin);
 	this->origin_anchor = CUSTOM;
 	updateAnchoredPosition();
 }
 
 void Widget::setParentAnchor(Anchor anchor) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	this->parent_anchor = anchor;
 	updateAnchoredPosition();
 }
 
 void Widget::setAnchorOffset(float x, float y) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	this->anchor_offset = sf::Vector2f(x, y);
 	updateAnchoredPosition();
 }
 
 void Widget::setAnchorOffset(const sf::Vector2f& offset) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	this->anchor_offset = offset;
 	updateAnchoredPosition();
 }
 
 void Widget::setPosition(float x, float y) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	transforms.setPosition(sf::Vector2f(x, y));
 }
 
 void Widget::setPosition(const sf::Vector2f& position) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	transforms.setPosition(position);
 }
 
 void Widget::setRotation(float angle) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	transforms.setRotation(angle);
 }
 
 void Widget::setVisible(bool value) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	this->visible = value;
 	widget_list.render_queue.invalidate();
 }
 
 void Widget::setClickThrough(bool value) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	this->click_through = value;
 }
 
@@ -374,18 +374,18 @@ void Widget::setParentSilent(Widget* new_parent) {
 }
 
 void Widget::setParent(Widget* new_parent) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	setParentSilent(new_parent);
 	internalOnSetParent(new_parent);
 }
 
 void Widget::setForceCustomCursor(bool value) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	this->force_custom_cursor = value;
 }
 
 void Widget::setName(const std::string& new_name) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	if (parent) {
 		parent->children_names.remove(this->name, this);
 		parent->children_names.add(new_name, this);
@@ -395,28 +395,28 @@ void Widget::setName(const std::string& new_name) {
 }
 
 void Widget::setClipChildren(bool value) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	if (this == widget_list.root_widget && value == false) {
-		assert(false, "Cannot disable clipChildren for root widget");
+		wAssert(false, "Cannot disable clipChildren for root widget");
 	}
 	this->clip_children = value;
 }
 
 void Widget::setRenderLayer(RenderLayer layer) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	this->layer = layer;
 	widget_list.render_queue.invalidate();
 }
 
 void Widget::removeFocus() {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	if (isFocused()) {
 		widget_list.setFocusedWidget(nullptr);
 	}
 }
 
 void Widget::processKeyboardEvent(const sf::Event& event) {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	internalProcessKeyboardEvent(event);
 }
 
@@ -425,7 +425,7 @@ sf::Vector2f Widget::getRenderPositionOffset() const {
 }
 
 void Widget::updateAnchoredPosition() {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	sf::Vector2f parent_size;
 	if (parent) {
 		parent_size = parent->getLocalBounds().getSize();
@@ -435,7 +435,7 @@ void Widget::updateAnchoredPosition() {
 }
 
 void Widget::update() {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	if (!visible) {
 		return;
 	}
@@ -477,7 +477,7 @@ std::string Widget::calcFullName() const {
 }
 
 void Widget::updateFullName() {
-	assert(!widget_list.isLocked());
+	wAssert(!widget_list.isLocked());
 	full_name = calcFullName();
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->updateFullName();
