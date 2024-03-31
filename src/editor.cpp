@@ -477,13 +477,14 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                 if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
                     try_select_tool(&move_tool);
                     grab_selected();
-                    leftButtonProcessWidgetsOnPress = false;
+                    startMoveGesture();
                 }
                 break;
             case sf::Keyboard::R:
                 if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
                     try_select_tool(&rotate_tool);
                     rotate_selected();
+                    startMoveGesture();
                 }
                 break;
             case sf::Keyboard::D:
@@ -495,7 +496,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                         try_select_tool(&move_tool);
                         grab_selected();
                         commit_action = true;
-                        leftButtonProcessWidgetsOnPress = false;
+                        startMoveGesture();
                     }
                 } else {
                     widgets.debug_render = !widgets.debug_render;
@@ -537,9 +538,7 @@ void Editor::onProcessMouseScroll(const sf::Event& event) {
 }
 
 void Editor::onProcessLeftClick() {
-    if (selected_tool == &select_tool) {
-        leftButtonProcessWidgetsOnRelease = false;
-    } else if (selected_tool == &create_tool) {
+    if (selected_tool == &create_tool) {
         std::string id_string = std::to_string(game_objects.getMaxId());
         switch (create_tool.type) {
             case CreateTool::BOX:
@@ -567,14 +566,12 @@ void Editor::onProcessLeftClick() {
             mouse_joint_def.stiffness = 50.0f;
             mouse_joint_def.target = b2MousePosWorld;
             drag_tool.mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
-            leftButtonProcessWidgetsOnRelease = false;
         }
     } else if (selected_tool == &move_tool) {
         for (GameObject* obj : move_tool.moving_objects) {
             //TODO: remember state for all children
             obj->setEnabled(obj->was_enabled, true);
             commit_action = true;
-            leftButtonPressGesture = false;
         }
         try_select_tool(&select_tool);
     } else if (selected_tool == &rotate_tool) {
@@ -582,7 +579,6 @@ void Editor::onProcessLeftClick() {
             //TODO: remember state for all children
             obj->setEnabled(obj->was_enabled, true);
             commit_action = true;
-            leftButtonPressGesture = false;
         }
         try_select_tool(&select_tool);
     } else if (selected_tool == &edit_tool && active_object) {
@@ -605,7 +601,6 @@ void Editor::onProcessLeftClick() {
                 if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     active_object->deselectAllVertices();
                 }
-                leftButtonProcessWidgetsOnRelease = false;
             }
         } else if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             if (edit_tool.edge_vertex == 0) {

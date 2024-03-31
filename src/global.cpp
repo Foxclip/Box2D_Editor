@@ -6,10 +6,6 @@ Logger& operator<<(Logger& lg, const b2Vec2& value) {
 	return lg << "(" << value.x << " " << value.y << ")";
 }
 
-Logger& operator<<(Logger& lg, const sf::Vector2f& value) {
-	return lg << "(" << value.x << " " << value.y << ")";
-}
-
 void draw_line(
 	sf::RenderTarget& target,
 	const sf::Vector2f& v1,

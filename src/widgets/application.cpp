@@ -2,6 +2,10 @@
 #include <Windows.h>
 #include <winuser.h>
 
+Logger& operator<<(Logger& lg, const sf::Vector2f& value) {
+    return lg << "(" << value.x << " " << value.y << ")";
+}
+
 namespace fw {
 
     void Application::init(
@@ -61,6 +65,10 @@ namespace fw {
 
     void Application::onRender() { }
 
+    void Application::startMoveGesture() {
+        startMoveGesture(MouseGesture::SCREEN);
+    }
+
     void Application::mainLoop() {
         while (window.isOpen()) {
             onFrameBegin();
@@ -113,11 +121,8 @@ namespace fw {
             switch (event.mouseButton.button) {
                 case sf::Mouse::Left:
                     leftButtonPressed = true;
-                    leftButtonPressGesture = true;
-                    leftButtonProcessWidgetsOnRelease = true;
                     mousePressPosf = mousePosf;
                     processLeftClick();
-                    leftButtonProcessWidgetsOnPress = true;
                     break;
                 case sf::Mouse::Right:
                     rightButtonPressed = true;
@@ -130,7 +135,6 @@ namespace fw {
                 case sf::Mouse::Left:
                     leftButtonPressed = false;
                     processLeftRelease();
-                    leftButtonPressGesture = false;
                     break;
                 case sf::Mouse::Right:
                     rightButtonPressed = false;
@@ -142,27 +146,80 @@ namespace fw {
         }
     }
 
+    void Application::startNormalGesture(
+        MouseGesture::MouseGestureSource source,
+        sf::Mouse::Button button
+    ) {
+        LoggerTag tag_mouse_gesture("mouseGesture");
+        mouseGesture = MouseGesture(source, MouseGesture::NORMAL, mousePosf, button);
+        std::string source_str = source == MouseGesture::WIDGETS ? "widgets" : "screen";
+        std::string type_str = "normal";
+        std::string button_str;
+        switch (button) {
+            case sf::Mouse::Left: button_str = "left"; break;
+            case sf::Mouse::Right: button_str = "right"; break;
+            case sf::Mouse::Middle: button_str = "middle"; break;
+            default: button_str = "other"; break;
+        }
+        logger << "Start gesture: \n";
+        LoggerIndent indent;
+        logger << source_str << "\n";
+        logger << type_str << "\n";
+        logger << mousePosf << "\n";
+        logger << button_str << "\n";
+    }
+
+    void Application::startMoveGesture(
+        MouseGesture::MouseGestureSource source
+    ) {
+        LoggerTag tag_mouse_gesture("mouseGesture");
+        mouseGesture = MouseGesture(source, MouseGesture::MOVE, mousePosf, sf::Mouse::Left);
+        std::string source_str = source == MouseGesture::WIDGETS ? "widgets" : "screen";
+        std::string type_str = "move";
+        logger << "Start gesture: \n";
+        LoggerIndent indent;
+        logger << source_str << "\n";
+        logger << type_str << "\n";
+        logger << mousePosf << "\n";
+    }
+
+    void Application::endGesture() {
+        LoggerTag tag_mouse_gesture("mouseGesture");
+        mouseGesture.active = false;
+        logger << "End gesture\n";
+    }
+
     void Application::processLeftClick() {
-        if (leftButtonProcessWidgetsOnPress) {
+        if (mouseGesture.active) {
+            if (mouseGesture.type == MouseGesture::MOVE) {
+                if (mouseGesture.source == MouseGesture::WIDGETS) {
+                    // skipping for now
+                } else if (mouseGesture.source == MouseGesture::SCREEN) {
+                    onProcessLeftClick();
+                }
+                endGesture();
+            }
+        } else {
             widgets.processClick(mousePosf);
             if (widgets.isClickBlocked()) {
-                return;
+                startNormalGesture(MouseGesture::WIDGETS, sf::Mouse::Left);
+            } else {
+                startNormalGesture(MouseGesture::SCREEN, sf::Mouse::Left);
+                onProcessLeftClick();
             }
         }
-        onProcessLeftClick();
     }
 
     void Application::processLeftRelease() {
-        if (!leftButtonPressGesture) {
+        if (!mouseGesture.active) {
             return;
         }
-        if (leftButtonProcessWidgetsOnRelease && widgets.getFocusedWidget()) {
+        if (mouseGesture.source == MouseGesture::WIDGETS) {
             widgets.processRelease(mousePosf);
-            if (widgets.isReleaseBlocked()) {
-                return;
-            }
+        } else if (mouseGesture.source == MouseGesture::SCREEN) {
+            onProcessLeftRelease();
         }
-        onProcessLeftRelease();
+        endGesture();
     }
 
     void Application::processKeyboard() {
@@ -178,7 +235,10 @@ namespace fw {
             case sf::Cursor::Text: window.setMouseCursor(text_cursor); break;
             default: window.setMouseCursor(arrow_cursor); break;
         }
-        onProcessMouse();
+        bool non_screen_gesture = mouseGesture.active && mouseGesture.source != MouseGesture::SCREEN;
+        if (!non_screen_gesture) {
+            onProcessMouse();
+        }
         mousePrevPos = mousePos;
     }
 
@@ -195,6 +255,21 @@ namespace fw {
         onRender();
         widgets.render(window);
         window.display();
+    }
+
+    MouseGesture::MouseGesture() { }
+
+    MouseGesture::MouseGesture(
+        MouseGestureSource source,
+        MouseGestureType type,
+        sf::Vector2f startPos,
+        sf::Mouse::Button button
+    ) {
+        this->source = source;
+        this->type = type;
+        this->startPos = startPos;
+        this->button = button;
+        active = true;
     }
 
 }

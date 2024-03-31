@@ -3,7 +3,32 @@
 #include <SFML/Graphics.hpp>
 #include "widget_list.h"
 
+Logger& operator<<(Logger& lg, const sf::Vector2f& value);
+
 namespace fw {
+
+	struct MouseGesture {
+		enum MouseGestureType {
+			NORMAL,
+			MOVE,
+		};
+		enum MouseGestureSource {
+			WIDGETS,
+			SCREEN,
+		};
+		bool active = false;
+		MouseGestureSource source;
+		MouseGestureType type;
+		sf::Vector2f startPos;
+		sf::Mouse::Button button;
+		MouseGesture();
+		MouseGesture(
+			MouseGestureSource source,
+			MouseGestureType type,
+			sf::Vector2f startPos,
+			sf::Mouse::Button button
+		);
+	};
 
 	class Application {
 	public:
@@ -26,9 +51,7 @@ namespace fw {
 		sf::Vector2f mousePressPosf;
 		bool leftButtonPressed = false;
 		bool rightButtonPressed = false;
-		bool leftButtonPressGesture = false;
-		bool leftButtonProcessWidgetsOnPress = true;
-		bool leftButtonProcessWidgetsOnRelease = true;
+		MouseGesture mouseGesture;
 		sf::Cursor arrow_cursor;
 		sf::Cursor text_cursor;
 
@@ -49,6 +72,7 @@ namespace fw {
 		virtual void afterProcessInput();
 		virtual void onProcessWorld();
 		virtual void onRender();
+		void startMoveGesture();
 
 	private:
 		void mainLoop();
@@ -57,6 +81,14 @@ namespace fw {
 		void processWindowEvent(const sf::Event& event);
 		void processKeyboardEvent(const sf::Event& event);
 		void processMouseEvent(const sf::Event& event);
+		void startNormalGesture(
+			MouseGesture::MouseGestureSource source,
+			sf::Mouse::Button button
+		);
+		void startMoveGesture(
+			MouseGesture::MouseGestureSource source
+		);
+		void endGesture();
 		void processLeftClick();
 		void processLeftRelease();
 		void processKeyboard();

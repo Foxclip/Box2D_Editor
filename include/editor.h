@@ -25,7 +25,6 @@ const int HOVER_OUTLINE_THICKNESS = 1;
 const int MOUSE_DRAG_THRESHOLD = 10;
 
 Logger& operator<<(Logger& lg, const b2Vec2& value);
-Logger& operator<<(Logger& lg, const sf::Vector2f& value);
 
 class QueryCallback : public b2QueryCallback {
 public:

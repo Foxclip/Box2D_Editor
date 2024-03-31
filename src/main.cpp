@@ -47,11 +47,11 @@ int main() {
     LoggerDisableTag disable_serialize_tag("serialize");
     LoggerDisableTag disable_recut_tag("recut");
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
+    LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
     std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: fix reselecting select tool when object is selected
     // TODO: separate Simulation and Application,
     // interface in Application, physics and object management in Simulation
     // TODO: blinking textbox cursor
