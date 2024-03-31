@@ -5,8 +5,8 @@ CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
     : fw::ContainerWidget(widget_list), app(p_app) {
     setVisible(false);
     setFillColor(sf::Color(255, 0, 0, 0));
-    setOrigin(Widget::CENTER_LEFT);
-    setParentAnchor(Widget::CENTER_LEFT);
+    setOrigin(Anchor::CENTER_LEFT);
+    setParentAnchor(Anchor::CENTER_LEFT);
     setHorizontal(false);
     setPadding(CREATE_PANEL_PADDING);
     setClickThrough(false);
@@ -31,8 +31,8 @@ CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
         text_widget->setString(CreateTool::create_type_name(static_cast<CreateTool::ObjectType>(i)));
         text_widget->setFillColor(sf::Color::Black);
-        text_widget->setOrigin(Widget::CENTER);
-        text_widget->setParentAnchor(Widget::CENTER);
+        text_widget->setOrigin(Anchor::CENTER);
+        text_widget->setParentAnchor(Anchor::CENTER);
         text_widget->setParent(button_widget);
         app.create_tool.create_buttons.add(button_widget);
         button_widget->setParent(this);

@@ -7,8 +7,8 @@ EditWindow::EditWindow(fw::WidgetList& widget_list, Editor& p_app)
     setSize(sf::Vector2f(100.0f, 200.0f));
     setHorizontal(false);
     setFillColor(sf::Color(128, 128, 128));
-    setOrigin(Widget::CENTER);
-    setParentAnchor(Widget::CENTER);
+    setOrigin(Anchor::CENTER);
+    setParentAnchor(Anchor::CENTER);
     setAnchorOffset(-20.0f, 20.0f);
     setPadding(TOOLBOX_PADDING);
     setClickThrough(false);
@@ -128,7 +128,7 @@ EditWindowParameter::EditWindowParameter(EditWindow& p_edit_window)
 fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::string& name, const std::string& text) {
     fw::ContainerWidget* parameter_widget = app.widgets.createWidget<fw::ContainerWidget>();
     parameter_widget->setFillColor(sf::Color::Transparent);
-    parameter_widget->setVerticalAlignment(fw::Widget::ALIGN_CENTER);
+    parameter_widget->setVerticalAlignment(fw::Widget::Alignment::ALIGN_CENTER);
     parameter_widget->setParent(&edit_window);
     parameter_widget->setName(name);
     fw::TextWidget* parameter_text_widget = app.widgets.createWidget<fw::TextWidget>();

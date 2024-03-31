@@ -284,14 +284,14 @@ namespace fw {
 	void Widget::setOrigin(float x, float y) {
 		wAssert(!widget_list.isLocked());
 		getTransformable().setOrigin(x, y);
-		this->origin_anchor = CUSTOM;
+		this->origin_anchor = Anchor::CUSTOM;
 		updateAnchoredPosition();
 	}
 
 	void Widget::setOrigin(const sf::Vector2f& origin) {
 		wAssert(!widget_list.isLocked());
 		getTransformable().setOrigin(origin);
-		this->origin_anchor = CUSTOM;
+		this->origin_anchor = Anchor::CUSTOM;
 		updateAnchoredPosition();
 	}
 
@@ -569,15 +569,15 @@ namespace fw {
 	sf::Vector2f Widget::anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size) {
 		float x = orig.x, y = orig.y;
 		switch (p_anchor) {
-			case Widget::TOP_LEFT: x = 0.0f; y = 0.0f; break;
-			case Widget::TOP_CENTER: x = size.x / 2.0f; y = 0.0f; break;
-			case Widget::TOP_RIGHT: x = size.x; y = 0.0f; break;
-			case Widget::CENTER_LEFT: x = 0.0f; y = size.y / 2.0f; break;
-			case Widget::CENTER: x = size.x / 2.0f; y = size.y / 2.0f; break;
-			case Widget::CENTER_RIGHT: x = size.x; y = size.y / 2.0f; break;
-			case Widget::BOTTOM_LEFT: x = 0.0f; y = size.y; break;
-			case Widget::BOTTOM_CENTER: x = size.x / 2.0f; y = size.y; break;
-			case Widget::BOTTOM_RIGHT: x = size.x; y = size.y; break;
+			case Anchor::TOP_LEFT: x = 0.0f; y = 0.0f; break;
+			case Anchor::TOP_CENTER: x = size.x / 2.0f; y = 0.0f; break;
+			case Anchor::TOP_RIGHT: x = size.x; y = 0.0f; break;
+			case Anchor::CENTER_LEFT: x = 0.0f; y = size.y / 2.0f; break;
+			case Anchor::CENTER: x = size.x / 2.0f; y = size.y / 2.0f; break;
+			case Anchor::CENTER_RIGHT: x = size.x; y = size.y / 2.0f; break;
+			case Anchor::BOTTOM_LEFT: x = 0.0f; y = size.y; break;
+			case Anchor::BOTTOM_CENTER: x = size.x / 2.0f; y = size.y; break;
+			case Anchor::BOTTOM_RIGHT: x = size.x; y = size.y; break;
 		}
 		return sf::Vector2f(x, y);
 	}

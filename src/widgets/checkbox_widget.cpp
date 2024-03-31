@@ -12,8 +12,8 @@ namespace fw {
 		check_widget->setVisible(checked);
 		check_widget->setSize(rect.getSize() * check_size);
 		check_widget->setFillColor(check_fill_color);
-		check_widget->setOrigin(CENTER);
-		check_widget->setParentAnchor(CENTER);
+		check_widget->setOrigin(Anchor::CENTER);
+		check_widget->setParentAnchor(Anchor::CENTER);
 		check_widget->setParent(this);
 		check_widget->setName("check");
 	}

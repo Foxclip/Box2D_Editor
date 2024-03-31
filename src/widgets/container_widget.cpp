@@ -77,34 +77,34 @@ namespace fw {
 
 	Widget::Anchor ContainerWidget::alignmentToAnchor(Alignment alignment) const {
 		switch (alignment) {
-			case Widget::ALIGN_TOP: return TOP_LEFT;
-			case Widget::ALIGN_CENTER:
+			case Alignment::ALIGN_TOP: return Anchor::TOP_LEFT;
+			case Alignment::ALIGN_CENTER:
 				if (horizontal) {
-					return CENTER_LEFT;
+					return Anchor::CENTER_LEFT;
 				} else {
-					return TOP_CENTER;
+					return Anchor::TOP_CENTER;
 				}
 				break;
-			case Widget::ALIGN_BOTTOM: return BOTTOM_LEFT;
-			case Widget::ALIGN_LEFT: return TOP_LEFT;
-			case Widget::ALIGN_RIGHT: return TOP_RIGHT;
-			default: wAssert(false, "Unknown alignment: " + std::to_string(alignment)); return Widget::TOP_LEFT;
+			case Alignment::ALIGN_BOTTOM: return Anchor::BOTTOM_LEFT;
+			case Alignment::ALIGN_LEFT: return Anchor::TOP_LEFT;
+			case Alignment::ALIGN_RIGHT: return Anchor::TOP_RIGHT;
+			default: wAssert(false, "Unknown alignment: " + std::to_string((int)alignment)); return Anchor::TOP_LEFT;
 		}
 	}
 
 	float ContainerWidget::alignmentToOffset(Alignment alignment, float max_size) const {
 		if (horizontal) {
 			switch (vertical_alignment) {
-				case ALIGN_TOP: return 0.0f;
-				case ALIGN_CENTER: return max_size / 2.0f;
-				case ALIGN_BOTTOM: return max_size;
+				case Alignment::ALIGN_TOP: return 0.0f;
+				case Alignment::ALIGN_CENTER: return max_size / 2.0f;
+				case Alignment::ALIGN_BOTTOM: return max_size;
 				default: return 0.0f;
 			}
 		} else {
 			switch (horizontal_alignment) {
-				case ALIGN_LEFT: return 0.0f;
-				case ALIGN_CENTER: return max_size / 2.0f;
-				case ALIGN_RIGHT: return max_size;
+				case Alignment::ALIGN_LEFT: return 0.0f;
+				case Alignment::ALIGN_CENTER: return max_size / 2.0f;
+				case Alignment::ALIGN_RIGHT: return max_size;
 				default: return 0.0f;
 			}
 		}

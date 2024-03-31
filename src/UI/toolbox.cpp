@@ -4,8 +4,8 @@
 Toolbox::Toolbox(fw::WidgetList& widget_list, Editor& p_app)
     : fw::ContainerWidget(widget_list), app(p_app) {
     setFillColor(sf::Color(255, 0, 0, 0));
-    setOrigin(Widget::TOP_CENTER);
-    setParentAnchor(Widget::TOP_CENTER);
+    setOrigin(Anchor::TOP_CENTER);
+    setParentAnchor(Anchor::TOP_CENTER);
     setPadding(TOOLBOX_PADDING);
     setClickThrough(false);
     setName("toolbox");
@@ -34,8 +34,8 @@ Toolbox::Toolbox(fw::WidgetList& widget_list, Editor& p_app)
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
         text_widget->setString(app.tools[i]->name);
         text_widget->setFillColor(sf::Color::Black);
-        text_widget->setOrigin(Widget::CENTER);
-        text_widget->setParentAnchor(Widget::CENTER);
+        text_widget->setOrigin(Anchor::CENTER);
+        text_widget->setParentAnchor(Anchor::CENTER);
         text_widget->setParent(tool_widget);
         tool->widget = tool_widget;
         app.tools_in_tool_panel.push_back(tool);

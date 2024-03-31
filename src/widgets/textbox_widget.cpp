@@ -11,9 +11,9 @@ namespace fw {
 		setForceCustomCursor(true);
 		text_widget = widget_list.createWidget<TextWidget>();
 		text_widget->setFillColor(text_color);
-		text_widget->setParentAnchor(CENTER_LEFT);
+		text_widget->setParentAnchor(Anchor::CENTER_LEFT);
 		text_widget->setAnchorOffset(TEXT_VIEW_ZERO_POS);
-		text_widget->setOrigin(CENTER_LEFT);
+		text_widget->setOrigin(Anchor::CENTER_LEFT);
 		text_widget->setRenderLayer(RenderLayer::TEXTBOX_TEXT);
 		text_widget->setParent(this);
 		cursor_widget = widget_list.createWidget<RectangleWidget>();

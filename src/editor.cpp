@@ -319,7 +319,7 @@ void Editor::init_widgets() {
     // pause widget
     paused_rect_widget = widgets.createWidget<fw::ContainerWidget>();
     paused_rect_widget->setFillColor(sf::Color(0, 0, 0, 128));
-    paused_rect_widget->setOrigin(fw::Widget::TOP_LEFT);
+    paused_rect_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     paused_rect_widget->setPadding(10.0f);
     paused_rect_widget->setName("paused rect");
     fw::TextWidget* paused_text_widget = widgets.createWidget<fw::TextWidget>();
@@ -327,13 +327,13 @@ void Editor::init_widgets() {
     paused_text_widget->setString("PAUSED");
     paused_text_widget->setCharacterSize(24);
     paused_text_widget->setFillColor(sf::Color::Yellow);
-    paused_text_widget->setOrigin(fw::Widget::TOP_LEFT);
+    paused_text_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     paused_text_widget->setParent(paused_rect_widget);
 
     // fps
     fps_widget = widgets.createWidget<fw::ContainerWidget>();
     fps_widget->setFillColor(sf::Color::Yellow);
-    fps_widget->setOrigin(fw::Widget::TOP_LEFT);
+    fps_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     fps_widget->setPosition(120.0f, 0.0f);
     fps_widget->setPadding(0.0f);
     fps_widget->setName("fps");
@@ -341,7 +341,7 @@ void Editor::init_widgets() {
     fps_text_widget->setFont(fps_font);
     fps_text_widget->setCharacterSize(32);
     fps_text_widget->setFillColor(sf::Color::Black);
-    fps_text_widget->setOrigin(fw::Widget::TOP_LEFT);
+    fps_text_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     fps_text_widget->setAdjustLocalBounds(false);
     fps_text_widget->setParent(fps_widget);
 
@@ -349,16 +349,16 @@ void Editor::init_widgets() {
     logger_widget = widgets.createWidget<fw::RectangleWidget>();
     logger_widget->setFillColor(sf::Color(0, 0, 0));
     logger_widget->setSize(sf::Vector2f(500.0f, 20.0f));
-    logger_widget->setOrigin(fw::Widget::BOTTOM_LEFT);
-    logger_widget->setParentAnchor(fw::Widget::BOTTOM_LEFT);
+    logger_widget->setOrigin(fw::Widget::Anchor::BOTTOM_LEFT);
+    logger_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_LEFT);
     logger_widget->setClipChildren(true);
     logger_widget->setName("logger");
     logger_text_widget = widgets.createWidget<fw::TextWidget>();
     logger_text_widget->setFont(console_font);
     logger_text_widget->setCharacterSize(15);
     logger_text_widget->setFillColor(sf::Color::White);
-    logger_text_widget->setOrigin(fw::Widget::TOP_LEFT);
-    logger_text_widget->setParentAnchor(fw::Widget::TOP_LEFT);
+    logger_text_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
+    logger_text_widget->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
 

@@ -34,7 +34,7 @@ namespace fw {
 
 	class Widget {
 	public:
-		enum Anchor {
+		enum class Anchor {
 			CUSTOM,
 			TOP_LEFT,
 			TOP_CENTER,
@@ -46,7 +46,7 @@ namespace fw {
 			BOTTOM_CENTER,
 			BOTTOM_RIGHT,
 		};
-		enum Alignment {
+		enum class Alignment {
 			ALIGN_TOP,
 			ALIGN_CENTER,
 			ALIGN_BOTTOM,
@@ -153,8 +153,8 @@ namespace fw {
 		CompVector<Widget*> children;
 		SearchIndexMultiple<std::string, Widget> children_names;
 		RenderLayer layer = RenderLayer::BASE;
-		Anchor origin_anchor = CUSTOM;
-		Anchor parent_anchor = CUSTOM;
+		Anchor origin_anchor = Anchor::CUSTOM;
+		Anchor parent_anchor = Anchor::CUSTOM;
 		sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);
 		WidgetUnclippedRegion unclipped_region = WidgetUnclippedRegion(this);
 		bool visible = true;

@@ -27,8 +27,8 @@ namespace fw {
 		bool horizontal = true;
 		float horizontal_padding = 0.0f;
 		float vertical_padding = 0.0f;
-		Alignment vertical_alignment = ALIGN_TOP;
-		Alignment horizontal_alignment = ALIGN_LEFT;
+		Alignment vertical_alignment = Alignment::ALIGN_TOP;
+		Alignment horizontal_alignment = Alignment::ALIGN_LEFT;
 
 	};
 
