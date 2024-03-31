@@ -1,8 +1,6 @@
 #pragma once
 
 #include "gameobject.h" // keep above windows imports
-#include <Windows.h>
-#include <winuser.h>
 #include <functional>
 #include <set>
 #include "logger.h"
@@ -10,7 +8,6 @@
 #include "history.h"
 #include "widgets/widgets.h"
 #include "objectlist.h"
-#include "UI/edit_window.h"
 
 const sf::String WINDOW_TITLE = "Box2D Editor";
 const int WINDOW_WIDTH = 800;
@@ -189,7 +186,6 @@ private:
 	void init_widgets();
 	void render_world();
 	void render_ui();
-	void maximize_window() const;
 	std::string serialize() const;
 	void deserialize(const std::string& str, bool set_camera);
 	void save_to_file(const std::string& filename) const;

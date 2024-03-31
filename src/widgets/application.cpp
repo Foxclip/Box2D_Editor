@@ -1,4 +1,6 @@
 #include "widgets/application.h"
+#include <Windows.h>
+#include <winuser.h>
 
 namespace fw {
 
@@ -18,6 +20,11 @@ namespace fw {
     void Application::start() {
         onStart();
         mainLoop();
+    }
+
+    void Application::maximizeWindow() const {
+        sf::WindowHandle windowHandle = window.getSystemHandle();
+        ShowWindow(windowHandle, SW_MAXIMIZE);
     }
 
     void Application::onInit() { }

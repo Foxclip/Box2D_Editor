@@ -213,7 +213,7 @@ void Editor::onInit() {
     };
     try_select_tool_by_index(0); // should be after init_tools and init_ui
     select_create_type(0);
-    maximize_window();
+    maximizeWindow();
     auto getter = [&]() { return serialize(); };
     auto setter = [&](std::string str) { deserialize(str, false); };
     history = History<std::string>("Editor", getter, setter);
@@ -937,11 +937,6 @@ void Editor::render_ui() {
     ui_texture.display();
     sf::Sprite ui_sprite(ui_texture.getTexture());
     window.draw(ui_sprite);
-}
-
-void Editor::maximize_window() const {
-    sf::WindowHandle windowHandle = window.getSystemHandle();
-    ShowWindow(windowHandle, SW_MAXIMIZE);
 }
 
 std::string Editor::serialize() const {

@@ -14,6 +14,7 @@ namespace fw {
 			unsigned int antialiasing
 		);
 		virtual void start();
+		void maximizeWindow() const;
 
 	protected:
 		sf::RenderWindow window;

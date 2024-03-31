@@ -51,8 +51,8 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: fix all warnings
-    // TODO: move maximizeWindow to Application
+    // TODO: set warning level to W4 (Wall)
+    // TODO: make Widget::Anchor and Widget::Alignment enum class
     // TODO: separate Simulation and Application,
     // interface in Application, physics and object management in Simulation
     // TODO: blinking textbox cursor
