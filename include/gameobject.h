@@ -2,13 +2,11 @@
 
 #include <set>
 #include <SFML/Graphics.hpp>
-#pragma warning(disable: 26495) // disable intellisense "uninitialized variable" warning
 #include "box2d/box2d.h"
-#pragma warning(default: 26495)
-#include "widgets/widgets.h"
+#include "compvector.h"
 #include "serializer.h"
 #include "polygon.h"
-#include "compvector.h"
+#include "utils.h"
 
 class LineStripShape : public sf::Drawable, public sf::Transformable {
 public:

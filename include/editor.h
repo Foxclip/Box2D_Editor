@@ -1,13 +1,12 @@
 #pragma once
 
-#include "gameobject.h" // keep above windows imports
 #include <functional>
 #include <set>
 #include "logger.h"
 #include "tools.h"
 #include "history.h"
 #include "widgets/widgets.h"
-#include "objectlist.h"
+#include "simulation.h"
 
 const sf::String WINDOW_TITLE = "Box2D Editor";
 const int WINDOW_WIDTH = 800;
@@ -53,9 +52,9 @@ public:
 	void load(const std::string& filename);
 	void setCameraPos(float x, float y);
 	void setCameraZoom(float zoom);
-	GameObjectList& getObjectList();
 	fw::WidgetList& getWidgetList();
 	void selectSingleObject(GameObject* object, bool with_children = false);
+	GameObjectList& getObjectList();
 	BoxObject* create_box(
 		const std::string& name,
 		const b2Vec2& pos,
@@ -142,16 +141,13 @@ private:
 	sf::Text object_info_text;
 	sf::Text id_text;
 
-	const int32 VELOCITY_ITERATIONS = 6;
-	const int32 POSITION_ITERATIONS = 2;
 	const float MOUSE_FORCE_SCALE = 50.0f;
-	std::unique_ptr<b2World> world;
 	float timeStep = 1.0f / FPS;
 	bool paused = true;
 	bool render_object_info = true;
 	b2Vec2 b2MousePosWorld;
 	GameObject* active_object = nullptr;
-	GameObjectList game_objects;
+	Simulation simulation;
 
 	History<std::string> history;
 	bool commit_action = false;
@@ -180,7 +176,6 @@ private:
 	void onProcessWorld() override;
 	void onRender() override;
 	void init_tools();
-	void init_world();
 	void init_ui();
 	void init_widgets();
 	void render_world();

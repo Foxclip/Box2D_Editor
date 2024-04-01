@@ -52,13 +52,15 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: separate Simulation and Application,
-    // interface in Application, physics and object management in Simulation
+    // TODO: change working directory
+    // TODO: inherit Simulation from GameObjectList
+    // TODO: fix drag tool crash
     // TODO: blinking textbox cursor
     // TODO: remove global.h
     // TODO: don't fill window with black color in Application::Render
     // TODO: CanvasWidget as a replacement to screen textures
     // TODO: EventRecorder for ui tests
+    // TODO: make tool panel with move, rotate and duplicate tools
     // TODO: make SearchIndex not use pointers for TObject type
     // TODO: align textboxes in EditWindow to the right
     // TODO: Dropdown widget

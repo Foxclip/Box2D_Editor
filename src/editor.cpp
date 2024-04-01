@@ -33,16 +33,16 @@ void Editor::setCameraZoom(float zoom) {
     zoomFactor = zoom;
 }
 
-GameObjectList& Editor::getObjectList() {
-    return game_objects;
-}
-
 fw::WidgetList& Editor::getWidgetList() {
     return widgets;
 }
 
 void Editor::selectSingleObject(GameObject* object, bool with_children) {
     select_tool.selectSingleObject(object, with_children);
+}
+
+GameObjectList& Editor::getObjectList() {
+    return simulation.getObjectList();
 }
 
 BoxObject* Editor::create_box(
@@ -52,17 +52,7 @@ BoxObject* Editor::create_box(
     const b2Vec2& size,
     const sf::Color& color
 ) {
-    b2BodyDef def;
-    def.type = b2_dynamicBody;
-    def.position = pos;
-    def.angle = angle;
-    std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(
-        &game_objects, def, size, color
-    );
-    BoxObject* ptr = uptr.get();
-    ptr->setName(name);
-    game_objects.add(std::move(uptr), true);
-    return ptr;
+    return simulation.create_box(name, pos, angle, size, color);
 }
 
 BallObject* Editor::create_ball(
@@ -72,16 +62,7 @@ BallObject* Editor::create_ball(
     const sf::Color& color,
     const sf::Color& notch_color
 ) {
-    b2BodyDef def;
-    def.type = b2_dynamicBody;
-    def.position = pos;
-    std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(
-        &game_objects, def, radius, color, notch_color
-    );
-    BallObject* ptr = uptr.get();
-    ptr->setName(name);
-    game_objects.add(std::move(uptr), true);
-    return ptr;
+    return simulation.create_ball(name, pos, radius, color, notch_color);
 }
 
 PolygonObject* Editor::create_polygon(
@@ -91,17 +72,7 @@ PolygonObject* Editor::create_polygon(
     const std::vector<b2Vec2>& vertices,
     const sf::Color& color
 ) {
-    b2BodyDef def;
-    def.type = b2_dynamicBody;
-    def.position = pos;
-    def.angle = angle;
-    std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(
-        &game_objects, def, vertices, color
-    );
-    PolygonObject* ptr = uptr.get();
-    ptr->setName(name);
-    game_objects.add(std::move(uptr), true);
-    return ptr;
+    return simulation.create_polygon(name, pos, angle, vertices, color);
 }
 
 PolygonObject* Editor::create_car(
@@ -111,63 +82,7 @@ PolygonObject* Editor::create_car(
     const std::vector<float>& wheels,
     const sf::Color& color
 ) {
-    b2BodyDef def;
-    def.type = b2_dynamicBody;
-    def.position = pos;
-    std::vector<b2Vec2> vertices;
-    for (size_t i = 0; i < lengths.size(); i++) {
-        b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
-        vertices.push_back(pos);
-    }
-    std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(
-        &game_objects, def, vertices, color
-    );
-    PolygonObject* car_ptr = uptr.get();
-    car_ptr->setName(name);
-    game_objects.add(std::move(uptr), true);
-    size_t wheel_count = 0;
-
-    for (size_t i = 0; i < wheels.size(); i++) {
-        if (wheels[i] == 0.0f) {
-            continue;
-        }
-        b2Vec2 wheel_pos = utils::get_pos<b2Vec2>(lengths, i);
-        b2Vec2 anchor_pos = wheel_pos;
-        b2Vec2 anchor_pos_world = car_ptr->rigid_body->GetPosition() + anchor_pos;
-        float radius = wheels[i];
-        b2BodyDef wheel_body_def;
-        {
-            wheel_body_def.type = b2_dynamicBody;
-            wheel_body_def.position = anchor_pos_world;
-        }
-        std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
-            &game_objects, wheel_body_def, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
-        );
-        BallObject* wheel_ptr = wheel.get();
-        {
-            wheel_ptr->setDensity(1.0f, false);
-            wheel_ptr->setFriction(0.3f, false);
-            wheel_ptr->setRestitution(0.5f, false);
-            std::string wheel_name = car_ptr->getName() + " wheel" + std::to_string(wheel_count);
-            wheel_ptr->setName(wheel_name);
-            wheel_ptr->setParent(car_ptr);
-            game_objects.add(std::move(wheel), true);
-        }
-        b2RevoluteJointDef wheel_joint_def;
-        {
-            wheel_joint_def.Initialize(car_ptr->rigid_body, wheel_ptr->rigid_body, anchor_pos_world);
-            wheel_joint_def.maxMotorTorque = 30.0f;
-            wheel_joint_def.motorSpeed = -10.0f;
-            wheel_joint_def.enableMotor = true;
-            std::unique_ptr<RevoluteJoint> joint = std::make_unique<RevoluteJoint>(
-                wheel_joint_def, world.get(), car_ptr, wheel_ptr
-            );
-            game_objects.addJoint(std::move(joint));
-        }
-        wheel_count++;
-    }
-
-    return car_ptr;
+    return simulation.create_car(name, pos, lengths, wheels, color);
 }
 
 ChainObject* Editor::create_chain(
@@ -177,16 +92,7 @@ ChainObject* Editor::create_chain(
     const std::vector<b2Vec2>& vertices,
     const sf::Color& color
 ) {
-    b2BodyDef def;
-    def.position = pos;
-    def.angle = angle;
-    std::unique_ptr<ChainObject> uptr = std::make_unique<ChainObject>(
-        &game_objects, def, vertices, color
-    );
-    ChainObject* ptr = uptr.get();
-    ptr->setName(name);
-    game_objects.add(std::move(uptr), true);
-    return ptr;
+    return simulation.create_chain(name, pos, angle, vertices, color);
 }
 
 void Editor::onInit() {
@@ -206,7 +112,6 @@ void Editor::onInit() {
         throw std::runtime_error("Shader loading error");
     }
     init_tools();
-    init_world();
     init_ui();
     logger.OnLineWrite = [&](std::string line) { // should be after init_ui and preferably before any logging
         logger_text_widget->setString(line);
@@ -223,7 +128,6 @@ void Editor::onInit() {
     for (size_t i = 0; i < tools_in_tool_panel.size(); i++) {
         assert(tools_in_tool_panel[i]->widget);
     }
-    assert(game_objects.world);
 }
 
 void Editor::onStart() {
@@ -274,14 +178,6 @@ void Editor::init_tools() {
         }
         edit_tool.edit_window_widget->setVisible(value);
     };
-}
-
-void Editor::init_world() {
-    b2Vec2 gravity(0.0f, -9.8f);
-    world = std::make_unique<b2World>(gravity);
-    b2BodyDef mouse_body_def;
-    drag_tool.mouse_body = world->CreateBody(&mouse_body_def);
-    game_objects.world = world.get();
 }
 
 void Editor::init_ui() {
@@ -450,11 +346,11 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
             case sf::Keyboard::A:
                 if (selected_tool == &select_tool) {
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
-                        for (GameObject* obj : game_objects.getAllVector()) {
+                        for (GameObject* obj : simulation.getObjectList().getAllVector()) {
                             select_tool.deselectObject(obj);
                         }
                     } else {
-                        for (GameObject* obj : game_objects.getAllVector()) {
+                        for (GameObject* obj : simulation.getObjectList().getAllVector()) {
                             select_tool.selectObject(obj);
                         }
                     }
@@ -491,7 +387,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
                         CompVector<GameObject*> old_objects = select_tool.getSelectedObjects();
-                        CompVector<GameObject*> new_objects = game_objects.duplicate(old_objects);
+                        CompVector<GameObject*> new_objects = simulation.getObjectList().duplicate(old_objects);
                         select_tool.setSelected(new_objects);
                         try_select_tool(&move_tool);
                         grab_selected();
@@ -539,16 +435,16 @@ void Editor::onProcessMouseScroll(const sf::Event& event) {
 
 void Editor::onProcessLeftClick() {
     if (selected_tool == &create_tool) {
-        std::string id_string = std::to_string(game_objects.getMaxId());
+        std::string id_string = std::to_string(simulation.getObjectList().getMaxId());
         switch (create_tool.type) {
             case CreateTool::BOX:
-                create_box(
+                simulation.create_box(
                     "box" + id_string, b2MousePosWorld, 0.0f, NEW_BOX_SIZE, NEW_BOX_COLOR
                 );
                 commit_action = true;
                 break;
             case CreateTool::BALL:
-                create_ball(
+                simulation.create_ball(
                     "ball" + id_string, b2MousePosWorld, NEW_BALL_RADIUS, NEW_BALL_COLOR, NEW_BALL_NOTCH_COLOR
                 );
                 commit_action = true;
@@ -557,6 +453,8 @@ void Editor::onProcessLeftClick() {
     } else if (selected_tool == &drag_tool) {
         b2Fixture* grabbed_fixture = get_fixture_at(mousePosf);
         if (grabbed_fixture) {
+            b2BodyDef mouse_body_def;
+            drag_tool.mouse_body = simulation.getWorld()->CreateBody(&mouse_body_def);
             b2Body* grabbed_body = grabbed_fixture->GetBody();
             b2MouseJointDef mouse_joint_def;
             mouse_joint_def.bodyA = drag_tool.mouse_body;
@@ -565,7 +463,7 @@ void Editor::onProcessLeftClick() {
             mouse_joint_def.maxForce = 5000.0f * grabbed_body->GetMass();
             mouse_joint_def.stiffness = 50.0f;
             mouse_joint_def.target = b2MousePosWorld;
-            drag_tool.mouse_joint = (b2MouseJoint*)world->CreateJoint(&mouse_joint_def);
+            drag_tool.mouse_joint = (b2MouseJoint*)simulation.getWorld()->CreateJoint(&mouse_joint_def);
         }
     } else if (selected_tool == &move_tool) {
         for (GameObject* obj : move_tool.moving_objects) {
@@ -633,8 +531,12 @@ void Editor::onProcessLeftRelease() {
         select_tool.rectangle_select.active = false;
         select_tool.applyRectSelection();
     }
+    if (drag_tool.mouse_body) {
+        simulation.getWorld()->DestroyBody(drag_tool.mouse_body);
+        drag_tool.mouse_body = nullptr;
+    }
     if (drag_tool.mouse_joint) {
-        world->DestroyJoint(drag_tool.mouse_joint);
+        simulation.getWorld()->DestroyJoint(drag_tool.mouse_joint);
         drag_tool.mouse_joint = nullptr;
     }
     if (edit_tool.grabbed_vertex != -1) {
@@ -750,8 +652,7 @@ void Editor::afterProcessInput() {
 
 void Editor::onProcessWorld() {
     if (!paused) {
-        world->Step(timeStep, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-        game_objects.transformFromRigidbody();
+        simulation.advance(timeStep);
     }
 }
 
@@ -769,8 +670,8 @@ void Editor::render_world() {
     selection_mask.clear();
     selection_mask.setView(world_view);
 
-    for (size_t i = 0; i < game_objects.getTopSize(); i++) {
-        GameObject* gameobject = game_objects.getFromTop(i);
+    for (size_t i = 0; i < simulation.getObjectList().getTopSize(); i++) {
+        GameObject* gameobject = simulation.getObjectList().getFromTop(i);
         gameobject->draw_varray = selected_tool == &edit_tool && gameobject == active_object;
         gameobject->render(world_texture);
     }
@@ -806,7 +707,7 @@ void Editor::render_ui() {
 
     if (render_object_info) {
         // parent relation lines
-        for (GameObject* object : game_objects.getAllVector()) {
+        for (GameObject* object : simulation.getObjectList().getAllVector()) {
             for (GameObject* child : object->getChildren()) {
                 sf::Vector2f v1 = world_to_screen(object->getGlobalPosition());
                 sf::Vector2f v2 = world_to_screen(child->getGlobalPosition());
@@ -814,16 +715,16 @@ void Editor::render_ui() {
             }
         }
         // object origin circles
-        for (size_t i = 0; i < game_objects.getAllSize(); i++) {
-            GameObject* gameobject = game_objects.getFromAll(i);
+        for (size_t i = 0; i < simulation.getObjectList().getAllSize(); i++) {
+            GameObject* gameobject = simulation.getObjectList().getFromAll(i);
             sf::Color circle_color = gameobject == active_object ? sf::Color(255, 255, 0) : sf::Color(255, 159, 44);
             origin_shape.setFillColor(circle_color);
             origin_shape.setPosition(world_to_screen(gameobject->getGlobalPosition()));
             target.draw(origin_shape);
         }
         // object info
-        for (size_t i = 0; i < game_objects.getAllSize(); i++) {
-            GameObject* gameobject = game_objects.getFromAll(i);
+        for (size_t i = 0; i < simulation.getObjectList().getAllSize(); i++) {
+            GameObject* gameobject = simulation.getObjectList().getFromAll(i);
             size_t info_index = 0;
             auto render_info = [&](const std::string& str) {
                 sf::Vector2f object_screen_pos = world_to_screen(gameobject->getGlobalPosition());
@@ -840,8 +741,8 @@ void Editor::render_ui() {
             render_info(utils::body_type_to_str(gameobject->getType()));
         }
         // indices
-        for (size_t i = 0; i < game_objects.getAllSize(); i++) {
-            if (PolygonObject* polygon_object = dynamic_cast<PolygonObject*>(game_objects.getFromAll(i))) {
+        for (size_t i = 0; i < simulation.getObjectList().getAllSize(); i++) {
+            if (PolygonObject* polygon_object = dynamic_cast<PolygonObject*>(simulation.getObjectList().getFromAll(i))) {
                 if (polygon_object->draw_indices) {
                     // TODO: render indices
                 }
@@ -947,50 +848,7 @@ std::string Editor::serialize() const {
     }
     tw << "/camera";
     tw << "\n\n";
-    size_t index = 0;
-    std::function<void(GameObject*)> serialize_obj = [&](GameObject* obj) {
-        logger << "Object: " << obj->id << "\n";
-        if (index > 0) {
-            tw << "\n\n";
-        }
-        obj->serialize(tw);
-        index++;
-    };
-    std::function<void(GameObject*)> serialize_tree = [&](GameObject* obj) {
-        serialize_obj(obj);
-        LoggerIndent children_indent;
-        for (size_t i = 0; i < obj->getChildren().size(); i++) {
-            serialize_tree(obj->getChild(i));
-        }
-    };
-    {
-        logger << "Objects\n";
-        LoggerIndent objects_indent;
-        if (game_objects.getAllSize() == 0) {
-            logger << "<empty>\n";
-        }
-        for (size_t i = 0; i < game_objects.getTopSize(); i++) {
-            GameObject* gameobject = game_objects.getFromTop(i);
-            serialize_tree(gameobject);
-        }
-    }
-    {
-        logger << "Joints\n";
-        LoggerIndent joints_indent;
-        if (game_objects.getJointsSize() == 0) {
-            logger << "<empty>\n";
-        } else {
-            tw << "\n\n";
-        }
-        for (size_t i = 0; i < game_objects.getJointsSize(); i++) {
-            if (i > 0) {
-                tw << "\n\n";
-            }
-            Joint* joint = game_objects.getJoint(i);
-            logger << "Joint: " << joint->object1->id << " " << joint->object2->id << "\n";
-            game_objects.getJoint(i)->serialize(tw);
-        }
-    }
+    simulation.serialize(tw);
     return tw.toStr();
 }
 
@@ -999,9 +857,7 @@ void Editor::deserialize(const std::string& str, bool set_camera) {
     if (active_object) {
         active_object_id = active_object->id;
     }
-    game_objects.clear();
     init_tools();
-    init_world();
     TokenReader tr(str);
     try {
         while (tr.validRange()) {
@@ -1029,39 +885,14 @@ void Editor::deserialize(const std::string& str, bool set_camera) {
                     viewCenterY = params.y;
                     zoomFactor = params.zoom;
                 }
-            } else if (entity == "object") {
-                std::unique_ptr<GameObject> gameobject;
-                std::string type = tr.readString();
-                if (type == "box") {
-                    gameobject = BoxObject::deserialize(tr, &game_objects);
-                } else if (type == "ball") {
-                    gameobject = BallObject::deserialize(tr, &game_objects);
-                } else if (type == "polygon") {
-                    gameobject = PolygonObject::deserialize(tr, &game_objects);
-                } else if (type == "chain") {
-                    gameobject = ChainObject::deserialize(tr, &game_objects);
-                } else {
-                    throw std::runtime_error("Unknown object type: " + type);
-                }
-                game_objects.add(std::move(gameobject), false);
-            } else if (entity == "joint") {
-                std::string type = tr.readString();
-                if (type == "revolute") {
-                    ptrdiff_t body_a_id, body_b_id;
-                    b2RevoluteJointDef def = RevoluteJoint::deserialize(tr, body_a_id, body_b_id);
-                    GameObject* object1 = game_objects.getById(body_a_id);
-                    GameObject* object2 = game_objects.getById(body_b_id);
-                    std::unique_ptr<RevoluteJoint> uptr = std::make_unique<RevoluteJoint>(def, world.get(), object1, object2);
-                    game_objects.addJoint(std::move(uptr));
-                } else {
-                    throw std::runtime_error("Unknown joint type: " + type);
-                }
+            } else if (entity == "simulation") {
+                simulation.deserialize(tr);
             } else {
                 throw std::runtime_error("Unknown entity type: " + entity);
             }
         }
         if (active_object_id >= 0) {
-            GameObject* object = game_objects.getById(active_object_id);
+            GameObject* object = simulation.getObjectList().getById(active_object_id);
             setActiveObject(object);
         }
     } catch (std::exception exc) {
@@ -1086,7 +917,7 @@ void Editor::load_from_file(const std::string& filename) {
     try {
         std::string str = utils::file_to_str(filename);
         deserialize(str, true);
-        logger << "Loaded from " << filename << "\n";
+        logger << "Editor loaded from " << filename << "\n";
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": " + filename + ": " + std::string(exc.what()));
     }
@@ -1234,7 +1065,7 @@ b2Fixture* Editor::get_fixture_at(const sf::Vector2f& screen_pos) const {
     b2AABB aabb;
     aabb.upperBound = world_pos;
     aabb.lowerBound = world_pos_next;
-    world->QueryAABB(&callback, aabb);
+    simulation.getWorld()->QueryAABB(&callback, aabb);
     for (size_t i = 0; i < callback.fixtures.size(); i++) {
         b2Fixture* fixture = callback.fixtures[i];
         if (fixture->GetShape()->m_type == b2Shape::e_chain) {
@@ -1356,7 +1187,7 @@ void Editor::select_objects_in_rect(const RectangleSelect& rectangle_select) {
     aabb.lowerBound = b2Vec2(lower_x, lower_y);
     aabb.upperBound = b2Vec2(upper_x, upper_y);
     QueryCallback callback;
-    world->QueryAABB(&callback, aabb);
+    simulation.getWorld()->QueryAABB(&callback, aabb);
     for (size_t i = 0; i < callback.fixtures.size(); i++) {
         if (utils::rect_fixture_intersect(aabb.lowerBound, aabb.upperBound, callback.fixtures[i])) {
             GameObject* gameobject = GameObject::getGameobject(callback.fixtures[i]->GetBody());
@@ -1450,7 +1281,7 @@ void Editor::delete_object(GameObject* object, bool remove_children) {
         setActiveObject(nullptr);
     }
     select_tool.deselectObject(object);
-    game_objects.remove(object, remove_children);
+    simulation.getObjectList().remove(object, remove_children);
 }
 
 void Editor::check_debugbreak() {

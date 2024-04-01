@@ -15,6 +15,7 @@ set(SRC_HEADER_FILES
     "${INCLUDE_DIR}/scenes.h"
     "${INCLUDE_DIR}/searchindex.h"
     "${INCLUDE_DIR}/serializer.h"
+    "${INCLUDE_DIR}/simulation.h"
     "${INCLUDE_DIR}/tools.h"
     "${INCLUDE_DIR}/utils.h"
     "${INCLUDE_DIR}/UI/create_panel.h"
@@ -32,6 +33,7 @@ set(SRC_SOURCE_FILES
     polygon.cpp
     searchindex.cpp
     serializer.cpp
+    simulation.cpp
     tools.cpp
     utils.cpp
     UI/create_panel.cpp
