@@ -180,7 +180,7 @@ Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_a, Gam
     ptrdiff_t body_a, body_b;
     if (dynamic_cast<const RevoluteJoint*>(joint)) {
         b2RevoluteJointDef def = RevoluteJoint::deserialize(tr, body_a, body_b);
-        new_joint = std::make_unique<RevoluteJoint>(def, world, new_a, new_b);
+        new_joint = std::make_unique<RevoluteJoint>(def, world.get(), new_a, new_b);
     } else {
         mAssert(false, "Unknown joint type");
     }

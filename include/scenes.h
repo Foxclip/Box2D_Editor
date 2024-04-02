@@ -155,7 +155,6 @@ void box_parent(Editor& app) {
         b2Vec2(1.0f, 1.0f),
         sf::Color(0, 255, 0)
     );
-    GameObjectList& objects = app.getObjectList();
     child->setParent(parent);
     another_child->setParent(child);
     parent->setGlobalPosition(b2Vec2(1.0f, 0.0f));
@@ -182,7 +181,7 @@ void convex_polygon(Editor& app) {
 
 void duplication(Editor& app) {
     app.load("level.txt");
-    GameObjectList& objects = app.getObjectList();
+    GameObjectList& objects = app.getSimulation();
     GameObject* car = objects.getByName("car0");
     logger << "Car pos: " << car->getPosition() << "\n";
     GameObject* car_copy = objects.duplicate(car, true);
@@ -205,7 +204,7 @@ void parent_loop(Editor& app) {
         b2Vec2(1.0f, 1.0f),
         sf::Color(0, 255, 0)
     );
-    GameObjectList& game_objects = app.getObjectList();
+    GameObjectList& game_objects = app.getSimulation();
     box0->setParent(box1);
     box1->setParent(box0);
 }

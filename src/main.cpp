@@ -52,7 +52,6 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: change working directory
     // TODO: inherit Simulation from GameObjectList
     // TODO: fix drag tool crash
     // TODO: blinking textbox cursor

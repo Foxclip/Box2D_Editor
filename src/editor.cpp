@@ -41,8 +41,8 @@ void Editor::selectSingleObject(GameObject* object, bool with_children) {
     select_tool.selectSingleObject(object, with_children);
 }
 
-GameObjectList& Editor::getObjectList() {
-    return simulation.getObjectList();
+Simulation& Editor::getSimulation() {
+    return simulation;
 }
 
 BoxObject* Editor::create_box(
@@ -346,11 +346,11 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
             case sf::Keyboard::A:
                 if (selected_tool == &select_tool) {
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
-                        for (GameObject* obj : simulation.getObjectList().getAllVector()) {
+                        for (GameObject* obj : simulation.getAllVector()) {
                             select_tool.deselectObject(obj);
                         }
                     } else {
-                        for (GameObject* obj : simulation.getObjectList().getAllVector()) {
+                        for (GameObject* obj : simulation.getAllVector()) {
                             select_tool.selectObject(obj);
                         }
                     }
@@ -387,7 +387,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
                         CompVector<GameObject*> old_objects = select_tool.getSelectedObjects();
-                        CompVector<GameObject*> new_objects = simulation.getObjectList().duplicate(old_objects);
+                        CompVector<GameObject*> new_objects = simulation.duplicate(old_objects);
                         select_tool.setSelected(new_objects);
                         try_select_tool(&move_tool);
                         grab_selected();
@@ -435,7 +435,7 @@ void Editor::onProcessMouseScroll(const sf::Event& event) {
 
 void Editor::onProcessLeftClick() {
     if (selected_tool == &create_tool) {
-        std::string id_string = std::to_string(simulation.getObjectList().getMaxId());
+        std::string id_string = std::to_string(simulation.getMaxId());
         switch (create_tool.type) {
             case CreateTool::BOX:
                 simulation.create_box(
@@ -670,8 +670,8 @@ void Editor::render_world() {
     selection_mask.clear();
     selection_mask.setView(world_view);
 
-    for (size_t i = 0; i < simulation.getObjectList().getTopSize(); i++) {
-        GameObject* gameobject = simulation.getObjectList().getFromTop(i);
+    for (size_t i = 0; i < simulation.getTopSize(); i++) {
+        GameObject* gameobject = simulation.getFromTop(i);
         gameobject->draw_varray = selected_tool == &edit_tool && gameobject == active_object;
         gameobject->render(world_texture);
     }
@@ -707,7 +707,7 @@ void Editor::render_ui() {
 
     if (render_object_info) {
         // parent relation lines
-        for (GameObject* object : simulation.getObjectList().getAllVector()) {
+        for (GameObject* object : simulation.getAllVector()) {
             for (GameObject* child : object->getChildren()) {
                 sf::Vector2f v1 = world_to_screen(object->getGlobalPosition());
                 sf::Vector2f v2 = world_to_screen(child->getGlobalPosition());
@@ -715,16 +715,16 @@ void Editor::render_ui() {
             }
         }
         // object origin circles
-        for (size_t i = 0; i < simulation.getObjectList().getAllSize(); i++) {
-            GameObject* gameobject = simulation.getObjectList().getFromAll(i);
+        for (size_t i = 0; i < simulation.getAllSize(); i++) {
+            GameObject* gameobject = simulation.getFromAll(i);
             sf::Color circle_color = gameobject == active_object ? sf::Color(255, 255, 0) : sf::Color(255, 159, 44);
             origin_shape.setFillColor(circle_color);
             origin_shape.setPosition(world_to_screen(gameobject->getGlobalPosition()));
             target.draw(origin_shape);
         }
         // object info
-        for (size_t i = 0; i < simulation.getObjectList().getAllSize(); i++) {
-            GameObject* gameobject = simulation.getObjectList().getFromAll(i);
+        for (size_t i = 0; i < simulation.getAllSize(); i++) {
+            GameObject* gameobject = simulation.getFromAll(i);
             size_t info_index = 0;
             auto render_info = [&](const std::string& str) {
                 sf::Vector2f object_screen_pos = world_to_screen(gameobject->getGlobalPosition());
@@ -741,8 +741,8 @@ void Editor::render_ui() {
             render_info(utils::body_type_to_str(gameobject->getType()));
         }
         // indices
-        for (size_t i = 0; i < simulation.getObjectList().getAllSize(); i++) {
-            if (PolygonObject* polygon_object = dynamic_cast<PolygonObject*>(simulation.getObjectList().getFromAll(i))) {
+        for (size_t i = 0; i < simulation.getAllSize(); i++) {
+            if (PolygonObject* polygon_object = dynamic_cast<PolygonObject*>(simulation.getFromAll(i))) {
                 if (polygon_object->draw_indices) {
                     // TODO: render indices
                 }
@@ -892,7 +892,7 @@ void Editor::deserialize(const std::string& str, bool set_camera) {
             }
         }
         if (active_object_id >= 0) {
-            GameObject* object = simulation.getObjectList().getById(active_object_id);
+            GameObject* object = simulation.getById(active_object_id);
             setActiveObject(object);
         }
     } catch (std::exception exc) {
@@ -1281,7 +1281,7 @@ void Editor::delete_object(GameObject* object, bool remove_children) {
         setActiveObject(nullptr);
     }
     select_tool.deselectObject(object);
-    simulation.getObjectList().remove(object, remove_children);
+    simulation.remove(object, remove_children);
 }
 
 void Editor::check_debugbreak() {

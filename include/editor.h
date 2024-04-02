@@ -54,7 +54,7 @@ public:
 	void setCameraZoom(float zoom);
 	fw::WidgetList& getWidgetList();
 	void selectSingleObject(GameObject* object, bool with_children = false);
-	GameObjectList& getObjectList();
+	Simulation& getSimulation();
 	BoxObject* create_box(
 		const std::string& name,
 		const b2Vec2& pos,

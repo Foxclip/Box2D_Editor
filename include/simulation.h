@@ -1,7 +1,7 @@
 #include <memory>
 #include "objectlist.h"
 
-class Simulation {
+class Simulation : public GameObjectList {
 public:
 	const int32 VELOCITY_ITERATIONS = 6;
 	const int32 POSITION_ITERATIONS = 2;
@@ -14,7 +14,6 @@ public:
 	std::string serialize(TokenWriter& tw) const;
 	void deserialize(const std::string& str);
 	void deserialize(TokenReader& tr);
-	GameObjectList& getObjectList();
 	b2World* getWorld() const;
 	BoxObject* create_box(
 		const std::string& name,
@@ -53,8 +52,6 @@ public:
 	);
 
 private:
-	std::unique_ptr<b2World> world;
-	GameObjectList game_objects;
-
 	void load_from_file(const std::string& filename);
+
 };

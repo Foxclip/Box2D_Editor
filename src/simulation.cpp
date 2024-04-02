@@ -6,7 +6,7 @@ Simulation::Simulation() {
 
 void Simulation::advance(float time_step) {
     world->Step(time_step, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-    game_objects.transformFromRigidbody();
+    transformFromRigidbody();
 }
 
 void Simulation::load(const std::string& filename) {
@@ -14,10 +14,9 @@ void Simulation::load(const std::string& filename) {
 }
 
 void Simulation::reset() {
-    game_objects.clear();
+    clear(); 
     b2Vec2 gravity(0.0f, -9.8f);
     world = std::make_unique<b2World>(gravity);
-    game_objects.world = world.get();
 }
 
 void Simulation::load_from_file(const std::string& filename) {
@@ -63,29 +62,29 @@ std::string Simulation::serialize(TokenWriter& tw) const {
         {
             logger << "Objects\n";
             LoggerIndent objects_indent;
-            if (game_objects.getAllSize() == 0) {
+            if (getAllSize() == 0) {
                 logger << "<empty>\n";
             }
-            for (size_t i = 0; i < game_objects.getTopSize(); i++) {
-                GameObject* gameobject = game_objects.getFromTop(i);
+            for (size_t i = 0; i < getTopSize(); i++) {
+                GameObject* gameobject = getFromTop(i);
                 serialize_tree(gameobject);
             }
         }
         {
             logger << "Joints\n";
             LoggerIndent joints_indent;
-            if (game_objects.getJointsSize() == 0) {
+            if (getJointsSize() == 0) {
                 logger << "<empty>\n";
             } else {
                 tw << "\n\n";
             }
-            for (size_t i = 0; i < game_objects.getJointsSize(); i++) {
+            for (size_t i = 0; i < getJointsSize(); i++) {
                 if (i > 0) {
                     tw << "\n\n";
                 }
-                Joint* joint = game_objects.getJoint(i);
+                Joint* joint = getJoint(i);
                 logger << "Joint: " << joint->object1->id << " " << joint->object2->id << "\n";
-                game_objects.getJoint(i)->serialize(tw);
+                getJoint(i)->serialize(tw);
             }
         }
     }
@@ -108,26 +107,26 @@ void Simulation::deserialize(TokenReader& tr) {
                 std::unique_ptr<GameObject> gameobject;
                 std::string type = tr.readString();
                 if (type == "box") {
-                    gameobject = BoxObject::deserialize(tr, &game_objects);
+                    gameobject = BoxObject::deserialize(tr, this);
                 } else if (type == "ball") {
-                    gameobject = BallObject::deserialize(tr, &game_objects);
+                    gameobject = BallObject::deserialize(tr, this);
                 } else if (type == "polygon") {
-                    gameobject = PolygonObject::deserialize(tr, &game_objects);
+                    gameobject = PolygonObject::deserialize(tr, this);
                 } else if (type == "chain") {
-                    gameobject = ChainObject::deserialize(tr, &game_objects);
+                    gameobject = ChainObject::deserialize(tr, this);
                 } else {
                     throw std::runtime_error("Unknown object type: " + type);
                 }
-                game_objects.add(std::move(gameobject), false);
+                add(std::move(gameobject), false);
             } else if (entity == "joint") {
                 std::string type = tr.readString();
                 if (type == "revolute") {
                     ptrdiff_t body_a_id, body_b_id;
                     b2RevoluteJointDef def = RevoluteJoint::deserialize(tr, body_a_id, body_b_id);
-                    GameObject* object1 = game_objects.getById(body_a_id);
-                    GameObject* object2 = game_objects.getById(body_b_id);
+                    GameObject* object1 = getById(body_a_id);
+                    GameObject* object2 = getById(body_b_id);
                     std::unique_ptr<RevoluteJoint> uptr = std::make_unique<RevoluteJoint>(def, world.get(), object1, object2);
-                    game_objects.addJoint(std::move(uptr));
+                    addJoint(std::move(uptr));
                 } else {
                     throw std::runtime_error("Unknown joint type: " + type);
                 }
@@ -138,10 +137,6 @@ void Simulation::deserialize(TokenReader& tr) {
     } catch (std::exception exc) {
         throw std::runtime_error("Line " + std::to_string(tr.getLine(-1)) + ": " + exc.what());
     }
-}
-
-GameObjectList& Simulation::getObjectList() {
-    return game_objects;
 }
 
 b2World* Simulation::getWorld() const {
@@ -160,11 +155,11 @@ BoxObject* Simulation::create_box(
     def.position = pos;
     def.angle = angle;
     std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(
-        &game_objects, def, size, color
+        this, def, size, color
     );
     BoxObject* ptr = uptr.get();
     ptr->setName(name);
-    game_objects.add(std::move(uptr), true);
+    add(std::move(uptr), true);
     return ptr;
 }
 
@@ -179,11 +174,11 @@ BallObject* Simulation::create_ball(
     def.type = b2_dynamicBody;
     def.position = pos;
     std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(
-        &game_objects, def, radius, color, notch_color
+        this, def, radius, color, notch_color
     );
     BallObject* ptr = uptr.get();
     ptr->setName(name);
-    game_objects.add(std::move(uptr), true);
+    add(std::move(uptr), true);
     return ptr;
 }
 
@@ -199,11 +194,11 @@ PolygonObject* Simulation::create_polygon(
     def.position = pos;
     def.angle = angle;
     std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(
-        &game_objects, def, vertices, color
+        this, def, vertices, color
     );
     PolygonObject* ptr = uptr.get();
     ptr->setName(name);
-    game_objects.add(std::move(uptr), true);
+    add(std::move(uptr), true);
     return ptr;
 }
 
@@ -223,11 +218,11 @@ PolygonObject* Simulation::create_car(
         vertices.push_back(pos);
     }
     std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(
-        &game_objects, def, vertices, color
+        this, def, vertices, color
     );
     PolygonObject* car_ptr = uptr.get();
     car_ptr->setName(name);
-    game_objects.add(std::move(uptr), true);
+    add(std::move(uptr), true);
     size_t wheel_count = 0;
 
     for (size_t i = 0; i < wheels.size(); i++) {
@@ -244,7 +239,7 @@ PolygonObject* Simulation::create_car(
             wheel_body_def.position = anchor_pos_world;
         }
         std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
-            &game_objects, wheel_body_def, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
+            this, wheel_body_def, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
         );
         BallObject* wheel_ptr = wheel.get();
         {
@@ -254,7 +249,7 @@ PolygonObject* Simulation::create_car(
             std::string wheel_name = car_ptr->getName() + " wheel" + std::to_string(wheel_count);
             wheel_ptr->setName(wheel_name);
             wheel_ptr->setParent(car_ptr);
-            game_objects.add(std::move(wheel), true);
+            add(std::move(wheel), true);
         }
         b2RevoluteJointDef wheel_joint_def;
         {
@@ -265,7 +260,7 @@ PolygonObject* Simulation::create_car(
             std::unique_ptr<RevoluteJoint> joint = std::make_unique<RevoluteJoint>(
                 wheel_joint_def, world.get(), car_ptr, wheel_ptr
             );
-            game_objects.addJoint(std::move(joint));
+            addJoint(std::move(joint));
         }
         wheel_count++;
     }
@@ -284,10 +279,10 @@ ChainObject* Simulation::create_chain(
     def.position = pos;
     def.angle = angle;
     std::unique_ptr<ChainObject> uptr = std::make_unique<ChainObject>(
-        &game_objects, def, vertices, color
+        this, def, vertices, color
     );
     ChainObject* ptr = uptr.get();
     ptr->setName(name);
-    game_objects.add(std::move(uptr), true);
+    add(std::move(uptr), true);
     return ptr;
 }
