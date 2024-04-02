@@ -49,3 +49,8 @@ target_link_libraries(Box2D_Editor PUBLIC src_lib)
 
 set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT Box2D_Editor)
 set_property(TARGET Box2D_Editor PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
+install(TARGETS Box2D_Editor RUNTIME DESTINATION bin)
+install(DIRECTORY fonts DESTINATION bin)
+install(DIRECTORY levels DESTINATION bin)
+install(DIRECTORY shaders DESTINATION bin)
