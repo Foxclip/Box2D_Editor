@@ -454,17 +454,28 @@ void Editor::onProcessLeftClick() {
         b2Fixture* grabbed_fixture = get_fixture_at(mousePosf);
         if (grabbed_fixture) {
             b2BodyDef mouse_body_def;
-            drag_tool.mouse_body = simulation.getWorld()->CreateBody(&mouse_body_def);
+            b2Body* mouse_body = simulation.getWorld()->CreateBody(&mouse_body_def);
+            drag_tool.mouse_body = std::unique_ptr<b2Body, std::function<void(b2Body*)>>(
+                mouse_body,
+                [&](b2Body* ptr) {
+                    simulation.getWorld()->DestroyBody(ptr);
+                }
+            );
             b2Body* grabbed_body = grabbed_fixture->GetBody();
             b2MouseJointDef mouse_joint_def;
-            mouse_joint_def.bodyA = drag_tool.mouse_body;
+            mouse_joint_def.bodyA = mouse_body;
             mouse_joint_def.bodyB = grabbed_body;
             mouse_joint_def.damping = 1.0f;
             mouse_joint_def.maxForce = 5000.0f * grabbed_body->GetMass();
             mouse_joint_def.stiffness = 50.0f;
             mouse_joint_def.target = b2MousePosWorld;
-            drag_tool.mouse_joint = (b2MouseJoint*)simulation.getWorld()->CreateJoint(&mouse_joint_def);
-        }
+            b2MouseJoint* mouse_joint = (b2MouseJoint*)simulation.getWorld()->CreateJoint(&mouse_joint_def);
+            drag_tool.mouse_joint = std::unique_ptr<b2MouseJoint, std::function<void(b2MouseJoint*)>>(
+                mouse_joint,
+                [&](b2MouseJoint* ptr) {
+                    simulation.getWorld()->DestroyJoint(ptr);
+                });
+            };
     } else if (selected_tool == &move_tool) {
         for (GameObject* obj : move_tool.moving_objects) {
             //TODO: remember state for all children
@@ -531,13 +542,12 @@ void Editor::onProcessLeftRelease() {
         select_tool.rectangle_select.active = false;
         select_tool.applyRectSelection();
     }
-    if (drag_tool.mouse_body) {
-        simulation.getWorld()->DestroyBody(drag_tool.mouse_body);
-        drag_tool.mouse_body = nullptr;
-    }
     if (drag_tool.mouse_joint) {
-        simulation.getWorld()->DestroyJoint(drag_tool.mouse_joint);
-        drag_tool.mouse_joint = nullptr;
+        // delete joint before deleting body
+        drag_tool.mouse_joint.reset();
+    }
+    if (drag_tool.mouse_body) {
+        drag_tool.mouse_body.reset();
     }
     if (edit_tool.grabbed_vertex != -1) {
         edit_tool.grabbed_vertex = -1;

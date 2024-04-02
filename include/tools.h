@@ -78,8 +78,8 @@ private:
 
 class DragTool : public Tool {
 public:
-	b2Body* mouse_body = nullptr;
-	b2MouseJoint* mouse_joint = nullptr;
+	std::unique_ptr<b2Body, std::function<void(b2Body*)>> mouse_body = nullptr;
+	std::unique_ptr<b2MouseJoint, std::function<void(b2MouseJoint*)>> mouse_joint = nullptr;
 
 	DragTool();
 	bool showInToolPanel() const override;

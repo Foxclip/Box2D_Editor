@@ -52,8 +52,6 @@ int main() {
     std::cout << "Starting app\n";
     execute_app();
 
-    // TODO: inherit Simulation from GameObjectList
-    // TODO: fix drag tool crash
     // TODO: blinking textbox cursor
     // TODO: remove global.h
     // TODO: don't fill window with black color in Application::Render
