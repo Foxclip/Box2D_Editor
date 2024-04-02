@@ -47,10 +47,5 @@ add_executable(Box2D_Editor src/main.cpp)
 
 target_link_libraries(Box2D_Editor PUBLIC src_lib)
 
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Box2D_Editor)
-
-add_custom_target(copy_assets
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/copy-assets.cmake
-    SOURCES copy-assets.cmake
-)
-add_dependencies(Box2D_Editor copy_assets)
+set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT Box2D_Editor)
+set_property(TARGET Box2D_Editor PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
