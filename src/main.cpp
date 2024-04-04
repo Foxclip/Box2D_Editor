@@ -7,9 +7,11 @@
 
 #ifndef NDEBUG
 void run_tests() {
-    CompoundVectorTest();
-    LoggerTest();
-    SearchIndexTest();
+    LoggerIndent tests_indent;
+    SimulationTests();
+    //CompoundVectorTest();
+    //LoggerTest();
+    //SearchIndexTest();
 }
 #endif
 
@@ -40,7 +42,7 @@ void execute_app() {
 int main() {
 
 #ifndef NDEBUG
-    std::cout << "Running tests\n";
+    logger << "Running tests\n";
     run_tests();
 #endif
 
@@ -49,9 +51,11 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
-    std::cout << "Starting app\n";
-    execute_app();
+    //logger << "Starting app\n";
+    //execute_app();
 
+    // TODO: tests: print vertical bars when logging expected and actual values
+    // TODO: Simulation tests
     // TODO: blinking textbox cursor
     // TODO: remove global.h
     // TODO: don't fill window with black color in Application::Render

@@ -1,5 +1,6 @@
 #include <memory>
 #include "objectlist.h"
+#include "test.h"
 
 class Simulation : public GameObjectList {
 public:
@@ -55,3 +56,14 @@ private:
 	void load_from_file(const std::string& filename);
 
 };
+
+#ifndef NDEBUG
+
+class SimulationTests : test::TestList {
+public:
+	SimulationTests();
+
+private:
+};
+
+#endif // !NDEBUG

@@ -16,6 +16,7 @@ set(SRC_HEADER_FILES
     "${INCLUDE_DIR}/searchindex.h"
     "${INCLUDE_DIR}/serializer.h"
     "${INCLUDE_DIR}/simulation.h"
+    "${INCLUDE_DIR}/test.h"
     "${INCLUDE_DIR}/tools.h"
     "${INCLUDE_DIR}/utils.h"
     "${INCLUDE_DIR}/UI/create_panel.h"
@@ -23,22 +24,23 @@ set(SRC_HEADER_FILES
     "${INCLUDE_DIR}/UI/toolbox.h"
 )
 set(SRC_SOURCE_FILES
-    compvector.cpp
-    editor.cpp
-    gameobject.cpp
-    global.cpp
-    logger.cpp
-    main.cpp
-    objectlist.cpp
-    polygon.cpp
-    searchindex.cpp
-    serializer.cpp
-    simulation.cpp
-    tools.cpp
-    utils.cpp
-    UI/create_panel.cpp
-    UI/edit_window.cpp
-    UI/toolbox.cpp
+    "compvector.cpp"
+    "editor.cpp"
+    "gameobject.cpp"
+    "global.cpp"
+    "logger.cpp"
+    "main.cpp"
+    "objectlist.cpp"
+    "polygon.cpp"
+    "searchindex.cpp"
+    "serializer.cpp"
+    "simulation.cpp"
+    "test.cpp"
+    "tools.cpp"
+    "utils.cpp"
+    "UI/create_panel.cpp"
+    "UI/edit_window.cpp"
+    "UI/toolbox.cpp"
 )
 add_library(src_lib ${SRC_HEADER_FILES} ${SRC_SOURCE_FILES})
 source_group(TREE ${INCLUDE_DIR} PREFIX "Header Files" FILES ${SRC_HEADER_FILES})

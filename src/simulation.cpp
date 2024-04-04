@@ -286,3 +286,30 @@ ChainObject* Simulation::create_chain(
     add(std::move(uptr), true);
     return ptr;
 }
+
+#ifndef NDEBUG
+
+SimulationTests::SimulationTests() : TestList("Simulation") {
+    addTest("basic", [&](test::Test& test) {
+        Simulation simulation;
+    });
+    addTest("box", [&](test::Test& test) {
+        Simulation simulation;
+        simulation.create_box(
+            "box0",
+            b2Vec2(1.0f, 1.0f),
+            utils::to_radians(45.0f),
+            b2Vec2(1.0f, 1.0f),
+            sf::Color::Green
+        );
+        tAssert(simulation.getAllSize() > 0);
+        BoxObject* box = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
+        tAssert(box, "Object is not a BoxObject");
+        tCompare(box->getName(), std::string("box0"));
+        tCheck(box->getGlobalPosition() == b2Vec2(1.0f, 1.0f));
+        tApproxCompare(box->getGlobalRotation(), utils::to_radians(45.0f));
+    });
+    runTests();
+}
+
+#endif // !NDEBUG
