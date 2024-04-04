@@ -25,11 +25,16 @@ namespace test {
 
 	void TestList::runTests() {
 		logger << "Running tests: " << name << "\n";
+		size_t passed_count = 0;
+		size_t failed_count = 0;
+		std::vector<std::string> failed_list;
 		LoggerIndent test_indent;
 		for (Test& test : test_list) {
 			bool result = test.run();
 			logger << (result ? "passed: " : "FAILED: ") << test.name << "\n";
-			if (!result) {
+			if (result) {
+				passed_count++;
+			} else {
 				LoggerIndent errors_indent;
 				if (!test.errors.empty()) {
 					for (const std::string& error : test.errors) {
@@ -38,7 +43,19 @@ namespace test {
 				} else {
 					logger << "<empty>" << "\n";
 				}
+				failed_list.push_back(test.name);
+				failed_count++;
 			}
+		}
+		logger << "Passed " << passed_count << " tests, failed " << failed_count << " tests";
+		if (failed_list.size() > 0) {
+			logger << ":\n";
+			LoggerIndent failed_list_indent;
+			for (const std::string& name : failed_list) {
+				logger << name << "\n";
+			}
+		} else {
+			logger << "\n";
 		}
 	}
 
