@@ -78,21 +78,17 @@ namespace test {
 
 	void TestList::runTestList() {
 		LoggerIndent test_list_indent;
-		size_t passed_count = 0;
-		size_t cancelled_count = 0;
-		size_t failed_count = 0;
-		std::vector<std::string> failed_list;
 		for (size_t i = 0; i < test_list.size(); i++) {
 			Test* test = test_list[i].get();
 			bool result = test->run();
 			std::string result_str;
 			if (result) {
 				logger << "passed: " << test->name << "\n";
-				passed_count++;
+				passed_list.push_back(test->name);
 			} else {
 				if (test->cancelled) {
 					logger << "cancelled: " << test->name << "\n";
-					cancelled_count++;
+					cancelled_list.push_back(test->name);
 				} else {
 					logger << "FAILED: " << test->name << "\n";
 					LoggerIndent errors_indent;
@@ -104,13 +100,12 @@ namespace test {
 						logger << "<empty>" << "\n";
 					}
 					failed_list.push_back(test->name);
-					failed_count++;
 				}
 			}
 		}
-		logger << "Passed " << passed_count << " tests, "
-			<< "cancelled " << cancelled_count << " tests, "
-			<< "failed " << failed_count << " tests";
+		logger << "Passed " << passed_list.size() << " tests, "
+			<< "cancelled " << cancelled_list.size() << " tests, "
+			<< "failed " << failed_list.size() << " tests";
 		if (failed_list.size() > 0) {
 			logger << ":\n";
 			LoggerIndent failed_list_indent;
@@ -147,6 +142,64 @@ namespace test {
 		for (TestList& test_list : test_lists) {
 			logger << "Running test list: " << test_list.name << "\n";
 			test_list.runTestList();
+			for (const std::string& name : test_list.passed_list) {
+				passed_list.push_back(test_list.name + "/" + name);
+			}
+			for (const std::string& name : test_list.cancelled_list) {
+				cancelled_list.push_back(test_list.name + "/" + name);
+			}
+			for (const std::string& name : test_list.failed_list) {
+				failed_list.push_back(test_list.name + "/" + name);
+			}
+		}
+		logger << "Passed " << passed_list.size() << " tests, "
+			<< "cancelled " << cancelled_list.size() << " tests, "
+			<< "failed " << failed_list.size() << " tests";
+		if (failed_list.size() > 0) {
+			logger << ":\n";
+			LoggerIndent failed_list_indent;
+			for (const std::string& name : failed_list) {
+				logger << name << "\n";
+			}
+		} else {
+			logger << "\n";
+		}
+	}
+
+	TestManager::TestManager() { }
+
+	void TestManager::addModule(std::unique_ptr<TestModule> module) {
+		modules.push_back(std::move(module));
+	}
+
+	void TestManager::runAllModules() {
+		std::vector<std::string> passed_list;
+		std::vector<std::string> cancelled_list;
+		std::vector<std::string> failed_list;
+		for (size_t i = 0; i < modules.size(); i++) {
+			TestModule* module = modules[i].get();
+			module->runModuleTests();
+			for (const std::string& name : module->passed_list) {
+				passed_list.push_back(module->name + "/" + name);
+			}
+			for (const std::string& name : module->cancelled_list) {
+				cancelled_list.push_back(module->name + "/" + name);
+			}
+			for (const std::string& name : module->failed_list) {
+				failed_list.push_back(module->name + "/" + name);
+			}
+		}
+		logger << "Passed " << passed_list.size() << " tests, "
+			<< "cancelled " << cancelled_list.size() << " tests, "
+			<< "failed " << failed_list.size() << " tests";
+		if (failed_list.size() > 0) {
+			logger << ":\n";
+			LoggerIndent failed_list_indent;
+			for (const std::string& name : failed_list) {
+				logger << name << "\n";
+			}
+		} else {
+			logger << "\n";
 		}
 	}
 

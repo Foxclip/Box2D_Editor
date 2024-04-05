@@ -55,6 +55,9 @@ namespace test {
 	class TestList {
 	public:
 		std::string name;
+		std::vector<std::string> passed_list;
+		std::vector<std::string> cancelled_list;
+		std::vector<std::string> failed_list;
 
 		TestList(const std::string& name);
 		Test* addTest(std::string name, TestFuncType func);
@@ -84,6 +87,9 @@ namespace test {
 	public:
 		std::string name;
 		std::vector<TestList> test_lists;
+		std::vector<std::string> passed_list;
+		std::vector<std::string> cancelled_list;
+		std::vector<std::string> failed_list;
 
 		TestModule(const std::string& name);
 		void runModuleTests();
@@ -92,6 +98,17 @@ namespace test {
 		virtual void createTestLists() = 0;
 
 	private:
+
+	};
+
+	class TestManager {
+	public:
+		TestManager();
+		void addModule(std::unique_ptr<TestModule> module);
+		void runAllModules();
+
+	private:
+		std::vector<std::unique_ptr<TestModule>> modules;
 
 	};
 
