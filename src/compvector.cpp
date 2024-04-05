@@ -271,6 +271,7 @@ void CompoundVectorTest::test_CompoundVectorUptr() {
 	}
 	{
 		// add method
+		// TODO: test return value
 		CompVectorUptr<int> vec;
 		vec.add(1);
 		vec.add(2);

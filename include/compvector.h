@@ -81,9 +81,9 @@ public:
 	CompVectorUptr(const std::initializer_list<T*>& list);
 	CompVectorUptr(const std::vector<T*>& vec);
 	size_t size() const;
-	bool add(const T& value);
-	bool add(const T* ptr);
-	bool add(std::unique_ptr<T> value);
+	T* add(const T& value);
+	T* add(const T* ptr);
+	T* add(std::unique_ptr<T> value);
 	bool insert(std::vector<T*>::const_iterator where, std::unique_ptr<T> value);
 	template<std::incrementable TIter>
 	size_t insert(std::vector<T*>::const_iterator where, TIter first, TIter last);
@@ -352,37 +352,35 @@ inline size_t CompVectorUptr<T, TCmp>::size() const {
 }
 
 template<typename T, typename TCmp>
-inline bool CompVectorUptr<T, TCmp>::add(const T& value) {
-	const T* ptr = &value;
-	bool added = comp.add(const_cast<T*>(ptr));
-	if (added) {
-		std::unique_ptr<T> uptr = std::make_unique<T>(value);
-		uptrs.push_back(std::move(uptr));
-		return true;
-	}
-	return false;
+inline T* CompVectorUptr<T, TCmp>::add(const T& value) {
+	std::unique_ptr<T> uptr = std::make_unique<T>(value);
+	T* ptr = uptr.get();
+	comp.add(ptr);
+	uptrs.push_back(std::move(uptr));
+	return ptr;
 }
 
 template<typename T, typename TCmp>
-inline bool CompVectorUptr<T, TCmp>::add(const T* ptr) {
-	bool added = comp.add(const_cast<T*>(ptr));
+inline T* CompVectorUptr<T, TCmp>::add(const T* ptr) {
+	T* nptr = const_cast<T*>(ptr);
+	bool added = comp.add(nptr);
 	if (added) {
-		std::unique_ptr<T> uptr = std::unique_ptr<T>(const_cast<T*>(ptr));
+		std::unique_ptr<T> uptr = std::unique_ptr<T>(nptr);
 		uptrs.push_back(std::move(uptr));
-		return true;
+		return nptr;
 	}
-	return false;
+	return nullptr;
 }
 
 template<typename T, typename TCmp>
-inline bool CompVectorUptr<T, TCmp>::add(std::unique_ptr<T> value) {
+inline T* CompVectorUptr<T, TCmp>::add(std::unique_ptr<T> value) {
 	T* ptr = value.get();
 	bool added = comp.add(ptr);
 	if (added) {
 		uptrs.push_back(std::move(value));
-		return true;
+		return ptr;
 	}
-	return false;
+	return nullptr;
 }
 
 template<typename T, typename TCmp>
