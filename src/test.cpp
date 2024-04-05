@@ -26,10 +26,31 @@ namespace test {
 		try {
 			func(*this);
 		} catch (std::exception exc) {
-			errors.push_back("EXCEPTION: " + std::string(exc.what()));
+			errors.push_back(Error("EXCEPTION: " + std::string(exc.what())));
 			result = false;
 		}
 		return result;
+	}
+
+	Test::Error::Error(const std::string& str) {
+		this->str = str;
+	}
+
+	Test::Error::Error(const std::string& str, const std::vector<Error>& subentries) {
+		this->str = str;
+		this->subentries = subentries;
+	}
+
+	void Test::Error::add(const Error& error) {
+		subentries.push_back(error);
+	}
+
+	void Test::Error::log() const {
+		logger << str << "\n";
+		LoggerIndent subentries_indent;
+		for (const Error& subentry : subentries) {
+			subentry.log();
+		}
 	}
 
 	TestList::TestList(const std::string& name) {
@@ -57,8 +78,8 @@ namespace test {
 					logger << "FAILED: " << test->name << "\n";
 					LoggerIndent errors_indent;
 					if (!test->errors.empty()) {
-						for (const std::string& error : test->errors) {
-							logger << error << "\n";
+						for (const Test::Error& error : test->errors) {
+							error.log();
 						}
 					} else {
 						logger << "<empty>" << "\n";
@@ -94,14 +115,14 @@ namespace test {
 
 	void TestList::testAssert(Test& test, bool value, const std::string& value_message) {
 		if (!value) {
-			test.errors.push_back("Failed condition: " + value_message);
+			test.errors.push_back(Test::Error("Failed condition: " + value_message));
 			test.result = false;
 		}
 	}
 
 	void TestList::testAssert(Test& test, bool value, const std::string& value_message, const std::string message) {
 		if (!value) {
-			test.errors.push_back(message + ": " + value_message);
+			test.errors.push_back(Test::Error(message + ": " + value_message));
 			test.result = false;
 		}
 	}

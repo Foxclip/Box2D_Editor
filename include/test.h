@@ -28,8 +28,16 @@ namespace test {
 
 	class Test {
 	public:
+		struct Error {
+			std::string str;
+			std::vector<Error> subentries;
+			explicit Error(const std::string& str);
+			explicit Error(const std::string& str, const std::vector<Error>& subentries);
+			void add(const Error& error);
+			void log() const;
+		};
 		std::string name = "<unnamed>";
-		std::vector<std::string> errors;
+		std::vector<Error> errors;
 		CompVector<Test*> required;
 		bool result = false;
 		bool cancelled = false;
@@ -90,7 +98,6 @@ namespace test {
 
 	template<typename T>
 	inline void TestList::compareFail(Test& test, const std::string& name, T actual, T expected) {
-		std::string message = name + "\n";
 		std::string actual_value_str;
 		std::string expected_value_str;
 		if constexpr (std::is_same_v<T, std::string>) {
@@ -100,9 +107,10 @@ namespace test {
 			expected_value_str = std::to_string(expected);
 			actual_value_str = std::to_string(actual);
 		}
-		message += "    Expected value: " + expected_value_str + "\n";
-		message += "      Actual value: " + actual_value_str;
-		test.errors.push_back(message);
+		Test::Error error(name);
+		error.add(Test::Error("Expected value: " + expected_value_str));
+		error.add(Test::Error("  Actual value: " + actual_value_str));
+		test.errors.push_back(error);
 		test.result = false;
 	}
 
