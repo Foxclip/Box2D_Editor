@@ -1,6 +1,7 @@
 #include "test.h"
 #include "logger.h"
 #include <cassert>
+#include <algorithm>
 
 namespace test {
 
@@ -9,7 +10,19 @@ namespace test {
 		this->func = func;
 	}
 
+	Test::Test(std::string name, CompVector<Test*> required, TestFuncType func)
+	: Test(name, func) {
+		this->required = required;
+	}
+
 	bool Test::run() {
+		if (!std::all_of(required.begin(), required.end(), [](Test* test) {
+			return test->result;
+		})) {
+			cancelled = true;
+			return false;
+		}
+		result = true;
 		try {
 			func(*this);
 		} catch (std::exception exc) {
@@ -26,28 +39,38 @@ namespace test {
 	void TestList::runTests() {
 		logger << "Running tests: " << name << "\n";
 		size_t passed_count = 0;
+		size_t cancelled_count = 0;
 		size_t failed_count = 0;
 		std::vector<std::string> failed_list;
 		LoggerIndent test_indent;
-		for (Test& test : test_list) {
-			bool result = test.run();
-			logger << (result ? "passed: " : "FAILED: ") << test.name << "\n";
+		for (Test* test : test_list) {
+			bool result = test->run();
+			std::string result_str;
 			if (result) {
+				logger << "passed: " << test->name << "\n";
 				passed_count++;
 			} else {
-				LoggerIndent errors_indent;
-				if (!test.errors.empty()) {
-					for (const std::string& error : test.errors) {
-						logger << error << "\n";
-					}
+				if (test->cancelled) {
+					logger << "cancelled: " << test->name << "\n";
+					cancelled_count++;
 				} else {
-					logger << "<empty>" << "\n";
+					logger << "FAILED: " << test->name << "\n";
+					LoggerIndent errors_indent;
+					if (!test->errors.empty()) {
+						for (const std::string& error : test->errors) {
+							logger << error << "\n";
+						}
+					} else {
+						logger << "<empty>" << "\n";
+					}
+					failed_list.push_back(test->name);
+					failed_count++;
 				}
-				failed_list.push_back(test.name);
-				failed_count++;
 			}
 		}
-		logger << "Passed " << passed_count << " tests, failed " << failed_count << " tests";
+		logger << "Passed " << passed_count << " tests, "
+			<< "cancelled " << cancelled_count << " tests, "
+			<< "failed " << failed_count << " tests";
 		if (failed_list.size() > 0) {
 			logger << ":\n";
 			LoggerIndent failed_list_indent;
@@ -59,9 +82,14 @@ namespace test {
 		}
 	}
 
-	void TestList::addTest(std::string name, TestFuncType func) {
-		Test test(name, func);
-		test_list.push_back(test);
+	Test* TestList::addTest(std::string name, TestFuncType func) {
+		return addTest(name, { }, func);
+	}
+
+	Test* TestList::addTest(std::string name, CompVector<Test*> required, TestFuncType func) {
+		Test test(name, required, func);
+		Test* ptr = test_list.add(test);
+		return ptr;
 	}
 
 	void TestList::testAssert(Test& test, bool value, const std::string& value_message) {

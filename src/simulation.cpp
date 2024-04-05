@@ -290,10 +290,10 @@ ChainObject* Simulation::create_chain(
 #ifndef NDEBUG
 
 SimulationTests::SimulationTests() : TestList("Simulation") {
-    addTest("basic", [&](test::Test& test) {
+    test::Test* basic_test = addTest("basic", [&](test::Test& test) {
         Simulation simulation;
     });
-    addTest("box", [&](test::Test& test) {
+    test::Test* box_test = addTest("box", { basic_test }, [&](test::Test& test) {
         Simulation simulation;
         simulation.create_box(
             "box0",

@@ -8,8 +8,8 @@
 #ifndef NDEBUG
 void run_tests() {
     LoggerIndent tests_indent;
-    //SimulationTests();
-    CompoundVectorTest();
+    SimulationTests simulation_tests;
+    //CompoundVectorTest();
     //LoggerTest();
     //SearchIndexTest();
 }

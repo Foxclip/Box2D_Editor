@@ -1,6 +1,7 @@
 #include <vector>
 #include <functional>
 #include <string>
+#include "compvector.h"
 
 namespace test {
 
@@ -29,9 +30,12 @@ namespace test {
 	public:
 		std::string name = "<unnamed>";
 		std::vector<std::string> errors;
-		bool result = true;
+		CompVector<Test*> required;
+		bool result = false;
+		bool cancelled = false;
 
 		Test(std::string name, TestFuncType func);
+		Test(std::string name, CompVector<Test*> required, TestFuncType func);
 		bool run();
 
 	private:
@@ -46,9 +50,10 @@ namespace test {
 		void runTests();
 
 	protected:
-		std::vector<Test> test_list;
+		CompVectorUptr<Test> test_list;
 
-		void addTest(std::string name, TestFuncType func);
+		Test* addTest(std::string name, TestFuncType func);
+		Test* addTest(std::string name, CompVector<Test*> required, TestFuncType func);
 		void testAssert(Test& test, bool value, const std::string& value_message);
 		void testAssert(Test& test, bool value, const std::string& value_message, const std::string message);
 		template<typename T>
