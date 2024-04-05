@@ -28,6 +28,14 @@ namespace test {
 		} \
 	}
 
+#define tAssertCompare(actual, expected) \
+	{ \
+		bool v = testCompare(test, #actual, actual, expected); \
+		if (!v) { \
+			return; \
+		} \
+	}
+
 	class Test {
 	public:
 		struct Error {
@@ -70,16 +78,16 @@ namespace test {
 
 		void testAssert(Test& test, bool value, const std::string& value_message);
 		void testAssert(Test& test, bool value, const std::string& value_message, const std::string message);
+		template<typename T, typename U>
+		bool testCompare(Test& test, const std::string& name, T actual, U expected);
 		template<typename T>
-		void testCompare(Test& test, const std::string& name, T actual, T expected);
-		template<typename T>
-		void testApproxCompare(Test& test, const std::string& name, T actual, T expected, T epsilon = 0.001f);
+		bool testApproxCompare(Test& test, const std::string& name, T actual, T expected, T epsilon = 0.001f);
 		template<typename T>
 		static bool equals(T left, T right, T epsilon = 0.001f);
 
 	private:
-		template<typename T>
-		void compareFail(Test& test, const std::string& name, T actual, T expected);
+		template<typename T, typename U>
+		void compareFail(Test& test, const std::string& name, T actual, U expected);
 
 	};
 
@@ -112,18 +120,22 @@ namespace test {
 
 	};
 
-	template<typename T>
-	inline void TestList::testCompare(Test& test, const std::string& name, T actual, T expected) {
+	template<typename T, typename U>
+	inline bool TestList::testCompare(Test& test, const std::string& name, T actual, U expected) {
 		if (actual != expected) {
 			compareFail(test, name, actual, expected);
+			return false;
 		}
+		return true;
 	}
 
 	template<typename T>
-	inline void TestList::testApproxCompare(Test& test, const std::string& name, T actual, T expected, T epsilon) {
+	inline bool TestList::testApproxCompare(Test& test, const std::string& name, T actual, T expected, T epsilon) {
 		if (!equals(actual, expected, epsilon)) {
 			compareFail(test, name, actual, expected);
+			return false;
 		}
+		return true;
 	}
 
 	template<typename T>
@@ -131,16 +143,19 @@ namespace test {
 		return abs(left - right) < epsilon;
 	}
 
-	template<typename T>
-	inline void TestList::compareFail(Test& test, const std::string& name, T actual, T expected) {
+	template<typename T, typename U>
+	inline void TestList::compareFail(Test& test, const std::string& name, T actual, U expected) {
 		std::string actual_value_str;
 		std::string expected_value_str;
-		if constexpr (std::is_same_v<T, std::string>) {
+		if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, const char*>) {
 			actual_value_str = actual;
+		} else {
+			actual_value_str = std::to_string(actual);
+		}
+		if constexpr (std::is_same_v<U, std::string> || std::is_same_v<U, const char*>) {
 			expected_value_str = expected;
 		} else {
 			expected_value_str = std::to_string(expected);
-			actual_value_str = std::to_string(actual);
 		}
 		Test::Error error(name);
 		error.add(Test::Error("Expected value: " + expected_value_str));
