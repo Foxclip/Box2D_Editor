@@ -7,9 +7,9 @@
 
 #ifndef NDEBUG
 void run_tests() {
-    LoggerIndent tests_indent;
-    SimulationTests simulation_tests;
-    //CompoundVectorTest();
+    LoggerIndent test_modules_indent;
+    SimulationTests().runModuleTests();
+    CompVectorTests().runModuleTests();
     //LoggerTest();
     //SearchIndexTest();
 }
@@ -54,6 +54,8 @@ int main() {
     //logger << "Starting app\n";
     //execute_app();
 
+    // TODO: make TestManager to show passed tests
+    // TODO: rewrite CompVector tests with tCompare
     // TODO: remake compvector, logger, and searchindex tests with TestList
     // TODO: show total number of passed and failed tests at the end
     // TODO: Simulation tests

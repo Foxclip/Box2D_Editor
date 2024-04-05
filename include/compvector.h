@@ -3,6 +3,7 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include "test.h"
 
 template<typename T, typename U>
 concept NotSameAs = !std::same_as<T, U>;
@@ -547,11 +548,20 @@ inline CompVectorUptr<T, TCmp>::operator std::vector<T*>() const {
 
 #ifndef NDEBUG
 
-class CompoundVectorTest {
+class TestModule;
+
+class CompVectorTests : public test::TestModule {
 public:
-	CompoundVectorTest();
-	void test_CompoundVector();
-	void test_CompoundVectorUptr();
+	struct CompVectorTestList : public test::TestList {
+		CompVectorTestList();
+	};
+	struct CompVectorUptrTestList : public test::TestList {
+		CompVectorUptrTestList();
+	};
+	CompVectorTests();
+
+protected:
+	void createTestLists() override;
 };
 
 #endif // NDEBUG

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <memory>
 #include "objectlist.h"
 #include "test.h"
@@ -59,9 +61,12 @@ private:
 
 #ifndef NDEBUG
 
-class SimulationTests : test::TestList {
+class SimulationTests : private test::TestList, public test::TestModule {
 public:
 	SimulationTests();
+
+protected:
+	void createTestLists() override;
 
 private:
 };

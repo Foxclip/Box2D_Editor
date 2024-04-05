@@ -289,7 +289,9 @@ ChainObject* Simulation::create_chain(
 
 #ifndef NDEBUG
 
-SimulationTests::SimulationTests() : TestList("Simulation") {
+SimulationTests::SimulationTests() : TestList("Simulation"), TestModule("Simulation") { }
+
+void SimulationTests::createTestLists() {
     test::Test* basic_test = addTest("basic", [&](test::Test& test) {
         Simulation simulation;
     });
@@ -309,7 +311,7 @@ SimulationTests::SimulationTests() : TestList("Simulation") {
         tCheck(box->getGlobalPosition() == b2Vec2(1.0f, 1.0f));
         tApproxCompare(box->getGlobalRotation(), utils::to_radians(45.0f));
     });
-    runTests();
+    test_lists.push_back(std::move(*this));
 }
 
 #endif // !NDEBUG

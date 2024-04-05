@@ -10,7 +10,7 @@ namespace test {
 		this->func = func;
 	}
 
-	Test::Test(std::string name, CompVector<Test*> required, TestFuncType func)
+	Test::Test(std::string name, std::vector<Test*> required, TestFuncType func)
 	: Test(name, func) {
 		this->required = required;
 	}
@@ -57,14 +57,33 @@ namespace test {
 		this->name = name;
 	}
 
-	void TestList::runTests() {
-		logger << "Running tests: " << name << "\n";
+	Test* TestList::addTest(std::string name, TestFuncType func) {
+		return addTest(name, { }, func);
+	}
+
+	Test* TestList::addTest(std::string name, std::vector<Test*> required, TestFuncType func) {
+		std::unique_ptr<Test> uptr = std::make_unique<Test>(name, required, func);
+		Test* ptr = uptr.get();
+		test_list.push_back(std::move(uptr));
+		return ptr;
+	}
+
+	std::vector<Test*> TestList::getTestList() const {
+		std::vector<Test*> result;
+		for (size_t i = 0; i < test_list.size(); i++) {
+			result.push_back(test_list[i].get());
+		}
+		return result;
+	}
+
+	void TestList::runTestList() {
+		LoggerIndent test_list_indent;
 		size_t passed_count = 0;
 		size_t cancelled_count = 0;
 		size_t failed_count = 0;
 		std::vector<std::string> failed_list;
-		LoggerIndent test_indent;
-		for (Test* test : test_list) {
+		for (size_t i = 0; i < test_list.size(); i++) {
+			Test* test = test_list[i].get();
 			bool result = test->run();
 			std::string result_str;
 			if (result) {
@@ -103,16 +122,6 @@ namespace test {
 		}
 	}
 
-	Test* TestList::addTest(std::string name, TestFuncType func) {
-		return addTest(name, { }, func);
-	}
-
-	Test* TestList::addTest(std::string name, CompVector<Test*> required, TestFuncType func) {
-		Test test(name, required, func);
-		Test* ptr = test_list.add(test);
-		return ptr;
-	}
-
 	void TestList::testAssert(Test& test, bool value, const std::string& value_message) {
 		if (!value) {
 			test.errors.push_back(Test::Error("Failed condition: " + value_message));
@@ -124,6 +133,20 @@ namespace test {
 		if (!value) {
 			test.errors.push_back(Test::Error(message + ": " + value_message));
 			test.result = false;
+		}
+	}
+
+	TestModule::TestModule(const std::string& name) {
+		this->name = name;
+	}
+
+	void TestModule::runModuleTests() {
+		createTestLists();
+		logger << "Running test module: " << name << "\n";
+		LoggerIndent test_module_indent;
+		for (TestList& test_list : test_lists) {
+			logger << "Running test list: " << test_list.name << "\n";
+			test_list.runTestList();
 		}
 	}
 

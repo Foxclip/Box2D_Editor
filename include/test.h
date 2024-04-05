@@ -1,7 +1,9 @@
+#pragma once
+
 #include <vector>
 #include <functional>
 #include <string>
-#include "compvector.h"
+#include <memory>
 
 namespace test {
 
@@ -38,12 +40,12 @@ namespace test {
 		};
 		std::string name = "<unnamed>";
 		std::vector<Error> errors;
-		CompVector<Test*> required;
+		std::vector<Test*> required;
 		bool result = false;
 		bool cancelled = false;
 
 		Test(std::string name, TestFuncType func);
-		Test(std::string name, CompVector<Test*> required, TestFuncType func);
+		Test(std::string name, std::vector<Test*> required, TestFuncType func);
 		bool run();
 
 	private:
@@ -55,13 +57,14 @@ namespace test {
 		std::string name;
 
 		TestList(const std::string& name);
-		void runTests();
+		Test* addTest(std::string name, TestFuncType func);
+		Test* addTest(std::string name, std::vector<Test*> required, TestFuncType func);
+		std::vector<Test*> getTestList() const;
+		void runTestList();
 
 	protected:
-		CompVectorUptr<Test> test_list;
+		std::vector<std::unique_ptr<Test>> test_list;
 
-		Test* addTest(std::string name, TestFuncType func);
-		Test* addTest(std::string name, CompVector<Test*> required, TestFuncType func);
 		void testAssert(Test& test, bool value, const std::string& value_message);
 		void testAssert(Test& test, bool value, const std::string& value_message, const std::string message);
 		template<typename T>
@@ -74,6 +77,21 @@ namespace test {
 	private:
 		template<typename T>
 		void compareFail(Test& test, const std::string& name, T actual, T expected);
+
+	};
+
+	class TestModule {
+	public:
+		std::string name;
+		std::vector<TestList> test_lists;
+
+		TestModule(const std::string& name);
+		void runModuleTests();
+
+	protected:
+		virtual void createTestLists() = 0;
+
+	private:
 
 	};
 
