@@ -56,8 +56,6 @@ int main() {
     //logger << "Starting app\n";
     //execute_app();
 
-    // TODO: rename OnBeforeRunList to OnBeforeRunAllTests
-    // TODO: don't show TestList info if there is one TestList in TestModule
     // TODO: remake compvector, logger, and searchindex tests with TestList
     // TODO: show total number of passed and failed tests at the end
     // TODO: Simulation tests

@@ -98,6 +98,11 @@ namespace test {
 		TestModule(const std::string& name);
 		TestList* createTestList(const std::string& name);
 		void runTests();
+		static void printSummary(
+			const std::vector<std::string>& passed_list,
+			const std::vector<std::string>& cancelled_list,
+			const std::vector<std::string>& failed_list
+		);
 
 	protected:
 		virtual void createTestLists() = 0;

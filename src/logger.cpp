@@ -323,12 +323,20 @@ void LoggerControl::close() {
 	closed = true;
 }
 
-LoggerIndent::LoggerIndent(ptrdiff_t indent) : m_logger(logger) {
-	action(indent);
+LoggerIndent::LoggerIndent(ptrdiff_t indent, bool condition) : m_logger(logger) {
+	if (condition) {
+		action(indent);
+	} else {
+		close();
+	}
 }
 
-LoggerIndent::LoggerIndent(Logger& p_logger, ptrdiff_t indent) : m_logger(p_logger) {
-	action(indent);
+LoggerIndent::LoggerIndent(Logger& p_logger, ptrdiff_t indent, bool condition) : m_logger(p_logger) {
+	if (condition) {
+		action(indent);
+	} else {
+		close();
+	}
 }
 
 LoggerIndent::~LoggerIndent() {

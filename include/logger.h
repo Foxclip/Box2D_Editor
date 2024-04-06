@@ -91,14 +91,14 @@ protected:
 
 class LoggerIndent : public LoggerControl {
 public:
-	LoggerIndent(ptrdiff_t indent = 1);
-	LoggerIndent(Logger& p_logger, ptrdiff_t indent = 1);
+	LoggerIndent(ptrdiff_t indent = 1, bool condition = true);
+	LoggerIndent(Logger& p_logger, ptrdiff_t indent = 1, bool condition = true);
 	~LoggerIndent();
 	void internalClose() override;
 
 private:
 	Logger& m_logger;
-	ptrdiff_t indent_level;
+	ptrdiff_t indent_level = 0;
 
 	void action(ptrdiff_t indent);
 };

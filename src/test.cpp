@@ -109,8 +109,7 @@ namespace test {
 	}
 
 	void TestList::runTests() {
-		LoggerIndent test_list_indent;
-		OnBeforeRunList();
+		OnBeforeRunAllTests();
 		for (size_t i = 0; i < test_list.size(); i++) {
 			Test* test = test_list[i].get();
 			OnBeforeRunTest();
@@ -138,19 +137,7 @@ namespace test {
 				}
 			}
 		}
-		OnAfterRunList();
-		logger << "Passed " << passed_list.size() << " tests, "
-			<< "cancelled " << cancelled_list.size() << " tests, "
-			<< "failed " << failed_list.size() << " tests";
-		if (failed_list.size() > 0) {
-			logger << ":\n";
-			LoggerIndent failed_list_indent;
-			for (const std::string& name : failed_list) {
-				logger << name << "\n";
-			}
-		} else {
-			logger << "\n";
-		}
+		OnAfterRunAllTests();
 	}
 
 	TestModule::TestModule(const std::string& name) {
@@ -170,8 +157,18 @@ namespace test {
 		beforeRunModule();
 		createTestLists();
 		for (auto& test_list : test_lists) {
-			logger << "Running test list: " << test_list->name << "\n";
+			if (test_lists.size() > 1) {
+				logger << "Running test list: " << test_list->name << "\n";
+			}
+			LoggerIndent test_list_indent(1, test_lists.size() > 1);
 			test_list->runTests();
+			if (test_lists.size() > 1) {
+				printSummary(
+					test_list->passed_list,
+					test_list->cancelled_list,
+					test_list->failed_list
+				);
+			}
 			for (const std::string& name : test_list->passed_list) {
 				passed_list.push_back(test_list->name + "/" + name);
 			}
@@ -183,6 +180,14 @@ namespace test {
 			}
 		}
 		afterRunModule();
+		printSummary(passed_list, cancelled_list, failed_list);
+	}
+
+	void TestModule::printSummary(
+		const std::vector<std::string>& passed_list,
+		const std::vector<std::string>& cancelled_list,
+		const std::vector<std::string>& failed_list
+	) {
 		logger << "Passed " << passed_list.size() << " tests, "
 			<< "cancelled " << cancelled_list.size() << " tests, "
 			<< "failed " << failed_list.size() << " tests";
@@ -232,18 +237,7 @@ namespace test {
 				failed_list.push_back(module->name + "/" + name);
 			}
 		}
-		logger << "Passed " << passed_list.size() << " tests, "
-			<< "cancelled " << cancelled_list.size() << " tests, "
-			<< "failed " << failed_list.size() << " tests";
-		if (failed_list.size() > 0) {
-			logger << ":\n";
-			LoggerIndent failed_list_indent;
-			for (const std::string& name : failed_list) {
-				logger << name << "\n";
-			}
-		} else {
-			logger << "\n";
-		}
+		TestModule::printSummary(passed_list, cancelled_list, failed_list);
 	}
 
 }
