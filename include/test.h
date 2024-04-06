@@ -69,8 +69,8 @@ namespace test {
 		std::vector<std::string> passed_list;
 		std::vector<std::string> cancelled_list;
 		std::vector<std::string> failed_list;
-		std::function<void(void)> OnBeforeRunList = []() { };
-		std::function<void(void)> OnAfterRunList = []() { };
+		std::function<void(void)> OnBeforeRunAllTests = []() { };
+		std::function<void(void)> OnAfterRunAllTests = []() { };
 		std::function<void(void)> OnBeforeRunTest = []() { };
 		std::function<void(void)> OnAfterRunTest = []() { };
 

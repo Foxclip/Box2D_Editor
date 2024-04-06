@@ -9,9 +9,9 @@
 void run_tests() {
     LoggerIndent test_modules_indent;
     test::TestManager test_manager;
-    test_manager.addModule<SimulationTests>();
     test_manager.addModule<CompVectorTests>();
     test_manager.addModule<LoggerTests>();
+    test_manager.addModule<SimulationTests>();
     test_manager.runAllModules();
     //SearchIndexTest();
 }
@@ -56,7 +56,6 @@ int main() {
     //logger << "Starting app\n";
     //execute_app();
 
-    // TODO: reorder test modules
     // TODO: rename OnBeforeRunList to OnBeforeRunAllTests
     // TODO: don't show TestList info if there is one TestList in TestModule
     // TODO: remake compvector, logger, and searchindex tests with TestList
