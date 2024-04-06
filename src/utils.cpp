@@ -338,7 +338,7 @@ namespace utils {
 		} else if (c == '"') {
 			return "\\\"";
 		} else if (c == EOF) {
-			return "(EOF)";
+			return "\\(EOF)";
 		} else {
 			return std::string(1, c);
 		}

@@ -32,6 +32,37 @@ namespace test {
 		return result;
 	}
 
+	std::string Test::char_to_str(char c) {
+		if (c < -1) {
+			return "(" + std::to_string(c) + ")";
+		} else if (c == '\n') {
+			return "\\n";
+		} else if (c == '\r') {
+			return "\\r";
+		} else if (c == '\t') {
+			return "\\t";
+		} else if (c == '\0') {
+			return "\\0";
+		} else if (c == '\\') {
+			return "\\\\";
+		} else if (c == '"') {
+			return "\\\"";
+		} else if (c == EOF) {
+			return "\\(EOF)";
+		} else {
+			return std::string(1, c);
+		}
+	}
+
+	std::string Test::char_to_esc(std::string str) {
+		std::string result;
+		for (size_t i = 0; i < str.size(); i++) {
+			char current_char = str[i];
+			result += char_to_str(current_char);
+		}
+		return result;
+	}
+
 	Test::Error::Error(const std::string& str) {
 		this->str = str;
 	}
@@ -46,7 +77,8 @@ namespace test {
 	}
 
 	void Test::Error::log() const {
-		logger << str << "\n";
+		std::string esc_str = char_to_esc(str);
+		logger << esc_str << "\n";
 		LoggerIndent subentries_indent;
 		for (const Error& subentry : subentries) {
 			subentry.log();
@@ -78,9 +110,12 @@ namespace test {
 
 	void TestList::runTests() {
 		LoggerIndent test_list_indent;
+		OnBeforeRunList();
 		for (size_t i = 0; i < test_list.size(); i++) {
 			Test* test = test_list[i].get();
+			OnBeforeRunTest();
 			bool result = test->run();
+			OnAfterRunTest();
 			std::string result_str;
 			if (result) {
 				logger << "passed: " << test->name << "\n";
@@ -103,6 +138,7 @@ namespace test {
 				}
 			}
 		}
+		OnAfterRunList();
 		logger << "Passed " << passed_list.size() << " tests, "
 			<< "cancelled " << cancelled_list.size() << " tests, "
 			<< "failed " << failed_list.size() << " tests";
@@ -129,9 +165,10 @@ namespace test {
 	}
 
 	void TestModule::runTests() {
-		createTestLists();
 		logger << "Running test module: " << name << "\n";
 		LoggerIndent test_module_indent;
+		beforeRunModule();
+		createTestLists();
 		for (auto& test_list : test_lists) {
 			logger << "Running test list: " << test_list->name << "\n";
 			test_list->runTests();
@@ -145,6 +182,7 @@ namespace test {
 				failed_list.push_back(test_list->name + "/" + name);
 			}
 		}
+		afterRunModule();
 		logger << "Passed " << passed_list.size() << " tests, "
 			<< "cancelled " << cancelled_list.size() << " tests, "
 			<< "failed " << failed_list.size() << " tests";
@@ -158,6 +196,10 @@ namespace test {
 			logger << "\n";
 		}
 	}
+
+	void TestModule::beforeRunModule() { }
+
+	void TestModule::afterRunModule() { }
 
 	void TestModule::testAssert(Test& test, bool value, const std::string& value_message) {
 		if (!value) {

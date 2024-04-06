@@ -25,67 +25,161 @@ void _loggerAssert_print_msg(bool value, const std::string& message) {
 
 Logger logger;
 
+Logger::Logger(bool test) {
+	if (test) {
+		test_mode = true;
+		write_time = false;
+	}
+}
+
 Logger& Logger::operator<<(const char* value) {
-	if (!logger.is_active) {
+	if (!is_active) {
 		return *this;
 	}
 	return writeString(std::string(value));
 }
 
 Logger& Logger::operator<<(std::string value) {
-	if (!logger.is_active) {
+	if (!is_active) {
 		return *this;
 	}
 	return writeString(value);
 }
 
 Logger& Logger::operator<<(int value) {
-	if (!logger.is_active) {
+	if (!is_active) {
 		return *this;
 	}
 	return writeInt(value);
 }
 
 Logger& Logger::operator<<(unsigned int value) {
-	if (!logger.is_active) {
+	if (!is_active) {
 		return *this;
 	}
 	return writeUnsignedInt(value);
 }
 
 Logger& Logger::operator<<(std::size_t value) {
-	if (!logger.is_active) {
+	if (!is_active) {
 		return *this;
 	}
 	return writeSizet(value);
 }
 
 Logger& Logger::operator<<(ptrdiff_t value) {
-	if (!logger.is_active) {
+	if (!is_active) {
 		return *this;
 	}
 	return writePtrdifft(value);
 }
 
 Logger& Logger::operator<<(float value) {
-	if (!logger.is_active) {
+	if (!is_active) {
 		return *this;
 	}
 	return writeFloat(value);
 }
 
 Logger& Logger::operator<<(double value) {
-	if (!logger.is_active) {
+	if (!is_active) {
 		return *this;
 	}
 	return writeDouble(value);
 }
 
 Logger& Logger::operator<<(bool value) {
-	if (!logger.is_active) {
+	if (!is_active) {
 		return *this;
 	}
 	return writeBool(value);
+}
+
+void Logger::lock() {
+	locked = true;
+}
+
+void Logger::unlock() {
+	locked = false;
+}
+
+void Logger::addIndentLevel(ptrdiff_t level) {
+	loggerAssert(!locked);
+	indent_level += level;
+	indent_level = std::max((ptrdiff_t)0, indent_level);
+	updateIndentStr();
+}
+
+void Logger::flush() {
+	loggerAssert(!locked);
+	internalFlush();
+}
+
+bool Logger::getAutoFlush() const {
+	return autoflush;
+}
+
+void Logger::setAutoFlush(bool value) {
+	loggerAssert(!locked);
+	this->autoflush = value;
+}
+
+bool Logger::getActiveSwitch() const {
+	return active_switch;
+}
+
+void Logger::setActiveSwitch(bool value) {
+	loggerAssert(!locked);
+	this->active_switch = value;
+}
+
+std::vector<std::string>& Logger::getTags() {
+	loggerAssert(!locked);
+	return tags;
+}
+
+const std::vector<std::string>& Logger::getTags() const {
+	return tags;
+}
+
+std::set<std::string>& Logger::getEnabledTags() {
+	loggerAssert(!locked);
+	return enabled_tags;
+}
+
+const std::set<std::string>& Logger::getEnabledTags() const {
+	return enabled_tags;
+}
+
+std::set<std::string>& Logger::getDisabledTags() {
+	loggerAssert(!locked);
+	return disabled_tags;
+}
+
+const std::set<std::string>& Logger::getDisabledTags() const {
+	return disabled_tags;
+}
+
+void Logger::updateAcive() {
+	loggerAssert(!locked);
+	if (tags.empty()) {
+		is_active = active_switch;
+		return;
+	}
+	std::string tag = tags.back();
+	if (active_switch) {
+		auto it = disabled_tags.find(tag);
+		bool found = it != disabled_tags.end();
+		is_active = !found;
+	} else {
+		auto it = enabled_tags.find(tag);
+		bool found = it != enabled_tags.end();
+		is_active = found;
+	}
+}
+
+const std::string& Logger::getTotalBuffer() const {
+	return total_buffer;
 }
 
 std::vector<std::string> Logger::splitString(const std::string& str) {
@@ -129,11 +223,6 @@ std::string Logger::boolToStr(bool value) {
 	return value ? "true" : "false";
 }
 
-void Logger::addIndentLevel(ptrdiff_t level) {
-	indent_level += level;
-	updateIndentStr();
-}
-
 Logger& Logger::writeString(std::string value) {
 	std::vector<std::string> lines = splitString(value);
 	for (size_t i = 0; i < lines.size(); i++) {
@@ -167,7 +256,7 @@ Logger& Logger::writeNewLine() {
 	line += "\n";
 	total_buffer += line;
 	if (autoflush) {
-		flush();
+		internalFlush();
 	}
 	line_buffer = "";
 	new_line = true;
@@ -214,32 +303,15 @@ Logger& Logger::writeBool(bool value) {
 
 void Logger::updateIndentStr() {
 	indent_str = "";
-	for (size_t i = 0; i < indent_level; i++) {
+	for (size_t i = 0; (ptrdiff_t)i < indent_level; i++) {
 		indent_str += "|   ";
 	}
 }
 
-void Logger::flush() {
+void Logger::internalFlush() {
 	if (!test_mode) {
 		std::cout << total_buffer;
 		total_buffer = "";
-	}
-}
-
-void Logger::updateAcive() {
-	if (tags.empty()) {
-		logger.is_active = active_switch;
-		return;
-	}
-	std::string tag = tags.back();
-	if (logger.active_switch) {
-		auto it = logger.disabled_tags.find(tag);
-		bool found = it != logger.disabled_tags.end();
-		logger.is_active = !found;
-	} else {
-		auto it = logger.enabled_tags.find(tag);
-		bool found = it != logger.enabled_tags.end();
-		logger.is_active = found;
 	}
 }
 
@@ -251,9 +323,12 @@ void LoggerControl::close() {
 	closed = true;
 }
 
-LoggerIndent::LoggerIndent(ptrdiff_t indent) {
-	this->indent_level = indent;
-	logger.addIndentLevel(indent);
+LoggerIndent::LoggerIndent(ptrdiff_t indent) : m_logger(logger) {
+	action(indent);
+}
+
+LoggerIndent::LoggerIndent(Logger& p_logger, ptrdiff_t indent) : m_logger(p_logger) {
+	action(indent);
 }
 
 LoggerIndent::~LoggerIndent() {
@@ -261,12 +336,20 @@ LoggerIndent::~LoggerIndent() {
 }
 
 void LoggerIndent::internalClose() {
-	logger.addIndentLevel(-indent_level);
+	m_logger.addIndentLevel(-indent_level);
 }
 
-LoggerLargeText::LoggerLargeText() {
-	autoflush_was_enabled = logger.autoflush;
-	logger.autoflush = false;
+void LoggerIndent::action(ptrdiff_t indent) {
+	this->indent_level = indent;
+	m_logger.addIndentLevel(indent);
+}
+
+LoggerLargeText::LoggerLargeText() : m_logger(logger) {
+	action();
+}
+
+LoggerLargeText::LoggerLargeText(Logger& p_logger) : m_logger(p_logger) {
+	action();
 }
 
 LoggerLargeText::~LoggerLargeText() {
@@ -274,14 +357,21 @@ LoggerLargeText::~LoggerLargeText() {
 }
 
 void LoggerLargeText::internalClose() {
-	logger.flush();
-	logger.autoflush = autoflush_was_enabled;
+	m_logger.flush();
+	m_logger.setAutoFlush(autoflush_was_enabled);
 }
 
-LoggerDeactivate::LoggerDeactivate() {
-	loggerAssert(logger.active_switch, "Not allowed to deactivate logger twice");
-	loggerAssert(logger.tags.size() == 0, "LoggerDeactivate must be outside of all LoggerTags");
-	logger.active_switch = false;
+void LoggerLargeText::action() {
+	autoflush_was_enabled = m_logger.getAutoFlush();
+	m_logger.setAutoFlush(false);
+}
+
+LoggerDeactivate::LoggerDeactivate() : m_logger(logger) {
+	action();
+}
+
+LoggerDeactivate::LoggerDeactivate(Logger& p_logger) : m_logger(p_logger) {
+	action();
 }
 
 LoggerDeactivate::~LoggerDeactivate() {
@@ -289,12 +379,21 @@ LoggerDeactivate::~LoggerDeactivate() {
 }
 
 void LoggerDeactivate::internalClose() {
-	logger.active_switch = true;
+	m_logger.setActiveSwitch(true);
 }
 
-LoggerTag::LoggerTag(const std::string& tag) {
-	logger.tags.push_back(tag);
-	logger.updateAcive();
+void LoggerDeactivate::action() {
+	loggerAssert(m_logger.getActiveSwitch(), "Not allowed to deactivate logger twice");
+	loggerAssert(m_logger.getTags().size() == 0, "LoggerDeactivate must be outside of all LoggerTags");
+	m_logger.setActiveSwitch(false);
+}
+
+LoggerTag::LoggerTag(const std::string& tag) : m_logger(logger) {
+	action(tag);
+}
+
+LoggerTag::LoggerTag(Logger& p_logger, const std::string& tag) : m_logger(p_logger) {
+	action(tag);
 }
 
 LoggerTag::~LoggerTag() {
@@ -302,14 +401,21 @@ LoggerTag::~LoggerTag() {
 }
 
 void LoggerTag::internalClose() {
-	logger.tags.pop_back();
-	logger.updateAcive();
+	m_logger.getTags().pop_back();
+	m_logger.updateAcive();
 }
 
-LoggerEnableTag::LoggerEnableTag(const std::string& tag) {
-	this->tag = tag;
-	logger.enabled_tags.insert(tag);
-	logger.updateAcive();
+void LoggerTag::action(const std::string& tag) {
+	m_logger.getTags().push_back(tag);
+	m_logger.updateAcive();
+}
+
+LoggerEnableTag::LoggerEnableTag(const std::string& tag) : m_logger(logger) {
+	action(tag);
+}
+
+LoggerEnableTag::LoggerEnableTag(Logger& p_logger, const std::string& tag) : m_logger(p_logger) {
+	action(tag);
 }
 
 LoggerEnableTag::~LoggerEnableTag() {
@@ -317,14 +423,22 @@ LoggerEnableTag::~LoggerEnableTag() {
 }
 
 void LoggerEnableTag::internalClose() {
-	logger.enabled_tags.erase(tag);
-	logger.updateAcive();
+	m_logger.getEnabledTags().erase(tag);
+	m_logger.updateAcive();
 }
 
-LoggerDisableTag::LoggerDisableTag(const std::string& tag) {
+void LoggerEnableTag::action(const std::string& tag) {
 	this->tag = tag;
-	logger.disabled_tags.insert(tag);
-	logger.updateAcive();
+	m_logger.getEnabledTags().insert(tag);
+	m_logger.updateAcive();
+}
+
+LoggerDisableTag::LoggerDisableTag(const std::string& tag) : m_logger(logger) {
+	action(tag);
+}
+
+LoggerDisableTag::LoggerDisableTag(Logger& p_logger, const std::string& tag) : m_logger(p_logger) {
+	action(tag);
 }
 
 LoggerDisableTag::~LoggerDisableTag() {
@@ -332,183 +446,187 @@ LoggerDisableTag::~LoggerDisableTag() {
 }
 
 void LoggerDisableTag::internalClose() {
-	logger.disabled_tags.erase(tag);
-	logger.updateAcive();
+	m_logger.getDisabledTags().erase(tag);
+	m_logger.updateAcive();
+}
+
+void LoggerDisableTag::action(const std::string& tag) {
+	this->tag = tag;
+	m_logger.getDisabledTags().insert(tag);
+	m_logger.updateAcive();
 }
 
 #ifndef NDEBUG
 
-void LoggerTest::testLogger() {
-	{
-		// simple test
+LoggerTests::LoggerTests() : TestModule("Logger") { }
+
+void LoggerTests::createTestLists() {
+	test::TestList* list = createTestList("Logger");
+	list->OnBeforeRunTest = []() { logger.lock(); };
+	list->OnAfterRunTest = []() { logger.unlock(); };
+
+	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
+		Logger logger(true);
 		logger << "Test\n";
-		assert(logger.total_buffer == "Test\n");
-		logger.total_buffer = "";
-	}
-	{
-		// multiple lines
+		tCompare(logger.getTotalBuffer(), "Test\n");
+	});
+	test::Test* multiple_lines_test = list->addTest("multiple_lines", { basic_test }, [&](test::Test& test) {
+		Logger logger(true);
 		logger << "Line1\n";
 		logger << "Line2\n";
-		assert(logger.total_buffer == "Line1\nLine2\n");
-		logger.total_buffer = "";
-	}
-	{
-		// tag
-		LoggerTag tag1("tag1");
+		tCompare(logger.getTotalBuffer(), "Line1\nLine2\n");
+	});
+	test::Test* tag_test = list->addTest("tag", { multiple_lines_test }, [&](test::Test& test) {
+		Logger logger(true);
+		LoggerTag tag1(logger, "tag1");
 		logger << "tag1\n";
-		assert(logger.total_buffer == "tag1\n");
-		logger.total_buffer = "";
-	}
-	{
-		// LoggerDeactivate
-		LoggerDeactivate deact;
-		LoggerTag tag1("tag1");
+		tCompare(logger.getTotalBuffer(), "tag1\n");
+	});
+	test::Test* deactivate_test = list->addTest("deactivate", { tag_test }, [&](test::Test& test) {
+		Logger logger(true);
+		LoggerDeactivate deact(logger);
+		LoggerTag tag1(logger, "tag1");
 		logger << "tag1\n";
-		assert(logger.total_buffer == "");
-		logger.total_buffer = "";
-	}
-	{
-		// enable tag
-		LoggerDeactivate deact;
-		LoggerEnableTag enable_tag1("tag1");
-		LoggerEnableTag enable_someTag("someTag");
-		LoggerDisableTag disable_someOtherTag("someOtherTag");
+		tCompare(logger.getTotalBuffer(), "");
+	});
+	test::Test* enable_tag_test = list->addTest("enable_tag", { deactivate_test }, [&](test::Test& test) {
+		Logger logger(true);
+		LoggerDeactivate deact(logger);
+		LoggerEnableTag enable_tag1(logger, "tag1");
+		LoggerEnableTag enable_someTag(logger, "someTag");
+		LoggerDisableTag disable_someOtherTag(logger, "someOtherTag");
 		{
-			LoggerTag tag1("tag1");
+			LoggerTag tag1(logger, "tag1");
 			logger << "tag1\n";
 		}
 		{
-			LoggerTag tag2("tag2");
+			LoggerTag tag2(logger, "tag2");
 			logger << "tag2\n";
 		}
-		assert(logger.total_buffer == "tag1\n");
-		logger.total_buffer = "";
-	}
-	{
-		// disable tag
-		LoggerDisableTag disable_tag2("tag2");
-		LoggerEnableTag disable_someTag("someTag");
-		LoggerDisableTag disable_someOtherTag("someOtherTag");
+		tCompare(logger.getTotalBuffer(), "tag1\n");
+	});
+	test::Test* disable_tag_test = list->addTest("disable_tag", { tag_test }, [&](test::Test& test) {
+		Logger logger(true);
+		LoggerDisableTag disable_tag2(logger, "tag2");
+		LoggerEnableTag enable_someTag(logger, "someTag");
+		LoggerDisableTag disable_someOtherTag(logger, "someOtherTag");
 		{
-			LoggerTag tag1("tag1");
+			LoggerTag tag1(logger, "tag1");
 			logger << "tag1\n";
 		}
 		{
-			LoggerTag tag2("tag2");
+			LoggerTag tag2(logger, "tag2");
 			logger << "tag2\n";
 		}
-		assert(logger.total_buffer == "tag1\n");
-		logger.total_buffer = "";
-	}
-	{
-		// return to disabled tag
-		LoggerDisableTag disable_tag1("tag1");
-		LoggerTag tag1("tag1");
+		tCompare(logger.getTotalBuffer(), "tag1\n");
+	});
+
+	std::vector<test::Test*> tag_tests = list->getTestList();
+
+	test::Test* return_disabled_test = list->addTest("return_disabled", { tag_tests }, [&](test::Test& test) {
+		Logger logger(true);
+		LoggerDisableTag disable_tag1(logger, "tag1");
+		LoggerTag tag1(logger, "tag1");
 		logger << "tag1 frist\n";
 		{
-			LoggerTag tag2("tag2");
+			LoggerTag tag2(logger, "tag2");
 			logger << "tag2\n";
 		}
 		logger << "tag1 second\n";
-		assert(logger.total_buffer == "tag2\n");
-		logger.total_buffer = "";
-	}
-	{
-		// nested tags
-		LoggerDeactivate deact;
-		LoggerEnableTag enable_tag1("tag1");
-		LoggerEnableTag enable_tag3("tag3");
+		tCompare(logger.getTotalBuffer(), "tag2\n");
+	});
+	test::Test* nested_tags_1_test = list->addTest("nested_tags_1", { tag_tests }, [&](test::Test& test) {
+		Logger logger(true);
+		LoggerDeactivate deact(logger);
+		LoggerEnableTag enable_tag1(logger, "tag1");
+		LoggerEnableTag enable_tag3(logger, "tag3");
 		{
-			LoggerTag tag1("tag1");
+			LoggerTag tag1(logger, "tag1");
 			logger << "tag1\n";
 			{
-				LoggerTag tag2("tag2");
+				LoggerTag tag2(logger, "tag2");
 				logger << "tag2\n";
 				{
-					LoggerTag tag3("tag3");
+					LoggerTag tag3(logger, "tag3");
 					logger << "tag3\n";
 				}
 			}
 		}
-		assert(logger.total_buffer == "tag1\ntag3\n");
-		logger.total_buffer = "";
-	}
-	{
-		// reenable tag
+		tCompare(logger.getTotalBuffer(), "tag1\ntag3\n");
+	});
+	test::Test* reenable_tag_1_test = list->addTest("reenable_tag_1", { tag_tests }, [&](test::Test& test) {
+		Logger logger(true);
 		{
-			LoggerTag tag1("tag1");
+			LoggerTag tag1(logger, "tag1");
 			logger << "tag1\n";
 			{
-				LoggerDisableTag disable_tag2("tag2");
-				LoggerTag tag2("tag2");
+				LoggerDisableTag disable_tag2(logger, "tag2");
+				LoggerTag tag2(logger, "tag2");
 				logger << "tag2 first\n";
 			}
 			{
-				LoggerTag tag2("tag2");
+				LoggerTag tag2(logger, "tag2");
 				logger << "tag2 second\n";
 			}
 		}
-		assert(logger.total_buffer == "tag1\ntag2 second\n");
-		logger.total_buffer = "";
-	}
-	{
-		// LoggerDisableTag after LoggerTag
+		tCompare(logger.getTotalBuffer(), "tag1\ntag2 second\n");
+	});
+	test::Test* disable_after_tag_test = list->addTest("disable_after_tag", { tag_tests }, [&](test::Test& test) {
+		Logger logger(true);
 		{
-			LoggerTag tag1("tag1");
+			LoggerTag tag1(logger, "tag1");
 			logger << "tag1 first\n";
-			LoggerDisableTag disable_tag1("tag1");
+			LoggerDisableTag disable_tag1(logger, "tag1");
 			logger << "tag1 second\n";
 			{
-				LoggerTag tag2("tag2");
+				LoggerTag tag2(logger, "tag2");
 				logger << "tag2\n";
 			}
 			logger << "tag1 third\n";
 		}
-		assert(logger.total_buffer == "tag1 first\ntag2\n");
-		logger.total_buffer = "";
-	}
-	{
-		// reenabling tag
+		tCompare(logger.getTotalBuffer(), "tag1 first\ntag2\n");
+	});
+	test::Test* reenable_tag_2_test = list->addTest("reenable_tag_2", { tag_tests }, [&](test::Test& test) {
+		Logger logger(true);
 		{
 			{
-				LoggerTag tag1("tag1");
+				LoggerTag tag1(logger, "tag1");
 				{
-					LoggerDisableTag disable_tag1("tag1");
-					LoggerTag tag2("tag2");
+					LoggerDisableTag disable_tag1(logger, "tag1");
+					LoggerTag tag2(logger, "tag2");
 				}
 				logger << "tag1 first\n";
 			}
 			{
-				LoggerTag tag1("tag1");
+				LoggerTag tag1(logger, "tag1");
 				{
-					LoggerTag tag2("tag2");
-					LoggerDisableTag disable_tag1("tag1");
+					LoggerTag tag2(logger, "tag2");
+					LoggerDisableTag disable_tag1(logger, "tag1");
 				}
 				logger << "tag1 second\n";
 			}
 		}
-		assert(logger.total_buffer == "tag1 first\ntag1 second\n");
-		logger.total_buffer = "";
-	}
-	{
-		// more nested tags
-		LoggerTag tag1("tag1");
-		LoggerDisableTag disable_tag2("tag2");
+		tCompare(logger.getTotalBuffer(), "tag1 first\ntag1 second\n");
+	});
+	test::Test* nested_tags_2_test = list->addTest("nested_tags_2", { tag_tests }, [&](test::Test& test) {
+		Logger logger(true);
+		LoggerTag tag1(logger, "tag1");
+		LoggerDisableTag disable_tag2(logger, "tag2");
 		logger << "tag1 first\n";
 		{
-			LoggerTag tag2("tag2");
+			LoggerTag tag2(logger, "tag2");
 			logger << "tag2 1\n";
 			{
-				LoggerTag tag3("tag3");
+				LoggerTag tag3(logger, "tag3");
 				logger << "tag3 1\n";
 				{
-					LoggerTag tag2("tag2");
+					LoggerTag tag2(logger, "tag2");
 					logger << "tag2 2\n";
 					{
-						LoggerTag tag4("tag4");
+						LoggerTag tag4(logger, "tag4");
 						logger << "tag4 1\n";
 						{
-							LoggerTag tag1_again("tag1");
+							LoggerTag tag1_again(logger, "tag1");
 							logger << "tag1 second\n";
 						}
 						logger << "tag4 2\n";
@@ -520,7 +638,7 @@ void LoggerTest::testLogger() {
 			logger << "tag2 4\n";
 		}
 		logger << "tag1 third\n";
-		assert(logger.total_buffer == 
+		tCompare(logger.getTotalBuffer(),
 			"tag1 first\n"
 			"tag3 1\n"
 			"tag4 1\n"
@@ -529,15 +647,7 @@ void LoggerTest::testLogger() {
 			"tag3 2\n"
 			"tag1 third\n"
 		);
-		logger.total_buffer = "";
-	}
-}
-
-LoggerTest::LoggerTest() {
-	logger.test_mode = true;
-	logger.write_time = false;
-	testLogger();
-	logger = Logger();
+	});
 }
 
 #endif // !NDEBUG

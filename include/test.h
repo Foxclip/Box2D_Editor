@@ -58,6 +58,9 @@ namespace test {
 
 	private:
 		TestFuncType func;
+
+		static std::string char_to_str(char c);
+		static std::string char_to_esc(std::string str);
 	};
 
 	class TestList {
@@ -66,6 +69,10 @@ namespace test {
 		std::vector<std::string> passed_list;
 		std::vector<std::string> cancelled_list;
 		std::vector<std::string> failed_list;
+		std::function<void(void)> OnBeforeRunList = []() { };
+		std::function<void(void)> OnAfterRunList = []() { };
+		std::function<void(void)> OnBeforeRunTest = []() { };
+		std::function<void(void)> OnAfterRunTest = []() { };
 
 		TestList(const std::string& name);
 		Test* addTest(std::string name, TestFuncType func);
@@ -94,6 +101,8 @@ namespace test {
 
 	protected:
 		virtual void createTestLists() = 0;
+		virtual void beforeRunModule();
+		virtual void afterRunModule();
 		void testAssert(Test& test, bool value, const std::string& value_message);
 		void testAssert(Test& test, bool value, const std::string& value_message, const std::string message);
 		template<typename T, typename U>
