@@ -287,8 +287,6 @@ ChainObject* Simulation::create_chain(
     return ptr;
 }
 
-#ifndef NDEBUG
-
 SimulationTests::SimulationTests() : TestModule("Simulation") { }
 
 void SimulationTests::createTestLists() {
@@ -313,5 +311,3 @@ void SimulationTests::createTestLists() {
         tApproxCompare(box->getGlobalRotation(), utils::to_radians(45.0f));
     });
 }
-
-#endif // !NDEBUG

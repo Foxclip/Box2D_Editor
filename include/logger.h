@@ -175,8 +175,6 @@ private:
 
 };
 
-#ifndef NDEBUG
-
 class LoggerTests : public test::TestModule {
 public:
 	LoggerTests();
@@ -184,5 +182,3 @@ public:
 protected:
 	void createTestLists() override;
 };
-
-#endif // NDEBUG

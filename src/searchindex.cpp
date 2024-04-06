@@ -1,5 +1,3 @@
-#ifndef NDEBUG
-
 #include "searchindex.h"
 #include <vector>
 #include <cassert>
@@ -220,5 +218,3 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		tCheck(sindex.find(8) == nullptr);
 	});
 }
-
-#endif // NDEBUG

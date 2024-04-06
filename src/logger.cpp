@@ -464,8 +464,6 @@ void LoggerDisableTag::action(const std::string& tag) {
 	m_logger.updateAcive();
 }
 
-#ifndef NDEBUG
-
 LoggerTests::LoggerTests() : TestModule("Logger") { }
 
 void LoggerTests::createTestLists() {
@@ -657,5 +655,3 @@ void LoggerTests::createTestLists() {
 		);
 	});
 }
-
-#endif // !NDEBUG

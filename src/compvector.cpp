@@ -1,5 +1,3 @@
-#ifndef NDEBUG
-
 #include "compvector.h"
 #include <cassert>
 #include <algorithm>
@@ -486,5 +484,3 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 		tCompare(*vec[2], 3);
 	});
 }
-
-#endif // NDEBUG

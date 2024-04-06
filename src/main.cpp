@@ -5,7 +5,6 @@
 #include "logger.h"
 #include "scenes.h"
 
-#ifndef NDEBUG
 void run_tests() {
     LoggerIndent test_modules_indent;
     test::TestManager test_manager;
@@ -15,7 +14,6 @@ void run_tests() {
     test_manager.addModule<SimulationTests>();
     test_manager.runAllModules();
 }
-#endif
 
 void execute_app() {
     Editor app;
@@ -43,10 +41,8 @@ void execute_app() {
 
 int main() {
 
-#ifndef NDEBUG
     logger << "Running tests\n";
     run_tests();
-#endif
 
     LoggerDisableTag disable_serialize_tag("serialize");
     LoggerDisableTag disable_recut_tag("recut");

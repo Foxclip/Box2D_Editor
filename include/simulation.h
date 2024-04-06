@@ -59,8 +59,6 @@ private:
 
 };
 
-#ifndef NDEBUG
-
 class SimulationTests : public test::TestModule {
 public:
 	SimulationTests();
@@ -70,5 +68,3 @@ protected:
 
 private:
 };
-
-#endif // !NDEBUG

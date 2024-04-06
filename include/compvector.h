@@ -546,8 +546,6 @@ inline CompVectorUptr<T, TCmp>::operator std::vector<T*>() const {
 	return comp.getVector();
 }
 
-#ifndef NDEBUG
-
 class TestModule;
 
 class CompVectorTests : public test::TestModule {
@@ -559,5 +557,3 @@ protected:
 	void createCompVectorList(test::TestList* list);
 	void createCompVectorUptrList(test::TestList* list);
 };
-
-#endif // NDEBUG

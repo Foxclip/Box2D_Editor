@@ -202,8 +202,6 @@ inline ObjectDataNode<TData, TObject>* SearchIndexMultiple<TData, TObject>::find
 	return nullptr;
 }
 
-#ifndef NDEBUG
-
 class SearchIndexTests : public test::TestModule {
 public:
 	SearchIndexTests();
@@ -214,5 +212,3 @@ protected:
 	void createTestListMultiple(test::TestList* list);
 
 };
-
-#endif // NDEBUG
