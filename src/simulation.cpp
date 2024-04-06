@@ -291,6 +291,9 @@ SimulationTests::SimulationTests() : TestModule("Simulation") { }
 
 void SimulationTests::createTestLists() {
     test::TestList* list = createTestList("Simulation");
+    list->OnBeforeRunTest = []() { logger.manualDeactivate(); };
+    list->OnAfterRunTest = []() { logger.manualActivate(); };
+
     test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
         Simulation simulation;
     });
@@ -307,7 +310,89 @@ void SimulationTests::createTestLists() {
         BoxObject* box = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
         tAssert(box, "Object is not a BoxObject");
         tCompare(box->getName(), std::string("box0"));
-        tCheck(box->getGlobalPosition() == b2Vec2(1.0f, 1.0f));
+        tApproxCompare(box->getGlobalPosition().x, 1.0f);
+        tApproxCompare(box->getGlobalPosition().y, 1.0f);
         tApproxCompare(box->getGlobalRotation(), utils::to_radians(45.0f));
+    });
+    test::Test* ball_test = list->addTest("ball", { basic_test }, [&](test::Test& test) {
+        Simulation simulation;
+        simulation.create_ball(
+            "ball0",
+            b2Vec2(1.0f, 1.0f),
+            1.0f,
+            sf::Color::Green,
+            sf::Color::Green
+        );
+        tAssert(simulation.getAllSize() > 0);
+        BallObject* ball = dynamic_cast<BallObject*>(simulation.getFromAll(0));
+        tAssert(ball, "Object is not a BallObject");
+        tCompare(ball->getName(), std::string("ball0"));
+        tApproxCompare(ball->getGlobalPosition().x, 1.0f);
+        tApproxCompare(ball->getGlobalPosition().y, 1.0f);
+        tApproxCompare(ball->getGlobalRotation(), utils::to_radians(0.0f));
+    });
+    test::Test* polygon_test = list->addTest("polygon", { basic_test }, [&](test::Test& test) {
+        Simulation simulation;
+        std::vector<b2Vec2> vertices;
+        for (size_t i = 0; i < 6; i++) {
+            b2Vec2 vertex = utils::get_circle_vertex<b2Vec2>(i, 6, 1.0f);
+            vertices.push_back(vertex);
+        }
+        simulation.create_polygon(
+            "polygon0",
+            b2Vec2(1.0f, 1.0f),
+            utils::to_radians(45.0f),
+            vertices,
+            sf::Color::Green
+        );
+        tAssert(simulation.getAllSize() > 0);
+        PolygonObject* polygon = dynamic_cast<PolygonObject*>(simulation.getFromAll(0));
+        tAssert(polygon, "Object is not a PolygonObject");
+        tCompare(polygon->getName(), std::string("polygon0"));
+        tApproxCompare(polygon->getGlobalPosition().x, 1.0f);
+        tApproxCompare(polygon->getGlobalPosition().y, 1.0f);
+        tApproxCompare(polygon->getGlobalRotation(), utils::to_radians(45.0f));
+    });
+    test::Test* car_test = list->addTest("car", { polygon_test }, [&](test::Test& test) {
+        Simulation simulation;
+        std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
+        std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+        simulation.create_car(
+            "car0",
+            b2Vec2(0.0f, 0.0f),
+            lengths,
+            wheels,
+            sf::Color(255, 0, 0)
+        );
+        tAssert(simulation.getAllSize() > 0);
+        {
+            PolygonObject* car = dynamic_cast<PolygonObject*>(simulation.getFromAll(0));
+            tAssert(car, "Object is not a PolygonObject");
+            tCompare(car->getName(), std::string("car0"));
+            tApproxCompare(car->getGlobalPosition().x, 0.0f);
+            tApproxCompare(car->getGlobalPosition().y, 0.0f);
+            tApproxCompare(car->getGlobalRotation(), utils::to_radians(0.0f));
+        }
+        {
+            BallObject* wheel0 = dynamic_cast<BallObject*>(simulation.getFromAll(1));
+            tAssert(wheel0, "Object is not a BallObject");
+            tCompare(wheel0->getName(), std::string("car0 wheel0"));
+            tApproxCompare(wheel0->getGlobalPosition().x, 5.0f);
+            tApproxCompare(wheel0->getGlobalPosition().y, 0.0f);
+        }
+        {
+            BallObject* wheel1 = dynamic_cast<BallObject*>(simulation.getFromAll(2));
+            tAssert(wheel1, "Object is not a BallObject");
+            tCompare(wheel1->getName(), std::string("car0 wheel1"));
+            tApproxCompare(wheel1->getGlobalPosition().x, -2.50000024f);
+            tApproxCompare(wheel1->getGlobalPosition().y, 4.33012676f);
+        }
+        {
+            BallObject* wheel2 = dynamic_cast<BallObject*>(simulation.getFromAll(3));
+            tAssert(wheel2, "Object is not a BallObject");
+            tCompare(wheel2->getName(), std::string("car0 wheel2"));
+            tApproxCompare(wheel2->getGlobalPosition().x, -2.49999952f);
+            tApproxCompare(wheel2->getGlobalPosition().y, -4.33012724f);
+        }
     });
 }

@@ -28,6 +28,8 @@ public:
 	Logger& operator<<(bool value);
 	void lock();
 	void unlock();
+	void manualActivate();
+	void manualDeactivate();
 	void addIndentLevel(ptrdiff_t level);
 	void flush();
 	bool getAutoFlush() const;
@@ -52,6 +54,7 @@ private:
 	std::string indent_str;
 	bool autoflush = true;
 	bool active_switch = true;
+	bool manual_switch_active = true;
 	bool is_active = true;
 	bool test_mode = false;
 	bool write_time = true;

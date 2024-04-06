@@ -53,6 +53,7 @@ int main() {
     //execute_app();
 
     // TODO: Simulation tests
+    // TODO: Widget tests
     // TODO: blinking textbox cursor
     // TODO: remove global.h
     // TODO: don't fill window with black color in Application::Render

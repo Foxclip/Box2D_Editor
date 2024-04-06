@@ -33,74 +33,85 @@ Logger::Logger(bool test) {
 }
 
 Logger& Logger::operator<<(const char* value) {
-	if (!is_active) {
+	if (!is_active || !manual_switch_active) {
 		return *this;
 	}
 	return writeString(std::string(value));
 }
 
 Logger& Logger::operator<<(std::string value) {
-	if (!is_active) {
+	if (!is_active || !manual_switch_active) {
 		return *this;
 	}
 	return writeString(value);
 }
 
 Logger& Logger::operator<<(int value) {
-	if (!is_active) {
+	if (!is_active || !manual_switch_active) {
 		return *this;
 	}
 	return writeInt(value);
 }
 
 Logger& Logger::operator<<(unsigned int value) {
-	if (!is_active) {
+	if (!is_active || !manual_switch_active) {
 		return *this;
 	}
 	return writeUnsignedInt(value);
 }
 
 Logger& Logger::operator<<(std::size_t value) {
-	if (!is_active) {
+	if (!is_active || !manual_switch_active) {
 		return *this;
 	}
 	return writeSizet(value);
 }
 
 Logger& Logger::operator<<(ptrdiff_t value) {
-	if (!is_active) {
+	if (!is_active || !manual_switch_active) {
 		return *this;
 	}
 	return writePtrdifft(value);
 }
 
 Logger& Logger::operator<<(float value) {
-	if (!is_active) {
+	if (!is_active || !manual_switch_active) {
 		return *this;
 	}
 	return writeFloat(value);
 }
 
 Logger& Logger::operator<<(double value) {
-	if (!is_active) {
+	if (!is_active || !manual_switch_active) {
 		return *this;
 	}
 	return writeDouble(value);
 }
 
 Logger& Logger::operator<<(bool value) {
-	if (!is_active) {
+	if (!is_active || !manual_switch_active) {
 		return *this;
 	}
 	return writeBool(value);
 }
 
 void Logger::lock() {
+	loggerAssert(!locked);
 	locked = true;
 }
 
 void Logger::unlock() {
 	locked = false;
+}
+
+void Logger::manualActivate() {
+	loggerAssert(!locked);
+	manual_switch_active = true;
+}
+
+void Logger::manualDeactivate() {
+	loggerAssert(!locked);
+	manual_switch_active = false;
 }
 
 void Logger::addIndentLevel(ptrdiff_t level) {
