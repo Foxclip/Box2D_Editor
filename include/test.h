@@ -89,6 +89,7 @@ namespace test {
 		std::vector<std::string> failed_list;
 
 		TestModule(const std::string& name);
+		TestList* createTestList(const std::string& name);
 		void runTests();
 
 	protected:

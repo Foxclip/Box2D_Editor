@@ -121,6 +121,13 @@ namespace test {
 		this->name = name;
 	}
 
+	TestList* TestModule::createTestList(const std::string& name) {
+		std::unique_ptr<TestList> test_list = std::make_unique<TestList>(name);
+		TestList* ptr = test_list.get();
+		test_lists.push_back(std::move(test_list));
+		return ptr;
+	}
+
 	void TestModule::runTests() {
 		createTestLists();
 		logger << "Running test module: " << name << "\n";

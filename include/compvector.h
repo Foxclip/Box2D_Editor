@@ -556,8 +556,8 @@ public:
 
 protected:
 	void createTestLists() override;
-	void createCompVectorList();
-	void createCompVectorUptrList();
+	void createCompVectorList(test::TestList* list);
+	void createCompVectorUptrList(test::TestList* list);
 };
 
 #endif // NDEBUG
