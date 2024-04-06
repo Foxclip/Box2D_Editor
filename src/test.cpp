@@ -157,18 +157,14 @@ namespace test {
 		beforeRunModule();
 		createTestLists();
 		for (auto& test_list : test_lists) {
-			if (test_lists.size() > 1) {
-				logger << "Running test list: " << test_list->name << "\n";
-			}
-			LoggerIndent test_list_indent(1, test_lists.size() > 1);
+			logger << "Running test list: " << test_list->name << "\n";
+			LoggerIndent test_list_indent;
 			test_list->runTests();
-			if (test_lists.size() > 1) {
-				printSummary(
-					test_list->passed_list,
-					test_list->cancelled_list,
-					test_list->failed_list
-				);
-			}
+			printSummary(
+				test_list->passed_list,
+				test_list->cancelled_list,
+				test_list->failed_list
+			);
 			for (const std::string& name : test_list->passed_list) {
 				passed_list.push_back(test_list->name + "/" + name);
 			}

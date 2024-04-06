@@ -56,8 +56,6 @@ int main() {
     //logger << "Starting app\n";
     //execute_app();
 
-    // TODO: remake compvector, logger, and searchindex tests with TestList
-    // TODO: show total number of passed and failed tests at the end
     // TODO: Simulation tests
     // TODO: blinking textbox cursor
     // TODO: remove global.h
