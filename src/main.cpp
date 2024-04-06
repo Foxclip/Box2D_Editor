@@ -9,8 +9,8 @@
 void run_tests() {
     LoggerIndent test_modules_indent;
     test::TestManager test_manager;
-    test_manager.addModule(std::make_unique<SimulationTests>());
-    test_manager.addModule(std::make_unique<CompVectorTests>());
+    test_manager.addModule<SimulationTests>();
+    test_manager.addModule<CompVectorTests>();
     test_manager.runAllModules();
     //LoggerTest();
     //SearchIndexTest();

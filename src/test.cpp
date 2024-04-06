@@ -173,12 +173,6 @@ namespace test {
 		}
 	}
 
-	TestManager::TestManager() { }
-
-	void TestManager::addModule(std::unique_ptr<TestModule> module) {
-		modules.push_back(std::move(module));
-	}
-
 	void TestManager::runAllModules() {
 		std::vector<std::string> passed_list;
 		std::vector<std::string> cancelled_list;

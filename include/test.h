@@ -111,8 +111,9 @@ namespace test {
 
 	class TestManager {
 	public:
-		TestManager();
-		void addModule(std::unique_ptr<TestModule> module);
+		template<typename T>
+		requires std::derived_from<T, TestModule>
+		void addModule();
 		void runAllModules();
 
 	private:
@@ -162,6 +163,13 @@ namespace test {
 		error.add(Test::Error("  Actual value: " + actual_value_str));
 		test.errors.push_back(error);
 		test.result = false;
+	}
+
+	template<typename T>
+	requires std::derived_from<T, TestModule>
+	inline void TestManager::addModule() {
+		std::unique_ptr<T> uptr = std::make_unique<T>();
+		modules.push_back(std::move(uptr));
 	}
 
 }
