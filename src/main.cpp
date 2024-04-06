@@ -9,11 +9,11 @@
 void run_tests() {
     LoggerIndent test_modules_indent;
     test::TestManager test_manager;
-    test_manager.addModule<CompVectorTests>();
     test_manager.addModule<LoggerTests>();
+    test_manager.addModule<CompVectorTests>();
+    test_manager.addModule<SearchIndexTests>();
     test_manager.addModule<SimulationTests>();
     test_manager.runAllModules();
-    //SearchIndexTest();
 }
 #endif
 

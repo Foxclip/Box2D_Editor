@@ -182,7 +182,7 @@ public:
 	LoggerTests();
 
 protected:
-	void createTestLists();
+	void createTestLists() override;
 };
 
 #endif // NDEBUG

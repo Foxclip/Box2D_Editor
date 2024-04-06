@@ -4,138 +4,221 @@
 #include <vector>
 #include <cassert>
 
+SearchIndexTests::SearchIndexTests() : TestModule("SearchIndex") { }
+
 class MyClass { };
 
-void test_SearchIndexUnique() {
-	MyClass mc1;
-	MyClass mc2;
-	MyClass mc3;
-	SearchIndexUnique<int, MyClass> sindex;
-	sindex.add(5, &mc1);
-	sindex.add(6, &mc2);
-	sindex.add(6, &mc2);
-	sindex.add(7, &mc3);
-	assert(sindex.size() == 3);
-	assert(sindex.contains(5));
-	assert(sindex.contains(6));
-	assert(sindex.contains(7));
-	assert(!sindex.contains(4));
-	assert(!sindex.contains(8));
-	assert(sindex.min() == 5);
-	assert(sindex.max() == 7);
-	assert(sindex.find(5) == &mc1);
-	assert(sindex.find(6) == &mc2);
-	assert(sindex.find(7) == &mc3);
-	assert(sindex.find(4) == nullptr);
-	assert(sindex.find(8) == nullptr);
-	sindex.remove(6);
-	assert(sindex.size() == 2);
-	assert(sindex.contains(5));
-	assert(!sindex.contains(6));
-	assert(sindex.contains(7));
-	assert(!sindex.contains(4));
-	assert(!sindex.contains(8));
-	assert(sindex.min() == 5);
-	assert(sindex.max() == 7);
-	assert(sindex.find(5) == &mc1);
-	assert(sindex.find(6) == nullptr);
-	assert(sindex.find(7) == &mc3);
-	sindex.remove(5);
-	assert(sindex.size() == 1);
-	assert(!sindex.contains(5));
-	assert(!sindex.contains(6));
-	assert(sindex.contains(7));
-	assert(!sindex.contains(4));
-	assert(!sindex.contains(8));
-	assert(sindex.min() == 7);
-	assert(sindex.max() == 7);
-	assert(sindex.find(5) == nullptr);
-	assert(sindex.find(6) == nullptr);
-	assert(sindex.find(7) == &mc3);
-	assert(sindex.find(4) == nullptr);
-	assert(sindex.find(8) == nullptr);
-	sindex.clear();
-	assert(sindex.size() == 0);
-	assert(!sindex.contains(5));
-	assert(!sindex.contains(6));
-	assert(!sindex.contains(7));
-	assert(!sindex.contains(4));
-	assert(!sindex.contains(8));
-	assert(sindex.find(5) == nullptr);
-	assert(sindex.find(6) == nullptr);
-	assert(sindex.find(7) == nullptr);
-	assert(sindex.find(4) == nullptr);
-	assert(sindex.find(8) == nullptr);
+void SearchIndexTests::createTestLists() {
+	test::TestList* test_list_unique = createTestList("SearchIndexUnique");
+	test::TestList* test_list_multiple = createTestList("SearchIndexMultiple");
+	createTestListUnique(test_list_unique);
+	createTestListMultiple(test_list_multiple);
 }
 
-void test_SearchIndexMultiple() {
-	MyClass mc1;
-	MyClass mc2;
-	MyClass mc3;
-	MyClass mc4;
-	SearchIndexMultiple<int, MyClass> sindex;
-	sindex.add(5, &mc1);
-	sindex.add(6, &mc2);
-	sindex.add(6, &mc4);
-	sindex.add(7, &mc3);
-	assert(sindex.size() == 4); 
-	assert(sindex.contains(5));
-	assert(sindex.contains(6));
-	assert(sindex.contains(7));
-	assert(!sindex.contains(4));
-	assert(!sindex.contains(8));
-	assert(sindex.min() == 5);
-	assert(sindex.max() == 7);
-	assert(sindex.find(5) == &mc1);
-	assert(sindex.find(6) == &mc2);
-	assert(sindex.find(7) == &mc3);
-	assert(sindex.find(4) == nullptr);
-	assert(sindex.find(8) == nullptr);
-	sindex.remove(6, &mc2);
-	assert(sindex.size() == 3);
-	assert(sindex.contains(5));
-	assert(sindex.contains(6));
-	assert(sindex.contains(7));
-	assert(!sindex.contains(4));
-	assert(!sindex.contains(8));
-	assert(sindex.min() == 5);
-	assert(sindex.max() == 7);
-	assert(sindex.find(5) == &mc1);
-	assert(sindex.find(6) == &mc4);
-	assert(sindex.find(7) == &mc3);
-	assert(sindex.find(4) == nullptr);
-	assert(sindex.find(8) == nullptr);
-	sindex.remove(5, &mc1);
-	assert(sindex.size() == 2);
-	assert(!sindex.contains(5));
-	assert(sindex.contains(6));
-	assert(sindex.contains(7));
-	assert(!sindex.contains(4));
-	assert(!sindex.contains(8));
-	assert(sindex.min() == 6);
-	assert(sindex.max() == 7);
-	assert(sindex.find(5) == nullptr);
-	assert(sindex.find(6) == &mc4);
-	assert(sindex.find(7) == &mc3);
-	assert(sindex.find(4) == nullptr);
-	assert(sindex.find(8) == nullptr);
-	sindex.clear();
-	assert(sindex.size() == 0);
-	assert(!sindex.contains(5));
-	assert(!sindex.contains(6));
-	assert(!sindex.contains(7));
-	assert(!sindex.contains(4));
-	assert(!sindex.contains(8));
-	assert(sindex.find(5) == nullptr);
-	assert(sindex.find(6) == nullptr);
-	assert(sindex.find(7) == nullptr);
-	assert(sindex.find(4) == nullptr);
-	assert(sindex.find(8) == nullptr);
+void SearchIndexTests::createTestListUnique(test::TestList* list) {
+	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
+		SearchIndexUnique<int, MyClass> sindex;
+	});
+	test::Test* add_test = list->addTest("add", { basic_test }, [&](test::Test& test) {
+		SearchIndexUnique<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc2);
+		sindex.add(7, &mc3);
+		tAssertCompare(sindex.size(), 3);
+	});
+	test::Test* contains_test = list->addTest("contains", { add_test }, [&](test::Test& test) {
+		SearchIndexUnique<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc2);
+		sindex.add(7, &mc3);
+		tAssertCompare(sindex.size(), 3);
+		tCheck(sindex.contains(5));
+		tCheck(sindex.contains(6));
+		tCheck(sindex.contains(7));
+		tCheck(!sindex.contains(4));
+		tCheck(!sindex.contains(8));
+	});
+	test::Test* min_max_test = list->addTest("min_max", { add_test }, [&](test::Test& test) {
+		SearchIndexUnique<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc2);
+		sindex.add(7, &mc3);
+		tAssertCompare(sindex.size(), 3);
+		tCompare(sindex.min(), 5);
+		tCompare(sindex.max(), 7);
+	});
+	test::Test* find_test = list->addTest("find", { add_test }, [&](test::Test& test) {
+		SearchIndexUnique<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc2);
+		sindex.add(7, &mc3);
+		tAssertCompare(sindex.size(), 3);
+		tCheck(sindex.find(5) == &mc1);
+		tCheck(sindex.find(6) == &mc2);
+		tCheck(sindex.find(7) == &mc3);
+		tCheck(sindex.find(4) == nullptr);
+		tCheck(sindex.find(8) == nullptr);
+	});
+	test::Test* remove_test = list->addTest("remove", { find_test }, [&](test::Test& test) {
+		SearchIndexUnique<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc2);
+		sindex.add(7, &mc3);
+		sindex.remove(6);
+		tAssertCompare(sindex.size(), 2);
+		tCheck(sindex.find(5) == &mc1);
+		tCheck(sindex.find(6) == nullptr);
+		tCheck(sindex.find(7) == &mc3);
+		sindex.remove(5);
+		tAssertCompare(sindex.size(), 1);
+		tCheck(sindex.find(5) == nullptr);
+		tCheck(sindex.find(6) == nullptr);
+		tCheck(sindex.find(7) == &mc3);
+	});
+	test::Test* clear_test = list->addTest("clear", { find_test }, [&](test::Test& test) {
+		SearchIndexUnique<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc2);
+		sindex.add(7, &mc3);
+		sindex.clear();
+		tAssertCompare(sindex.size(), 0);
+		tCheck(sindex.find(5) == nullptr);
+		tCheck(sindex.find(6) == nullptr);
+		tCheck(sindex.find(7) == nullptr);
+		tCheck(sindex.find(4) == nullptr);
+		tCheck(sindex.find(8) == nullptr);
+	});
 }
 
-SearchIndexTest::SearchIndexTest() {
-	test_SearchIndexUnique();
-	test_SearchIndexMultiple();
+void SearchIndexTests::createTestListMultiple(test::TestList* list) {
+	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
+		SearchIndexMultiple<int, MyClass> sindex;
+	});
+	test::Test* add_test = list->addTest("add", { basic_test }, [&](test::Test& test) {
+		SearchIndexMultiple<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		MyClass mc4;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc4);
+		sindex.add(7, &mc3);
+		tAssertCompare(sindex.size(), 4);
+	});
+	test::Test* contains_test = list->addTest("contains", { add_test }, [&](test::Test& test) {
+		SearchIndexMultiple<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		MyClass mc4;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc4);
+		sindex.add(7, &mc3);
+		tAssertCompare(sindex.size(), 4);
+		tCheck(sindex.contains(5));
+		tCheck(sindex.contains(6));
+		tCheck(sindex.contains(7));
+		tCheck(!sindex.contains(4));
+		tCheck(!sindex.contains(8));
+	});
+	test::Test* min_max_test = list->addTest("min_max", { add_test }, [&](test::Test& test) {
+		SearchIndexMultiple<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		MyClass mc4;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc4);
+		sindex.add(7, &mc3);
+		tAssertCompare(sindex.size(), 4);
+		tCompare(sindex.min(), 5);
+		tCompare(sindex.max(), 7);
+	});
+	test::Test* find_test = list->addTest("find", { add_test }, [&](test::Test& test) {
+		SearchIndexMultiple<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		MyClass mc4;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc4);
+		sindex.add(7, &mc3);
+		tAssertCompare(sindex.size(), 4);
+		tCheck(sindex.find(5) == &mc1);
+		tCheck(sindex.find(6) == &mc2);
+		tCheck(sindex.find(7) == &mc3);
+		tCheck(sindex.find(4) == nullptr);
+		tCheck(sindex.find(8) == nullptr);
+	});
+	test::Test* remove_test = list->addTest("remove", { find_test }, [&](test::Test& test) {
+		SearchIndexMultiple<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		MyClass mc4;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc4);
+		sindex.add(7, &mc3);
+		tAssertCompare(sindex.size(), 4);
+		sindex.remove(6, &mc2);
+		tAssertCompare(sindex.size(), 3);
+		tCheck(sindex.find(5) == &mc1);
+		tCheck(sindex.find(6) == &mc4);
+		tCheck(sindex.find(7) == &mc3);
+		sindex.remove(5, &mc1);
+		tAssertCompare(sindex.size(), 2);
+		tCheck(sindex.find(5) == nullptr);
+		tCheck(sindex.find(6) == &mc4);
+		tCheck(sindex.find(7) == &mc3);
+	});
+	test::Test* clear_test = list->addTest("clear", { find_test }, [&](test::Test& test) {
+		SearchIndexMultiple<int, MyClass> sindex;
+		MyClass mc1;
+		MyClass mc2;
+		MyClass mc3;
+		MyClass mc4;
+		sindex.add(5, &mc1);
+		sindex.add(6, &mc2);
+		sindex.add(6, &mc4);
+		sindex.add(7, &mc3);
+		tAssertCompare(sindex.size(), 4);
+		sindex.clear();
+		tAssertCompare(sindex.size(), 0);
+		tCheck(sindex.find(5) == nullptr);
+		tCheck(sindex.find(6) == nullptr);
+		tCheck(sindex.find(7) == nullptr);
+		tCheck(sindex.find(4) == nullptr);
+		tCheck(sindex.find(8) == nullptr);
+	});
 }
 
 #endif // NDEBUG

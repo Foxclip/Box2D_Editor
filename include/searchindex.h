@@ -1,5 +1,6 @@
 #pragma once
 #include <set>
+#include "test.h"
 
 template<typename TData, typename TObject>
 struct ObjectData {
@@ -203,9 +204,15 @@ inline ObjectDataNode<TData, TObject>* SearchIndexMultiple<TData, TObject>::find
 
 #ifndef NDEBUG
 
-class SearchIndexTest {
+class SearchIndexTests : public test::TestModule {
 public:
-	SearchIndexTest();
+	SearchIndexTests();
+
+protected:
+	void createTestLists() override;
+	void createTestListUnique(test::TestList* list);
+	void createTestListMultiple(test::TestList* list);
+
 };
 
 #endif // NDEBUG
