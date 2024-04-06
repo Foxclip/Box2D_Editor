@@ -71,7 +71,7 @@ namespace test {
 		Test* addTest(std::string name, TestFuncType func);
 		Test* addTest(std::string name, std::vector<Test*> required, TestFuncType func);
 		std::vector<Test*> getTestList() const;
-		void runTestList();
+		void runTests();
 
 	protected:
 		std::vector<std::unique_ptr<Test>> test_list;
@@ -89,7 +89,7 @@ namespace test {
 		std::vector<std::string> failed_list;
 
 		TestModule(const std::string& name);
-		void runModuleTests();
+		void runTests();
 
 	protected:
 		virtual void createTestLists() = 0;

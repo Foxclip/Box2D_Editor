@@ -76,7 +76,7 @@ namespace test {
 		return result;
 	}
 
-	void TestList::runTestList() {
+	void TestList::runTests() {
 		LoggerIndent test_list_indent;
 		for (size_t i = 0; i < test_list.size(); i++) {
 			Test* test = test_list[i].get();
@@ -121,13 +121,13 @@ namespace test {
 		this->name = name;
 	}
 
-	void TestModule::runModuleTests() {
+	void TestModule::runTests() {
 		createTestLists();
 		logger << "Running test module: " << name << "\n";
 		LoggerIndent test_module_indent;
 		for (auto& test_list : test_lists) {
 			logger << "Running test list: " << test_list->name << "\n";
-			test_list->runTestList();
+			test_list->runTests();
 			for (const std::string& name : test_list->passed_list) {
 				passed_list.push_back(test_list->name + "/" + name);
 			}
@@ -178,7 +178,7 @@ namespace test {
 		std::vector<std::string> failed_list;
 		for (size_t i = 0; i < modules.size(); i++) {
 			TestModule* module = modules[i].get();
-			module->runModuleTests();
+			module->runTests();
 			for (const std::string& name : module->passed_list) {
 				passed_list.push_back(module->name + "/" + name);
 			}
