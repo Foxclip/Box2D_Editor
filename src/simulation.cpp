@@ -289,13 +289,14 @@ ChainObject* Simulation::create_chain(
 
 #ifndef NDEBUG
 
-SimulationTests::SimulationTests() : TestList("Simulation"), TestModule("Simulation") { }
+SimulationTests::SimulationTests() : TestModule("Simulation") { }
 
 void SimulationTests::createTestLists() {
-    test::Test* basic_test = addTest("basic", [&](test::Test& test) {
+    std::unique_ptr<test::TestList> test_list = std::make_unique<test::TestList>("Simulation");
+    test::Test* basic_test = test_list->addTest("basic", [&](test::Test& test) {
         Simulation simulation;
     });
-    test::Test* box_test = addTest("box", { basic_test }, [&](test::Test& test) {
+    test::Test* box_test = test_list->addTest("box", { basic_test }, [&](test::Test& test) {
         Simulation simulation;
         simulation.create_box(
             "box0",
@@ -311,7 +312,7 @@ void SimulationTests::createTestLists() {
         tCheck(box->getGlobalPosition() == b2Vec2(1.0f, 1.0f));
         tApproxCompare(box->getGlobalRotation(), utils::to_radians(45.0f));
     });
-    test_lists.push_back(std::move(*this));
+    test_lists.push_back(std::move(test_list));
 }
 
 #endif // !NDEBUG

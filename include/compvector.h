@@ -552,16 +552,12 @@ class TestModule;
 
 class CompVectorTests : public test::TestModule {
 public:
-	struct CompVectorTestList : public test::TestList {
-		CompVectorTestList();
-	};
-	struct CompVectorUptrTestList : public test::TestList {
-		CompVectorUptrTestList();
-	};
 	CompVectorTests();
 
 protected:
 	void createTestLists() override;
+	void createCompVectorList();
+	void createCompVectorUptrList();
 };
 
 #endif // NDEBUG

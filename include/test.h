@@ -76,6 +76,23 @@ namespace test {
 	protected:
 		std::vector<std::unique_ptr<Test>> test_list;
 
+	private:
+
+	};
+
+	class TestModule {
+	public:
+		std::string name;
+		std::vector<std::unique_ptr<TestList>> test_lists;
+		std::vector<std::string> passed_list;
+		std::vector<std::string> cancelled_list;
+		std::vector<std::string> failed_list;
+
+		TestModule(const std::string& name);
+		void runModuleTests();
+
+	protected:
+		virtual void createTestLists() = 0;
 		void testAssert(Test& test, bool value, const std::string& value_message);
 		void testAssert(Test& test, bool value, const std::string& value_message, const std::string message);
 		template<typename T, typename U>
@@ -91,24 +108,6 @@ namespace test {
 
 	};
 
-	class TestModule {
-	public:
-		std::string name;
-		std::vector<TestList> test_lists;
-		std::vector<std::string> passed_list;
-		std::vector<std::string> cancelled_list;
-		std::vector<std::string> failed_list;
-
-		TestModule(const std::string& name);
-		void runModuleTests();
-
-	protected:
-		virtual void createTestLists() = 0;
-
-	private:
-
-	};
-
 	class TestManager {
 	public:
 		TestManager();
@@ -121,7 +120,7 @@ namespace test {
 	};
 
 	template<typename T, typename U>
-	inline bool TestList::testCompare(Test& test, const std::string& name, T actual, U expected) {
+	inline bool TestModule::testCompare(Test& test, const std::string& name, T actual, U expected) {
 		if (actual != expected) {
 			compareFail(test, name, actual, expected);
 			return false;
@@ -130,7 +129,7 @@ namespace test {
 	}
 
 	template<typename T>
-	inline bool TestList::testApproxCompare(Test& test, const std::string& name, T actual, T expected, T epsilon) {
+	inline bool TestModule::testApproxCompare(Test& test, const std::string& name, T actual, T expected, T epsilon) {
 		if (!equals(actual, expected, epsilon)) {
 			compareFail(test, name, actual, expected);
 			return false;
@@ -139,12 +138,12 @@ namespace test {
 	}
 
 	template<typename T>
-	inline bool TestList::equals(T left, T right, T epsilon) {
+	inline bool TestModule::equals(T left, T right, T epsilon) {
 		return abs(left - right) < epsilon;
 	}
 
 	template<typename T, typename U>
-	inline void TestList::compareFail(Test& test, const std::string& name, T actual, U expected) {
+	inline void TestModule::compareFail(Test& test, const std::string& name, T actual, U expected) {
 		std::string actual_value_str;
 		std::string expected_value_str;
 		if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, const char*>) {

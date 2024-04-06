@@ -61,7 +61,7 @@ private:
 
 #ifndef NDEBUG
 
-class SimulationTests : private test::TestList, public test::TestModule {
+class SimulationTests : public test::TestModule {
 public:
 	SimulationTests();
 

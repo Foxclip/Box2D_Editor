@@ -56,7 +56,6 @@ int main() {
     //logger << "Starting app\n";
     //execute_app();
 
-    // TODO: rewrite CompVector tests with tCompare
     // TODO: remake compvector, logger, and searchindex tests with TestList
     // TODO: show total number of passed and failed tests at the end
     // TODO: Simulation tests

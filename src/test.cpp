@@ -117,20 +117,6 @@ namespace test {
 		}
 	}
 
-	void TestList::testAssert(Test& test, bool value, const std::string& value_message) {
-		if (!value) {
-			test.errors.push_back(Test::Error("Failed condition: " + value_message));
-			test.result = false;
-		}
-	}
-
-	void TestList::testAssert(Test& test, bool value, const std::string& value_message, const std::string message) {
-		if (!value) {
-			test.errors.push_back(Test::Error(message + ": " + value_message));
-			test.result = false;
-		}
-	}
-
 	TestModule::TestModule(const std::string& name) {
 		this->name = name;
 	}
@@ -139,17 +125,17 @@ namespace test {
 		createTestLists();
 		logger << "Running test module: " << name << "\n";
 		LoggerIndent test_module_indent;
-		for (TestList& test_list : test_lists) {
-			logger << "Running test list: " << test_list.name << "\n";
-			test_list.runTestList();
-			for (const std::string& name : test_list.passed_list) {
-				passed_list.push_back(test_list.name + "/" + name);
+		for (auto& test_list : test_lists) {
+			logger << "Running test list: " << test_list->name << "\n";
+			test_list->runTestList();
+			for (const std::string& name : test_list->passed_list) {
+				passed_list.push_back(test_list->name + "/" + name);
 			}
-			for (const std::string& name : test_list.cancelled_list) {
-				cancelled_list.push_back(test_list.name + "/" + name);
+			for (const std::string& name : test_list->cancelled_list) {
+				cancelled_list.push_back(test_list->name + "/" + name);
 			}
-			for (const std::string& name : test_list.failed_list) {
-				failed_list.push_back(test_list.name + "/" + name);
+			for (const std::string& name : test_list->failed_list) {
+				failed_list.push_back(test_list->name + "/" + name);
 			}
 		}
 		logger << "Passed " << passed_list.size() << " tests, "
@@ -163,6 +149,20 @@ namespace test {
 			}
 		} else {
 			logger << "\n";
+		}
+	}
+
+	void TestModule::testAssert(Test& test, bool value, const std::string& value_message) {
+		if (!value) {
+			test.errors.push_back(Test::Error("Failed condition: " + value_message));
+			test.result = false;
+		}
+	}
+
+	void TestModule::testAssert(Test& test, bool value, const std::string& value_message, const std::string message) {
+		if (!value) {
+			test.errors.push_back(Test::Error(message + ": " + value_message));
+			test.result = false;
 		}
 	}
 
