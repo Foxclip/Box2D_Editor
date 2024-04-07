@@ -25,7 +25,6 @@ set(SRC_HEADER_FILES
     "${INCLUDE_DIR}/UI/toolbox.h"
 )
 set(SRC_SOURCE_FILES
-    "compvector.cpp"
     "editor.cpp"
     "gameobject.cpp"
     "global.cpp"
@@ -33,7 +32,6 @@ set(SRC_SOURCE_FILES
     "main.cpp"
     "objectlist.cpp"
     "polygon.cpp"
-    "searchindex.cpp"
     "serializer.cpp"
     "simulation.cpp"
     "test.cpp"

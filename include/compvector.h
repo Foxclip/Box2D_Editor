@@ -545,15 +545,3 @@ template<typename T, typename TCmp>
 inline CompVectorUptr<T, TCmp>::operator std::vector<T*>() const {
 	return comp.getVector();
 }
-
-class TestModule;
-
-class CompVectorTests : public test::TestModule {
-public:
-	CompVectorTests();
-
-protected:
-	void createTestLists() override;
-	void createCompVectorList(test::TestList* list);
-	void createCompVectorUptrList(test::TestList* list);
-};

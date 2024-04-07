@@ -1,5 +1,4 @@
-#include "compvector.h"
-#include <cassert>
+#include "tests/compvector_tests.h"
 #include <algorithm>
 #include <ranges>
 

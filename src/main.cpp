@@ -4,7 +4,7 @@
 #include "editor.h"
 #include "logger.h"
 #include "scenes.h"
-#include "tests/simulation_tests.h"
+#include "tests/tests.h"
 
 void run_tests() {
     logger << "Running tests\n";

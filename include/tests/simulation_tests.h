@@ -1,7 +1,7 @@
 #pragma once
 
-#include "test.h"
 #include "simulation.h"
+#include "test.h"
 
 class SimulationTests : public test::TestModule {
 public:

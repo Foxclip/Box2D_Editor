@@ -1,6 +1,4 @@
-#include "searchindex.h"
-#include <vector>
-#include <cassert>
+#include "tests/searchindex_tests.h"
 
 SearchIndexTests::SearchIndexTests() : TestModule("SearchIndex") { }
 

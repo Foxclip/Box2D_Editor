@@ -6,7 +6,6 @@
 #include <functional>
 #include <stack>
 #include <set>
-#include "test.h"
 
 // if a method can modify logger object
 // in a way unrelated to logging,
@@ -176,12 +175,4 @@ private:
 
 	void action(const std::string& tag);
 
-};
-
-class LoggerTests : public test::TestModule {
-public:
-	LoggerTests();
-
-protected:
-	void createTestLists() override;
 };
