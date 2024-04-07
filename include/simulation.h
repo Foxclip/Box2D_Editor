@@ -2,7 +2,6 @@
 
 #include <memory>
 #include "objectlist.h"
-#include "test.h"
 
 class Simulation : public GameObjectList {
 public:
@@ -57,14 +56,4 @@ public:
 private:
 	void load_from_file(const std::string& filename);
 
-};
-
-class SimulationTests : public test::TestModule {
-public:
-	SimulationTests();
-
-protected:
-	void createTestLists() override;
-
-private:
 };

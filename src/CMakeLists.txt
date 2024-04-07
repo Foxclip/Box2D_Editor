@@ -1,6 +1,7 @@
 set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 
 add_subdirectory(widgets)
+add_subdirectory(tests)
 
 set(SRC_HEADER_FILES
     "${INCLUDE_DIR}/compvector.h"
@@ -51,6 +52,7 @@ target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
 target_link_libraries(src_lib PRIVATE widgets_lib)
+target_link_libraries(src_lib PRIVATE tests_lib)
 target_link_libraries(src_lib PUBLIC sfml-graphics sfml-system sfml-window)
 target_link_libraries(src_lib PRIVATE box2d)
 target_link_libraries(src_lib PRIVATE clip)
