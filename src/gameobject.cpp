@@ -778,6 +778,12 @@ TokenWriter& BallObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
+std::unique_ptr<BallObject> BallObject::deserialize(const std::string& str, GameObjectList* object_list) {
+	TokenReader tr(str);
+	std::unique_ptr<BallObject> uptr = deserialize(tr, object_list);
+	return uptr;
+}
+
 std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
@@ -844,6 +850,20 @@ void BallObject::internalSyncVertices() {
 	circle_notch_shape = std::make_unique<CircleNotchShape>(radius, 30, 4);
 	circle_notch_shape->setCircleColor(color);
 	circle_notch_shape->setNotchColor(notch_color);
+}
+
+bool BallObject::operator==(const BallObject& other) const {
+	const BallObject* other_ptr = dynamic_cast<const BallObject*>(&other);
+	if (!other_ptr) {
+		return false;
+	}
+	if (static_cast<const GameObject&>(*this) != other) {
+		return false;
+	}
+	if (radius != other_ptr->radius) {
+		return false;
+	}
+	return true;
 }
 
 LineStripShape::LineStripShape() { }

@@ -6,15 +6,34 @@ void SimulationTests::createTestLists() {
     test::TestList* list = createTestList("Simulation");
     list->OnBeforeRunTest = []() { logger.manualDeactivate(); };
     list->OnAfterRunTest = []() { logger.manualActivate(); };
-    std::function<std::string(const sf::Color&)> color_to_str = [](const sf::Color& color) {
-        return
-            "(" +
-            std::to_string(color.r) + " " +
-            std::to_string(color.g) + " " +
-            std::to_string(color.b) + " " +
-            std::to_string(color.a)
-            + ")";
-    };
+    std::function<std::string(const sf::Color&)> color_to_str =
+        [](const sf::Color& color) {
+            return
+                "(" +
+                std::to_string(color.r) + " " +
+                std::to_string(color.g) + " " +
+                std::to_string(color.b) + " " +
+                std::to_string(color.a)
+                + ")";
+        };
+    std::function<void(test::Test&, GameObject*, GameObject*)> cmp_common = 
+        [&, color_to_str](test::Test& test, GameObject* objA, GameObject* objB) {
+            tCheck(*objA == *objB);
+            tCompare(objB->getChildren().size(), objA->getChildren().size());
+            if (objA->getChildren().size() == objB->getChildren().size()) {
+                for (size_t i = 0; i < objA->getChildren().size(); i++) {
+                    tCompare(objB->getChild(i)->getId(), objA->getChild(i)->getId());
+                }
+            }
+            tCompare(objB->color, objA->color, color_to_str);
+            tCompare(objB->getId(), objA->getId());
+            tCompare(objB->getName(), objA->getName());
+            tCompare(objB->parent_id, objA->parent_id);
+            tCompare(objB->getTransform().q.GetAngle(), objA->getTransform().q.GetAngle());
+            tCompare(objB->getTransform().p.x, objA->getTransform().p.x);
+            tCompare(objB->getTransform().p.y, objA->getTransform().p.y);
+            tCheck(objB->getVertices() == objA->getVertices());
+        };
 
     test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
         Simulation simulation;
@@ -127,7 +146,7 @@ void SimulationTests::createTestLists() {
             tApproxCompare(wheel2->getGlobalPosition().y, -4.33012724f);
         }
     });
-    test::Test* box_serialize_test = list->addTest("box_serialize", { box_test }, [&, color_to_str](test::Test& test) {
+    test::Test* box_serialize_test = list->addTest("box_serialize", { box_test }, [=, this](test::Test& test) {
         Simulation simulation;
         simulation.create_box(
             "box0",
@@ -140,22 +159,24 @@ void SimulationTests::createTestLists() {
         std::string str = boxA->serialize();
         std::unique_ptr<BoxObject> uptr = BoxObject::deserialize(str, &simulation);
         BoxObject* boxB = uptr.get();
-        tCheck(*boxA == *boxB);
-        tCompare(boxB->getChildren().size(), boxA->getChildren().size());
-        if (boxA->getChildren().size() == boxB->getChildren().size()) {
-            for (size_t i = 0; i < boxA->getChildren().size(); i++) {
-                tCompare(boxB->getChild(i)->getId(), boxA->getChild(i)->getId());
-            }
-        }
-        tCompare(boxB->color, boxA->color, color_to_str);
-        tCompare(boxB->getId(), boxA->getId());
-        tCompare(boxB->getName(), boxA->getName());
-        tCompare(boxB->parent_id, boxA->parent_id);
-        tCompare(boxB->getTransform().q.GetAngle(), boxA->getTransform().q.GetAngle());
-        tCompare(boxB->getTransform().p.x, boxA->getTransform().p.x);
-        tCompare(boxB->getTransform().p.y, boxA->getTransform().p.y);
-        tCheck(boxB->getVertices() == boxA->getVertices());
+        cmp_common(test, boxA, boxB);
         tCompare(boxB->size.x, boxA->size.x);
         tCompare(boxB->size.y, boxA->size.y);
+    });
+    test::Test* ball_serialize_test = list->addTest("ball_serialize", { ball_test }, [=, this](test::Test& test) {
+        Simulation simulation;
+        simulation.create_ball(
+            "ball0",
+            b2Vec2(1.0f, 1.0f),
+            1.0f,
+            sf::Color::Green,
+            sf::Color::Green
+        );
+        BallObject* ballA = dynamic_cast<BallObject*>(simulation.getFromAll(0));
+        std::string str = ballA->serialize();
+        std::unique_ptr<BallObject> uptr = BallObject::deserialize(str, &simulation);
+        BallObject* ballB = uptr.get();
+        cmp_common(test, ballA, ballB);
+        tCompare(ballB->radius, ballA->radius);
     });
 }

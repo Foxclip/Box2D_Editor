@@ -250,9 +250,12 @@ public:
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
 	void drawMask(sf::RenderTarget& mask) override;
+	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
+	static std::unique_ptr<BallObject> deserialize(const std::string& str, GameObjectList* object_list);
 	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
+	bool operator==(const BallObject& other) const;
 
 private:
 	std::unique_ptr<CircleNotchShape> circle_notch_shape;
