@@ -97,7 +97,7 @@ void SimulationTests::createTestLists() {
         tApproxCompare(polygon->getGlobalPosition().y, 1.0f);
         tApproxCompare(polygon->getGlobalRotation(), utils::to_radians(45.0f));
     });
-    test::Test* car_test = list->addTest("car", { polygon_test }, [&](test::Test& test) {
+    test::Test* car_test = list->addTest("car", { ball_test, polygon_test }, [&](test::Test& test) {
         Simulation simulation;
         std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
         std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
@@ -145,6 +145,32 @@ void SimulationTests::createTestLists() {
             tApproxCompare(wheel2->getGlobalPosition().x, -2.49999952f);
             tApproxCompare(wheel2->getGlobalPosition().y, -4.33012724f);
         }
+    });
+    test::Test* chain_test = list->addTest("chain", { basic_test }, [&](test::Test& test) {
+        Simulation simulation;
+        std::vector<b2Vec2> vertices = {
+            b2Vec2(25.0f, 8.0f),
+            b2Vec2(15.0f, 2.0f),
+            b2Vec2(5.0f, 0.0f),
+            b2Vec2(-5.0f, 0.0f),
+            b2Vec2(-15.0f, 2.0f),
+            b2Vec2(-25.0f, 8.0f),
+        };
+        simulation.create_chain(
+            "chain0",
+            b2Vec2(1.0f, 1.0f),
+            utils::to_radians(45.0f),
+            vertices,
+            sf::Color(255, 255, 255)
+        );
+        tAssert(simulation.getAllSize() > 0);
+        ChainObject* chain = dynamic_cast<ChainObject*>(simulation.getFromAll(0));
+        tAssert(chain, "Object is not a ChainObject");
+        tCompare(chain->getName(), "chain0");
+        tCompare(chain->getId(), 0);
+        tApproxCompare(chain->getGlobalPosition().x, 1.0f);
+        tApproxCompare(chain->getGlobalPosition().y, 1.0f);
+        tApproxCompare(chain->getGlobalRotation(), utils::to_radians(45.0f));
     });
     test::Test* box_serialize_test = list->addTest("box_serialize", { box_test }, [=, this](test::Test& test) {
         Simulation simulation;
@@ -198,5 +224,28 @@ void SimulationTests::createTestLists() {
         std::unique_ptr<PolygonObject> uptr = PolygonObject::deserialize(str, &simulation);
         PolygonObject* polygonB = uptr.get();
         cmp_common(test, polygonA, polygonB);
+    });
+    test::Test* chain_serialize_test = list->addTest("chain_serialize", { chain_test }, [=, this](test::Test& test) {
+        Simulation simulation;
+        std::vector<b2Vec2> vertices = {
+            b2Vec2(25.0f, 8.0f),
+            b2Vec2(15.0f, 2.0f),
+            b2Vec2(5.0f, 0.0f),
+            b2Vec2(-5.0f, 0.0f),
+            b2Vec2(-15.0f, 2.0f),
+            b2Vec2(-25.0f, 8.0f),
+        };
+        simulation.create_chain(
+            "chain0",
+            b2Vec2(1.0f, 1.0f),
+            utils::to_radians(45.0f),
+            vertices,
+            sf::Color(255, 255, 255)
+        );
+        ChainObject* chainA = dynamic_cast<ChainObject*>(simulation.getFromAll(0));
+        std::string str = chainA->serialize();
+        std::unique_ptr<ChainObject> uptr = ChainObject::deserialize(str, &simulation);
+        ChainObject* chainB = uptr.get();
+        cmp_common(test, chainA, chainB);
     });
 }

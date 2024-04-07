@@ -52,6 +52,7 @@ int main() {
     run_tests();
     //execute_app();
 
+    // TODO: add templated compare_common method to GameObject
     // TODO: Simulation tests
     // TODO: Widget tests
     // TODO: blinking textbox cursor

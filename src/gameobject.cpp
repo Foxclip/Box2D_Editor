@@ -1157,6 +1157,12 @@ TokenWriter& ChainObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
+std::unique_ptr<ChainObject> ChainObject::deserialize(const std::string& str, GameObjectList* object_list) {
+	TokenReader tr(str);
+	std::unique_ptr<ChainObject> uptr = deserialize(tr, object_list);
+	return uptr;
+}
+
 std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
@@ -1221,6 +1227,17 @@ void ChainObject::internalSyncVertices() {
 		line_strip_shape->varray[i].position = tosf(b2vertices[i]);
 		line_strip_shape->varray[i].color = color;
 	}
+}
+
+bool ChainObject::operator==(const ChainObject& other) const {
+	const ChainObject* other_ptr = dynamic_cast<const ChainObject*>(&other);
+	if (!other_ptr) {
+		return false;
+	}
+	if (static_cast<const GameObject&>(*this) != other) {
+		return false;
+	}
+	return true;
 }
 
 EditableVertex::EditableVertex(b2Vec2 pos) {
