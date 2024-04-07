@@ -179,4 +179,24 @@ void SimulationTests::createTestLists() {
         cmp_common(test, ballA, ballB);
         tCompare(ballB->radius, ballA->radius);
     });
+    test::Test* polygon_serialize_test = list->addTest("polygon_serialize", { polygon_test }, [=, this](test::Test& test) {
+        Simulation simulation;
+        std::vector<b2Vec2> vertices;
+        for (size_t i = 0; i < 6; i++) {
+            b2Vec2 vertex = utils::get_circle_vertex<b2Vec2>(i, 6, 1.0f);
+            vertices.push_back(vertex);
+        }
+        simulation.create_polygon(
+            "polygon0",
+            b2Vec2(1.0f, 1.0f),
+            utils::to_radians(45.0f),
+            vertices,
+            sf::Color::Green
+        );
+        PolygonObject* polygonA = dynamic_cast<PolygonObject*>(simulation.getFromAll(0));
+        std::string str = polygonA->serialize();
+        std::unique_ptr<PolygonObject> uptr = PolygonObject::deserialize(str, &simulation);
+        PolygonObject* polygonB = uptr.get();
+        cmp_common(test, polygonA, polygonB);
+    });
 }

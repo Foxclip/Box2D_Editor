@@ -960,6 +960,12 @@ TokenWriter& PolygonObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
+std::unique_ptr<PolygonObject> PolygonObject::deserialize(const std::string& str, GameObjectList* object_list) {
+	TokenReader tr(str);
+	std::unique_ptr<PolygonObject> uptr = deserialize(tr, object_list);
+	return uptr;
+}
+
 std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
@@ -1029,6 +1035,17 @@ void PolygonObject::internalSyncVertices() {
 			rigid_body->CreateFixture(&b2polygon, 1.0f);
 		}
 	}
+}
+
+bool PolygonObject::operator==(const PolygonObject& other) const {
+	const PolygonObject* other_ptr = dynamic_cast<const PolygonObject*>(&other);
+	if (!other_ptr) {
+		return false;
+	}
+	if (static_cast<const GameObject&>(*this) != other) {
+		return false;
+	}
+	return true;
 }
 
 CircleNotchShape::CircleNotchShape(float radius, size_t point_count, size_t notch_segment_count) {
