@@ -1250,12 +1250,13 @@ bool EditableVertex::operator==(const EditableVertex& other) const {
 	return pos == other.pos;
 }
 
-RevoluteJoint::RevoluteJoint(b2RevoluteJointDef& def, b2World* world, GameObject* object1, GameObject* object2) {
+RevoluteJoint::RevoluteJoint(const b2RevoluteJointDef& def, b2World* world, GameObject* object1, GameObject* object2) {
 	this->object1 = object1;
 	this->object2 = object2;
-	def.bodyA = object1->rigid_body;
-	def.bodyB = object2->rigid_body;
-	joint = world->CreateJoint(&def);
+	b2RevoluteJointDef def_copy(def);
+	def_copy.bodyA = object1->rigid_body;
+	def_copy.bodyB = object2->rigid_body;
+	joint = world->CreateJoint(&def_copy);
 }
 
 RevoluteJoint::RevoluteJoint(b2RevoluteJoint* joint) {

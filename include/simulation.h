@@ -52,6 +52,11 @@ public:
 		const std::vector<b2Vec2>& vertices,
 		const sf::Color& color
 	);
+	RevoluteJoint* createRevoluteJoint(
+		const b2RevoluteJointDef& def,
+		GameObject* obj1,
+		GameObject* obj2
+	);
 
 private:
 	void load_from_file(const std::string& filename);

@@ -53,6 +53,8 @@ int main() {
     //execute_app();
 
     // TODO: add templated compare_common method to GameObject
+    // TODOL compare number of objects in simulation tests
+    // TODO: joint serialization test
     // TODO: Simulation tests
     // TODO: Widget tests
     // TODO: blinking textbox cursor

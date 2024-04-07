@@ -217,55 +217,34 @@ PolygonObject* Simulation::create_car(
         b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
         vertices.push_back(pos);
     }
-    std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(
-        this, def, vertices, color
-    );
-    PolygonObject* car_ptr = uptr.get();
-    car_ptr->setName(name);
-    add(std::move(uptr), true);
+    PolygonObject* car = create_polygon(name, pos, 0.0f, vertices, color);
     size_t wheel_count = 0;
-
     for (size_t i = 0; i < wheels.size(); i++) {
         if (wheels[i] == 0.0f) {
             continue;
         }
         b2Vec2 wheel_pos = utils::get_pos<b2Vec2>(lengths, i);
         b2Vec2 anchor_pos = wheel_pos;
-        b2Vec2 anchor_pos_world = car_ptr->rigid_body->GetPosition() + anchor_pos;
+        b2Vec2 anchor_pos_world = car->rigid_body->GetPosition() + anchor_pos;
         float radius = wheels[i];
-        b2BodyDef wheel_body_def;
-        {
-            wheel_body_def.type = b2_dynamicBody;
-            wheel_body_def.position = anchor_pos_world;
-        }
-        std::unique_ptr<BallObject> wheel = std::make_unique<BallObject>(
-            this, wheel_body_def, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
+        std::string wheel_name = car->getName() + " wheel" + std::to_string(wheel_count);
+        BallObject* wheel = create_ball(
+            wheel_name, anchor_pos_world, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
         );
-        BallObject* wheel_ptr = wheel.get();
-        {
-            wheel_ptr->setDensity(1.0f, false);
-            wheel_ptr->setFriction(0.3f, false);
-            wheel_ptr->setRestitution(0.5f, false);
-            std::string wheel_name = car_ptr->getName() + " wheel" + std::to_string(wheel_count);
-            wheel_ptr->setName(wheel_name);
-            wheel_ptr->setParent(car_ptr);
-            add(std::move(wheel), true);
-        }
+        wheel->setDensity(1.0f, false);
+        wheel->setFriction(0.3f, false);
+        wheel->setRestitution(0.5f, false);
+        wheel->setParent(car);
         b2RevoluteJointDef wheel_joint_def;
-        {
-            wheel_joint_def.Initialize(car_ptr->rigid_body, wheel_ptr->rigid_body, anchor_pos_world);
-            wheel_joint_def.maxMotorTorque = 30.0f;
-            wheel_joint_def.motorSpeed = -10.0f;
-            wheel_joint_def.enableMotor = true;
-            std::unique_ptr<RevoluteJoint> joint = std::make_unique<RevoluteJoint>(
-                wheel_joint_def, world.get(), car_ptr, wheel_ptr
-            );
-            addJoint(std::move(joint));
-        }
+        wheel_joint_def.Initialize(car->rigid_body, wheel->rigid_body, anchor_pos_world);
+        wheel_joint_def.maxMotorTorque = 30.0f;
+        wheel_joint_def.motorSpeed = -10.0f;
+        wheel_joint_def.enableMotor = true;
+        RevoluteJoint* wheel_joint = createRevoluteJoint(wheel_joint_def, car, wheel);
         wheel_count++;
     }
 
-    return car_ptr;
+    return car;
 }
 
 ChainObject* Simulation::create_chain(
@@ -284,5 +263,18 @@ ChainObject* Simulation::create_chain(
     ChainObject* ptr = uptr.get();
     ptr->setName(name);
     add(std::move(uptr), true);
+    return ptr;
+}
+
+RevoluteJoint* Simulation::createRevoluteJoint(
+    const b2RevoluteJointDef& def,
+    GameObject* obj1,
+    GameObject* obj2
+) {
+    std::unique_ptr<RevoluteJoint> uptr = std::make_unique<RevoluteJoint>(
+        def, world.get(), obj1, obj2
+    );
+    RevoluteJoint* ptr = uptr.get();
+    addJoint(std::move(uptr));
     return ptr;
 }
