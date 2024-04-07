@@ -48,6 +48,7 @@ public:
 	bool selected = false;
 
 	EditableVertex(b2Vec2 pos);
+	bool operator==(const EditableVertex& other) const;
 
 private:
 };
@@ -86,6 +87,7 @@ public:
 	void setGlobalTransform(const b2Transform& transform);
 	void setPosition(const b2Vec2& position);
 	void setAngle(float angle);
+	bool operator==(const GameObjectTransforms& other) const;
 
 private:
 	friend class GameObject;
@@ -97,6 +99,7 @@ private:
 	void recalcGlobalTransform() const;
 
 };
+bool operator==(const b2Rot& left, const b2Rot& right);
 
 class GameObjectList;
 
@@ -168,6 +171,7 @@ public:
 	size_t getVertexCount() const;
 	size_t getEdgeCount() const;
 	const EditableVertex& getVertex(size_t index) const;
+	const std::vector<EditableVertex>& getVertices() const;
 	b2Vec2 getGlobalVertexPos(size_t index);
 	void setGlobalVertexPos(size_t index, const b2Vec2& new_pos);
 	bool tryDeleteVertex(ptrdiff_t index);
@@ -179,12 +183,14 @@ public:
 	virtual void syncVertices(bool save_velocities = false);
 	void transformFromRigidbody();
 	void transformToRigidbody();
+	std::string serialize() const;
 	virtual TokenWriter& serialize(TokenWriter& tw) const = 0;
 	static TokenWriter& serializeBody(TokenWriter& tw, b2Body* body);
 	static TokenWriter& serializeFixture(TokenWriter& tw, b2Fixture* fixture);
 	static BodyDef deserializeBody(TokenReader& tr);
 	static b2FixtureDef deserializeFixture(TokenReader& tr);
 	static GameObject* getGameobject(b2Body* body);
+	virtual bool operator==(const GameObject& other) const;
 
 protected:
 	GameObjectList* object_list = nullptr;
@@ -218,9 +224,12 @@ public:
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
 	void drawMask(sf::RenderTarget& mask) override;
+	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
+	static std::unique_ptr<BoxObject> deserialize(const std::string& str, GameObjectList* object_list);
 	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
+	bool operator==(const BoxObject& other) const;
 
 private:
 	std::unique_ptr<sf::RectangleShape> rect_shape;

@@ -293,6 +293,15 @@ void SimulationTests::createTestLists() {
     test::TestList* list = createTestList("Simulation");
     list->OnBeforeRunTest = []() { logger.manualDeactivate(); };
     list->OnAfterRunTest = []() { logger.manualActivate(); };
+    std::function<std::string(const sf::Color&)> color_to_str = [](const sf::Color& color) {
+        return
+            "(" +
+            std::to_string(color.r) + " " +
+            std::to_string(color.g) + " " +
+            std::to_string(color.b) + " " +
+            std::to_string(color.a)
+            + ")";
+    };
 
     test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
         Simulation simulation;
@@ -404,5 +413,36 @@ void SimulationTests::createTestLists() {
             tApproxCompare(wheel2->getGlobalPosition().x, -2.49999952f);
             tApproxCompare(wheel2->getGlobalPosition().y, -4.33012724f);
         }
+    });
+    test::Test* box_serialize_test = list->addTest("box_serialize", { box_test }, [&, color_to_str](test::Test& test) {
+        Simulation simulation;
+        simulation.create_box(
+            "box0",
+            b2Vec2(1.0f, 1.0f),
+            utils::to_radians(45.0f),
+            b2Vec2(1.0f, 1.0f),
+            sf::Color::Green
+        );
+        BoxObject* boxA = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
+        std::string str = boxA->serialize();
+        std::unique_ptr<BoxObject> uptr = BoxObject::deserialize(str, &simulation);
+        BoxObject* boxB = uptr.get();
+        tCheck(*boxA == *boxB);
+        tCompare(boxB->getChildren().size(), boxA->getChildren().size());
+        if (boxA->getChildren().size() == boxB->getChildren().size()) {
+            for (size_t i = 0; i < boxA->getChildren().size(); i++) {
+                tCompare(boxB->getChild(i)->getId(), boxA->getChild(i)->getId());
+            }
+        }
+        tCompare(boxB->color, boxA->color, color_to_str);
+        tCompare(boxB->getId(), boxA->getId());
+        tCompare(boxB->getName(), boxA->getName());
+        tCompare(boxB->parent_id, boxA->parent_id);
+        tCompare(boxB->getTransform().q.GetAngle(), boxA->getTransform().q.GetAngle());
+        tCompare(boxB->getTransform().p.x, boxA->getTransform().p.x);
+        tCompare(boxB->getTransform().p.y, boxA->getTransform().p.y);
+        tCheck(boxB->getVertices() == boxA->getVertices());
+        tCompare(boxB->size.x, boxA->size.x);
+        tCompare(boxB->size.y, boxA->size.y);
     });
 }

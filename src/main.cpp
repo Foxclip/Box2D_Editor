@@ -6,6 +6,7 @@
 #include "scenes.h"
 
 void run_tests() {
+    logger << "Running tests\n";
     LoggerIndent test_modules_indent;
     test::TestManager test_manager;
     test_manager.addModule<LoggerTests>();
@@ -16,6 +17,7 @@ void run_tests() {
 }
 
 void execute_app() {
+    logger << "Starting app\n";
     Editor app;
     try {
         app.init();
@@ -41,15 +43,12 @@ void execute_app() {
 
 int main() {
 
-    logger << "Running tests\n";
-    run_tests();
-
     LoggerDisableTag disable_serialize_tag("serialize");
     LoggerDisableTag disable_recut_tag("recut");
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
-    //logger << "Starting app\n";
+    run_tests();
     //execute_app();
 
     // TODO: Simulation tests

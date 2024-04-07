@@ -366,6 +366,10 @@ const EditableVertex& GameObject::getVertex(size_t index) const {
 	return vertices[index];
 }
 
+const std::vector<EditableVertex>& GameObject::getVertices() const {
+	return vertices;
+}
+
 b2Vec2 GameObject::getGlobalVertexPos(size_t index) {
 	return toGlobal(vertices[index].pos);
 }
@@ -440,6 +444,12 @@ void GameObject::transformToRigidbody() {
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->transformToRigidbody();
 	}
+}
+
+std::string GameObject::serialize() const {
+	TokenWriter tw;
+	serialize(tw);
+	return tw.toStr();
 }
 
 std::vector<b2Vec2> GameObject::getPositions() const {
@@ -566,6 +576,36 @@ GameObject* GameObject::getGameobject(b2Body* body) {
 	return reinterpret_cast<GameObject*>(body->GetUserData().pointer);
 }
 
+bool GameObject::operator==(const GameObject& other) const {
+	if (children.size() != other.children.size()) {
+		return false;
+	}
+	for (size_t i = 0; i < children.size(); i++) {
+		if (children[i]->id != other.children[i]->id) {
+			return false;
+		}
+	}
+	if (color != other.color) {
+		return false;
+	}
+	if (id != other.id) {
+		return false;
+	}
+	if (name != other.name) {
+		return false;
+	}
+	if (parent_id != other.parent_id) {
+		return false;
+	}
+	if (transforms != other.transforms) {
+		return false;
+	}
+	if (vertices != other.vertices) {
+		return false;
+	}
+	return true;
+}
+
 BoxObject::BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, sf::Color color) {
 	this->object_list = object_list;
 	this->color = color;
@@ -610,6 +650,12 @@ TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
 	}
 	tw << "/object";
 	return tw;
+}
+
+std::unique_ptr<BoxObject> BoxObject::deserialize(const std::string& str, GameObjectList* object_list) {
+	TokenReader tr(str);
+	std::unique_ptr<BoxObject> uptr = deserialize(tr, object_list);
+	return uptr;
 }
 
 std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
@@ -670,6 +716,20 @@ void BoxObject::internalSyncVertices() {
 	rect_shape = std::make_unique<sf::RectangleShape>(tosf(size));
 	rect_shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
 	rect_shape->setFillColor(color);
+}
+
+bool BoxObject::operator==(const BoxObject& other) const {
+	const BoxObject* other_ptr = dynamic_cast<const BoxObject*>(&other);
+	if (!other_ptr) {
+		return false;
+	}
+	if (static_cast<const GameObject&>(*this) != other) {
+		return false;
+	}
+	if (size != other_ptr->size) {
+		return false;
+	}
+	return true;
 }
 
 BallObject::BallObject(GameObjectList* object_list, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color) {
@@ -1132,6 +1192,10 @@ EditableVertex::EditableVertex(b2Vec2 pos) {
 	this->selected = false;
 }
 
+bool EditableVertex::operator==(const EditableVertex& other) const {
+	return pos == other.pos;
+}
+
 RevoluteJoint::RevoluteJoint(b2RevoluteJointDef& def, b2World* world, GameObject* object1, GameObject* object2) {
 	this->object1 = object1;
 	this->object2 = object2;
@@ -1266,8 +1330,16 @@ void GameObjectTransforms::setAngle(float angle) {
 	invalidateGlobalTransform();
 }
 
+bool GameObjectTransforms::operator==(const GameObjectTransforms& other) const {
+	return transform.q == other.transform.q && transform.p == other.transform.p;
+}
+
 void GameObjectTransforms::recalcGlobalTransform() const {
 	b2Transform parent_global_transform = object->getParentGlobalTransform();
 	global_transform = b2Mul(parent_global_transform, transform);
 	global_transform_valid = true;
+}
+
+bool operator==(const b2Rot& left, const b2Rot& right) {
+	return left.c == right.c && left.s == right.s;
 }
