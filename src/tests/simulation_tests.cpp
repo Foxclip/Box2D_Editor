@@ -37,6 +37,7 @@ void SimulationTests::createTestLists() {
 
     test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
         Simulation simulation;
+        tAssertCompare(simulation.getAllSize(), 0);
     });
     test::Test* box_test = list->addTest("box", { basic_test }, [&](test::Test& test) {
         Simulation simulation;
@@ -47,7 +48,7 @@ void SimulationTests::createTestLists() {
             b2Vec2(1.0f, 1.0f),
             sf::Color::Green
         );
-        tAssert(simulation.getAllSize() > 0);
+        tAssertCompare(simulation.getAllSize(), 1);
         BoxObject* box = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
         tAssert(box, "Object is not a BoxObject");
         tCompare(box->getName(), "box0");
@@ -65,7 +66,7 @@ void SimulationTests::createTestLists() {
             sf::Color::Green,
             sf::Color::Green
         );
-        tAssert(simulation.getAllSize() > 0);
+        tAssertCompare(simulation.getAllSize(), 1);
         BallObject* ball = dynamic_cast<BallObject*>(simulation.getFromAll(0));
         tAssert(ball, "Object is not a BallObject");
         tCompare(ball->getName(), "ball0");
@@ -88,7 +89,7 @@ void SimulationTests::createTestLists() {
             vertices,
             sf::Color::Green
         );
-        tAssert(simulation.getAllSize() > 0);
+        tAssertCompare(simulation.getAllSize(), 1);
         PolygonObject* polygon = dynamic_cast<PolygonObject*>(simulation.getFromAll(0));
         tAssert(polygon, "Object is not a PolygonObject");
         tCompare(polygon->getName(), "polygon0");
@@ -114,7 +115,7 @@ void SimulationTests::createTestLists() {
             vertices,
             sf::Color(255, 255, 255)
         );
-        tAssert(simulation.getAllSize() > 0);
+        tAssertCompare(simulation.getAllSize(), 1);
         ChainObject* chain = dynamic_cast<ChainObject*>(simulation.getFromAll(0));
         tAssert(chain, "Object is not a ChainObject");
         tCompare(chain->getName(), "chain0");
