@@ -1263,6 +1263,14 @@ RevoluteJoint::RevoluteJoint(b2RevoluteJoint* joint) {
 	this->joint = joint;
 }
 
+b2Vec2 RevoluteJoint::getAnchorA() const {
+	return joint->GetAnchorA();
+}
+
+b2Vec2 RevoluteJoint::getAnchorB() const {
+	return joint->GetAnchorB();
+}
+
 TokenWriter& RevoluteJoint::serialize(TokenWriter& tw) const {
 	b2RevoluteJoint* joint = static_cast<b2RevoluteJoint*>(this->joint);
 	size_t bodyAId = GameObject::getGameobject(joint->GetBodyA())->id;

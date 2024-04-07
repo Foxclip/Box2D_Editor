@@ -124,7 +124,32 @@ void SimulationTests::createTestLists() {
         tApproxCompare(chain->getGlobalPosition().y, 1.0f);
         tApproxCompare(chain->getGlobalRotation(), utils::to_radians(45.0f));
     });
-    test::Test* car_test = list->addTest("car", { ball_test, polygon_test }, [&](test::Test& test) {
+    test::Test* revolute_joint_test = list->addTest("revolute_joint", { box_test }, [&](test::Test& test) {
+        Simulation simulation;
+        BoxObject* box0 = simulation.create_box(
+            "box0",
+            b2Vec2(0.0f, 0.0f),
+            utils::to_radians(0.0f),
+            b2Vec2(1.0f, 1.0f),
+            sf::Color::Green
+        );
+        BoxObject* box1 = simulation.create_box(
+            "box1",
+            b2Vec2(0.0f, 5.0f),
+            utils::to_radians(0.0f),
+            b2Vec2(1.0f, 1.0f),
+            sf::Color::Green
+        );
+        b2RevoluteJointDef joint_def;
+        joint_def.Initialize(box0->rigid_body, box1->rigid_body, b2Vec2(0.0f, 5.0f));
+        simulation.createRevoluteJoint(joint_def, box0, box1);
+        tAssertCompare(simulation.getJointsSize(), 1);
+        RevoluteJoint* joint = dynamic_cast<RevoluteJoint*>(simulation.getJoint(0));
+        tAssert(joint, "Joint is not a RevoluteJoint");
+        tAssertCompare(joint->getAnchorA().x, 0.0f);
+        tAssertCompare(joint->getAnchorA().y, 5.0f);
+    });
+    test::Test* car_test = list->addTest("car", { ball_test, polygon_test, revolute_joint_test }, [&](test::Test& test) {
         Simulation simulation;
         std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
         std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
