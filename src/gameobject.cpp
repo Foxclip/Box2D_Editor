@@ -15,6 +15,10 @@ GameObject::~GameObject() {
 	}
 }
 
+ptrdiff_t GameObject::getId() const {
+	return id;
+}
+
 const std::string& GameObject::getName() const {
 	return name;
 }

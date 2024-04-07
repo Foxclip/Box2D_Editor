@@ -119,6 +119,7 @@ public:
 	GameObject();
 	~GameObject();
 	virtual bool isClosed() const = 0;
+	ptrdiff_t getId() const;
 	const std::string& getName() const;
 	virtual sf::Drawable* getDrawable() const = 0;
 	virtual sf::Transformable* getTransformable() const = 0;
