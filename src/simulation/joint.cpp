@@ -7,6 +7,30 @@ Joint::~Joint() {
 	joint->GetBodyA()->GetWorld()->DestroyJoint(joint);
 }
 
+b2JointType Joint::getType() const {
+	return joint->GetType();
+}
+
+b2Body* Joint::getBodyA() {
+	return joint->GetBodyA();
+}
+
+b2Body* Joint::getBodyB() {
+	return joint->GetBodyB();
+}
+
+b2Vec2 Joint::getAnchorA() const {
+	return joint->GetAnchorA();
+}
+
+b2Vec2 Joint::getAnchorB() const {
+	return joint->GetAnchorB();
+}
+
+bool Joint::getCollideConnected() const {
+	return joint->GetCollideConnected();
+}
+
 RevoluteJoint::RevoluteJoint(const b2RevoluteJointDef& def, b2World* world, GameObject* object1, GameObject* object2) {
 	this->object1 = object1;
 	this->object2 = object2;
@@ -14,18 +38,68 @@ RevoluteJoint::RevoluteJoint(const b2RevoluteJointDef& def, b2World* world, Game
 	def_copy.bodyA = object1->rigid_body;
 	def_copy.bodyB = object2->rigid_body;
 	joint = world->CreateJoint(&def_copy);
+	revolute_joint = dynamic_cast<b2RevoluteJoint*>(joint);
 }
 
 RevoluteJoint::RevoluteJoint(b2RevoluteJoint* joint) {
 	this->joint = joint;
+	revolute_joint = dynamic_cast<b2RevoluteJoint*>(joint);
 }
 
-b2Vec2 RevoluteJoint::getAnchorA() const {
-	return joint->GetAnchorA();
+float RevoluteJoint::getReferenceAngle() const {
+	return revolute_joint->GetReferenceAngle();
 }
 
-b2Vec2 RevoluteJoint::getAnchorB() const {
-	return joint->GetAnchorB();
+float RevoluteJoint::getJointAngle() const {
+	return revolute_joint->GetJointAngle();
+}
+
+float RevoluteJoint::getJointSpeed() const {
+	return revolute_joint->GetJointSpeed();
+}
+
+bool RevoluteJoint::isLimitEnabled() const {
+	return revolute_joint->IsLimitEnabled();
+}
+
+void RevoluteJoint::enableLimit(bool flag) {
+	revolute_joint->EnableLimit(flag);
+}
+
+float RevoluteJoint::getLowerLimit() const {
+	return revolute_joint->GetLowerLimit();
+}
+
+float RevoluteJoint::getUpperLimit() const {
+	return revolute_joint->GetUpperLimit();
+}
+
+void RevoluteJoint::setLimits(float lower, float upper) {
+	revolute_joint->SetLimits(lower, upper);
+}
+
+bool RevoluteJoint::isMotorEnabled() const {
+	return revolute_joint->IsMotorEnabled();
+}
+
+void RevoluteJoint::enableMotor(bool flag) {
+	revolute_joint->EnableMotor(flag);
+}
+
+void RevoluteJoint::setMotorSpeed(float speed) {
+	revolute_joint->SetMotorSpeed(speed);
+}
+
+float RevoluteJoint::getMotorSpeed() const {
+	return revolute_joint->GetMotorSpeed();
+}
+
+void RevoluteJoint::setMaxMotorTorque(float torque) {
+	revolute_joint->SetMaxMotorTorque(torque);
+}
+
+float RevoluteJoint::getMaxMotorTorque() const {
+	return revolute_joint->GetMaxMotorTorque();
 }
 
 TokenWriter& RevoluteJoint::serialize(TokenWriter& tw) const {
