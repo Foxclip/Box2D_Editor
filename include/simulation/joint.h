@@ -5,6 +5,10 @@
 class GameObject;
 class GameObjectList;
 
+// adding Joint derived class
+// add isEqual to derived class
+// add comparison to == operator in Joint
+
 class Joint {
 public:
 	GameObject* object1 = nullptr;
@@ -47,7 +51,7 @@ public:
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<RevoluteJoint> deserialize(const std::string& str, GameObjectList* object_list);
 	static std::unique_ptr<RevoluteJoint> deserialize(TokenReader& tr, GameObjectList* object_list);
-	bool operator==(const RevoluteJoint& other) const;
+	bool isEqual(const Joint* other) const;
 
 private:
 	b2RevoluteJoint* revolute_joint = nullptr;

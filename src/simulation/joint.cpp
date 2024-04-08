@@ -9,8 +9,10 @@ Joint::~Joint() {
 }
 
 bool Joint::operator==(const Joint& other) const {
-	if (getType() != other.getType()) {
-		return false;
+	if (const RevoluteJoint* revolute_joint = dynamic_cast<const RevoluteJoint*>(this)) {
+		if (!revolute_joint->isEqual(&other)) {
+			return false;
+		}
 	}
 	if (
 		object1->getId() != other.object1->getId() ||
@@ -212,12 +214,9 @@ std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(TokenReader& tr, GameO
 	}
 }
 
-bool RevoluteJoint::operator==(const RevoluteJoint& other) const {
-	const RevoluteJoint* other_ptr = dynamic_cast<const RevoluteJoint*>(&other);
+bool RevoluteJoint::isEqual(const Joint* other) const {
+	const RevoluteJoint* other_ptr = dynamic_cast<const RevoluteJoint*>(other);
 	if (!other_ptr) {
-		return false;
-	}
-	if (static_cast<const Joint&>(*this) != other) {
 		return false;
 	}
 	if (getLowerLimit() != other_ptr->getLowerLimit()) {
