@@ -12,7 +12,6 @@ void SimulationTests::createTestLists() {
     };
     std::function<void(test::Test&, GameObject*, GameObject*)> obj_cmp_common = 
         [&, color_to_str](test::Test& test, GameObject* objA, GameObject* objB) {
-        tCheck(*objA == *objB);
         tCompare(objB->getChildren().size(), objA->getChildren().size());
         if (objA->getChildren().size() == objB->getChildren().size()) {
             for (size_t i = 0; i < objA->getChildren().size(); i++) {
@@ -215,6 +214,7 @@ void SimulationTests::createTestLists() {
         std::string str = boxA->serialize();
         std::unique_ptr<BoxObject> uptr = BoxObject::deserialize(str, &simulation);
         BoxObject* boxB = uptr.get();
+        tCheck(*boxA == *boxB);
         obj_cmp_common(test, boxA, boxB);
         tCompare(boxB->size.x, boxA->size.x);
         tCompare(boxB->size.y, boxA->size.y);
@@ -232,6 +232,7 @@ void SimulationTests::createTestLists() {
         std::string str = ballA->serialize();
         std::unique_ptr<BallObject> uptr = BallObject::deserialize(str, &simulation);
         BallObject* ballB = uptr.get();
+        tCheck(*ballA == *ballB);
         obj_cmp_common(test, ballA, ballB);
         tCompare(ballB->radius, ballA->radius);
     });
@@ -253,6 +254,7 @@ void SimulationTests::createTestLists() {
         std::string str = polygonA->serialize();
         std::unique_ptr<PolygonObject> uptr = PolygonObject::deserialize(str, &simulation);
         PolygonObject* polygonB = uptr.get();
+        tCheck(*polygonA == *polygonB);
         obj_cmp_common(test, polygonA, polygonB);
     });
     test::Test* chain_serialize_test = list->addTest("chain_serialize", { chain_test }, [=, this](test::Test& test) {
@@ -276,6 +278,7 @@ void SimulationTests::createTestLists() {
         std::string str = chainA->serialize();
         std::unique_ptr<ChainObject> uptr = ChainObject::deserialize(str, &simulation);
         ChainObject* chainB = uptr.get();
+        tCheck(*chainA == *chainB);
         obj_cmp_common(test, chainA, chainB);
     });
     test::Test* revolute_joint_serialize_test = list->addTest("revolute_joint_serialize", { revolute_joint_test }, [=, this](test::Test& test) {
