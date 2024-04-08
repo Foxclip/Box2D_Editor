@@ -19,7 +19,6 @@ GameObject::GameObject() { }
 
 GameObject::~GameObject() {
 	if (rigid_body) {
-		//logger << "Destroy body: " << id << "\n";
 		rigid_body->GetWorld()->DestroyBody(rigid_body);
 		rigid_body = nullptr;
 	}
@@ -587,6 +586,25 @@ GameObject* GameObject::getGameobject(b2Body* body) {
 }
 
 bool GameObject::operator==(const GameObject& other) const {
+	if (const BoxObject* box = dynamic_cast<const BoxObject*>(this)) {
+		if (!box->isEqual(&other)) {
+			return false;
+		}
+	} else if (const BallObject* ball = dynamic_cast<const BallObject*>(this)) {
+		if (!ball->isEqual(&other)) {
+			return false;
+		}
+	} else if (const PolygonObject* polygon = dynamic_cast<const PolygonObject*>(this)) {
+		if (!polygon->isEqual(&other)) {
+			return false;
+		}
+	} else if (const ChainObject* chain = dynamic_cast<const ChainObject*>(this)) {
+		if (!chain->isEqual(&other)) {
+			return false;
+		}
+	} else {
+		mAssert(false, "Unknown GameObject type:" + std::string(typeid(other).name()));
+	}
 	if (children.size() != other.children.size()) {
 		return false;
 	}
@@ -728,15 +746,12 @@ void BoxObject::internalSyncVertices() {
 	rect_shape->setFillColor(color);
 }
 
-bool BoxObject::operator==(const BoxObject& other) const {
-	const BoxObject* other_ptr = dynamic_cast<const BoxObject*>(&other);
-	if (!other_ptr) {
+bool BoxObject::isEqual(const GameObject* other) const {
+	const BoxObject* box = dynamic_cast<const BoxObject*>(other);
+	if (!box) {
 		return false;
 	}
-	if (static_cast<const GameObject&>(*this) != other) {
-		return false;
-	}
-	if (size != other_ptr->size) {
+	if (size != box->size) {
 		return false;
 	}
 	return true;
@@ -862,15 +877,12 @@ void BallObject::internalSyncVertices() {
 	circle_notch_shape->setNotchColor(notch_color);
 }
 
-bool BallObject::operator==(const BallObject& other) const {
-	const BallObject* other_ptr = dynamic_cast<const BallObject*>(&other);
-	if (!other_ptr) {
+bool BallObject::isEqual(const GameObject* other) const {
+	const BallObject* ball = dynamic_cast<const BallObject*>(other);
+	if (!ball) {
 		return false;
 	}
-	if (static_cast<const GameObject&>(*this) != other) {
-		return false;
-	}
-	if (radius != other_ptr->radius) {
+	if (radius != ball->radius) {
 		return false;
 	}
 	return true;
@@ -1021,12 +1033,9 @@ void PolygonObject::internalSyncVertices() {
 	}
 }
 
-bool PolygonObject::operator==(const PolygonObject& other) const {
-	const PolygonObject* other_ptr = dynamic_cast<const PolygonObject*>(&other);
-	if (!other_ptr) {
-		return false;
-	}
-	if (static_cast<const GameObject&>(*this) != other) {
+bool PolygonObject::isEqual(const GameObject* other) const {
+	const PolygonObject* polygon = dynamic_cast<const PolygonObject*>(other);
+	if (!polygon) {
 		return false;
 	}
 	return true;
@@ -1159,12 +1168,9 @@ void ChainObject::internalSyncVertices() {
 	}
 }
 
-bool ChainObject::operator==(const ChainObject& other) const {
-	const ChainObject* other_ptr = dynamic_cast<const ChainObject*>(&other);
-	if (!other_ptr) {
-		return false;
-	}
-	if (static_cast<const GameObject&>(*this) != other) {
+bool ChainObject::isEqual(const GameObject* other) const {
+	const ChainObject* chain = dynamic_cast<const ChainObject*>(other);
+	if (!chain) {
 		return false;
 	}
 	return true;

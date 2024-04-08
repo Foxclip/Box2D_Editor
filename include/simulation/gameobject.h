@@ -30,6 +30,10 @@ private:
 
 class GameObjectList;
 
+// adding GameObject derived class
+// add isEqual to derived class
+// add comparison to == operator in GameObject
+
 class GameObject {
 public:
 	ptrdiff_t id = -1;
@@ -117,7 +121,7 @@ public:
 	static BodyDef deserializeBody(TokenReader& tr);
 	static b2FixtureDef deserializeFixture(TokenReader& tr);
 	static GameObject* getGameobject(b2Body* body);
-	virtual bool operator==(const GameObject& other) const;
+	bool operator==(const GameObject& other) const;
 
 protected:
 	GameObjectList* object_list = nullptr;
@@ -156,7 +160,7 @@ public:
 	static std::unique_ptr<BoxObject> deserialize(const std::string& str, GameObjectList* object_list);
 	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
-	bool operator==(const BoxObject& other) const;
+	bool isEqual(const GameObject* other) const;
 
 private:
 	std::unique_ptr<sf::RectangleShape> rect_shape;
@@ -182,7 +186,7 @@ public:
 	static std::unique_ptr<BallObject> deserialize(const std::string& str, GameObjectList* object_list);
 	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
-	bool operator==(const BallObject& other) const;
+	bool isEqual(const GameObject* other) const;
 
 private:
 	std::unique_ptr<CircleNotchShape> circle_notch_shape;
@@ -209,7 +213,7 @@ public:
 	static std::unique_ptr<PolygonObject> deserialize(const std::string& str, GameObjectList* object_list);
 	static std::unique_ptr<PolygonObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
-	bool operator==(const PolygonObject& other) const;
+	bool isEqual(const GameObject* other) const;
 
 private:
 	std::unique_ptr<SplittablePolygon> polygon;
@@ -227,7 +231,7 @@ public:
 	static std::unique_ptr<ChainObject> deserialize(const std::string& str, GameObjectList* object_list);
 	static std::unique_ptr<ChainObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
-	bool operator==(const ChainObject& other) const;
+	bool isEqual(const GameObject* other) const;
 
 private:
 	std::unique_ptr<LineStripShape> line_strip_shape;

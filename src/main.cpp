@@ -52,7 +52,6 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: format simulation tests like car serialization test
     // TODO: make gameobject and joint == operator actually virtual
     // TODO: Simulation tests
     // TODO: Widget tests
