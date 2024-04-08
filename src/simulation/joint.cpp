@@ -143,6 +143,7 @@ TokenWriter& RevoluteJoint::serialize(TokenWriter& tw) const {
 		tw.writeb2Vec2Param("anchor_a", joint->GetLocalAnchorA());
 		tw.writeb2Vec2Param("anchor_b", joint->GetLocalAnchorB());
 		tw.writeBoolParam("collide_connected", joint->GetCollideConnected());
+		tw.writeFloatParam("reference_angle", joint->GetReferenceAngle());
 		tw.writeFloatParam("angle_lower_limit", joint->GetLowerLimit());
 		tw.writeFloatParam("angle_upper_limit", joint->GetUpperLimit());
 		tw.writeBoolParam("angle_limit_enabled", joint->IsLimitEnabled());
@@ -182,6 +183,8 @@ std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(TokenReader& tr, GameO
 				def.localAnchorB = tr.readb2Vec2();
 			} else if (pname == "collide_connected") {
 				def.collideConnected = tr.readBool();
+			} else if (pname == "reference_angle") {
+				def.referenceAngle = tr.readFloat();
 			} else if (pname == "angle_lower_limit") {
 				def.lowerAngle = tr.readFloat();
 			} else if (pname == "angle_upper_limit") {

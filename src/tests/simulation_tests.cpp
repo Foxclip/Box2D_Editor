@@ -205,9 +205,9 @@ void SimulationTests::createTestLists() {
         Simulation simulation;
         simulation.create_box(
             "box0",
-            b2Vec2(1.0f, 1.0f),
+            b2Vec2(1.5f, -3.5f),
             utils::to_radians(45.0f),
-            b2Vec2(1.0f, 1.0f),
+            b2Vec2(1.1f, 2.0f),
             sf::Color::Green
         );
         BoxObject* boxA = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
@@ -223,8 +223,8 @@ void SimulationTests::createTestLists() {
         Simulation simulation;
         simulation.create_ball(
             "ball0",
-            b2Vec2(1.0f, 1.0f),
-            1.0f,
+            b2Vec2(1.5f, -3.5f),
+            2.2f,
             sf::Color::Green,
             sf::Color::Green
         );
@@ -245,7 +245,7 @@ void SimulationTests::createTestLists() {
         }
         simulation.create_polygon(
             "polygon0",
-            b2Vec2(1.0f, 1.0f),
+            b2Vec2(1.5f, -3.5f),
             utils::to_radians(45.0f),
             vertices,
             sf::Color::Green
@@ -269,10 +269,10 @@ void SimulationTests::createTestLists() {
         };
         simulation.create_chain(
             "chain0",
-            b2Vec2(1.0f, 1.0f),
+            b2Vec2(1.5f, -3.5f),
             utils::to_radians(45.0f),
             vertices,
-            sf::Color(255, 255, 255)
+            sf::Color::Green
         );
         ChainObject* chainA = dynamic_cast<ChainObject*>(simulation.getFromAll(0));
         std::string str = chainA->serialize();
@@ -285,20 +285,28 @@ void SimulationTests::createTestLists() {
         Simulation simulation;
         BoxObject* box0 = simulation.create_box(
             "box0",
-            b2Vec2(0.0f, 0.0f),
-            utils::to_radians(0.0f),
-            b2Vec2(1.0f, 1.0f),
+            b2Vec2(1.5f, -3.5f),
+            utils::to_radians(45.0f),
+            b2Vec2(1.5f, 2.0f),
             sf::Color::Green
         );
         BoxObject* box1 = simulation.create_box(
             "box1",
             b2Vec2(0.0f, 5.0f),
-            utils::to_radians(0.0f),
-            b2Vec2(1.0f, 1.0f),
+            utils::to_radians(-10.0f),
+            b2Vec2(3.0f, 0.5f),
             sf::Color::Green
         );
         b2RevoluteJointDef joint_def;
         joint_def.Initialize(box0->rigid_body, box1->rigid_body, b2Vec2(0.0f, 5.0f));
+        joint_def.collideConnected = true;
+        joint_def.enableLimit = true;
+        joint_def.enableMotor = true;
+        joint_def.lowerAngle = utils::to_radians(5.0f);
+        joint_def.maxMotorTorque = 150.0f;
+        joint_def.motorSpeed = 33.3f;
+        joint_def.referenceAngle = utils::to_radians(1.1f);
+        joint_def.upperAngle = utils::to_radians(55.0f);
         RevoluteJoint* jointA = simulation.createRevoluteJoint(joint_def, box0, box1);
         std::string str = jointA->serialize();
         std::unique_ptr<RevoluteJoint> uptr = RevoluteJoint::deserialize(str, &simulation);
