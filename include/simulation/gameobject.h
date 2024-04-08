@@ -2,13 +2,14 @@
 
 #include <set>
 #include <SFML/Graphics.hpp>
-#include "box2d/box2d.h"
+#include <box2d/box2d.h>
 #include "compvector.h"
 #include "serializer.h"
 #include "polygon.h"
 #include "utils.h"
 #include "shapes.h"
 #include "joint.h"
+#include "gameobject_transform.h"
 
 struct BodyDef {
 	b2BodyDef body_def;
@@ -26,30 +27,6 @@ public:
 
 private:
 };
-
-class GameObjectTransforms {
-public:
-	GameObjectTransforms(const GameObject* object);
-	const b2Transform& getTransform() const;
-	const b2Transform& getGlobalTransform() const;
-	void invalidateGlobalTransform();
-	void setTransform(const b2Vec2& position, float angle);
-	void setGlobalTransform(const b2Transform& transform);
-	void setPosition(const b2Vec2& position);
-	void setAngle(float angle);
-	bool operator==(const GameObjectTransforms& other) const;
-
-private:
-	friend class GameObject;
-	const GameObject* object = nullptr;
-	b2Transform transform;
-	mutable b2Transform global_transform;
-	mutable bool global_transform_valid = false;
-
-	void recalcGlobalTransform() const;
-
-};
-bool operator==(const b2Rot& left, const b2Rot& right);
 
 class GameObjectList;
 
