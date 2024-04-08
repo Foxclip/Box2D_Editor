@@ -1,5 +1,5 @@
 #include <cassert>
-#include "polygon.h"
+#include "simulation/polygon.h"
 
 sf::Text vertex_text;
 

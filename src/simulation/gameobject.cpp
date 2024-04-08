@@ -1,6 +1,6 @@
 #include <numbers>
-#include "gameobject.h"
-#include "objectlist.h"
+#include "simulation/gameobject.h"
+#include "simulation/objectlist.h"
 
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gameobject.h"
+#include "simulation/gameobject.h"
 #include "widgets/widget.h"
 #include "UI/edit_window.h"
 #include <set>
