@@ -1,10 +1,33 @@
 #include "simulation/joint.h"
 #include "simulation/gameobject.h"
+#include "simulation/objectlist.h"
 
 Joint::~Joint() {
 	size_t object_a_id = GameObject::getGameobject(joint->GetBodyA())->id;
 	size_t object_b_id = GameObject::getGameobject(joint->GetBodyB())->id;
 	joint->GetBodyA()->GetWorld()->DestroyJoint(joint);
+}
+
+bool Joint::operator==(const Joint& other) const {
+	if (getType() != other.getType()) {
+		return false;
+	}
+	if (
+		object1->getId() != other.object1->getId() ||
+		object2->getId() != other.object2->getId()
+	) {
+		return false;
+	}
+	if (getAnchorA() != other.getAnchorA()) {
+		return false;
+	}
+	if (getAnchorB() != other.getAnchorB()) {
+		return false;
+	}
+	if (getCollideConnected() != other.getCollideConnected()) {
+		return false;
+	}
+	return true;
 }
 
 b2JointType Joint::getType() const {
@@ -29,6 +52,12 @@ b2Vec2 Joint::getAnchorB() const {
 
 bool Joint::getCollideConnected() const {
 	return joint->GetCollideConnected();
+}
+
+std::string Joint::serialize() const {
+	TokenWriter tw;
+	serialize(tw);
+	return tw.toStr();
 }
 
 RevoluteJoint::RevoluteJoint(const b2RevoluteJointDef& def, b2World* world, GameObject* object1, GameObject* object2) {
@@ -125,22 +154,28 @@ TokenWriter& RevoluteJoint::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-b2RevoluteJointDef RevoluteJoint::deserialize(TokenReader& tr, ptrdiff_t& p_body_a, ptrdiff_t& p_body_b) {
+std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(const std::string& str, GameObjectList* object_list) {
+	TokenReader tr(str);
+	std::unique_ptr<RevoluteJoint> uptr = deserialize(tr, object_list);
+	return uptr;
+}
+
+std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		b2RevoluteJointDef def;
 		def.bodyA = nullptr;
 		def.bodyB = nullptr;
-		p_body_a = -1;
-		p_body_b = -1;
+		ptrdiff_t object_a_id = -1;
+		ptrdiff_t object_b_id = -1;
 		if (tr.tryEat("joint")) {
 			tr.eat("revolute");
 		}
 		while (tr.validRange()) {
 			std::string pname = tr.readString();
 			if (pname == "body_a") {
-				p_body_a = tr.readULL();
+				object_a_id = tr.readULL();
 			} else if (pname == "body_b") {
-				p_body_b = tr.readULL();
+				object_b_id = tr.readULL();
 			} else if (pname == "anchor_a") {
 				def.localAnchorA = tr.readb2Vec2();
 			} else if (pname == "anchor_b") {
@@ -165,8 +200,43 @@ b2RevoluteJointDef RevoluteJoint::deserialize(TokenReader& tr, ptrdiff_t& p_body
 				throw std::runtime_error("Unknown RevoluteJoint parameter name: " + pname);
 			}
 		}
-		return def;
+		GameObject* object1 = object_list->getById(object_a_id);
+		GameObject* object2 = object_list->getById(object_b_id);
+		std::unique_ptr<RevoluteJoint> uptr = std::make_unique<RevoluteJoint>(def, object_list->getWorld(), object1, object2);
+		return uptr;
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
 	}
+}
+
+bool RevoluteJoint::operator==(const RevoluteJoint& other) const {
+	const RevoluteJoint* other_ptr = dynamic_cast<const RevoluteJoint*>(&other);
+	if (!other_ptr) {
+		return false;
+	}
+	if (static_cast<const Joint&>(*this) != other) {
+		return false;
+	}
+	if (getLowerLimit() != other_ptr->getLowerLimit()) {
+		return false;
+	}
+	if (getMaxMotorTorque() != other_ptr->getMaxMotorTorque()) {
+		return false;
+	}
+	if (getMotorSpeed() != other_ptr->getMotorSpeed()) {
+		return false;
+	}
+	if (getReferenceAngle() != other_ptr->getReferenceAngle()) {
+		return false;
+	}
+	if (getUpperLimit() != other_ptr->getUpperLimit()) {
+		return false;
+	}
+	if (isLimitEnabled() != other_ptr->isLimitEnabled()) {
+		return false;
+	}
+	if (isMotorEnabled() != other_ptr->isMotorEnabled()) {
+		return false;
+	}
+	return true;
 }

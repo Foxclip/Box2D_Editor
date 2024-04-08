@@ -9,6 +9,7 @@ class GameObjectList {
 public:
 	std::unique_ptr<b2World> world;
 
+	b2World* getWorld() const;
 	size_t getTopSize() const;
 	size_t getAllSize() const;
 	size_t getJointsSize() const;

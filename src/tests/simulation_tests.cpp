@@ -8,32 +8,36 @@ void SimulationTests::createTestLists() {
     list->OnAfterRunTest = []() { logger.manualActivate(); };
     std::function<std::string(const sf::Color&)> color_to_str =
         [](const sf::Color& color) {
-            return
-                "(" +
-                std::to_string(color.r) + " " +
-                std::to_string(color.g) + " " +
-                std::to_string(color.b) + " " +
-                std::to_string(color.a)
-                + ")";
-        };
-    std::function<void(test::Test&, GameObject*, GameObject*)> cmp_common = 
+        return "(" + utils::color_to_str(color) + ")";
+    };
+    std::function<void(test::Test&, GameObject*, GameObject*)> obj_cmp_common = 
         [&, color_to_str](test::Test& test, GameObject* objA, GameObject* objB) {
-            tCheck(*objA == *objB);
-            tCompare(objB->getChildren().size(), objA->getChildren().size());
-            if (objA->getChildren().size() == objB->getChildren().size()) {
-                for (size_t i = 0; i < objA->getChildren().size(); i++) {
-                    tCompare(objB->getChild(i)->getId(), objA->getChild(i)->getId());
-                }
+        tCheck(*objA == *objB);
+        tCompare(objB->getChildren().size(), objA->getChildren().size());
+        if (objA->getChildren().size() == objB->getChildren().size()) {
+            for (size_t i = 0; i < objA->getChildren().size(); i++) {
+                tCompare(objB->getChild(i)->getId(), objA->getChild(i)->getId());
             }
-            tCompare(objB->color, objA->color, color_to_str);
-            tCompare(objB->getId(), objA->getId());
-            tCompare(objB->getName(), objA->getName());
-            tCompare(objB->parent_id, objA->parent_id);
-            tCompare(objB->getTransform().q.GetAngle(), objA->getTransform().q.GetAngle());
-            tCompare(objB->getTransform().p.x, objA->getTransform().p.x);
-            tCompare(objB->getTransform().p.y, objA->getTransform().p.y);
-            tCheck(objB->getVertices() == objA->getVertices());
-        };
+        }
+        tCompare(objB->color, objA->color, color_to_str);
+        tCompare(objB->getId(), objA->getId());
+        tCompare(objB->getName(), objA->getName());
+        tCompare(objB->parent_id, objA->parent_id);
+        tCompare(objB->getTransform().q.GetAngle(), objA->getTransform().q.GetAngle());
+        tCompare(objB->getTransform().p.x, objA->getTransform().p.x);
+        tCompare(objB->getTransform().p.y, objA->getTransform().p.y);
+        tCheck(objB->getVertices() == objA->getVertices());
+    };
+    std::function<void(test::Test&, Joint*, Joint*)> joint_cmp_common =
+        [&](test::Test& test, Joint* jointA, Joint* jointB) {
+        tCompare(jointB->object1->getId(), jointA->object1->getId());
+        tCompare(jointB->object2->getId(), jointA->object2->getId());
+        tCompare(jointB->getAnchorA().x, jointA->getAnchorA().x);
+        tCompare(jointB->getAnchorA().y, jointA->getAnchorA().y);
+        tCompare(jointB->getAnchorB().x, jointA->getAnchorB().x);
+        tCompare(jointB->getAnchorB().y, jointA->getAnchorB().y);
+        tCompare(jointB->getCollideConnected(), jointA->getCollideConnected());
+    };
 
     test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
         Simulation simulation;
@@ -211,7 +215,7 @@ void SimulationTests::createTestLists() {
         std::string str = boxA->serialize();
         std::unique_ptr<BoxObject> uptr = BoxObject::deserialize(str, &simulation);
         BoxObject* boxB = uptr.get();
-        cmp_common(test, boxA, boxB);
+        obj_cmp_common(test, boxA, boxB);
         tCompare(boxB->size.x, boxA->size.x);
         tCompare(boxB->size.y, boxA->size.y);
     });
@@ -228,7 +232,7 @@ void SimulationTests::createTestLists() {
         std::string str = ballA->serialize();
         std::unique_ptr<BallObject> uptr = BallObject::deserialize(str, &simulation);
         BallObject* ballB = uptr.get();
-        cmp_common(test, ballA, ballB);
+        obj_cmp_common(test, ballA, ballB);
         tCompare(ballB->radius, ballA->radius);
     });
     test::Test* polygon_serialize_test = list->addTest("polygon_serialize", { polygon_test }, [=, this](test::Test& test) {
@@ -249,7 +253,7 @@ void SimulationTests::createTestLists() {
         std::string str = polygonA->serialize();
         std::unique_ptr<PolygonObject> uptr = PolygonObject::deserialize(str, &simulation);
         PolygonObject* polygonB = uptr.get();
-        cmp_common(test, polygonA, polygonB);
+        obj_cmp_common(test, polygonA, polygonB);
     });
     test::Test* chain_serialize_test = list->addTest("chain_serialize", { chain_test }, [=, this](test::Test& test) {
         Simulation simulation;
@@ -272,6 +276,38 @@ void SimulationTests::createTestLists() {
         std::string str = chainA->serialize();
         std::unique_ptr<ChainObject> uptr = ChainObject::deserialize(str, &simulation);
         ChainObject* chainB = uptr.get();
-        cmp_common(test, chainA, chainB);
+        obj_cmp_common(test, chainA, chainB);
+    });
+    test::Test* revolute_joint_serialize_test = list->addTest("revolute_joint_serialize", { revolute_joint_test }, [=, this](test::Test& test) {
+        Simulation simulation;
+        BoxObject* box0 = simulation.create_box(
+            "box0",
+            b2Vec2(0.0f, 0.0f),
+            utils::to_radians(0.0f),
+            b2Vec2(1.0f, 1.0f),
+            sf::Color::Green
+        );
+        BoxObject* box1 = simulation.create_box(
+            "box1",
+            b2Vec2(0.0f, 5.0f),
+            utils::to_radians(0.0f),
+            b2Vec2(1.0f, 1.0f),
+            sf::Color::Green
+        );
+        b2RevoluteJointDef joint_def;
+        joint_def.Initialize(box0->rigid_body, box1->rigid_body, b2Vec2(0.0f, 5.0f));
+        RevoluteJoint* jointA = simulation.createRevoluteJoint(joint_def, box0, box1);
+        std::string str = jointA->serialize();
+        std::unique_ptr<RevoluteJoint> uptr = RevoluteJoint::deserialize(str, &simulation);
+        RevoluteJoint* jointB = uptr.get();
+        tCheck(*jointA == *jointB);
+        joint_cmp_common(test, jointA, jointB);
+        tCompare(jointB->getLowerLimit(), jointA->getLowerLimit());
+        tCompare(jointB->getMaxMotorTorque(), jointA->getMaxMotorTorque());
+        tCompare(jointB->getMotorSpeed(), jointA->getMotorSpeed());
+        tCompare(jointB->getReferenceAngle(), jointA->getReferenceAngle());
+        tCompare(jointB->getUpperLimit(), jointA->getUpperLimit());
+        tCompare(jointB->isLimitEnabled(), jointA->isLimitEnabled());
+        tCompare(jointB->isMotorEnabled(), jointA->isMotorEnabled());
     });
 }

@@ -121,11 +121,7 @@ void Simulation::deserialize(TokenReader& tr) {
             } else if (entity == "joint") {
                 std::string type = tr.readString();
                 if (type == "revolute") {
-                    ptrdiff_t body_a_id, body_b_id;
-                    b2RevoluteJointDef def = RevoluteJoint::deserialize(tr, body_a_id, body_b_id);
-                    GameObject* object1 = getById(body_a_id);
-                    GameObject* object2 = getById(body_b_id);
-                    std::unique_ptr<RevoluteJoint> uptr = std::make_unique<RevoluteJoint>(def, world.get(), object1, object2);
+                    std::unique_ptr<RevoluteJoint> uptr = RevoluteJoint::deserialize(tr, this);
                     addJoint(std::move(uptr));
                 } else {
                     throw std::runtime_error("Unknown joint type: " + type);
@@ -137,10 +133,6 @@ void Simulation::deserialize(TokenReader& tr) {
     } catch (std::exception exc) {
         throw std::runtime_error("Line " + std::to_string(tr.getLine(-1)) + ": " + exc.what());
     }
-}
-
-b2World* Simulation::getWorld() const {
-    return world.get();
 }
 
 BoxObject* Simulation::create_box(

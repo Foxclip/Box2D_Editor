@@ -16,7 +16,6 @@ public:
 	std::string serialize(TokenWriter& tw) const;
 	void deserialize(const std::string& str);
 	void deserialize(TokenReader& tr);
-	b2World* getWorld() const;
 	BoxObject* create_box(
 		const std::string& name,
 		const b2Vec2& pos,

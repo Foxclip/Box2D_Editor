@@ -110,18 +110,18 @@ namespace test {
 		virtual void afterRunModule();
 		void testAssert(Test& test, bool value, const std::string& value_message);
 		void testAssert(Test& test, bool value, const std::string& value_message, const std::string message);
-		template<typename T, typename U>
-		bool testCompare(Test& test, const std::string& name, T actual, U expected);
-		template<typename T, typename U>
-		bool testCompare(Test& test, const std::string& name, T actual, U expected, std::function<std::string(const T&)> to_str);
+		template<typename T1, typename T2>
+		bool testCompare(Test& test, const std::string& name, T1 actual, T2 expected);
+		template<typename T1, typename T2, typename TStr>
+		bool testCompare(Test& test, const std::string& name, T1 actual, T2 expected, TStr to_str);
 		template<typename T>
 		bool testApproxCompare(Test& test, const std::string& name, T actual, T expected, T epsilon = 0.001f);
 		template<typename T>
 		static bool equals(T left, T right, T epsilon = 0.001f);
 
 	private:
-		template<typename T, typename U>
-		void compareFail(Test& test, const std::string& name, T actual, U expected, std::function<std::string(const T&)> to_str);
+		template<typename T1, typename T2, typename TStr>
+		void compareFail(Test& test, const std::string& name, T1 actual, T2 expected, TStr to_str);
 
 	};
 
@@ -137,19 +137,19 @@ namespace test {
 
 	};
 
-	template<typename T, typename U>
-	inline bool TestModule::testCompare(Test& test, const std::string& name, T actual, U expected) {
-		std::function<std::string(const T&)> func;
-		if constexpr (std::same_as<T, std::string> || std::same_as<T, const char*>) {
-			func = [](const T& val) { return val; };
+	template<typename T1, typename T2>
+	inline bool TestModule::testCompare(Test& test, const std::string& name, T1 actual, T2 expected) {
+		if constexpr (std::same_as<T1, std::string> || std::same_as<T1, const char*>) {
+			auto func = [](const T1& val) { return val; };
+			return testCompare(test, name, actual, expected, func);
 		} else {
-			func = [](const T& val) { return std::to_string(val); };
+			auto func = [](const T1& val) { return std::to_string(val); };
+			return testCompare(test, name, actual, expected, func);
 		}
-		return testCompare(test, name, actual, expected, func);
 	}
 
-	template<typename T, typename U>
-	inline bool TestModule::testCompare(Test& test, const std::string& name, T actual, U expected, std::function<std::string(const T&)> to_str) {
+	template<typename T1, typename T2, typename TStr>
+	inline bool TestModule::testCompare(Test& test, const std::string& name, T1 actual, T2 expected, TStr to_str) {
 		if (actual != expected) {
 			compareFail(test, name, actual, expected, to_str);
 			return false;
@@ -160,7 +160,7 @@ namespace test {
 	template<typename T>
 	inline bool TestModule::testApproxCompare(Test& test, const std::string& name, T actual, T expected, T epsilon) {
 		if (!equals(actual, expected, epsilon)) {
-			std::function<std::string(const T&)> func = [](const T& val) { return std::to_string(val); };
+			auto func = [](const T& val) { return std::to_string(val); };
 			compareFail(test, name, actual, expected, func);
 			return false;
 		}
@@ -172,8 +172,8 @@ namespace test {
 		return abs(left - right) < epsilon;
 	}
 
-	template<typename T, typename U>
-	inline void TestModule::compareFail(Test& test, const std::string& name, T actual, U expected, std::function<std::string(const T&)> to_str) {
+	template<typename T1, typename T2, typename TStr>
+	inline void TestModule::compareFail(Test& test, const std::string& name, T1 actual, T2 expected, TStr to_str) {
 		std::string actual_value_str;
 		std::string expected_value_str;
 		actual_value_str = to_str(actual);

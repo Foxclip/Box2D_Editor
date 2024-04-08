@@ -1,5 +1,9 @@
 #include "simulation/objectlist.h"
 
+b2World* GameObjectList::getWorld() const {
+    return world.get();
+}
+
 size_t GameObjectList::getTopSize() const {
     return top_objects.size();
 }
@@ -177,10 +181,8 @@ Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_a, Gam
     std::string str = joint->serialize(tw).toStr();
     TokenReader tr(str);
     std::unique_ptr<Joint> new_joint;
-    ptrdiff_t body_a, body_b;
     if (dynamic_cast<const RevoluteJoint*>(joint)) {
-        b2RevoluteJointDef def = RevoluteJoint::deserialize(tr, body_a, body_b);
-        new_joint = std::make_unique<RevoluteJoint>(def, world.get(), new_a, new_b);
+        new_joint = RevoluteJoint::deserialize(tr, this);
     } else {
         mAssert(false, "Unknown joint type");
     }

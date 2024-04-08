@@ -3,6 +3,7 @@
 #include <serializer.h>
 
 class GameObject;
+class GameObjectList;
 
 class Joint {
 public:
@@ -15,8 +16,10 @@ public:
 	b2Vec2 getAnchorA() const;
 	b2Vec2 getAnchorB() const;
 	bool getCollideConnected() const;
+	std::string serialize() const;
 	virtual TokenWriter& serialize(TokenWriter& tw) const = 0;
 	~Joint();
+	bool operator==(const Joint& other) const;
 
 protected:
 	b2Joint* joint = nullptr;
@@ -40,8 +43,11 @@ public:
 	float getMotorSpeed() const;
 	void setMaxMotorTorque(float torque);
 	float getMaxMotorTorque() const;
+	using Joint::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static b2RevoluteJointDef deserialize(TokenReader& tr, ptrdiff_t& p_body_a, ptrdiff_t& p_body_b);
+	static std::unique_ptr<RevoluteJoint> deserialize(const std::string& str, GameObjectList* object_list);
+	static std::unique_ptr<RevoluteJoint> deserialize(TokenReader& tr, GameObjectList* object_list);
+	bool operator==(const RevoluteJoint& other) const;
 
 private:
 	b2RevoluteJoint* revolute_joint = nullptr;
