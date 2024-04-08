@@ -52,7 +52,7 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: show file and line in testAssert and testCompare
+    // TODO: set non-default parameters in serialized objects and joints
     // TODO: car serialization test (full Simulation serialization)
     // TODO: Simulation tests
     // TODO: Widget tests
