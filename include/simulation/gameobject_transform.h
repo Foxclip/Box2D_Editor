@@ -4,9 +4,9 @@
 
 class GameObject;
 
-class GameObjectTransforms {
+class GameObjectTransform {
 public:
-	GameObjectTransforms(const GameObject* object);
+	GameObjectTransform(const GameObject* object);
 	const b2Transform& getTransform() const;
 	const b2Transform& getGlobalTransform() const;
 	void invalidateGlobalTransform();
@@ -14,7 +14,7 @@ public:
 	void setGlobalTransform(const b2Transform& transform);
 	void setPosition(const b2Vec2& position);
 	void setAngle(float angle);
-	bool operator==(const GameObjectTransforms& other) const;
+	bool operator==(const GameObjectTransform& other) const;
 
 private:
 	friend class GameObject;

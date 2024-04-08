@@ -135,10 +135,10 @@ protected:
 
 private:
 	friend class GameObjectList;
-	friend class GameObjectTransforms;
+	friend class GameObjectTransform;
 	ptrdiff_t new_id = -1;
 	CompVector<GameObject*> children;
-	GameObjectTransforms transforms = GameObjectTransforms(this);
+	GameObjectTransform transforms = GameObjectTransform(this);
 
 };
 
