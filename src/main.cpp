@@ -52,8 +52,8 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: set non-default parameters in serialized objects and joints
-    // TODO: car serialization test (full Simulation serialization)
+    // TODO: format simulation tests like car serialization test
+    // TODO: make gameobject and joint == operator actually virtual
     // TODO: Simulation tests
     // TODO: Widget tests
     // TODO: blinking textbox cursor

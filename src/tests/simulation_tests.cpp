@@ -321,4 +321,35 @@ void SimulationTests::createTestLists() {
         tCompare(jointB->isLimitEnabled(), jointA->isLimitEnabled());
         tCompare(jointB->isMotorEnabled(), jointA->isMotorEnabled());
     });
+    test::Test* car_serialize_test = list->addTest(
+        "car_serialize",
+        {
+            car_test,
+            ball_serialize_test,
+            polygon_serialize_test,
+            revolute_joint_serialize_test
+        },
+        [&](test::Test& test) {
+            Simulation simulationA;
+            std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
+            std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+            simulationA.create_car(
+                "car0",
+                b2Vec2(0.0f, 0.0f),
+                lengths,
+                wheels,
+                sf::Color(255, 0, 0)
+            );
+            std::string str = simulationA.serialize();
+            Simulation simulationB;
+            simulationB.deserialize(str);
+            tAssertCompare(simulationB.getAllSize(), 4);
+            for (size_t i = 0; i < simulationB.getAllSize(); i++) {
+                tCheck(*simulationA.getFromAll(i) == *simulationB.getFromAll(i));
+            }
+            for (size_t i = 0; i < simulationB.getJointsSize(); i++) {
+                tCheck(*simulationA.getJoint(i) == *simulationB.getJoint(i));
+            }
+        }
+    );
 }

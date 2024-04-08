@@ -101,6 +101,7 @@ void Simulation::deserialize(const std::string& str) {
 void Simulation::deserialize(TokenReader& tr) {
     reset();
     try {
+        tr.tryEat("simulation");
         while (tr.validRange()) {
             std::string entity = tr.readString();
             if (entity == "object") {
@@ -126,12 +127,14 @@ void Simulation::deserialize(TokenReader& tr) {
                 } else {
                     throw std::runtime_error("Unknown joint type: " + type);
                 }
+            } else if (entity == "/simulation") {
+                break;
             } else {
                 throw std::runtime_error("Unknown entity type: " + entity);
             }
         }
     } catch (std::exception exc) {
-        throw std::runtime_error("Line " + std::to_string(tr.getLine(-1)) + ": " + exc.what());
+        throw std::runtime_error(__FUNCTION__": Line " + std::to_string(tr.getLine(-1)) + ": " + exc.what());
     }
 }
 

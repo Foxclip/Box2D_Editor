@@ -906,7 +906,7 @@ void Editor::deserialize(const std::string& str, bool set_camera) {
             setActiveObject(object);
         }
     } catch (std::exception exc) {
-        throw std::runtime_error("Line " + std::to_string(tr.getLine(-1)) + ": " + exc.what());
+        throw std::runtime_error(__FUNCTION__": Line " + std::to_string(tr.getLine(-1)) + ": " + exc.what());
     }
 }
 
