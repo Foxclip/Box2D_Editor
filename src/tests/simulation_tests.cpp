@@ -52,7 +52,7 @@ void SimulationTests::createTestLists() {
         },
         [&](test::Test& test) {
             Simulation simulation;
-            simulation.create_box(
+            simulation.createBox(
                 "box0",
                 b2Vec2(1.0f, 1.0f),
                 utils::to_radians(45.0f),
@@ -76,7 +76,7 @@ void SimulationTests::createTestLists() {
         },
         [&](test::Test& test) {
             Simulation simulation;
-            simulation.create_ball(
+            simulation.createBall(
                 "ball0",
                 b2Vec2(1.0f, 1.0f),
                 1.0f,
@@ -105,7 +105,7 @@ void SimulationTests::createTestLists() {
                 b2Vec2 vertex = utils::get_circle_vertex<b2Vec2>(i, 6, 1.0f);
                 vertices.push_back(vertex);
             }
-            simulation.create_polygon(
+            simulation.createPolygon(
                 "polygon0",
                 b2Vec2(1.0f, 1.0f),
                 utils::to_radians(45.0f),
@@ -137,7 +137,7 @@ void SimulationTests::createTestLists() {
                 b2Vec2(-15.0f, 2.0f),
                 b2Vec2(-25.0f, 8.0f),
             };
-            simulation.create_chain(
+            simulation.createChain(
                 "chain0",
                 b2Vec2(1.0f, 1.0f),
                 utils::to_radians(45.0f),
@@ -161,14 +161,14 @@ void SimulationTests::createTestLists() {
         },
         [&](test::Test& test) {
             Simulation simulation;
-            BoxObject* box0 = simulation.create_box(
+            BoxObject* box0 = simulation.createBox(
                 "box0",
                 b2Vec2(0.0f, 0.0f),
                 utils::to_radians(0.0f),
                 b2Vec2(1.0f, 1.0f),
                 sf::Color::Green
             );
-            BoxObject* box1 = simulation.create_box(
+            BoxObject* box1 = simulation.createBox(
                 "box1",
                 b2Vec2(0.0f, 5.0f),
                 utils::to_radians(0.0f),
@@ -196,7 +196,7 @@ void SimulationTests::createTestLists() {
             Simulation simulation;
             std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
             std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
-            simulation.create_car(
+            simulation.createCar(
                 "car0",
                 b2Vec2(0.0f, 0.0f),
                 lengths,
@@ -249,7 +249,7 @@ void SimulationTests::createTestLists() {
         },
         [=, this](test::Test& test) {
             Simulation simulation;
-            simulation.create_box(
+            simulation.createBox(
                 "box0",
                 b2Vec2(1.5f, -3.5f),
                 utils::to_radians(45.0f),
@@ -273,7 +273,7 @@ void SimulationTests::createTestLists() {
         },
         [=, this](test::Test& test) {
             Simulation simulation;
-            simulation.create_ball(
+            simulation.createBall(
                 "ball0",
                 b2Vec2(1.5f, -3.5f),
                 2.2f,
@@ -301,7 +301,7 @@ void SimulationTests::createTestLists() {
                 b2Vec2 vertex = utils::get_circle_vertex<b2Vec2>(i, 6, 1.0f);
                 vertices.push_back(vertex);
             }
-            simulation.create_polygon(
+            simulation.createPolygon(
                 "polygon0",
                 b2Vec2(1.5f, -3.5f),
                 utils::to_radians(45.0f),
@@ -331,7 +331,7 @@ void SimulationTests::createTestLists() {
                 b2Vec2(-15.0f, 2.0f),
                 b2Vec2(-25.0f, 8.0f),
             };
-            simulation.create_chain(
+            simulation.createChain(
                 "chain0",
                 b2Vec2(1.5f, -3.5f),
                 utils::to_radians(45.0f),
@@ -353,14 +353,14 @@ void SimulationTests::createTestLists() {
         },
         [=, this](test::Test& test) {
             Simulation simulation;
-            BoxObject* box0 = simulation.create_box(
+            BoxObject* box0 = simulation.createBox(
                 "box0",
                 b2Vec2(1.5f, -3.5f),
                 utils::to_radians(45.0f),
                 b2Vec2(1.5f, 2.0f),
                 sf::Color::Green
             );
-            BoxObject* box1 = simulation.create_box(
+            BoxObject* box1 = simulation.createBox(
                 "box1",
                 b2Vec2(0.0f, 5.0f),
                 utils::to_radians(-10.0f),
@@ -404,7 +404,7 @@ void SimulationTests::createTestLists() {
             Simulation simulationA;
             std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
             std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
-            simulationA.create_car(
+            simulationA.createCar(
                 "car0",
                 b2Vec2(0.0f, 0.0f),
                 lengths,
@@ -430,7 +430,7 @@ void SimulationTests::createTestLists() {
         },
         [&](test::Test& test) {
             Simulation simulation;
-            simulation.create_box(
+            simulation.createBox(
                 "box0",
                 b2Vec2(0.0f, 0.0f),
                 utils::to_radians(0.0f),

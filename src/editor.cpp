@@ -52,7 +52,7 @@ BoxObject* Editor::create_box(
     const b2Vec2& size,
     const sf::Color& color
 ) {
-    return simulation.create_box(name, pos, angle, size, color);
+    return simulation.createBox(name, pos, angle, size, color);
 }
 
 BallObject* Editor::create_ball(
@@ -62,7 +62,7 @@ BallObject* Editor::create_ball(
     const sf::Color& color,
     const sf::Color& notch_color
 ) {
-    return simulation.create_ball(name, pos, radius, color, notch_color);
+    return simulation.createBall(name, pos, radius, color, notch_color);
 }
 
 PolygonObject* Editor::create_polygon(
@@ -72,7 +72,7 @@ PolygonObject* Editor::create_polygon(
     const std::vector<b2Vec2>& vertices,
     const sf::Color& color
 ) {
-    return simulation.create_polygon(name, pos, angle, vertices, color);
+    return simulation.createPolygon(name, pos, angle, vertices, color);
 }
 
 PolygonObject* Editor::create_car(
@@ -82,7 +82,7 @@ PolygonObject* Editor::create_car(
     const std::vector<float>& wheels,
     const sf::Color& color
 ) {
-    return simulation.create_car(name, pos, lengths, wheels, color);
+    return simulation.createCar(name, pos, lengths, wheels, color);
 }
 
 ChainObject* Editor::create_chain(
@@ -92,7 +92,7 @@ ChainObject* Editor::create_chain(
     const std::vector<b2Vec2>& vertices,
     const sf::Color& color
 ) {
-    return simulation.create_chain(name, pos, angle, vertices, color);
+    return simulation.createChain(name, pos, angle, vertices, color);
 }
 
 void Editor::onInit() {
@@ -438,13 +438,13 @@ void Editor::onProcessLeftClick() {
         std::string id_string = std::to_string(simulation.getMaxId());
         switch (create_tool.type) {
             case CreateTool::BOX:
-                simulation.create_box(
+                simulation.createBox(
                     "box" + id_string, b2MousePosWorld, 0.0f, NEW_BOX_SIZE, NEW_BOX_COLOR
                 );
                 commit_action = true;
                 break;
             case CreateTool::BALL:
-                simulation.create_ball(
+                simulation.createBall(
                     "ball" + id_string, b2MousePosWorld, NEW_BALL_RADIUS, NEW_BALL_COLOR, NEW_BALL_NOTCH_COLOR
                 );
                 commit_action = true;

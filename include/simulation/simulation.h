@@ -16,35 +16,35 @@ public:
 	std::string serialize(TokenWriter& tw) const;
 	void deserialize(const std::string& str);
 	void deserialize(TokenReader& tr);
-	BoxObject* create_box(
+	BoxObject* createBox(
 		const std::string& name,
 		const b2Vec2& pos,
 		float angle,
 		const b2Vec2& size,
 		const sf::Color& color
 	);
-	BallObject* create_ball(
+	BallObject* createBall(
 		const std::string& name,
 		const b2Vec2& pos,
 		float radius,
 		const sf::Color& color,
 		const sf::Color& notch_color = sf::Color::Transparent
 	);
-	PolygonObject* create_polygon(
+	PolygonObject* createPolygon(
 		const std::string& name,
 		const b2Vec2& pos,
 		float angle,
 		const std::vector<b2Vec2>& vertices,
 		const sf::Color& color
 	);
-	PolygonObject* create_car(
+	PolygonObject* createCar(
 		const std::string& name,
 		const b2Vec2& pos,
 		const std::vector<float>& lengths,
 		const std::vector<float>& wheels,
 		const sf::Color& color
 	);
-	ChainObject* create_chain(
+	ChainObject* createChain(
 		const std::string& name,
 		const b2Vec2& pos,
 		float angle,
@@ -58,6 +58,5 @@ public:
 	);
 
 private:
-	void load_from_file(const std::string& filename);
 
 };

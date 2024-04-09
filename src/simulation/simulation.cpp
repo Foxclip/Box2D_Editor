@@ -10,16 +10,6 @@ void Simulation::advance(float time_step) {
 }
 
 void Simulation::load(const std::string& filename) {
-	load_from_file(filename);
-}
-
-void Simulation::reset() {
-    clear(); 
-    b2Vec2 gravity(0.0f, -9.8f);
-    world = std::make_unique<b2World>(gravity);
-}
-
-void Simulation::load_from_file(const std::string& filename) {
     LoggerTag tag_saveload("saveload");
     try {
         std::string str = utils::file_to_str(filename);
@@ -28,6 +18,12 @@ void Simulation::load_from_file(const std::string& filename) {
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": " + filename + ": " + std::string(exc.what()));
     }
+}
+
+void Simulation::reset() {
+    clear(); 
+    b2Vec2 gravity(0.0f, -9.8f);
+    world = std::make_unique<b2World>(gravity);
 }
 
 std::string Simulation::serialize() const {
@@ -138,7 +134,7 @@ void Simulation::deserialize(TokenReader& tr) {
     }
 }
 
-BoxObject* Simulation::create_box(
+BoxObject* Simulation::createBox(
     const std::string& name,
     const b2Vec2& pos,
     float angle,
@@ -158,7 +154,7 @@ BoxObject* Simulation::create_box(
     return ptr;
 }
 
-BallObject* Simulation::create_ball(
+BallObject* Simulation::createBall(
     const std::string& name,
     const b2Vec2& pos,
     float radius,
@@ -177,7 +173,7 @@ BallObject* Simulation::create_ball(
     return ptr;
 }
 
-PolygonObject* Simulation::create_polygon(
+PolygonObject* Simulation::createPolygon(
     const std::string& name,
     const b2Vec2& pos,
     float angle,
@@ -197,7 +193,7 @@ PolygonObject* Simulation::create_polygon(
     return ptr;
 }
 
-PolygonObject* Simulation::create_car(
+PolygonObject* Simulation::createCar(
     const std::string& name,
     const b2Vec2& pos,
     const std::vector<float>& lengths,
@@ -212,7 +208,7 @@ PolygonObject* Simulation::create_car(
         b2Vec2 pos = utils::get_pos<b2Vec2>(lengths, i);
         vertices.push_back(pos);
     }
-    PolygonObject* car = create_polygon(name, pos, 0.0f, vertices, color);
+    PolygonObject* car = createPolygon(name, pos, 0.0f, vertices, color);
     size_t wheel_count = 0;
     for (size_t i = 0; i < wheels.size(); i++) {
         if (wheels[i] == 0.0f) {
@@ -223,7 +219,7 @@ PolygonObject* Simulation::create_car(
         b2Vec2 anchor_pos_world = car->rigid_body->GetPosition() + anchor_pos;
         float radius = wheels[i];
         std::string wheel_name = car->getName() + " wheel" + std::to_string(wheel_count);
-        BallObject* wheel = create_ball(
+        BallObject* wheel = createBall(
             wheel_name, anchor_pos_world, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
         );
         wheel->setDensity(1.0f, false);
@@ -242,7 +238,7 @@ PolygonObject* Simulation::create_car(
     return car;
 }
 
-ChainObject* Simulation::create_chain(
+ChainObject* Simulation::createChain(
     const std::string& name,
     const b2Vec2& pos,
     float angle,
