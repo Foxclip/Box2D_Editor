@@ -116,7 +116,7 @@ namespace test {
 		template<typename T1, typename T2, typename TStr>
 		bool testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str);
 		template<typename T>
-		bool testApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, T epsilon = 0.001f);
+		bool testApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, T epsilon = 0.0001f);
 		template<typename T>
 		static bool equals(T left, T right, T epsilon = 0.001f);
 

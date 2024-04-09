@@ -423,4 +423,24 @@ void SimulationTests::createTestLists() {
             }
         }
     );
+    test::Test* advance_test = list->addTest(
+        "advance",
+        {
+            box_test
+        },
+        [&](test::Test& test) {
+            Simulation simulation;
+            simulation.create_box(
+                "box0",
+                b2Vec2(0.0f, 0.0f),
+                utils::to_radians(0.0f),
+                b2Vec2(1.0f, 1.0f),
+                sf::Color::Green
+            );
+            BoxObject* box = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
+            simulation.advance(1.0f / 60.0f);
+            tApproxCompare(box->getGlobalPosition().x, 0.0f);
+            tApproxCompare(box->getGlobalPosition().y, -0.002722f);
+        }
+    );
 }

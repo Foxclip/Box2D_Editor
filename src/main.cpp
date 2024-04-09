@@ -52,8 +52,9 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: make gameobject and joint == operator actually virtual
-    // TODO: Simulation tests
+    // TODO: Simulation load test
+    // TODO: advancing Simulation tests
+    // TODO: ObjectList tests
     // TODO: Widget tests
     // TODO: blinking textbox cursor
     // TODO: remove global.h
