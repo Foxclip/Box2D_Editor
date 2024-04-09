@@ -11,6 +11,7 @@ public:
 	Simulation();
 	void advance(float time_step);
 	void load(const std::string& filename);
+	void save(const std::string& filename) const;
 	void reset();
 	std::string serialize() const;
 	std::string serialize(TokenWriter& tw) const;

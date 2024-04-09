@@ -20,6 +20,17 @@ void Simulation::load(const std::string& filename) {
     }
 }
 
+void Simulation::save(const std::string& filename) const {
+    LoggerTag tag_saveload("saveload");
+    try {
+        std::string str = serialize();
+        utils::str_to_file(str, filename);
+        logger << "Simulation saved to " << filename << "\n";
+    } catch (std::exception exc) {
+        throw std::runtime_error(__FUNCTION__": " + filename + ": " + std::string(exc.what()));
+    }
+}
+
 void Simulation::reset() {
     clear();
     b2Vec2 gravity(0.0f, -9.8f);

@@ -37,6 +37,13 @@ void SimulationTests::createTestLists() {
             tCompare(jointB->getAnchorB().y, jointA->getAnchorB().y);
             tCompare(jointB->getCollideConnected(), jointA->getCollideConnected());
         };
+    std::function<void(test::Test&, BoxObject*, BoxObject*)> box_cmp =
+        [&, obj_cmp_common](test::Test& test, BoxObject* boxA, BoxObject* boxB) {
+            tCheck(*boxA == *boxB);
+            obj_cmp_common(test, boxA, boxB);
+            tCompare(boxB->size.x, boxA->size.x);
+            tCompare(boxB->size.y, boxA->size.y);
+        };
 
     test::Test* basic_test = list->addTest(
         "basic",
@@ -260,10 +267,7 @@ void SimulationTests::createTestLists() {
             std::string str = boxA->serialize();
             std::unique_ptr<BoxObject> uptr = BoxObject::deserialize(str, &simulation);
             BoxObject* boxB = uptr.get();
-            tCheck(*boxA == *boxB);
-            obj_cmp_common(test, boxA, boxB);
-            tCompare(boxB->size.x, boxA->size.x);
-            tCompare(boxB->size.y, boxA->size.y);
+            box_cmp(test, boxA, boxB);
         }
     );
     test::Test* ball_serialize_test = list->addTest(
@@ -441,6 +445,35 @@ void SimulationTests::createTestLists() {
             simulation.advance(1.0f / 60.0f);
             tApproxCompare(box->getGlobalPosition().x, 0.0f);
             tApproxCompare(box->getGlobalPosition().y, -0.002722f);
+        }
+    );
+    test::Test* saveload_test = list->addTest(
+        "saveload",
+        {
+            box_test
+        },
+        [=, this](test::Test& test) {
+            Simulation simulationA;
+            simulationA.createBox(
+                "box0",
+                b2Vec2(1.5f, -3.5f),
+                utils::to_radians(45.0f),
+                b2Vec2(1.1f, 2.0f),
+                sf::Color::Green
+            );
+            BoxObject* boxA = dynamic_cast<BoxObject*>(simulationA.getFromAll(0));
+            const std::filesystem::path tmp_dir = "tests/_tmp";
+            if (!std::filesystem::exists(tmp_dir)) {
+                std::filesystem::create_directory(tmp_dir);
+            }
+            const std::filesystem::path temp_filename = tmp_dir / "box.txt";
+            simulationA.save(temp_filename.string());
+            Simulation simulationB;
+            simulationB.load(temp_filename.string());
+            tAssertCompare(simulationB.getAllSize(), 1);
+            BoxObject* boxB = dynamic_cast<BoxObject*>(simulationB.getFromAll(0));
+            tAssert(boxB, "Object is not a BoxObject");
+            box_cmp(test, boxA, boxB);
         }
     );
 }
