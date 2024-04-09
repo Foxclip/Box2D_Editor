@@ -1,0 +1,87 @@
+simulation
+
+    object chain
+        id 0
+        name "ground"
+        vertices 8 0 -8 0
+        color 255 255 255 255
+        body
+            type static
+            position 0 0
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 1
+        name "box0"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -0.011257356 0.51499939
+            angle 6.65536604e-08
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 2
+        name "box1"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position 1.44276547 0.514999688
+            angle -1.57079625
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 3
+        name "box3"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position 3.48226285 0.516706109
+            angle -1.57421482
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+/simulation

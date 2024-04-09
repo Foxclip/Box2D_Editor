@@ -476,4 +476,54 @@ void SimulationTests::createTestLists() {
             box_cmp(test, boxA, boxB);
         }
     );
+    test::Test* box_stack_test = list->addTest(
+        "box_stack",
+        {
+            advance_test,
+            saveload_test
+        },
+        [&](test::Test& test) {
+            Simulation simulationA;
+            std::vector<b2Vec2> ground_vertices = {
+                b2Vec2(8.0f, 0.0f),
+                b2Vec2(-8.0f, 0.0f),
+            };
+            ChainObject* ground = simulationA.createChain(
+                "ground",
+                b2Vec2(0.0f, 0.0f),
+                utils::to_radians(0.0f),
+                ground_vertices,
+                sf::Color(255, 255, 255)
+            );
+            BoxObject* box0 = simulationA.createBox(
+                "box0",
+                b2Vec2(0.0f, 0.6f),
+                utils::to_radians(0.0f),
+                b2Vec2(1.0f, 1.0f),
+                sf::Color(0, 255, 0)
+            );
+            BoxObject* box1 = simulationA.createBox(
+                "box1",
+                b2Vec2(0.5f, 1.7f),
+                utils::to_radians(0.0f),
+                b2Vec2(1.0f, 1.0f),
+                sf::Color(0, 255, 0)
+            );
+            BoxObject* box2 = simulationA.createBox(
+                "box3",
+                b2Vec2(1.0f, 2.8f),
+                utils::to_radians(0.0f),
+                b2Vec2(1.0f, 1.0f),
+                sf::Color(0, 255, 0)
+            );
+            const int fps = 60;
+            float advance_time = 3.0f;
+            for (size_t i = 0; i < fps * advance_time; i++) {
+                simulationA.advance(1.0f / fps);
+            }
+            Simulation simulationB;
+            simulationB.load("tests/box_stack.txt");
+            tCheck(simulationA == simulationB);
+        }
+    );
 }

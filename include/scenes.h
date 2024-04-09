@@ -208,3 +208,38 @@ void parent_loop(Editor& app) {
     box0->setParent(box1);
     box1->setParent(box0);
 }
+
+void box_stack(Editor& app) {
+    std::vector<b2Vec2> ground_vertices = {
+        b2Vec2(8.0f, 0.0f),
+        b2Vec2(-8.0f, 0.0f),
+    };
+    ChainObject* ground = app.createChain(
+        "ground",
+        b2Vec2(0.0f, 0.0f),
+        utils::to_radians(0.0f),
+        ground_vertices,
+        sf::Color(255, 255, 255)
+    );
+    BoxObject* box0 = app.createBox(
+        "box0",
+        b2Vec2(0.0f, 0.6f),
+        utils::to_radians(0.0f),
+        b2Vec2(1.0f, 1.0f),
+        sf::Color(0, 255, 0)
+    );
+    BoxObject* box1 = app.createBox(
+        "box1",
+        b2Vec2(0.5f, 1.7f),
+        utils::to_radians(0.0f),
+        b2Vec2(1.0f, 1.0f),
+        sf::Color(0, 255, 0)
+    );
+    BoxObject* box2 = app.createBox(
+        "box3",
+        b2Vec2(1.0f, 2.8f),
+        utils::to_radians(0.0f),
+        b2Vec2(1.0f, 1.0f),
+        sf::Color(0, 255, 0)
+    );
+}

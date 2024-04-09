@@ -280,3 +280,15 @@ RevoluteJoint* Simulation::createRevoluteJoint(
     addJoint(std::move(uptr));
     return ptr;
 }
+
+bool Simulation::operator==(const Simulation& other) const {
+    if (getAllSize() != other.getAllSize()) {
+        return false;
+    }
+    for (size_t i = 0; i < getAllSize(); i++) {
+        if (*getFromAll(i) != *other.getFromAll(i)) {
+            return false;
+        }
+    }
+    return true;
+}

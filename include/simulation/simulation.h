@@ -57,6 +57,7 @@ public:
 		GameObject* obj1,
 		GameObject* obj2
 	);
+	bool operator==(const Simulation& other) const;
 
 private:
 

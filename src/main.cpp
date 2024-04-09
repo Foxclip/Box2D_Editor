@@ -34,6 +34,7 @@ void execute_app() {
         //convex_polygon(app);
         //duplication(app);
         //parent_loop(app);
+        //box_stack(app);
         app.start();
     } catch (std::string msg) {
         logger << "ERROR: " << msg << "\n";
@@ -52,8 +53,6 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: Simulation load test
-    // TODO: advancing Simulation tests
     // TODO: ObjectList tests
     // TODO: Widget tests
     // TODO: blinking textbox cursor
