@@ -19,7 +19,7 @@ Toolbox::Toolbox(fw::WidgetList& widget_list, Editor& p_app)
         tool_widget->setFillColor(sf::Color(128, 128, 128));
         tool_widget->setOutlineColor(sf::Color::Yellow);
         tool_widget->OnClick = [=](const sf::Vector2f& pos) {
-            app.try_select_tool(tool);
+            app.trySelectTool(tool);
         };
         tool_widget->OnMouseEnter = [=](const sf::Vector2f pos) {
             tool_widget->setOutlineThickness(-1.0f);

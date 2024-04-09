@@ -11,12 +11,12 @@ void scene1(Editor& app) {
         b2Vec2(-15.0f, 2.0f),
         b2Vec2(-25.0f, 8.0f),
     };
-    GameObject* ground = app.create_chain("ground", b2Vec2(0.0f, 0.0f), 0.0f, ground_vertices, sf::Color(255, 255, 255));
+    GameObject* ground = app.createChain("ground", b2Vec2(0.0f, 0.0f), 0.0f, ground_vertices, sf::Color(255, 255, 255));
 
-    GameObject* box0 = app.create_box("box0", b2Vec2(0.0f, 1.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color(0, 255, 0));
-    GameObject* box1 = app.create_box("box1", b2Vec2(0.1f, 2.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color(0, 255, 0));
-    GameObject* box2 = app.create_box("box2", b2Vec2(0.2f, 3.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color(0, 255, 0));
-    GameObject* ball = app.create_ball("ball0", b2Vec2(0.0f, 5.0f), 0.5f, sf::Color(0, 255, 0), sf::Color(0, 64, 0));
+    GameObject* box0 = app.createBox("box0", b2Vec2(0.0f, 1.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color(0, 255, 0));
+    GameObject* box1 = app.createBox("box1", b2Vec2(0.1f, 2.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color(0, 255, 0));
+    GameObject* box2 = app.createBox("box2", b2Vec2(0.2f, 3.0f), utils::to_radians(0.0f), b2Vec2(1.0f, 1.0f), sf::Color(0, 255, 0));
+    GameObject* ball = app.createBall("ball0", b2Vec2(0.0f, 5.0f), 0.5f, sf::Color(0, 255, 0), sf::Color(0, 64, 0));
     CompVector<GameObject*> dynamic_objects = { box0, box1, box2, ball };
     for (size_t i = 0; i < dynamic_objects.size(); i++) {
         GameObject* box = dynamic_objects[i];
@@ -28,7 +28,7 @@ void scene1(Editor& app) {
 
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
     std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
-    GameObject* car = app.create_car("car0", b2Vec2(0.0f, 10.0f), lengths, wheels, sf::Color(255, 0, 0));
+    GameObject* car = app.createCar("car0", b2Vec2(0.0f, 10.0f), lengths, wheels, sf::Color(255, 0, 0));
     car->setType(b2_dynamicBody, false);
     car->setDensity(1.0f, false);
     car->setFriction(0.3f, false);
@@ -39,7 +39,7 @@ void scene1(Editor& app) {
 }
 
 void single_box(Editor& app) {
-    GameObject* box0 = app.create_box(
+    GameObject* box0 = app.createBox(
         "box0",
         b2Vec2(0.0f, 0.0f),
         utils::to_radians(0.0f),
@@ -51,7 +51,7 @@ void single_box(Editor& app) {
 }
 
 void single_ball(Editor& app) {
-    GameObject* ball = app.create_ball(
+    GameObject* ball = app.createBall(
         "ball0",
         b2Vec2(0.0f, 0.0f),
         0.5f,
@@ -71,7 +71,7 @@ void ground_transform(Editor& app) {
         b2Vec2(-15.0f, 2.0f),
         b2Vec2(-25.0f, 8.0f),
     };
-    GameObject* ground = app.create_chain(
+    GameObject* ground = app.createChain(
         "ground",
         b2Vec2(0.0f, 5.0f),
         utils::to_radians(45.0f),
@@ -85,7 +85,7 @@ void ground_transform(Editor& app) {
 void single_car(Editor& app) {
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
     std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
-    GameObject* car = app.create_car("car0", b2Vec2(0.0f, 0.0f), lengths, wheels, sf::Color(255, 0, 0));
+    GameObject* car = app.createCar("car0", b2Vec2(0.0f, 0.0f), lengths, wheels, sf::Color(255, 0, 0));
     car->setType(b2_dynamicBody, false);
     car->setDensity(1.0f, false);
     car->setFriction(0.3f, false);
@@ -103,14 +103,14 @@ void multiple_chains(Editor& app) {
         b2Vec2(-15.0f, 2.0f),
         b2Vec2(-25.0f, 8.0f),
     };
-    GameObject* chain1 = app.create_chain(
+    GameObject* chain1 = app.createChain(
         "chain0",
         b2Vec2(0.0f, 0.0f),
         utils::to_radians(0.0f),
         ground_vertices,
         sf::Color(255, 255, 255)
     );
-    GameObject* chain2 = app.create_chain(
+    GameObject* chain2 = app.createChain(
         "chain1",
         b2Vec2(0.0f, 5.0f),
         utils::to_radians(0.0f),
@@ -124,7 +124,7 @@ void multiple_chains(Editor& app) {
 void polygon(Editor& app) {
     std::vector<float> lengths = { 5.0f, 5.0f, 5.0f, 5.0f };
     std::vector<float> wheels = { 0.0f, 0.0f, 0.0f, 0.0f };
-    GameObject* car = app.create_car("polygon0", b2Vec2(0.0f, 0.0f), lengths, wheels, sf::Color(255, 0, 0));
+    GameObject* car = app.createCar("polygon0", b2Vec2(0.0f, 0.0f), lengths, wheels, sf::Color(255, 0, 0));
     car->setType(b2_dynamicBody, false);
     car->setDensity(1.0f, false);
     car->setFriction(0.3f, false);
@@ -134,21 +134,21 @@ void polygon(Editor& app) {
 }
 
 void box_parent(Editor& app) {
-    GameObject* parent = app.create_box(
+    GameObject* parent = app.createBox(
         "parent",
         b2Vec2(0.0f, 0.0f),
         utils::to_radians(0.0f),
         b2Vec2(1.0f, 1.0f),
         sf::Color(0, 255, 0)
     );
-    GameObject* child = app.create_box(
+    GameObject* child = app.createBox(
         "child",
         b2Vec2(2.0f, 0.0f),
         utils::to_radians(0.0f),
         b2Vec2(1.0f, 1.0f),
         sf::Color(0, 255, 0)
     );
-    GameObject* another_child = app.create_box(
+    GameObject* another_child = app.createBox(
         "another child",
         b2Vec2(4.0f, 0.0f),
         utils::to_radians(0.0f),
@@ -169,7 +169,7 @@ void convex_polygon(Editor& app) {
         b2Vec2 pos = utils::get_circle_vertex<b2Vec2>(i, VERTEX_COUNT, 1.0f);
         vertices.push_back(pos);
     }
-    PolygonObject* polygon = app.create_polygon("polygon", b2Vec2(0.0f, 0.0f), 0.0f, vertices, sf::Color(255, 0, 0));
+    PolygonObject* polygon = app.createPolygon("polygon", b2Vec2(0.0f, 0.0f), 0.0f, vertices, sf::Color(255, 0, 0));
     polygon->setType(b2_dynamicBody, false);
     polygon->setDensity(1.0f, false);
     polygon->setFriction(0.3f, false);
@@ -190,14 +190,14 @@ void duplication(Editor& app) {
 }
 
 void parent_loop(Editor& app) {
-    GameObject* box0 = app.create_box(
+    GameObject* box0 = app.createBox(
         "box0",
         b2Vec2(0.0f, 0.0f),
         utils::to_radians(0.0f),
         b2Vec2(1.0f, 1.0f),
         sf::Color(0, 255, 0)
     );
-    GameObject* box1 = app.create_box(
+    GameObject* box1 = app.createBox(
         "box1",
         b2Vec2(2.0f, 0.0f),
         utils::to_radians(0.0f),

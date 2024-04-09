@@ -21,7 +21,7 @@ void Simulation::load(const std::string& filename) {
 }
 
 void Simulation::reset() {
-    clear(); 
+    clear();
     b2Vec2 gravity(0.0f, -9.8f);
     world = std::make_unique<b2World>(gravity);
 }

@@ -21,7 +21,7 @@ void Editor::init() {
 }
 
 void Editor::load(const std::string& filename) {
-    load_from_file(filename);
+    loadFromFile(filename);
 }
 
 void Editor::setCameraPos(float x, float y) {
@@ -45,7 +45,7 @@ Simulation& Editor::getSimulation() {
     return simulation;
 }
 
-BoxObject* Editor::create_box(
+BoxObject* Editor::createBox(
     const std::string& name,
     const b2Vec2& pos,
     float angle,
@@ -55,7 +55,7 @@ BoxObject* Editor::create_box(
     return simulation.createBox(name, pos, angle, size, color);
 }
 
-BallObject* Editor::create_ball(
+BallObject* Editor::createBall(
     const std::string& name,
     const b2Vec2& pos,
     float radius,
@@ -65,7 +65,7 @@ BallObject* Editor::create_ball(
     return simulation.createBall(name, pos, radius, color, notch_color);
 }
 
-PolygonObject* Editor::create_polygon(
+PolygonObject* Editor::createPolygon(
     const std::string& name,
     const b2Vec2& pos,
     float angle,
@@ -75,7 +75,7 @@ PolygonObject* Editor::create_polygon(
     return simulation.createPolygon(name, pos, angle, vertices, color);
 }
 
-PolygonObject* Editor::create_car(
+PolygonObject* Editor::createCar(
     const std::string& name,
     const b2Vec2& pos,
     const std::vector<float>& lengths,
@@ -85,7 +85,7 @@ PolygonObject* Editor::create_car(
     return simulation.createCar(name, pos, lengths, wheels, color);
 }
 
-ChainObject* Editor::create_chain(
+ChainObject* Editor::createChain(
     const std::string& name,
     const b2Vec2& pos,
     float angle,
@@ -111,13 +111,13 @@ void Editor::onInit() {
     if (!selection_shader.loadFromFile("shaders/selection.frag", sf::Shader::Fragment)) {
         throw std::runtime_error("Shader loading error");
     }
-    init_tools();
-    init_ui();
-    logger.OnLineWrite = [&](std::string line) { // should be after init_ui and preferably before any logging
+    initTools();
+    initUi();
+    logger.OnLineWrite = [&](std::string line) { // should be after initUi and preferably before any logging
         logger_text_widget->setString(line);
     };
-    try_select_tool_by_index(0); // should be after init_tools and init_ui
-    select_create_type(0);
+    trySelectToolByIndex(0); // should be after initTools and initUi
+    selectCreateType(0);
     maximizeWindow();
     auto getter = [&]() { return serialize(); };
     auto setter = [&](std::string str) { deserialize(str, false); };
@@ -164,7 +164,7 @@ void Editor::onProcessWindowEvent(const sf::Event& event) {
     }
 }
 
-void Editor::init_tools() {
+void Editor::initTools() {
     for (size_t i = 0; i < tools.size(); i++) {
         tools[i]->reset();
     }
@@ -180,12 +180,12 @@ void Editor::init_tools() {
     };
 }
 
-void Editor::init_ui() {
-    load_font(ui_font, "fonts/STAN0757.TTF");
-    load_font(fps_font, "fonts/fraps.ttf");
-    load_font(console_font, "fonts/courbd.ttf");
-    load_font(small_font, "fonts/HelvetiPixel.ttf");
-    load_font(textbox_font, "fonts/verdana.ttf");
+void Editor::initUi() {
+    loadFont(ui_font, "fonts/STAN0757.TTF");
+    loadFont(fps_font, "fonts/fraps.ttf");
+    loadFont(console_font, "fonts/courbd.ttf");
+    loadFont(small_font, "fonts/HelvetiPixel.ttf");
+    loadFont(textbox_font, "fonts/verdana.ttf");
 
     arrow_cursor.loadFromSystem(sf::Cursor::Arrow);
     text_cursor.loadFromSystem(sf::Cursor::Text);
@@ -204,10 +204,10 @@ void Editor::init_ui() {
     object_info_text.setCharacterSize(16);
     object_info_text.setFillColor(sf::Color::White);
 
-    init_widgets();
+    initWidgets();
 }
 
-void Editor::init_widgets() {
+void Editor::initWidgets() {
     toolbox_widget = widgets.createWidget<Toolbox>(*this);
     edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(*this);
     create_tool.create_panel_widget = widgets.createWidget<CreatePanel>(*this);
@@ -287,32 +287,32 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                         obj->setGlobalPosition(obj->orig_pos);
                         obj->setEnabled(obj->was_enabled, true);
                     }
-                    try_select_tool(&select_tool);
+                    trySelectTool(&select_tool);
                 } else if (selected_tool == &rotate_tool) {
                     for (GameObject* obj : rotate_tool.rotating_objects) {
                         obj->setGlobalPosition(obj->orig_pos);
                         obj->setGlobalAngle(obj->orig_angle);
                         obj->setEnabled(obj->was_enabled, true);
                     }
-                    try_select_tool(&select_tool);
+                    trySelectTool(&select_tool);
                 }
                 break;
-            case sf::Keyboard::Space: toggle_pause(); break;
-            case sf::Keyboard::Num1: try_select_tool_by_index(0); break;
-            case sf::Keyboard::Num2: try_select_tool_by_index(1); break;
-            case sf::Keyboard::Num3: try_select_tool_by_index(2); break;
-            case sf::Keyboard::Num4: try_select_tool_by_index(3); break;
-            case sf::Keyboard::Num5: try_select_tool_by_index(4); break;
-            case sf::Keyboard::Num6: try_select_tool_by_index(5); break;
-            case sf::Keyboard::Num7: try_select_tool_by_index(6); break;
-            case sf::Keyboard::Num8: try_select_tool_by_index(7); break;
-            case sf::Keyboard::Num9: try_select_tool_by_index(8); break;
-            case sf::Keyboard::Num0: try_select_tool_by_index(9); break;
+            case sf::Keyboard::Space: togglePause(); break;
+            case sf::Keyboard::Num1: trySelectToolByIndex(0); break;
+            case sf::Keyboard::Num2: trySelectToolByIndex(1); break;
+            case sf::Keyboard::Num3: trySelectToolByIndex(2); break;
+            case sf::Keyboard::Num4: trySelectToolByIndex(3); break;
+            case sf::Keyboard::Num5: trySelectToolByIndex(4); break;
+            case sf::Keyboard::Num6: trySelectToolByIndex(5); break;
+            case sf::Keyboard::Num7: trySelectToolByIndex(6); break;
+            case sf::Keyboard::Num8: trySelectToolByIndex(7); break;
+            case sf::Keyboard::Num9: trySelectToolByIndex(8); break;
+            case sf::Keyboard::Num0: trySelectToolByIndex(9); break;
             case sf::Keyboard::X:
                 if (selected_tool == &select_tool) {
                     CompVector<GameObject*> selected_copy = select_tool.getSelectedObjects();
                     for (GameObject* obj : selected_copy | std::views::reverse) {
-                        delete_object(obj, false);
+                        deleteObject(obj, false);
                         commit_action = true;
                     }
                 } else if (selected_tool == &edit_tool && active_object) {
@@ -325,7 +325,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
             case sf::Keyboard::LAlt: edit_tool.mode = EditTool::INSERT; break;
             case sf::Keyboard::S:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
-                    save_to_file("levels/level.txt");
+                    saveToFile("levels/level.txt");
                 }
                 break;
             case sf::Keyboard::Z:
@@ -364,22 +364,22 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                 break;
             case sf::Keyboard::Tab:
                 if (selected_tool == &edit_tool) {
-                    try_select_tool(&select_tool);
+                    trySelectTool(&select_tool);
                 } else if (selected_tool == &select_tool && active_object) {
-                    try_select_tool(&edit_tool);
+                    trySelectTool(&edit_tool);
                 }
                 break;
             case sf::Keyboard::G:
                 if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
-                    try_select_tool(&move_tool);
-                    grab_selected();
+                    trySelectTool(&move_tool);
+                    grabSelected();
                     startMoveGesture();
                 }
                 break;
             case sf::Keyboard::R:
                 if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
-                    try_select_tool(&rotate_tool);
-                    rotate_selected();
+                    trySelectTool(&rotate_tool);
+                    rotateSelected();
                     startMoveGesture();
                 }
                 break;
@@ -389,8 +389,8 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                         CompVector<GameObject*> old_objects = select_tool.getSelectedObjects();
                         CompVector<GameObject*> new_objects = simulation.duplicate(old_objects);
                         select_tool.setSelected(new_objects);
-                        try_select_tool(&move_tool);
-                        grab_selected();
+                        trySelectTool(&move_tool);
+                        grabSelected();
                         commit_action = true;
                         startMoveGesture();
                     }
@@ -423,7 +423,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
 }
 
 void Editor::beforeProcessMouseEvent(const sf::Event& event) {
-    sfMousePosWorld = pixel_to_world(mousePos);
+    sfMousePosWorld = pixelToWorld(mousePos);
     b2MousePosWorld = tob2(sfMousePosWorld);
 }
 
@@ -451,7 +451,7 @@ void Editor::onProcessLeftClick() {
                 break;
         }
     } else if (selected_tool == &drag_tool) {
-        b2Fixture* grabbed_fixture = get_fixture_at(mousePosf);
+        b2Fixture* grabbed_fixture = getFixtureAt(mousePosf);
         if (grabbed_fixture) {
             b2BodyDef mouse_body_def;
             b2Body* mouse_body = simulation.getWorld()->CreateBody(&mouse_body_def);
@@ -482,14 +482,14 @@ void Editor::onProcessLeftClick() {
             obj->setEnabled(obj->was_enabled, true);
             commit_action = true;
         }
-        try_select_tool(&select_tool);
+        trySelectTool(&select_tool);
     } else if (selected_tool == &rotate_tool) {
         for (GameObject* obj : rotate_tool.rotating_objects) {
             //TODO: remember state for all children
             obj->setEnabled(obj->was_enabled, true);
             commit_action = true;
         }
-        try_select_tool(&select_tool);
+        trySelectTool(&select_tool);
     } else if (selected_tool == &edit_tool && active_object) {
         if (edit_tool.mode == EditTool::HOVER) {
             if (edit_tool.highlighted_vertex != -1) {
@@ -528,7 +528,7 @@ void Editor::onProcessLeftClick() {
 void Editor::onProcessLeftRelease() {
     if (selected_tool == &select_tool) {
         if (utils::length(mousePosf - mousePressPosf) < MOUSE_DRAG_THRESHOLD) {
-            GameObject* object = get_object_at(mousePosf);
+            GameObject* object = getObjectAt(mousePosf);
             setActiveObject(object);
             bool with_children = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
@@ -565,7 +565,7 @@ void Editor::onProcessMouse() {
     if (selected_tool == &select_tool) {
         {
             GameObject* old_hover = select_tool.hover_object;
-            GameObject* new_hover = get_object_at(mousePosf);
+            GameObject* new_hover = getObjectAt(mousePosf);
             if (old_hover) {
                 old_hover->hover = false;
             }
@@ -576,11 +576,11 @@ void Editor::onProcessMouse() {
         }
     } else if (selected_tool == &edit_tool) {
         if (edit_tool.mode == EditTool::HOVER) {
-            edit_tool.highlighted_vertex = mouse_get_object_vertex();
+            edit_tool.highlighted_vertex = mouseGetObjectVertex();
         } else if (edit_tool.mode == EditTool::ADD) {
-            edit_tool.edge_vertex = mouse_get_edge_vertex();
+            edit_tool.edge_vertex = mouseGetEdgeVertex();
         } else if (edit_tool.mode == EditTool::INSERT) {
-            edit_tool.highlighted_edge = mouse_get_object_edge();
+            edit_tool.highlighted_edge = mouseGetObjectEdge();
             if (edit_tool.highlighted_edge != -1) {
                 b2Vec2 v1 = active_object->getGlobalVertexPos(edit_tool.highlighted_edge);
                 b2Vec2 v2 = active_object->getGlobalVertexPos(active_object->indexLoop(edit_tool.highlighted_edge + 1));
@@ -605,10 +605,10 @@ void Editor::onProcessMouse() {
     if (leftButtonPressed) {
         if (selected_tool == &select_tool) {
             if (select_tool.rectangle_select.active) {
-                select_objects_in_rect(select_tool.rectangle_select);
+                selectObjectsInRect(select_tool.rectangle_select);
             } else if (utils::length(mousePosf - mousePressPosf) >= MOUSE_DRAG_THRESHOLD) {
                 select_tool.rectangle_select.active = true;
-                select_tool.rectangle_select.select_origin = screen_to_world(mousePressPosf);
+                select_tool.rectangle_select.select_origin = screenToWorld(mousePressPosf);
                 if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
                     select_tool.clearSelected();
                 }
@@ -620,7 +620,7 @@ void Editor::onProcessMouse() {
         } else if (selected_tool == &edit_tool) {
             if (edit_tool.mode == EditTool::SELECT) {
                 if (edit_tool.rectangle_select.active) {
-                    select_vertices_in_rect(edit_tool.rectangle_select);
+                    selectVerticesInRect(edit_tool.rectangle_select);
                 }
             } else if (edit_tool.mode == EditTool::MOVE) {
                 if (edit_tool.grabbed_vertex != -1) {
@@ -654,7 +654,7 @@ void Editor::afterProcessInput() {
         quickload_requested = false;
     }
     if (load_request.requested) {
-        load_from_file(load_request.filename);
+        loadFromFile(load_request.filename);
         history.save("Load");
         load_request.requested = false;
     }
@@ -667,11 +667,11 @@ void Editor::onProcessWorld() {
 }
 
 void Editor::onRender() {
-    render_world();
-    render_ui();
+    renderWorld();
+    renderUi();
 }
 
-void Editor::render_world() {
+void Editor::renderWorld() {
     world_texture.clear(sf::Color(0, 0, 0));
     world_view.setCenter(viewCenterX, viewCenterY);
     world_view.setSize(world_texture.getSize().x / zoomFactor, -1.0f * world_texture.getSize().y / zoomFactor);
@@ -708,7 +708,7 @@ void Editor::render_world() {
     window.draw(selection_sprite, &selection_shader);
 }
 
-void Editor::render_ui() {
+void Editor::renderUi() {
     ui_texture.clear(sf::Color(0, 0, 0, 0));
     ui_view.setCenter(ui_texture.getSize().x / 2.0f, ui_texture.getSize().y / 2.0f);
     ui_view.setSize((float)ui_texture.getSize().x, (float)ui_texture.getSize().y);
@@ -719,8 +719,8 @@ void Editor::render_ui() {
         // parent relation lines
         for (GameObject* object : simulation.getAllVector()) {
             for (GameObject* child : object->getChildren()) {
-                sf::Vector2f v1 = world_to_screen(object->getGlobalPosition());
-                sf::Vector2f v2 = world_to_screen(child->getGlobalPosition());
+                sf::Vector2f v1 = worldToScreen(object->getGlobalPosition());
+                sf::Vector2f v2 = worldToScreen(child->getGlobalPosition());
                 draw_line(target, v1, v2, sf::Color(128, 128, 128));
             }
         }
@@ -729,7 +729,7 @@ void Editor::render_ui() {
             GameObject* gameobject = simulation.getFromAll(i);
             sf::Color circle_color = gameobject == active_object ? sf::Color(255, 255, 0) : sf::Color(255, 159, 44);
             origin_shape.setFillColor(circle_color);
-            origin_shape.setPosition(world_to_screen(gameobject->getGlobalPosition()));
+            origin_shape.setPosition(worldToScreen(gameobject->getGlobalPosition()));
             target.draw(origin_shape);
         }
         // object info
@@ -737,7 +737,7 @@ void Editor::render_ui() {
             GameObject* gameobject = simulation.getFromAll(i);
             size_t info_index = 0;
             auto render_info = [&](const std::string& str) {
-                sf::Vector2f object_screen_pos = world_to_screen(gameobject->getGlobalPosition());
+                sf::Vector2f object_screen_pos = worldToScreen(gameobject->getGlobalPosition());
                 float line_scaling = 3.0f / 4.0f;
                 sf::Vector2f offset = sf::Vector2f(0.0f, info_index * object_info_text.getCharacterSize() * line_scaling);
                 sf::Vector2f pos = object_screen_pos + offset;
@@ -762,29 +762,29 @@ void Editor::render_ui() {
 
     if (selected_tool == &select_tool) {
         if (select_tool.rectangle_select.active) {
-            render_rectangle_select(target, select_tool.rectangle_select);
+            renderRectangleSelect(target, select_tool.rectangle_select);
         }
     } else if (selected_tool == &drag_tool) {
         if (drag_tool.mouse_joint) {
-            sf::Vector2f grabbed_point = world_to_screen(drag_tool.mouse_joint->GetAnchorB());
+            sf::Vector2f grabbed_point = worldToScreen(drag_tool.mouse_joint->GetAnchorB());
             draw_line(target, grabbed_point, mousePosf, sf::Color::Yellow);
         }
     } else if (selected_tool == &rotate_tool) {
         for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
-            draw_line(target, world_to_screen(rotate_tool.pivot_pos), mousePosf, sf::Color::Yellow);
+            draw_line(target, worldToScreen(rotate_tool.pivot_pos), mousePosf, sf::Color::Yellow);
         }
     } else if (selected_tool == &edit_tool && active_object) {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             // ghost edge
-            sf::Vector2i v1 = world_to_pixel(active_object->getGlobalVertexPos(edit_tool.edge_vertex));
+            sf::Vector2i v1 = worldToPixel(active_object->getGlobalVertexPos(edit_tool.edge_vertex));
             sf::Vector2i v2 = mousePos;
             draw_line(target, to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
             // ghost edge normal
             sf::Vector2f norm_v1, norm_v2;
             if (edit_tool.edge_vertex == 0) {
-                get_screen_normal(v1, v2, norm_v1, norm_v2);
+                getScreenNormal(v1, v2, norm_v1, norm_v2);
             } else {
-                get_screen_normal(v2, v1, norm_v1, norm_v2);
+                getScreenNormal(v2, v1, norm_v1, norm_v2);
             }
             draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
             // ghost vertex
@@ -796,8 +796,8 @@ void Editor::render_ui() {
             // edge highlight
             b2Vec2 v1 = active_object->getGlobalVertexPos(edit_tool.highlighted_edge);
             b2Vec2 v2 = active_object->getGlobalVertexPos(active_object->indexLoop(edit_tool.highlighted_edge + 1));
-            sf::Vector2f v1_screen = world_to_screen(v1);
-            sf::Vector2f v2_screen = world_to_screen(v2);
+            sf::Vector2f v1_screen = worldToScreen(v1);
+            sf::Vector2f v2_screen = worldToScreen(v2);
             sf::Vector2f vec = v2_screen - v1_screen;
             float angle = atan2(vec.y, vec.x);
             edit_tool.edge_highlight.setPosition(v1_screen);
@@ -805,14 +805,14 @@ void Editor::render_ui() {
             edit_tool.edge_highlight.setSize(sf::Vector2f(utils::length(vec), 3.0f));
             target.draw(edit_tool.edge_highlight);
             // ghost vertex on the edge
-            sf::Vector2f ghost_vertex_pos = world_to_screen(edit_tool.insertVertexPos);
+            sf::Vector2f ghost_vertex_pos = worldToScreen(edit_tool.insertVertexPos);
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
             target.draw(edit_tool.vertex_rect);
         }
         // vertices
         for (size_t i = 0; i < active_object->getVertexCount(); i++) {
-            edit_tool.vertex_rect.setPosition(world_to_screen(active_object->getGlobalVertexPos(i)));
+            edit_tool.vertex_rect.setPosition(worldToScreen(active_object->getGlobalVertexPos(i)));
             bool selected = active_object->isVertexSelected(i);
             sf::Color vertex_color = selected ? sf::Color(255, 255, 0) : sf::Color(255, 0, 0);
             edit_tool.vertex_rect.setFillColor(vertex_color);
@@ -821,7 +821,7 @@ void Editor::render_ui() {
         // edge normals
         for (size_t i = 0; i < active_object->getEdgeCount(); i++) {
             sf::Vector2f norm_v1, norm_v2;
-            get_screen_normal(
+            getScreenNormal(
                 active_object->getGlobalVertexPos(i),
                 active_object->getGlobalVertexPos(active_object->indexLoop(i + 1)),
                 norm_v1, 
@@ -831,12 +831,12 @@ void Editor::render_ui() {
         }
         if (edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) {
             // highlighted vertex
-            sf::Vector2f vertex_pos = world_to_screen(active_object->getGlobalVertexPos(edit_tool.highlighted_vertex));
+            sf::Vector2f vertex_pos = worldToScreen(active_object->getGlobalVertexPos(edit_tool.highlighted_vertex));
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
             target.draw(edit_tool.vertex_highlight_rect);
         } else if (edit_tool.mode == EditTool::SELECT && edit_tool.rectangle_select.active) {
             //selection box
-            render_rectangle_select(target, edit_tool.rectangle_select);
+            renderRectangleSelect(target, edit_tool.rectangle_select);
         }
     }
 
@@ -867,7 +867,7 @@ void Editor::deserialize(const std::string& str, bool set_camera) {
     if (active_object) {
         active_object_id = active_object->id;
     }
-    init_tools();
+    initTools();
     TokenReader tr(str);
     try {
         while (tr.validRange()) {
@@ -910,19 +910,19 @@ void Editor::deserialize(const std::string& str, bool set_camera) {
     }
 }
 
-void Editor::save_to_file(const std::string& filename) const {
+void Editor::saveToFile(const std::string& filename) const {
     LoggerTag tag_saveload("saveload");
     std::string str = serialize();
     utils::str_to_file(str, filename);
     logger << "Saved to " << filename << "\n";
 }
 
-void Editor::load_action(const std::string& filename) {
+void Editor::loadAction(const std::string& filename) {
     load_request.requested = true;
     load_request.filename = filename;
 }
 
-void Editor::load_from_file(const std::string& filename) {
+void Editor::loadFromFile(const std::string& filename) {
     LoggerTag tag_saveload("saveload");
     try {
         std::string str = utils::file_to_str(filename);
@@ -955,20 +955,20 @@ void Editor::setActiveObject(GameObject* object) {
         if (object) {
             edit_tool.edit_window_widget->updateParameters();
         } else {
-            try_select_tool(&select_tool);
+            trySelectTool(&select_tool);
         }
     }
 }
 
-Tool* Editor::try_select_tool_by_index(size_t index) {
+Tool* Editor::trySelectToolByIndex(size_t index) {
     if (tools_in_tool_panel.size() > index) {
         Tool* tool = tools_in_tool_panel[index];
-        try_select_tool(tool);
+        trySelectTool(tool);
     }
     return nullptr;
 }
 
-Tool* Editor::try_select_tool(Tool* tool) {
+Tool* Editor::trySelectTool(Tool* tool) {
     if (tool == selected_tool) {
         return tool;
     }
@@ -986,7 +986,7 @@ Tool* Editor::try_select_tool(Tool* tool) {
     return tool;
 }
 
-void Editor::select_create_type(size_t type) {
+void Editor::selectCreateType(size_t type) {
     create_tool.type = static_cast<CreateTool::ObjectType>(type);
     for (size_t j = 0; j < create_tool.create_buttons.size(); j++) {
         create_tool.create_buttons[j]->setFillColor(sf::Color(128, 128, 128));
@@ -994,52 +994,52 @@ void Editor::select_create_type(size_t type) {
     create_tool.create_buttons[type]->setFillColor(sf::Color(0, 175, 255));
 }
 
-void Editor::toggle_pause() {
+void Editor::togglePause() {
     paused = !paused;
     paused_rect_widget->setVisible(paused);
 }
 
-void Editor::load_font(sf::Font& font, const std::string& filename, bool smooth) {
+void Editor::loadFont(sf::Font& font, const std::string& filename, bool smooth) {
     if (!font.loadFromFile(filename)) {
         throw std::runtime_error("Font loading error (" + filename + ")");
     }
     font.setSmooth(smooth);
 }
 
-sf::Vector2f Editor::screen_to_world(const sf::Vector2f& screen_pos) const {
+sf::Vector2f Editor::screenToWorld(const sf::Vector2f& screen_pos) const {
     sf::Transform combined = world_view.getInverseTransform() * ui_view.getTransform();
     sf::Vector2f result = combined.transformPoint(screen_pos);
     return result;
 }
 
-sf::Vector2f Editor::pixel_to_world(const sf::Vector2i& screen_pos) const {
-    return screen_to_world(to2f(screen_pos) + sf::Vector2f(0.5f, 0.5f));
+sf::Vector2f Editor::pixelToWorld(const sf::Vector2i& screen_pos) const {
+    return screenToWorld(to2f(screen_pos) + sf::Vector2f(0.5f, 0.5f));
 }
 
-sf::Vector2f Editor::world_to_screen(const sf::Vector2f& world_pos) const {
+sf::Vector2f Editor::worldToScreen(const sf::Vector2f& world_pos) const {
     sf::Transform combined = ui_view.getInverseTransform() * world_view.getTransform();
     sf::Vector2f result = combined.transformPoint(world_pos);
     return result;
 }
 
-sf::Vector2f Editor::world_to_screen(const b2Vec2& world_pos) const {
-    return world_to_screen(tosf(world_pos));
+sf::Vector2f Editor::worldToScreen(const b2Vec2& world_pos) const {
+    return worldToScreen(tosf(world_pos));
 }
 
-sf::Vector2i Editor::world_to_pixel(const sf::Vector2f& world_pos) const {
-    return to2i(world_to_screen(world_pos));
+sf::Vector2i Editor::worldToPixel(const sf::Vector2f& world_pos) const {
+    return to2i(worldToScreen(world_pos));
 }
 
-sf::Vector2i Editor::world_to_pixel(const b2Vec2& world_pos) const {
-    return to2i(world_to_screen(tosf(world_pos)));
+sf::Vector2i Editor::worldToPixel(const b2Vec2& world_pos) const {
+    return to2i(worldToScreen(tosf(world_pos)));
 }
 
-sf::Vector2f Editor::world_dir_to_screenf(const b2Vec2& world_dir) const {
+sf::Vector2f Editor::worldDirToScreenf(const b2Vec2& world_dir) const {
     //TODO: calculate new direction using an actual sf::View
     return sf::Vector2f(world_dir.x, -world_dir.y);
 }
 
-ptrdiff_t Editor::mouse_get_chain_edge(const b2Fixture* fixture) const {
+ptrdiff_t Editor::mouseGetChainEdge(const b2Fixture* fixture) const {
     const b2ChainShape* shape = dynamic_cast<const b2ChainShape*>(fixture->GetShape());
     const b2Body* body = fixture->GetBody();
     for (size_t i = 0; i < shape->m_count - 1; i++) {
@@ -1057,8 +1057,8 @@ ptrdiff_t Editor::mouse_get_chain_edge(const b2Fixture* fixture) const {
             continue;
         }
         b2Vec2 b2_mouse_pos = tob2(to2f(mousePos));
-        b2Vec2 b2_p1 = tob2(world_to_screen(p1));
-        b2Vec2 b2_p2 = tob2(world_to_screen(p2));
+        b2Vec2 b2_p1 = tob2(worldToScreen(p1));
+        b2Vec2 b2_p2 = tob2(worldToScreen(p2));
         float dist = utils::distance_to_line(b2_mouse_pos, b2_p1, b2_p2);
         if (dist <= EditTool::EDGE_HIGHLIGHT_DISTANCE) {
             return i;
@@ -1067,9 +1067,9 @@ ptrdiff_t Editor::mouse_get_chain_edge(const b2Fixture* fixture) const {
     return -1;
 }
 
-b2Fixture* Editor::get_fixture_at(const sf::Vector2f& screen_pos) const {
-    b2Vec2 world_pos = tob2(screen_to_world(screen_pos));
-    b2Vec2 world_pos_next = tob2(screen_to_world(screen_pos + sf::Vector2f(1.0f, 1.0f)));
+b2Fixture* Editor::getFixtureAt(const sf::Vector2f& screen_pos) const {
+    b2Vec2 world_pos = tob2(screenToWorld(screen_pos));
+    b2Vec2 world_pos_next = tob2(screenToWorld(screen_pos + sf::Vector2f(1.0f, 1.0f)));
     b2Vec2 midpoint = 0.5f * (world_pos + world_pos_next);
     QueryCallback callback;
     b2AABB aabb;
@@ -1079,7 +1079,7 @@ b2Fixture* Editor::get_fixture_at(const sf::Vector2f& screen_pos) const {
     for (size_t i = 0; i < callback.fixtures.size(); i++) {
         b2Fixture* fixture = callback.fixtures[i];
         if (fixture->GetShape()->m_type == b2Shape::e_chain) {
-            if (mouse_get_chain_edge(fixture) >= 0) {
+            if (mouseGetChainEdge(fixture) >= 0) {
                 return fixture;
             }
         } else if (fixture->TestPoint(midpoint)) {
@@ -1089,9 +1089,9 @@ b2Fixture* Editor::get_fixture_at(const sf::Vector2f& screen_pos) const {
     return nullptr;
 }
 
-GameObject* Editor::get_object_at(const sf::Vector2f& screen_pos) const {
+GameObject* Editor::getObjectAt(const sf::Vector2f& screen_pos) const {
     GameObject* result = nullptr;
-    b2Fixture* fixture = get_fixture_at(mousePosf);
+    b2Fixture* fixture = getFixtureAt(mousePosf);
     if (fixture) {
         b2Body* body = fixture->GetBody();
         result = GameObject::getGameobject(body);
@@ -1099,15 +1099,15 @@ GameObject* Editor::get_object_at(const sf::Vector2f& screen_pos) const {
     return result;
 }
 
-ptrdiff_t Editor::mouse_get_object_vertex() const {
+ptrdiff_t Editor::mouseGetObjectVertex() const {
     if (!active_object) {
         return -1;
     }
     ptrdiff_t closest_vertex_i = 0;
-    sf::Vector2i closest_vertex_pos = world_to_pixel(active_object->getGlobalVertexPos(0));
+    sf::Vector2i closest_vertex_pos = worldToPixel(active_object->getGlobalVertexPos(0));
     float closest_vertex_offset = utils::get_max_offset(closest_vertex_pos, mousePos);
     for (size_t i = 1; i < active_object->getVertexCount(); i++) {
-        sf::Vector2i vertex_pos = world_to_pixel(active_object->getGlobalVertexPos(i));
+        sf::Vector2i vertex_pos = worldToPixel(active_object->getGlobalVertexPos(i));
         float offset = (float)utils::get_max_offset(vertex_pos, mousePos);
         if (offset < closest_vertex_offset) {
             closest_vertex_i = i;
@@ -1121,7 +1121,7 @@ ptrdiff_t Editor::mouse_get_object_vertex() const {
     return -1;
 }
 
-ptrdiff_t Editor::mouse_get_object_edge() const {
+ptrdiff_t Editor::mouseGetObjectEdge() const {
     if (!active_object) {
         return -1;
     }
@@ -1140,8 +1140,8 @@ ptrdiff_t Editor::mouse_get_object_edge() const {
             continue;
         }
         b2Vec2 b2_mouse_pos = tob2(to2f(mousePos));
-        b2Vec2 b2_p1 = tob2(world_to_screen(p1));
-        b2Vec2 b2_p2 = tob2(world_to_screen(p2));
+        b2Vec2 b2_p1 = tob2(worldToScreen(p1));
+        b2Vec2 b2_p2 = tob2(worldToScreen(p2));
         float dist = utils::distance_to_line(b2_mouse_pos, b2_p1, b2_p2);
         if (dist <= EditTool::EDGE_HIGHLIGHT_DISTANCE) {
             return i;
@@ -1150,7 +1150,7 @@ ptrdiff_t Editor::mouse_get_object_edge() const {
     return -1;
 }
 
-ptrdiff_t Editor::mouse_get_edge_vertex() const {
+ptrdiff_t Editor::mouseGetEdgeVertex() const {
     if (!active_object) {
         return -1;
     }
@@ -1159,8 +1159,8 @@ ptrdiff_t Editor::mouse_get_edge_vertex() const {
     }
     ptrdiff_t v_start_i = 0;
     ptrdiff_t v_end_i = active_object->getEdgeCount();
-    sf::Vector2f v_start = world_to_screen(active_object->getGlobalVertexPos(v_start_i));
-    sf::Vector2f v_end = world_to_screen(active_object->getGlobalVertexPos(v_end_i));
+    sf::Vector2f v_start = worldToScreen(active_object->getGlobalVertexPos(v_start_i));
+    sf::Vector2f v_end = worldToScreen(active_object->getGlobalVertexPos(v_end_i));
     float v_start_dist = utils::length(mousePosf - v_start);
     float v_end_dist = utils::length(mousePosf - v_end);
     if (v_start_dist <= v_end_dist) {
@@ -1170,7 +1170,7 @@ ptrdiff_t Editor::mouse_get_edge_vertex() const {
     }
 }
 
-void Editor::select_vertices_in_rect(const RectangleSelect& rectangle_select) {
+void Editor::selectVerticesInRect(const RectangleSelect& rectangle_select) {
     sf::Vector2f mpos = sfMousePosWorld;
     sf::Vector2f origin = rectangle_select.select_origin;
     float left = std::min(mpos.x, origin.x);
@@ -1187,7 +1187,7 @@ void Editor::select_vertices_in_rect(const RectangleSelect& rectangle_select) {
     }
 }
 
-void Editor::select_objects_in_rect(const RectangleSelect& rectangle_select) {
+void Editor::selectObjectsInRect(const RectangleSelect& rectangle_select) {
     select_tool.clearRectSelected();
     b2AABB aabb;
     float lower_x = std::min(rectangle_select.select_origin.x, sfMousePosWorld.x);
@@ -1206,22 +1206,22 @@ void Editor::select_objects_in_rect(const RectangleSelect& rectangle_select) {
     }
 }
 
-void Editor::render_rectangle_select(sf::RenderTarget& target, RectangleSelect& rectangle_select) {
-    sf::Vector2f pos = world_to_screen(rectangle_select.select_origin);
+void Editor::renderRectangleSelect(sf::RenderTarget& target, RectangleSelect& rectangle_select) {
+    sf::Vector2f pos = worldToScreen(rectangle_select.select_origin);
     rectangle_select.select_rect.setPosition(pos);
     rectangle_select.select_rect.setSize(mousePosf - pos);
     target.draw(rectangle_select.select_rect);
 }
 
-void Editor::get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
+void Editor::getScreenNormal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
     b2Vec2 midpoint = 0.5f * (v1 + v2);
-    norm_v1 = world_to_screen(midpoint);
-    sf::Vector2f edge_dir = utils::normalize(world_dir_to_screenf(v2 - v1));
+    norm_v1 = worldToScreen(midpoint);
+    sf::Vector2f edge_dir = utils::normalize(worldDirToScreenf(v2 - v1));
     sf::Vector2f norm_dir = utils::rot90CCW(edge_dir);
     norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
 }
 
-void Editor::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
+void Editor::getScreenNormal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
     sf::Vector2f v1f = to2f(v1);
     sf::Vector2f v2f = to2f(v2);
     sf::Vector2f midpoint = (v1f + v2f) / 2.0f;
@@ -1231,7 +1231,7 @@ void Editor::get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, s
     norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
 }
 
-bool Editor::is_parent_selected(const GameObject* object) const {
+bool Editor::isParentSelected(const GameObject* object) const {
     CompVector<GameObject*> parents = object->getParentChain();
     for (size_t i = 0; i < parents.size(); i++) {
         auto it = select_tool.getSelectedObjects().find(parents[i]);
@@ -1242,11 +1242,11 @@ bool Editor::is_parent_selected(const GameObject* object) const {
     return false;
 }
 
-void Editor::grab_selected() {
+void Editor::grabSelected() {
     move_tool.orig_cursor_pos = b2MousePosWorld;
     move_tool.moving_objects = CompVector<GameObject*>();
     for (GameObject* obj : select_tool.getSelectedObjects()) {
-        if (is_parent_selected(obj)) {
+        if (isParentSelected(obj)) {
             continue;
         }
         move_tool.moving_objects.add(obj);
@@ -1259,11 +1259,11 @@ void Editor::grab_selected() {
     }
 }
 
-void Editor::rotate_selected() {
+void Editor::rotateSelected() {
     rotate_tool.orig_cursor_pos = b2MousePosWorld;
     rotate_tool.rotating_objects = CompVector<GameObject*>();
     for (GameObject* obj : select_tool.getSelectedObjects()) {
-        if (is_parent_selected(obj)) {
+        if (isParentSelected(obj)) {
             continue;
         }
         rotate_tool.rotating_objects.add(obj);
@@ -1283,7 +1283,7 @@ void Editor::rotate_selected() {
     rotate_tool.orig_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
 }
 
-void Editor::delete_object(GameObject* object, bool remove_children) {
+void Editor::deleteObject(GameObject* object, bool remove_children) {
     if (!object) {
         return;
     }
@@ -1294,7 +1294,7 @@ void Editor::delete_object(GameObject* object, bool remove_children) {
     simulation.remove(object, remove_children);
 }
 
-void Editor::check_debugbreak() {
+void Editor::checkDebugbreak() {
     if (debug_break) {
         __debugbreak();
         debug_break = false;

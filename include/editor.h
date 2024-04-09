@@ -55,35 +55,35 @@ public:
 	fw::WidgetList& getWidgetList();
 	void selectSingleObject(GameObject* object, bool with_children = false);
 	Simulation& getSimulation();
-	BoxObject* create_box(
+	BoxObject* createBox(
 		const std::string& name,
 		const b2Vec2& pos,
 		float angle,
 		const b2Vec2& size,
 		const sf::Color& color
 	);
-	BallObject* create_ball(
+	BallObject* createBall(
 		const std::string& name,
 		const b2Vec2& pos,
 		float radius,
 		const sf::Color& color,
 		const sf::Color& notch_color = sf::Color::Transparent
 	);
-	PolygonObject* create_polygon(
+	PolygonObject* createPolygon(
 		const std::string& name,
 		const b2Vec2& pos,
 		float angle,
 		const std::vector<b2Vec2>& vertices,
 		const sf::Color& color
 	);
-	PolygonObject* create_car(
+	PolygonObject* createCar(
 		const std::string& name,
 		const b2Vec2& pos,
 		const std::vector<float>& lengths,
 		const std::vector<float>& wheels,
 		const sf::Color& color
 	);
-	ChainObject* create_chain(
+	ChainObject* createChain(
 		const std::string& name,
 		const b2Vec2& pos,
 		float angle,
@@ -175,46 +175,46 @@ private:
 	void afterProcessInput() override;
 	void onProcessWorld() override;
 	void onRender() override;
-	void init_tools();
-	void init_ui();
-	void init_widgets();
-	void render_world();
-	void render_ui();
+	void initTools();
+	void initUi();
+	void initWidgets();
+	void renderWorld();
+	void renderUi();
 	std::string serialize() const;
 	void deserialize(const std::string& str, bool set_camera);
-	void save_to_file(const std::string& filename) const;
-	void load_action(const std::string& filename);
-	void load_from_file(const std::string& filename);
+	void saveToFile(const std::string& filename) const;
+	void loadAction(const std::string& filename);
+	void loadFromFile(const std::string& filename);
 	void quicksave();
 	void quickload();
 	void setActiveObject(GameObject* object);
-	Tool* try_select_tool_by_index(size_t index);
-	Tool* try_select_tool(Tool* tool);
-	void select_create_type(size_t type);
-	void toggle_pause();
-	void load_font(sf::Font& font, const std::string& filename, bool smooth = false);
-	sf::Vector2f screen_to_world(const sf::Vector2f& screen_pos) const;
-	sf::Vector2f pixel_to_world(const sf::Vector2i& screen_pos) const;
-	sf::Vector2f world_to_screen(const sf::Vector2f& world_pos) const;
-	sf::Vector2f world_to_screen(const b2Vec2& world_pos) const;
-	sf::Vector2i world_to_pixel(const sf::Vector2f& world_pos) const;
-	sf::Vector2i world_to_pixel(const b2Vec2& world_pos) const;
-	sf::Vector2f world_dir_to_screenf(const b2Vec2& world_dir) const;
-	ptrdiff_t mouse_get_chain_edge(const b2Fixture* fixture) const;
-	b2Fixture* get_fixture_at(const sf::Vector2f& screen_pos) const;
-	GameObject* get_object_at(const sf::Vector2f& screen_pos) const;
-	ptrdiff_t mouse_get_object_vertex() const;
-	ptrdiff_t mouse_get_object_edge() const;
-	ptrdiff_t mouse_get_edge_vertex() const;
-	void select_vertices_in_rect(const RectangleSelect& rectangle_select);
-	void select_objects_in_rect(const RectangleSelect& rectangle_select);
-	void render_rectangle_select(sf::RenderTarget& target, RectangleSelect& rectangle_select);
-	void get_screen_normal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const;
-	void get_screen_normal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const;
-	bool is_parent_selected(const GameObject* object) const;
-	void grab_selected();
-	void rotate_selected();
-	void delete_object(GameObject* object, bool remove_children);
-	void check_debugbreak();
+	Tool* trySelectToolByIndex(size_t index);
+	Tool* trySelectTool(Tool* tool);
+	void selectCreateType(size_t type);
+	void togglePause();
+	void loadFont(sf::Font& font, const std::string& filename, bool smooth = false);
+	sf::Vector2f screenToWorld(const sf::Vector2f& screen_pos) const;
+	sf::Vector2f pixelToWorld(const sf::Vector2i& screen_pos) const;
+	sf::Vector2f worldToScreen(const sf::Vector2f& world_pos) const;
+	sf::Vector2f worldToScreen(const b2Vec2& world_pos) const;
+	sf::Vector2i worldToPixel(const sf::Vector2f& world_pos) const;
+	sf::Vector2i worldToPixel(const b2Vec2& world_pos) const;
+	sf::Vector2f worldDirToScreenf(const b2Vec2& world_dir) const;
+	ptrdiff_t mouseGetChainEdge(const b2Fixture* fixture) const;
+	b2Fixture* getFixtureAt(const sf::Vector2f& screen_pos) const;
+	GameObject* getObjectAt(const sf::Vector2f& screen_pos) const;
+	ptrdiff_t mouseGetObjectVertex() const;
+	ptrdiff_t mouseGetObjectEdge() const;
+	ptrdiff_t mouseGetEdgeVertex() const;
+	void selectVerticesInRect(const RectangleSelect& rectangle_select);
+	void selectObjectsInRect(const RectangleSelect& rectangle_select);
+	void renderRectangleSelect(sf::RenderTarget& target, RectangleSelect& rectangle_select);
+	void getScreenNormal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const;
+	void getScreenNormal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const;
+	bool isParentSelected(const GameObject* object) const;
+	void grabSelected();
+	void rotateSelected();
+	void deleteObject(GameObject* object, bool remove_children);
+	void checkDebugbreak();
 
 };
