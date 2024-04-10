@@ -3,9 +3,12 @@
 SimulationTests::SimulationTests() : TestModule("Simulation") { }
 
 void SimulationTests::createTestLists() {
+    createSimulationList();
+    createGameObjectList();
+}
+
+void SimulationTests::createSimulationList() {
     test::TestList* list = createTestList("Simulation");
-    list->OnBeforeRunTest = []() { logger.manualDeactivate(); };
-    list->OnAfterRunTest = []() { logger.manualActivate(); };
 
     test::Test* basic_test = list->addTest(
         "basic",
@@ -449,7 +452,7 @@ void SimulationTests::createTestLists() {
                 sf::Color(0, 255, 0)
             );
             BoxObject* box2 = simulationA.createBox(
-                "box3",
+                "box2",
                 b2Vec2(1.0f, 2.8f),
                 utils::to_radians(0.0f),
                 b2Vec2(1.0f, 1.0f),
@@ -506,6 +509,50 @@ void SimulationTests::createTestLists() {
             Simulation simulationB;
             simulationB.load("tests/moving_car.txt");
             simCmp(test, simulationA, simulationB);
+        }
+    );
+}
+
+void SimulationTests::createGameObjectList() {
+    test::TestList* list = createTestList("GameObject");
+
+    test::Test* set_parent_two_test = list->addTest(
+        "set_parent_two",
+        [&](test::Test& test) {
+            Simulation simulation;
+            b2Vec2 box0_initial_pos(0.0f, 0.6f);
+            b2Vec2 box1_initial_pos(0.5f, 1.7f);
+            BoxObject* box0 = simulation.createBox(
+                "box0",
+                box0_initial_pos,
+                utils::to_radians(0.0f),
+                b2Vec2(1.0f, 1.0f),
+                sf::Color(0, 255, 0)
+            );
+            BoxObject* box1 = simulation.createBox(
+                "box1",
+                box1_initial_pos,
+                utils::to_radians(0.0f),
+                b2Vec2(1.0f, 1.0f),
+                sf::Color(0, 255, 0)
+            );
+            b2Vec2 box0_local_pos_before = box0->getPosition();
+            b2Vec2 box0_global_pos_before = box0->getGlobalPosition();
+            b2Vec2 box1_local_pos_before = box1->getPosition();
+            b2Vec2 box1_global_pos_before = box1->getGlobalPosition();
+            box1->setParent(box0);
+            tCheck(box0->getParent() == nullptr);
+            tAssertCompare(box1->getParent()->getId(), box0->getId());
+            tAssertCompare(box0->getChildren().size(), 1);
+            tCheck(box0->getChild(0) == box1);
+            b2Vec2 box0_local_pos_after = box0->getPosition();
+            b2Vec2 box0_global_pos_after = box0->getGlobalPosition();
+            b2Vec2 box1_local_pos_after = box1->getPosition();
+            b2Vec2 box1_global_pos_after = box1->getGlobalPosition();
+            tVec2ApproxCompare(box0_local_pos_after, box0_local_pos_before, &SimulationTests::b2Vec2ToStr);
+            tVec2ApproxCompare(box0_global_pos_after, box0_global_pos_before, &SimulationTests::b2Vec2ToStr);
+            tVec2ApproxCompare(box1_local_pos_after, box1_local_pos_before - box0_local_pos_before, &SimulationTests::b2Vec2ToStr);
+            tVec2ApproxCompare(box1_global_pos_after, box1_global_pos_before, &SimulationTests::b2Vec2ToStr);
         }
     );
 }

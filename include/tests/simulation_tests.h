@@ -9,6 +9,8 @@ public:
 
 protected:
 	void createTestLists() override;
+	void createSimulationList();
+	void createGameObjectList();
 
 private:
 	static std::string colorToStr(const sf::Color& color);

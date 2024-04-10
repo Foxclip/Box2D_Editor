@@ -141,9 +141,11 @@ namespace test {
 		OnBeforeRunAllTests();
 		for (size_t i = 0; i < test_list.size(); i++) {
 			Test* test = test_list[i].get();
+			logger.manualDeactivate();
 			OnBeforeRunTest();
 			bool result = test->run();
 			OnAfterRunTest();
+			logger.manualActivate();
 			std::string result_str;
 			if (result) {
 				logger << "passed: " << test->name << "\n";
@@ -267,6 +269,9 @@ namespace test {
 			}
 		}
 		TestModule::printSummary(passed_list, cancelled_list, failed_list);
+		if (cancelled_list.empty() && failed_list.empty()) {
+			logger << "ALL PASSED\n";
+		}
 	}
 
 }

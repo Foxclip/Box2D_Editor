@@ -65,7 +65,7 @@ simulation
 
     object box
         id 3
-        name "box3"
+        name "box2"
         size 1 1
         color 0 255 0 255
         body

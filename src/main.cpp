@@ -42,7 +42,7 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: use simCmp in car_serialize test
+    // TODO: GameObject tests
     // TODO: ObjectList tests
     // TODO: Widget tests
     // TODO: blinking textbox cursor
