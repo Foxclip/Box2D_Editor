@@ -27,7 +27,7 @@ void EditWindow::createParameters() {
         "dynamic parameter",
         "Dynamic:",
         [=]() {
-            return app.active_object->getType() == b2_dynamicBody;
+            return app.active_object->getBodyType() == b2_dynamicBody;
         },
         [=](bool value) {
             b2BodyType type = value ? b2_dynamicBody : b2_staticBody;

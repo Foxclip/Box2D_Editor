@@ -6,44 +6,6 @@ void SimulationTests::createTestLists() {
     test::TestList* list = createTestList("Simulation");
     list->OnBeforeRunTest = []() { logger.manualDeactivate(); };
     list->OnAfterRunTest = []() { logger.manualActivate(); };
-    std::function<std::string(const sf::Color&)> color_to_str =
-        [](const sf::Color& color) {
-            return "(" + utils::color_to_str(color) + ")";
-        };
-    std::function<void(test::Test&, GameObject*, GameObject*)> obj_cmp_common = 
-        [&, color_to_str](test::Test& test, GameObject* objA, GameObject* objB) {
-            tCompare(objB->getChildren().size(), objA->getChildren().size());
-            if (objA->getChildren().size() == objB->getChildren().size()) {
-                for (size_t i = 0; i < objA->getChildren().size(); i++) {
-                    tCompare(objB->getChild(i)->getId(), objA->getChild(i)->getId());
-                }
-            }
-            tCompare(objB->color, objA->color, color_to_str);
-            tCompare(objB->getId(), objA->getId());
-            tCompare(objB->getName(), objA->getName());
-            tCompare(objB->parent_id, objA->parent_id);
-            tCompare(objB->getTransform().q.GetAngle(), objA->getTransform().q.GetAngle());
-            tCompare(objB->getTransform().p.x, objA->getTransform().p.x);
-            tCompare(objB->getTransform().p.y, objA->getTransform().p.y);
-            tCheck(objB->getVertices() == objA->getVertices());
-        };
-    std::function<void(test::Test&, Joint*, Joint*)> joint_cmp_common =
-        [&](test::Test& test, Joint* jointA, Joint* jointB) {
-            tCompare(jointB->object1->getId(), jointA->object1->getId());
-            tCompare(jointB->object2->getId(), jointA->object2->getId());
-            tCompare(jointB->getAnchorA().x, jointA->getAnchorA().x);
-            tCompare(jointB->getAnchorA().y, jointA->getAnchorA().y);
-            tCompare(jointB->getAnchorB().x, jointA->getAnchorB().x);
-            tCompare(jointB->getAnchorB().y, jointA->getAnchorB().y);
-            tCompare(jointB->getCollideConnected(), jointA->getCollideConnected());
-        };
-    std::function<void(test::Test&, BoxObject*, BoxObject*)> box_cmp =
-        [&, obj_cmp_common](test::Test& test, BoxObject* boxA, BoxObject* boxB) {
-            tCheck(*boxA == *boxB);
-            obj_cmp_common(test, boxA, boxB);
-            tCompare(boxB->size.x, boxA->size.x);
-            tCompare(boxB->size.y, boxA->size.y);
-        };
 
     test::Test* basic_test = list->addTest(
         "basic",
@@ -267,7 +229,7 @@ void SimulationTests::createTestLists() {
             std::string str = boxA->serialize();
             std::unique_ptr<BoxObject> uptr = BoxObject::deserialize(str, &simulation);
             BoxObject* boxB = uptr.get();
-            box_cmp(test, boxA, boxB);
+            boxCmp(test, boxA, boxB);
         }
     );
     test::Test* ball_serialize_test = list->addTest(
@@ -289,7 +251,7 @@ void SimulationTests::createTestLists() {
             std::unique_ptr<BallObject> uptr = BallObject::deserialize(str, &simulation);
             BallObject* ballB = uptr.get();
             tCheck(*ballA == *ballB);
-            obj_cmp_common(test, ballA, ballB);
+            objCmpCommon(test, ballA, ballB);
             tCompare(ballB->radius, ballA->radius);
         }
     );
@@ -317,7 +279,7 @@ void SimulationTests::createTestLists() {
             std::unique_ptr<PolygonObject> uptr = PolygonObject::deserialize(str, &simulation);
             PolygonObject* polygonB = uptr.get();
             tCheck(*polygonA == *polygonB);
-            obj_cmp_common(test, polygonA, polygonB);
+            objCmpCommon(test, polygonA, polygonB);
         }
     );
     test::Test* chain_serialize_test = list->addTest(
@@ -347,7 +309,7 @@ void SimulationTests::createTestLists() {
             std::unique_ptr<ChainObject> uptr = ChainObject::deserialize(str, &simulation);
             ChainObject* chainB = uptr.get();
             tCheck(*chainA == *chainB);
-            obj_cmp_common(test, chainA, chainB);
+            objCmpCommon(test, chainA, chainB);
         }
     );
     test::Test* revolute_joint_serialize_test = list->addTest(
@@ -386,7 +348,7 @@ void SimulationTests::createTestLists() {
             std::unique_ptr<RevoluteJoint> uptr = RevoluteJoint::deserialize(str, &simulation);
             RevoluteJoint* jointB = uptr.get();
             tCheck(*jointA == *jointB);
-            joint_cmp_common(test, jointA, jointB);
+            jointCmpCommon(test, jointA, jointB);
             tCompare(jointB->getLowerLimit(), jointA->getLowerLimit());
             tCompare(jointB->getMaxMotorTorque(), jointA->getMaxMotorTorque());
             tCompare(jointB->getMotorSpeed(), jointA->getMotorSpeed());
@@ -450,7 +412,8 @@ void SimulationTests::createTestLists() {
     test::Test* saveload_test = list->addTest(
         "saveload",
         {
-            box_test
+            box_test,
+            box_serialize_test
         },
         [=, this](test::Test& test) {
             Simulation simulationA;
@@ -473,7 +436,7 @@ void SimulationTests::createTestLists() {
             tAssertCompare(simulationB.getAllSize(), 1);
             BoxObject* boxB = dynamic_cast<BoxObject*>(simulationB.getFromAll(0));
             tAssert(boxB, "Object is not a BoxObject");
-            box_cmp(test, boxA, boxB);
+            boxCmp(test, boxA, boxB);
         }
     );
     test::Test* box_stack_test = list->addTest(
@@ -523,7 +486,128 @@ void SimulationTests::createTestLists() {
             }
             Simulation simulationB;
             simulationB.load("tests/box_stack.txt");
-            tCheck(simulationA == simulationB);
+            simCmp(test, simulationA, simulationB);
         }
     );
+    test::Test* moving_car_test = list->addTest(
+        "moving_car",
+        {
+            advance_test,
+            saveload_test,
+            car_serialize_test
+        },
+        [&](test::Test& test) {
+            Simulation simulationA;
+            std::vector<b2Vec2> ground_vertices = {
+                b2Vec2(8.0f, 0.0f),
+                b2Vec2(-8.0f, 0.0f),
+            };
+            ChainObject* ground = simulationA.createChain(
+                "ground",
+                b2Vec2(0.0f, 0.0f),
+                utils::to_radians(0.0f),
+                ground_vertices,
+                sf::Color(255, 255, 255)
+            );
+            std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
+            std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+            GameObject* car = simulationA.createCar(
+                "car0",
+                b2Vec2(0.0f, 6.0f),
+                lengths,
+                wheels,
+                sf::Color(255, 0, 0)
+            );
+            car->setType(b2_dynamicBody, false);
+            car->setDensity(1.0f, false);
+            car->setFriction(0.3f, false);
+            car->setRestitution(0.5f, false);
+            const int fps = 60;
+            size_t advance_steps = 100;
+            for (size_t i = 0; i < advance_steps; i++) {
+                simulationA.advance(1.0f / fps);
+            }
+            Simulation simulationB;
+            simulationB.load("tests/moving_car.txt");
+            simCmp(test, simulationA, simulationB);
+        }
+    );
+}
+
+std::string SimulationTests::colorToStr(const sf::Color& color) {
+    return "(" + utils::color_to_str(color) + ")";
+}
+
+void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, const GameObject* objB) {
+    tCompare(objB->getChildren().size(), objA->getChildren().size());
+    if (objA->getChildren().size() == objB->getChildren().size()) {
+        for (size_t i = 0; i < objA->getChildren().size(); i++) {
+            tCompare(objB->getChild(i)->getId(), objA->getChild(i)->getId());
+        }
+    }
+    tCompare(objB->color, objA->color, &SimulationTests::colorToStr);
+    tCompare(objB->getId(), objA->getId());
+    tCompare(objB->getName(), objA->getName());
+    tCompare(objB->parent_id, objA->parent_id);
+    tCompare(objB->getTransform().q.GetAngle(), objA->getTransform().q.GetAngle());
+    tCompare(objB->getTransform().p.x, objA->getTransform().p.x);
+    tCompare(objB->getTransform().p.y, objA->getTransform().p.y);
+    tCheck(objB->getVertices() == objA->getVertices());
+}
+
+void SimulationTests::jointCmpCommon(test::Test& test, Joint* jointA, Joint* jointB) {
+    tCompare(jointB->object1->getId(), jointA->object1->getId());
+    tCompare(jointB->object2->getId(), jointA->object2->getId());
+    tCompare(jointB->getAnchorA().x, jointA->getAnchorA().x);
+    tCompare(jointB->getAnchorA().y, jointA->getAnchorA().y);
+    tCompare(jointB->getAnchorB().x, jointA->getAnchorB().x);
+    tCompare(jointB->getAnchorB().y, jointA->getAnchorB().y);
+    tCompare(jointB->getCollideConnected(), jointA->getCollideConnected());
+}
+
+void SimulationTests::boxCmp(test::Test& test, BoxObject* boxA, BoxObject* boxB) {
+    tCheck(*boxA == *boxB);
+    objCmpCommon(test, boxA, boxB);
+    tCompare(boxB->size.x, boxA->size.x);
+    tCompare(boxB->size.y, boxA->size.y);
+}
+
+void SimulationTests::ballCmp(test::Test& test, BallObject* ballA, BallObject* ballB) {
+    tCheck(*ballA == *ballB);
+    objCmpCommon(test, ballA, ballB);
+    tCompare(ballB->radius, ballA->radius);
+}
+
+void SimulationTests::polygonCmp(test::Test& test, PolygonObject* polygonA, PolygonObject* polygonB) {
+    tCheck(*polygonA == *polygonB);
+    objCmpCommon(test, polygonA, polygonB);
+}
+
+void SimulationTests::chainCmp(test::Test& test, ChainObject* chainA, ChainObject* chainB) {
+    tCheck(*chainA == *chainB);
+    objCmpCommon(test, chainA, chainB);
+}
+
+void SimulationTests::simCmp(test::Test& test, Simulation& simA, Simulation& simB) {
+    tAssertCompare(simA.getAllSize(), simB.getAllSize());
+    for (size_t i = 0; i < simA.getAllSize(); i++) {
+        GameObject* objA = simA.getFromAll(i);
+        GameObject* objB = simB.getFromAll(i);
+        switch (objA->getType()) {
+            case GameObject::GameObjectType::Box:
+                boxCmp(test, dynamic_cast<BoxObject*>(objA), dynamic_cast<BoxObject*>(objB));
+                break;
+            case GameObject::GameObjectType::Ball:
+                ballCmp(test, dynamic_cast<BallObject*>(objA), dynamic_cast<BallObject*>(objB));
+                break;
+            case GameObject::GameObjectType::Polygon:
+                polygonCmp(test, dynamic_cast<PolygonObject*>(objA), dynamic_cast<PolygonObject*>(objB));
+                break;
+            case GameObject::GameObjectType::Chain:
+                chainCmp(test, dynamic_cast<ChainObject*>(objA), dynamic_cast<ChainObject*>(objB));
+                break;
+            default:
+                mAssert(false, "Unknown GameObject type");
+        }
+    }
 }

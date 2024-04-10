@@ -414,6 +414,9 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
             case sf::Keyboard::B:
                 debug_break = true;
                 break;
+            case sf::Keyboard::E:
+                simulation.advance(timeStep);
+                break;
         }
     }
     if (event.type == sf::Event::KeyReleased) {
@@ -759,7 +762,7 @@ void Editor::renderUi() {
             };
             render_info("id: " + std::to_string(gameobject->id));
             render_info(gameobject->getName());
-            render_info(utils::body_type_to_str(gameobject->getType()));
+            render_info(utils::body_type_to_str(gameobject->getBodyType()));
         }
         // indices
         for (size_t i = 0; i < simulation.getAllSize(); i++) {

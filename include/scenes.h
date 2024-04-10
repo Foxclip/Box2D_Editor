@@ -243,3 +243,24 @@ void box_stack(Editor& app) {
         sf::Color(0, 255, 0)
     );
 }
+
+void moving_car(Editor& app) {
+    std::vector<b2Vec2> ground_vertices = {
+        b2Vec2(8.0f, 0.0f),
+        b2Vec2(-8.0f, 0.0f),
+    };
+    ChainObject* ground = app.createChain(
+        "ground",
+        b2Vec2(0.0f, 0.0f),
+        utils::to_radians(0.0f),
+        ground_vertices,
+        sf::Color(255, 255, 255)
+    );
+    std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
+    std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+    GameObject* car = app.createCar("car0", b2Vec2(0.0f, 6.0f), lengths, wheels, sf::Color(255, 0, 0));
+    car->setType(b2_dynamicBody, false);
+    car->setDensity(1.0f, false);
+    car->setFriction(0.3f, false);
+    car->setRestitution(0.5f, false);
+}

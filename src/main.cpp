@@ -22,19 +22,8 @@ void execute_app() {
     Editor app;
     try {
         app.init();
-        //scene1(app);
-        app.load("levels/level.txt");
-        //ground_transform(app);
-        //single_box(app);
-        //single_ball(app);
-        //single_car(app);
-        //multiple_chains(app);
-        //polygon(app);
-        //box_parent(app);
-        //convex_polygon(app);
-        //duplication(app);
-        //parent_loop(app);
-        //box_stack(app);
+        //app.load("levels/level.txt");
+        moving_car(app);
         app.start();
     } catch (std::string msg) {
         logger << "ERROR: " << msg << "\n";
@@ -50,10 +39,11 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
-    //run_tests();
-    execute_app();
+    run_tests();
+    //execute_app();
 
     // TODO: Simulation moving car test
+    // TODO: check velocity and angular velocity in test comparisons
     // TODO: ObjectList tests
     // TODO: Widget tests
     // TODO: blinking textbox cursor

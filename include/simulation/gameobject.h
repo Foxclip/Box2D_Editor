@@ -33,9 +33,17 @@ class GameObjectList;
 // adding GameObject derived class
 // add isEqual to derived class
 // add comparison to == operator in GameObject
+// add item to GameObjectType enum
+// add it to comparison function in Simulation test
 
 class GameObject {
 public:
+	enum class GameObjectType {
+		Box,
+		Ball,
+		Polygon,
+		Chain
+	};
 	ptrdiff_t id = -1;
 	ptrdiff_t parent_id = -1;
 	b2Body* rigid_body = nullptr;
@@ -52,12 +60,13 @@ public:
 
 	GameObject();
 	~GameObject();
+	virtual GameObjectType getType() const = 0;
 	virtual bool isClosed() const = 0;
 	ptrdiff_t getId() const;
 	const std::string& getName() const;
 	virtual sf::Drawable* getDrawable() const = 0;
 	virtual sf::Transformable* getTransformable() const = 0;
-	b2BodyType getType() const;
+	b2BodyType getBodyType() const;
 	const b2Vec2& getPosition() const;
 	const b2Vec2& getLinearVelocity() const;
 	float getAngularVelocity() const;
@@ -151,6 +160,7 @@ public:
 	b2Vec2 size = b2Vec2();
 
 	BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, sf::Color color);
+	GameObjectType getType() const;
 	bool isClosed() const override;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
@@ -177,6 +187,7 @@ public:
 		sf::Color color,
 		sf::Color notch_color = sf::Color::Transparent
 	);
+	GameObjectType getType() const;
 	bool isClosed() const override;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
@@ -202,6 +213,7 @@ public:
 		const std::vector<b2Vec2>& vertices,
 		const sf::Color& color
 	);
+	GameObjectType getType() const;
 	bool isClosed() const override;
 	SplittablePolygon* getSplittablePolygon() const;
 	sf::Drawable* getDrawable() const override;
@@ -222,6 +234,7 @@ private:
 class ChainObject : public GameObject {
 public:
 	ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
+	GameObjectType getType() const;
 	bool isClosed() const override;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;

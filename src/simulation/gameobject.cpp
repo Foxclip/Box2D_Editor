@@ -32,7 +32,7 @@ const std::string& GameObject::getName() const {
 	return name;
 }
 
-b2BodyType GameObject::getType() const {
+b2BodyType GameObject::getBodyType() const {
 	return rigid_body->GetType();
 }
 
@@ -644,6 +644,10 @@ BoxObject::BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, sf
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 }
 
+GameObject::GameObjectType BoxObject::getType() const {
+	return GameObjectType::Box;
+}
+
 bool BoxObject::isClosed() const {
 	return false;
 }
@@ -767,6 +771,10 @@ BallObject::BallObject(GameObjectList* object_list, b2BodyDef def, float radius,
 	syncVertices(true);
 	transformFromRigidbody();
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+}
+
+GameObject::GameObjectType BallObject::getType() const {
+	return GameObjectType::Ball;
 }
 
 bool BallObject::isClosed() const {
@@ -905,6 +913,10 @@ PolygonObject::PolygonObject(
 	transformFromRigidbody();
 	polygon->setFillColor(color);
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+}
+
+GameObject::GameObjectType PolygonObject::getType() const {
+	return GameObjectType::Polygon;
 }
 
 bool PolygonObject::isClosed() const {
@@ -1056,6 +1068,10 @@ ChainObject::ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector
 	transformFromRigidbody();
 	line_strip_shape->setLineColor(color);
 	rigid_body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+}
+
+GameObject::GameObjectType ChainObject::getType() const {
+	return GameObjectType::Chain;
 }
 
 bool ChainObject::isClosed() const {
