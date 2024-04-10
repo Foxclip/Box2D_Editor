@@ -42,8 +42,6 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: check velocity and angular velocity in test comparisons
-    // TODO: compare joints in simCmp
     // TODO: use simCmp in car_serialize test
     // TODO: ObjectList tests
     // TODO: Widget tests

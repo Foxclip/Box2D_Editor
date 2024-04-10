@@ -12,6 +12,9 @@ namespace test {
 	class Test;
 	using TestFuncType = std::function<void(Test& test)>;
 
+#define tMessage(message) \
+	testMessage(test, __FILE__, __LINE__, message)
+
 #define tCheck(value, ...) \
 	testAssert(test, __FILE__, __LINE__, value, #value, __VA_ARGS__)
 
@@ -135,6 +138,7 @@ namespace test {
 		virtual void createTestLists() = 0;
 		virtual void beforeRunModule();
 		virtual void afterRunModule();
+		void testMessage(Test& test, const std::string& file, size_t line, const std::string& message);
 		void testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message);
 		void testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message, const std::string message);
 		template<typename T1, typename T2>

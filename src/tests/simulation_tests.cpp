@@ -550,6 +550,32 @@ void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, con
     tCheck(objB->getVertices() == objA->getVertices());
 }
 
+void SimulationTests::boxCmp(test::Test& test, BoxObject* boxA, BoxObject* boxB) {
+    tAssert(boxA && boxB, "Objects have different types");
+    tCheck(*boxA == *boxB);
+    objCmpCommon(test, boxA, boxB);
+    tCompare(boxB->size, boxA->size, &SimulationTests::b2Vec2ToStr);
+}
+
+void SimulationTests::ballCmp(test::Test& test, BallObject* ballA, BallObject* ballB) {
+    tAssert(ballA && ballB, "Objects have different types");
+    tCheck(*ballA == *ballB);
+    objCmpCommon(test, ballA, ballB);
+    tCompare(ballB->radius, ballA->radius);
+}
+
+void SimulationTests::polygonCmp(test::Test& test, PolygonObject* polygonA, PolygonObject* polygonB) {
+    tAssert(polygonA && polygonB, "Objects have different types");
+    tCheck(*polygonA == *polygonB);
+    objCmpCommon(test, polygonA, polygonB);
+}
+
+void SimulationTests::chainCmp(test::Test& test, ChainObject* chainA, ChainObject* chainB) {
+    tAssert(chainA && chainB, "Objects have different types");
+    tCheck(*chainA == *chainB);
+    objCmpCommon(test, chainA, chainB);
+}
+
 void SimulationTests::jointCmpCommon(test::Test& test, Joint* jointA, Joint* jointB) {
     tCompare(jointB->object1->getId(), jointA->object1->getId());
     tCompare(jointB->object2->getId(), jointA->object2->getId());
@@ -558,26 +584,17 @@ void SimulationTests::jointCmpCommon(test::Test& test, Joint* jointA, Joint* joi
     tCompare(jointB->getCollideConnected(), jointA->getCollideConnected());
 }
 
-void SimulationTests::boxCmp(test::Test& test, BoxObject* boxA, BoxObject* boxB) {
-    tCheck(*boxA == *boxB);
-    objCmpCommon(test, boxA, boxB);
-    tCompare(boxB->size, boxA->size, &SimulationTests::b2Vec2ToStr);
-}
-
-void SimulationTests::ballCmp(test::Test& test, BallObject* ballA, BallObject* ballB) {
-    tCheck(*ballA == *ballB);
-    objCmpCommon(test, ballA, ballB);
-    tCompare(ballB->radius, ballA->radius);
-}
-
-void SimulationTests::polygonCmp(test::Test& test, PolygonObject* polygonA, PolygonObject* polygonB) {
-    tCheck(*polygonA == *polygonB);
-    objCmpCommon(test, polygonA, polygonB);
-}
-
-void SimulationTests::chainCmp(test::Test& test, ChainObject* chainA, ChainObject* chainB) {
-    tCheck(*chainA == *chainB);
-    objCmpCommon(test, chainA, chainB);
+void SimulationTests::revoluteJointCmp(test::Test& test, RevoluteJoint* jointA, RevoluteJoint* jointB) {
+    tAssert(jointA && jointB, "Joints have different types");
+    tCheck(*jointA == *jointB);
+    jointCmpCommon(test, jointA, jointB);
+    tCompare(jointB->getLowerLimit(), jointA->getLowerLimit());
+    tCompare(jointB->getMaxMotorTorque(), jointA->getMaxMotorTorque());
+    tCompare(jointB->getMotorSpeed(), jointA->getMotorSpeed());
+    tCompare(jointB->getReferenceAngle(), jointA->getReferenceAngle());
+    tCompare(jointB->getUpperLimit(), jointA->getUpperLimit());
+    tCompare(jointB->isLimitEnabled(), jointA->isLimitEnabled());
+    tCompare(jointB->isMotorEnabled(), jointA->isMotorEnabled());
 }
 
 void SimulationTests::simCmp(test::Test& test, Simulation& simA, Simulation& simB) {
@@ -602,6 +619,21 @@ void SimulationTests::simCmp(test::Test& test, Simulation& simA, Simulation& sim
                 break;
             default:
                 mAssert(false, "Unknown GameObject type");
+        }
+    }
+    tAssertCompare(simA.getJointsSize(), simB.getJointsSize());
+    for (size_t i = 0; i < simA.getJointsSize(); i++) {
+        Joint* jointA = simA.getJoint(i);
+        Joint* jointB = simB.getJoint(i);
+        std::string jointA_str = std::to_string(jointA->object1->getId()) + "-" + std::to_string(jointA->object2->getId());
+        std::string jointB_str = std::to_string(jointB->object1->getId()) + "-" + std::to_string(jointB->object2->getId());
+        tContainer("Joints " + jointA_str + " and " + jointB_str + " are different: ");
+        switch (jointA->getType()) {
+            case b2JointType::e_revoluteJoint:
+                revoluteJointCmp(test, dynamic_cast<RevoluteJoint*>(jointA), dynamic_cast<RevoluteJoint*>(jointB));
+                break;
+            default:
+                mAssert(false, "Unknown Joint type");
         }
     }
 }

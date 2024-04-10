@@ -8,6 +8,7 @@ class GameObjectList;
 // adding Joint derived class
 // add isEqual to derived class
 // add comparison to == operator in Joint
+// add comparisons to Simulation test module
 
 class Joint {
 public:

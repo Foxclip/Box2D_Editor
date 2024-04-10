@@ -225,6 +225,12 @@ namespace test {
 
 	void TestModule::afterRunModule() { }
 
+	void TestModule::testMessage(Test& test, const std::string& file, size_t line, const std::string& message) {
+		std::string filename = std::filesystem::path(file).filename().string();
+		std::string location_str = "[" + filename + ":" + std::to_string(line) + "]";
+		test.getCurrentError()->add(message + " " + location_str);
+	}
+
 	void TestModule::testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message) {
 		if (!value) {
 			std::string filename = std::filesystem::path(file).filename().string();
