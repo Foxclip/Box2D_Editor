@@ -33,8 +33,7 @@ void SimulationTests::createTestLists() {
             tAssert(box, "Object is not a BoxObject");
             tCompare(box->getName(), "box0");
             tCompare(box->getId(), 0);
-            tApproxCompare(box->getGlobalPosition().x, 1.0f);
-            tApproxCompare(box->getGlobalPosition().y, 1.0f);
+            tCompare(box->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
             tApproxCompare(box->getGlobalRotation(), utils::to_radians(45.0f));
         }
     );
@@ -57,8 +56,7 @@ void SimulationTests::createTestLists() {
             tAssert(ball, "Object is not a BallObject");
             tCompare(ball->getName(), "ball0");
             tCompare(ball->getId(), 0);
-            tApproxCompare(ball->getGlobalPosition().x, 1.0f);
-            tApproxCompare(ball->getGlobalPosition().y, 1.0f);
+            tCompare(ball->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
             tApproxCompare(ball->getGlobalRotation(), utils::to_radians(0.0f));
         }
     );
@@ -86,8 +84,7 @@ void SimulationTests::createTestLists() {
             tAssert(polygon, "Object is not a PolygonObject");
             tCompare(polygon->getName(), "polygon0");
             tCompare(polygon->getId(), 0);
-            tApproxCompare(polygon->getGlobalPosition().x, 1.0f);
-            tApproxCompare(polygon->getGlobalPosition().y, 1.0f);
+            tCompare(polygon->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
             tApproxCompare(polygon->getGlobalRotation(), utils::to_radians(45.0f));
         }
     );
@@ -118,8 +115,7 @@ void SimulationTests::createTestLists() {
             tAssert(chain, "Object is not a ChainObject");
             tCompare(chain->getName(), "chain0");
             tCompare(chain->getId(), 0);
-            tApproxCompare(chain->getGlobalPosition().x, 1.0f);
-            tApproxCompare(chain->getGlobalPosition().y, 1.0f);
+            tCompare(chain->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
             tApproxCompare(chain->getGlobalRotation(), utils::to_radians(45.0f));
         }
     );
@@ -150,8 +146,7 @@ void SimulationTests::createTestLists() {
             tAssertCompare(simulation.getJointsSize(), 1);
             RevoluteJoint* joint = dynamic_cast<RevoluteJoint*>(simulation.getJoint(0));
             tAssert(joint, "Joint is not a RevoluteJoint");
-            tAssertCompare(joint->getAnchorA().x, 0.0f);
-            tAssertCompare(joint->getAnchorA().y, 5.0f);
+            tCompare(joint->getAnchorA(), b2Vec2(0.0f, 5.0f), &SimulationTests::b2Vec2ToStr);
         }
     );
     test::Test* car_test = list->addTest(
@@ -178,8 +173,7 @@ void SimulationTests::createTestLists() {
                 tAssert(car, "Object is not a PolygonObject");
                 tCompare(car->getName(), "car0");
                 tCompare(car->getId(), 0);
-                tApproxCompare(car->getGlobalPosition().x, 0.0f);
-                tApproxCompare(car->getGlobalPosition().y, 0.0f);
+                tVec2ApproxCompare(car->getGlobalPosition(), b2Vec2(0.0f, 0.0f), &SimulationTests::b2Vec2ToStr);
                 tApproxCompare(car->getGlobalRotation(), utils::to_radians(0.0f));
             }
             {
@@ -188,8 +182,7 @@ void SimulationTests::createTestLists() {
                 tCompare(wheel0->getName(), "car0 wheel0");
                 tCompare(wheel0->getId(), 1);
                 tCheck(wheel0->getParent() == car);
-                tApproxCompare(wheel0->getGlobalPosition().x, 5.0f);
-                tApproxCompare(wheel0->getGlobalPosition().y, 0.0f);
+                tVec2ApproxCompare(wheel0->getGlobalPosition(), b2Vec2(5.0f, 0.0f), &SimulationTests::b2Vec2ToStr);
             }
             {
                 BallObject* wheel1 = dynamic_cast<BallObject*>(simulation.getFromAll(2));
@@ -197,8 +190,7 @@ void SimulationTests::createTestLists() {
                 tCompare(wheel1->getName(), "car0 wheel1");
                 tCompare(wheel1->getId(), 2);
                 tCheck(wheel1->getParent() == car);
-                tApproxCompare(wheel1->getGlobalPosition().x, -2.50000024f);
-                tApproxCompare(wheel1->getGlobalPosition().y, 4.33012676f);
+                tVec2ApproxCompare(wheel1->getGlobalPosition(), b2Vec2(-2.50000024f, 4.33012676f), &SimulationTests::b2Vec2ToStr);
             }
             {
                 BallObject* wheel2 = dynamic_cast<BallObject*>(simulation.getFromAll(3));
@@ -206,8 +198,7 @@ void SimulationTests::createTestLists() {
                 tCompare(wheel2->getName(), "car0 wheel2");
                 tCompare(wheel2->getId(), 3);
                 tCheck(wheel2->getParent() == car);
-                tApproxCompare(wheel2->getGlobalPosition().x, -2.49999952f);
-                tApproxCompare(wheel2->getGlobalPosition().y, -4.33012724f);
+                tVec2ApproxCompare(wheel2->getGlobalPosition(), b2Vec2(-2.49999952f, -4.33012724f), &SimulationTests::b2Vec2ToStr);
             }
         }
     );
@@ -405,8 +396,7 @@ void SimulationTests::createTestLists() {
             );
             BoxObject* box = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
             simulation.advance(1.0f / 60.0f);
-            tApproxCompare(box->getGlobalPosition().x, 0.0f);
-            tApproxCompare(box->getGlobalPosition().y, -0.002722f);
+            tVec2ApproxCompare(box->getGlobalPosition(), b2Vec2(0.0f, -0.002722f), &SimulationTests::b2Vec2ToStr);
         }
     );
     test::Test* saveload_test = list->addTest(
@@ -538,6 +528,10 @@ std::string SimulationTests::colorToStr(const sf::Color& color) {
     return "(" + utils::color_to_str(color) + ")";
 }
 
+std::string SimulationTests::b2Vec2ToStr(const b2Vec2& vec) {
+    return "(" + utils::vec_to_str(vec) + ")";
+}
+
 void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, const GameObject* objB) {
     tCompare(objB->getChildren().size(), objA->getChildren().size());
     if (objA->getChildren().size() == objB->getChildren().size()) {
@@ -550,26 +544,22 @@ void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, con
     tCompare(objB->getName(), objA->getName());
     tCompare(objB->parent_id, objA->parent_id);
     tCompare(objB->getTransform().q.GetAngle(), objA->getTransform().q.GetAngle());
-    tCompare(objB->getTransform().p.x, objA->getTransform().p.x);
-    tCompare(objB->getTransform().p.y, objA->getTransform().p.y);
+    tCompare(objB->getTransform().p, objA->getTransform().p, &SimulationTests::b2Vec2ToStr);
     tCheck(objB->getVertices() == objA->getVertices());
 }
 
 void SimulationTests::jointCmpCommon(test::Test& test, Joint* jointA, Joint* jointB) {
     tCompare(jointB->object1->getId(), jointA->object1->getId());
     tCompare(jointB->object2->getId(), jointA->object2->getId());
-    tCompare(jointB->getAnchorA().x, jointA->getAnchorA().x);
-    tCompare(jointB->getAnchorA().y, jointA->getAnchorA().y);
-    tCompare(jointB->getAnchorB().x, jointA->getAnchorB().x);
-    tCompare(jointB->getAnchorB().y, jointA->getAnchorB().y);
+    tCompare(jointB->getAnchorA(), jointA->getAnchorA(), &SimulationTests::b2Vec2ToStr);
+    tCompare(jointB->getAnchorB(), jointA->getAnchorB(), &SimulationTests::b2Vec2ToStr);
     tCompare(jointB->getCollideConnected(), jointA->getCollideConnected());
 }
 
 void SimulationTests::boxCmp(test::Test& test, BoxObject* boxA, BoxObject* boxB) {
     tCheck(*boxA == *boxB);
     objCmpCommon(test, boxA, boxB);
-    tCompare(boxB->size.x, boxA->size.x);
-    tCompare(boxB->size.y, boxA->size.y);
+    tCompare(boxB->size, boxA->size, &SimulationTests::b2Vec2ToStr);
 }
 
 void SimulationTests::ballCmp(test::Test& test, BallObject* ballA, BallObject* ballB) {

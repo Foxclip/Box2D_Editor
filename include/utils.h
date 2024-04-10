@@ -306,4 +306,9 @@ namespace utils {
 		return avg;
 	}
 
+	template<typename TVec2>
+	bool vec_approx_cmp(const TVec2& left, const TVec2& right, double epsilon = 0.0001) {
+		return abs(left.x - right.x) < epsilon && abs(left.y - right.y) < epsilon;
+	}
+
 }

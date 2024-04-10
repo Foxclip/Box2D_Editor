@@ -12,6 +12,7 @@ protected:
 
 private:
 	static std::string colorToStr(const sf::Color& color);
+	static std::string b2Vec2ToStr(const b2Vec2& vec);
 	void objCmpCommon(test::Test& test, const GameObject* objA, const GameObject* objB);
 	void jointCmpCommon(test::Test& test, Joint* jointA, Joint* jointB);
 	void boxCmp(test::Test& test, BoxObject* boxA, BoxObject* boxB);
