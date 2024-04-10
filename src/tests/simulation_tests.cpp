@@ -545,6 +545,8 @@ void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, con
     tCompare(objB->parent_id, objA->parent_id);
     tCompare(objB->getTransform().q.GetAngle(), objA->getTransform().q.GetAngle());
     tCompare(objB->getTransform().p, objA->getTransform().p, &SimulationTests::b2Vec2ToStr);
+    tCompare(objB->getLinearVelocity(), objA->getLinearVelocity(), &SimulationTests::b2Vec2ToStr);
+    tCompare(objB->getAngularVelocity(), objA->getAngularVelocity());
     tCheck(objB->getVertices() == objA->getVertices());
 }
 
