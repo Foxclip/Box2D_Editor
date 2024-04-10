@@ -8,6 +8,8 @@ namespace test {
 	Test::Test(std::string name, TestFuncType func) {
 		this->name = name;
 		this->func = func;
+		root_error = std::make_unique<Error>("root", Error::Type::Root);
+		error_stack.push(root_error.get());
 	}
 
 	Test::Test(std::string name, std::vector<Test*> required, TestFuncType func)
@@ -26,10 +28,14 @@ namespace test {
 		try {
 			func(*this);
 		} catch (std::exception exc) {
-			errors.push_back(Error("EXCEPTION: " + std::string(exc.what())));
+			getCurrentError()->add("EXCEPTION: " + std::string(exc.what()));
 			result = false;
 		}
 		return result;
+	}
+
+	Test::Error* Test::getCurrentError() const {
+		return error_stack.top();
 	}
 
 	std::string Test::char_to_str(char c) {
@@ -54,35 +60,58 @@ namespace test {
 		}
 	}
 
-	std::string Test::char_to_esc(std::string str) {
+	std::string Test::char_to_esc(std::string str, bool convert_quotes) {
 		std::string result;
 		for (size_t i = 0; i < str.size(); i++) {
 			char current_char = str[i];
-			result += char_to_str(current_char);
+			if (!convert_quotes && current_char == '"') {
+				result += current_char;
+			} else {
+				result += char_to_str(current_char);
+			}
 		}
 		return result;
 	}
 
-	Test::Error::Error(const std::string& str) {
+	Test::Error::Error(const std::string& str, Type type) {
 		this->str = str;
+		this->type = type;
 	}
 
-	Test::Error::Error(const std::string& str, const std::vector<Error>& subentries) {
-		this->str = str;
-		this->subentries = subentries;
-	}
-
-	void Test::Error::add(const Error& error) {
-		subentries.push_back(error);
+	Test::Error* Test::Error::add(const std::string& message, Type type) {
+		std::unique_ptr<Error> uptr = std::make_unique<Error>(message, type);
+		Error* ptr = uptr.get();
+		subentries.push_back(std::move(uptr));
+		return ptr;
 	}
 
 	void Test::Error::log() const {
-		std::string esc_str = char_to_esc(str);
-		logger << esc_str << "\n";
-		LoggerIndent subentries_indent;
-		for (const Error& subentry : subentries) {
-			subentry.log();
+		if (type == Type::Container && subentries.empty()) {
+			return;
 		}
+		if (type != Type::Root) {
+			std::string esc_str = char_to_esc(str, false);
+			logger << esc_str << "\n";
+		}
+		if (subentries.size() > 0) {
+			LoggerIndent subentries_indent(type != Type::Root);
+			for (auto& subentry : subentries) {
+				subentry->log();
+			}
+		}
+	}
+
+	ErrorContainer::ErrorContainer(Test& test, const std::string& message) : test(test) {
+		Test::Error* error = test.getCurrentError()->add(message, Test::Error::Type::Container);
+		test.error_stack.push(error);
+	}
+
+	ErrorContainer::~ErrorContainer() {
+		close();
+	}
+
+	void ErrorContainer::close() {
+		test.error_stack.pop();
 	}
 
 	TestList::TestList(const std::string& name) {
@@ -126,13 +155,7 @@ namespace test {
 				} else {
 					logger << "FAILED: " << test->name << "\n";
 					LoggerIndent errors_indent;
-					if (!test->errors.empty()) {
-						for (const Test::Error& error : test->errors) {
-							error.log();
-						}
-					} else {
-						logger << "<empty>" << "\n";
-					}
+					test->root_error->log();
 					failed_list.push_back(test->name);
 				}
 			}
@@ -206,7 +229,7 @@ namespace test {
 		if (!value) {
 			std::string filename = std::filesystem::path(file).filename().string();
 			std::string location_str = "[" + filename + ":" + std::to_string(line) + "]";
-			test.errors.push_back(Test::Error("Failed condition: " + value_message + " " + location_str));
+			test.getCurrentError()->add("Failed condition: " + value_message + " " + location_str);
 			test.result = false;
 		}
 	}
@@ -215,7 +238,7 @@ namespace test {
 		if (!value) {
 			std::string filename = std::filesystem::path(file).filename().string();
 			std::string location_str = "[" + filename + ":" + std::to_string(line) + "]";
-			test.errors.push_back(Test::Error(message + ": " + value_message + " " + location_str));
+			test.getCurrentError()->add(message + ": " + value_message + " " + location_str);
 			test.result = false;
 		}
 	}

@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <filesystem>
+#include <stack>
 
 namespace test {
 
@@ -37,31 +38,53 @@ namespace test {
 		} \
 	}
 
+#define tContainer(message) \
+	test::ErrorContainer error_container(test, message);
+
 	class Test {
 	public:
 		struct Error {
+			enum class Type {
+				Root,
+				Container,
+				Normal,
+			};
+			Type type;
 			std::string str;
-			std::vector<Error> subentries;
-			explicit Error(const std::string& str);
-			explicit Error(const std::string& str, const std::vector<Error>& subentries);
-			void add(const Error& error);
+			std::vector<std::unique_ptr<Error>> subentries;
+			explicit Error(const std::string& str, Type type);
+			Error* add(const std::string& message, Type type = Type::Normal);
 			void log() const;
 		};
 		std::string name = "<unnamed>";
-		std::vector<Error> errors;
 		std::vector<Test*> required;
 		bool result = false;
 		bool cancelled = false;
+		std::unique_ptr<Error> root_error;
 
 		Test(std::string name, TestFuncType func);
 		Test(std::string name, std::vector<Test*> required, TestFuncType func);
 		bool run();
+		Error* getCurrentError() const;
 
 	private:
+		friend class ErrorContainer;
 		TestFuncType func;
+		std::stack<Error*> error_stack;
 
 		static std::string char_to_str(char c);
-		static std::string char_to_esc(std::string str);
+		static std::string char_to_esc(std::string str, bool convert_quotes = true);
+	};
+
+	class ErrorContainer {
+	public:
+		ErrorContainer(Test& test, const std::string& message);
+		~ErrorContainer();
+
+	private:
+		Test& test;
+
+		void close();
 	};
 
 	class TestList {
@@ -177,10 +200,9 @@ namespace test {
 	inline void TestModule::compareFail(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str) {
 		std::string filename = std::filesystem::path(file).filename().string();
 		std::string location_str = "[" + filename + ":" + std::to_string(line) + "]";
-		Test::Error error(name + " " + location_str);
-		error.add(Test::Error("Expected value: " + to_str(expected)));
-		error.add(Test::Error("  Actual value: " + to_str(actual)));
-		test.errors.push_back(error);
+		Test::Error* error = test.getCurrentError()->add(name + " " + location_str);
+		error->add("Expected value: " + to_str(expected));
+		error->add("  Actual value: " + to_str(actual));
 		test.result = false;
 	}
 

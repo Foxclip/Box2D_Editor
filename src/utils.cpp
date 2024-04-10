@@ -344,11 +344,15 @@ namespace utils {
 		}
 	}
 
-	std::string char_to_esc(std::string str) {
+	std::string char_to_esc(std::string str, bool convert_quotes) {
 		std::string result;
 		for (size_t i = 0; i < str.size(); i++) {
 			char current_char = str[i];
-			result += char_to_str(current_char);
+			if (!convert_quotes && current_char == '"') {
+				result += current_char;
+			} else {
+				result += char_to_str(current_char);
+			}
 		}
 		return result;
 	}

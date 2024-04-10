@@ -589,10 +589,12 @@ void SimulationTests::chainCmp(test::Test& test, ChainObject* chainA, ChainObjec
 }
 
 void SimulationTests::simCmp(test::Test& test, Simulation& simA, Simulation& simB) {
+    tContainer("Sumulations are different:");
     tAssertCompare(simA.getAllSize(), simB.getAllSize());
     for (size_t i = 0; i < simA.getAllSize(); i++) {
         GameObject* objA = simA.getFromAll(i);
         GameObject* objB = simB.getFromAll(i);
+        tContainer("Objects \"" + objA->getName() + "\" and " + objB->getName() + "\" are different: ");
         switch (objA->getType()) {
             case GameObject::GameObjectType::Box:
                 boxCmp(test, dynamic_cast<BoxObject*>(objA), dynamic_cast<BoxObject*>(objB));

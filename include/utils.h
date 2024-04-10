@@ -48,7 +48,7 @@ namespace utils {
 	bool rect_fixture_intersect(const b2Vec2& lower_bound, const b2Vec2& upper_bound, const b2Fixture* fixture);
 	float sgn(float value);
 	std::string char_to_str(char c);
-	std::string char_to_esc(std::string str);
+	std::string char_to_esc(std::string str, bool convert_quotes = true);
 	std::string esc_to_char(std::string str);
 	void quantize_position(sf::Transform& transform);
 	bool parseLL(const std::string& str, long long& result);
