@@ -338,15 +338,7 @@ void SimulationTests::createTestLists() {
             std::string str = jointA->serialize();
             std::unique_ptr<RevoluteJoint> uptr = RevoluteJoint::deserialize(str, &simulation);
             RevoluteJoint* jointB = uptr.get();
-            tCheck(*jointA == *jointB);
-            jointCmpCommon(test, jointA, jointB);
-            tCompare(jointB->getLowerLimit(), jointA->getLowerLimit());
-            tCompare(jointB->getMaxMotorTorque(), jointA->getMaxMotorTorque());
-            tCompare(jointB->getMotorSpeed(), jointA->getMotorSpeed());
-            tCompare(jointB->getReferenceAngle(), jointA->getReferenceAngle());
-            tCompare(jointB->getUpperLimit(), jointA->getUpperLimit());
-            tCompare(jointB->isLimitEnabled(), jointA->isLimitEnabled());
-            tCompare(jointB->isMotorEnabled(), jointA->isMotorEnabled());
+            revoluteJointCmp(test, jointA, jointB);
         }
     );
     test::Test* car_serialize_test = list->addTest(
@@ -371,13 +363,7 @@ void SimulationTests::createTestLists() {
             std::string str = simulationA.serialize();
             Simulation simulationB;
             simulationB.deserialize(str);
-            tAssertCompare(simulationB.getAllSize(), 4);
-            for (size_t i = 0; i < simulationB.getAllSize(); i++) {
-                tCheck(*simulationA.getFromAll(i) == *simulationB.getFromAll(i));
-            }
-            for (size_t i = 0; i < simulationB.getJointsSize(); i++) {
-                tCheck(*simulationA.getJoint(i) == *simulationB.getJoint(i));
-            }
+            simCmp(test, simulationA, simulationB);
         }
     );
     test::Test* advance_test = list->addTest(
