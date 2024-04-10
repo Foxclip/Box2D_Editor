@@ -212,6 +212,16 @@ void Editor::initWidgets() {
     edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(*this);
     create_tool.create_panel_widget = widgets.createWidget<CreatePanel>(*this);
 
+    // step text
+    step_widget = widgets.createWidget<fw::TextWidget>();
+    step_widget->setFont(ui_font);
+    step_widget->setString(std::to_string(simulation.getStep()));
+    step_widget->setCharacterSize(10);
+    step_widget->setFillColor(sf::Color::White);
+    step_widget->setOrigin(fw::Widget::Anchor::TOP_RIGHT);
+    step_widget->setParentAnchor(fw::Widget::Anchor::TOP_RIGHT);
+    step_widget->setName("step text");
+
     // pause widget
     paused_rect_widget = widgets.createWidget<fw::ContainerWidget>();
     paused_rect_widget->setFillColor(sf::Color(0, 0, 0, 128));
@@ -664,6 +674,7 @@ void Editor::onProcessWorld() {
     if (!paused) {
         simulation.advance(timeStep);
     }
+    step_widget->setString(std::to_string(simulation.getStep()));
 }
 
 void Editor::onRender() {

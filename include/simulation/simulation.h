@@ -5,10 +5,8 @@
 
 class Simulation : public GameObjectList {
 public:
-	const int32 VELOCITY_ITERATIONS = 6;
-	const int32 POSITION_ITERATIONS = 2;
-
 	Simulation();
+	size_t getStep() const;
 	void advance(float time_step);
 	void load(const std::string& filename);
 	void save(const std::string& filename) const;
@@ -60,5 +58,8 @@ public:
 	bool operator==(const Simulation& other) const;
 
 private:
+	const int32 VELOCITY_ITERATIONS = 6;
+	const int32 POSITION_ITERATIONS = 2;
+	size_t step = 0;
 
 };

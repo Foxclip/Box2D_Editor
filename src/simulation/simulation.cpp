@@ -4,9 +4,14 @@ Simulation::Simulation() {
     reset();
 }
 
+size_t Simulation::getStep() const {
+    return step;
+}
+
 void Simulation::advance(float time_step) {
     world->Step(time_step, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     transformFromRigidbody();
+    step++;
 }
 
 void Simulation::load(const std::string& filename) {

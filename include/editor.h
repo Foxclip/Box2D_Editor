@@ -137,6 +137,7 @@ private:
 	fw::TextWidget* fps_text_widget;
 	fw::RectangleWidget* logger_widget;
 	fw::TextWidget* logger_text_widget;
+	fw::TextWidget* step_widget;
 	sf::CircleShape origin_shape;
 	sf::Text object_info_text;
 	sf::Text id_text;
