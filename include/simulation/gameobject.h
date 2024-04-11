@@ -44,7 +44,6 @@ public:
 		Polygon,
 		Chain
 	};
-	b2Body* rigid_body = nullptr;
 	sf::Color color;
 	bool hover = false;
 	bool selected = false;
@@ -66,6 +65,7 @@ public:
 	virtual sf::Drawable* getDrawable() const = 0;
 	virtual sf::Transformable* getTransformable() const = 0;
 	b2BodyType getBodyType() const;
+	b2Body* getRigidBody() const;
 	const b2Vec2& getPosition() const;
 	const b2Vec2& getLinearVelocity() const;
 	float getAngularVelocity() const;
@@ -137,9 +137,10 @@ protected:
 	ptrdiff_t id = -1;
 	ptrdiff_t parent_id = -1;
 	std::string name = "<unnamed>";
-	GameObjectList* object_list = nullptr;
+	b2Body* rigid_body = nullptr;
 	std::vector<EditableVertex> vertices;
 	GameObject* parent = nullptr;
+	GameObjectList* object_list = nullptr;
 
 	virtual void drawMask(sf::RenderTarget& mask) = 0;
 	std::vector<b2Vec2> getPositions() const;

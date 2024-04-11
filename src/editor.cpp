@@ -1271,7 +1271,7 @@ void Editor::grabSelected() {
         move_tool.moving_objects.add(obj);
         obj->orig_pos = obj->getGlobalPosition();
         obj->cursor_offset = obj->getGlobalPosition() - b2MousePosWorld;
-        obj->was_enabled = obj->rigid_body->IsEnabled();
+        obj->was_enabled = obj->getRigidBody()->IsEnabled();
         obj->setEnabled(false, true);
         obj->setLinearVelocity(b2Vec2(0.0f, 0.0f), true);
         obj->setAngularVelocity(0.0f, true);
@@ -1288,7 +1288,7 @@ void Editor::rotateSelected() {
         rotate_tool.rotating_objects.add(obj);
         obj->orig_pos = obj->getGlobalPosition();
         obj->orig_angle = obj->getGlobalRotation();
-        obj->was_enabled = obj->rigid_body->IsEnabled();
+        obj->was_enabled = obj->getRigidBody()->IsEnabled();
         obj->setEnabled(false, true);
         obj->setAngularVelocity(0.0f, true);
     }

@@ -249,7 +249,7 @@ PolygonObject* Simulation::createCar(
         }
         b2Vec2 wheel_pos = utils::get_pos<b2Vec2>(lengths, i);
         b2Vec2 anchor_pos = wheel_pos;
-        b2Vec2 anchor_pos_world = car->rigid_body->GetPosition() + anchor_pos;
+        b2Vec2 anchor_pos_world = car->getRigidBody()->GetPosition() + anchor_pos;
         float radius = wheels[i];
         std::string wheel_name = car->getName() + " wheel" + std::to_string(wheel_count);
         BallObject* wheel = createBall(
@@ -260,7 +260,7 @@ PolygonObject* Simulation::createCar(
         wheel->setRestitution(0.5f, false);
         wheel->setParent(car);
         b2RevoluteJointDef wheel_joint_def;
-        wheel_joint_def.Initialize(car->rigid_body, wheel->rigid_body, anchor_pos_world);
+        wheel_joint_def.Initialize(car->getRigidBody(), wheel->getRigidBody(), anchor_pos_world);
         wheel_joint_def.maxMotorTorque = 30.0f;
         wheel_joint_def.motorSpeed = -10.0f;
         wheel_joint_def.enableMotor = true;

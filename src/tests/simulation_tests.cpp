@@ -116,7 +116,7 @@ void SimulationTests::createSimulationList() {
             BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.0f, 0.0f));
             BoxObject* box1 = createBox(simulation, "box1", b2Vec2(0.0f, 5.0f));
             b2RevoluteJointDef joint_def;
-            joint_def.Initialize(box0->rigid_body, box1->rigid_body, b2Vec2(0.0f, 5.0f));
+            joint_def.Initialize(box0->getRigidBody(), box1->getRigidBody(), b2Vec2(0.0f, 5.0f));
             simulation.createRevoluteJoint(joint_def, box0, box1);
             tAssert(tCompare(simulation.getJointsSize(), 1));
             RevoluteJoint* joint = dynamic_cast<RevoluteJoint*>(simulation.getJoint(0));
@@ -272,7 +272,7 @@ void SimulationTests::createSimulationList() {
                 "box1", b2Vec2(0.0f, 5.0f), utils::to_radians(-10.0f), b2Vec2(3.0f, 0.5f), sf::Color::Green
             );
             b2RevoluteJointDef joint_def;
-            joint_def.Initialize(box0->rigid_body, box1->rigid_body, b2Vec2(0.0f, 5.0f));
+            joint_def.Initialize(box0->getRigidBody(), box1->getRigidBody(), b2Vec2(0.0f, 5.0f));
             joint_def.collideConnected = true;
             joint_def.enableLimit = true;
             joint_def.enableMotor = true;

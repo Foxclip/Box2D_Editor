@@ -66,8 +66,8 @@ RevoluteJoint::RevoluteJoint(const b2RevoluteJointDef& def, b2World* world, Game
 	this->object1 = object1;
 	this->object2 = object2;
 	b2RevoluteJointDef def_copy(def);
-	def_copy.bodyA = object1->rigid_body;
-	def_copy.bodyB = object2->rigid_body;
+	def_copy.bodyA = object1->getRigidBody();
+	def_copy.bodyB = object2->getRigidBody();
 	joint = world->CreateJoint(&def_copy);
 	revolute_joint = dynamic_cast<b2RevoluteJoint*>(joint);
 }

@@ -43,6 +43,10 @@ b2BodyType GameObject::getBodyType() const {
 	return rigid_body->GetType();
 }
 
+b2Body* GameObject::getRigidBody() const {
+	return rigid_body;
+}
+
 const b2Vec2& GameObject::getPosition() const {
 	return getTransform().p;
 }
