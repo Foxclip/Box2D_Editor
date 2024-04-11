@@ -1,6 +1,6 @@
 #include "tests/searchindex_tests.h"
 
-SearchIndexTests::SearchIndexTests() : TestModule("SearchIndex") { }
+SearchIndexTests::SearchIndexTests(test::TestManager& manager) : TestModule("SearchIndex", manager) { }
 
 class MyClass { };
 

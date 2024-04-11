@@ -1,6 +1,6 @@
 #include "tests/simulation_tests.h"
 
-SimulationTests::SimulationTests() : TestModule("Simulation") { }
+SimulationTests::SimulationTests(test::TestManager& manager) : TestModule("Simulation", manager) { }
 
 void SimulationTests::createTestLists() {
     createSimulationList();

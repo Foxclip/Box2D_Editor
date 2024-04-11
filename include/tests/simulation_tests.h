@@ -5,10 +5,10 @@
 
 class SimulationTests : public test::TestModule {
 public:
-	SimulationTests();
+	SimulationTests(test::TestManager& manager);
+	void createTestLists() override;
 
 protected:
-	void createTestLists() override;
 	void createSimulationList();
 	void createGameObjectList();
 

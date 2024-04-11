@@ -5,10 +5,10 @@
 
 class CompVectorTests : public test::TestModule {
 public:
-	CompVectorTests();
+	CompVectorTests(test::TestManager& manager);
+	void createTestLists() override;
 
 protected:
-	void createTestLists() override;
 	void createCompVectorList(test::TestList* list);
 	void createCompVectorUptrList(test::TestList* list);
 };

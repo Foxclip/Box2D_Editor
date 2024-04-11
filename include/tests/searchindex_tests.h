@@ -5,10 +5,10 @@
 
 class SearchIndexTests : public test::TestModule {
 public:
-	SearchIndexTests();
+	SearchIndexTests(test::TestManager& manager);
+	void createTestLists() override;
 
 protected:
-	void createTestLists() override;
 	void createTestListUnique(test::TestList* list);
 	void createTestListMultiple(test::TestList* list);
 

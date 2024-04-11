@@ -42,7 +42,6 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: remove toStr argument in tVec2ApproxCompare
     // TODO: GameObject tests
     // TODO: ObjectList tests
     // TODO: Widget tests

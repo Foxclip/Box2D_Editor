@@ -5,8 +5,8 @@
 
 class LoggerTests : public test::TestModule {
 public:
-	LoggerTests();
+	LoggerTests(test::TestManager& manager);
+	void createTestLists() override;
 
 protected:
-	void createTestLists() override;
 };

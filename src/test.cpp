@@ -114,7 +114,7 @@ namespace test {
 		test.error_stack.pop();
 	}
 
-	TestList::TestList(const std::string& name) {
+	TestList::TestList(const std::string& name, TestModule& module) : module(module) {
 		this->name = name;
 	}
 
@@ -139,23 +139,27 @@ namespace test {
 
 	void TestList::runTests() {
 		OnBeforeRunAllTests();
-		for (size_t i = 0; i < test_list.size(); i++) {
-			Test* test = test_list[i].get();
+		for (auto& test : test_list) {
+			std::string spacing_str;
+			size_t spacing_size = module.manager.max_test_name - test->name.size();
+			for (size_t i = 0; i < spacing_size; i++) {
+				spacing_str += "-";
+			}
+			logger << test->name << spacing_str << "|";
 			logger.manualDeactivate();
 			OnBeforeRunTest();
 			bool result = test->run();
 			OnAfterRunTest();
 			logger.manualActivate();
-			std::string result_str;
 			if (result) {
-				logger << "passed: " << test->name << "\n";
+				logger << "passed" << "\n";
 				passed_list.push_back(test->name);
 			} else {
 				if (test->cancelled) {
-					logger << "cancelled: " << test->name << "\n";
+					logger << "cancelled" << "\n";
 					cancelled_list.push_back(test->name);
 				} else {
-					logger << "FAILED: " << test->name << "\n";
+					logger << "FAILED" << "\n";
 					LoggerIndent errors_indent;
 					test->root_error->log();
 					failed_list.push_back(test->name);
@@ -165,31 +169,32 @@ namespace test {
 		OnAfterRunAllTests();
 	}
 
-	TestModule::TestModule(const std::string& name) {
+	TestModule::TestModule(const std::string& name, TestManager& manager) : manager(manager) {
 		this->name = name;
 	}
 
 	TestList* TestModule::createTestList(const std::string& name) {
-		std::unique_ptr<TestList> test_list = std::make_unique<TestList>(name);
+		std::unique_ptr<TestList> test_list = std::make_unique<TestList>(name, *this);
 		TestList* ptr = test_list.get();
 		test_lists.push_back(std::move(test_list));
 		return ptr;
 	}
 
 	void TestModule::runTests() {
-		logger << "Running test module: " << name << "\n";
+		logger << "Module: " << name << "\n";
 		LoggerIndent test_module_indent;
 		beforeRunModule();
-		createTestLists();
 		for (auto& test_list : test_lists) {
-			logger << "Running test list: " << test_list->name << "\n";
+			logger << "List: " << test_list->name << "\n";
 			LoggerIndent test_list_indent;
 			test_list->runTests();
-			printSummary(
-				test_list->passed_list,
-				test_list->cancelled_list,
-				test_list->failed_list
-			);
+			if (manager.print_list_summary) {
+				printSummary(
+					test_list->passed_list,
+					test_list->cancelled_list,
+					test_list->failed_list
+				);
+			}
 			for (const std::string& name : test_list->passed_list) {
 				passed_list.push_back(test_list->name + "/" + name);
 			}
@@ -201,7 +206,9 @@ namespace test {
 			}
 		}
 		afterRunModule();
-		printSummary(passed_list, cancelled_list, failed_list);
+		if (manager.print_module_summary) {
+			printSummary(passed_list, cancelled_list, failed_list);
+		}
 	}
 
 	void TestModule::printSummary(
@@ -252,6 +259,18 @@ namespace test {
 	}
 
 	void TestManager::runAllModules() {
+		for (auto& module : modules) {
+			module->createTestLists();
+		}
+		for (auto& module : modules) {
+			for (auto& list : module->test_lists) {
+				for (Test* test : list->getTestList()) {
+					if (test->name.size() > max_test_name) {
+						max_test_name = test->name.size();
+					}
+				}
+			}
+		}
 		std::vector<std::string> passed_list;
 		std::vector<std::string> cancelled_list;
 		std::vector<std::string> failed_list;

@@ -1,6 +1,6 @@
 #include "tests/logger_tests.h"
 
-LoggerTests::LoggerTests() : TestModule("Logger") { }
+LoggerTests::LoggerTests(test::TestManager& manager) : TestModule("Logger", manager) { }
 
 void LoggerTests::createTestLists() {
 	test::TestList* list = createTestList("Logger");

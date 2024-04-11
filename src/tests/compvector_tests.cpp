@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <ranges>
 
-CompVectorTests::CompVectorTests() : TestModule("CompVector") { }
+CompVectorTests::CompVectorTests(test::TestManager& manager) : TestModule("CompVector", manager) { }
 
 void CompVectorTests::createTestLists() {
 	test::TestList* compvector_test_list = createTestList("CompVector");

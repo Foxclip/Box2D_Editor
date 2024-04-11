@@ -93,6 +93,8 @@ namespace test {
 		void close();
 	};
 
+	class TestModule;
+
 	class TestList {
 	public:
 		std::string name;
@@ -104,18 +106,21 @@ namespace test {
 		std::function<void(void)> OnBeforeRunTest = []() { };
 		std::function<void(void)> OnAfterRunTest = []() { };
 
-		TestList(const std::string& name);
+		TestList(const std::string& name, TestModule& module);
 		Test* addTest(std::string name, TestFuncType func);
 		Test* addTest(std::string name, std::vector<Test*> required, TestFuncType func);
 		std::vector<Test*> getTestList() const;
 		void runTests();
 
 	protected:
+		TestModule& module;
 		std::vector<std::unique_ptr<Test>> test_list;
 
 	private:
 
 	};
+
+	class TestManager;
 
 	class TestModule {
 	public:
@@ -125,7 +130,8 @@ namespace test {
 		std::vector<std::string> cancelled_list;
 		std::vector<std::string> failed_list;
 
-		TestModule(const std::string& name);
+		TestModule(const std::string& name, TestManager& manager);
+		virtual void createTestLists() = 0;
 		TestList* createTestList(const std::string& name);
 		void runTests();
 		static void printSummary(
@@ -135,7 +141,9 @@ namespace test {
 		);
 
 	protected:
-		virtual void createTestLists() = 0;
+		friend class TestList;
+		TestManager& manager;
+
 		virtual void beforeRunModule();
 		virtual void afterRunModule();
 		void testMessage(Test& test, const std::string& file, size_t line, const std::string& message);
@@ -160,13 +168,19 @@ namespace test {
 
 	class TestManager {
 	public:
+		bool print_module_summary = false;
+		bool print_list_summary = false;
+
 		template<typename T>
 		requires std::derived_from<T, TestModule>
 		void addModule();
 		void runAllModules();
 
 	private:
+		friend class TestList;
+		friend class Test;
 		std::vector<std::unique_ptr<TestModule>> modules;
+		size_t max_test_name = 0;
 
 	};
 
@@ -230,7 +244,7 @@ namespace test {
 	template<typename T>
 	requires std::derived_from<T, TestModule>
 	inline void TestManager::addModule() {
-		std::unique_ptr<T> uptr = std::make_unique<T>();
+		std::unique_ptr<T> uptr = std::make_unique<T>(*this);
 		modules.push_back(std::move(uptr));
 	}
 
