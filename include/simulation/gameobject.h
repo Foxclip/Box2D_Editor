@@ -94,7 +94,8 @@ public:
 	void setParent(GameObject* new_parent);
 	void setName(const std::string& new_name);
 	void setEnabled(bool enabled, bool include_children);
-	void setGlobalTransform(const b2Transform& transform);
+	void setGlobalTransform(const b2Transform& p_transform);
+	void setPosition(const b2Vec2& pos);
 	void setGlobalPosition(const b2Vec2& pos);
 	void setGlobalAngle(float angle);
 	void setLinearVelocity(const b2Vec2& velocity, bool include_children);
@@ -151,7 +152,7 @@ private:
 	friend class GameObjectTransform;
 	ptrdiff_t new_id = -1;
 	CompVector<GameObject*> children;
-	GameObjectTransform transforms = GameObjectTransform(this);
+	GameObjectTransform transform = GameObjectTransform(this);
 
 };
 

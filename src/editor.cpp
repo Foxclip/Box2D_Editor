@@ -610,6 +610,11 @@ void Editor::onProcessMouse() {
             b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.pivot_pos;
             float current_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
             float offset = current_mouse_angle - rotate_tool.orig_mouse_angle;
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
+                float offset_deg = utils::to_degrees(offset);
+                float quantized_offset = ((int)(offset_deg / ROTATE_ANGLE_STEP)) * ROTATE_ANGLE_STEP;
+                offset = utils::to_radians(quantized_offset);
+            }
             b2Vec2 new_pos = utils::rotate_point(obj->orig_pos, rotate_tool.pivot_pos, offset);
             obj->setGlobalPosition(new_pos);
             obj->setGlobalAngle(obj->orig_angle + offset);

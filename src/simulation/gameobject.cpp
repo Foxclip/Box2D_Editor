@@ -61,11 +61,11 @@ float GameObject::getGlobalRotation() const {
 }
 
 const b2Transform& GameObject::getTransform() const {
-	return transforms.getTransform();
+	return transform.getTransform();
 }
 
 const b2Transform& GameObject::getGlobalTransform() const {
-	return transforms.getGlobalTransform();
+	return transform.getGlobalTransform();
 }
 
 b2Transform GameObject::getParentGlobalTransform() const {
@@ -245,19 +245,24 @@ void GameObject::setEnabled(bool enabled, bool include_children) {
 	}
 }
 
-void GameObject::setGlobalTransform(const b2Transform& transform) {
-	transforms.setGlobalTransform(transform);
+void GameObject::setGlobalTransform(const b2Transform& p_transform) {
+	transform.setGlobalTransform(p_transform);
+}
+
+void GameObject::setPosition(const b2Vec2& pos) {
+	transform.setPosition(pos);
+	transformToRigidbody();
 }
 
 void GameObject::setGlobalPosition(const b2Vec2& pos) {
 	b2Vec2 parent_local_pos = toParentLocal(pos);
-	transforms.setPosition(parent_local_pos);
+	transform.setPosition(parent_local_pos);
 	transformToRigidbody();
 }
 
 void GameObject::setGlobalAngle(float angle) {
 	float parent_local_angle = toParentLocalAngle(angle);
-	transforms.setAngle(parent_local_angle);
+	transform.setAngle(parent_local_angle);
 	transformToRigidbody();
 }
 
@@ -442,7 +447,7 @@ void GameObject::syncVertices(bool save_velocities) {
 }
 
 void GameObject::transformFromRigidbody() {
-	transforms.setGlobalTransform(rigid_body->GetTransform());
+	transform.setGlobalTransform(rigid_body->GetTransform());
 	for (size_t i = 0; i < children.size(); i++) {
 		children[i]->transformFromRigidbody();
 	}
@@ -625,7 +630,7 @@ bool GameObject::operator==(const GameObject& other) const {
 	if (parent_id != other.parent_id) {
 		return false;
 	}
-	if (transforms != other.transforms) {
+	if (transform != other.transform) {
 		return false;
 	}
 	if (vertices != other.vertices) {

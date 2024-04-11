@@ -1,5 +1,8 @@
 #include "tests/simulation_tests.h"
 
+#define vecApproxCmp(actual, expected) \
+    tVec2ApproxCompare(actual, expected, &SimulationTests::b2Vec2ToStr);
+
 SimulationTests::SimulationTests() : TestModule("Simulation") { }
 
 void SimulationTests::createTestLists() {
@@ -505,6 +508,9 @@ void SimulationTests::createGameObjectList() {
     );
     test::Test* set_parent_three_test = list->addTest(
         "set_parent_three",
+        {
+            set_parent_two_test
+        },
         [&](test::Test& test) {
             Simulation simulation;
             BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
@@ -537,6 +543,34 @@ void SimulationTests::createGameObjectList() {
             tVec2ApproxCompare(box1_global_pos_after, box1_global_pos_before, &SimulationTests::b2Vec2ToStr);
             tVec2ApproxCompare(box2_local_pos_after, box2_local_pos_before - box1_local_pos_before, &SimulationTests::b2Vec2ToStr);
             tVec2ApproxCompare(box2_global_pos_after, box2_global_pos_before, &SimulationTests::b2Vec2ToStr);
+        }
+    );
+    test::Test* set_position_two_test = list->addTest(
+        "set_position_two",
+        {
+            set_parent_two_test
+        },
+        [&](test::Test& test) {
+            Simulation simulation;
+            b2Vec2 box0_initial_pos = b2Vec2(0.5f, 0.5f);
+            b2Vec2 box1_initial_pos = b2Vec2(1.1f, 1.1f);
+            BoxObject* box0 = createBox(simulation, "box0", box0_initial_pos);
+            BoxObject* box1 = createBox(simulation, "box1", box1_initial_pos);
+            b2Vec2 rel_pos = box1_initial_pos - box0_initial_pos;
+            b2Vec2 box0_new_pos(1.0f, 1.0f);
+            box1->setParent(box0);
+            box0->setPosition(box0_new_pos);
+            vecApproxCmp(box0->getGlobalPosition(), box0_new_pos);
+            vecApproxCmp(box1->getGlobalPosition(), box0_new_pos + rel_pos);
+            b2Vec2 box1_new_pos(2.0f, 2.0f);
+            box1->setPosition(box1_new_pos);
+            vecApproxCmp(box0->getGlobalPosition(), box0_new_pos);
+            vecApproxCmp(box1->getGlobalPosition(), box0_new_pos + box1_new_pos);
+            b2Vec2 box1_new_global_pos(2.0f, 2.0f);
+            box1->setGlobalPosition(box1_new_global_pos);
+            vecApproxCmp(box0->getGlobalPosition(), box0_new_pos);
+            vecApproxCmp(box1->getPosition(), box1_new_global_pos - box0_new_pos);
+            vecApproxCmp(box1->getGlobalPosition(), box1_new_global_pos);
         }
     );
 }

@@ -23,7 +23,7 @@ void execute_app() {
     try {
         app.init();
         //app.load("levels/level.txt");
-        moving_car(app);
+        box_parent(app);
         app.start();
     } catch (std::string msg) {
         logger << "ERROR: " << msg << "\n";
@@ -42,6 +42,7 @@ int main() {
     run_tests();
     //execute_app();
 
+    // TODO: remove toStr argument in tVec2ApproxCompare
     // TODO: GameObject tests
     // TODO: ObjectList tests
     // TODO: Widget tests

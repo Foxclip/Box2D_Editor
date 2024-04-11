@@ -17,6 +17,7 @@ const sf::Color NEW_BOX_COLOR = sf::Color(0, 255, 0);
 const float NEW_BALL_RADIUS = 0.5f;
 const sf::Color NEW_BALL_COLOR = sf::Color(0, 255, 0);
 const sf::Color NEW_BALL_NOTCH_COLOR = sf::Color(0, 64, 0);
+const float ROTATE_ANGLE_STEP = 5.0f;
 
 class RectangleSelect {
 public:

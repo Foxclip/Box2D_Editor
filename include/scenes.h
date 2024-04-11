@@ -134,30 +134,29 @@ void polygon(Editor& app) {
 }
 
 void box_parent(Editor& app) {
-    GameObject* parent = app.createBox(
+    BoxObject* parent = app.createBox(
         "parent",
-        b2Vec2(0.0f, 0.0f),
+        b2Vec2(0.5f, 0.5f),
         utils::to_radians(0.0f),
         b2Vec2(1.0f, 1.0f),
         sf::Color(0, 255, 0)
     );
-    GameObject* child = app.createBox(
+    BoxObject* child = app.createBox(
         "child",
-        b2Vec2(2.0f, 0.0f),
+        b2Vec2(2.1f, 2.1f),
         utils::to_radians(0.0f),
         b2Vec2(1.0f, 1.0f),
         sf::Color(0, 255, 0)
     );
-    GameObject* another_child = app.createBox(
+    BoxObject* another_child = app.createBox(
         "another child",
-        b2Vec2(4.0f, 0.0f),
+        b2Vec2(3.75f, 3.75f),
         utils::to_radians(0.0f),
         b2Vec2(1.0f, 1.0f),
         sf::Color(0, 255, 0)
     );
     child->setParent(parent);
     another_child->setParent(child);
-    parent->setGlobalPosition(b2Vec2(1.0f, 0.0f));
     app.setCameraPos(0.0f, 0.0f);
     app.setCameraZoom(200.0f);
 }

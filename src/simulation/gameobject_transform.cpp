@@ -21,7 +21,7 @@ const b2Transform& GameObjectTransform::getGlobalTransform() const {
 void GameObjectTransform::invalidateGlobalTransform() {
 	global_transform_valid = false;
 	for (size_t i = 0; i < object->children.size(); i++) {
-		object->children[i]->transforms.invalidateGlobalTransform();
+		object->children[i]->transform.invalidateGlobalTransform();
 	}
 }
 
