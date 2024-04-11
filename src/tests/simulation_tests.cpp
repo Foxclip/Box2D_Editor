@@ -649,6 +649,18 @@ void SimulationTests::createGameObjectList() {
             tVec2ApproxCompare(polygon->getGlobalVertexPos(0), new_vertex_pos);
         }
     );
+    test::Test* add_vertex_test = list->addTest(
+        "add_vertex",
+        [&](test::Test& test) {
+            Simulation simulation;
+            PolygonObject* polygon = simulation.createRegularPolygon(
+                "polygon", b2Vec2(0.0f, 0.0f), 0.0f, 6, 1.0f, sf::Color::Red
+            );
+            b2Vec2 midpoint = 0.5f * (polygon->getGlobalVertexPos(0) + polygon->getGlobalVertexPos(1));
+            polygon->addVertexGlobal(1, midpoint);
+            tVec2ApproxCompare(polygon->getGlobalVertexPos(1), midpoint);
+        }
+    );
 }
 
 std::string SimulationTests::colorToStr(const sf::Color& color) {
