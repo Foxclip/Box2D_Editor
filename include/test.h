@@ -204,7 +204,7 @@ namespace test {
 	inline bool TestModule::testVec2ApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, double epsilon) {
 		if (!equals(actual.x, expected.x, epsilon) || !equals(actual.y, expected.y, epsilon)) {
 			auto to_str = [](const T& vec) {
-				return "(" + std::to_string(vec.x) + " " + std::to_string(vec.y);
+				return "(" + std::to_string(vec.x) + " " + std::to_string(vec.y) + ")";
 			};
 			compareFail(test, file, line, name, actual, expected, to_str);
 			return false;
