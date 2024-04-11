@@ -44,7 +44,6 @@ public:
 		Polygon,
 		Chain
 	};
-	sf::Color color;
 	bool hover = false;
 	bool selected = false;
 	bool draw_varray = false;
@@ -53,7 +52,6 @@ public:
 	b2Vec2 orig_pos = b2Vec2_zero;
 	float orig_angle = 0.0f;
 	bool was_enabled = true;
-	CompVector<Joint*> joints;
 
 	GameObject();
 	~GameObject();
@@ -62,6 +60,7 @@ public:
 	ptrdiff_t getId() const;
 	ptrdiff_t getParentId() const;
 	const std::string& getName() const;
+	const sf::Color& getColor() const;
 	virtual sf::Drawable* getDrawable() const = 0;
 	virtual sf::Transformable* getTransformable() const = 0;
 	b2BodyType getBodyType() const;
@@ -138,9 +137,11 @@ protected:
 	ptrdiff_t parent_id = -1;
 	std::string name = "<unnamed>";
 	b2Body* rigid_body = nullptr;
+	CompVector<Joint*> joints;
 	std::vector<EditableVertex> vertices;
 	GameObject* parent = nullptr;
 	GameObjectList* object_list = nullptr;
+	sf::Color color;
 
 	virtual void drawMask(sf::RenderTarget& mask) = 0;
 	std::vector<b2Vec2> getPositions() const;

@@ -39,6 +39,10 @@ const std::string& GameObject::getName() const {
 	return name;
 }
 
+const sf::Color& GameObject::getColor() const {
+	return color;
+}
+
 b2BodyType GameObject::getBodyType() const {
 	return rigid_body->GetType();
 }

@@ -662,7 +662,7 @@ void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, con
             tCompare(objB->getChild(i)->getId(), objA->getChild(i)->getId());
         }
     }
-    tCompare(objB->color, objA->color, &SimulationTests::colorToStr);
+    tCompare(objB->getColor(), objA->getColor(), &SimulationTests::colorToStr);
     tCompare(objB->getId(), objA->getId());
     tCompare(objB->getName(), objA->getName());
     tCompare(objB->getParentId(), objA->getParentId());
