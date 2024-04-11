@@ -3,8 +3,8 @@
 #include "simulation/objectlist.h"
 
 Joint::~Joint() {
-	size_t object_a_id = GameObject::getGameobject(joint->GetBodyA())->id;
-	size_t object_b_id = GameObject::getGameobject(joint->GetBodyB())->id;
+	size_t object_a_id = GameObject::getGameobject(joint->GetBodyA())->getId();
+	size_t object_b_id = GameObject::getGameobject(joint->GetBodyB())->getId();
 	joint->GetBodyA()->GetWorld()->DestroyJoint(joint);
 }
 
@@ -135,8 +135,8 @@ float RevoluteJoint::getMaxMotorTorque() const {
 
 TokenWriter& RevoluteJoint::serialize(TokenWriter& tw) const {
 	b2RevoluteJoint* joint = static_cast<b2RevoluteJoint*>(this->joint);
-	size_t bodyAId = GameObject::getGameobject(joint->GetBodyA())->id;
-	size_t bodyBId = GameObject::getGameobject(joint->GetBodyB())->id;
+	size_t bodyAId = GameObject::getGameobject(joint->GetBodyA())->getId();
+	size_t bodyBId = GameObject::getGameobject(joint->GetBodyB())->getId();
 	tw << "joint revolute" << "\n";
 	{
 		TokenWriterIndent joint_indent(tw);

@@ -44,8 +44,6 @@ public:
 		Polygon,
 		Chain
 	};
-	ptrdiff_t id = -1;
-	ptrdiff_t parent_id = -1;
 	b2Body* rigid_body = nullptr;
 	sf::Color color;
 	bool hover = false;
@@ -136,8 +134,10 @@ public:
 	bool operator==(const GameObject& other) const;
 
 protected:
-	GameObjectList* object_list = nullptr;
+	ptrdiff_t id = -1;
+	ptrdiff_t parent_id = -1;
 	std::string name = "<unnamed>";
+	GameObjectList* object_list = nullptr;
 	std::vector<EditableVertex> vertices;
 	GameObject* parent = nullptr;
 

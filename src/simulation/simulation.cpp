@@ -54,7 +54,7 @@ std::string Simulation::serialize(TokenWriter& tw) const {
     LoggerIndent serialize_indent;
     size_t index = 0;
     std::function<void(GameObject*)> serialize_obj = [&](GameObject* obj) {
-        logger << "Object: " << obj->id << "\n";
+        logger << "Object: " << obj->getId() << "\n";
         if (index > 0) {
             tw << "\n\n";
         }
@@ -95,7 +95,7 @@ std::string Simulation::serialize(TokenWriter& tw) const {
                     tw << "\n\n";
                 }
                 Joint* joint = getJoint(i);
-                logger << "Joint: " << joint->object1->id << " " << joint->object2->id << "\n";
+                logger << "Joint: " << joint->object1->getId() << " " << joint->object2->getId() << "\n";
                 getJoint(i)->serialize(tw);
             }
         }

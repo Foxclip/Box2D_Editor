@@ -765,7 +765,7 @@ void Editor::renderUi() {
                 target.draw(object_info_text);
                 info_index++;
             };
-            render_info("id: " + std::to_string(gameobject->id));
+            render_info("id: " + std::to_string(gameobject->getId()));
             render_info(gameobject->getName());
             render_info(utils::body_type_to_str(gameobject->getBodyType()));
         }
@@ -884,7 +884,7 @@ std::string Editor::serialize() const {
 void Editor::deserialize(const std::string& str, bool set_camera) {
     ptrdiff_t active_object_id = -1;
     if (active_object) {
-        active_object_id = active_object->id;
+        active_object_id = active_object->getId();
     }
     initTools();
     TokenReader tr(str);

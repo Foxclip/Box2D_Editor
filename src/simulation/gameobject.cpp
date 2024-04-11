@@ -689,7 +689,7 @@ TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
 		TokenWriterIndent box_indent(tw);
 		tw.writeSizetParam("id", id);
 		if (parent) {
-			tw.writeSizetParam("parent_id", parent->id);
+			tw.writeSizetParam("parent_id", parent->getId());
 		}
 		tw.writeQuotedStringParam("name", name);
 		tw.writeb2Vec2Param("size", size);
@@ -815,7 +815,7 @@ TokenWriter& BallObject::serialize(TokenWriter& tw) const {
 		TokenWriterIndent ball_indent(tw);
 		tw.writeSizetParam("id", id);
 		if (parent) {
-			tw.writeSizetParam("parent_id", parent->id);
+			tw.writeSizetParam("parent_id", parent->getId());
 		}
 		tw.writeQuotedStringParam("name", name);
 		tw.writeFloatParam("radius", radius);
@@ -969,7 +969,7 @@ TokenWriter& PolygonObject::serialize(TokenWriter& tw) const {
 		TokenWriterIndent car_indent(tw);
 		tw.writeSizetParam("id", id);
 		if (parent) {
-			tw.writeSizetParam("parent_id", parent->id);
+			tw.writeSizetParam("parent_id", parent->getId());
 		}
 		tw.writeQuotedStringParam("name", name);
 		tw << "vertices";
@@ -1112,7 +1112,7 @@ TokenWriter& ChainObject::serialize(TokenWriter& tw) const {
 		TokenWriterIndent chain_indent(tw);
 		tw.writeSizetParam("id", id);
 		if (parent) {
-			tw.writeSizetParam("parent_id", parent->id);
+			tw.writeSizetParam("parent_id", parent->getId());
 		}
 		tw.writeQuotedStringParam("name", name);
 		tw << "vertices";
