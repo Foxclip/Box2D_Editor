@@ -97,6 +97,7 @@ public:
 	void setGlobalTransform(const b2Transform& p_transform);
 	void setPosition(const b2Vec2& pos);
 	void setGlobalPosition(const b2Vec2& pos);
+	void setAngle(float angle);
 	void setGlobalAngle(float angle);
 	void setLinearVelocity(const b2Vec2& velocity, bool include_children);
 	void setAngularVelocity(float velocity, bool include_children);

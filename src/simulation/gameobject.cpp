@@ -260,6 +260,10 @@ void GameObject::setGlobalPosition(const b2Vec2& pos) {
 	transformToRigidbody();
 }
 
+void GameObject::setAngle(float angle) {
+	transform.setAngle(angle);
+}
+
 void GameObject::setGlobalAngle(float angle) {
 	float parent_local_angle = toParentLocalAngle(angle);
 	transform.setAngle(parent_local_angle);
