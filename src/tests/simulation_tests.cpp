@@ -490,7 +490,7 @@ void SimulationTests::createGameObjectList() {
             b2Vec2 box1_global_pos_before = box1->getGlobalPosition();
             box1->setParent(box0);
             tCheck(box0->getParent() == nullptr);
-            tAssert(tCompare(box1->getParent()->getId(), box0->getId()));
+            tAssert(tCompare(box1->getParentId(), box0->getId()));
             tAssert(tCompare(box0->getChildren().size(), 1));
             tCheck(box0->getChild(0) == box1);
             b2Vec2 box0_local_pos_after = box0->getPosition();
@@ -522,8 +522,8 @@ void SimulationTests::createGameObjectList() {
             box1->setParent(box0);
             box2->setParent(box1);
             tCheck(box0->getParent() == nullptr);
-            tAssert(tCompare(box1->getParent()->getId(), box0->getId()));
-            tAssert(tCompare(box2->getParent()->getId(), box1->getId()));
+            tAssert(tCompare(box1->getParentId(), box0->getId()));
+            tAssert(tCompare(box2->getParentId(), box1->getId()));
             tAssert(tCompare(box0->getChildren().size(), 1));
             tAssert(tCompare(box1->getChildren().size(), 1));
             tCheck(box0->getChild(0) == box1);

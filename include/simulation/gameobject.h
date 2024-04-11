@@ -63,6 +63,7 @@ public:
 	virtual GameObjectType getType() const = 0;
 	virtual bool isClosed() const = 0;
 	ptrdiff_t getId() const;
+	ptrdiff_t getParentId() const;
 	const std::string& getName() const;
 	virtual sf::Drawable* getDrawable() const = 0;
 	virtual sf::Transformable* getTransformable() const = 0;

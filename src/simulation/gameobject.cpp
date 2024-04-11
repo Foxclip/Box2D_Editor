@@ -28,6 +28,13 @@ ptrdiff_t GameObject::getId() const {
 	return id;
 }
 
+ptrdiff_t GameObject::getParentId() const {
+	if (!parent) {
+		return -1;
+	}
+	return parent->getId();
+}
+
 const std::string& GameObject::getName() const {
 	return name;
 }
