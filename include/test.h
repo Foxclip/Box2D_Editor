@@ -19,26 +19,18 @@ namespace test {
 	testAssert(test, __FILE__, __LINE__, value, #value, __VA_ARGS__)
 
 #define tCompare(actual, expected, ...) \
-	testCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__);
+	testCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__)
 
 #define tApproxCompare(actual, expected, ...) \
 	testApproxCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__)
 
 #define tVec2ApproxCompare(actual, expected, ...) \
-	testVec2ApproxCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__);
+	testVec2ApproxCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__)
 
 #define tAssert(expr) \
 	if (!expr) { \
 		return; \
 	} \
-
-#define tAssertCompare(actual, expected) \
-	{ \
-		bool v = testCompare(test, __FILE__, __LINE__, #actual, actual, expected); \
-		if (!v) { \
-			return; \
-		} \
-	}
 
 #define tContainer(message) \
 	test::ErrorContainer error_container(test, message);

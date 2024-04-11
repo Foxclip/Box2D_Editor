@@ -24,7 +24,7 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(6, &mc2);
 		sindex.add(7, &mc3);
-		tAssertCompare(sindex.size(), 3);
+		tAssert(tCompare(sindex.size(), 3));
 	});
 	test::Test* contains_test = list->addTest("contains", { add_test }, [&](test::Test& test) {
 		SearchIndexUnique<int, MyClass> sindex;
@@ -35,7 +35,7 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(6, &mc2);
 		sindex.add(7, &mc3);
-		tAssertCompare(sindex.size(), 3);
+		tAssert(tCompare(sindex.size(), 3));
 		tCheck(sindex.contains(5));
 		tCheck(sindex.contains(6));
 		tCheck(sindex.contains(7));
@@ -51,7 +51,7 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(6, &mc2);
 		sindex.add(7, &mc3);
-		tAssertCompare(sindex.size(), 3);
+		tAssert(tCompare(sindex.size(), 3));
 		tCompare(sindex.min(), 5);
 		tCompare(sindex.max(), 7);
 	});
@@ -64,7 +64,7 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(6, &mc2);
 		sindex.add(7, &mc3);
-		tAssertCompare(sindex.size(), 3);
+		tAssert(tCompare(sindex.size(), 3));
 		tCheck(sindex.find(5) == &mc1);
 		tCheck(sindex.find(6) == &mc2);
 		tCheck(sindex.find(7) == &mc3);
@@ -81,12 +81,12 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(7, &mc3);
 		sindex.remove(6);
-		tAssertCompare(sindex.size(), 2);
+		tAssert(tCompare(sindex.size(), 2));
 		tCheck(sindex.find(5) == &mc1);
 		tCheck(sindex.find(6) == nullptr);
 		tCheck(sindex.find(7) == &mc3);
 		sindex.remove(5);
-		tAssertCompare(sindex.size(), 1);
+		tAssert(tCompare(sindex.size(), 1));
 		tCheck(sindex.find(5) == nullptr);
 		tCheck(sindex.find(6) == nullptr);
 		tCheck(sindex.find(7) == &mc3);
@@ -101,7 +101,7 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(7, &mc3);
 		sindex.clear();
-		tAssertCompare(sindex.size(), 0);
+		tAssert(tCompare(sindex.size(), 0));
 		tCheck(sindex.find(5) == nullptr);
 		tCheck(sindex.find(6) == nullptr);
 		tCheck(sindex.find(7) == nullptr);
@@ -124,7 +124,7 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(6, &mc4);
 		sindex.add(7, &mc3);
-		tAssertCompare(sindex.size(), 4);
+		tAssert(tCompare(sindex.size(), 4));
 	});
 	test::Test* contains_test = list->addTest("contains", { add_test }, [&](test::Test& test) {
 		SearchIndexMultiple<int, MyClass> sindex;
@@ -136,7 +136,7 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(6, &mc4);
 		sindex.add(7, &mc3);
-		tAssertCompare(sindex.size(), 4);
+		tAssert(tCompare(sindex.size(), 4));
 		tCheck(sindex.contains(5));
 		tCheck(sindex.contains(6));
 		tCheck(sindex.contains(7));
@@ -153,7 +153,7 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(6, &mc4);
 		sindex.add(7, &mc3);
-		tAssertCompare(sindex.size(), 4);
+		tAssert(tCompare(sindex.size(), 4));
 		tCompare(sindex.min(), 5);
 		tCompare(sindex.max(), 7);
 	});
@@ -167,7 +167,7 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(6, &mc4);
 		sindex.add(7, &mc3);
-		tAssertCompare(sindex.size(), 4);
+		tAssert(tCompare(sindex.size(), 4));
 		tCheck(sindex.find(5) == &mc1);
 		tCheck(sindex.find(6) == &mc2);
 		tCheck(sindex.find(7) == &mc3);
@@ -184,14 +184,14 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(6, &mc4);
 		sindex.add(7, &mc3);
-		tAssertCompare(sindex.size(), 4);
+		tAssert(tCompare(sindex.size(), 4));
 		sindex.remove(6, &mc2);
-		tAssertCompare(sindex.size(), 3);
+		tAssert(tCompare(sindex.size(), 3));
 		tCheck(sindex.find(5) == &mc1);
 		tCheck(sindex.find(6) == &mc4);
 		tCheck(sindex.find(7) == &mc3);
 		sindex.remove(5, &mc1);
-		tAssertCompare(sindex.size(), 2);
+		tAssert(tCompare(sindex.size(), 2));
 		tCheck(sindex.find(5) == nullptr);
 		tCheck(sindex.find(6) == &mc4);
 		tCheck(sindex.find(7) == &mc3);
@@ -206,9 +206,9 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		sindex.add(6, &mc2);
 		sindex.add(6, &mc4);
 		sindex.add(7, &mc3);
-		tAssertCompare(sindex.size(), 4);
+		tAssert(tCompare(sindex.size(), 4));
 		sindex.clear();
-		tAssertCompare(sindex.size(), 0);
+		tAssert(tCompare(sindex.size(), 0));
 		tCheck(sindex.find(5) == nullptr);
 		tCheck(sindex.find(6) == nullptr);
 		tCheck(sindex.find(7) == nullptr);

@@ -14,7 +14,7 @@ void SimulationTests::createSimulationList() {
         "basic",
         [&](test::Test& test) {
             Simulation simulation;
-            tAssertCompare(simulation.getAllSize(), 0);
+            tAssert(tCompare(simulation.getAllSize(), 0));
         }
     );
     test::Test* box_test = list->addTest(
@@ -31,7 +31,7 @@ void SimulationTests::createSimulationList() {
                 b2Vec2(1.0f, 1.0f),
                 sf::Color::Green
             );
-            tAssertCompare(simulation.getAllSize(), 1);
+            tAssert(tCompare(simulation.getAllSize(), 1));
             BoxObject* box = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
             tAssert(tCheck(box, "Object is not a BoxObject"));
             tCompare(box->getName(), "box0");
@@ -54,7 +54,7 @@ void SimulationTests::createSimulationList() {
                 sf::Color::Green,
                 sf::Color::Green
             );
-            tAssertCompare(simulation.getAllSize(), 1);
+            tAssert(tCompare(simulation.getAllSize(), 1));
             BallObject* ball = dynamic_cast<BallObject*>(simulation.getFromAll(0));
             tAssert(tCheck(ball, "Object is not a BallObject"));
             tCompare(ball->getName(), "ball0");
@@ -82,7 +82,7 @@ void SimulationTests::createSimulationList() {
                 vertices,
                 sf::Color::Green
             );
-            tAssertCompare(simulation.getAllSize(), 1);
+            tAssert(tCompare(simulation.getAllSize(), 1));
             PolygonObject* polygon = dynamic_cast<PolygonObject*>(simulation.getFromAll(0));
             tAssert(tCheck(polygon, "Object is not a PolygonObject"));
             tCompare(polygon->getName(), "polygon0");
@@ -113,7 +113,7 @@ void SimulationTests::createSimulationList() {
                 vertices,
                 sf::Color(255, 255, 255)
             );
-            tAssertCompare(simulation.getAllSize(), 1);
+            tAssert(tCompare(simulation.getAllSize(), 1));
             ChainObject* chain = dynamic_cast<ChainObject*>(simulation.getFromAll(0));
             tAssert(tCheck(chain, "Object is not a ChainObject"));
             tCompare(chain->getName(), "chain0");
@@ -134,7 +134,7 @@ void SimulationTests::createSimulationList() {
             b2RevoluteJointDef joint_def;
             joint_def.Initialize(box0->rigid_body, box1->rigid_body, b2Vec2(0.0f, 5.0f));
             simulation.createRevoluteJoint(joint_def, box0, box1);
-            tAssertCompare(simulation.getJointsSize(), 1);
+            tAssert(tCompare(simulation.getJointsSize(), 1));
             RevoluteJoint* joint = dynamic_cast<RevoluteJoint*>(simulation.getJoint(0));
             tAssert(tCheck(joint, "Joint is not a RevoluteJoint"));
             tCompare(joint->getAnchorA(), b2Vec2(0.0f, 5.0f), &SimulationTests::b2Vec2ToStr);
@@ -158,7 +158,7 @@ void SimulationTests::createSimulationList() {
                 wheels,
                 sf::Color(255, 0, 0)
             );
-            tAssertCompare(simulation.getAllSize(), 4);
+            tAssert(tCompare(simulation.getAllSize(), 4));
             PolygonObject* car = dynamic_cast<PolygonObject*>(simulation.getFromAll(0));
             {
                 tAssert(tCheck(car, "Object is not a PolygonObject"));
@@ -392,7 +392,7 @@ void SimulationTests::createSimulationList() {
             simulationA.save(temp_filename.string());
             Simulation simulationB;
             simulationB.load(temp_filename.string());
-            tAssertCompare(simulationB.getAllSize(), 1);
+            tAssert(tCompare(simulationB.getAllSize(), 1));
             BoxObject* boxB = dynamic_cast<BoxObject*>(simulationB.getFromAll(0));
             tAssert(tCheck(boxB, "Object is not a BoxObject"));
             boxCmp(test, boxA, boxB);
@@ -490,8 +490,8 @@ void SimulationTests::createGameObjectList() {
             b2Vec2 box1_global_pos_before = box1->getGlobalPosition();
             box1->setParent(box0);
             tCheck(box0->getParent() == nullptr);
-            tAssertCompare(box1->getParent()->getId(), box0->getId());
-            tAssertCompare(box0->getChildren().size(), 1);
+            tAssert(tCompare(box1->getParent()->getId(), box0->getId()));
+            tAssert(tCompare(box0->getChildren().size(), 1));
             tCheck(box0->getChild(0) == box1);
             b2Vec2 box0_local_pos_after = box0->getPosition();
             b2Vec2 box0_global_pos_after = box0->getGlobalPosition();
@@ -522,10 +522,10 @@ void SimulationTests::createGameObjectList() {
             box1->setParent(box0);
             box2->setParent(box1);
             tCheck(box0->getParent() == nullptr);
-            tAssertCompare(box1->getParent()->getId(), box0->getId());
-            tAssertCompare(box2->getParent()->getId(), box1->getId());
-            tAssertCompare(box0->getChildren().size(), 1);
-            tAssertCompare(box1->getChildren().size(), 1);
+            tAssert(tCompare(box1->getParent()->getId(), box0->getId()));
+            tAssert(tCompare(box2->getParent()->getId(), box1->getId()));
+            tAssert(tCompare(box0->getChildren().size(), 1));
+            tAssert(tCompare(box1->getChildren().size(), 1));
             tCheck(box0->getChild(0) == box1);
             tCheck(box1->getChild(0) == box2);
             b2Vec2 box0_local_pos_after = box0->getPosition();
@@ -688,7 +688,7 @@ void SimulationTests::revoluteJointCmp(test::Test& test, RevoluteJoint* jointA, 
 
 void SimulationTests::simCmp(test::Test& test, Simulation& simA, Simulation& simB) {
     tContainer("Sumulations are different:");
-    tAssertCompare(simA.getAllSize(), simB.getAllSize());
+    tAssert(tCompare(simA.getAllSize(), simB.getAllSize()));
     for (size_t i = 0; i < simA.getAllSize(); i++) {
         GameObject* objA = simA.getFromAll(i);
         GameObject* objB = simB.getFromAll(i);
@@ -710,7 +710,7 @@ void SimulationTests::simCmp(test::Test& test, Simulation& simA, Simulation& sim
                 mAssert(false, "Unknown GameObject type");
         }
     }
-    tAssertCompare(simA.getJointsSize(), simB.getJointsSize());
+    tAssert(tCompare(simA.getJointsSize(), simB.getJointsSize()));
     for (size_t i = 0; i < simA.getJointsSize(); i++) {
         Joint* jointA = simA.getJoint(i);
         Joint* jointB = simB.getJoint(i);

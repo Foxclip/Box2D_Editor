@@ -18,14 +18,14 @@ void CompVectorTests::createCompVectorList(test::TestList* list) {
 	});
 	test::Test* one_value_test = list->addTest("one_value", { empty_vector_test }, [&](test::Test& test) {
 		CompVector<int> vec = { 5 };
-		tAssertCompare(vec.size(), 1);
+		tAssert(tCompare(vec.size(), 1));
 		tCompare(vec[0], 5);
 		tCompare(vec.front(), 5);
 		tCompare(vec.back(), 5);
 	});
 	test::Test* multiple_values_test = list->addTest("multiple_values", { one_value_test }, [&](test::Test& test) {
 		CompVector<int> vec = { 1, 2, 3 };
-		tAssertCompare(vec.size(), 3);
+		tAssert(tCompare(vec.size(), 3));
 		tCompare(vec[0], 1);
 		tCompare(vec[1], 2);
 		tCompare(vec[2], 3);
@@ -38,7 +38,7 @@ void CompVectorTests::createCompVectorList(test::TestList* list) {
 	test::Test* convert_to_vector_test = list->addTest("convert_to_vector", { values_tests }, [&](test::Test& test) {
 		CompVector<int> cvec = { 1, 2, 3 };
 		std::vector<int> vec = cvec;
-		tAssertCompare(vec.size(), 3);
+		tAssert(tCompare(vec.size(), 3));
 		tCompare(vec[0], 1);
 		tCompare(vec[1], 2);
 		tCompare(vec[2], 3);
@@ -179,7 +179,7 @@ void CompVectorTests::createCompVectorList(test::TestList* list) {
 	test::Test* clear_test = list->addTest("clear", { basic_tests }, [&](test::Test& test) {
 		CompVector<int> vec = { 1, 2, 3 };
 		vec.clear();
-		tAssertCompare(vec.size(), 0);
+		tAssert(tCompare(vec.size(), 0));
 	});
 	test::Test* equals_test = list->addTest("equals", { basic_tests }, [&](test::Test& test) {
 		CompVector<int> vec = { 1, 2, 3 };
@@ -211,14 +211,14 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 	});
 	test::Test* one_value_test = list->addTest("one_value", [&](test::Test& test) {
 		CompVectorUptr<int> vec = { 5 };
-		tAssertCompare(vec.size(), 1);
+		tAssert(tCompare(vec.size(), 1));
 		tCompare(*vec[0], 5);
 		tCompare(*vec.front(), 5);
 		tCompare(*vec.back(), 5);
 	});
 	test::Test* multiple_values_test = list->addTest("multiple_values", [&](test::Test& test) {
 		CompVectorUptr<int> vec = { 1, 2, 3 };
-		tAssertCompare(vec.size(), 3);
+		tAssert(tCompare(vec.size(), 3));
 		tCompare(*vec[0], 1);
 		tCompare(*vec[1], 2);
 		tCompare(*vec[2], 3);
@@ -265,7 +265,7 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 		int* ptr1 = vec.add(1);
 		int* ptr2 = vec.add(2);
 		int* ptr3 = vec.add(3);
-		tAssertCompare(vec.size(), 3);
+		tAssert(tCompare(vec.size(), 3));
 		tCompare(*vec[0], 1);
 		tCompare(*vec[1], 2);
 		tCompare(*vec[2], 3);
@@ -339,7 +339,7 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 		int* ptr5 = new int(5);
 		CompVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
 		vec.remove(ptr2);
-		tAssertCompare(vec.size(), 2);
+		tAssert(tCompare(vec.size(), 2));
 		tCompare(*vec[0], 1);
 		tCompare(*vec[1], 3);
 		tCompare(*vec.front(), 1);
@@ -348,7 +348,7 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 	test::Test* remove_at_test = list->addTest("remove_at", { basic_tests }, [&](test::Test& test) {
 		CompVectorUptr<int> vec = { 1, 2, 3 };
 		vec.removeAt(1);
-		tAssertCompare(vec.size(), 2);
+		tAssert(tCompare(vec.size(), 2));
 		tCompare(*vec[0], 1);
 		tCompare(*vec[1], 3);
 		tCompare(*vec.front(), 1);
@@ -357,7 +357,7 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 	test::Test* reverse_test = list->addTest("reverse", { basic_tests }, [&](test::Test& test) {
 		CompVectorUptr<int> vec = { 1, 2, 3 };
 		vec.reverse();
-		tAssertCompare(vec.size(), 3);
+		tAssert(tCompare(vec.size(), 3));
 		tCompare(*vec[0], 3);
 		tCompare(*vec[1], 2);
 		tCompare(*vec[2], 1);
@@ -458,14 +458,14 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 	test::Test* clear_test = list->addTest("clear", { basic_tests }, [&](test::Test& test) {
 		CompVectorUptr<int> vec = { 1, 2, 3 };
 		vec.clear();
-		tAssertCompare(vec.size(), 0);
+		tAssert(tCompare(vec.size(), 0));
 	});
 	test::Test* no_duplicates_test = list->addTest("duplicates", { basic_tests }, [&](test::Test& test) {
 		int* ptr1 = new int(1);
 		int* ptr2 = new int(2);
 		int* ptr3 = new int(3);
 		CompVectorUptr<int> vec({ ptr1, ptr2, ptr2, ptr3 });
-		tAssertCompare(vec.size(), 3);
+		tAssert(tCompare(vec.size(), 3));
 		tCompare(*vec[0], 1);
 		tCompare(*vec[1], 2);
 		tCompare(*vec[2], 3);
@@ -477,7 +477,7 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 		int* ptr5 = new int(5);
 		CompVectorUptr<int> vec({ ptr1, ptr2, ptr3 });
 		vec.remove(ptr5);
-		tAssertCompare(vec.size(), 3);
+		tAssert(tCompare(vec.size(), 3));
 		tCompare(*vec[0], 1);
 		tCompare(*vec[1], 2);
 		tCompare(*vec[2], 3);
