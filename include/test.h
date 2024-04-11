@@ -24,8 +24,8 @@ namespace test {
 #define tApproxCompare(actual, expected, ...) \
 	testApproxCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__)
 
-#define tVec2ApproxCompare(actual, expected, to_str, ...) \
-	testVec2ApproxCompare(test, __FILE__, __LINE__, #actual, actual, expected, to_str, __VA_ARGS__);
+#define tVec2ApproxCompare(actual, expected, ...) \
+	testVec2ApproxCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__);
 
 #define tAssert(value, ...) \
 	{ \
@@ -147,8 +147,8 @@ namespace test {
 		bool testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str);
 		template<typename T>
 		bool testApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, T epsilon = 0.0001f);
-		template<typename T, typename TStr>
-		bool testVec2ApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, TStr to_str, double epsilon = 0.0001);
+		template<typename T>
+		bool testVec2ApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, double epsilon = 0.0001);
 		template<typename T, typename TEps>
 		static bool equals(T left, T right, TEps epsilon = 0.0001f);
 
@@ -200,9 +200,12 @@ namespace test {
 		return true;
 	}
 
-	template<typename T, typename TStr>
-	inline bool TestModule::testVec2ApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, TStr to_str, double epsilon) {
+	template<typename T>
+	inline bool TestModule::testVec2ApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, double epsilon) {
 		if (!equals(actual.x, expected.x, epsilon) || !equals(actual.y, expected.y, epsilon)) {
+			auto to_str = [](const T& vec) {
+				return "(" + std::to_string(vec.x) + " " + std::to_string(vec.y);
+			};
 			compareFail(test, file, line, name, actual, expected, to_str);
 			return false;
 		}

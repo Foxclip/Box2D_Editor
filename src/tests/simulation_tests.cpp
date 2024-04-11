@@ -1,8 +1,5 @@
 #include "tests/simulation_tests.h"
 
-#define vecApproxCmp(actual, expected) \
-    tVec2ApproxCompare(actual, expected, &SimulationTests::b2Vec2ToStr);
-
 SimulationTests::SimulationTests() : TestModule("Simulation") { }
 
 void SimulationTests::createTestLists() {
@@ -167,7 +164,7 @@ void SimulationTests::createSimulationList() {
                 tAssert(car, "Object is not a PolygonObject");
                 tCompare(car->getName(), "car0");
                 tCompare(car->getId(), 0);
-                tVec2ApproxCompare(car->getGlobalPosition(), b2Vec2(0.0f, 0.0f), &SimulationTests::b2Vec2ToStr);
+                tVec2ApproxCompare(car->getGlobalPosition(), b2Vec2(0.0f, 0.0f));
                 tApproxCompare(car->getGlobalRotation(), utils::to_radians(0.0f));
             }
             {
@@ -176,7 +173,7 @@ void SimulationTests::createSimulationList() {
                 tCompare(wheel0->getName(), "car0 wheel0");
                 tCompare(wheel0->getId(), 1);
                 tCheck(wheel0->getParent() == car);
-                tVec2ApproxCompare(wheel0->getGlobalPosition(), b2Vec2(5.0f, 0.0f), &SimulationTests::b2Vec2ToStr);
+                tVec2ApproxCompare(wheel0->getGlobalPosition(), b2Vec2(5.0f, 0.0f));
             }
             {
                 BallObject* wheel1 = dynamic_cast<BallObject*>(simulation.getFromAll(2));
@@ -184,7 +181,7 @@ void SimulationTests::createSimulationList() {
                 tCompare(wheel1->getName(), "car0 wheel1");
                 tCompare(wheel1->getId(), 2);
                 tCheck(wheel1->getParent() == car);
-                tVec2ApproxCompare(wheel1->getGlobalPosition(), b2Vec2(-2.50000024f, 4.33012676f), &SimulationTests::b2Vec2ToStr);
+                tVec2ApproxCompare(wheel1->getGlobalPosition(), b2Vec2(-2.50000024f, 4.33012676f));
             }
             {
                 BallObject* wheel2 = dynamic_cast<BallObject*>(simulation.getFromAll(3));
@@ -192,7 +189,7 @@ void SimulationTests::createSimulationList() {
                 tCompare(wheel2->getName(), "car0 wheel2");
                 tCompare(wheel2->getId(), 3);
                 tCheck(wheel2->getParent() == car);
-                tVec2ApproxCompare(wheel2->getGlobalPosition(), b2Vec2(-2.49999952f, -4.33012724f), &SimulationTests::b2Vec2ToStr);
+                tVec2ApproxCompare(wheel2->getGlobalPosition(), b2Vec2(-2.49999952f, -4.33012724f));
             }
         }
     );
@@ -369,7 +366,7 @@ void SimulationTests::createSimulationList() {
             Simulation simulation;
             BoxObject* box = createBox(simulation, "box0", b2Vec2(0.0f, 0.0f));
             simulation.advance(1.0f / 60.0f);
-            tVec2ApproxCompare(box->getGlobalPosition(), b2Vec2(0.0f, -0.002722f), &SimulationTests::b2Vec2ToStr);
+            tVec2ApproxCompare(box->getGlobalPosition(), b2Vec2(0.0f, -0.002722f));
         }
     );
     test::Test* saveload_test = list->addTest(
@@ -500,10 +497,10 @@ void SimulationTests::createGameObjectList() {
             b2Vec2 box0_global_pos_after = box0->getGlobalPosition();
             b2Vec2 box1_local_pos_after = box1->getPosition();
             b2Vec2 box1_global_pos_after = box1->getGlobalPosition();
-            tVec2ApproxCompare(box0_local_pos_after, box0_local_pos_before, &SimulationTests::b2Vec2ToStr);
-            tVec2ApproxCompare(box0_global_pos_after, box0_global_pos_before, &SimulationTests::b2Vec2ToStr);
-            tVec2ApproxCompare(box1_local_pos_after, box1_local_pos_before - box0_local_pos_before, &SimulationTests::b2Vec2ToStr);
-            tVec2ApproxCompare(box1_global_pos_after, box1_global_pos_before, &SimulationTests::b2Vec2ToStr);
+            tVec2ApproxCompare(box0_local_pos_after, box0_local_pos_before);
+            tVec2ApproxCompare(box0_global_pos_after, box0_global_pos_before);
+            tVec2ApproxCompare(box1_local_pos_after, box1_local_pos_before - box0_local_pos_before);
+            tVec2ApproxCompare(box1_global_pos_after, box1_global_pos_before);
         }
     );
     test::Test* set_parent_three_test = list->addTest(
@@ -537,12 +534,12 @@ void SimulationTests::createGameObjectList() {
             b2Vec2 box1_global_pos_after = box1->getGlobalPosition();
             b2Vec2 box2_local_pos_after = box2->getPosition();
             b2Vec2 box2_global_pos_after = box2->getGlobalPosition();
-            tVec2ApproxCompare(box0_local_pos_after, box0_local_pos_before, &SimulationTests::b2Vec2ToStr);
-            tVec2ApproxCompare(box0_global_pos_after, box0_global_pos_before, &SimulationTests::b2Vec2ToStr);
-            tVec2ApproxCompare(box1_local_pos_after, box1_local_pos_before - box0_local_pos_before, &SimulationTests::b2Vec2ToStr);
-            tVec2ApproxCompare(box1_global_pos_after, box1_global_pos_before, &SimulationTests::b2Vec2ToStr);
-            tVec2ApproxCompare(box2_local_pos_after, box2_local_pos_before - box1_local_pos_before, &SimulationTests::b2Vec2ToStr);
-            tVec2ApproxCompare(box2_global_pos_after, box2_global_pos_before, &SimulationTests::b2Vec2ToStr);
+            tVec2ApproxCompare(box0_local_pos_after, box0_local_pos_before);
+            tVec2ApproxCompare(box0_global_pos_after, box0_global_pos_before);
+            tVec2ApproxCompare(box1_local_pos_after, box1_local_pos_before - box0_local_pos_before);
+            tVec2ApproxCompare(box1_global_pos_after, box1_global_pos_before);
+            tVec2ApproxCompare(box2_local_pos_after, box2_local_pos_before - box1_local_pos_before);
+            tVec2ApproxCompare(box2_global_pos_after, box2_global_pos_before);
         }
     );
     test::Test* set_position_two_test = list->addTest(
@@ -560,17 +557,17 @@ void SimulationTests::createGameObjectList() {
             b2Vec2 box0_new_pos(1.0f, 1.0f);
             box1->setParent(box0);
             box0->setPosition(box0_new_pos);
-            vecApproxCmp(box0->getGlobalPosition(), box0_new_pos);
-            vecApproxCmp(box1->getGlobalPosition(), box0_new_pos + rel_pos);
+            tVec2ApproxCompare(box0->getGlobalPosition(), box0_new_pos);
+            tVec2ApproxCompare(box1->getGlobalPosition(), box0_new_pos + rel_pos);
             b2Vec2 box1_new_pos(2.0f, 2.0f);
             box1->setPosition(box1_new_pos);
-            vecApproxCmp(box0->getGlobalPosition(), box0_new_pos);
-            vecApproxCmp(box1->getGlobalPosition(), box0_new_pos + box1_new_pos);
+            tVec2ApproxCompare(box0->getGlobalPosition(), box0_new_pos);
+            tVec2ApproxCompare(box1->getGlobalPosition(), box0_new_pos + box1_new_pos);
             b2Vec2 box1_new_global_pos(2.0f, 2.0f);
             box1->setGlobalPosition(box1_new_global_pos);
-            vecApproxCmp(box0->getGlobalPosition(), box0_new_pos);
-            vecApproxCmp(box1->getPosition(), box1_new_global_pos - box0_new_pos);
-            vecApproxCmp(box1->getGlobalPosition(), box1_new_global_pos);
+            tVec2ApproxCompare(box0->getGlobalPosition(), box0_new_pos);
+            tVec2ApproxCompare(box1->getPosition(), box1_new_global_pos - box0_new_pos);
+            tVec2ApproxCompare(box1->getGlobalPosition(), box1_new_global_pos);
         }
     );
 }
