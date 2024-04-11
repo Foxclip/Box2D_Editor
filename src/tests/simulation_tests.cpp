@@ -528,6 +528,14 @@ void SimulationTests::createGameObjectList() {
             tAssert(tCompare(box1->getChildren().size(), 1));
             tCheck(box0->getChild(0) == box1);
             tCheck(box1->getChild(0) == box2);
+            std::vector<GameObject*> box2_parent_chain = box2->getParentChain();
+            tAssert(tCompare(box2_parent_chain.size(), 2));
+            tCompare(box2_parent_chain[0]->getName(), "box1");
+            tCompare(box2_parent_chain[1]->getName(), "box0");
+            std::vector<GameObject*> box0_all_children = box0->getAllChildren();
+            tAssert(tCompare(box0_all_children.size(), 2));
+            tCompare(box0_all_children[0]->getName(), "box1");
+            tCompare(box0_all_children[1]->getName(), "box2");
             b2Vec2 box0_local_pos_after = box0->getPosition();
             b2Vec2 box0_global_pos_after = box0->getGlobalPosition();
             b2Vec2 box1_local_pos_after = box1->getPosition();
