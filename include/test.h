@@ -27,14 +27,10 @@ namespace test {
 #define tVec2ApproxCompare(actual, expected, ...) \
 	testVec2ApproxCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__);
 
-#define tAssert(value, ...) \
-	{ \
-		bool v = value; \
-		testAssert(test, __FILE__, __LINE__, v, #value, __VA_ARGS__); \
-		if (!v) { \
-			return; \
-		} \
-	}
+#define tAssert(expr) \
+	if (!expr) { \
+		return; \
+	} \
 
 #define tAssertCompare(actual, expected) \
 	{ \
@@ -147,8 +143,8 @@ namespace test {
 		virtual void beforeRunModule();
 		virtual void afterRunModule();
 		void testMessage(Test& test, const std::string& file, size_t line, const std::string& message);
-		void testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message);
-		void testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message, const std::string message);
+		bool testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message);
+		bool testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message, const std::string message);
 		template<typename T1, typename T2>
 		bool testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected);
 		template<typename T1, typename T2, typename TStr>

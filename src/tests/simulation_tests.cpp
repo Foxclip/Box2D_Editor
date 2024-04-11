@@ -33,7 +33,7 @@ void SimulationTests::createSimulationList() {
             );
             tAssertCompare(simulation.getAllSize(), 1);
             BoxObject* box = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
-            tAssert(box, "Object is not a BoxObject");
+            tAssert(tCheck(box, "Object is not a BoxObject"));
             tCompare(box->getName(), "box0");
             tCompare(box->getId(), 0);
             tCompare(box->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
@@ -56,7 +56,7 @@ void SimulationTests::createSimulationList() {
             );
             tAssertCompare(simulation.getAllSize(), 1);
             BallObject* ball = dynamic_cast<BallObject*>(simulation.getFromAll(0));
-            tAssert(ball, "Object is not a BallObject");
+            tAssert(tCheck(ball, "Object is not a BallObject"));
             tCompare(ball->getName(), "ball0");
             tCompare(ball->getId(), 0);
             tCompare(ball->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
@@ -84,7 +84,7 @@ void SimulationTests::createSimulationList() {
             );
             tAssertCompare(simulation.getAllSize(), 1);
             PolygonObject* polygon = dynamic_cast<PolygonObject*>(simulation.getFromAll(0));
-            tAssert(polygon, "Object is not a PolygonObject");
+            tAssert(tCheck(polygon, "Object is not a PolygonObject"));
             tCompare(polygon->getName(), "polygon0");
             tCompare(polygon->getId(), 0);
             tCompare(polygon->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
@@ -115,7 +115,7 @@ void SimulationTests::createSimulationList() {
             );
             tAssertCompare(simulation.getAllSize(), 1);
             ChainObject* chain = dynamic_cast<ChainObject*>(simulation.getFromAll(0));
-            tAssert(chain, "Object is not a ChainObject");
+            tAssert(tCheck(chain, "Object is not a ChainObject"));
             tCompare(chain->getName(), "chain0");
             tCompare(chain->getId(), 0);
             tCompare(chain->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
@@ -136,7 +136,7 @@ void SimulationTests::createSimulationList() {
             simulation.createRevoluteJoint(joint_def, box0, box1);
             tAssertCompare(simulation.getJointsSize(), 1);
             RevoluteJoint* joint = dynamic_cast<RevoluteJoint*>(simulation.getJoint(0));
-            tAssert(joint, "Joint is not a RevoluteJoint");
+            tAssert(tCheck(joint, "Joint is not a RevoluteJoint"));
             tCompare(joint->getAnchorA(), b2Vec2(0.0f, 5.0f), &SimulationTests::b2Vec2ToStr);
         }
     );
@@ -161,7 +161,7 @@ void SimulationTests::createSimulationList() {
             tAssertCompare(simulation.getAllSize(), 4);
             PolygonObject* car = dynamic_cast<PolygonObject*>(simulation.getFromAll(0));
             {
-                tAssert(car, "Object is not a PolygonObject");
+                tAssert(tCheck(car, "Object is not a PolygonObject"));
                 tCompare(car->getName(), "car0");
                 tCompare(car->getId(), 0);
                 tVec2ApproxCompare(car->getGlobalPosition(), b2Vec2(0.0f, 0.0f));
@@ -169,7 +169,7 @@ void SimulationTests::createSimulationList() {
             }
             {
                 BallObject* wheel0 = dynamic_cast<BallObject*>(simulation.getFromAll(1));
-                tAssert(wheel0, "Object is not a BallObject");
+                tAssert(tCheck(wheel0, "Object is not a BallObject"));
                 tCompare(wheel0->getName(), "car0 wheel0");
                 tCompare(wheel0->getId(), 1);
                 tCheck(wheel0->getParent() == car);
@@ -177,7 +177,7 @@ void SimulationTests::createSimulationList() {
             }
             {
                 BallObject* wheel1 = dynamic_cast<BallObject*>(simulation.getFromAll(2));
-                tAssert(wheel1, "Object is not a BallObject");
+                tAssert(tCheck(wheel1, "Object is not a BallObject"));
                 tCompare(wheel1->getName(), "car0 wheel1");
                 tCompare(wheel1->getId(), 2);
                 tCheck(wheel1->getParent() == car);
@@ -185,7 +185,7 @@ void SimulationTests::createSimulationList() {
             }
             {
                 BallObject* wheel2 = dynamic_cast<BallObject*>(simulation.getFromAll(3));
-                tAssert(wheel2, "Object is not a BallObject");
+                tAssert(tCheck(wheel2, "Object is not a BallObject"));
                 tCompare(wheel2->getName(), "car0 wheel2");
                 tCompare(wheel2->getId(), 3);
                 tCheck(wheel2->getParent() == car);
@@ -394,7 +394,7 @@ void SimulationTests::createSimulationList() {
             simulationB.load(temp_filename.string());
             tAssertCompare(simulationB.getAllSize(), 1);
             BoxObject* boxB = dynamic_cast<BoxObject*>(simulationB.getFromAll(0));
-            tAssert(boxB, "Object is not a BoxObject");
+            tAssert(tCheck(boxB, "Object is not a BoxObject"));
             boxCmp(test, boxA, boxB);
         }
     );
@@ -640,27 +640,27 @@ void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, con
 }
 
 void SimulationTests::boxCmp(test::Test& test, BoxObject* boxA, BoxObject* boxB) {
-    tAssert(boxA && boxB, "Objects have different types");
+    tAssert(tCheck(boxA && boxB, "Objects have different types"));
     tCheck(*boxA == *boxB);
     objCmpCommon(test, boxA, boxB);
     tCompare(boxB->size, boxA->size, &SimulationTests::b2Vec2ToStr);
 }
 
 void SimulationTests::ballCmp(test::Test& test, BallObject* ballA, BallObject* ballB) {
-    tAssert(ballA && ballB, "Objects have different types");
+    tAssert(tCheck(ballA && ballB, "Objects have different types"));
     tCheck(*ballA == *ballB);
     objCmpCommon(test, ballA, ballB);
     tCompare(ballB->radius, ballA->radius);
 }
 
 void SimulationTests::polygonCmp(test::Test& test, PolygonObject* polygonA, PolygonObject* polygonB) {
-    tAssert(polygonA && polygonB, "Objects have different types");
+    tAssert(tCheck(polygonA && polygonB, "Objects have different types"));
     tCheck(*polygonA == *polygonB);
     objCmpCommon(test, polygonA, polygonB);
 }
 
 void SimulationTests::chainCmp(test::Test& test, ChainObject* chainA, ChainObject* chainB) {
-    tAssert(chainA && chainB, "Objects have different types");
+    tAssert(tCheck(chainA && chainB, "Objects have different types"));
     tCheck(*chainA == *chainB);
     objCmpCommon(test, chainA, chainB);
 }
@@ -674,7 +674,7 @@ void SimulationTests::jointCmpCommon(test::Test& test, Joint* jointA, Joint* joi
 }
 
 void SimulationTests::revoluteJointCmp(test::Test& test, RevoluteJoint* jointA, RevoluteJoint* jointB) {
-    tAssert(jointA && jointB, "Joints have different types");
+    tAssert(tCheck(jointA && jointB, "Joints have different types"));
     tCheck(*jointA == *jointB);
     jointCmpCommon(test, jointA, jointB);
     tCompare(jointB->getLowerLimit(), jointA->getLowerLimit());

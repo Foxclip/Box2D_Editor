@@ -240,22 +240,24 @@ namespace test {
 		test.getCurrentError()->add(message + " " + location_str);
 	}
 
-	void TestModule::testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message) {
+	bool TestModule::testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message) {
 		if (!value) {
 			std::string filename = std::filesystem::path(file).filename().string();
 			std::string location_str = "[" + filename + ":" + std::to_string(line) + "]";
 			test.getCurrentError()->add("Failed condition: " + value_message + " " + location_str);
 			test.result = false;
 		}
+		return value;
 	}
 
-	void TestModule::testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message, const std::string message) {
+	bool TestModule::testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message, const std::string message) {
 		if (!value) {
 			std::string filename = std::filesystem::path(file).filename().string();
 			std::string location_str = "[" + filename + ":" + std::to_string(line) + "]";
 			test.getCurrentError()->add(message + ": " + value_message + " " + location_str);
 			test.result = false;
 		}
+		return value;
 	}
 
 	void TestManager::runAllModules() {
