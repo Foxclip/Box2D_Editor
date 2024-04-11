@@ -555,6 +555,45 @@ void SimulationTests::createGameObjectList() {
             tVec2ApproxCompare(box1_global_pos_after, box1_global_pos_before, &SimulationTests::b2Vec2ToStr);
         }
     );
+    test::Test* set_parent_three_test = list->addTest(
+        "set_parent_three",
+        [&](test::Test& test) {
+            Simulation simulation;
+            b2Vec2 box0_initial_pos(0.5f, 0.5f);
+            b2Vec2 box1_initial_pos(1.1f, 1.1f);
+            b2Vec2 box2_initial_pos(1.75f, 1.75f);
+            BoxObject* box0 = createBox(simulation, box0_initial_pos);
+            BoxObject* box1 = createBox(simulation, box1_initial_pos);
+            BoxObject* box2 = createBox(simulation, box2_initial_pos);
+            b2Vec2 box0_local_pos_before = box0->getPosition();
+            b2Vec2 box0_global_pos_before = box0->getGlobalPosition();
+            b2Vec2 box1_local_pos_before = box1->getPosition();
+            b2Vec2 box1_global_pos_before = box1->getGlobalPosition();
+            b2Vec2 box2_local_pos_before = box2->getPosition();
+            b2Vec2 box2_global_pos_before = box2->getGlobalPosition();
+            box1->setParent(box0);
+            box2->setParent(box1);
+            tCheck(box0->getParent() == nullptr);
+            tAssertCompare(box1->getParent()->getId(), box0->getId());
+            tAssertCompare(box2->getParent()->getId(), box1->getId());
+            tAssertCompare(box0->getChildren().size(), 1);
+            tAssertCompare(box1->getChildren().size(), 1);
+            tCheck(box0->getChild(0) == box1);
+            tCheck(box1->getChild(0) == box2);
+            b2Vec2 box0_local_pos_after = box0->getPosition();
+            b2Vec2 box0_global_pos_after = box0->getGlobalPosition();
+            b2Vec2 box1_local_pos_after = box1->getPosition();
+            b2Vec2 box1_global_pos_after = box1->getGlobalPosition();
+            b2Vec2 box2_local_pos_after = box2->getPosition();
+            b2Vec2 box2_global_pos_after = box2->getGlobalPosition();
+            tVec2ApproxCompare(box0_local_pos_after, box0_local_pos_before, &SimulationTests::b2Vec2ToStr);
+            tVec2ApproxCompare(box0_global_pos_after, box0_global_pos_before, &SimulationTests::b2Vec2ToStr);
+            tVec2ApproxCompare(box1_local_pos_after, box1_local_pos_before - box0_local_pos_before, &SimulationTests::b2Vec2ToStr);
+            tVec2ApproxCompare(box1_global_pos_after, box1_global_pos_before, &SimulationTests::b2Vec2ToStr);
+            tVec2ApproxCompare(box2_local_pos_after, box2_local_pos_before - box1_local_pos_before, &SimulationTests::b2Vec2ToStr);
+            tVec2ApproxCompare(box2_global_pos_after, box2_global_pos_before, &SimulationTests::b2Vec2ToStr);
+        }
+    );
 }
 
 std::string SimulationTests::colorToStr(const sf::Color& color) {
@@ -563,6 +602,17 @@ std::string SimulationTests::colorToStr(const sf::Color& color) {
 
 std::string SimulationTests::b2Vec2ToStr(const b2Vec2& vec) {
     return "(" + utils::vec_to_str(vec) + ")";
+}
+
+BoxObject* SimulationTests::createBox(Simulation& simulation, const b2Vec2& pos) const {
+    BoxObject* box = simulation.createBox(
+        "box0",
+        pos,
+        utils::to_radians(0.0f),
+        b2Vec2(1.0f, 1.0f),
+        sf::Color(0, 255, 0)
+    );
+    return box;
 }
 
 void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, const GameObject* objB) {
