@@ -400,4 +400,4 @@ FodyWeavers.xsd
 build/
 box2d/
 sfml/
-tests/_tmp/
+tests/tmp/

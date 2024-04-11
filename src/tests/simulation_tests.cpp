@@ -129,20 +129,8 @@ void SimulationTests::createSimulationList() {
         },
         [&](test::Test& test) {
             Simulation simulation;
-            BoxObject* box0 = simulation.createBox(
-                "box0",
-                b2Vec2(0.0f, 0.0f),
-                utils::to_radians(0.0f),
-                b2Vec2(1.0f, 1.0f),
-                sf::Color::Green
-            );
-            BoxObject* box1 = simulation.createBox(
-                "box1",
-                b2Vec2(0.0f, 5.0f),
-                utils::to_radians(0.0f),
-                b2Vec2(1.0f, 1.0f),
-                sf::Color::Green
-            );
+            BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.0f, 0.0f));
+            BoxObject* box1 = createBox(simulation, "box1", b2Vec2(0.0f, 5.0f));
             b2RevoluteJointDef joint_def;
             joint_def.Initialize(box0->rigid_body, box1->rigid_body, b2Vec2(0.0f, 5.0f));
             simulation.createRevoluteJoint(joint_def, box0, box1);
@@ -376,14 +364,7 @@ void SimulationTests::createSimulationList() {
         },
         [&](test::Test& test) {
             Simulation simulation;
-            simulation.createBox(
-                "box0",
-                b2Vec2(0.0f, 0.0f),
-                utils::to_radians(0.0f),
-                b2Vec2(1.0f, 1.0f),
-                sf::Color::Green
-            );
-            BoxObject* box = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
+            BoxObject* box = createBox(simulation, "box0", b2Vec2(0.0f, 0.0f));
             simulation.advance(1.0f / 60.0f);
             tVec2ApproxCompare(box->getGlobalPosition(), b2Vec2(0.0f, -0.002722f), &SimulationTests::b2Vec2ToStr);
         }
@@ -396,15 +377,14 @@ void SimulationTests::createSimulationList() {
         },
         [=, this](test::Test& test) {
             Simulation simulationA;
-            simulationA.createBox(
+            BoxObject* boxA = simulationA.createBox(
                 "box0",
                 b2Vec2(1.5f, -3.5f),
                 utils::to_radians(45.0f),
                 b2Vec2(1.1f, 2.0f),
                 sf::Color::Green
             );
-            BoxObject* boxA = dynamic_cast<BoxObject*>(simulationA.getFromAll(0));
-            const std::filesystem::path tmp_dir = "tests/_tmp";
+            const std::filesystem::path tmp_dir = "tests/tmp";
             if (!std::filesystem::exists(tmp_dir)) {
                 std::filesystem::create_directory(tmp_dir);
             }
@@ -437,27 +417,9 @@ void SimulationTests::createSimulationList() {
                 ground_vertices,
                 sf::Color(255, 255, 255)
             );
-            BoxObject* box0 = simulationA.createBox(
-                "box0",
-                b2Vec2(0.0f, 0.6f),
-                utils::to_radians(0.0f),
-                b2Vec2(1.0f, 1.0f),
-                sf::Color(0, 255, 0)
-            );
-            BoxObject* box1 = simulationA.createBox(
-                "box1",
-                b2Vec2(0.5f, 1.7f),
-                utils::to_radians(0.0f),
-                b2Vec2(1.0f, 1.0f),
-                sf::Color(0, 255, 0)
-            );
-            BoxObject* box2 = simulationA.createBox(
-                "box2",
-                b2Vec2(1.0f, 2.8f),
-                utils::to_radians(0.0f),
-                b2Vec2(1.0f, 1.0f),
-                sf::Color(0, 255, 0)
-            );
+            BoxObject* box0 = createBox(simulationA, "box0", b2Vec2(0.0f, 0.6f));
+            BoxObject* box1 = createBox(simulationA, "box1", b2Vec2(0.5f, 1.7f));
+            BoxObject* box2 = createBox(simulationA, "box2", b2Vec2(1.0f, 2.8f));
             const int fps = 60;
             float advance_time = 3.0f;
             for (size_t i = 0; i < fps * advance_time; i++) {
@@ -520,22 +482,8 @@ void SimulationTests::createGameObjectList() {
         "set_parent_two",
         [&](test::Test& test) {
             Simulation simulation;
-            b2Vec2 box0_initial_pos(0.0f, 0.6f);
-            b2Vec2 box1_initial_pos(0.5f, 1.7f);
-            BoxObject* box0 = simulation.createBox(
-                "box0",
-                box0_initial_pos,
-                utils::to_radians(0.0f),
-                b2Vec2(1.0f, 1.0f),
-                sf::Color(0, 255, 0)
-            );
-            BoxObject* box1 = simulation.createBox(
-                "box1",
-                box1_initial_pos,
-                utils::to_radians(0.0f),
-                b2Vec2(1.0f, 1.0f),
-                sf::Color(0, 255, 0)
-            );
+            BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.0f, 0.6f));
+            BoxObject* box1 = createBox(simulation, "box1", b2Vec2(0.5f, 1.7f));
             b2Vec2 box0_local_pos_before = box0->getPosition();
             b2Vec2 box0_global_pos_before = box0->getGlobalPosition();
             b2Vec2 box1_local_pos_before = box1->getPosition();
@@ -559,12 +507,9 @@ void SimulationTests::createGameObjectList() {
         "set_parent_three",
         [&](test::Test& test) {
             Simulation simulation;
-            b2Vec2 box0_initial_pos(0.5f, 0.5f);
-            b2Vec2 box1_initial_pos(1.1f, 1.1f);
-            b2Vec2 box2_initial_pos(1.75f, 1.75f);
-            BoxObject* box0 = createBox(simulation, box0_initial_pos);
-            BoxObject* box1 = createBox(simulation, box1_initial_pos);
-            BoxObject* box2 = createBox(simulation, box2_initial_pos);
+            BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
+            BoxObject* box1 = createBox(simulation, "box1", b2Vec2(1.1f, 1.1f));
+            BoxObject* box2 = createBox(simulation, "box2", b2Vec2(1.75f, 1.75f));
             b2Vec2 box0_local_pos_before = box0->getPosition();
             b2Vec2 box0_global_pos_before = box0->getGlobalPosition();
             b2Vec2 box1_local_pos_before = box1->getPosition();
@@ -604,9 +549,9 @@ std::string SimulationTests::b2Vec2ToStr(const b2Vec2& vec) {
     return "(" + utils::vec_to_str(vec) + ")";
 }
 
-BoxObject* SimulationTests::createBox(Simulation& simulation, const b2Vec2& pos) const {
+BoxObject* SimulationTests::createBox(Simulation& simulation, const std::string& name, const b2Vec2& pos) const {
     BoxObject* box = simulation.createBox(
-        "box0",
+        name,
         pos,
         utils::to_radians(0.0f),
         b2Vec2(1.0f, 1.0f),
