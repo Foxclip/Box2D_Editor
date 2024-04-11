@@ -240,7 +240,7 @@ namespace test {
 		test.getCurrentError()->add(message + " " + location_str);
 	}
 
-	bool TestModule::testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message) {
+	bool TestModule::testCheck(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message) {
 		if (!value) {
 			std::string filename = std::filesystem::path(file).filename().string();
 			std::string location_str = "[" + filename + ":" + std::to_string(line) + "]";
@@ -250,7 +250,7 @@ namespace test {
 		return value;
 	}
 
-	bool TestModule::testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message, const std::string message) {
+	bool TestModule::testCheck(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message, const std::string message) {
 		if (!value) {
 			std::string filename = std::filesystem::path(file).filename().string();
 			std::string location_str = "[" + filename + ":" + std::to_string(line) + "]";

@@ -16,7 +16,7 @@ namespace test {
 	testMessage(test, __FILE__, __LINE__, message)
 
 #define tCheck(value, ...) \
-	testAssert(test, __FILE__, __LINE__, value, #value, __VA_ARGS__)
+	testCheck(test, __FILE__, __LINE__, value, #value, __VA_ARGS__)
 
 #define tCompare(actual, expected, ...) \
 	testCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__)
@@ -135,8 +135,8 @@ namespace test {
 		virtual void beforeRunModule();
 		virtual void afterRunModule();
 		void testMessage(Test& test, const std::string& file, size_t line, const std::string& message);
-		bool testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message);
-		bool testAssert(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message, const std::string message);
+		bool testCheck(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message);
+		bool testCheck(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message, const std::string message);
 		template<typename T1, typename T2>
 		bool testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected);
 		template<typename T1, typename T2, typename TStr>
