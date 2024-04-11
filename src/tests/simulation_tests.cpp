@@ -613,8 +613,6 @@ void SimulationTests::createGameObjectList() {
             BoxObject* box0 = createBox(simulation, "box0", box0_initial_pos);
             BoxObject* box1 = createBox(simulation, "box1", box1_initial_pos);
             BoxObject* box2 = createBox(simulation, "box2", box2_initial_pos);
-            b2Vec2 box1_box0_rel_pos = box1_initial_pos - box0_initial_pos;
-            b2Vec2 box2_box1_rel_pos = box2_initial_pos - box1_initial_pos;
             box1->setParent(box0);
             box2->setParent(box1);
             float box0_new_angle = utils::to_radians(45.0f);
@@ -636,6 +634,19 @@ void SimulationTests::createGameObjectList() {
             b2Vec2 box2_pos2_check = utils::rotate_point(box2_pos1_check, box1_pos_check, box1_new_angle);
             tVec2ApproxCompare(box2->getGlobalPosition(), box2_pos2_check);
             tApproxCompare(box2->getGlobalRotation(), box0_new_angle + box1_new_angle);
+        }
+    );
+    test::Test* set_vertex_pos_test = list->addTest(
+        "set_vertex_pos",
+        [&](test::Test& test) {
+            Simulation simulation;
+            PolygonObject* polygon = simulation.createRegularPolygon(
+                "polygon", b2Vec2(0.0f, 0.0f), 0.0f, 6, 1.0f, sf::Color::Red
+            );
+            b2Vec2 old_vertex_pos = polygon->getGlobalVertexPos(0);
+            b2Vec2 new_vertex_pos = old_vertex_pos + b2Vec2(1.0f, 0.0f);
+            polygon->setGlobalVertexPos(0, new_vertex_pos);
+            tVec2ApproxCompare(polygon->getGlobalVertexPos(0), new_vertex_pos);
         }
     );
 }

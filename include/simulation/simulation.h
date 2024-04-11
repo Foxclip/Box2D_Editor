@@ -36,6 +36,14 @@ public:
 		const std::vector<b2Vec2>& vertices,
 		const sf::Color& color
 	);
+	PolygonObject* createRegularPolygon(
+		const std::string& name,
+		const b2Vec2& pos,
+		float angle,
+		size_t vertex_count,
+		float radius,
+		const sf::Color& color
+	);
 	PolygonObject* createCar(
 		const std::string& name,
 		const b2Vec2& pos,

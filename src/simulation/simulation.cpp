@@ -209,6 +209,23 @@ PolygonObject* Simulation::createPolygon(
     return ptr;
 }
 
+PolygonObject* Simulation::createRegularPolygon(
+    const std::string& name,
+    const b2Vec2& pos,
+    float angle,
+    size_t vertex_count,
+    float radius,
+    const sf::Color& color
+) {
+    std::vector<b2Vec2> vertices;
+    for (size_t i = 0; i < vertex_count; i++) {
+        b2Vec2 pos = utils::get_circle_vertex<b2Vec2>(i, vertex_count, radius);
+        vertices.push_back(pos);
+    }
+    PolygonObject* polygon = createPolygon(name, pos, angle, vertices, color);
+    return polygon;
+}
+
 PolygonObject* Simulation::createCar(
     const std::string& name,
     const b2Vec2& pos,

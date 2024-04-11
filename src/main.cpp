@@ -42,6 +42,7 @@ int main() {
     run_tests();
     //execute_app();
 
+    // TODO: shorten create methods to three lines
     // TODO: GameObject tests
     // TODO: ObjectList tests
     // TODO: Widget tests
