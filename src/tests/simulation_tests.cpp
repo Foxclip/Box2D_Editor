@@ -651,6 +651,9 @@ void SimulationTests::createGameObjectList() {
     );
     test::Test* add_vertex_test = list->addTest(
         "add_vertex",
+        {
+            set_vertex_pos_test
+        },
         [&](test::Test& test) {
             Simulation simulation;
             PolygonObject* polygon = simulation.createRegularPolygon(
@@ -659,6 +662,32 @@ void SimulationTests::createGameObjectList() {
             b2Vec2 midpoint = 0.5f * (polygon->getGlobalVertexPos(0) + polygon->getGlobalVertexPos(1));
             polygon->addVertexGlobal(1, midpoint);
             tVec2ApproxCompare(polygon->getGlobalVertexPos(1), midpoint);
+        }
+    );
+    test::Test* delete_vertex_test = list->addTest(
+        "delete_vertex",
+        {
+            set_vertex_pos_test
+        },
+        [&](test::Test& test) {
+            Simulation simulation;
+            PolygonObject* polygon = simulation.createRegularPolygon(
+                "polygon", b2Vec2(0.0f, 0.0f), 0.0f, 6, 1.0f, sf::Color::Red
+            );
+            std::vector<EditableVertex> vertices = polygon->getVertices();
+            polygon->tryDeleteVertex(5);
+            tAssert(tCompare(polygon->getVertexCount(), 5));
+            tVec2ApproxCompare(polygon->getGlobalVertexPos(0), vertices[0].pos);
+            tVec2ApproxCompare(polygon->getGlobalVertexPos(1), vertices[1].pos);
+            tVec2ApproxCompare(polygon->getGlobalVertexPos(2), vertices[2].pos);
+            tVec2ApproxCompare(polygon->getGlobalVertexPos(3), vertices[3].pos);
+            tVec2ApproxCompare(polygon->getGlobalVertexPos(4), vertices[4].pos);
+            polygon->tryDeleteVertex(2);
+            tAssert(tCompare(polygon->getVertexCount(), 4));
+            tVec2ApproxCompare(polygon->getGlobalVertexPos(0), vertices[0].pos);
+            tVec2ApproxCompare(polygon->getGlobalVertexPos(1), vertices[1].pos);
+            tVec2ApproxCompare(polygon->getGlobalVertexPos(2), vertices[3].pos);
+            tVec2ApproxCompare(polygon->getGlobalVertexPos(3), vertices[4].pos);
         }
     );
 }
