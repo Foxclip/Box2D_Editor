@@ -42,7 +42,6 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: GameObject tests
     // TODO: ObjectList tests
     // TODO: Widget tests
     // TODO: blinking textbox cursor

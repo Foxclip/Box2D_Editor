@@ -5,6 +5,7 @@ SimulationTests::SimulationTests(test::TestManager& manager) : TestModule("Simul
 void SimulationTests::createTestLists() {
     createSimulationList();
     createGameObjectList();
+    createObjectListList();
 }
 
 void SimulationTests::createSimulationList() {
@@ -632,6 +633,28 @@ void SimulationTests::createGameObjectList() {
             tVec2ApproxCompare(polygon->getGlobalVertexPos(1), vertices[1].pos);
             tVec2ApproxCompare(polygon->getGlobalVertexPos(2), vertices[3].pos);
             tVec2ApproxCompare(polygon->getGlobalVertexPos(3), vertices[4].pos);
+        }
+    );
+}
+
+void SimulationTests::createObjectListList() {
+    test::TestList* list = createTestList("ObjectList");
+
+    test::Test* object_list_test = list->addTest(
+        "object_list",
+        [&](test::Test& test) {
+            Simulation simulation;
+            BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
+            BoxObject* box1 = createBox(simulation, "box1", b2Vec2(1.1f, 1.1f));
+            BoxObject* box2 = createBox(simulation, "box2", b2Vec2(1.75f, 1.75f));
+            box1->setParent(box0);
+            tAssert(tCompare(simulation.getAllSize(), 3));
+            tAssert(tCompare(simulation.getTopSize(), 2));
+            tCompare(simulation.getFromAll(0)->getName(), box0->getName());
+            tCompare(simulation.getFromAll(1)->getName(), box1->getName());
+            tCompare(simulation.getFromAll(2)->getName(), box2->getName());
+            tCompare(simulation.getFromTop(0)->getName(), box0->getName());
+            tCompare(simulation.getFromTop(1)->getName(), box2->getName());
         }
     );
 }

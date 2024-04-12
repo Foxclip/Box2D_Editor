@@ -11,6 +11,7 @@ public:
 protected:
 	void createSimulationList();
 	void createGameObjectList();
+	void createObjectListList();
 
 private:
 	static std::string colorToStr(const sf::Color& color);
