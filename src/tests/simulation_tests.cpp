@@ -889,6 +889,32 @@ void SimulationTests::createObjectListList() {
             tAssert(tCompare(simulation.getJointsSize(), 0));
         }
     );
+    test::Test* clear_test = list->addTest(
+        "clear",
+        {
+            objects_test
+        },
+        [&](test::Test& test) {
+            Simulation simulation;
+            BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
+            BoxObject* box1 = createBox(simulation, "box1", b2Vec2(1.1f, 1.1f));
+            BoxObject* box2 = createBox(simulation, "box2", b2Vec2(1.75f, 1.75f));
+            RevoluteJoint* joint0 = simulation.createRevoluteJoint(box0, box1, b2Vec2(0.0f, 0.0f));
+            RevoluteJoint* joint1 = simulation.createRevoluteJoint(box1, box2, b2Vec2(0.0f, 0.0f));
+            box1->setParent(box0);
+            box2->setParent(box1);
+            simulation.clear();
+            tAssert(tCompare(simulation.getAllSize(), 0));
+            tAssert(tCompare(simulation.getTopSize(), 0));
+            tAssert(tCompare(simulation.getJointsSize(), 0));
+            tCheck(simulation.getById(0) == nullptr);
+            tCheck(simulation.getById(1) == nullptr);
+            tCheck(simulation.getById(2) == nullptr);
+            tCheck(simulation.getByName("box0") == nullptr);
+            tCheck(simulation.getByName("box1") == nullptr);
+            tCheck(simulation.getByName("box2") == nullptr);
+        }
+    );
 }
 
 std::string SimulationTests::colorToStr(const sf::Color& color) {
