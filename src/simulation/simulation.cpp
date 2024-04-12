@@ -303,6 +303,17 @@ RevoluteJoint* Simulation::createRevoluteJoint(
     return ptr;
 }
 
+RevoluteJoint* Simulation::createRevoluteJoint(
+    GameObject* obj1,
+    GameObject* obj2,
+    const b2Vec2& pos
+) {
+    b2RevoluteJointDef joint_def;
+    joint_def.Initialize(obj1->getRigidBody(), obj2->getRigidBody(), pos);
+    RevoluteJoint* joint = createRevoluteJoint(joint_def, obj1, obj2);
+    return joint;
+}
+
 bool Simulation::operator==(const Simulation& other) const {
     if (getAllSize() != other.getAllSize()) {
         return false;

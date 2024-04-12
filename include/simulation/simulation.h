@@ -63,6 +63,11 @@ public:
 		GameObject* obj1,
 		GameObject* obj2
 	);
+	RevoluteJoint* createRevoluteJoint(
+		GameObject* obj1,
+		GameObject* obj2,
+		const b2Vec2& pos
+	);
 	bool operator==(const Simulation& other) const;
 
 private:

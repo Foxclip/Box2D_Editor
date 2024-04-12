@@ -117,10 +117,7 @@ void SimulationTests::createSimulationList() {
             BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.0f, 0.0f));
             BoxObject* box1 = createBox(simulation, "box1", b2Vec2(0.0f, 5.0f));
             b2RevoluteJointDef joint_def;
-            joint_def.Initialize(box0->getRigidBody(), box1->getRigidBody(), b2Vec2(0.0f, 5.0f));
-            simulation.createRevoluteJoint(joint_def, box0, box1);
-            tAssert(tCompare(simulation.getJointsSize(), 1));
-            RevoluteJoint* joint = dynamic_cast<RevoluteJoint*>(simulation.getJoint(0));
+            RevoluteJoint* joint = simulation.createRevoluteJoint(box0, box1, b2Vec2(0.0f, 5.0f));
             tAssert(tCheck(joint, "Joint is not a RevoluteJoint"));
             tCompare(joint->getAnchorA(), b2Vec2(0.0f, 5.0f), &SimulationTests::b2Vec2ToStr);
         }
