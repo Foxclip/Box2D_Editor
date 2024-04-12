@@ -163,7 +163,22 @@ std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(const std::string& str
 	return uptr;
 }
 
+std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(
+	const std::string& str, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
+) {
+	TokenReader tr(str);
+	std::unique_ptr<RevoluteJoint> uptr = deserialize(tr, object_list, new_object_a, new_object_b);
+	return uptr;
+}
+
 std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(TokenReader& tr, GameObjectList* object_list) {
+	std::unique_ptr<RevoluteJoint> uptr = deserialize(tr, object_list, nullptr, nullptr);
+	return uptr;
+}
+
+std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(
+	TokenReader& tr, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
+) {
 	try {
 		b2RevoluteJointDef def;
 		def.bodyA = nullptr;
@@ -207,6 +222,12 @@ std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(TokenReader& tr, GameO
 		}
 		GameObject* object1 = object_list->getById(object_a_id);
 		GameObject* object2 = object_list->getById(object_b_id);
+		if (new_object_a) {
+			object1 = new_object_a;
+		}
+		if (new_object_b) {
+			object2 = new_object_b;
+		}
 		std::unique_ptr<RevoluteJoint> uptr = std::make_unique<RevoluteJoint>(def, object_list->getWorld(), object1, object2);
 		return uptr;
 	} catch (std::exception exc) {

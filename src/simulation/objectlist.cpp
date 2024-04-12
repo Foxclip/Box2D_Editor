@@ -180,13 +180,13 @@ GameObject* GameObjectList::duplicateObject(const GameObject* object) {
     return ptr;
 }
 
-Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b) {
+Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_object_a, GameObject* new_object_b) {
     TokenWriter tw;
     std::string str = joint->serialize(tw).toStr();
     TokenReader tr(str);
     std::unique_ptr<Joint> new_joint;
     if (dynamic_cast<const RevoluteJoint*>(joint)) {
-        new_joint = RevoluteJoint::deserialize(tr, this);
+        new_joint = RevoluteJoint::deserialize(tr, this, new_object_a, new_object_b);
     } else {
         mAssert(false, "Unknown joint type");
     }

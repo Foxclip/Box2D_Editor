@@ -42,6 +42,6 @@ private:
 	SearchIndexMultiple<std::string, GameObject> names;
 
 	GameObject* duplicateObject(const GameObject* object);
-	Joint* duplicateJoint(const Joint* joint, GameObject* new_a, GameObject* new_b);
+	Joint* duplicateJoint(const Joint* joint, GameObject* new_object_a, GameObject* new_object_b);
 
 };

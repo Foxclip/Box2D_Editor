@@ -51,7 +51,13 @@ public:
 	using Joint::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<RevoluteJoint> deserialize(const std::string& str, GameObjectList* object_list);
+	static std::unique_ptr<RevoluteJoint> deserialize(
+		const std::string& str, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
+	);
 	static std::unique_ptr<RevoluteJoint> deserialize(TokenReader& tr, GameObjectList* object_list);
+	static std::unique_ptr<RevoluteJoint> deserialize(
+		TokenReader& tr, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
+	);
 	bool isEqual(const Joint* other) const;
 
 private:

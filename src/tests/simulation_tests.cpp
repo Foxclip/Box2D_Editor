@@ -728,10 +728,40 @@ void SimulationTests::createObjectListList() {
             BoxObject* box2 = createBox(simulation, "box2", b2Vec2(1.75f, 1.75f));
             RevoluteJoint* joint0 = simulation.createRevoluteJoint(box0, box1, b2Vec2(0.0f, 0.0f));
             RevoluteJoint* joint1 = simulation.createRevoluteJoint(box1, box2, b2Vec2(0.0f, 0.0f));
+            box1->setParent(box0);
+            box2->setParent(box1);
             BoxObject* box3 = dynamic_cast<BoxObject*>(simulation.duplicate(box0));
             tAssert(tCompare(simulation.getAllSize(), 4));
             tCompare(box3->getId(), 3);
             boxCmp(test, box0, box3, false);
+        }
+    );
+    test::Test* duplicate_with_children_test = list->addTest(
+        "duplicate_with_children",
+        {
+            duplicate_test
+        },
+        [&](test::Test& test) {
+            Simulation simulation;
+            BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
+            BoxObject* box1 = createBox(simulation, "box1", b2Vec2(1.1f, 1.1f));
+            BoxObject* box2 = createBox(simulation, "box2", b2Vec2(1.75f, 1.75f));
+            RevoluteJoint* joint0 = simulation.createRevoluteJoint(box0, box1, b2Vec2(0.0f, 0.0f));
+            RevoluteJoint* joint1 = simulation.createRevoluteJoint(box1, box2, b2Vec2(0.0f, 0.0f));
+            box1->setParent(box0);
+            box2->setParent(box1);
+            BoxObject* box3 = dynamic_cast<BoxObject*>(simulation.duplicate(box0, true));
+            tAssert(tCompare(simulation.getAllSize(), 6));
+            tAssert(tCompare(box3->getChildren().size(), 1));
+            BoxObject* box4 = dynamic_cast<BoxObject*>(box3->getChild(0));
+            tAssert(tCompare(box4->getChildren().size(), 1));
+            BoxObject* box5 = dynamic_cast<BoxObject*>(box4->getChild(0));
+            tCompare(box3->getId(), 3);
+            tCompare(box4->getId(), 4);
+            tCompare(box5->getId(), 5);
+            boxCmp(test, box0, box3, false);
+            boxCmp(test, box1, box4, false);
+            boxCmp(test, box2, box5, false);
         }
     );
 }
@@ -759,6 +789,7 @@ void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, con
     if (cmp_id) {
         tCompare(objB->getId(), objA->getId());
         tCompare(objB->getParentId(), objA->getParentId());
+        tCompare(objB->getChildren().size(), objA->getChildren().size());
         if (objA->getChildren().size() == objB->getChildren().size()) {
             for (size_t i = 0; i < objA->getChildren().size(); i++) {
                 tCompare(objB->getChild(i)->getId(), objA->getChild(i)->getId());
@@ -772,7 +803,6 @@ void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, con
     tCompare(objB->getLinearVelocity(), objA->getLinearVelocity(), &SimulationTests::b2Vec2ToStr);
     tCompare(objB->getAngularVelocity(), objA->getAngularVelocity());
     tCheck(objB->getVertices() == objA->getVertices());
-    tCompare(objB->getChildren().size(), objA->getChildren().size());
 }
 
 void SimulationTests::boxCmp(test::Test& test, BoxObject* boxA, BoxObject* boxB, bool cmp_id) {
