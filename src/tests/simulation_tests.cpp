@@ -660,6 +660,20 @@ void SimulationTests::createObjectListList() {
             tCompare(simulation.getMaxId(), 2);
         }
     );
+    test::Test* joints_test = list->addTest(
+        "joints",
+        [&](test::Test& test) {
+            Simulation simulation;
+            BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
+            BoxObject* box1 = createBox(simulation, "box1", b2Vec2(1.1f, 1.1f));
+            BoxObject* box2 = createBox(simulation, "box2", b2Vec2(1.75f, 1.75f));
+            RevoluteJoint* joint0 = simulation.createRevoluteJoint(box0, box1, b2Vec2(0.0f, 0.0f));
+            RevoluteJoint* joint1 = simulation.createRevoluteJoint(box1, box2, b2Vec2(0.0f, 0.0f));
+            tAssert(tCompare(simulation.getJointsSize(), 2));
+            tCheck(simulation.getJoint(0) == joint0);
+            tCheck(simulation.getJoint(1) == joint1);
+        }
+    );
 }
 
 std::string SimulationTests::colorToStr(const sf::Color& color) {
