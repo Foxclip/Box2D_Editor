@@ -25,12 +25,10 @@ void SimulationTests::createSimulationList() {
         },
         [&](test::Test& test) {
             Simulation simulation;
-            simulation.createBox(
+            BoxObject* box = simulation.createBox(
                 "box0", b2Vec2(1.0f, 1.0f), utils::to_radians(45.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green
             );
-            tAssert(tCompare(simulation.getAllSize(), 1));
-            BoxObject* box = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
-            tAssert(tCheck(box, "Object is not a BoxObject"));
+            tAssert(tCheck(box));
             tCompare(box->getName(), "box0");
             tCompare(box->getId(), 0);
             tCompare(box->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
@@ -44,12 +42,10 @@ void SimulationTests::createSimulationList() {
         },
         [&](test::Test& test) {
             Simulation simulation;
-            simulation.createBall(
+            BallObject* ball = simulation.createBall(
                 "ball0", b2Vec2(1.0f, 1.0f), 1.0f, sf::Color::Green, sf::Color::Green
             );
-            tAssert(tCompare(simulation.getAllSize(), 1));
-            BallObject* ball = dynamic_cast<BallObject*>(simulation.getFromAll(0));
-            tAssert(tCheck(ball, "Object is not a BallObject"));
+            tAssert(tCheck(ball));
             tCompare(ball->getName(), "ball0");
             tCompare(ball->getId(), 0);
             tCompare(ball->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
@@ -68,12 +64,10 @@ void SimulationTests::createSimulationList() {
                 b2Vec2 vertex = utils::get_circle_vertex<b2Vec2>(i, 6, 1.0f);
                 vertices.push_back(vertex);
             }
-            simulation.createPolygon(
+            PolygonObject* polygon = simulation.createPolygon(
                 "polygon0", b2Vec2(1.0f, 1.0f), utils::to_radians(45.0f), vertices, sf::Color::Green
             );
-            tAssert(tCompare(simulation.getAllSize(), 1));
-            PolygonObject* polygon = dynamic_cast<PolygonObject*>(simulation.getFromAll(0));
-            tAssert(tCheck(polygon, "Object is not a PolygonObject"));
+            tAssert(tCheck(polygon));
             tCompare(polygon->getName(), "polygon0");
             tCompare(polygon->getId(), 0);
             tCompare(polygon->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
@@ -95,12 +89,10 @@ void SimulationTests::createSimulationList() {
                 b2Vec2(-15.0f, 2.0f),
                 b2Vec2(-25.0f, 8.0f),
             };
-            simulation.createChain(
+            ChainObject* chain = simulation.createChain(
                 "chain0", b2Vec2(1.0f, 1.0f), utils::to_radians(45.0f), vertices, sf::Color(255, 255, 255)
             );
-            tAssert(tCompare(simulation.getAllSize(), 1));
-            ChainObject* chain = dynamic_cast<ChainObject*>(simulation.getFromAll(0));
-            tAssert(tCheck(chain, "Object is not a ChainObject"));
+            tAssert(tCheck(chain));
             tCompare(chain->getName(), "chain0");
             tCompare(chain->getId(), 0);
             tCompare(chain->getGlobalPosition(), b2Vec2(1.0f, 1.0f), &SimulationTests::b2Vec2ToStr);
@@ -118,7 +110,7 @@ void SimulationTests::createSimulationList() {
             BoxObject* box1 = createBox(simulation, "box1", b2Vec2(0.0f, 5.0f));
             b2RevoluteJointDef joint_def;
             RevoluteJoint* joint = simulation.createRevoluteJoint(box0, box1, b2Vec2(0.0f, 5.0f));
-            tAssert(tCheck(joint, "Joint is not a RevoluteJoint"));
+            tAssert(tCheck(joint));
             tCompare(joint->getAnchorA(), b2Vec2(0.0f, 5.0f), &SimulationTests::b2Vec2ToStr);
         }
     );
@@ -133,13 +125,12 @@ void SimulationTests::createSimulationList() {
             Simulation simulation;
             std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
             std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
-            simulation.createCar(
+            PolygonObject* car = simulation.createCar(
                 "car0", b2Vec2(0.0f, 0.0f), lengths, wheels, sf::Color(255, 0, 0)
             );
             tAssert(tCompare(simulation.getAllSize(), 4));
-            PolygonObject* car = dynamic_cast<PolygonObject*>(simulation.getFromAll(0));
             {
-                tAssert(tCheck(car, "Object is not a PolygonObject"));
+                tAssert(tCheck(car));
                 tCompare(car->getName(), "car0");
                 tCompare(car->getId(), 0);
                 tVec2ApproxCompare(car->getGlobalPosition(), b2Vec2(0.0f, 0.0f));
@@ -178,10 +169,9 @@ void SimulationTests::createSimulationList() {
         },
         [=, this](test::Test& test) {
             Simulation simulation;
-            simulation.createBox(
+            BoxObject* boxA = simulation.createBox(
                 "box0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), b2Vec2(1.1f, 2.0f), sf::Color::Green
             );
-            BoxObject* boxA = dynamic_cast<BoxObject*>(simulation.getFromAll(0));
             std::string str = boxA->serialize();
             std::unique_ptr<BoxObject> uptr = BoxObject::deserialize(str, &simulation);
             BoxObject* boxB = uptr.get();
@@ -195,16 +185,13 @@ void SimulationTests::createSimulationList() {
         },
         [=, this](test::Test& test) {
             Simulation simulation;
-            simulation.createBall(
+            BallObject* ballA = simulation.createBall(
                 "ball0", b2Vec2(1.5f, -3.5f), 2.2f, sf::Color::Green, sf::Color::Green
             );
-            BallObject* ballA = dynamic_cast<BallObject*>(simulation.getFromAll(0));
             std::string str = ballA->serialize();
             std::unique_ptr<BallObject> uptr = BallObject::deserialize(str, &simulation);
             BallObject* ballB = uptr.get();
-            tCheck(*ballA == *ballB);
-            objCmpCommon(test, ballA, ballB);
-            tCompare(ballB->radius, ballA->radius);
+            ballCmp(test, ballA, ballB);
         }
     );
     test::Test* polygon_serialize_test = list->addTest(
@@ -219,15 +206,13 @@ void SimulationTests::createSimulationList() {
                 b2Vec2 vertex = utils::get_circle_vertex<b2Vec2>(i, 6, 1.0f);
                 vertices.push_back(vertex);
             }
-            simulation.createPolygon(
+            PolygonObject* polygonA = simulation.createPolygon(
                 "polygon0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), vertices, sf::Color::Green
             );
-            PolygonObject* polygonA = dynamic_cast<PolygonObject*>(simulation.getFromAll(0));
             std::string str = polygonA->serialize();
             std::unique_ptr<PolygonObject> uptr = PolygonObject::deserialize(str, &simulation);
             PolygonObject* polygonB = uptr.get();
-            tCheck(*polygonA == *polygonB);
-            objCmpCommon(test, polygonA, polygonB);
+            polygonCmp(test, polygonA, polygonB);
         }
     );
     test::Test* chain_serialize_test = list->addTest(
@@ -245,15 +230,13 @@ void SimulationTests::createSimulationList() {
                 b2Vec2(-15.0f, 2.0f),
                 b2Vec2(-25.0f, 8.0f),
             };
-            simulation.createChain(
+            ChainObject* chainA = simulation.createChain(
                 "chain0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), vertices, sf::Color::Green
             );
-            ChainObject* chainA = dynamic_cast<ChainObject*>(simulation.getFromAll(0));
             std::string str = chainA->serialize();
             std::unique_ptr<ChainObject> uptr = ChainObject::deserialize(str, &simulation);
             ChainObject* chainB = uptr.get();
-            tCheck(*chainA == *chainB);
-            objCmpCommon(test, chainA, chainB);
+            chainCmp(test, chainA, chainB);
         }
     );
     test::Test* revolute_joint_serialize_test = list->addTest(
