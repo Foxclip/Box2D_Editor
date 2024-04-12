@@ -674,6 +674,26 @@ void SimulationTests::createObjectListList() {
             tCheck(simulation.getJoint(1) == joint1);
         }
     );
+    test::Test* add_test = list->addTest(
+        "add",
+        [&](test::Test& test) {
+            Simulation simulationA;
+            BoxObject* box0 = simulationA.createBox(
+                "box0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), b2Vec2(1.1f, 2.0f), sf::Color::Green
+            );
+            std::string str0 = box0->serialize();
+            std::unique_ptr<BoxObject> uptr1 = BoxObject::deserialize(str0, &simulationA);
+            BoxObject* box1 = dynamic_cast<BoxObject*>(simulationA.add(std::move(uptr1), true));
+            tAssert(tCompare(simulationA.getAllSize(), 2));
+            tCompare(box1->getId(), 1);
+            Simulation simulationB;
+            std::string str1 = box1->serialize();
+            std::unique_ptr<BoxObject> uptr2 = BoxObject::deserialize(str1, &simulationB);
+            BoxObject* box2 = dynamic_cast<BoxObject*>(simulationB.add(std::move(uptr2), false));
+            tAssert(tCompare(simulationB.getAllSize(), 1));
+            boxCmp(test, box1, box2);
+        }
+    );
 }
 
 std::string SimulationTests::colorToStr(const sf::Color& color) {
