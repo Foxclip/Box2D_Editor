@@ -40,6 +40,10 @@ ptrdiff_t GameObjectList::getTopIndex(GameObject* object) const {
     return top_objects.getIndex(object);
 }
 
+ptrdiff_t GameObjectList::getAllIndex(GameObject* object) const {
+    return all_objects.getIndex(object);
+}
+
 Joint* GameObjectList::getJoint(size_t i) const {
     return joints[i];
 }

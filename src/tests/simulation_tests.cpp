@@ -620,8 +620,8 @@ void SimulationTests::createGameObjectList() {
 void SimulationTests::createObjectListList() {
     test::TestList* list = createTestList("ObjectList");
 
-    test::Test* object_list_test = list->addTest(
-        "object_list",
+    test::Test* objects_test = list->addTest(
+        "objects",
         [&](test::Test& test) {
             Simulation simulation;
             BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
@@ -635,6 +635,29 @@ void SimulationTests::createObjectListList() {
             tCompare(simulation.getFromAll(2)->getName(), box2->getName());
             tCompare(simulation.getFromTop(0)->getName(), box0->getName());
             tCompare(simulation.getFromTop(1)->getName(), box2->getName());
+            tCheck(simulation.getById(0) == box0);
+            tCheck(simulation.getById(1) == box1);
+            tCheck(simulation.getById(2) == box2);
+            tCheck(simulation.getByName("box0") == box0);
+            tCheck(simulation.getByName("box1") == box1);
+            tCheck(simulation.getByName("box2") == box2);
+            tCompare(simulation.getAllIndex(box0), 0);
+            tCompare(simulation.getAllIndex(box1), 1);
+            tCompare(simulation.getAllIndex(box2), 2);
+            tCompare(simulation.getTopIndex(box0), 0);
+            tCompare(simulation.getTopIndex(box1), -1);
+            tCompare(simulation.getTopIndex(box2), 1);
+            tCheck(simulation.contains(box0));
+            tCheck(simulation.contains(box1));
+            tCheck(simulation.contains(box2));
+            tAssert(tCompare(simulation.getAllVector().size(), 3));
+            tCheck(simulation.getAllVector()[0] == box0);
+            tCheck(simulation.getAllVector()[1] == box1);
+            tCheck(simulation.getAllVector()[2] == box2);
+            tAssert(tCompare(simulation.getTopVector().size(), 2));
+            tCheck(simulation.getTopVector()[0] == box0);
+            tCheck(simulation.getTopVector()[1] == box2);
+            tCompare(simulation.getMaxId(), 2);
         }
     );
 }

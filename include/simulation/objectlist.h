@@ -19,6 +19,7 @@ public:
 	GameObject* getByName(const std::string& name) const;
 	bool contains(GameObject* object) const;
 	ptrdiff_t getTopIndex(GameObject* object) const;
+	ptrdiff_t getAllIndex(GameObject* object) const;
 	Joint* getJoint(size_t i) const;
 	const CompVector<GameObject*>& getTopVector() const;
 	const CompVector<GameObject*>& getAllVector() const;
