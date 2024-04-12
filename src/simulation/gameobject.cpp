@@ -609,7 +609,7 @@ GameObject* GameObject::getGameobject(b2Body* body) {
 	return reinterpret_cast<GameObject*>(body->GetUserData().pointer);
 }
 
-bool GameObject::operator==(const GameObject& other) const {
+bool GameObject::compare(const GameObject& other, bool compare_id) const {
 	if (const BoxObject* box = dynamic_cast<const BoxObject*>(this)) {
 		if (!box->isEqual(&other)) {
 			return false;
@@ -629,24 +629,26 @@ bool GameObject::operator==(const GameObject& other) const {
 	} else {
 		mAssert(false, "Unknown GameObject type:" + std::string(typeid(other).name()));
 	}
-	if (children.size() != other.children.size()) {
-		return false;
-	}
-	for (size_t i = 0; i < children.size(); i++) {
-		if (children[i]->id != other.children[i]->id) {
+	if (compare_id) {
+		if (id != other.id) {
 			return false;
+		}
+		if (parent_id != other.parent_id) {
+			return false;
+		}
+		if (children.size() != other.children.size()) {
+			return false;
+		}
+		for (size_t i = 0; i < children.size(); i++) {
+			if (children[i]->id != other.children[i]->id) {
+				return false;
+			}
 		}
 	}
 	if (color != other.color) {
 		return false;
 	}
-	if (id != other.id) {
-		return false;
-	}
 	if (name != other.name) {
-		return false;
-	}
-	if (parent_id != other.parent_id) {
 		return false;
 	}
 	if (transform != other.transform) {
@@ -656,6 +658,10 @@ bool GameObject::operator==(const GameObject& other) const {
 		return false;
 	}
 	return true;
+}
+
+bool GameObject::operator==(const GameObject& other) const {
+	return compare(other);
 }
 
 BoxObject::BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, sf::Color color) {

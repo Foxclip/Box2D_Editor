@@ -130,6 +130,7 @@ public:
 	static BodyDef deserializeBody(TokenReader& tr);
 	static b2FixtureDef deserializeFixture(TokenReader& tr);
 	static GameObject* getGameobject(b2Body* body);
+	bool compare(const GameObject& other, bool compare_id = true) const;
 	bool operator==(const GameObject& other) const;
 
 protected:

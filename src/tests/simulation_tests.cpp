@@ -715,6 +715,25 @@ void SimulationTests::createObjectListList() {
             revoluteJointCmp(test, joint0, joint1);
         }
     );
+    test::Test* duplicate_test = list->addTest(
+        "duplicate",
+        {
+            add_test,
+            add_joint_test
+        },
+        [&](test::Test& test) {
+            Simulation simulation;
+            BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
+            BoxObject* box1 = createBox(simulation, "box1", b2Vec2(1.1f, 1.1f));
+            BoxObject* box2 = createBox(simulation, "box2", b2Vec2(1.75f, 1.75f));
+            RevoluteJoint* joint0 = simulation.createRevoluteJoint(box0, box1, b2Vec2(0.0f, 0.0f));
+            RevoluteJoint* joint1 = simulation.createRevoluteJoint(box1, box2, b2Vec2(0.0f, 0.0f));
+            BoxObject* box3 = dynamic_cast<BoxObject*>(simulation.duplicate(box0));
+            tAssert(tCompare(simulation.getAllSize(), 4));
+            tCompare(box3->getId(), 3);
+            boxCmp(test, box0, box3, false);
+        }
+    );
 }
 
 std::string SimulationTests::colorToStr(const sf::Color& color) {
@@ -736,48 +755,50 @@ BoxObject* SimulationTests::createBox(Simulation& simulation, const std::string&
     return box;
 }
 
-void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, const GameObject* objB) {
-    tCompare(objB->getChildren().size(), objA->getChildren().size());
-    if (objA->getChildren().size() == objB->getChildren().size()) {
-        for (size_t i = 0; i < objA->getChildren().size(); i++) {
-            tCompare(objB->getChild(i)->getId(), objA->getChild(i)->getId());
+void SimulationTests::objCmpCommon(test::Test& test, const GameObject* objA, const GameObject* objB, bool cmp_id) {
+    if (cmp_id) {
+        tCompare(objB->getId(), objA->getId());
+        tCompare(objB->getParentId(), objA->getParentId());
+        if (objA->getChildren().size() == objB->getChildren().size()) {
+            for (size_t i = 0; i < objA->getChildren().size(); i++) {
+                tCompare(objB->getChild(i)->getId(), objA->getChild(i)->getId());
+            }
         }
     }
     tCompare(objB->getColor(), objA->getColor(), &SimulationTests::colorToStr);
-    tCompare(objB->getId(), objA->getId());
     tCompare(objB->getName(), objA->getName());
-    tCompare(objB->getParentId(), objA->getParentId());
     tCompare(objB->getTransform().q.GetAngle(), objA->getTransform().q.GetAngle());
     tCompare(objB->getTransform().p, objA->getTransform().p, &SimulationTests::b2Vec2ToStr);
     tCompare(objB->getLinearVelocity(), objA->getLinearVelocity(), &SimulationTests::b2Vec2ToStr);
     tCompare(objB->getAngularVelocity(), objA->getAngularVelocity());
     tCheck(objB->getVertices() == objA->getVertices());
+    tCompare(objB->getChildren().size(), objA->getChildren().size());
 }
 
-void SimulationTests::boxCmp(test::Test& test, BoxObject* boxA, BoxObject* boxB) {
+void SimulationTests::boxCmp(test::Test& test, BoxObject* boxA, BoxObject* boxB, bool cmp_id) {
     tAssert(tCheck(boxA && boxB, "Objects have different types"));
-    tCheck(*boxA == *boxB);
-    objCmpCommon(test, boxA, boxB);
+    tCheck(boxA->compare(*boxB, cmp_id));
+    objCmpCommon(test, boxA, boxB, cmp_id);
     tCompare(boxB->size, boxA->size, &SimulationTests::b2Vec2ToStr);
 }
 
-void SimulationTests::ballCmp(test::Test& test, BallObject* ballA, BallObject* ballB) {
+void SimulationTests::ballCmp(test::Test& test, BallObject* ballA, BallObject* ballB, bool cmp_id) {
     tAssert(tCheck(ballA && ballB, "Objects have different types"));
-    tCheck(*ballA == *ballB);
-    objCmpCommon(test, ballA, ballB);
+    tCheck(ballA->compare(*ballB, cmp_id));
+    objCmpCommon(test, ballA, ballB, cmp_id);
     tCompare(ballB->radius, ballA->radius);
 }
 
-void SimulationTests::polygonCmp(test::Test& test, PolygonObject* polygonA, PolygonObject* polygonB) {
+void SimulationTests::polygonCmp(test::Test& test, PolygonObject* polygonA, PolygonObject* polygonB, bool cmp_id) {
     tAssert(tCheck(polygonA && polygonB, "Objects have different types"));
-    tCheck(*polygonA == *polygonB);
-    objCmpCommon(test, polygonA, polygonB);
+    tCheck(polygonA->compare(*polygonB, cmp_id));
+    objCmpCommon(test, polygonA, polygonB, cmp_id);
 }
 
-void SimulationTests::chainCmp(test::Test& test, ChainObject* chainA, ChainObject* chainB) {
+void SimulationTests::chainCmp(test::Test& test, ChainObject* chainA, ChainObject* chainB, bool cmp_id) {
     tAssert(tCheck(chainA && chainB, "Objects have different types"));
-    tCheck(*chainA == *chainB);
-    objCmpCommon(test, chainA, chainB);
+    tCheck(chainA->compare(*chainB, cmp_id));
+    objCmpCommon(test, chainA, chainB, cmp_id);
 }
 
 void SimulationTests::jointCmpCommon(test::Test& test, Joint* jointA, Joint* jointB) {
