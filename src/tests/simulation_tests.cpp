@@ -676,11 +676,12 @@ void SimulationTests::createObjectListList() {
     );
     test::Test* add_test = list->addTest(
         "add",
+        {
+            objects_test
+        },
         [&](test::Test& test) {
             Simulation simulationA;
-            BoxObject* box0 = simulationA.createBox(
-                "box0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), b2Vec2(1.1f, 2.0f), sf::Color::Green
-            );
+            BoxObject* box0 = createBox(simulationA, "box0", b2Vec2(1.5f, -3.5f));
             std::string str0 = box0->serialize();
             std::unique_ptr<BoxObject> uptr1 = BoxObject::deserialize(str0, &simulationA);
             BoxObject* box1 = dynamic_cast<BoxObject*>(simulationA.add(std::move(uptr1), true));
@@ -692,6 +693,26 @@ void SimulationTests::createObjectListList() {
             BoxObject* box2 = dynamic_cast<BoxObject*>(simulationB.add(std::move(uptr2), false));
             tAssert(tCompare(simulationB.getAllSize(), 1));
             boxCmp(test, box1, box2);
+        }
+    );
+    test::Test* add_joint_test = list->addTest(
+        "add_joint",
+        {
+            joints_test
+        },
+        [&](test::Test& test) {
+            Simulation simulationA;
+            BoxObject* box0A = createBox(simulationA, "box0", b2Vec2(1.5f, -3.5f));
+            BoxObject* box1A = createBox(simulationA, "box1", b2Vec2(1.0f, 0.5f));
+            RevoluteJoint* joint0 = simulationA.createRevoluteJoint(box0A, box1A, b2Vec2(0.0f, 0.0f));
+            std::string str = joint0->serialize();
+            Simulation simulationB;
+            BoxObject* box0B = createBox(simulationB, "box0", b2Vec2(1.5f, -3.5f));
+            BoxObject* box1B = createBox(simulationB, "box1", b2Vec2(1.0f, 0.5f));
+            std::unique_ptr<RevoluteJoint> uptr = RevoluteJoint::deserialize(str, &simulationB);
+            RevoluteJoint* joint1 = dynamic_cast<RevoluteJoint*>(simulationB.addJoint(std::move(uptr)));
+            tAssert(tCompare(simulationB.getJointsSize(), 1));
+            revoluteJointCmp(test, joint0, joint1);
         }
     );
 }
