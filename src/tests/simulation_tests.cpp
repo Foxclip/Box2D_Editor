@@ -333,10 +333,7 @@ void SimulationTests::createSimulationList() {
             simulationA.save(temp_filename.string());
             Simulation simulationB;
             simulationB.load(temp_filename.string());
-            tAssert(tCompare(simulationB.getAllSize(), 1));
-            BoxObject* boxB = dynamic_cast<BoxObject*>(simulationB.getFromAll(0));
-            tAssert(tCheck(boxB, "Object is not a BoxObject"));
-            boxCmp(test, boxA, boxB);
+            simCmp(test, simulationA, simulationB);
         }
     );
     test::Test* box_stack_test = list->addTest(
