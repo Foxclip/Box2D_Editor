@@ -129,6 +129,14 @@ GameObject* GameObject::getChild(size_t index) const {
 	return children[index];
 }
 
+const CompVector<Joint*>& GameObject::getJoints() const {
+	return joints;
+}
+
+Joint* GameObject::getJoint(size_t index) const {
+	return joints[index];
+}
+
 b2Vec2 GameObject::toGlobal(const b2Vec2& pos) {
 	b2Transform gt = getGlobalTransform();
 	return b2Mul(gt, pos);
