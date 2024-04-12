@@ -111,6 +111,12 @@ void SimulationTests::createSimulationList() {
             b2RevoluteJointDef joint_def;
             RevoluteJoint* joint = simulation.createRevoluteJoint(box0, box1, b2Vec2(0.0f, 5.0f));
             tAssert(tCheck(joint));
+            tAssert(tCompare(simulation.getJointsSize(), 1));
+            tCheck(simulation.getJoint(0) == joint);
+            tAssert(tCompare(box0->getJoints().size(), 1));
+            tCheck(box0->getJoint(0) == joint);
+            tAssert(tCompare(box1->getJoints().size(), 1));
+            tCheck(box1->getJoint(0) == joint);
             tCompare(joint->getAnchorA(), b2Vec2(0.0f, 5.0f), &SimulationTests::b2Vec2ToStr);
         }
     );
@@ -266,6 +272,12 @@ void SimulationTests::createSimulationList() {
             std::string str = jointA->serialize();
             std::unique_ptr<RevoluteJoint> uptr = RevoluteJoint::deserialize(str, &simulation);
             RevoluteJoint* jointB = uptr.get();
+            tAssert(tCompare(simulation.getJointsSize(), 1));
+            tCheck(simulation.getJoint(0) == jointA);
+            tAssert(tCompare(box0->getJoints().size(), 1));
+            tCheck(box0->getJoint(0) == jointA);
+            tAssert(tCompare(box1->getJoints().size(), 1));
+            tCheck(box1->getJoint(0) == jointA);
             revoluteJointCmp(test, jointA, jointB);
         }
     );
@@ -672,6 +684,13 @@ void SimulationTests::createObjectListList() {
             tAssert(tCompare(simulation.getJointsSize(), 2));
             tCheck(simulation.getJoint(0) == joint0);
             tCheck(simulation.getJoint(1) == joint1);
+            tAssert(tCompare(box0->getJoints().size(), 1));
+            tCheck(box0->getJoint(0) == joint0);
+            tAssert(tCompare(box1->getJoints().size(), 2));
+            tCheck(box1->getJoint(0) == joint0);
+            tCheck(box1->getJoint(1) == joint1);
+            tAssert(tCompare(box2->getJoints().size(), 1));
+            tCheck(box2->getJoint(0) == joint1);
         }
     );
     test::Test* add_test = list->addTest(
@@ -712,6 +731,11 @@ void SimulationTests::createObjectListList() {
             std::unique_ptr<RevoluteJoint> uptr = RevoluteJoint::deserialize(str, &simulationB);
             RevoluteJoint* joint1 = dynamic_cast<RevoluteJoint*>(simulationB.addJoint(std::move(uptr)));
             tAssert(tCompare(simulationB.getJointsSize(), 1));
+            tCheck(simulationB.getJoint(0) == joint1);
+            tAssert(tCompare(box0B->getJoints().size(), 1));
+            tCheck(box0B->getJoint(0) == joint1);
+            tAssert(tCompare(box1B->getJoints().size(), 1));
+            tCheck(box1B->getJoint(0) == joint1);
             revoluteJointCmp(test, joint0, joint1);
         }
     );
@@ -734,6 +758,17 @@ void SimulationTests::createObjectListList() {
             tAssert(tCompare(simulation.getAllSize(), 4));
             tCompare(box3->getId(), 3);
             boxCmp(test, box0, box3, false);
+            tAssert(tCompare(simulation.getJointsSize(), 2));
+            tCheck(simulation.getJoint(0) == joint0);
+            tCheck(simulation.getJoint(1) == joint1);
+            tAssert(tCompare(box0->getJoints().size(), 1));
+            tCheck(box0->getJoint(0) == joint0);
+            tAssert(tCompare(box1->getJoints().size(), 2));
+            tCheck(box1->getJoint(0) == joint0);
+            tCheck(box1->getJoint(1) == joint1);
+            tAssert(tCompare(box2->getJoints().size(), 1));
+            tCheck(box2->getJoint(0) == joint1);
+            tAssert(tCompare(box3->getJoints().size(), 0));
         }
     );
     test::Test* duplicate_with_children_test = list->addTest(
@@ -762,6 +797,25 @@ void SimulationTests::createObjectListList() {
             boxCmp(test, box0, box3, false);
             boxCmp(test, box1, box4, false);
             boxCmp(test, box2, box5, false);
+            tAssert(tCompare(simulation.getJointsSize(), 4));
+            tCheck(simulation.getJoint(0) == joint0);
+            tCheck(simulation.getJoint(1) == joint1);
+            Joint* joint2 = simulation.getJoint(2);
+            Joint* joint3 = simulation.getJoint(3);
+            tAssert(tCompare(box0->getJoints().size(), 1));
+            tCheck(box0->getJoint(0) == joint0);
+            tAssert(tCompare(box1->getJoints().size(), 2));
+            tCheck(box1->getJoint(0) == joint0);
+            tCheck(box1->getJoint(1) == joint1);
+            tAssert(tCompare(box2->getJoints().size(), 1));
+            tCheck(box2->getJoint(0) == joint1);
+            tAssert(tCompare(box3->getJoints().size(), 1));
+            tCheck(box3->getJoint(0) == joint2);
+            tAssert(tCompare(box4->getJoints().size(), 2));
+            tCheck(box4->getJoint(0) == joint2);
+            tCheck(box4->getJoint(1) == joint3);
+            tAssert(tCompare(box5->getJoints().size(), 1));
+            tCheck(box5->getJoint(0) == joint3);
         }
     );
     test::Test* remove_joint_test = list->addTest(
@@ -780,10 +834,11 @@ void SimulationTests::createObjectListList() {
             box2->setParent(box1);
             simulation.removeJoint(joint0);
             tAssert(tCompare(simulation.getJointsSize(), 1));
+            tCheck(simulation.getJoint(0) == joint1);
             tAssert(tCompare(box0->getJoints().size(), 0));
             tAssert(tCompare(box1->getJoints().size(), 1));
-            tAssert(tCompare(box2->getJoints().size(), 1));
             tCheck(box1->getJoint(0) == joint1);
+            tAssert(tCompare(box2->getJoints().size(), 1));
             tCheck(box2->getJoint(0) == joint1);
         }
     );
