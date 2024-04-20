@@ -67,8 +67,6 @@ namespace fw {
 
     void Application::beforeProcessMouseEvent(const sf::Event& event) { }
 
-    void Application::onProcessMouseEvent(const sf::Event& event) { }
-
     void Application::onProcessLeftClick() { }
 
     void Application::onProcessLeftRelease() { }

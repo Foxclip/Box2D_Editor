@@ -66,7 +66,6 @@ namespace fw {
 		virtual void onProcessWindowEvent(const sf::Event& event);
 		virtual void onProcessKeyboardEvent(const sf::Event& event);
 		virtual void beforeProcessMouseEvent(const sf::Event& event);
-		virtual void onProcessMouseEvent(const sf::Event& event);
 		virtual void onProcessLeftClick();
 		virtual void onProcessLeftRelease();
 		virtual void onProcessMouseScroll(const sf::Event& event);

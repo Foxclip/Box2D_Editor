@@ -7,10 +7,38 @@ class TestApplication : public fw::Application {
 public:
 	bool initialized = false;
 	bool started = false;
+	bool frame_begin = false;
+	bool frame_end = false;
+	bool process_widgets = false;
+	bool process_window_event = false;
+	bool process_keyboard_event = false;
+	bool before_process_mouse_event = false;
+	bool process_left_click = false;
+	bool process_left_release = false;
+	bool process_mouse_scroll = false;
+	bool process_keyboard = false;
+	bool process_mouse = false;
+	bool after_process_input = false;
+	bool process_world = false;
+	bool rendered = false;
 	bool closed = false;
 
 	void onInit() override;
 	void onStart() override;
+	void onFrameBegin() override;
+	void onFrameEnd() override;
+	void onProcessWidgets() override;
+	void onProcessWindowEvent(const sf::Event& event) override;
+	void onProcessKeyboardEvent(const sf::Event& event) override;
+	void beforeProcessMouseEvent(const sf::Event& event) override;
+	void onProcessLeftClick() override;
+	void onProcessLeftRelease() override;
+	void onProcessMouseScroll(const sf::Event& event) override;
+	void onProcessKeyboard() override;
+	void onProcessMouse() override;
+	void afterProcessInput() override;
+	void onProcessWorld() override;
+	void onRender() override;
 	void onClose() override;
 };
 
