@@ -5,6 +5,7 @@
 #include "logger.h"
 #include "scenes.h"
 #include "tests/tests.h"
+#include <tests/widget_tests.h>
 
 void run_tests() {
     logger << "Running tests\n";
@@ -14,6 +15,7 @@ void run_tests() {
     test_manager.addModule<CompVectorTests>();
     test_manager.addModule<SearchIndexTests>();
     test_manager.addModule<SimulationTests>();
+    test_manager.addModule<WidgetTests>();
     test_manager.runAllModules();
 }
 
@@ -42,7 +44,6 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: ObjectList tests
     // TODO: Widget tests
     // TODO: blinking textbox cursor
     // TODO: remove global.h
