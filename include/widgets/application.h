@@ -40,6 +40,7 @@ namespace fw {
 		);
 		virtual void start();
 		void maximizeWindow() const;
+		sf::Vector2u getWindowSize() const;
 
 	protected:
 		sf::RenderWindow window;

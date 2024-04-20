@@ -31,6 +31,10 @@ namespace fw {
         ShowWindow(windowHandle, SW_MAXIMIZE);
     }
 
+    sf::Vector2u Application::getWindowSize() const {
+        return window.getSize();
+    }
+
     void Application::onInit() { }
 
     void Application::onStart() { }
