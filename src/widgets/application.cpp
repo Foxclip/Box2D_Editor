@@ -21,9 +21,20 @@ namespace fw {
         onInit();
     }
 
-    void Application::start() {
+    void Application::start(bool loop) {
         onStart();
-        mainLoop();
+        if (loop) {
+            mainLoop();
+        }
+    }
+
+    void Application::advance() {
+        onFrameBegin();
+        processWidgets();
+        processInput();
+        processWorld();
+        render();
+        onFrameEnd();
     }
 
     void Application::maximizeWindow() const {
@@ -33,6 +44,11 @@ namespace fw {
 
     sf::Vector2u Application::getWindowSize() const {
         return window.getSize();
+    }
+
+    void Application::close() {
+        window.close();
+        onClose();
     }
 
     void Application::onInit() { }
@@ -69,18 +85,15 @@ namespace fw {
 
     void Application::onRender() { }
 
+    void Application::onClose() { }
+
     void Application::startMoveGesture() {
         startMoveGesture(MouseGesture::SCREEN);
     }
 
     void Application::mainLoop() {
         while (window.isOpen()) {
-            onFrameBegin();
-            processWidgets();
-            processInput();
-            processWorld();
-            render();
-            onFrameEnd();
+            advance();
         }
     }
 

@@ -38,9 +38,11 @@ namespace fw {
 			unsigned int window_height,
 			unsigned int antialiasing
 		);
-		virtual void start();
+		virtual void start(bool loop = true);
+		void advance();
 		void maximizeWindow() const;
 		sf::Vector2u getWindowSize() const;
+		void close();
 
 	protected:
 		sf::RenderWindow window;
@@ -73,6 +75,7 @@ namespace fw {
 		virtual void afterProcessInput();
 		virtual void onProcessWorld();
 		virtual void onRender();
+		virtual void onClose();
 		void startMoveGesture();
 
 	private:
