@@ -21,9 +21,10 @@ namespace fw {
         onInit();
     }
 
-    void Application::start(bool loop) {
+    void Application::start(bool external_control) {
+        this->external_control = external_control;
         onStart();
-        if (loop) {
+        if (!external_control) {
             mainLoop();
         }
     }
@@ -44,6 +45,14 @@ namespace fw {
 
     sf::Vector2u Application::getWindowSize() const {
         return window.getSize();
+    }
+
+    void Application::setExternalMousePos(const sf::Vector2i& pos) {
+        external_mouse_pos = pos;
+    }
+
+    void Application::addExternalEvent(const sf::Event& event) {
+        external_event_queue.push(event);
     }
 
     void Application::close() {
@@ -102,13 +111,21 @@ namespace fw {
     }
 
     void Application::processInput() {
-        mousePos = sf::Mouse::getPosition(window);
-        mousePosf = to2f(mousePos);
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            processWindowEvent(event);
-            processKeyboardEvent(event);
-            processMouseEvent(event);
+        if (external_control) {
+            mousePos = external_mouse_pos;
+            mousePosf = to2f(mousePos);
+            while (!external_event_queue.empty()) {
+                sf::Event event = external_event_queue.front();
+                external_event_queue.pop();
+                processEvent(event);
+            }
+        } else {
+            mousePos = sf::Mouse::getPosition(window);
+            mousePosf = to2f(mousePos);
+            sf::Event event;
+            while (window.pollEvent(event)) {
+                processEvent(event);
+            }
         }
         processKeyboard();
         processMouse();
@@ -116,6 +133,12 @@ namespace fw {
         widgets.updateWidgets();
         widgets.updateRenderQueue();
         widgets.lock();
+    }
+
+    void Application::processEvent(const sf::Event& event) {
+        processWindowEvent(event);
+        processKeyboardEvent(event);
+        processMouseEvent(event);
     }
 
     void Application::processWindowEvent(const sf::Event& event) {

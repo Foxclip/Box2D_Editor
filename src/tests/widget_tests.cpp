@@ -36,7 +36,7 @@ void WidgetTests::createApplicationList() {
         [&](test::Test& test) {
             TestApplication application;
             application.init("Test window", 800, 600, 0);
-            application.start(false);
+            application.start(true);
             tAssert(tCheck(application.started));
         }
     );
@@ -48,16 +48,16 @@ void WidgetTests::createApplicationList() {
         [&](test::Test& test) {
             TestApplication application;
             application.init("Test window", 800, 600, 0);
-            application.start(false);
+            application.start(true);
             application.advance();
             tCheck(application.initialized);
             tCheck(application.started);
             tCheck(application.frame_begin);
             tCheck(application.frame_end);
             tCheck(application.process_widgets);
-            tCheck(application.process_window_event);
-            tCheck(application.process_keyboard_event);
-            tCheck(application.before_process_mouse_event);
+            tCheck(!application.process_window_event);
+            tCheck(!application.process_keyboard_event);
+            tCheck(!application.before_process_mouse_event);
             tCheck(!application.process_left_click);
             tCheck(!application.process_left_release);
             tCheck(!application.process_mouse_scroll);
@@ -76,7 +76,7 @@ void WidgetTests::createApplicationList() {
         [&](test::Test& test) {
             TestApplication application;
             application.init("Test window", 800, 600, 0);
-            application.start(false);
+            application.start(true);
             application.advance();
             application.close();
             tCheck(application.closed);

@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "widget_list.h"
+#include <queue>
 
 Logger& operator<<(Logger& lg, const sf::Vector2f& value);
 
@@ -38,10 +39,12 @@ namespace fw {
 			unsigned int window_height,
 			unsigned int antialiasing
 		);
-		virtual void start(bool loop = true);
+		virtual void start(bool external_control = false);
 		void advance();
 		void maximizeWindow() const;
 		sf::Vector2u getWindowSize() const;
+		void setExternalMousePos(const sf::Vector2i& pos);
+		void addExternalEvent(const sf::Event& event);
 		void close();
 
 	protected:
@@ -57,6 +60,9 @@ namespace fw {
 		MouseGesture mouseGesture;
 		sf::Cursor arrow_cursor;
 		sf::Cursor text_cursor;
+		bool external_control = false;
+		sf::Vector2i external_mouse_pos;
+		std::queue<sf::Event> external_event_queue;
 
 		virtual void onInit();
 		virtual void onStart();
@@ -81,6 +87,7 @@ namespace fw {
 		void mainLoop();
 		void processWidgets();
 		void processInput();
+		void processEvent(const sf::Event& event);
 		void processWindowEvent(const sf::Event& event);
 		void processKeyboardEvent(const sf::Event& event);
 		void processMouseEvent(const sf::Event& event);
