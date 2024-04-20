@@ -68,6 +68,20 @@ void WidgetTests::createApplicationList() {
             tCheck(application.rendered);
         }
     );
+    test::Test* close_test = list->addTest(
+        "close",
+        {
+            start_test
+        },
+        [&](test::Test& test) {
+            TestApplication application;
+            application.init("Test window", 800, 600, 0);
+            application.start(false);
+            application.advance();
+            application.close();
+            tCheck(application.closed);
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2uToStr(const sf::Vector2u& vec) {
