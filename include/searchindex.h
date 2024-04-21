@@ -1,5 +1,7 @@
 #pragma once
+
 #include <set>
+#include <map>
 
 template<typename TData, typename TObject>
 struct ObjectData {
@@ -56,7 +58,7 @@ public:
 	void clear();
 
 private:
-	std::set<ObjectData<TData, TObject>> set;
+	std::map<TData, TObject*> map;
 };
 
 template<typename TData, typename TObject>
@@ -83,20 +85,20 @@ inline SearchIndexUnique<TData, TObject>::SearchIndexUnique() { }
 
 template<typename TData, typename TObject>
 inline bool SearchIndexUnique<TData, TObject>::add(const TData& data, TObject* ptr) {
-	auto inserted = set.insert(ObjectData<TData, TObject>(data, ptr));
+	auto inserted = map.insert({ data, ptr });
 	return inserted.second;
 }
 
 template<typename TData, typename TObject>
 inline size_t SearchIndexUnique<TData, TObject>::size() const {
-	return set.size();
+	return map.size();
 }
 
 template<typename TData, typename TObject>
 inline TObject* SearchIndexUnique<TData, TObject>::find(const TData& data) const {
-	auto it = set.find(ObjectData<TData, TObject>(data, nullptr));
-	if (it != set.end()) {
-		TObject* ptr = const_cast<TObject*>(it->ptr);
+	auto it = map.find(data);
+	if (it != map.end()) {
+		TObject* ptr = (*it).second;
 		return ptr;
 	}
 	return nullptr;
@@ -104,27 +106,27 @@ inline TObject* SearchIndexUnique<TData, TObject>::find(const TData& data) const
 
 template<typename TData, typename TObject>
 inline TData SearchIndexUnique<TData, TObject>::min() const {
-	return set.begin()->data;
+	return (*map.begin()).first;
 }
 
 template<typename TData, typename TObject>
 inline TData SearchIndexUnique<TData, TObject>::max() const {
-	return set.rbegin()->data;
+	return (*map.rbegin()).first;
 }
 
 template<typename TData, typename TObject>
 inline bool SearchIndexUnique<TData, TObject>::contains(const TData& data) const {
-	return find(data);
+	return map.contains(data);
 }
 
 template<typename TData, typename TObject>
 inline void SearchIndexUnique<TData, TObject>::remove(const TData& data) {
-	set.erase(ObjectData<TData, TObject>(data, nullptr));
+	map.erase(data);
 }
 
 template<typename TData, typename TObject>
 inline void SearchIndexUnique<TData, TObject>::clear() {
-	set = std::set<ObjectData<TData, TObject>>();
+	map = std::map<TData, TObject*>();
 }
 
 template<typename TData, typename TObject>
