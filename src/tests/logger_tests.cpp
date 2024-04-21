@@ -49,6 +49,24 @@ void LoggerTests::createLoggerList(test::TestList* list) {
 		logger << "Line3\n";
 		tCompare(logger.getTotalBuffer(), "Line1\n|   Line2\n|   |   Line3\n");
 	});
+	test::Test* logger_flush_test = list->addTest("loggerflush", { multiple_lines_test }, [&](test::Test& test) {
+		Logger logger(true);
+		logger << "Str1";
+		tCompare(logger.getLineBuffer(), "Str1");
+		tCompare(logger.getTotalBuffer(), "");
+		logger << LoggerFlush();
+		tCompare(logger.getLineBuffer(), "");
+		tCompare(logger.getTotalBuffer(), "Str1");
+		logger << "Str2";
+		tCompare(logger.getLineBuffer(), "Str2");
+		tCompare(logger.getTotalBuffer(), "Str1");
+		logger << LoggerFlush();
+		tCompare(logger.getLineBuffer(), "");
+		tCompare(logger.getTotalBuffer(), "Str1Str2");
+		logger << "\n";
+		logger << "Str3\n";
+		tCompare(logger.getTotalBuffer(), "Str1Str2\nStr3\n");
+	});
 }
 
 void LoggerTests::createTagsList(test::TestList* list) {

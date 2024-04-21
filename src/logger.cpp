@@ -194,6 +194,10 @@ void Logger::updateAcive() {
 	}
 }
 
+const std::string& Logger::getLineBuffer() const {
+	return line_buffer;
+}
+
 const std::string& Logger::getTotalBuffer() const {
 	return total_buffer;
 }

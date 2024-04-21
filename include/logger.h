@@ -45,6 +45,7 @@ public:
 	std::set<std::string>& getDisabledTags();
 	const std::set<std::string>& getDisabledTags() const;
 	void updateAcive();
+	const std::string& getLineBuffer() const;
 	const std::string& getTotalBuffer() const;
 
 private:
