@@ -9,4 +9,7 @@ public:
 	void createTestLists() override;
 
 protected:
+	void createLoggerList();
+	void createTagsList();
+
 };

@@ -3,6 +3,11 @@
 LoggerTests::LoggerTests(test::TestManager& manager) : TestModule("Logger", manager) { }
 
 void LoggerTests::createTestLists() {
+	createLoggerList();
+	createTagsList();
+}
+
+void LoggerTests::createLoggerList() {
 	test::TestList* list = createTestList("Logger");
 	list->OnBeforeRunTest = []() { logger.lock(); };
 	list->OnAfterRunTest = []() { logger.unlock(); };
@@ -18,7 +23,14 @@ void LoggerTests::createTestLists() {
 		logger << "Line2\n";
 		tCompare(logger.getTotalBuffer(), "Line1\nLine2\n");
 	});
-	test::Test* tag_test = list->addTest("tag", { multiple_lines_test }, [&](test::Test& test) {
+}
+
+void LoggerTests::createTagsList() {
+	test::TestList* list = createTestList("Tags");
+	list->OnBeforeRunTest = []() { logger.lock(); };
+	list->OnAfterRunTest = []() { logger.unlock(); };
+
+	test::Test* tag_test = list->addTest("tag", [&](test::Test& test) {
 		Logger logger(true);
 		LoggerTag tag1(logger, "tag1");
 		logger << "tag1\n";

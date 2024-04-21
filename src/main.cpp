@@ -44,6 +44,7 @@ int main() {
     run_tests();
     //execute_app();
 
+    // TODO: required test lists
     // TODO: use map and multimap where possible
     // TODO: Widget tests
     // TODO: blinking textbox cursor
