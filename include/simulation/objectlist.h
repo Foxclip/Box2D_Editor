@@ -38,8 +38,8 @@ private:
 	CompVectorUptr<GameObject> all_objects;
 	CompVector<GameObject*> top_objects;
 	CompVectorUptr<Joint> joints;
-	SearchIndexUnique<size_t, GameObject> ids;
-	SearchIndexMultiple<std::string, GameObject> names;
+	SearchIndexUnique<size_t, GameObject*> ids;
+	SearchIndexMultiple<std::string, GameObject*> names;
 
 	GameObject* duplicateObject(const GameObject* object);
 	Joint* duplicateJoint(const Joint* joint, GameObject* new_object_a, GameObject* new_object_b);

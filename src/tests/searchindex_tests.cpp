@@ -13,10 +13,10 @@ void SearchIndexTests::createTestLists() {
 
 void SearchIndexTests::createTestListUnique(test::TestList* list) {
 	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
-		SearchIndexUnique<int, MyClass> sindex;
+		SearchIndexUnique<int, MyClass*> sindex;
 	});
 	test::Test* add_test = list->addTest("add", { basic_test }, [&](test::Test& test) {
-		SearchIndexUnique<int, MyClass> sindex;
+		SearchIndexUnique<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;
@@ -27,7 +27,7 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 		tAssert(tCompare(sindex.size(), 3));
 	});
 	test::Test* contains_test = list->addTest("contains", { add_test }, [&](test::Test& test) {
-		SearchIndexUnique<int, MyClass> sindex;
+		SearchIndexUnique<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;
@@ -43,7 +43,7 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 		tCheck(!sindex.contains(8));
 	});
 	test::Test* min_max_test = list->addTest("min_max", { add_test }, [&](test::Test& test) {
-		SearchIndexUnique<int, MyClass> sindex;
+		SearchIndexUnique<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;
@@ -56,7 +56,7 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 		tCompare(sindex.max(), 7);
 	});
 	test::Test* find_test = list->addTest("find", { add_test }, [&](test::Test& test) {
-		SearchIndexUnique<int, MyClass> sindex;
+		SearchIndexUnique<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;
@@ -72,7 +72,7 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 		tCheck(sindex.find(8) == nullptr);
 	});
 	test::Test* remove_test = list->addTest("remove", { find_test }, [&](test::Test& test) {
-		SearchIndexUnique<int, MyClass> sindex;
+		SearchIndexUnique<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;
@@ -92,7 +92,7 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 		tCheck(sindex.find(7) == &mc3);
 	});
 	test::Test* clear_test = list->addTest("clear", { find_test }, [&](test::Test& test) {
-		SearchIndexUnique<int, MyClass> sindex;
+		SearchIndexUnique<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;
@@ -112,10 +112,10 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 
 void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
-		SearchIndexMultiple<int, MyClass> sindex;
+		SearchIndexMultiple<int, MyClass*> sindex;
 	});
 	test::Test* add_test = list->addTest("add", { basic_test }, [&](test::Test& test) {
-		SearchIndexMultiple<int, MyClass> sindex;
+		SearchIndexMultiple<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;
@@ -127,7 +127,7 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		tAssert(tCompare(sindex.size(), 4));
 	});
 	test::Test* contains_test = list->addTest("contains", { add_test }, [&](test::Test& test) {
-		SearchIndexMultiple<int, MyClass> sindex;
+		SearchIndexMultiple<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;
@@ -144,7 +144,7 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		tCheck(!sindex.contains(8));
 	});
 	test::Test* min_max_test = list->addTest("min_max", { add_test }, [&](test::Test& test) {
-		SearchIndexMultiple<int, MyClass> sindex;
+		SearchIndexMultiple<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;
@@ -158,7 +158,7 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		tCompare(sindex.max(), 7);
 	});
 	test::Test* find_test = list->addTest("find", { add_test }, [&](test::Test& test) {
-		SearchIndexMultiple<int, MyClass> sindex;
+		SearchIndexMultiple<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;
@@ -175,7 +175,7 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		tCheck(sindex.find(8) == nullptr);
 	});
 	test::Test* remove_test = list->addTest("remove", { find_test }, [&](test::Test& test) {
-		SearchIndexMultiple<int, MyClass> sindex;
+		SearchIndexMultiple<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;
@@ -197,7 +197,7 @@ void SearchIndexTests::createTestListMultiple(test::TestList* list) {
 		tCheck(sindex.find(7) == &mc3);
 	});
 	test::Test* clear_test = list->addTest("clear", { find_test }, [&](test::Test& test) {
-		SearchIndexMultiple<int, MyClass> sindex;
+		SearchIndexMultiple<int, MyClass*> sindex;
 		MyClass mc1;
 		MyClass mc2;
 		MyClass mc3;

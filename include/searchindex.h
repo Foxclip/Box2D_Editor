@@ -6,9 +6,9 @@
 template<typename TKey, typename TData>
 class SearchIndex {
 public:
-	virtual bool add(const TKey& key, TData* data) = 0;
+	virtual bool add(const TKey& key, const TData& data) = 0;
 	virtual size_t size() const = 0;
-	virtual TData* find(const TKey& key) const = 0;
+	virtual TData find(const TKey& key) const = 0;
 	virtual TKey min() const = 0;
 	virtual TKey max() const = 0;
 	virtual bool contains(const TKey& key) const = 0;
@@ -19,9 +19,9 @@ template<typename TKey, typename TData>
 class SearchIndexUnique : SearchIndex<TKey, TData> {
 public:
 	SearchIndexUnique();
-	bool add(const TKey& key, TData* data);
+	bool add(const TKey& key, const TData& data);
 	size_t size() const;
-	TData* find(const TKey& key) const;
+	TData find(const TKey& key) const;
 	TKey min() const;
 	TKey max() const;
 	bool contains(const TKey& key) const;
@@ -29,24 +29,24 @@ public:
 	void clear();
 
 private:
-	std::map<TKey, TData*> map;
+	std::map<TKey, TData> map;
 };
 
 template<typename TKey, typename TData>
 class SearchIndexMultiple : SearchIndex<TKey, TData> {
 public:
 	SearchIndexMultiple();
-	bool add(const TKey& key, TData* data);
+	bool add(const TKey& key, const TData& data);
 	size_t size() const;
-	TData* find(const TKey& key) const;
+	TData find(const TKey& key) const;
 	TKey min() const;
 	TKey max() const;
 	bool contains(const TKey& key) const;
-	void remove(const TKey& key, TData* data);
+	void remove(const TKey& key, const TData& data);
 	void clear();
 
 private:
-	std::map<TKey, std::set<TData*>> map;
+	std::map<TKey, std::set<TData>> map;
 
 };
 
@@ -54,7 +54,7 @@ template<typename TKey, typename TData>
 inline SearchIndexUnique<TKey, TData>::SearchIndexUnique() { }
 
 template<typename TKey, typename TData>
-inline bool SearchIndexUnique<TKey, TData>::add(const TKey& key, TData* data) {
+inline bool SearchIndexUnique<TKey, TData>::add(const TKey& key, const TData& data) {
 	auto inserted = map.insert({ key, data });
 	return inserted.second;
 }
@@ -65,13 +65,13 @@ inline size_t SearchIndexUnique<TKey, TData>::size() const {
 }
 
 template<typename TKey, typename TData>
-inline TData* SearchIndexUnique<TKey, TData>::find(const TKey& key) const {
+inline TData SearchIndexUnique<TKey, TData>::find(const TKey& key) const {
 	auto it = map.find(key);
 	if (it != map.end()) {
-		TData* data = (*it).second;
+		TData data = (*it).second;
 		return data;
 	}
-	return nullptr;
+	return TData();
 }
 
 template<typename TKey, typename TData>
@@ -96,17 +96,17 @@ inline void SearchIndexUnique<TKey, TData>::remove(const TKey& key) {
 
 template<typename TKey, typename TData>
 inline void SearchIndexUnique<TKey, TData>::clear() {
-	map = std::map<TKey, TData*>();
+	map = std::map<TKey, TData>();
 }
 
 template<typename TKey, typename TData>
 inline SearchIndexMultiple<TKey, TData>::SearchIndexMultiple() { }
 
 template<typename TKey, typename TData>
-inline bool SearchIndexMultiple<TKey, TData>::add(const TKey& key, TData* data) {
+inline bool SearchIndexMultiple<TKey, TData>::add(const TKey& key, const TData& data) {
 	auto it = map.find(key);
 	if (it == map.end()) {
-		auto inserted = map.insert({ key, std::set<TData*>() });
+		auto inserted = map.insert({ key, std::set<TData>() });
 		it = inserted.first;
 	}
 	auto inserted = it->second.insert(data);
@@ -123,13 +123,13 @@ inline size_t SearchIndexMultiple<TKey, TData>::size() const {
 }
 
 template<typename TKey, typename TData>
-inline TData* SearchIndexMultiple<TKey, TData>::find(const TKey& key) const {
+inline TData SearchIndexMultiple<TKey, TData>::find(const TKey& key) const {
 	auto it = map.find(key);
 	if (it != map.end()) {
-		TData* data = *it->second.begin();
+		TData data = *it->second.begin();
 		return data;
 	}
-	return nullptr;
+	return TData();
 }
 
 template<typename TKey, typename TData>
@@ -148,10 +148,10 @@ inline bool SearchIndexMultiple<TKey, TData>::contains(const TKey& key) const {
 }
 
 template<typename TKey, typename TData>
-inline void SearchIndexMultiple<TKey, TData>::remove(const TKey& key, TData* data) {
+inline void SearchIndexMultiple<TKey, TData>::remove(const TKey& key, const TData& data) {
 	auto it = map.find(key);
 	if (it != map.end()) {
-		std::set<TData*>& set = it->second;
+		std::set<TData>& set = it->second;
 		set.erase(data);
 		if (set.empty()) {
 			map.erase(it);
@@ -161,6 +161,6 @@ inline void SearchIndexMultiple<TKey, TData>::remove(const TKey& key, TData* dat
 
 template<typename TKey, typename TData>
 inline void SearchIndexMultiple<TKey, TData>::clear() {
-	map = std::map<TKey, std::set<TData*>>();
+	map = std::map<TKey, std::set<TData>>();
 }
 

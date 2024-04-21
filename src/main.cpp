@@ -11,11 +11,11 @@ void run_tests() {
     logger << "Running tests\n";
     LoggerIndent test_modules_indent;
     test::TestManager test_manager;
-    //test_manager.addModule<LoggerTests>();
-    //test_manager.addModule<CompVectorTests>();
+    test_manager.addModule<LoggerTests>();
+    test_manager.addModule<CompVectorTests>();
     test_manager.addModule<SearchIndexTests>();
-    //test_manager.addModule<SimulationTests>();
-    //test_manager.addModule<WidgetTests>();
+    test_manager.addModule<SimulationTests>();
+    test_manager.addModule<WidgetTests>();
     test_manager.runAllModules();
 }
 
@@ -51,7 +51,6 @@ int main() {
     // TODO: CanvasWidget as a replacement to screen textures
     // TODO: EventRecorder for ui tests
     // TODO: make tool panel with move, rotate and duplicate tools
-    // TODO: make SearchIndex not use pointers for TObject type
     // TODO: align textboxes in EditWindow to the right
     // TODO: Dropdown widget
     // TODO: object list window (outliner)

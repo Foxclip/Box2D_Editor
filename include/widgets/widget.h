@@ -151,7 +151,7 @@ namespace fw {
 		WidgetTransform transforms = WidgetTransform(this);
 		Widget* parent = nullptr;
 		CompVector<Widget*> children;
-		SearchIndexMultiple<std::string, Widget> children_names;
+		SearchIndexMultiple<std::string, Widget*> children_names;
 		RenderLayer layer = RenderLayer::BASE;
 		Anchor origin_anchor = Anchor::CUSTOM;
 		Anchor parent_anchor = Anchor::CUSTOM;
