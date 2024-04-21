@@ -114,8 +114,9 @@ namespace test {
 		test.error_stack.pop();
 	}
 
-	TestList::TestList(const std::string& name, TestModule& module) : module(module) {
+	TestList::TestList(const std::string& name, TestModule& module, const std::vector<TestList*>& required_lists) : module(module) {
 		this->name = name;
+		this->required_lists = required_lists;
 	}
 
 	Test* TestList::addTest(std::string name, TestFuncType func) {
@@ -168,14 +169,15 @@ namespace test {
 			}
 		}
 		OnAfterRunAllTests();
+		is_run = true;
 	}
 
 	TestModule::TestModule(const std::string& name, TestManager& manager) : manager(manager) {
 		this->name = name;
 	}
 
-	TestList* TestModule::createTestList(const std::string& name) {
-		std::unique_ptr<TestList> test_list = std::make_unique<TestList>(name, *this);
+	TestList* TestModule::createTestList(const std::string& name, const std::vector<TestList*>& required_lists) {
+		std::unique_ptr<TestList> test_list = std::make_unique<TestList>(name, *this, required_lists);
 		TestList* ptr = test_list.get();
 		test_lists.push_back(std::move(test_list));
 		return ptr;
@@ -188,13 +190,29 @@ namespace test {
 		for (auto& test_list : test_lists) {
 			logger << "List: " << test_list->name << "\n";
 			LoggerIndent test_list_indent;
-			test_list->runTests();
-			if (manager.print_list_summary) {
-				printSummary(
-					test_list->passed_list,
-					test_list->cancelled_list,
-					test_list->failed_list
-				);
+			bool cancelled = false;
+			for (TestList* req_list : test_list->required_lists) {
+				if (!req_list->is_run || req_list->failed_list.size() > 0) {
+					cancelled = true;
+					break;
+				}
+			}
+			if (cancelled) {
+				std::vector<Test*> tests = test_list->getTestList();
+				for (Test* test : tests) {
+					test->cancelled = true;
+					test_list->cancelled_list.push_back(test->name);
+				}
+				logger << "Cancelled " << tests.size() << " tests\n";
+			} else {
+				test_list->runTests();
+				if (manager.print_list_summary) {
+					printSummary(
+						test_list->passed_list,
+						test_list->cancelled_list,
+						test_list->failed_list
+					);
+				}
 			}
 			for (const std::string& name : test_list->passed_list) {
 				passed_list.push_back(test_list->name + "/" + name);

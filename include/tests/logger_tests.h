@@ -9,7 +9,7 @@ public:
 	void createTestLists() override;
 
 protected:
-	void createLoggerList();
-	void createTagsList();
+	void createLoggerList(test::TestList* list);
+	void createTagsList(test::TestList* list);
 
 };

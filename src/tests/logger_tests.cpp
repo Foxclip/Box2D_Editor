@@ -3,15 +3,15 @@
 LoggerTests::LoggerTests(test::TestManager& manager) : TestModule("Logger", manager) { }
 
 void LoggerTests::createTestLists() {
-	createLoggerList();
-	createTagsList();
+	test::TestList* logger_list = createTestList("Logger");
+	logger_list->OnBeforeRunTest = []() { logger.lock(); };
+	logger_list->OnAfterRunTest = []() { logger.unlock(); };
+	test::TestList* tags_list = createTestList("Tags", { logger_list });
+	createLoggerList(logger_list);
+	createTagsList(tags_list);
 }
 
-void LoggerTests::createLoggerList() {
-	test::TestList* list = createTestList("Logger");
-	list->OnBeforeRunTest = []() { logger.lock(); };
-	list->OnAfterRunTest = []() { logger.unlock(); };
-
+void LoggerTests::createLoggerList(test::TestList* list) {
 	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
 		Logger logger(true);
 		logger << "Test\n";
@@ -25,11 +25,7 @@ void LoggerTests::createLoggerList() {
 	});
 }
 
-void LoggerTests::createTagsList() {
-	test::TestList* list = createTestList("Tags");
-	list->OnBeforeRunTest = []() { logger.lock(); };
-	list->OnAfterRunTest = []() { logger.unlock(); };
-
+void LoggerTests::createTagsList(test::TestList* list) {
 	test::Test* tag_test = list->addTest("tag", [&](test::Test& test) {
 		Logger logger(true);
 		LoggerTag tag1(logger, "tag1");

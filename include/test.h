@@ -86,15 +86,17 @@ namespace test {
 	class TestList {
 	public:
 		std::string name;
+		std::vector<TestList*> required_lists;
 		std::vector<std::string> passed_list;
 		std::vector<std::string> cancelled_list;
 		std::vector<std::string> failed_list;
+		bool is_run = false;
 		std::function<void(void)> OnBeforeRunAllTests = []() { };
 		std::function<void(void)> OnAfterRunAllTests = []() { };
 		std::function<void(void)> OnBeforeRunTest = []() { };
 		std::function<void(void)> OnAfterRunTest = []() { };
 
-		TestList(const std::string& name, TestModule& module);
+		TestList(const std::string& name, TestModule& module, const std::vector<TestList*>& required_lists = { });
 		Test* addTest(std::string name, TestFuncType func);
 		Test* addTest(std::string name, std::vector<Test*> required, TestFuncType func);
 		std::vector<Test*> getTestList() const;
@@ -120,7 +122,7 @@ namespace test {
 
 		TestModule(const std::string& name, TestManager& manager);
 		virtual void createTestLists() = 0;
-		TestList* createTestList(const std::string& name);
+		TestList* createTestList(const std::string& name, const std::vector<TestList*>& required_lists = { });
 		void runTests();
 		static void printSummary(
 			const std::vector<std::string>& passed_list,
