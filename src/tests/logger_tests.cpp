@@ -23,6 +23,32 @@ void LoggerTests::createLoggerList(test::TestList* list) {
 		logger << "Line2\n";
 		tCompare(logger.getTotalBuffer(), "Line1\nLine2\n");
 	});
+	test::Test* indent_test = list->addTest("indent", { multiple_lines_test }, [&](test::Test& test) {
+		Logger logger(true);
+		logger << "Line1\n";
+		LoggerIndent indent(logger);
+		logger << "Line2\n";
+		tCompare(logger.getTotalBuffer(), "Line1\n|   Line2\n");
+	});
+	test::Test* indent_2_test = list->addTest("indent_2", { indent_test }, [&](test::Test& test) {
+		Logger logger(true);
+		logger << "Line1\n";
+		{
+			LoggerIndent indent(logger);
+			logger << "Line2\n";
+		}
+		logger << "Line3\n";
+		tCompare(logger.getTotalBuffer(), "Line1\n|   Line2\nLine3\n");
+	});
+	test::Test* indent_3_test = list->addTest("indent_3", { indent_test }, [&](test::Test& test) {
+		Logger logger(true);
+		logger << "Line1\n";
+		LoggerIndent indent1(logger);
+		logger << "Line2\n";
+		LoggerIndent indent2(logger);
+		logger << "Line3\n";
+		tCompare(logger.getTotalBuffer(), "Line1\n|   Line2\n|   |   Line3\n");
+	});
 }
 
 void LoggerTests::createTagsList(test::TestList* list) {
