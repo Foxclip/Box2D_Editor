@@ -67,6 +67,23 @@ void LoggerTests::createLoggerList(test::TestList* list) {
 		logger << "Str3\n";
 		tCompare(logger.getTotalBuffer(), "Str1Str2\nStr3\n");
 	});
+	test::Test* onlinewrite_test = list->addTest("onlinewrite", { logger_flush_test }, [&](test::Test& test) {
+		Logger logger(true);
+		std::string str;
+		logger.OnLineWrite = [&](std::string line) {
+			str = line;
+		};
+		logger << "Line1\n";
+		tCompare(str, "Line1");
+		logger << "Str1";
+		tCompare(str, "Line1");
+		logger << LoggerFlush();
+		tCompare(str, "Str1");
+		logger << "Str2";
+		tCompare(str, "Str1");
+		logger << "\n";
+		tCompare(str, "Str2");
+	});
 }
 
 void LoggerTests::createTagsList(test::TestList* list) {
