@@ -4,35 +4,6 @@
 #include <map>
 
 template<typename TData, typename TObject>
-struct ObjectData {
-	TData data;
-	TObject* ptr = nullptr;
-
-	ObjectData(TData data, TObject* ptr) {
-		this->data = data;
-		this->ptr = ptr;
-	}
-	bool operator<(const ObjectData& other) const {
-		return data < other.data;
-	}
-
-};
-
-template<typename TData, typename TObject>
-struct ObjectDataNode {
-	TData data;
-	std::set<TObject*> set;
-
-	ObjectDataNode(TData data) {
-		this->data = data;
-	}
-	bool operator<(const ObjectDataNode& other) const {
-		return data < other.data;
-	}
-
-};
-
-template<typename TData, typename TObject>
 class SearchIndex {
 public:
 	virtual bool add(const TData& data, TObject* ptr) = 0;
@@ -75,9 +46,8 @@ public:
 	void clear();
 
 private:
-	std::set<ObjectDataNode<TData, TObject>> set;
+	std::map<TData, std::set<TObject*>> map;
 
-	ObjectDataNode<TData, TObject>* findNode(const TData& data) const;
 };
 
 template<typename TData, typename TObject>
@@ -134,29 +104,29 @@ inline SearchIndexMultiple<TData, TObject>::SearchIndexMultiple() { }
 
 template<typename TData, typename TObject>
 inline bool SearchIndexMultiple<TData, TObject>::add(const TData& data, TObject* ptr) {
-	ObjectDataNode<TData, TObject>* node = findNode(data);
-	if (!node) {
-		auto inserted = set.insert(ObjectDataNode<TData, TObject>(data));
-		node = const_cast<ObjectDataNode<TData, TObject>*>(&*(inserted.first));
+	auto it = map.find(data);
+	if (it == map.end()) {
+		auto inserted = map.insert({ data, std::set<TObject*>() });
+		it = inserted.first;
 	}
-	auto inserted = node->set.insert(ptr);
+	auto inserted = it->second.insert(ptr);
 	return inserted.second;
 }
 
 template<typename TData, typename TObject>
 inline size_t SearchIndexMultiple<TData, TObject>::size() const {
 	size_t result = 0;
-	for (const ObjectDataNode<TData, TObject>& node : set) {
-		result += node.set.size();
+	for (auto& node : map) {
+		result += node.second.size();
 	}
 	return result;
 }
 
 template<typename TData, typename TObject>
 inline TObject* SearchIndexMultiple<TData, TObject>::find(const TData& data) const {
-	ObjectDataNode<TData, TObject>* node = findNode(data);
-	if (node) {
-		TObject* ptr = *node->set.begin();
+	auto it = map.find(data);
+	if (it != map.end()) {
+		TObject* ptr = *it->second.begin();
 		return ptr;
 	}
 	return nullptr;
@@ -164,41 +134,33 @@ inline TObject* SearchIndexMultiple<TData, TObject>::find(const TData& data) con
 
 template<typename TData, typename TObject>
 inline TData SearchIndexMultiple<TData, TObject>::min() const {
-	return set.begin()->data;
+	return (*map.begin()).first;
 }
 
 template<typename TData, typename TObject>
 inline TData SearchIndexMultiple<TData, TObject>::max() const {
-	return set.rbegin()->data;
+	return (*map.rbegin()).first;
 }
 
 template<typename TData, typename TObject>
 inline bool SearchIndexMultiple<TData, TObject>::contains(const TData& data) const {
-	return find(data);
+	return map.contains(data);
 }
 
 template<typename TData, typename TObject>
 inline void SearchIndexMultiple<TData, TObject>::remove(const TData& data, TObject* ptr) {
-	ObjectDataNode<TData, TObject>* node = findNode(data);
-	if (node) {
-		node->set.erase(ptr);
-		if (node->set.empty()) {
-			set.erase(*node);
+	auto it = map.find(data);
+	if (it != map.end()) {
+		std::set<TObject*>& set = it->second;
+		set.erase(ptr);
+		if (set.empty()) {
+			map.erase(it);
 		}
 	}
 }
 
 template<typename TData, typename TObject>
 inline void SearchIndexMultiple<TData, TObject>::clear() {
-	set = std::set<ObjectDataNode<TData, TObject>>();
+	map = std::map<TData, std::set<TObject*>>();
 }
 
-template<typename TData, typename TObject>
-inline ObjectDataNode<TData, TObject>* SearchIndexMultiple<TData, TObject>::findNode(const TData& data) const {
-	auto it = set.find(ObjectDataNode<TData, TObject>(data));
-	if (it != set.end()) {
-		ObjectDataNode<TData, TObject>* ptr = const_cast<ObjectDataNode<TData, TObject>*>(&*it);
-		return ptr;
-	}
-	return nullptr;
-}
