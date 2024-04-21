@@ -3,70 +3,70 @@
 #include <set>
 #include <map>
 
-template<typename TData, typename TObject>
+template<typename TKey, typename TObject>
 class SearchIndex {
 public:
-	virtual bool add(const TData& data, TObject* ptr) = 0;
+	virtual bool add(const TKey& key, TObject* ptr) = 0;
 	virtual size_t size() const = 0;
-	virtual TObject* find(const TData& data) const = 0;
-	virtual TData min() const = 0;
-	virtual TData max() const = 0;
-	virtual bool contains(const TData& data) const = 0;
+	virtual TObject* find(const TKey& key) const = 0;
+	virtual TKey min() const = 0;
+	virtual TKey max() const = 0;
+	virtual bool contains(const TKey& key) const = 0;
 	virtual void clear() = 0;
 };
 
-template<typename TData, typename TObject>
-class SearchIndexUnique : SearchIndex<TData, TObject> {
+template<typename TKey, typename TObject>
+class SearchIndexUnique : SearchIndex<TKey, TObject> {
 public:
 	SearchIndexUnique();
-	bool add(const TData& data, TObject* ptr);
+	bool add(const TKey& key, TObject* ptr);
 	size_t size() const;
-	TObject* find(const TData& data) const;
-	TData min() const;
-	TData max() const;
-	bool contains(const TData& data) const;
-	void remove(const TData& data);
+	TObject* find(const TKey& key) const;
+	TKey min() const;
+	TKey max() const;
+	bool contains(const TKey& key) const;
+	void remove(const TKey& key);
 	void clear();
 
 private:
-	std::map<TData, TObject*> map;
+	std::map<TKey, TObject*> map;
 };
 
-template<typename TData, typename TObject>
-class SearchIndexMultiple : SearchIndex<TData, TObject> {
+template<typename TKey, typename TObject>
+class SearchIndexMultiple : SearchIndex<TKey, TObject> {
 public:
 	SearchIndexMultiple();
-	bool add(const TData& data, TObject* ptr);
+	bool add(const TKey& key, TObject* ptr);
 	size_t size() const;
-	TObject* find(const TData& data) const;
-	TData min() const;
-	TData max() const;
-	bool contains(const TData& data) const;
-	void remove(const TData& data, TObject* ptr);
+	TObject* find(const TKey& key) const;
+	TKey min() const;
+	TKey max() const;
+	bool contains(const TKey& key) const;
+	void remove(const TKey& key, TObject* ptr);
 	void clear();
 
 private:
-	std::map<TData, std::set<TObject*>> map;
+	std::map<TKey, std::set<TObject*>> map;
 
 };
 
-template<typename TData, typename TObject>
-inline SearchIndexUnique<TData, TObject>::SearchIndexUnique() { }
+template<typename TKey, typename TObject>
+inline SearchIndexUnique<TKey, TObject>::SearchIndexUnique() { }
 
-template<typename TData, typename TObject>
-inline bool SearchIndexUnique<TData, TObject>::add(const TData& data, TObject* ptr) {
-	auto inserted = map.insert({ data, ptr });
+template<typename TKey, typename TObject>
+inline bool SearchIndexUnique<TKey, TObject>::add(const TKey& key, TObject* ptr) {
+	auto inserted = map.insert({ key, ptr });
 	return inserted.second;
 }
 
-template<typename TData, typename TObject>
-inline size_t SearchIndexUnique<TData, TObject>::size() const {
+template<typename TKey, typename TObject>
+inline size_t SearchIndexUnique<TKey, TObject>::size() const {
 	return map.size();
 }
 
-template<typename TData, typename TObject>
-inline TObject* SearchIndexUnique<TData, TObject>::find(const TData& data) const {
-	auto it = map.find(data);
+template<typename TKey, typename TObject>
+inline TObject* SearchIndexUnique<TKey, TObject>::find(const TKey& key) const {
+	auto it = map.find(key);
 	if (it != map.end()) {
 		TObject* ptr = (*it).second;
 		return ptr;
@@ -74,47 +74,47 @@ inline TObject* SearchIndexUnique<TData, TObject>::find(const TData& data) const
 	return nullptr;
 }
 
-template<typename TData, typename TObject>
-inline TData SearchIndexUnique<TData, TObject>::min() const {
+template<typename TKey, typename TObject>
+inline TKey SearchIndexUnique<TKey, TObject>::min() const {
 	return (*map.begin()).first;
 }
 
-template<typename TData, typename TObject>
-inline TData SearchIndexUnique<TData, TObject>::max() const {
+template<typename TKey, typename TObject>
+inline TKey SearchIndexUnique<TKey, TObject>::max() const {
 	return (*map.rbegin()).first;
 }
 
-template<typename TData, typename TObject>
-inline bool SearchIndexUnique<TData, TObject>::contains(const TData& data) const {
-	return map.contains(data);
+template<typename TKey, typename TObject>
+inline bool SearchIndexUnique<TKey, TObject>::contains(const TKey& key) const {
+	return map.contains(key);
 }
 
-template<typename TData, typename TObject>
-inline void SearchIndexUnique<TData, TObject>::remove(const TData& data) {
-	map.erase(data);
+template<typename TKey, typename TObject>
+inline void SearchIndexUnique<TKey, TObject>::remove(const TKey& key) {
+	map.erase(key);
 }
 
-template<typename TData, typename TObject>
-inline void SearchIndexUnique<TData, TObject>::clear() {
-	map = std::map<TData, TObject*>();
+template<typename TKey, typename TObject>
+inline void SearchIndexUnique<TKey, TObject>::clear() {
+	map = std::map<TKey, TObject*>();
 }
 
-template<typename TData, typename TObject>
-inline SearchIndexMultiple<TData, TObject>::SearchIndexMultiple() { }
+template<typename TKey, typename TObject>
+inline SearchIndexMultiple<TKey, TObject>::SearchIndexMultiple() { }
 
-template<typename TData, typename TObject>
-inline bool SearchIndexMultiple<TData, TObject>::add(const TData& data, TObject* ptr) {
-	auto it = map.find(data);
+template<typename TKey, typename TObject>
+inline bool SearchIndexMultiple<TKey, TObject>::add(const TKey& key, TObject* ptr) {
+	auto it = map.find(key);
 	if (it == map.end()) {
-		auto inserted = map.insert({ data, std::set<TObject*>() });
+		auto inserted = map.insert({ key, std::set<TObject*>() });
 		it = inserted.first;
 	}
 	auto inserted = it->second.insert(ptr);
 	return inserted.second;
 }
 
-template<typename TData, typename TObject>
-inline size_t SearchIndexMultiple<TData, TObject>::size() const {
+template<typename TKey, typename TObject>
+inline size_t SearchIndexMultiple<TKey, TObject>::size() const {
 	size_t result = 0;
 	for (auto& node : map) {
 		result += node.second.size();
@@ -122,9 +122,9 @@ inline size_t SearchIndexMultiple<TData, TObject>::size() const {
 	return result;
 }
 
-template<typename TData, typename TObject>
-inline TObject* SearchIndexMultiple<TData, TObject>::find(const TData& data) const {
-	auto it = map.find(data);
+template<typename TKey, typename TObject>
+inline TObject* SearchIndexMultiple<TKey, TObject>::find(const TKey& key) const {
+	auto it = map.find(key);
 	if (it != map.end()) {
 		TObject* ptr = *it->second.begin();
 		return ptr;
@@ -132,24 +132,24 @@ inline TObject* SearchIndexMultiple<TData, TObject>::find(const TData& data) con
 	return nullptr;
 }
 
-template<typename TData, typename TObject>
-inline TData SearchIndexMultiple<TData, TObject>::min() const {
+template<typename TKey, typename TObject>
+inline TKey SearchIndexMultiple<TKey, TObject>::min() const {
 	return (*map.begin()).first;
 }
 
-template<typename TData, typename TObject>
-inline TData SearchIndexMultiple<TData, TObject>::max() const {
+template<typename TKey, typename TObject>
+inline TKey SearchIndexMultiple<TKey, TObject>::max() const {
 	return (*map.rbegin()).first;
 }
 
-template<typename TData, typename TObject>
-inline bool SearchIndexMultiple<TData, TObject>::contains(const TData& data) const {
-	return map.contains(data);
+template<typename TKey, typename TObject>
+inline bool SearchIndexMultiple<TKey, TObject>::contains(const TKey& key) const {
+	return map.contains(key);
 }
 
-template<typename TData, typename TObject>
-inline void SearchIndexMultiple<TData, TObject>::remove(const TData& data, TObject* ptr) {
-	auto it = map.find(data);
+template<typename TKey, typename TObject>
+inline void SearchIndexMultiple<TKey, TObject>::remove(const TKey& key, TObject* ptr) {
+	auto it = map.find(key);
 	if (it != map.end()) {
 		std::set<TObject*>& set = it->second;
 		set.erase(ptr);
@@ -159,8 +159,8 @@ inline void SearchIndexMultiple<TData, TObject>::remove(const TData& data, TObje
 	}
 }
 
-template<typename TData, typename TObject>
-inline void SearchIndexMultiple<TData, TObject>::clear() {
-	map = std::map<TData, std::set<TObject*>>();
+template<typename TKey, typename TObject>
+inline void SearchIndexMultiple<TKey, TObject>::clear() {
+	map = std::map<TKey, std::set<TObject*>>();
 }
 
