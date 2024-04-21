@@ -140,17 +140,18 @@ namespace test {
 	void TestList::runTests() {
 		OnBeforeRunAllTests();
 		for (auto& test : test_list) {
-			std::string spacing_str;
-			size_t spacing_size = module.manager.max_test_name - test->name.size();
-			for (size_t i = 0; i < spacing_size; i++) {
-				spacing_str += "-";
-			}
-			logger << test->name << spacing_str << "|";
+			logger << test->name << LoggerFlush();
 			logger.manualDeactivate();
 			OnBeforeRunTest();
 			bool result = test->run();
 			OnAfterRunTest();
 			logger.manualActivate();
+			std::string spacing_str;
+			size_t spacing_size = module.manager.max_test_name - test->name.size();
+			for (size_t i = 0; i < spacing_size; i++) {
+				spacing_str += "-";
+			}
+			logger << spacing_str << "|";
 			if (result) {
 				logger << "passed" << "\n";
 				passed_list.push_back(test->name);

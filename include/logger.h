@@ -11,6 +11,8 @@
 // in a way unrelated to logging,
 // add loggerAssert(!locked);
 
+struct LoggerFlush { };
+
 class Logger {
 public:
 	std::function<void(std::string line)> OnLineWrite = [](std::string line) { };
@@ -25,6 +27,7 @@ public:
 	Logger& operator<<(float value);
 	Logger& operator<<(double value);
 	Logger& operator<<(bool value);
+	Logger& operator<<(const LoggerFlush& flush);
 	void lock();
 	void unlock();
 	void manualActivate();
@@ -78,6 +81,7 @@ private:
 	Logger& writeBool(bool value);
 	void updateIndentStr();
 	void internalFlush();
+	void flushLineBuffer(bool newline = false);
 };
 
 extern Logger logger;

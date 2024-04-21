@@ -95,6 +95,11 @@ Logger& Logger::operator<<(bool value) {
 	return writeBool(value);
 }
 
+Logger& Logger::operator<<(const LoggerFlush& flush) {
+	flushLineBuffer();
+	return *this;
+}
+
 void Logger::lock() {
 	loggerAssert(!locked);
 	locked = true;
@@ -249,6 +254,10 @@ Logger& Logger::writeString(std::string value) {
 
 Logger& Logger::writeToLineBuffer(std::string value) {
 	if (new_line) {
+		if (write_time) {
+			std::string current_time = currentTime();
+			line_buffer += "[" + current_time + "] ";
+		}
 		line_buffer += indent_str;
 	}
 	line_buffer += value;
@@ -257,19 +266,7 @@ Logger& Logger::writeToLineBuffer(std::string value) {
 }
 
 Logger& Logger::writeNewLine() {
-	std::string line;
-	if (write_time) {
-		std::string current_time = currentTime();
-		line += "[" + current_time + "] ";
-	}
-	line += line_buffer;
-	OnLineWrite(line);
-	line += "\n";
-	total_buffer += line;
-	if (autoflush) {
-		internalFlush();
-	}
-	line_buffer = "";
+	flushLineBuffer(true);
 	new_line = true;
 	return *this;
 }
@@ -324,6 +321,19 @@ void Logger::internalFlush() {
 		std::cout << total_buffer;
 		total_buffer = "";
 	}
+}
+
+void Logger::flushLineBuffer(bool write_newline) {
+	OnLineWrite(line_buffer);
+	if (write_newline) {
+		line_buffer += "\n";
+	}
+	total_buffer += line_buffer;
+	if (autoflush) {
+		internalFlush();
+	}
+	new_line = false;
+	line_buffer = "";
 }
 
 void LoggerControl::close() {
