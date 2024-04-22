@@ -231,6 +231,88 @@ void WidgetTests::createWidgetsList() {
             tCompare(root_widget->getFillColor(), sf::Color::Transparent, &WidgetTests::colorToStr);
         }
     );
+    test::Test* rectangle_widget_test = list->addTest(
+        "rectangle_widget",
+        {
+            root_widget_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            application.setExternalMousePos(sf::Vector2i(400, 300));
+            application.advance();
+            fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            fw::Widget* root_widget = application.getWidgets().getRootWidget();
+            sf::Vector2f position(100.0f, 100.0f);
+            sf::Vector2f size(100.0f, 100.0f);
+            rectangle_widget->setPosition(position);
+            rectangle_widget->setSize(size);
+            tAssert(tCheck(rectangle_widget));
+            tCompare(application.getWidgets().getSize(), 2);
+            tCompare(rectangle_widget->getName(), "rectangle");
+            tCompare(rectangle_widget->getFullName(), "root|rectangle");
+            tCheck(!rectangle_widget->isVisualPositionQuantized());
+            tCheck(rectangle_widget->isVisible());
+            fw::WidgetVisibility wv = rectangle_widget->checkVisibility();
+            tCheck(wv.addedToRoot);
+            tCheck(wv.allParentsVisible);
+            tCheck(wv.hasUnclippedRegion);
+            tCheck(wv.nonZeroSize);
+            tCheck(wv.onScreen);
+            tCheck(wv.opaque);
+            tCheck(wv.visibleSetting);
+            tCheck(rectangle_widget->isClickThrough());
+            tCheck(!rectangle_widget->isMouseOver());
+            tCheck(!rectangle_widget->isFocusable());
+            tCheck(!rectangle_widget->isFocused());
+            tCheck(!rectangle_widget->getClipChildren());
+            tCheck(!rectangle_widget->getForceCustomCursor());
+            tCheck(rectangle_widget->getParent() == root_widget);
+            CompVector<fw::Widget*> parent_chain = rectangle_widget->getParentChain();
+            tAssert(tCompare(parent_chain.size(), 1));
+            tCheck(parent_chain[0] == root_widget);
+            tCompare(rectangle_widget->getChildren().size(), 0);
+            const CompVector<fw::Widget*>& root_children = root_widget->getChildren();
+            tAssert(tCompare(root_children.size(), 1));
+            tCheck(root_children[0] == rectangle_widget);
+            tCheck(root_widget->getChild(0) == rectangle_widget);
+            sf::FloatRect local_bounds = sf::FloatRect(sf::Vector2f(), size);
+            sf::FloatRect parent_local_bounds = sf::FloatRect(position, size);
+            auto rect_to_str = &WidgetTests::floatRectToStr;
+            tCompare(rectangle_widget->getLocalBounds(), local_bounds, rect_to_str);
+            tCompare(rectangle_widget->getParentLocalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(rectangle_widget->getGlobalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(rectangle_widget->getVisualLocalBounds(), local_bounds, rect_to_str);
+            tCompare(rectangle_widget->getVisualParentLocalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(rectangle_widget->getVisualGlobalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(rectangle_widget->getUnclippedRegion(), parent_local_bounds, rect_to_str);
+            tCompare(rectangle_widget->getQuantizedUnclippedRegion(), parent_local_bounds, rect_to_str);
+            tCompare(rectangle_widget->getWidth(), parent_local_bounds.width);
+            tCompare(rectangle_widget->getHeight(), parent_local_bounds.height);
+            tCompare(rectangle_widget->getGlobalWidth(), parent_local_bounds.width);
+            tCompare(rectangle_widget->getGlobalHeight(), parent_local_bounds.height);
+            auto vec2f_to_str = &WidgetTests::sfVec2fToStr;
+            tCompare(rectangle_widget->getSize(), size, vec2f_to_str);
+            sf::Vector2f top_left = parent_local_bounds.getPosition();
+            sf::Vector2f top_right = parent_local_bounds.getPosition() + sf::Vector2f(parent_local_bounds.width, 0.0f);
+            sf::Vector2f bottom_left = parent_local_bounds.getPosition() + sf::Vector2f(0.0f, parent_local_bounds.height);
+            sf::Vector2f bottom_right = parent_local_bounds.getPosition() + parent_local_bounds.getSize();
+            tCompare(rectangle_widget->getTopLeft(), top_left, vec2f_to_str);
+            tCompare(rectangle_widget->getTopRight(), top_right, vec2f_to_str);
+            tCompare(rectangle_widget->getBottomLeft(), bottom_left, vec2f_to_str);
+            tCompare(rectangle_widget->getBottomRight(), bottom_right, vec2f_to_str);
+            tCompare(rectangle_widget->getGlobalTopLeft(), top_left, vec2f_to_str);
+            tCompare(rectangle_widget->getGlobalTopRight(), top_right, vec2f_to_str);
+            tCompare(rectangle_widget->getGlobalBottomLeft(), bottom_left, vec2f_to_str);
+            tCompare(rectangle_widget->getGlobalBottomRight(), bottom_right, vec2f_to_str);
+            tCompare(rectangle_widget->getVisualGlobalTopLeft(), top_left, vec2f_to_str);
+            tCompare(rectangle_widget->getVisualGlobalTopRight(), top_right, vec2f_to_str);
+            tCompare(rectangle_widget->getVisualGlobalBottomLeft(), bottom_left, vec2f_to_str);
+            tCompare(rectangle_widget->getVisualGlobalBottomRight(), bottom_right, vec2f_to_str);
+            tCompare(rectangle_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {

@@ -33,8 +33,10 @@ namespace fw {
         onFrameBegin();
         processWidgets();
         processInput();
+        widgets.lock();
         processWorld();
         render();
+        widgets.unlock();
         onFrameEnd();
     }
 
@@ -113,7 +115,6 @@ namespace fw {
     }
 
     void Application::processWidgets() {
-        widgets.unlock();
         widgets.reset(sf::Vector2f((float)window.getSize().x, (float)window.getSize().y), mousePosf);
         onProcessWidgets();
     }
@@ -140,7 +141,6 @@ namespace fw {
         afterProcessInput();
         widgets.updateWidgets();
         widgets.updateRenderQueue();
-        widgets.lock();
     }
 
     void Application::processEvent(const sf::Event& event) {
