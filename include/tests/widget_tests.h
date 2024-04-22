@@ -24,6 +24,7 @@ public:
 	bool closed = false;
 	sf::Vector2i click_pos;
 	sf::Vector2i release_pos;
+	bool space_key_pressed = false;
 
 	void onInit() override;
 	void onStart() override;

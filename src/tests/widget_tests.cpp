@@ -130,6 +130,34 @@ void WidgetTests::createApplicationList() {
             }
         }
     );
+    test::Test* keyboard_events_test = list->addTest(
+        "keyboard_events",
+        {
+            advance_test
+        },
+        [&](test::Test& test) {
+            TestApplication application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            tCheck(!application.space_key_pressed);
+            {
+                sf::Event event;
+                event.type = sf::Event::KeyPressed;
+                event.key.code = sf::Keyboard::Space;
+                application.addExternalEvent(event);
+                application.advance();
+                tCheck(application.space_key_pressed);
+            }
+            {
+                sf::Event event;
+                event.type = sf::Event::KeyReleased;
+                event.key.code = sf::Keyboard::Space;
+                application.addExternalEvent(event);
+                application.advance();
+                tCheck(!application.space_key_pressed);
+            }
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2uToStr(const sf::Vector2u& vec) {
@@ -166,6 +194,15 @@ void TestApplication::onProcessWindowEvent(const sf::Event& event) {
 
 void TestApplication::onProcessKeyboardEvent(const sf::Event& event) {
     process_keyboard_event = true;
+    if (event.type == sf::Event::KeyPressed) {
+        if (event.key.code == sf::Keyboard::Space) {
+            space_key_pressed = true;
+        }
+    } else if (event.type == sf::Event::KeyReleased) {
+        if (event.key.code == sf::Keyboard::Space) {
+            space_key_pressed = false;
+        }
+    }
 }
 
 void TestApplication::beforeProcessMouseEvent(const sf::Event& event) {
