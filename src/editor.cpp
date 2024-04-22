@@ -9,7 +9,14 @@
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
 const auto to2i = fw::to2i;
-const auto to2f = fw::to2f;
+
+sf::Vector2f to2f(sf::Vector2i vec) {
+    return fw::to2f(vec);
+}
+
+sf::Vector2f to2f(sf::Vector2u vec) {
+    return fw::to2f(vec);
+}
 
 bool QueryCallback::ReportFixture(b2Fixture* fixture) {
     fixtures.push_back(fixture);

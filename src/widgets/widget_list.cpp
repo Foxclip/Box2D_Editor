@@ -11,6 +11,10 @@ namespace fw {
 		root_widget->setName("root");
 	}
 
+	size_t WidgetList::getSize() const {
+		return widgets.size();
+	}
+
 	bool WidgetList::contains(const Widget* widget) {
 		return widgets.contains(widget);
 	}

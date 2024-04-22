@@ -52,9 +52,14 @@ public:
 
 protected:
 	void createApplicationList();
+	void createWidgetsList();
 
 private:
-	static std::string sfVec2uToStr(const sf::Vector2u& vec);
+	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);
+	static std::string sfVec2uToStr(const sf::Vector2u& vec);
+	static std::string cursorTypeToStr(sf::Cursor::Type type);
+	static std::string floatRectToStr(const sf::FloatRect& rect);
+	static std::string colorToStr(const sf::Color& color);
 
 };

@@ -41,7 +41,7 @@ namespace fw {
 		WidgetVisibility v;
 		sf::FloatRect global_bounds = getGlobalBounds();
 		CompVector<Widget*> parents = getParentChain();
-		v.addedToRoot = parents.contains(widget_list.root_widget);
+		v.addedToRoot = this == widget_list.root_widget || parents.contains(widget_list.root_widget);
 		v.allParentsVisible = true;
 		for (size_t i = 0; i < parents.size(); i++) {
 			if (!parents[i]->visible) {

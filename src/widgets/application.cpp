@@ -59,6 +59,10 @@ namespace fw {
         return mousePos;
     }
 
+    WidgetList& Application::getWidgets() {
+        return widgets;
+    }
+
     void Application::close() {
         window.close();
         onClose();

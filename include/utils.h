@@ -29,6 +29,7 @@ namespace utils {
 	float to_radians(float angle);
 	b2Vec2 tob2(const sf::Vector2f& vec);
 	sf::Vector2f tosf(const b2Vec2& vec);
+	sf::Vector2f to2f(const b2Vec2& vec);
 	float get_max_offset(const sf::Vector2i& v1, const sf::Vector2i& v2);
 	void set_origin_to_center_normal(sf::Text& text);
 	void set_origin_to_center_bounds(sf::Text& text);

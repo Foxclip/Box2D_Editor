@@ -24,6 +24,7 @@ namespace fw {
 
 	sf::Vector2i to2i(const sf::Vector2f& vec);
 	sf::Vector2f to2f(const sf::Vector2i& vec);
+	sf::Vector2f to2f(const sf::Vector2u& vec);
 	void extend_bounds(sf::FloatRect& rect1, const sf::FloatRect& rect2);
 	bool parseLL(const std::string& str, long long& result);
 	bool parseFloat(const std::string& str, float& result);

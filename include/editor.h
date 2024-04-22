@@ -46,6 +46,9 @@ private:
 	int fps = 0;
 };
 
+sf::Vector2f to2f(sf::Vector2i vec);
+sf::Vector2f to2f(sf::Vector2u vec);
+
 class Editor : public fw::Application {
 public:
 	void init();

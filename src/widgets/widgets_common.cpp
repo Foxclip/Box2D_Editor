@@ -22,6 +22,10 @@ namespace fw {
 		return sf::Vector2f((float)vec.x, (float)vec.y);
 	}
 
+	sf::Vector2f to2f(const sf::Vector2u& vec) {
+		return sf::Vector2f((float)vec.x, (float)vec.y);
+	}
+
 	void extend_bounds(sf::FloatRect& rect1, const sf::FloatRect& rect2) {
 		float rect1_right = rect1.left + rect1.width;
 		float rect2_right = rect2.left + rect2.width;
