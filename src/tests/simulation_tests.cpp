@@ -476,6 +476,27 @@ void SimulationTests::createGameObjectList() {
             tVec2ApproxCompare(box2_global_pos_after, box2_global_pos_before);
         }
     );
+    test::Test* parent_loop_test = list->addTest(
+        "parent_loop",
+        {
+            set_parent_three_test
+        },
+        [&](test::Test& test) {
+            Simulation simulation;
+            BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
+            BoxObject* box1 = createBox(simulation, "box1", b2Vec2(1.1f, 1.1f));
+            BoxObject* box2 = createBox(simulation, "box2", b2Vec2(1.75f, 1.75f));
+            box1->setParent(box0);
+            box2->setParent(box1);
+            bool exception = false;
+            try {
+                box0->setParent(box2);
+            } catch (std::exception exc) {
+                exception = true;
+            }
+            tCheck(exception);
+        }
+    );
     test::Test* set_position_two_test = list->addTest(
         "set_position_two",
         {
