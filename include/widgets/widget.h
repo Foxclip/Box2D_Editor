@@ -83,6 +83,7 @@ namespace fw {
 		Widget* getParent() const;
 		CompVector<Widget*> getParentChain() const;
 		const CompVector<Widget*>& getChildren() const;
+		CompVector<Widget*> getAllChildren() const;
 		Widget* getChild(size_t index) const;
 		Widget* find(const std::string& name) const;
 		virtual sf::FloatRect getLocalBounds() const = 0;

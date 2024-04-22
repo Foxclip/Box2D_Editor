@@ -131,6 +131,16 @@ namespace fw {
 		return children;
 	}
 
+	CompVector<Widget*> Widget::getAllChildren() const {
+		CompVector<Widget*> result;
+		result.insert(result.end(), children.begin(), children.end());
+		for (size_t i = 0; i < children.size(); i++) {
+			const CompVector<Widget*>& child_children = children[i]->getAllChildren();
+			result.insert(result.end(), child_children.begin(), child_children.end());
+		}
+		return result;
+	}
+
 	Widget* Widget::getChild(size_t index) const {
 		return children[index];
 	}

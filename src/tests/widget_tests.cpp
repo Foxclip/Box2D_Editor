@@ -313,6 +313,49 @@ void WidgetTests::createWidgetsList() {
             tCompare(rectangle_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
         }
     );
+    test::Test* set_parent_test = list->addTest(
+        "set_parent",
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            application.setExternalMousePos(sf::Vector2i(400, 300));
+            application.advance();
+            fw::Widget* root_widget = application.getWidgets().getRootWidget();
+            fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            sf::Vector2f parent_local_pos_before = parent_widget->getPosition();
+            sf::Vector2f parent_global_pos_before = parent_widget->getGlobalPosition();
+            sf::Vector2f child_local_pos_before = child_widget->getPosition();
+            sf::Vector2f child_global_pos_before = child_widget->getGlobalPosition();
+            child_widget->setParent(parent_widget);
+            tCheck(child_widget->getParent() == parent_widget);
+            CompVector<fw::Widget*> parent_chain = child_widget->getParentChain();
+            tAssert(tCompare(parent_chain.size(), 2));
+            tCheck(parent_chain[0] == parent_widget);
+            tCheck(parent_chain[1] == root_widget);
+            tCheck(parent_widget->getParent() == root_widget);
+            tAssert(tCompare(child_widget->getChildren().size(), 0));
+            const CompVector<fw::Widget*>& parent_children = parent_widget->getChildren();
+            tAssert(tCompare(parent_children.size(), 1));
+            tCheck(parent_children[0] == child_widget);
+            tCheck(parent_widget->getChild(0) == child_widget);
+            tAssert(tCompare(parent_widget->getChildren().size(), 1));
+            tCheck(parent_widget->getChild(0) == child_widget);
+            CompVector<fw::Widget*> root_children = root_widget->getAllChildren();
+            tAssert(tCompare(root_children.size(), 2));
+            tCheck(root_children[0] == parent_widget);
+            tCheck(root_children[1] == child_widget);
+            sf::Vector2f parent_local_pos_after = parent_widget->getPosition();
+            sf::Vector2f parent_global_pos_after = parent_widget->getGlobalPosition();
+            sf::Vector2f child_local_pos_after = child_widget->getPosition();
+            sf::Vector2f child_global_pos_after = child_widget->getGlobalPosition();
+            tVec2ApproxCompare(parent_local_pos_after, parent_local_pos_before);
+            tVec2ApproxCompare(parent_global_pos_after, parent_global_pos_before);
+            tVec2ApproxCompare(child_local_pos_after, child_local_pos_before - parent_local_pos_before);
+            tVec2ApproxCompare(child_global_pos_after, child_global_pos_before);
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
