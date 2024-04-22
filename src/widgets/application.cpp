@@ -55,6 +55,10 @@ namespace fw {
         external_event_queue.push(event);
     }
 
+    sf::Vector2i Application::getMousePos() const {
+        return mousePos;
+    }
+
     void Application::close() {
         window.close();
         onClose();

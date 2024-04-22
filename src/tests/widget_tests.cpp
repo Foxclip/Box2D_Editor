@@ -82,9 +82,61 @@ void WidgetTests::createApplicationList() {
             tCheck(application.closed);
         }
     );
+    test::Test* mouse_events_test = list->addTest(
+        "mouse_events",
+        {
+            advance_test
+        },
+        [&](test::Test& test) {
+            TestApplication application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            {
+                sf::Vector2i pos(100, 100);
+                application.setExternalMousePos(pos);
+                sf::Event event;
+                event.type = sf::Event::MouseButtonPressed;
+                event.mouseButton.button = sf::Mouse::Left;
+                event.mouseButton.x = pos.x;
+                event.mouseButton.y = pos.y;
+                application.addExternalEvent(event);
+                application.advance();
+                tCompare(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+                tCompare(application.click_pos, pos, &WidgetTests::sfVec2iToStr);
+            }
+            {
+                sf::Vector2i pos(150, 150);
+                application.setExternalMousePos(pos);
+                sf::Event event;
+                event.type = sf::Event::MouseMoved;
+                event.mouseButton.x = pos.x;
+                event.mouseButton.y = pos.y;
+                application.addExternalEvent(event);
+                application.advance();
+                tCompare(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+            }
+            {
+                sf::Vector2i pos(200, 200);
+                application.setExternalMousePos(pos);
+                sf::Event event;
+                event.type = sf::Event::MouseButtonReleased;
+                event.mouseButton.button = sf::Mouse::Left;
+                event.mouseButton.x = pos.x;
+                event.mouseButton.y = pos.y;
+                application.addExternalEvent(event);
+                application.advance();
+                tCompare(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+                tCompare(application.release_pos, pos, &WidgetTests::sfVec2iToStr);
+            }
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2uToStr(const sf::Vector2u& vec) {
+    return "(" + utils::vec_to_str(vec) + ")";
+}
+
+std::string WidgetTests::sfVec2iToStr(const sf::Vector2i& vec) {
     return "(" + utils::vec_to_str(vec) + ")";
 }
 
@@ -122,10 +174,12 @@ void TestApplication::beforeProcessMouseEvent(const sf::Event& event) {
 
 void TestApplication::onProcessLeftClick() {
     process_left_click = true;
+    click_pos = mousePos;
 }
 
 void TestApplication::onProcessLeftRelease() {
     process_left_release = true;
+    release_pos = mousePos;
 }
 
 void TestApplication::onProcessMouseScroll(const sf::Event& event) {

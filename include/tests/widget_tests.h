@@ -22,6 +22,8 @@ public:
 	bool process_world = false;
 	bool rendered = false;
 	bool closed = false;
+	sf::Vector2i click_pos;
+	sf::Vector2i release_pos;
 
 	void onInit() override;
 	void onStart() override;
@@ -52,5 +54,6 @@ protected:
 
 private:
 	static std::string sfVec2uToStr(const sf::Vector2u& vec);
+	static std::string sfVec2iToStr(const sf::Vector2i& vec);
 
 };

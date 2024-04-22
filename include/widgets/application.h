@@ -45,6 +45,7 @@ namespace fw {
 		sf::Vector2u getWindowSize() const;
 		void setExternalMousePos(const sf::Vector2i& pos);
 		void addExternalEvent(const sf::Event& event);
+		sf::Vector2i getMousePos() const;
 		void close();
 
 	protected:
