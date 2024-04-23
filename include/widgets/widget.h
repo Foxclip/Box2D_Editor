@@ -106,6 +106,9 @@ namespace fw {
 		const sf::Vector2f& getOrigin() const;
 		virtual const sf::Vector2f& getPosition() const;
 		virtual sf::Vector2f getGlobalPosition() const;
+		sf::Vector2f getCenter() const;
+		sf::Vector2f getGlobalCenter() const;
+		sf::Vector2f getVisualGlobalCenter() const;
 		sf::Vector2f getTopLeft() const;
 		sf::Vector2f getTopRight() const;
 		sf::Vector2f getBottomLeft() const;

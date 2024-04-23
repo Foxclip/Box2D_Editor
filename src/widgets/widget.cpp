@@ -287,6 +287,21 @@ namespace fw {
 		return sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height);
 	}
 
+	sf::Vector2f Widget::getCenter() const {
+		sf::FloatRect bounds = getLocalBounds();
+		return bounds.getPosition() + bounds.getSize() / 2.0f;
+	}
+
+	sf::Vector2f Widget::getGlobalCenter() const {
+		sf::FloatRect bounds = getGlobalBounds();
+		return bounds.getPosition() + bounds.getSize() / 2.0f;
+	}
+
+	sf::Vector2f Widget::getVisualGlobalCenter() const {
+		sf::FloatRect bounds = getVisualGlobalBounds();
+		return bounds.getPosition() + bounds.getSize() / 2.0f;
+	}
+
 	void Widget::setOrigin(Anchor anchor) {
 		wAssert(!widget_list.isLocked());
 		sf::Vector2f origin_pos = anchorToPos(anchor, getOrigin(), getSize());

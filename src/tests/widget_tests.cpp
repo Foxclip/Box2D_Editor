@@ -686,7 +686,7 @@ void WidgetTests::createWidgetsList() {
     test::Test* checkbox_widget_basic_test = list->addTest(
         "checkbox_widget_basic",
         {
-            root_widget_test
+            rectangle_widget_test
         },
         [&](test::Test& test) {
             fw::Application application;
@@ -758,6 +758,27 @@ void WidgetTests::createWidgetsList() {
             tCompare(checkbox_widget->getVisualGlobalBottomLeft(), bottom_left, vec2f_to_str);
             tCompare(checkbox_widget->getVisualGlobalBottomRight(), bottom_right, vec2f_to_str);
             tCompare(checkbox_widget->getFillColor(), sf::Color(50, 50, 50), &WidgetTests::colorToStr);
+        }
+    );
+    test::Test* checkbox_widget_toggle_test = list->addTest(
+        "checkbox_widget_toggle",
+        {
+            checkbox_widget_basic_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            fw::CheckboxWidget* checkbox_widget = application.getWidgets().createWidget<fw::CheckboxWidget>();
+            tCheck(!checkbox_widget->getValue());
+            application.mouseMove(fw::to2i(checkbox_widget->getGlobalCenter()));
+            application.advance();
+            application.mouseLeftPress();
+            application.advance();
+            tCheck(checkbox_widget->getValue());
+            application.mouseLeftRelease();
+            application.advance();
+            tCheck(checkbox_widget->getValue());
         }
     );
 }
