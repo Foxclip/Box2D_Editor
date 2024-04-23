@@ -575,26 +575,28 @@ void WidgetTests::createWidgetsList() {
             child_widget->setParent(parent_widget);
             sf::Vector2f parent_size(100.0f, 100.0f);
             sf::Vector2f child_size(30.0f, 30.0f);
+            sf::Vector2f anchor_offset(5.0f, 7.0f);
             parent_widget->setSize(parent_size);
             child_widget->setSize(child_size);
             child_widget->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
-            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f());
+            child_widget->setAnchorOffset(anchor_offset);
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f() + anchor_offset);
             child_widget->setParentAnchor(fw::Widget::Anchor::TOP_CENTER);
-            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, 0.0f));
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, 0.0f) + anchor_offset);
             child_widget->setParentAnchor(fw::Widget::Anchor::TOP_RIGHT);
-            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x, 0.0f));
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x, 0.0f) + anchor_offset);
             child_widget->setParentAnchor(fw::Widget::Anchor::CENTER_LEFT);
-            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(0.0f, parent_size.y / 2.0f));
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(0.0f, parent_size.y / 2.0f) + anchor_offset);
             child_widget->setParentAnchor(fw::Widget::Anchor::CENTER);
-            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y / 2.0f));
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y / 2.0f) + anchor_offset);
             child_widget->setParentAnchor(fw::Widget::Anchor::CENTER_RIGHT);
-            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y / 2.0f));
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y / 2.0f) + anchor_offset);
             child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_LEFT);
-            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(0.0f, parent_size.y));
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(0.0f, parent_size.y) + anchor_offset);
             child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_CENTER);
-            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y));
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y) + anchor_offset);
             child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_RIGHT);
-            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y));
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y) + anchor_offset);
         }
     );
 }
