@@ -223,12 +223,12 @@ void WidgetTests::createWidgetsList() {
             application.mouseMove(400, 300);
             application.advance();
             fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            tAssert(tCheck(rectangle_widget));
             fw::Widget* root_widget = application.getWidgets().getRootWidget();
             sf::Vector2f position(100.0f, 100.0f);
             sf::Vector2f size(100.0f, 100.0f);
             rectangle_widget->setPosition(position);
             rectangle_widget->setSize(size);
-            tAssert(tCheck(rectangle_widget));
             tCompare(application.getWidgets().getSize(), 2);
             tCompare(rectangle_widget->getName(), "rectangle");
             tCompare(rectangle_widget->getFullName(), "root|rectangle");
@@ -593,6 +593,7 @@ void WidgetTests::createWidgetsList() {
             application.mouseMove(400, 300);
             application.advance();
             fw::TextWidget* text_widget = application.getWidgets().createWidget<fw::TextWidget>();
+            tAssert(tCheck(text_widget));
             text_widget->setCharacterSize(20);
             sf::Font font;
             font.loadFromFile("fonts/verdana.ttf");
@@ -602,7 +603,6 @@ void WidgetTests::createWidgetsList() {
             sf::Vector2f size(41.0f, 20.0f);
             sf::Vector2f local_bounds_offset(0.0f, 6.0f);
             text_widget->setPosition(position);
-            tAssert(tCheck(text_widget));
             tCompare(application.getWidgets().getSize(), 2);
             tCompare(text_widget->getName(), "text");
             tCompare(text_widget->getFullName(), "root|text");
@@ -655,11 +655,11 @@ void WidgetTests::createWidgetsList() {
             application.mouseMove(400, 300);
             application.advance();
             fw::CheckboxWidget* checkbox_widget = application.getWidgets().createWidget<fw::CheckboxWidget>();
+            tAssert(tCheck(checkbox_widget));
             sf::Vector2f position(100.0f, 100.0f);
             sf::Vector2f size(20.0f, 20.0f);
             checkbox_widget->setPosition(position);
             checkbox_widget->setSize(size);
-            tAssert(tCheck(checkbox_widget));
             tCompare(application.getWidgets().getSize(), 3);
             tCompare(checkbox_widget->getName(), "checkbox");
             tCompare(checkbox_widget->getFullName(), "root|checkbox");
@@ -735,11 +735,11 @@ void WidgetTests::createWidgetsList() {
             application.mouseMove(400, 300);
             application.advance();
             fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>();
+            tAssert(tCheck(container_widget));
             sf::Vector2f position(100.0f, 100.0f);
             sf::Vector2f size(100.0f, 100.0f);
             container_widget->setPosition(position);
             container_widget->setSize(size);
-            tAssert(tCheck(container_widget));
             tCompare(application.getWidgets().getSize(), 2);
             tCompare(container_widget->getName(), "container");
             tCompare(container_widget->getFullName(), "root|container");
@@ -814,6 +814,61 @@ void WidgetTests::createWidgetsList() {
             tVec2ApproxCompare(container_widget->getSize(), new_container_size);
             tVec2ApproxCompare(child_1_widget->getPosition(), sf::Vector2f(horizontal_padding, vertical_padding));
             tVec2ApproxCompare(child_2_widget->getPosition(), sf::Vector2f(horizontal_padding + child_1_widget->getWidth() + horizontal_padding, vertical_padding));
+        }
+    );
+    test::Test* textbox_widget_basic_test = list->addTest(
+        "textbox_widget_basic",
+        {
+            rectangle_widget_test,
+            text_widget_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>();
+            tAssert(tCheck(textbox_widget));
+            sf::Vector2f position(100.0f, 100.0f);
+            sf::Vector2f size(40.0f, 20.0f);
+            textbox_widget->setPosition(position);
+            textbox_widget->setSize(size);
+            tCompare(application.getWidgets().getSize(), 5);
+            tCompare(textbox_widget->getName(), "textbox");
+            tCompare(textbox_widget->getFullName(), "root|textbox");
+            tCheck(!textbox_widget->isVisualPositionQuantized());
+            tCheck(textbox_widget->isVisible());
+            fw::WidgetVisibility wv = textbox_widget->checkVisibility();
+            tCheck(wv.addedToRoot);
+            tCheck(wv.allParentsVisible);
+            tCheck(wv.hasUnclippedRegion);
+            tCheck(wv.nonZeroSize);
+            tCheck(wv.onScreen);
+            tCheck(wv.opaque);
+            tCheck(wv.visibleSetting);
+            tCheck(!textbox_widget->isClickThrough());
+            tCheck(!textbox_widget->isMouseOver());
+            tCheck(textbox_widget->isFocusable());
+            tCheck(!textbox_widget->isFocused());
+            tCheck(textbox_widget->getClipChildren());
+            tCheck(textbox_widget->getForceCustomCursor());
+            sf::FloatRect local_bounds = sf::FloatRect(sf::Vector2f(), size);
+            sf::FloatRect parent_local_bounds = sf::FloatRect(position, size);
+            auto rect_to_str = &WidgetTests::floatRectToStr;
+            tCompare(textbox_widget->getLocalBounds(), local_bounds, rect_to_str);
+            tCompare(textbox_widget->getParentLocalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(textbox_widget->getGlobalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(textbox_widget->getVisualLocalBounds(), local_bounds, rect_to_str);
+            tCompare(textbox_widget->getVisualParentLocalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(textbox_widget->getVisualGlobalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(textbox_widget->getUnclippedRegion(), parent_local_bounds, rect_to_str);
+            tCompare(textbox_widget->getQuantizedUnclippedRegion(), parent_local_bounds, rect_to_str);
+            tCompare(textbox_widget->getWidth(), parent_local_bounds.width);
+            tCompare(textbox_widget->getHeight(), parent_local_bounds.height);
+            auto vec2f_to_str = &WidgetTests::sfVec2fToStr;
+            tCompare(textbox_widget->getSize(), size, vec2f_to_str);
+            tCompare(textbox_widget->getFillColor(), sf::Color(50, 50, 50), &WidgetTests::colorToStr);
         }
     );
 }
