@@ -50,6 +50,7 @@ namespace fw {
 		void mouseLeftRelease();
 		void keyPress(sf::Keyboard::Key key);
 		void keyRelease(sf::Keyboard::Key key);
+		void textEntered(sf::Uint32 code);
 		sf::Vector2i getMousePos() const;
 		sf::Vector2f getMousePosf() const;
 		const sf::Vector2f& getMousePressPosf() const;

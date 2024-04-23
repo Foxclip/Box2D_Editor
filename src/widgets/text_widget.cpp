@@ -179,9 +179,7 @@ namespace fw {
 	}
 
 	void TextWidget::update() {
-		if (!getFont()) {
-			wAssert(false, "Font is not set for " + full_name);
-		}
+		wAssert(getFont(), "Font is not set for " + full_name);
 		Widget::update();
 	}
 

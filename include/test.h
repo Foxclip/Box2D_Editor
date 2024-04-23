@@ -176,7 +176,7 @@ namespace test {
 
 	template<typename T1, typename T2>
 	inline bool TestModule::testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected) {
-		if constexpr (std::same_as<T1, std::string> || std::same_as<T1, const char*>) {
+		if constexpr (std::convertible_to<T1, std::string> || std::same_as<T1, const char*>) {
 			auto func = [](const T1& val) { return val; };
 			return testCompare(test, file, line, name, actual, expected, func);
 		} else {

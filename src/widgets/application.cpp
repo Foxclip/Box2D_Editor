@@ -104,6 +104,14 @@ namespace fw {
         addExternalEvent(event);
     }
 
+    void Application::textEntered(sf::Uint32 code) {
+        wAssert(external_control);
+        sf::Event event;
+        event.type = sf::Event::TextEntered;
+        event.text.unicode = code;
+        addExternalEvent(event);
+    }
+
     sf::Vector2i Application::getMousePos() const {
         if (external_control) {
             return external_mouse_pos;

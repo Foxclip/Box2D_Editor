@@ -871,6 +871,89 @@ void WidgetTests::createWidgetsList() {
             tCompare(textbox_widget->getFillColor(), sf::Color(50, 50, 50), &WidgetTests::colorToStr);
         }
     );
+    test::Test* textbox_widget_input_test = list->addTest(
+        "textbox_widget_input",
+        {
+            textbox_widget_basic_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>();
+            textbox_widget->setCharacterSize(20);
+            sf::Font font;
+            font.loadFromFile("fonts/verdana.ttf");
+            textbox_widget->setFont(font);
+            sf::Vector2f position(100.0f, 100.0f);
+            sf::Vector2f size(40.0f, 20.0f);
+            std::string value = "Text";
+            textbox_widget->setPosition(position);
+            textbox_widget->setSize(size);
+            textbox_widget->setValue(value);
+            application.advance();
+            application.mouseMove(fw::to2i(textbox_widget->getGlobalCenter()));
+            application.mouseLeftPress();
+            application.advance();
+            tCheck(textbox_widget->isFocused());
+            tCheck(application.getWidgets().getFocusedWidget() == textbox_widget);
+            tCheck(textbox_widget->isEditMode());
+            tCompare(textbox_widget->getValue(), value);
+            tCheck(textbox_widget->isValidValue());
+            tCompare(textbox_widget->getCursorPos(), value.size());
+            tCheck(textbox_widget->isSelectionActive());
+            tCompare(textbox_widget->getSelectedText(), value);
+            tCompare(textbox_widget->getSelectionLeft(), 0);
+            tCompare(textbox_widget->getSelectionRight(), value.size());
+            application.mouseLeftRelease();
+            application.advance();
+            application.keyPress(sf::Keyboard::BackSpace);
+            application.textEntered('\b');
+            application.advance();
+            tCompare(textbox_widget->getValue(), "");
+            tCompare(textbox_widget->getCursorPos(), 0);
+            tCheck(!textbox_widget->isSelectionActive());
+            tCompare(textbox_widget->getSelectedText(), "");
+            tCompare(textbox_widget->getSelectionLeft(), -1);
+            tCompare(textbox_widget->getSelectionRight(), -1);
+            application.keyPress(sf::Keyboard::A);
+            application.textEntered('a');
+            application.advance();
+            tCompare(textbox_widget->getValue(), "a");
+            tCompare(textbox_widget->getCursorPos(), 1);
+            tCheck(!textbox_widget->isSelectionActive());
+            tCompare(textbox_widget->getSelectedText(), "");
+            tCompare(textbox_widget->getSelectionLeft(), -1);
+            tCompare(textbox_widget->getSelectionRight(), -1);
+            application.keyPress(sf::Keyboard::B);
+            application.textEntered('b');
+            application.advance();
+            tCompare(textbox_widget->getValue(), "ab");
+            tCompare(textbox_widget->getCursorPos(), 2);
+            tCheck(!textbox_widget->isSelectionActive()); 
+            tCompare(textbox_widget->getSelectedText(), "");
+            tCompare(textbox_widget->getSelectionLeft(), -1);
+            tCompare(textbox_widget->getSelectionRight(), -1);
+            application.keyPress(sf::Keyboard::C);
+            application.textEntered('c');
+            application.advance();
+            tCompare(textbox_widget->getValue(), "abc");
+            tCompare(textbox_widget->getCursorPos(), 3);
+            tCheck(!textbox_widget->isSelectionActive());
+            tCompare(textbox_widget->getSelectedText(), "");
+            tCompare(textbox_widget->getSelectionLeft(), -1);
+            tCompare(textbox_widget->getSelectionRight(), -1);
+            application.keyPress(sf::Keyboard::Enter);
+            application.textEntered('\n');
+            application.advance();
+            tCheck(!textbox_widget->isEditMode());
+            tCompare(textbox_widget->getValue(), "abc");
+            tCheck(textbox_widget->isFocused());
+            tCheck(application.getWidgets().getFocusedWidget() == textbox_widget);
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
