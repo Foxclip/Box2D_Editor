@@ -48,6 +48,15 @@ namespace fw {
 		return getParentGlobalTransform().transformRect(getVisualParentLocalBounds());
 	}
 
+	sf::Vector2f TextWidget::getRenderPositionOffset() const {
+		sf::Vector2f offset(0.0f, 0.0f);
+		if (!adjust_local_bounds) {
+			sf::FloatRect bounds = text.getLocalBounds();
+			offset = sf::Vector2f(0.0f, bounds.getPosition().y);
+		}
+		return -offset;
+	}
+
 	const sf::Font* TextWidget::getFont() const {
 		return text.getFont();
 	}
@@ -167,15 +176,6 @@ namespace fw {
 
 	const sf::Transformable& TextWidget::getTransformable() const {
 		return text;
-	}
-
-	sf::Vector2f TextWidget::getRenderPositionOffset() const {
-		sf::Vector2f offset(0.0f, 0.0f);
-		if (!adjust_local_bounds) {
-			sf::FloatRect bounds = text.getLocalBounds();
-			offset = sf::Vector2f(0.0f, bounds.getPosition().y);
-		}
-		return -offset;
 	}
 
 	void TextWidget::update() {

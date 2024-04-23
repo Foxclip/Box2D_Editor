@@ -16,6 +16,7 @@ namespace fw {
 		sf::FloatRect getVisualLocalBounds() const override;
 		sf::FloatRect getVisualParentLocalBounds() const override;
 		sf::FloatRect getVisualGlobalBounds() const override;
+		sf::Vector2f getRenderPositionOffset() const override;
 		const sf::Font* getFont() const;
 		size_t getStringSize() const;
 		unsigned int getCharacterSize() const;
@@ -41,7 +42,6 @@ namespace fw {
 		const sf::Drawable& getDrawable() const override;
 		sf::Transformable& getTransformable() override;
 		const sf::Transformable& getTransformable() const override;
-		sf::Vector2f getRenderPositionOffset() const override;
 		void update() override;
 
 	private:
