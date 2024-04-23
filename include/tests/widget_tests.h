@@ -61,5 +61,6 @@ private:
 	static std::string cursorTypeToStr(sf::Cursor::Type type);
 	static std::string floatRectToStr(const sf::FloatRect& rect);
 	static std::string colorToStr(const sf::Color& color);
+	static std::string anchorToStr(fw::Widget::Anchor anchor);
 
 };

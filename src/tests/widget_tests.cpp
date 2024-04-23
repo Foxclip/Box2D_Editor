@@ -683,6 +683,83 @@ void WidgetTests::createWidgetsList() {
             tCompare(text_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
         }
     );
+    test::Test* checkbox_widget_basic_test = list->addTest(
+        "checkbox_widget_basic",
+        {
+            root_widget_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::CheckboxWidget* checkbox_widget = application.getWidgets().createWidget<fw::CheckboxWidget>();
+            sf::Vector2f position(100.0f, 100.0f);
+            sf::Vector2f size(20.0f, 20.0f);
+            checkbox_widget->setPosition(position);
+            checkbox_widget->setSize(size);
+            tAssert(tCheck(checkbox_widget));
+            tCompare(application.getWidgets().getSize(), 3);
+            tCompare(checkbox_widget->getName(), "checkbox");
+            tCompare(checkbox_widget->getFullName(), "root|checkbox");
+            tCheck(!checkbox_widget->isVisualPositionQuantized());
+            tCheck(checkbox_widget->isVisible());
+            fw::WidgetVisibility wv = checkbox_widget->checkVisibility();
+            tCheck(wv.addedToRoot);
+            tCheck(wv.allParentsVisible);
+            tCheck(wv.hasUnclippedRegion);
+            tCheck(wv.nonZeroSize);
+            tCheck(wv.onScreen);
+            tCheck(wv.opaque);
+            tCheck(wv.visibleSetting);
+            tCheck(!checkbox_widget->isClickThrough());
+            tCheck(!checkbox_widget->isMouseOver());
+            tCheck(checkbox_widget->isFocusable());
+            tCheck(!checkbox_widget->isFocused());
+            tCheck(!checkbox_widget->getClipChildren());
+            tCheck(!checkbox_widget->getForceCustomCursor());
+            if (tCompare(checkbox_widget->getChildren().size(), 1)) {
+                fw::RectangleWidget* check_widget = dynamic_cast<fw::RectangleWidget*>(checkbox_widget->getChild(0));
+                tCheck(check_widget, "Check widget is not a RectangleWidget");
+                tCompare(check_widget->getParentAnchor(), fw::Widget::Anchor::CENTER, &WidgetTests::anchorToStr);
+            }
+            sf::FloatRect local_bounds = sf::FloatRect(sf::Vector2f(), size);
+            sf::FloatRect parent_local_bounds = sf::FloatRect(position, size);
+            auto rect_to_str = &WidgetTests::floatRectToStr;
+            tCompare(checkbox_widget->getLocalBounds(), local_bounds, rect_to_str);
+            tCompare(checkbox_widget->getParentLocalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(checkbox_widget->getGlobalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(checkbox_widget->getVisualLocalBounds(), local_bounds, rect_to_str);
+            tCompare(checkbox_widget->getVisualParentLocalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(checkbox_widget->getVisualGlobalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(checkbox_widget->getUnclippedRegion(), parent_local_bounds, rect_to_str);
+            tCompare(checkbox_widget->getQuantizedUnclippedRegion(), parent_local_bounds, rect_to_str);
+            tCompare(checkbox_widget->getWidth(), parent_local_bounds.width);
+            tCompare(checkbox_widget->getHeight(), parent_local_bounds.height);
+            tCompare(checkbox_widget->getGlobalWidth(), parent_local_bounds.width);
+            tCompare(checkbox_widget->getGlobalHeight(), parent_local_bounds.height);
+            auto vec2f_to_str = &WidgetTests::sfVec2fToStr;
+            tCompare(checkbox_widget->getSize(), size, vec2f_to_str);
+            sf::Vector2f top_left = parent_local_bounds.getPosition();
+            sf::Vector2f top_right = parent_local_bounds.getPosition() + sf::Vector2f(parent_local_bounds.width, 0.0f);
+            sf::Vector2f bottom_left = parent_local_bounds.getPosition() + sf::Vector2f(0.0f, parent_local_bounds.height);
+            sf::Vector2f bottom_right = parent_local_bounds.getPosition() + parent_local_bounds.getSize();
+            tCompare(checkbox_widget->getTopLeft(), top_left, vec2f_to_str);
+            tCompare(checkbox_widget->getTopRight(), top_right, vec2f_to_str);
+            tCompare(checkbox_widget->getBottomLeft(), bottom_left, vec2f_to_str);
+            tCompare(checkbox_widget->getBottomRight(), bottom_right, vec2f_to_str);
+            tCompare(checkbox_widget->getGlobalTopLeft(), top_left, vec2f_to_str);
+            tCompare(checkbox_widget->getGlobalTopRight(), top_right, vec2f_to_str);
+            tCompare(checkbox_widget->getGlobalBottomLeft(), bottom_left, vec2f_to_str);
+            tCompare(checkbox_widget->getGlobalBottomRight(), bottom_right, vec2f_to_str);
+            tCompare(checkbox_widget->getVisualGlobalTopLeft(), top_left, vec2f_to_str);
+            tCompare(checkbox_widget->getVisualGlobalTopRight(), top_right, vec2f_to_str);
+            tCompare(checkbox_widget->getVisualGlobalBottomLeft(), bottom_left, vec2f_to_str);
+            tCompare(checkbox_widget->getVisualGlobalBottomRight(), bottom_right, vec2f_to_str);
+            tCompare(checkbox_widget->getFillColor(), sf::Color(50, 50, 50), &WidgetTests::colorToStr);
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
@@ -720,7 +797,7 @@ std::string WidgetTests::cursorTypeToStr(sf::Cursor::Type type) {
         case sf::Cursor::Cross:                  return "Cross";
         case sf::Cursor::Help:                   return "Help";
         case sf::Cursor::NotAllowed:             return "NotAllowed";
-        default:                                 mAssert(false, "Unknown cursor type"); return "";
+        default:                                 mAssert(false, "Unknown cursor type"); return "Unknown";
     }
 }
 
@@ -730,6 +807,22 @@ std::string WidgetTests::floatRectToStr(const sf::FloatRect& rect) {
 
 std::string WidgetTests::colorToStr(const sf::Color& color) {
     return "(" + utils::color_to_str(color) + ")";
+}
+
+std::string WidgetTests::anchorToStr(fw::Widget::Anchor anchor) {
+    switch (anchor) {
+        case fw::Widget::Anchor::CUSTOM:        return "CUSTOM";
+        case fw::Widget::Anchor::TOP_LEFT:      return "TOP_LEFT";
+        case fw::Widget::Anchor::TOP_CENTER:    return "TOP_CENTER";
+        case fw::Widget::Anchor::TOP_RIGHT:     return "TOP_RIGHT";
+        case fw::Widget::Anchor::CENTER_LEFT:   return "CENTER_LEFT";
+        case fw::Widget::Anchor::CENTER:        return "CENTER";
+        case fw::Widget::Anchor::CENTER_RIGHT:  return "CENTER_RIGHT";
+        case fw::Widget::Anchor::BOTTOM_LEFT:   return "BOTTOM_LEFT";
+        case fw::Widget::Anchor::BOTTOM_CENTER: return "BOTTOM_CENTER";
+        case fw::Widget::Anchor::BOTTOM_RIGHT:  return "BOTTOM_RIGHT";
+        default:                                mAssert("Unknown anchor type"); return "Unknown";
+    }
 }
 
 void TestApplication::onInit() {

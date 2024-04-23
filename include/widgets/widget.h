@@ -101,6 +101,7 @@ namespace fw {
 		float getHeight() const;
 		float getGlobalWidth() const;
 		float getGlobalHeight() const;
+		Anchor getParentAnchor() const;
 		sf::Vector2f getAnchorOffset() const;
 		const sf::Vector2f& getOrigin() const;
 		virtual const sf::Vector2f& getPosition() const;

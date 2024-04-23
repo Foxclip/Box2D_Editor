@@ -207,6 +207,10 @@ namespace fw {
 		return getGlobalBounds().height;
 	}
 
+	Widget::Anchor Widget::getParentAnchor() const {
+		return parent_anchor;
+	}
+
 	sf::Vector2f Widget::getAnchorOffset() const {
 		return anchor_offset;
 	}
