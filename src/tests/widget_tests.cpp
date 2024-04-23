@@ -777,6 +777,45 @@ void WidgetTests::createWidgetsList() {
             tCompare(container_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
         }
     );
+    test::Test* container_widget_children_test = list->addTest(
+        "container_widget_children",
+        {
+            container_widget_basic_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>();
+            sf::Vector2f position(100.0f, 100.0f);
+            sf::Vector2f container_size(100.0f, 100.0f);
+            float horizontal_padding = 5.0f;
+            float vertical_padding = 10.0f;
+            container_widget->setPosition(position);
+            container_widget->setSize(container_size);
+            container_widget->setHorizontalPadding(horizontal_padding);
+            container_widget->setVerticalPadding(vertical_padding);
+            tVec2ApproxCompare(container_widget->getSize(), container_size);
+            application.advance();
+            tVec2ApproxCompare(container_widget->getSize(), sf::Vector2f(horizontal_padding, vertical_padding));
+            fw::RectangleWidget* child_1_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            fw::RectangleWidget* child_2_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            sf::Vector2f child_1_size(35.0f, 28.0f);
+            sf::Vector2f child_2_size(46.0f, 54.0f);
+            child_1_widget->setSize(child_1_size);
+            child_2_widget->setSize(child_2_size);
+            child_1_widget->setParent(container_widget);
+            child_2_widget->setParent(container_widget);
+            application.advance();
+            sf::Vector2f new_container_size = sf::Vector2f(
+                horizontal_padding + child_1_widget->getWidth() + horizontal_padding + child_2_widget->getWidth() + horizontal_padding,
+                vertical_padding + std::max(child_1_widget->getHeight(), child_2_widget->getHeight()) + vertical_padding
+            );
+            tVec2ApproxCompare(container_widget->getSize(), new_container_size);
+            tVec2ApproxCompare(child_1_widget->getPosition(), sf::Vector2f(horizontal_padding, vertical_padding));
+            tVec2ApproxCompare(child_2_widget->getPosition(), sf::Vector2f(horizontal_padding + child_1_widget->getWidth() + horizontal_padding, vertical_padding));
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
