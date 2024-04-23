@@ -24,7 +24,7 @@ bool QueryCallback::ReportFixture(b2Fixture* fixture) {
 }
 
 void Editor::init() {
-    fw::Application::init(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, ANTIALIASING);
+    fw::Application::init(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, ANTIALIASING, true);
 }
 
 void Editor::load(const std::string& filename) {

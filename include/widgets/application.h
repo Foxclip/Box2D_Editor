@@ -37,7 +37,8 @@ namespace fw {
 			const sf::String& window_title,
 			unsigned int window_width,
 			unsigned int window_height,
-			unsigned int antialiasing
+			unsigned int antialiasing,
+			bool vsync
 		);
 		virtual void start(bool external_control = false);
 		void advance();

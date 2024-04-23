@@ -24,7 +24,7 @@ void WidgetTests::createApplicationList() {
         },
         [&](test::Test& test) {
             TestApplication application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             tAssert(tCheck(application.initialized));
             tCompare(application.getWindowSize(), sf::Vector2u(800, 600), &WidgetTests::sfVec2uToStr);
         }
@@ -36,7 +36,7 @@ void WidgetTests::createApplicationList() {
         },
         [&](test::Test& test) {
             TestApplication application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             tAssert(tCheck(application.started));
         }
@@ -48,7 +48,7 @@ void WidgetTests::createApplicationList() {
         },
         [&](test::Test& test) {
             TestApplication application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.advance();
             tCheck(application.initialized);
@@ -76,7 +76,7 @@ void WidgetTests::createApplicationList() {
         },
         [&](test::Test& test) {
             TestApplication application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.advance();
             application.close();
@@ -90,7 +90,7 @@ void WidgetTests::createApplicationList() {
         },
         [&](test::Test& test) {
             TestApplication application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             {
                 sf::Vector2i pos(100, 100);
@@ -124,7 +124,7 @@ void WidgetTests::createApplicationList() {
         },
         [&](test::Test& test) {
             TestApplication application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             tCheck(!application.space_key_pressed);
             {
@@ -148,7 +148,7 @@ void WidgetTests::createWidgetsList() {
         "root_widget",
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -218,7 +218,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -282,7 +282,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -328,7 +328,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -395,7 +395,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -505,7 +505,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -527,7 +527,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -548,7 +548,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -588,7 +588,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -650,7 +650,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -709,7 +709,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             fw::CheckboxWidget* checkbox_widget = application.getWidgets().createWidget<fw::CheckboxWidget>();
             tCheck(!checkbox_widget->getValue());
@@ -730,7 +730,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -784,7 +784,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>();
             sf::Vector2f position(100.0f, 100.0f);
@@ -824,7 +824,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();
@@ -878,7 +878,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             fw::Application application;
-            application.init("Test window", 800, 600, 0);
+            application.init("Test window", 800, 600, 0, false);
             application.start(true);
             application.mouseMove(400, 300);
             application.advance();

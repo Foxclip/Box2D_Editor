@@ -12,12 +12,13 @@ namespace fw {
         const sf::String& window_title,
         unsigned int window_width,
         unsigned int window_height,
-        unsigned int antialiasing
+        unsigned int antialiasing,
+        bool vsync
     ) {
         sf::ContextSettings cs_window;
         cs_window.antialiasingLevel = antialiasing;
         window.create(sf::VideoMode(window_width, window_height), window_title, sf::Style::Default, cs_window);
-        window.setVerticalSyncEnabled(true);
+        window.setVerticalSyncEnabled(vsync);
         onInit();
     }
 
