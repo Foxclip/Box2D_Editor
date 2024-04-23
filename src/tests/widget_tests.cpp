@@ -406,6 +406,116 @@ void WidgetTests::createWidgetsList() {
             tCheck(mouse_exited);
         }
     );
+    test::Test* widget_mouse_events_2_test = list->addTest(
+        "widget_mouse_events_2",
+        {
+            root_widget_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::RectangleWidget* rectangle_widget_1 = application.getWidgets().createWidget<fw::RectangleWidget>();
+            fw::RectangleWidget* rectangle_widget_2 = application.getWidgets().createWidget<fw::RectangleWidget>();
+            rectangle_widget_1->setClickThrough(false);
+            bool mouse_entered_1 = false;
+            bool mouse_pressed_1 = false;
+            bool mouse_released_1 = false;
+            bool mouse_exited_1 = false;
+            bool mouse_entered_2 = false;
+            bool mouse_pressed_2 = false;
+            bool mouse_released_2 = false;
+            bool mouse_exited_2 = false;
+            rectangle_widget_1->OnMouseEnter = [&](const sf::Vector2f& pos) {
+                mouse_entered_1 = true;
+            };
+            rectangle_widget_1->OnClick = [&](const sf::Vector2f& pos) {
+                mouse_pressed_1 = true;
+            };
+            rectangle_widget_1->OnRelease = [&](const sf::Vector2f& pos) {
+                mouse_released_1 = true;
+            };
+            rectangle_widget_1->OnMouseExit = [&](const sf::Vector2f& pos) {
+                mouse_exited_1 = true;
+            };
+            rectangle_widget_2->OnMouseEnter = [&](const sf::Vector2f& pos) {
+                mouse_entered_2 = true;
+            };
+            rectangle_widget_2->OnClick = [&](const sf::Vector2f& pos) {
+                mouse_pressed_2 = true;
+            };
+            rectangle_widget_2->OnRelease = [&](const sf::Vector2f& pos) {
+                mouse_released_2 = true;
+            };
+            rectangle_widget_2->OnMouseExit = [&](const sf::Vector2f& pos) {
+                mouse_exited_2 = true;
+            };
+            sf::Vector2f position(100.0f, 100.0f);
+            sf::Vector2f size(100.0f, 100.0f);
+            sf::Vector2i mouse_pos_1(150, 150);
+            sf::Vector2i mouse_pos_2(300, 300);
+            rectangle_widget_1->setPosition(position);
+            rectangle_widget_1->setSize(size);
+            rectangle_widget_2->setPosition(position);
+            rectangle_widget_2->setSize(size);
+            tCheck(!rectangle_widget_1->isMouseOver());
+            tCheck(!mouse_entered_1);
+            tCheck(!mouse_pressed_1);
+            tCheck(!mouse_released_1);
+            tCheck(!mouse_exited_1);
+            tCheck(!rectangle_widget_2->isMouseOver());
+            tCheck(!mouse_entered_2);
+            tCheck(!mouse_pressed_2);
+            tCheck(!mouse_released_2);
+            tCheck(!mouse_exited_2);
+            application.mouseMove(mouse_pos_1);
+            application.advance();
+            tCheck(rectangle_widget_1->isMouseOver());
+            tCheck(mouse_entered_1);
+            tCheck(!mouse_pressed_1);
+            tCheck(!mouse_released_1);
+            tCheck(!mouse_exited_1);
+            tCheck(rectangle_widget_2->isMouseOver());
+            tCheck(mouse_entered_2);
+            tCheck(!mouse_pressed_2);
+            tCheck(!mouse_released_2);
+            tCheck(!mouse_exited_2);
+            application.mouseLeftPress();
+            application.advance();
+            tCheck(mouse_entered_1);
+            tCheck(mouse_pressed_1);
+            tCheck(!mouse_released_1);
+            tCheck(!mouse_exited_1);
+            tCheck(mouse_entered_2);
+            tCheck(mouse_pressed_2);
+            tCheck(!mouse_released_2);
+            tCheck(!mouse_exited_2);
+            application.mouseLeftRelease();
+            application.advance();
+            tCheck(mouse_entered_1);
+            tCheck(mouse_pressed_1);
+            tCheck(!mouse_released_1); // no focused widget, so release is not processed
+            tCheck(!mouse_exited_1);
+            tCheck(mouse_entered_2);
+            tCheck(mouse_pressed_2);
+            tCheck(!mouse_released_2);
+            tCheck(!mouse_exited_2);
+            application.mouseMove(mouse_pos_2);
+            application.advance();
+            tCheck(!rectangle_widget_1->isMouseOver());
+            tCheck(mouse_entered_1);
+            tCheck(mouse_pressed_1);
+            tCheck(!mouse_released_1);
+            tCheck(mouse_exited_1);
+            tCheck(!rectangle_widget_2->isMouseOver());
+            tCheck(mouse_entered_2);
+            tCheck(mouse_pressed_2);
+            tCheck(!mouse_released_2);
+            tCheck(mouse_exited_2);
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
