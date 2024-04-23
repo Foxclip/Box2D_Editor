@@ -94,37 +94,23 @@ void WidgetTests::createApplicationList() {
             application.start(true);
             {
                 sf::Vector2i pos(100, 100);
-                application.setExternalMousePos(pos);
-                sf::Event event;
-                event.type = sf::Event::MouseButtonPressed;
-                event.mouseButton.button = sf::Mouse::Left;
-                event.mouseButton.x = pos.x;
-                event.mouseButton.y = pos.y;
-                application.addExternalEvent(event);
+                application.mouseMove(pos);
+                application.mouseLeftPress();
                 application.advance();
                 tCompare(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
                 tCompare(application.click_pos, pos, &WidgetTests::sfVec2iToStr);
             }
             {
                 sf::Vector2i pos(150, 150);
-                application.setExternalMousePos(pos);
-                sf::Event event;
-                event.type = sf::Event::MouseMoved;
-                event.mouseButton.x = pos.x;
-                event.mouseButton.y = pos.y;
-                application.addExternalEvent(event);
+                application.mouseMove(pos);
+                application.mouseMove(pos);
                 application.advance();
                 tCompare(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
             }
             {
                 sf::Vector2i pos(200, 200);
-                application.setExternalMousePos(pos);
-                sf::Event event;
-                event.type = sf::Event::MouseButtonReleased;
-                event.mouseButton.button = sf::Mouse::Left;
-                event.mouseButton.x = pos.x;
-                event.mouseButton.y = pos.y;
-                application.addExternalEvent(event);
+                application.mouseMove(pos);
+                application.mouseLeftRelease();
                 application.advance();
                 tCompare(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
                 tCompare(application.release_pos, pos, &WidgetTests::sfVec2iToStr);
@@ -142,18 +128,12 @@ void WidgetTests::createApplicationList() {
             application.start(true);
             tCheck(!application.space_key_pressed);
             {
-                sf::Event event;
-                event.type = sf::Event::KeyPressed;
-                event.key.code = sf::Keyboard::Space;
-                application.addExternalEvent(event);
+                application.keyPress(sf::Keyboard::Space);
                 application.advance();
                 tCheck(application.space_key_pressed);
             }
             {
-                sf::Event event;
-                event.type = sf::Event::KeyReleased;
-                event.key.code = sf::Keyboard::Space;
-                application.addExternalEvent(event);
+                application.keyRelease(sf::Keyboard::Space);
                 application.advance();
                 tCheck(!application.space_key_pressed);
             }
@@ -170,7 +150,7 @@ void WidgetTests::createWidgetsList() {
             fw::Application application;
             application.init("Test window", 800, 600, 0);
             application.start(true);
-            application.setExternalMousePos(sf::Vector2i(400, 300));
+            application.mouseMove(400, 300);
             application.advance();
             fw::RectangleWidget* root_widget = dynamic_cast<fw::RectangleWidget*>(application.getWidgets().getRootWidget());
             tAssert(tCheck(root_widget, "Root widget is not a RectangleWidget"));
@@ -240,7 +220,7 @@ void WidgetTests::createWidgetsList() {
             fw::Application application;
             application.init("Test window", 800, 600, 0);
             application.start(true);
-            application.setExternalMousePos(sf::Vector2i(400, 300));
+            application.mouseMove(400, 300);
             application.advance();
             fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
             fw::Widget* root_widget = application.getWidgets().getRootWidget();
@@ -315,11 +295,14 @@ void WidgetTests::createWidgetsList() {
     );
     test::Test* set_parent_test = list->addTest(
         "set_parent",
+        {
+            root_widget_test
+        },
         [&](test::Test& test) {
             fw::Application application;
             application.init("Test window", 800, 600, 0);
             application.start(true);
-            application.setExternalMousePos(sf::Vector2i(400, 300));
+            application.mouseMove(400, 300);
             application.advance();
             fw::Widget* root_widget = application.getWidgets().getRootWidget();
             fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
@@ -354,6 +337,73 @@ void WidgetTests::createWidgetsList() {
             tVec2ApproxCompare(parent_global_pos_after, parent_global_pos_before);
             tVec2ApproxCompare(child_local_pos_after, child_local_pos_before - parent_local_pos_before);
             tVec2ApproxCompare(child_global_pos_after, child_global_pos_before);
+        }
+    );
+    test::Test* widget_mouse_events_1_test = list->addTest(
+        "widget_mouse_events_1",
+        {
+            root_widget_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            bool mouse_entered = false;
+            bool mouse_pressed = false;
+            bool mouse_released = false;
+            bool mouse_exited = false;
+            rectangle_widget->OnMouseEnter = [&](const sf::Vector2f& pos) {
+                mouse_entered = true;
+            };
+            rectangle_widget->OnClick = [&](const sf::Vector2f& pos) {
+                mouse_pressed = true;
+            };
+            rectangle_widget->OnRelease = [&](const sf::Vector2f& pos) {
+                mouse_released = true;
+            };
+            rectangle_widget->OnMouseExit = [&](const sf::Vector2f& pos) {
+                mouse_exited = true;
+            };
+            sf::Vector2f position(100.0f, 100.0f);
+            sf::Vector2f size(100.0f, 100.0f);
+            sf::Vector2i mouse_pos_1(150, 150);
+            sf::Vector2i mouse_pos_2(300, 300);
+            rectangle_widget->setPosition(position);
+            rectangle_widget->setSize(size);
+            tCheck(!rectangle_widget->isMouseOver());
+            tCheck(!mouse_entered);
+            tCheck(!mouse_pressed);
+            tCheck(!mouse_released);
+            tCheck(!mouse_exited);
+            application.mouseMove(mouse_pos_1);
+            application.advance();
+            tCheck(rectangle_widget->isMouseOver());
+            tCheck(mouse_entered);
+            tCheck(!mouse_pressed);
+            tCheck(!mouse_released);
+            tCheck(!mouse_exited);
+            application.mouseLeftPress();
+            application.advance();
+            tCheck(mouse_entered);
+            tCheck(mouse_pressed);
+            tCheck(!mouse_released);
+            tCheck(!mouse_exited);
+            application.mouseLeftRelease();
+            application.advance();
+            tCheck(mouse_entered);
+            tCheck(mouse_pressed);
+            tCheck(!mouse_released); // clickThrough is on, so release is not processed
+            tCheck(!mouse_exited);
+            application.mouseMove(mouse_pos_2);
+            application.advance();
+            tCheck(!rectangle_widget->isMouseOver());
+            tCheck(mouse_entered);
+            tCheck(mouse_pressed);
+            tCheck(!mouse_released);
+            tCheck(mouse_exited);
         }
     );
 }
@@ -448,12 +498,12 @@ void TestApplication::beforeProcessMouseEvent(const sf::Event& event) {
 
 void TestApplication::onProcessLeftClick() {
     process_left_click = true;
-    click_pos = mousePos;
+    click_pos = getMousePos();
 }
 
 void TestApplication::onProcessLeftRelease() {
     process_left_release = true;
-    release_pos = mousePos;
+    release_pos = getMousePos();
 }
 
 void TestApplication::onProcessMouseScroll(const sf::Event& event) {

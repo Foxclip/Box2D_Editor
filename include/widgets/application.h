@@ -43,9 +43,16 @@ namespace fw {
 		void advance();
 		void maximizeWindow() const;
 		sf::Vector2u getWindowSize() const;
-		void setExternalMousePos(const sf::Vector2i& pos);
 		void addExternalEvent(const sf::Event& event);
+		void mouseMove(int x, int y);
+		void mouseMove(const sf::Vector2i& pos);
+		void mouseLeftPress();
+		void mouseLeftRelease();
+		void keyPress(sf::Keyboard::Key key);
+		void keyRelease(sf::Keyboard::Key key);
 		sf::Vector2i getMousePos() const;
+		sf::Vector2f getMousePosf() const;
+		const sf::Vector2f& getMousePressPosf() const;
 		WidgetList& getWidgets();
 		void close();
 
@@ -53,8 +60,6 @@ namespace fw {
 		sf::RenderWindow window;
 		sf::View window_view;
 		WidgetList widgets;
-		sf::Vector2i mousePos;
-		sf::Vector2f mousePosf;
 		sf::Vector2i mousePrevPos;
 		sf::Vector2f mousePressPosf;
 		bool leftButtonPressed = false;

@@ -49,16 +49,75 @@ namespace fw {
         return window.getSize();
     }
 
-    void Application::setExternalMousePos(const sf::Vector2i& pos) {
-        external_mouse_pos = pos;
-    }
-
     void Application::addExternalEvent(const sf::Event& event) {
+        wAssert(external_control);
         external_event_queue.push(event);
     }
 
+    void Application::mouseMove(int x, int y) {
+        mouseMove(sf::Vector2i(x, y));
+    }
+
+    void Application::mouseMove(const sf::Vector2i& pos) {
+        wAssert(external_control);
+        external_mouse_pos = pos;
+        sf::Event event;
+        event.type = sf::Event::MouseMoved;
+        event.mouseButton.x = pos.x;
+        event.mouseButton.y = pos.y;
+        addExternalEvent(event);
+    }
+
+    void Application::mouseLeftPress() {
+        wAssert(external_control);
+        sf::Event event;
+        event.type = sf::Event::MouseButtonPressed;
+        event.mouseButton.button = sf::Mouse::Left;
+        event.mouseButton.x = external_mouse_pos.x;
+        event.mouseButton.y = external_mouse_pos.y;
+        addExternalEvent(event);
+    }
+
+    void Application::mouseLeftRelease() {
+        wAssert(external_control);
+        sf::Event event;
+        event.type = sf::Event::MouseButtonReleased;
+        event.mouseButton.button = sf::Mouse::Left;
+        event.mouseButton.x = external_mouse_pos.x;
+        event.mouseButton.y = external_mouse_pos.y;
+        addExternalEvent(event);
+    }
+
+    void Application::keyPress(sf::Keyboard::Key key) {
+        wAssert(external_control);
+        sf::Event event;
+        event.type = sf::Event::KeyPressed;
+        event.key.code = key;
+        addExternalEvent(event);
+    }
+
+    void Application::keyRelease(sf::Keyboard::Key key) {
+        wAssert(external_control);
+        sf::Event event;
+        event.type = sf::Event::KeyReleased;
+        event.key.code = key;
+        addExternalEvent(event);
+    }
+
     sf::Vector2i Application::getMousePos() const {
-        return mousePos;
+        if (external_control) {
+            return external_mouse_pos;
+        } else {
+            return sf::Mouse::getPosition(window);
+        }
+    }
+
+    sf::Vector2f Application::getMousePosf() const {
+        return to2f(getMousePos());
+    }
+
+    const sf::Vector2f& Application::getMousePressPosf() const {
+        return mousePressPosf;
     }
 
     WidgetList& Application::getWidgets() {
@@ -115,22 +174,18 @@ namespace fw {
     }
 
     void Application::processWidgets() {
-        widgets.reset(sf::Vector2f((float)window.getSize().x, (float)window.getSize().y), mousePosf);
+        widgets.reset(sf::Vector2f((float)window.getSize().x, (float)window.getSize().y), getMousePosf());
         onProcessWidgets();
     }
 
     void Application::processInput() {
         if (external_control) {
-            mousePos = external_mouse_pos;
-            mousePosf = to2f(mousePos);
             while (!external_event_queue.empty()) {
                 sf::Event event = external_event_queue.front();
                 external_event_queue.pop();
                 processEvent(event);
             }
         } else {
-            mousePos = sf::Mouse::getPosition(window);
-            mousePosf = to2f(mousePos);
             sf::Event event;
             while (window.pollEvent(event)) {
                 processEvent(event);
@@ -167,7 +222,7 @@ namespace fw {
             switch (event.mouseButton.button) {
                 case sf::Mouse::Left:
                     leftButtonPressed = true;
-                    mousePressPosf = mousePosf;
+                    mousePressPosf = getMousePosf();
                     processLeftClick();
                     break;
                 case sf::Mouse::Right:
@@ -197,7 +252,7 @@ namespace fw {
         sf::Mouse::Button button
     ) {
         LoggerTag tag_mouse_gesture("mouseGesture");
-        mouseGesture = MouseGesture(source, MouseGesture::NORMAL, mousePosf, button);
+        mouseGesture = MouseGesture(source, MouseGesture::NORMAL, getMousePosf(), button);
         std::string source_str = source == MouseGesture::WIDGETS ? "widgets" : "screen";
         std::string type_str = "normal";
         std::string button_str;
@@ -211,7 +266,7 @@ namespace fw {
         LoggerIndent indent;
         logger << source_str << "\n";
         logger << type_str << "\n";
-        logger << mousePosf << "\n";
+        logger << getMousePosf() << "\n";
         logger << button_str << "\n";
     }
 
@@ -219,14 +274,14 @@ namespace fw {
         MouseGesture::MouseGestureSource source
     ) {
         LoggerTag tag_mouse_gesture("mouseGesture");
-        mouseGesture = MouseGesture(source, MouseGesture::MOVE, mousePosf, sf::Mouse::Left);
+        mouseGesture = MouseGesture(source, MouseGesture::MOVE, getMousePosf(), sf::Mouse::Left);
         std::string source_str = source == MouseGesture::WIDGETS ? "widgets" : "screen";
         std::string type_str = "move";
         logger << "Start gesture: \n";
         LoggerIndent indent;
         logger << source_str << "\n";
         logger << type_str << "\n";
-        logger << mousePosf << "\n";
+        logger << getMousePosf() << "\n";
     }
 
     void Application::endGesture() {
@@ -246,7 +301,7 @@ namespace fw {
                 endGesture();
             }
         } else {
-            widgets.processClick(mousePosf);
+            widgets.processClick(getMousePosf());
             if (widgets.isClickBlocked()) {
                 startNormalGesture(MouseGesture::WIDGETS, sf::Mouse::Left);
             } else {
@@ -261,7 +316,7 @@ namespace fw {
             return;
         }
         if (mouseGesture.source == MouseGesture::WIDGETS) {
-            widgets.processRelease(mousePosf);
+            widgets.processRelease(getMousePosf());
         } else if (mouseGesture.source == MouseGesture::SCREEN) {
             onProcessLeftRelease();
         }
@@ -273,7 +328,7 @@ namespace fw {
     }
 
     void Application::processMouse() {
-        widgets.processMouse(mousePosf);
+        widgets.processMouse(getMousePosf());
         sf::Cursor::Type cursor_type = sf::Cursor::Arrow;
         widgets.getCurrentCursorType(cursor_type);
         switch (cursor_type) {
@@ -285,7 +340,7 @@ namespace fw {
         if (!non_screen_gesture) {
             onProcessMouse();
         }
-        mousePrevPos = mousePos;
+        mousePrevPos = getMousePos();
     }
 
 
