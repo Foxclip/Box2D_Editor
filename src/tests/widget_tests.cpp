@@ -559,6 +559,44 @@ void WidgetTests::createWidgetsList() {
             tCheck(application.getWidgets().find("child") == child_widget);
         }
     );
+    test::Test* anchor_test = list->addTest(
+        "anchor",
+        {
+            set_parent_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            child_widget->setParent(parent_widget);
+            sf::Vector2f parent_size(100.0f, 100.0f);
+            sf::Vector2f child_size(30.0f, 30.0f);
+            parent_widget->setSize(parent_size);
+            child_widget->setSize(child_size);
+            child_widget->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f());
+            child_widget->setParentAnchor(fw::Widget::Anchor::TOP_CENTER);
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, 0.0f));
+            child_widget->setParentAnchor(fw::Widget::Anchor::TOP_RIGHT);
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x, 0.0f));
+            child_widget->setParentAnchor(fw::Widget::Anchor::CENTER_LEFT);
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(0.0f, parent_size.y / 2.0f));
+            child_widget->setParentAnchor(fw::Widget::Anchor::CENTER);
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y / 2.0f));
+            child_widget->setParentAnchor(fw::Widget::Anchor::CENTER_RIGHT);
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y / 2.0f));
+            child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_LEFT);
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(0.0f, parent_size.y));
+            child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_CENTER);
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y));
+            child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_RIGHT);
+            tVec2ApproxCompare(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y));
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
