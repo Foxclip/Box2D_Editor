@@ -81,6 +81,9 @@ namespace fw {
 	}
 
 	Widget* WidgetList::find(const std::string& name) const {
+		if (root_widget->getName() == name) {
+			return root_widget;
+		}
 		return root_widget->find(name);
 	}
 

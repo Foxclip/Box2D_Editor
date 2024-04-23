@@ -538,6 +538,27 @@ void WidgetTests::createWidgetsList() {
             tVec2ApproxCompare(child_widget->toLocal(sf::Vector2f(140.0f, 135.0f)), sf::Vector2f(10.0f, 5.0f));
         }
     );
+    test::Test* find_test = list->addTest(
+        "find",
+        {
+            set_parent_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            parent_widget->setName("parent");
+            child_widget->setName("child");
+            child_widget->setParent(parent_widget);
+            tCheck(application.getWidgets().find("root") == application.getWidgets().getRootWidget());
+            tCheck(application.getWidgets().find("parent") == parent_widget);
+            tCheck(application.getWidgets().find("child") == child_widget);
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
