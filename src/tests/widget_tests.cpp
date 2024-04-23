@@ -516,6 +516,28 @@ void WidgetTests::createWidgetsList() {
             tCheck(mouse_exited_2);
         }
     );
+    test::Test* coordinates_test = list->addTest(
+        "coordinates",
+        {
+            set_parent_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            sf::Vector2f parent_pos(100.0f, 100.0f);
+            sf::Vector2f child_local_pos(30.0f, 30.0f);
+            child_widget->setParent(parent_widget);
+            parent_widget->setPosition(parent_pos);
+            child_widget->setPosition(child_local_pos);
+            tVec2ApproxCompare(child_widget->toGlobal(sf::Vector2f(10.0f, 5.0f)), sf::Vector2f(140.0f, 135.0f));
+            tVec2ApproxCompare(child_widget->toLocal(sf::Vector2f(140.0f, 135.0f)), sf::Vector2f(10.0f, 5.0f));
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
