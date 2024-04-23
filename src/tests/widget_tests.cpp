@@ -781,6 +781,78 @@ void WidgetTests::createWidgetsList() {
             tCheck(checkbox_widget->getValue());
         }
     );
+    test::Test* container_widget_basic_test = list->addTest(
+        "container_widget_basic",
+        {
+            rectangle_widget_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>();
+            sf::Vector2f position(100.0f, 100.0f);
+            sf::Vector2f size(100.0f, 100.0f);
+            container_widget->setPosition(position);
+            container_widget->setSize(size);
+            tAssert(tCheck(container_widget));
+            tCompare(application.getWidgets().getSize(), 2);
+            tCompare(container_widget->getName(), "container");
+            tCompare(container_widget->getFullName(), "root|container");
+            tCheck(!container_widget->isVisualPositionQuantized());
+            tCheck(container_widget->isVisible());
+            fw::WidgetVisibility wv = container_widget->checkVisibility();
+            tCheck(wv.addedToRoot);
+            tCheck(wv.allParentsVisible);
+            tCheck(wv.hasUnclippedRegion);
+            tCheck(wv.nonZeroSize);
+            tCheck(wv.onScreen);
+            tCheck(wv.opaque);
+            tCheck(wv.visibleSetting);
+            tCheck(container_widget->isClickThrough());
+            tCheck(!container_widget->isMouseOver());
+            tCheck(!container_widget->isFocusable());
+            tCheck(!container_widget->isFocused());
+            tCheck(!container_widget->getClipChildren());
+            tCheck(!container_widget->getForceCustomCursor());
+            sf::FloatRect local_bounds = sf::FloatRect(sf::Vector2f(), size);
+            sf::FloatRect parent_local_bounds = sf::FloatRect(position, size);
+            auto rect_to_str = &WidgetTests::floatRectToStr;
+            tCompare(container_widget->getLocalBounds(), local_bounds, rect_to_str);
+            tCompare(container_widget->getParentLocalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(container_widget->getGlobalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(container_widget->getVisualLocalBounds(), local_bounds, rect_to_str);
+            tCompare(container_widget->getVisualParentLocalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(container_widget->getVisualGlobalBounds(), parent_local_bounds, rect_to_str);
+            tCompare(container_widget->getUnclippedRegion(), parent_local_bounds, rect_to_str);
+            tCompare(container_widget->getQuantizedUnclippedRegion(), parent_local_bounds, rect_to_str);
+            tCompare(container_widget->getWidth(), parent_local_bounds.width);
+            tCompare(container_widget->getHeight(), parent_local_bounds.height);
+            tCompare(container_widget->getGlobalWidth(), parent_local_bounds.width);
+            tCompare(container_widget->getGlobalHeight(), parent_local_bounds.height);
+            auto vec2f_to_str = &WidgetTests::sfVec2fToStr;
+            tCompare(container_widget->getSize(), size, vec2f_to_str);
+            sf::Vector2f top_left = parent_local_bounds.getPosition();
+            sf::Vector2f top_right = parent_local_bounds.getPosition() + sf::Vector2f(parent_local_bounds.width, 0.0f);
+            sf::Vector2f bottom_left = parent_local_bounds.getPosition() + sf::Vector2f(0.0f, parent_local_bounds.height);
+            sf::Vector2f bottom_right = parent_local_bounds.getPosition() + parent_local_bounds.getSize();
+            tCompare(container_widget->getTopLeft(), top_left, vec2f_to_str);
+            tCompare(container_widget->getTopRight(), top_right, vec2f_to_str);
+            tCompare(container_widget->getBottomLeft(), bottom_left, vec2f_to_str);
+            tCompare(container_widget->getBottomRight(), bottom_right, vec2f_to_str);
+            tCompare(container_widget->getGlobalTopLeft(), top_left, vec2f_to_str);
+            tCompare(container_widget->getGlobalTopRight(), top_right, vec2f_to_str);
+            tCompare(container_widget->getGlobalBottomLeft(), bottom_left, vec2f_to_str);
+            tCompare(container_widget->getGlobalBottomRight(), bottom_right, vec2f_to_str);
+            tCompare(container_widget->getVisualGlobalTopLeft(), top_left, vec2f_to_str);
+            tCompare(container_widget->getVisualGlobalTopRight(), top_right, vec2f_to_str);
+            tCompare(container_widget->getVisualGlobalBottomLeft(), bottom_left, vec2f_to_str);
+            tCompare(container_widget->getVisualGlobalBottomRight(), bottom_right, vec2f_to_str);
+            tCompare(container_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
