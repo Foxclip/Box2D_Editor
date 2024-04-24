@@ -86,8 +86,22 @@ namespace test {
 	}
 
 	void Test::Error::log() const {
-		if (type == Type::Container && subentries.empty()) {
-			return;
+		if (type == Type::Container) {
+			std::function<bool(const Error& error)> has_non_container_subentries = [&](const Error& error) {
+				for (auto& subentry : error.subentries) {
+					if (subentry->type != Type::Container) {
+						return true;
+					} else {
+						if (has_non_container_subentries(*subentry)) {
+							return true;
+						}
+					}
+				}
+				return false;
+			};
+			if (!has_non_container_subentries(*this)) {
+				return;
+			}
 		}
 		if (type != Type::Root) {
 			std::string esc_str = char_to_esc(str, false);
@@ -101,8 +115,11 @@ namespace test {
 		}
 	}
 
-	ErrorContainer::ErrorContainer(Test& test, const std::string& message) : test(test) {
-		Test::Error* error = test.getCurrentError()->add(message, Test::Error::Type::Container);
+	ErrorContainer::ErrorContainer(Test& test, const std::string& file, size_t line, const std::string& message) : test(test) {
+		std::string filename = std::filesystem::path(file).filename().string();
+		std::string location_str = "[" + filename + ":" + std::to_string(line) + "]";
+		std::string space_str = message.size() > 0 ? " " : "";
+		Test::Error* error = test.getCurrentError()->add(message + space_str + location_str, Test::Error::Type::Container);
 		test.error_stack.push(error);
 	}
 

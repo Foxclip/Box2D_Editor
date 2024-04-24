@@ -33,7 +33,13 @@ namespace test {
 	} \
 
 #define tContainer(message) \
-	test::ErrorContainer error_container(test, message);
+	test::ErrorContainer error_container(test, __FILE__, __LINE__, message);
+
+#define tWrapContainer(expr, ...) \
+	{ \
+		tContainer(#expr); \
+		expr; \
+	}
 
 	class Test {
 	public:
@@ -72,7 +78,7 @@ namespace test {
 
 	class ErrorContainer {
 	public:
-		ErrorContainer(Test& test, const std::string& message);
+		ErrorContainer(Test& test, const std::string& file, size_t line, const std::string& message = "");
 		~ErrorContainer();
 
 	private:

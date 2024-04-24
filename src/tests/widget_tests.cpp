@@ -954,6 +954,91 @@ void WidgetTests::createWidgetsList() {
             tCheck(application.getWidgets().getFocusedWidget() == textbox_widget);
         }
     );
+    test::Test* textbox_widget_cursor_test = list->addTest(
+        "textbox_widget_cursor",
+        {
+            textbox_widget_basic_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0, false);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>();
+            textbox_widget->setCharacterSize(20);
+            sf::Font font;
+            font.loadFromFile("fonts/verdana.ttf");
+            textbox_widget->setFont(font);
+            sf::Vector2f position(100.0f, 100.0f);
+            sf::Vector2f size(40.0f, 20.0f);
+            std::string value = "Text";
+            textbox_widget->setPosition(position);
+            textbox_widget->setSize(size);
+            textbox_widget->setValue(value);
+            auto check_selection = [&]() {
+                tCheck(!textbox_widget->isSelectionActive());
+                tCompare(textbox_widget->getSelectedText(), "");
+                tCompare(textbox_widget->getSelectionLeft(), -1);
+                tCompare(textbox_widget->getSelectionRight(), -1);
+            };
+            application.advance();
+            application.mouseMove(fw::to2i(textbox_widget->getGlobalCenter()));
+            application.mouseLeftPress();
+            application.advance();
+            application.mouseLeftRelease();
+            application.advance();
+            application.keyPress(sf::Keyboard::BackSpace);
+            application.textEntered('\b');
+            application.advance();
+            application.keyPress(sf::Keyboard::Left);
+            application.advance();
+            tCompare(textbox_widget->getValue(), "");
+            tCompare(textbox_widget->getCursorPos(), 0);
+            tWrapContainer(check_selection());
+            application.keyPress(sf::Keyboard::Right);
+            application.advance();
+            tCompare(textbox_widget->getValue(), "");
+            tCompare(textbox_widget->getCursorPos(), 0);
+            tWrapContainer(check_selection());
+            application.keyPress(sf::Keyboard::A);
+            application.textEntered('a');
+            application.advance();
+            application.keyPress(sf::Keyboard::B);
+            application.textEntered('b');
+            application.advance();
+            application.keyPress(sf::Keyboard::C);
+            application.textEntered('c');
+            application.advance();
+            application.keyPress(sf::Keyboard::D);
+            application.textEntered('d');
+            application.advance();
+            tCompare(textbox_widget->getValue(), "abcd");
+            tCompare(textbox_widget->getCursorPos(), 4);
+            tWrapContainer(check_selection());
+            auto move_cursor = [&](sf::Keyboard::Key key, size_t pos) {
+                application.keyPress(key);
+                application.advance();
+                tCompare(textbox_widget->getValue(), "abcd");
+                tCompare(textbox_widget->getCursorPos(), pos);
+                tWrapContainer(check_selection());
+            };
+            tWrapContainer(move_cursor(sf::Keyboard::Right, 4));
+            tWrapContainer(move_cursor(sf::Keyboard::Right, 4));
+            tWrapContainer(move_cursor(sf::Keyboard::Left, 3));
+            tWrapContainer(move_cursor(sf::Keyboard::Left, 2));
+            tWrapContainer(move_cursor(sf::Keyboard::Left, 1));
+            tWrapContainer(move_cursor(sf::Keyboard::Left, 0));
+            tWrapContainer(move_cursor(sf::Keyboard::Left, 0));
+            tWrapContainer(move_cursor(sf::Keyboard::Left, 0));
+            tWrapContainer(move_cursor(sf::Keyboard::Right, 1));
+            tWrapContainer(move_cursor(sf::Keyboard::Right, 2));
+            tWrapContainer(move_cursor(sf::Keyboard::Right, 3));
+            tWrapContainer(move_cursor(sf::Keyboard::Right, 4));
+            tWrapContainer(move_cursor(sf::Keyboard::Right, 4));
+            tWrapContainer(move_cursor(sf::Keyboard::Right, 4));
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
