@@ -52,6 +52,9 @@ namespace fw {
 		void keyPress(sf::Keyboard::Key key);
 		void keyRelease(sf::Keyboard::Key key);
 		void textEntered(sf::Uint32 code);
+		bool isLCtrlPressed() const;
+		bool isLAltPressed() const;
+		bool isLShiftPressed() const;
 		sf::Vector2i getMousePos() const;
 		sf::Vector2f getMousePosf() const;
 		const sf::Vector2f& getMousePressPosf() const;
@@ -61,7 +64,7 @@ namespace fw {
 	protected:
 		sf::RenderWindow window;
 		sf::View window_view;
-		WidgetList widgets;
+		WidgetList widgets = WidgetList(*this);
 		sf::Vector2i mousePrevPos;
 		sf::Vector2f mousePressPosf;
 		bool leftButtonPressed = false;
@@ -71,6 +74,9 @@ namespace fw {
 		sf::Cursor text_cursor;
 		bool external_control = false;
 		sf::Vector2i external_mouse_pos;
+		bool external_lctrl_pressed = false;
+		bool external_lalt_pressed = false;
+		bool external_lshift_pressed = false;
 		std::queue<sf::Event> external_event_queue;
 
 		virtual void onInit();

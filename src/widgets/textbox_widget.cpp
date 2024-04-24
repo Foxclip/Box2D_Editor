@@ -346,8 +346,8 @@ namespace fw {
 	}
 
 	void TextBoxWidget::processKeyPressedEvent(const sf::Event& event) {
-		bool shift_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
-		bool ctrl_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
+		bool shift_pressed = widget_list.isLShiftPressed();
+		bool ctrl_pressed = widget_list.isLCtrlPressed();
 		if (event.key.code == sf::Keyboard::Escape) {
 			disableEditMode(false);
 			removeFocus();

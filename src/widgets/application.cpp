@@ -91,6 +91,13 @@ namespace fw {
 
     void Application::keyPress(sf::Keyboard::Key key) {
         wAssert(external_control);
+        if (key == sf::Keyboard::LControl) {
+            external_lctrl_pressed = true;
+        } else if (key == sf::Keyboard::LAlt) {
+            external_lalt_pressed = true;
+        } else if (key == sf::Keyboard::LShift) {
+            external_lshift_pressed = true;
+        }
         sf::Event event;
         event.type = sf::Event::KeyPressed;
         event.key.code = key;
@@ -99,6 +106,13 @@ namespace fw {
 
     void Application::keyRelease(sf::Keyboard::Key key) {
         wAssert(external_control);
+        if (key == sf::Keyboard::LControl) {
+            external_lctrl_pressed = false;
+        } else if (key == sf::Keyboard::LAlt) {
+            external_lalt_pressed = false;
+        } else if (key == sf::Keyboard::LShift) {
+            external_lshift_pressed = false;
+        }
         sf::Event event;
         event.type = sf::Event::KeyReleased;
         event.key.code = key;
@@ -111,6 +125,30 @@ namespace fw {
         event.type = sf::Event::TextEntered;
         event.text.unicode = code;
         addExternalEvent(event);
+    }
+
+    bool Application::isLCtrlPressed() const {
+        if (external_control) {
+            return external_lctrl_pressed;
+        } else {
+            return sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
+        }
+    }
+
+    bool Application::isLAltPressed() const {
+        if (external_control) {
+            return external_lalt_pressed;
+        } else {
+            return sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt);
+        }
+    }
+
+    bool Application::isLShiftPressed() const {
+        if (external_control) {
+            return external_lshift_pressed;
+        } else {
+            return sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
+        }
     }
 
     sf::Vector2i Application::getMousePos() const {

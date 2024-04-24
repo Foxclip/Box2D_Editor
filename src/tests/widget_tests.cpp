@@ -1037,6 +1037,135 @@ void WidgetTests::createWidgetsList() {
             tWrapContainer(move_cursor(sf::Keyboard::Right, 4));
             tWrapContainer(move_cursor(sf::Keyboard::Right, 4));
             tWrapContainer(move_cursor(sf::Keyboard::Right, 4));
+            tWrapContainer(move_cursor(sf::Keyboard::Home, 0));
+            tWrapContainer(move_cursor(sf::Keyboard::Home, 0));
+            tWrapContainer(move_cursor(sf::Keyboard::End, 4));
+            tWrapContainer(move_cursor(sf::Keyboard::End, 4));
+        }
+    );
+    test::Test* textbox_widget_selection_test = list->addTest(
+        "textbox_widget_selection",
+        {
+            textbox_widget_cursor_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0, false);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>();
+            textbox_widget->setCharacterSize(20);
+            sf::Font font;
+            font.loadFromFile("fonts/verdana.ttf");
+            textbox_widget->setFont(font);
+            sf::Vector2f position(100.0f, 100.0f);
+            sf::Vector2f size(40.0f, 20.0f);
+            std::string value = "Text";
+            textbox_widget->setPosition(position);
+            textbox_widget->setSize(size);
+            textbox_widget->setValue(value);
+            application.advance();
+            auto click_mouse = [&](const sf::Vector2i& pos) {
+                application.mouseMove(pos);
+                application.mouseLeftPress();
+                application.advance();
+                application.mouseLeftRelease();
+                application.advance();
+            };
+            auto press_key = [&](sf::Keyboard::Key key) {
+                application.keyPress(key);
+                application.advance();
+            };
+            auto release_key = [&](sf::Keyboard::Key key) {
+                application.keyRelease(key);
+                application.advance();
+            };
+            auto tap_key = [&](sf::Keyboard::Key key) {
+                press_key(key);
+                release_key(key);
+            };
+            auto check_selection = [&](bool active, const std::string& text, size_t cursor_pos, ptrdiff_t left, ptrdiff_t right) {
+                tCheck(textbox_widget->isSelectionActive() == active);
+                tCompare(textbox_widget->getSelectedText(), text);
+                tCompare(textbox_widget->getCursorPos(), cursor_pos);
+                tCompare(textbox_widget->getSelectionLeft(), left);
+                tCompare(textbox_widget->getSelectionRight(), right);
+            };
+            auto select_all = [&]() {
+                application.keyPress(sf::Keyboard::LControl);
+                application.keyPress(sf::Keyboard::A);
+                application.advance();
+                application.keyRelease(sf::Keyboard::A);
+                application.keyRelease(sf::Keyboard::LControl);
+                application.advance();
+            };
+            click_mouse(fw::to2i(textbox_widget->getGlobalCenter()));
+            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
+            tap_key(sf::Keyboard::Left);
+            tWrapContainer(check_selection(false, "", 0, -1, -1));
+
+            tAssertNoErrors();
+
+            select_all();
+            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
+            tap_key(sf::Keyboard::Right);
+            tWrapContainer(check_selection(false, "", 4, -1, -1));
+            select_all();
+            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
+            tap_key(sf::Keyboard::Home);
+            tWrapContainer(check_selection(false, "", 0, -1, -1));
+            select_all();
+            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
+            tap_key(sf::Keyboard::End);
+            tWrapContainer(check_selection(false, "", 4, -1, -1));
+
+            tAssertNoErrors();
+
+            tap_key(sf::Keyboard::Home);
+            press_key(sf::Keyboard::LShift);
+            tap_key(sf::Keyboard::Right);
+            tWrapContainer(check_selection(true, "T", 1, 0, 1));
+            tap_key(sf::Keyboard::Right);
+            tWrapContainer(check_selection(true, "Te", 2, 0, 2));
+            tap_key(sf::Keyboard::Right);
+            tWrapContainer(check_selection(true, "Tex", 3, 0, 3));
+            tap_key(sf::Keyboard::Right);
+            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
+            tap_key(sf::Keyboard::Right);
+            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
+            release_key(sf::Keyboard::LShift);
+            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
+            tap_key(sf::Keyboard::Left);
+            tWrapContainer(check_selection(false, "", 0, -1, -1));
+
+            tAssertNoErrors();
+
+            tap_key(sf::Keyboard::Right);
+            tap_key(sf::Keyboard::Right);
+            tap_key(sf::Keyboard::Right);
+            press_key(sf::Keyboard::LShift);
+            tap_key(sf::Keyboard::Left);
+            tWrapContainer(check_selection(true, "x", 2, 2, 3));
+            tap_key(sf::Keyboard::Left);
+            tWrapContainer(check_selection(true, "ex", 1, 1, 3));
+            tap_key(sf::Keyboard::Left);
+            tWrapContainer(check_selection(true, "Tex", 0, 0, 3));
+            release_key(sf::Keyboard::LShift);
+            tap_key(sf::Keyboard::Right);
+            tWrapContainer(check_selection(false, "", 3, -1, -1));
+
+            tAssertNoErrors();
+
+            tap_key(sf::Keyboard::Home);
+            tap_key(sf::Keyboard::Right);
+            press_key(sf::Keyboard::LShift);
+            tap_key(sf::Keyboard::Right);
+            tap_key(sf::Keyboard::Right);
+            release_key(sf::Keyboard::LShift);
+            tWrapContainer(check_selection(true, "ex", 3, 1, 3));
+            select_all();
+            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
         }
     );
 }

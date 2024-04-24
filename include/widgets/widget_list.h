@@ -12,11 +12,13 @@ namespace fw {
 	// And if if changes render queue:
 	// render_queue.invalidate();
 
+	class Application;
+
 	class WidgetList {
 	public:
 		bool debug_render = false;
 
-		WidgetList();
+		WidgetList(Application& application);
 		size_t getSize() const;
 		bool contains(const Widget* widget);
 		bool isClickBlocked() const;
@@ -26,6 +28,9 @@ namespace fw {
 		Widget* getTopWidgetUnderCursor() const;
 		CompVector<Widget*> getWidgetsUnderCursor(bool can_block, bool& blocked) const;
 		bool getCurrentCursorType(sf::Cursor::Type& result) const;
+		bool isLCtrlPressed() const;
+		bool isLAltPressed() const;
+		bool isLShiftPressed() const;
 		Widget* find(const std::string& name) const;
 		template<typename T, typename... Args>
 			requires std::derived_from<T, Widget>
@@ -45,6 +50,7 @@ namespace fw {
 
 	private:
 		friend class Widget;
+		Application& application;
 		bool locked = false;
 		bool click_blocked = false;
 		bool release_blocked = false;

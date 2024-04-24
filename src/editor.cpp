@@ -341,13 +341,13 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
             case sf::Keyboard::LControl: edit_tool.mode = EditTool::ADD; break;
             case sf::Keyboard::LAlt: edit_tool.mode = EditTool::INSERT; break;
             case sf::Keyboard::S:
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
+                if (isLCtrlPressed()) {
                     saveToFile("levels/level.txt");
                 }
                 break;
             case sf::Keyboard::Z:
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                if (isLCtrlPressed()) {
+                    if (isLShiftPressed()) {
                         history.redo();
                     } else {
                         history.undo();
@@ -362,7 +362,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                 break;
             case sf::Keyboard::A:
                 if (selected_tool == &select_tool) {
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
+                    if (isLAltPressed()) {
                         for (GameObject* obj : simulation.getAllVector()) {
                             select_tool.deselectObject(obj);
                         }
@@ -372,7 +372,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                         }
                     }
                 } else if (selected_tool == &edit_tool && active_object) {
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
+                    if (isLAltPressed()) {
                         active_object->deselectAllVertices();
                     } else {
                         active_object->selectAllVertices();
@@ -401,7 +401,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                 }
                 break;
             case sf::Keyboard::D:
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                if (isLShiftPressed()) {
                     if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
                         CompVector<GameObject*> old_objects = select_tool.getSelectedObjects();
                         CompVector<GameObject*> new_objects = simulation.duplicate(old_objects);
@@ -517,7 +517,7 @@ void Editor::onProcessLeftClick() {
                 edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
                 const EditableVertex& vertex = active_object->getVertex(edit_tool.grabbed_vertex);
                 edit_tool.grabbed_vertex_offset = vertex.pos - active_object->toLocal(b2MousePosWorld);
-                bool shift = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
+                bool shift = isLShiftPressed();
                 if (!vertex.selected && !shift) {
                     active_object->deselectAllVertices();
                 } else if (shift) {
@@ -527,7 +527,7 @@ void Editor::onProcessLeftClick() {
                 edit_tool.mode = EditTool::SELECT;
                 edit_tool.rectangle_select.active = true;
                 edit_tool.rectangle_select.select_origin = sfMousePosWorld;
-                if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                if (!isLShiftPressed()) {
                     active_object->deselectAllVertices();
                 }
             }
@@ -550,8 +550,8 @@ void Editor::onProcessLeftRelease() {
         if (utils::length(getMousePosf() - getMousePressPosf()) < MOUSE_DRAG_THRESHOLD) {
             GameObject* object = getObjectAt(getMousePosf());
             setActiveObject(object);
-            bool with_children = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+            bool with_children = isLCtrlPressed();
+            if (isLShiftPressed()) {
                 select_tool.toggleSelect(object, with_children);
             } else {
                 select_tool.selectSingleObject(object, with_children);
@@ -617,7 +617,7 @@ void Editor::onProcessMouse() {
             b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.pivot_pos;
             float current_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
             float offset = current_mouse_angle - rotate_tool.orig_mouse_angle;
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
+            if (isLCtrlPressed()) {
                 float offset_deg = utils::to_degrees(offset);
                 float quantized_offset = ((int)(offset_deg / ROTATE_ANGLE_STEP)) * ROTATE_ANGLE_STEP;
                 offset = utils::to_radians(quantized_offset);
@@ -634,7 +634,7 @@ void Editor::onProcessMouse() {
             } else if (utils::length(getMousePosf() - getMousePressPosf()) >= MOUSE_DRAG_THRESHOLD) {
                 select_tool.rectangle_select.active = true;
                 select_tool.rectangle_select.select_origin = screenToWorld(getMousePressPosf());
-                if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+                if (!isLShiftPressed()) {
                     select_tool.clearSelected();
                 }
             }

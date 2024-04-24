@@ -1,10 +1,11 @@
+#include "widgets/application.h"
 #include "widgets/widget_list.h"
 #include "widgets/rectangle_widget.h"
 #include <ranges>
 
 namespace fw {
 
-	WidgetList::WidgetList() {
+	WidgetList::WidgetList(Application& application) : application(application) {
 		root_widget = createWidget<RectangleWidget>();
 		root_widget->setFillColor(sf::Color::Transparent);
 		root_widget->setClipChildren(true);
@@ -78,6 +79,18 @@ namespace fw {
 			}
 		}
 		return false;
+	}
+
+	bool WidgetList::isLCtrlPressed() const {
+		return application.isLCtrlPressed();
+	}
+
+	bool WidgetList::isLAltPressed() const {
+		return application.isLAltPressed();
+	}
+
+	bool WidgetList::isLShiftPressed() const {
+		return application.isLShiftPressed();
 	}
 
 	Widget* WidgetList::find(const std::string& name) const {

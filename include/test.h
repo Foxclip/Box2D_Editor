@@ -32,6 +32,11 @@ namespace test {
 		return; \
 	} \
 
+#define tAssertNoErrors() \
+	if (!test.result) { \
+		return; \
+	} \
+
 #define tContainer(message) \
 	test::ErrorContainer error_container(test, __FILE__, __LINE__, message);
 
