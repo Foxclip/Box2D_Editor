@@ -55,6 +55,7 @@ protected:
 	void createWidgetsList();
 
 private:
+	sf::Font textbox_font;
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);
 	static std::string sfVec2uToStr(const sf::Vector2u& vec);
@@ -62,5 +63,6 @@ private:
 	static std::string floatRectToStr(const sf::FloatRect& rect);
 	static std::string colorToStr(const sf::Color& color);
 	static std::string anchorToStr(fw::Widget::Anchor anchor);
+	fw::TextBoxWidget* initTextBox(fw::Application& application, float width, float height) const;
 
 };

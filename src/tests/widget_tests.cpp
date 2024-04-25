@@ -45,25 +45,6 @@
 #define CHECK_SELECTION(active, text, cursor_pos, left, right) \
     T_WRAP_CONTAINER(_CHECK_SELECTION(active, text, cursor_pos, left, right))
 
-#define INIT_TEXTBOX() \
-    fw::Application application; \
-    application.init("Test window", 800, 600, 0, false); \
-    application.start(true); \
-    application.mouseMove(400, 300); \
-    application.advance(); \
-    fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>(); \
-    textbox_widget->setCharacterSize(20); \
-    sf::Font font; \
-    font.loadFromFile("fonts/verdana.ttf"); \
-    textbox_widget->setFont(font); \
-    sf::Vector2f position(100.0f, 100.0f); \
-    sf::Vector2f size(80.0f, 20.0f); \
-    std::string value = "Text"; \
-    textbox_widget->setPosition(position); \
-    textbox_widget->setSize(size); \
-    textbox_widget->setValue(value); \
-    application.advance(); \
-
 WidgetTests::WidgetTests(test::TestManager& manager) : TestModule("Widgets", manager) { }
 
 void WidgetTests::createTestLists() {
@@ -206,6 +187,9 @@ void WidgetTests::createApplicationList() {
 
 void WidgetTests::createWidgetsList() {
     test::TestList* list = createTestList("Widgets");
+    list->OnBeforeRunAllTests = [&]() {
+        textbox_font.loadFromFile("fonts/verdana.ttf");
+    };
 
     test::Test* root_widget_test = list->addTest(
         "root_widget",
@@ -940,13 +924,14 @@ void WidgetTests::createWidgetsList() {
             textbox_widget_basic_test
         },
         [&](test::Test& test) {
-            INIT_TEXTBOX();
+            fw::Application application;
+            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
             CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
             T_CHECK(textbox_widget->isFocused());
             T_CHECK(application.getWidgets().getFocusedWidget() == textbox_widget);
             T_CHECK(textbox_widget->isEditMode());
-            T_COMPARE(textbox_widget->getValue(), value);
+            T_COMPARE(textbox_widget->getValue(), "Text");
             T_CHECK(textbox_widget->isValidValue());
             CHECK_SELECTION(true, "Text", 4, 0, 4);
             ENTER_TEXT(sf::Keyboard::BackSpace, '\b');
@@ -974,7 +959,8 @@ void WidgetTests::createWidgetsList() {
             textbox_widget_basic_test
         },
         [&](test::Test& test) {
-            INIT_TEXTBOX();
+            fw::Application application;
+            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
             CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
             ENTER_TEXT(sf::Keyboard::BackSpace, '\b');
@@ -1016,13 +1002,63 @@ void WidgetTests::createWidgetsList() {
             T_WRAP_CONTAINER(move_cursor(sf::Keyboard::End, 4));
         }
     );
+    test::Test* textbox_widget_scroll_test = list->addTest(
+        "textbox_widget_scroll",
+        {
+            textbox_widget_cursor_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            fw::TextBoxWidget* textbox_widget = initTextBox(application, 20.0f, 20.0f);
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+
+            const fw::TextWidget* text_widget = textbox_widget->getTextWidget();
+            float zero_pos = textbox_widget->TEXT_VIEW_ZERO_POS.x;
+            float right_margin = textbox_widget->getWidth() - textbox_widget->CURSOR_MOVE_MARGIN;
+            auto calc_text_pos = [&](size_t cursor_pos_index) {
+                float cursor_pos = zero_pos + text_widget->getLocalCharPos(cursor_pos_index).x;
+                float past_right_margin = std::max(0.0f, cursor_pos - right_margin);
+                float text_pos = zero_pos - past_right_margin;
+                return text_pos;
+            };
+            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(4));
+            TAP_KEY(sf::Keyboard::Home);
+            T_APPROX_COMPARE(text_widget->getPosition().x, zero_pos);
+
+            T_ASSERT_NO_ERRORS();
+            TAP_KEY(sf::Keyboard::Right);
+            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(1));
+            TAP_KEY(sf::Keyboard::Right);
+            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(2));
+            TAP_KEY(sf::Keyboard::Right);
+            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(3));
+            TAP_KEY(sf::Keyboard::Right);
+            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(4));
+            TAP_KEY(sf::Keyboard::Right);
+            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(4));
+
+            T_ASSERT_NO_ERRORS();
+            float begin_pos = text_widget->getPosition().x;
+            TAP_KEY(sf::Keyboard::Left);
+            T_COMPARE(text_widget->getPosition().x, begin_pos);
+            TAP_KEY(sf::Keyboard::Left);
+            T_COMPARE(textbox_widget->getLocalCharPos(2).x, zero_pos);
+            TAP_KEY(sf::Keyboard::Left);
+            T_COMPARE(textbox_widget->getLocalCharPos(1).x, zero_pos);
+            TAP_KEY(sf::Keyboard::Left);
+            T_COMPARE(textbox_widget->getLocalCharPos(0).x, zero_pos);
+            TAP_KEY(sf::Keyboard::Left);
+            T_COMPARE(textbox_widget->getLocalCharPos(0).x, zero_pos);
+        }
+    );
     test::Test* textbox_widget_selection_test = list->addTest(
         "textbox_widget_selection",
         {
             textbox_widget_cursor_test
         },
         [&](test::Test& test) {
-            INIT_TEXTBOX();
+            fw::Application application;
+            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
             CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
             CHECK_SELECTION(true, "Text", 4, 0, 4);
@@ -1094,7 +1130,8 @@ void WidgetTests::createWidgetsList() {
             textbox_widget_cursor_test
         },
         [&](test::Test& test) {
-            INIT_TEXTBOX();
+            fw::Application application;
+            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
             CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
             auto click_at_char = [&](size_t index) {
@@ -1123,7 +1160,8 @@ void WidgetTests::createWidgetsList() {
             textbox_widget_mouse_click_test
         },
         [&](test::Test& test) {
-            INIT_TEXTBOX();
+            fw::Application application;
+            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
 
             auto get_char_pos = [&](size_t index) {
                 return fw::to2i(textbox_widget->getGlobalCharPos(index));
@@ -1232,6 +1270,24 @@ std::string WidgetTests::anchorToStr(fw::Widget::Anchor anchor) {
         case fw::Widget::Anchor::BOTTOM_RIGHT:  return "BOTTOM_RIGHT";
         default:                                mAssert("Unknown anchor type"); return "Unknown";
     }
+}
+
+fw::TextBoxWidget* WidgetTests::initTextBox(fw::Application& application, float width, float height) const {
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>();
+    textbox_widget->setCharacterSize(20);
+    textbox_widget->setFont(textbox_font);
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(width, height);
+    std::string value = "Text";
+    textbox_widget->setPosition(position);
+    textbox_widget->setSize(size);
+    textbox_widget->setValue(value);
+    application.advance();
+    return textbox_widget;
 }
 
 void TestApplication::onInit() {

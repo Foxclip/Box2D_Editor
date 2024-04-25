@@ -11,15 +11,23 @@ namespace fw {
 
 	class TextBoxWidget : public RectangleWidget {
 	public:
+		const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(40.0f, 20.0f);
+		const sf::Vector2f TEXT_VIEW_ZERO_POS = sf::Vector2f(2.0f, 0.0f);
+		const sf::Vector2f CURSOR_OFFSET = sf::Vector2f(0.0f, 0.0f);
+		const float CURSOR_MARGIN = 2.0f; // cursor sticking out above and below text
+		const float SELECTION_MARGIN = 2.0f; // selection sticking out above and below text
+		const std::string VALID_INTEGER_CHARS = "+-0123456789";
+		const std::string VALID_FLOAT_CHARS = "+-.e0123456789";
+		const float CURSOR_MOVE_MARGIN = 2.0f; // scroll text when cursor approaches margin
+		std::function<void(bool)> OnEditModeToggle = [](bool new_value) { };
+		std::function<void(const sf::String&)> OnValueChanged = [](const sf::String& new_value) { };
+		std::function<void(const sf::String&)> OnConfirm = [](const sf::String& value) { };
+		std::function<void()> OnCancel = []() { };
 		enum TextBoxType {
 			TEXT,
 			INTEGER,
 			FLOAT,
 		};
-		std::function<void(bool)> OnEditModeToggle = [](bool new_value) { };
-		std::function<void(const sf::String&)> OnValueChanged = [](const sf::String& new_value) { };
-		std::function<void(const sf::String&)> OnConfirm = [](const sf::String& value) { };
-		std::function<void()> OnCancel = []() { };
 
 		TextBoxWidget(WidgetList& widget_list);
 		bool isFocusable() const override;
@@ -110,14 +118,6 @@ namespace fw {
 		void doGroupAction(ActionType action_type, const std::function<void()>& action);
 
 	private:
-		const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(40.0f, 20.0f);
-		const sf::Vector2f TEXT_VIEW_ZERO_POS = sf::Vector2f(2.0f, 0.0f);
-		const sf::Vector2f CURSOR_OFFSET = sf::Vector2f(0.0f, 0.0f);
-		const float CURSOR_MARGIN = 2.0f;
-		const float SELECTION_MARGIN = 2.0f;
-		const std::string VALID_INTEGER_CHARS = "+-0123456789";
-		const std::string VALID_FLOAT_CHARS = "+-.e0123456789";
-		const float CURSOR_MOVE_MARGIN = 2.0f;
 		TextWidget* text_widget = nullptr;
 		RectangleWidget* cursor_widget = nullptr;
 		RectangleWidget* selection_widget = nullptr;
