@@ -12,37 +12,37 @@ namespace test {
 	class Test;
 	using TestFuncType = std::function<void(Test& test)>;
 
-#define tMessage(message) \
+#define T_MESSAGE(message) \
 	testMessage(test, __FILE__, __LINE__, message)
 
-#define tCheck(value, ...) \
+#define T_CHECK(value, ...) \
 	testCheck(test, __FILE__, __LINE__, value, #value, __VA_ARGS__)
 
-#define tCompare(actual, expected, ...) \
+#define T_COMPARE(actual, expected, ...) \
 	testCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__)
 
-#define tApproxCompare(actual, expected, ...) \
+#define T_APPROX_COMPARE(actual, expected, ...) \
 	testApproxCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__)
 
-#define tVec2ApproxCompare(actual, expected, ...) \
+#define T_VEC2_APPROX_COMPARE(actual, expected, ...) \
 	testVec2ApproxCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__)
 
-#define tAssert(expr) \
+#define T_ASSERT(expr) \
 	if (!expr) { \
 		return; \
 	} \
 
-#define tAssertNoErrors() \
+#define T_ASSERT_NO_ERRORS() \
 	if (!test.result) { \
 		return; \
 	} \
 
-#define tContainer(message) \
+#define T_CONTAINER(message) \
 	test::ErrorContainer error_container(test, __FILE__, __LINE__, message);
 
-#define tWrapContainer(expr, ...) \
+#define T_WRAP_CONTAINER(expr, ...) \
 	{ \
-		tContainer(#expr); \
+		T_CONTAINER(#expr); \
 		expr; \
 	}
 

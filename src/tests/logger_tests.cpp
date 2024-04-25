@@ -15,20 +15,20 @@ void LoggerTests::createLoggerList(test::TestList* list) {
 	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
 		Logger logger(true);
 		logger << "Test\n";
-		tCompare(logger.getTotalBuffer(), "Test\n");
+		T_COMPARE(logger.getTotalBuffer(), "Test\n");
 	});
 	test::Test* multiple_lines_test = list->addTest("multiple_lines", { basic_test }, [&](test::Test& test) {
 		Logger logger(true);
 		logger << "Line1\n";
 		logger << "Line2\n";
-		tCompare(logger.getTotalBuffer(), "Line1\nLine2\n");
+		T_COMPARE(logger.getTotalBuffer(), "Line1\nLine2\n");
 	});
 	test::Test* indent_test = list->addTest("indent", { multiple_lines_test }, [&](test::Test& test) {
 		Logger logger(true);
 		logger << "Line1\n";
 		LoggerIndent indent(logger);
 		logger << "Line2\n";
-		tCompare(logger.getTotalBuffer(), "Line1\n|   Line2\n");
+		T_COMPARE(logger.getTotalBuffer(), "Line1\n|   Line2\n");
 	});
 	test::Test* indent_2_test = list->addTest("indent_2", { indent_test }, [&](test::Test& test) {
 		Logger logger(true);
@@ -38,7 +38,7 @@ void LoggerTests::createLoggerList(test::TestList* list) {
 			logger << "Line2\n";
 		}
 		logger << "Line3\n";
-		tCompare(logger.getTotalBuffer(), "Line1\n|   Line2\nLine3\n");
+		T_COMPARE(logger.getTotalBuffer(), "Line1\n|   Line2\nLine3\n");
 	});
 	test::Test* indent_3_test = list->addTest("indent_3", { indent_test }, [&](test::Test& test) {
 		Logger logger(true);
@@ -47,25 +47,25 @@ void LoggerTests::createLoggerList(test::TestList* list) {
 		logger << "Line2\n";
 		LoggerIndent indent2(logger);
 		logger << "Line3\n";
-		tCompare(logger.getTotalBuffer(), "Line1\n|   Line2\n|   |   Line3\n");
+		T_COMPARE(logger.getTotalBuffer(), "Line1\n|   Line2\n|   |   Line3\n");
 	});
 	test::Test* logger_flush_test = list->addTest("loggerflush", { multiple_lines_test }, [&](test::Test& test) {
 		Logger logger(true);
 		logger << "Str1";
-		tCompare(logger.getLineBuffer(), "Str1");
-		tCompare(logger.getTotalBuffer(), "");
+		T_COMPARE(logger.getLineBuffer(), "Str1");
+		T_COMPARE(logger.getTotalBuffer(), "");
 		logger << LoggerFlush();
-		tCompare(logger.getLineBuffer(), "");
-		tCompare(logger.getTotalBuffer(), "Str1");
+		T_COMPARE(logger.getLineBuffer(), "");
+		T_COMPARE(logger.getTotalBuffer(), "Str1");
 		logger << "Str2";
-		tCompare(logger.getLineBuffer(), "Str2");
-		tCompare(logger.getTotalBuffer(), "Str1");
+		T_COMPARE(logger.getLineBuffer(), "Str2");
+		T_COMPARE(logger.getTotalBuffer(), "Str1");
 		logger << LoggerFlush();
-		tCompare(logger.getLineBuffer(), "");
-		tCompare(logger.getTotalBuffer(), "Str1Str2");
+		T_COMPARE(logger.getLineBuffer(), "");
+		T_COMPARE(logger.getTotalBuffer(), "Str1Str2");
 		logger << "\n";
 		logger << "Str3\n";
-		tCompare(logger.getTotalBuffer(), "Str1Str2\nStr3\n");
+		T_COMPARE(logger.getTotalBuffer(), "Str1Str2\nStr3\n");
 	});
 	test::Test* onlinewrite_test = list->addTest("onlinewrite", { logger_flush_test }, [&](test::Test& test) {
 		Logger logger(true);
@@ -74,15 +74,15 @@ void LoggerTests::createLoggerList(test::TestList* list) {
 			str = line;
 		};
 		logger << "Line1\n";
-		tCompare(str, "Line1");
+		T_COMPARE(str, "Line1");
 		logger << "Str1";
-		tCompare(str, "Line1");
+		T_COMPARE(str, "Line1");
 		logger << LoggerFlush();
-		tCompare(str, "Str1");
+		T_COMPARE(str, "Str1");
 		logger << "Str2";
-		tCompare(str, "Str1");
+		T_COMPARE(str, "Str1");
 		logger << "\n";
-		tCompare(str, "Str2");
+		T_COMPARE(str, "Str2");
 	});
 }
 
@@ -91,14 +91,14 @@ void LoggerTests::createTagsList(test::TestList* list) {
 		Logger logger(true);
 		LoggerTag tag1(logger, "tag1");
 		logger << "tag1\n";
-		tCompare(logger.getTotalBuffer(), "tag1\n");
+		T_COMPARE(logger.getTotalBuffer(), "tag1\n");
 	});
 	test::Test* deactivate_test = list->addTest("deactivate", { tag_test }, [&](test::Test& test) {
 		Logger logger(true);
 		LoggerDeactivate deact(logger);
 		LoggerTag tag1(logger, "tag1");
 		logger << "tag1\n";
-		tCompare(logger.getTotalBuffer(), "");
+		T_COMPARE(logger.getTotalBuffer(), "");
 	});
 	test::Test* enable_tag_test = list->addTest("enable_tag", { deactivate_test }, [&](test::Test& test) {
 		Logger logger(true);
@@ -114,7 +114,7 @@ void LoggerTests::createTagsList(test::TestList* list) {
 			LoggerTag tag2(logger, "tag2");
 			logger << "tag2\n";
 		}
-		tCompare(logger.getTotalBuffer(), "tag1\n");
+		T_COMPARE(logger.getTotalBuffer(), "tag1\n");
 	});
 	test::Test* disable_tag_test = list->addTest("disable_tag", { tag_test }, [&](test::Test& test) {
 		Logger logger(true);
@@ -129,7 +129,7 @@ void LoggerTests::createTagsList(test::TestList* list) {
 			LoggerTag tag2(logger, "tag2");
 			logger << "tag2\n";
 		}
-		tCompare(logger.getTotalBuffer(), "tag1\n");
+		T_COMPARE(logger.getTotalBuffer(), "tag1\n");
 	});
 
 	std::vector<test::Test*> tag_tests = list->getTestList();
@@ -144,7 +144,7 @@ void LoggerTests::createTagsList(test::TestList* list) {
 			logger << "tag2\n";
 		}
 		logger << "tag1 second\n";
-		tCompare(logger.getTotalBuffer(), "tag2\n");
+		T_COMPARE(logger.getTotalBuffer(), "tag2\n");
 	});
 	test::Test* nested_tags_1_test = list->addTest("nested_tags_1", { tag_tests }, [&](test::Test& test) {
 		Logger logger(true);
@@ -163,7 +163,7 @@ void LoggerTests::createTagsList(test::TestList* list) {
 				}
 			}
 		}
-		tCompare(logger.getTotalBuffer(), "tag1\ntag3\n");
+		T_COMPARE(logger.getTotalBuffer(), "tag1\ntag3\n");
 	});
 	test::Test* reenable_tag_1_test = list->addTest("reenable_tag_1", { tag_tests }, [&](test::Test& test) {
 		Logger logger(true);
@@ -180,7 +180,7 @@ void LoggerTests::createTagsList(test::TestList* list) {
 				logger << "tag2 second\n";
 			}
 		}
-		tCompare(logger.getTotalBuffer(), "tag1\ntag2 second\n");
+		T_COMPARE(logger.getTotalBuffer(), "tag1\ntag2 second\n");
 	});
 	test::Test* disable_after_tag_test = list->addTest("disable_after_tag", { tag_tests }, [&](test::Test& test) {
 		Logger logger(true);
@@ -195,7 +195,7 @@ void LoggerTests::createTagsList(test::TestList* list) {
 			}
 			logger << "tag1 third\n";
 		}
-		tCompare(logger.getTotalBuffer(), "tag1 first\ntag2\n");
+		T_COMPARE(logger.getTotalBuffer(), "tag1 first\ntag2\n");
 	});
 	test::Test* reenable_tag_2_test = list->addTest("reenable_tag_2", { tag_tests }, [&](test::Test& test) {
 		Logger logger(true);
@@ -217,7 +217,7 @@ void LoggerTests::createTagsList(test::TestList* list) {
 				logger << "tag1 second\n";
 			}
 		}
-		tCompare(logger.getTotalBuffer(), "tag1 first\ntag1 second\n");
+		T_COMPARE(logger.getTotalBuffer(), "tag1 first\ntag1 second\n");
 	});
 	test::Test* nested_tags_2_test = list->addTest("nested_tags_2", { tag_tests }, [&](test::Test& test) {
 		Logger logger(true);
@@ -249,7 +249,7 @@ void LoggerTests::createTagsList(test::TestList* list) {
 			logger << "tag2 4\n";
 		}
 		logger << "tag1 third\n";
-		tCompare(logger.getTotalBuffer(),
+		T_COMPARE(logger.getTotalBuffer(),
 			"tag1 first\n"
 			"tag3 1\n"
 			"tag4 1\n"
