@@ -1128,44 +1128,44 @@ void WidgetTests::createWidgetsList() {
             auto get_char_pos = [&](size_t index) {
                 return fw::to2i(textbox_widget->getGlobalCharPos(index));
             };
+            auto move_to_char = [&](size_t index) {
+                application.mouseMove(get_char_pos(index));
+                application.advance();
+            };
+            auto drag_from_char = [&](size_t index) {
+                application.mouseMove(get_char_pos(index));
+                application.mouseLeftPress();
+                application.advance();
+            };
+            auto mouse_release = [&]() {
+                application.mouseLeftRelease();
+                application.advance();
+            };
             T_ASSERT(T_CHECK(!textbox_widget->isEditMode()));
-            application.mouseMove(get_char_pos(1));
-            application.mouseLeftPress();
-            application.advance();
+            drag_from_char(1);
             T_ASSERT(T_CHECK(textbox_widget->isEditMode()));
             CHECK_SELECTION(true, "Text", 4, 0, 4);
-            application.mouseMove(get_char_pos(2));
-            application.advance();
+            move_to_char(2);
             CHECK_SELECTION(true, "e", 2, 1, 2);
-            application.mouseMove(get_char_pos(3));
-            application.advance();
+            move_to_char(3);
             CHECK_SELECTION(true, "ex", 3, 1, 3);
-            application.mouseLeftRelease();
-            application.advance();
+            mouse_release();
             CHECK_SELECTION(true, "ex", 3, 1, 3);
 
             T_ASSERT_NO_ERRORS();
-            application.mouseMove(get_char_pos(0));
-            application.mouseLeftPress();
-            application.advance();
+            drag_from_char(0);
             CHECK_SELECTION(false, "", 0, -1, -1);
-            application.mouseMove(get_char_pos(4));
-            application.advance();
+            move_to_char(4);
             CHECK_SELECTION(true, "Text", 4, 0, 4);
-            application.mouseLeftRelease();
-            application.advance();
+            mouse_release();
             CHECK_SELECTION(true, "Text", 4, 0, 4);
 
             T_ASSERT_NO_ERRORS();
-            application.mouseMove(get_char_pos(4));
-            application.mouseLeftPress();
-            application.advance();
+            drag_from_char(4);
             CHECK_SELECTION(false, "", 4, -1, -1);
-            application.mouseMove(get_char_pos(0));
-            application.advance();
+            move_to_char(0);
             CHECK_SELECTION(true, "Text", 0, 0, 4);
-            application.mouseLeftRelease();
-            application.advance();
+            mouse_release();
             CHECK_SELECTION(true, "Text", 0, 0, 4);
         }
     );
