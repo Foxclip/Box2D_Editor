@@ -76,6 +76,10 @@ namespace fw {
 		return editor_fail_background_color;
 	}
 
+	const TextWidget* TextBoxWidget::getTextWidget() const {
+		return text_widget;
+	}
+
 	const sf::Font* TextBoxWidget::getFont() const {
 		return text_widget->getFont();
 	}
@@ -141,6 +145,12 @@ namespace fw {
 
 	sf::Vector2f TextBoxWidget::getGlobalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
 		return text_widget->getGlobalCharPos(index, top_aligned, with_kerning);
+	}
+
+	const sf::Glyph& TextBoxWidget::getGlyph(size_t index) const {
+		sf::Uint32 code = getValue()[index];
+		const sf::Glyph& glyph = text_widget->getFont()->getGlyph(code, getCharacterSize(), false);
+		return glyph;
 	}
 
 	ptrdiff_t TextBoxWidget::getSelectionLeft() const {
@@ -712,8 +722,8 @@ namespace fw {
 			return getStringSize();
 		} else {
 			size_t char_right = char_left + 1;
-			sf::Vector2f pos_left = getGlobalCharPos(char_left, true, true);
-			sf::Vector2f pos_right = getGlobalCharPos(char_right, true, true);
+			sf::Vector2f pos_left = getGlobalCharPos(char_left);
+			sf::Vector2f pos_right = getGlobalCharPos(char_right);
 			float dist_left = abs(pos.x - pos_left.x);
 			float dist_right = abs(pos.x - pos_right.x);
 			sf::Vector2f cursor_visual_pos;

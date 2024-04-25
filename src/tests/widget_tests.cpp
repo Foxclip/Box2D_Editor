@@ -28,12 +28,15 @@
     application.keyRelease(sf::Keyboard::LControl); \
     application.advance();
 
-#define CHECK_SELECTION(active, text, cursor_pos, left, right) \
+#define _CHECK_SELECTION(active, text, cursor_pos, left, right) \
     T_CHECK(textbox_widget->isSelectionActive() == active); \
     T_COMPARE(textbox_widget->getSelectedText(), text); \
     T_COMPARE(textbox_widget->getCursorPos(), cursor_pos); \
     T_COMPARE(textbox_widget->getSelectionLeft(), left); \
     T_COMPARE(textbox_widget->getSelectionRight(), right); \
+
+#define CHECK_SELECTION(active, text, cursor_pos, left, right) \
+    T_WRAP_CONTAINER(_CHECK_SELECTION(active, text, cursor_pos, left, right))
 
 #define INIT_TEXTBOX() \
     fw::Application application; \
@@ -47,7 +50,7 @@
     font.loadFromFile("fonts/verdana.ttf"); \
     textbox_widget->setFont(font); \
     sf::Vector2f position(100.0f, 100.0f); \
-    sf::Vector2f size(40.0f, 20.0f); \
+    sf::Vector2f size(80.0f, 20.0f); \
     std::string value = "Text"; \
     textbox_widget->setPosition(position); \
     textbox_widget->setSize(size); \
@@ -1038,7 +1041,6 @@ void WidgetTests::createWidgetsList() {
             CHECK_SELECTION(false, "", 0, -1, -1);
 
             T_ASSERT_NO_ERRORS();
-
             SELECT_ALL();
             CHECK_SELECTION(true, "Text", 4, 0, 4);
             TAP_KEY(sf::Keyboard::Right);
@@ -1053,7 +1055,6 @@ void WidgetTests::createWidgetsList() {
             CHECK_SELECTION(false, "", 4, -1, -1);
 
             T_ASSERT_NO_ERRORS();
-
             TAP_KEY(sf::Keyboard::Home);
             PRESS_KEY(sf::Keyboard::LShift);
             TAP_KEY(sf::Keyboard::Right);
@@ -1072,7 +1073,6 @@ void WidgetTests::createWidgetsList() {
             CHECK_SELECTION(false, "", 0, -1, -1);
 
             T_ASSERT_NO_ERRORS();
-
             TAP_KEY(sf::Keyboard::Right);
             TAP_KEY(sf::Keyboard::Right);
             TAP_KEY(sf::Keyboard::Right);
@@ -1088,7 +1088,6 @@ void WidgetTests::createWidgetsList() {
             CHECK_SELECTION(false, "", 3, -1, -1);
 
             T_ASSERT_NO_ERRORS();
-
             TAP_KEY(sf::Keyboard::Home);
             TAP_KEY(sf::Keyboard::Right);
             PRESS_KEY(sf::Keyboard::LShift);
@@ -1098,6 +1097,34 @@ void WidgetTests::createWidgetsList() {
             CHECK_SELECTION(true, "ex", 3, 1, 3);
             SELECT_ALL();
             CHECK_SELECTION(true, "Text", 4, 0, 4);
+        }
+    );
+    test::Test* textbox_widget_mouse_click_test = list->addTest(
+        "textbox_widget_mouse_click",
+        {
+            textbox_widget_cursor_test
+        },
+        [&](test::Test& test) {
+            INIT_TEXTBOX();
+
+            auto click_at_char = [&](size_t index) {
+                T_ASSERT_NO_ERRORS();
+                SELECT_ALL();
+                CHECK_SELECTION(true, "Text", 4, 0, 4);
+                CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCharPos(index)));
+                T_CHECK(textbox_widget->isFocused());
+                CHECK_SELECTION(false, "", index, -1, -1);
+            };
+            T_WRAP_CONTAINER(click_at_char(0));
+            T_WRAP_CONTAINER(click_at_char(1));
+            T_WRAP_CONTAINER(click_at_char(2));
+            T_WRAP_CONTAINER(click_at_char(3));
+            T_WRAP_CONTAINER(click_at_char(4));
+
+            T_ASSERT_NO_ERRORS();
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalTopRight() + sf::Vector2f(10.0f, 0.0f)));
+            CHECK_SELECTION(false, "", 0, -1, -1);
+            T_CHECK(!textbox_widget->isFocused());
         }
     );
 }

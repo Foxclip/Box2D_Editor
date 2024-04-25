@@ -32,6 +32,7 @@ namespace fw {
 		const sf::Color& getSelectionColor() const;
 		const sf::Color& getFailFillColor() const;
 		const sf::Color& getEditFailFillColor() const;
+		const TextWidget* getTextWidget() const;
 		const sf::Font* getFont() const;
 		unsigned int getCharacterSize() const;
 		const sf::String& getValue() const;
@@ -42,8 +43,9 @@ namespace fw {
 		size_t getCursorPos() const;
 		bool isEditMode() const;
 		bool isSelectionActive() const;
-		sf::Vector2f getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const;
-		sf::Vector2f getGlobalCharPos(size_t index, bool top_aligned, bool with_kerning) const;
+		sf::Vector2f getLocalCharPos(size_t index, bool top_aligned = true, bool with_kerning = true) const;
+		sf::Vector2f getGlobalCharPos(size_t index, bool top_aligned = true, bool with_kerning = true) const;
+		const sf::Glyph& getGlyph(size_t index) const;
 		ptrdiff_t getSelectionLeft() const;
 		ptrdiff_t getSelectionRight() const;
 		void setFillColor(const sf::Color& color) override;

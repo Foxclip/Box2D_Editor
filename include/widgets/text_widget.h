@@ -23,9 +23,9 @@ namespace fw {
 		const sf::Color& getFillColor() const override;
 		const sf::String& getString() const;
 		float getKerning(size_t index) const;
-		sf::Vector2f getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const;
-		sf::Vector2f getParentLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const;
-		sf::Vector2f getGlobalCharPos(size_t index, bool top_aligned, bool with_kerning) const;
+		sf::Vector2f getLocalCharPos(size_t index, bool top_aligned = true, bool with_kerning = true) const;
+		sf::Vector2f getParentLocalCharPos(size_t index, bool top_aligned = true, bool with_kerning = true) const;
+		sf::Vector2f getGlobalCharPos(size_t index, bool top_aligned = true, bool with_kerning = true) const;
 		size_t getCharAt(const sf::Vector2f& pos) const;
 		void setFont(const sf::Font& font);
 		void setCharacterSize(unsigned int size);

@@ -78,7 +78,7 @@ namespace fw {
 	}
 
 	float TextWidget::getKerning(size_t index) const {
-		if (index == 0) {
+		if (index == 0 || index > getStringSize()) {
 			return 0.0f;
 		}
 		sf::Uint32 left_char = getString()[index - 1];
