@@ -1,6 +1,40 @@
 #include "tests/widget_tests.h"
 #include <utils.h>
 
+#define CLICK_MOUSE(pos) \
+    application.mouseMove(pos); \
+    application.mouseLeftPress(); \
+    application.advance(); \
+    application.mouseLeftRelease(); \
+    application.advance();
+
+#define PRESS_KEY(key) \
+    application.keyPress(key); \
+    application.advance();
+
+#define RELEASE_KEY(key) \
+    application.keyRelease(key); \
+    application.advance();
+
+#define TAP_KEY(key) \
+    PRESS_KEY(key) \
+    RELEASE_KEY(key)
+
+#define SELECT_ALL() \
+    application.keyPress(sf::Keyboard::LControl); \
+    application.keyPress(sf::Keyboard::A); \
+    application.advance(); \
+    application.keyRelease(sf::Keyboard::A); \
+    application.keyRelease(sf::Keyboard::LControl); \
+    application.advance();
+
+#define CHECK_SELECTION(active, text, cursor_pos, left, right) \
+    tCheck(textbox_widget->isSelectionActive() == active); \
+    tCompare(textbox_widget->getSelectedText(), text); \
+    tCompare(textbox_widget->getCursorPos(), cursor_pos); \
+    tCompare(textbox_widget->getSelectionLeft(), left); \
+    tCompare(textbox_widget->getSelectionRight(), right); \
+
 WidgetTests::WidgetTests(test::TestManager& manager) : TestModule("Widgets", manager) { }
 
 void WidgetTests::createTestLists() {
@@ -976,12 +1010,6 @@ void WidgetTests::createWidgetsList() {
             textbox_widget->setPosition(position);
             textbox_widget->setSize(size);
             textbox_widget->setValue(value);
-            auto check_selection = [&]() {
-                tCheck(!textbox_widget->isSelectionActive());
-                tCompare(textbox_widget->getSelectedText(), "");
-                tCompare(textbox_widget->getSelectionLeft(), -1);
-                tCompare(textbox_widget->getSelectionRight(), -1);
-            };
             application.advance();
             application.mouseMove(fw::to2i(textbox_widget->getGlobalCenter()));
             application.mouseLeftPress();
@@ -994,13 +1022,11 @@ void WidgetTests::createWidgetsList() {
             application.keyPress(sf::Keyboard::Left);
             application.advance();
             tCompare(textbox_widget->getValue(), "");
-            tCompare(textbox_widget->getCursorPos(), 0);
-            tWrapContainer(check_selection());
+            CHECK_SELECTION(false, "", 0, -1, -1);
             application.keyPress(sf::Keyboard::Right);
             application.advance();
             tCompare(textbox_widget->getValue(), "");
-            tCompare(textbox_widget->getCursorPos(), 0);
-            tWrapContainer(check_selection());
+            CHECK_SELECTION(false, "", 0, -1, -1);
             application.keyPress(sf::Keyboard::A);
             application.textEntered('a');
             application.advance();
@@ -1014,14 +1040,12 @@ void WidgetTests::createWidgetsList() {
             application.textEntered('d');
             application.advance();
             tCompare(textbox_widget->getValue(), "abcd");
-            tCompare(textbox_widget->getCursorPos(), 4);
-            tWrapContainer(check_selection());
+            CHECK_SELECTION(false, "", 4, -1, -1);
             auto move_cursor = [&](sf::Keyboard::Key key, size_t pos) {
                 application.keyPress(key);
                 application.advance();
                 tCompare(textbox_widget->getValue(), "abcd");
-                tCompare(textbox_widget->getCursorPos(), pos);
-                tWrapContainer(check_selection());
+                CHECK_SELECTION(false, "", pos, -1, -1);
             };
             tWrapContainer(move_cursor(sf::Keyboard::Right, 4));
             tWrapContainer(move_cursor(sf::Keyboard::Right, 4));
@@ -1066,106 +1090,72 @@ void WidgetTests::createWidgetsList() {
             textbox_widget->setSize(size);
             textbox_widget->setValue(value);
             application.advance();
-            auto click_mouse = [&](const sf::Vector2i& pos) {
-                application.mouseMove(pos);
-                application.mouseLeftPress();
-                application.advance();
-                application.mouseLeftRelease();
-                application.advance();
-            };
-            auto press_key = [&](sf::Keyboard::Key key) {
-                application.keyPress(key);
-                application.advance();
-            };
-            auto release_key = [&](sf::Keyboard::Key key) {
-                application.keyRelease(key);
-                application.advance();
-            };
-            auto tap_key = [&](sf::Keyboard::Key key) {
-                press_key(key);
-                release_key(key);
-            };
-            auto check_selection = [&](bool active, const std::string& text, size_t cursor_pos, ptrdiff_t left, ptrdiff_t right) {
-                tCheck(textbox_widget->isSelectionActive() == active);
-                tCompare(textbox_widget->getSelectedText(), text);
-                tCompare(textbox_widget->getCursorPos(), cursor_pos);
-                tCompare(textbox_widget->getSelectionLeft(), left);
-                tCompare(textbox_widget->getSelectionRight(), right);
-            };
-            auto select_all = [&]() {
-                application.keyPress(sf::Keyboard::LControl);
-                application.keyPress(sf::Keyboard::A);
-                application.advance();
-                application.keyRelease(sf::Keyboard::A);
-                application.keyRelease(sf::Keyboard::LControl);
-                application.advance();
-            };
-            click_mouse(fw::to2i(textbox_widget->getGlobalCenter()));
-            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
-            tap_key(sf::Keyboard::Left);
-            tWrapContainer(check_selection(false, "", 0, -1, -1));
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            TAP_KEY(sf::Keyboard::Left);
+            CHECK_SELECTION(false, "", 0, -1, -1);
 
             tAssertNoErrors();
 
-            select_all();
-            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
-            tap_key(sf::Keyboard::Right);
-            tWrapContainer(check_selection(false, "", 4, -1, -1));
-            select_all();
-            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
-            tap_key(sf::Keyboard::Home);
-            tWrapContainer(check_selection(false, "", 0, -1, -1));
-            select_all();
-            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
-            tap_key(sf::Keyboard::End);
-            tWrapContainer(check_selection(false, "", 4, -1, -1));
+            SELECT_ALL();
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            TAP_KEY(sf::Keyboard::Right);
+            CHECK_SELECTION(false, "", 4, -1, -1);
+            SELECT_ALL();
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            TAP_KEY(sf::Keyboard::Home);
+            CHECK_SELECTION(false, "", 0, -1, -1);
+            SELECT_ALL();
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            TAP_KEY(sf::Keyboard::End);
+            CHECK_SELECTION(false, "", 4, -1, -1);
 
             tAssertNoErrors();
 
-            tap_key(sf::Keyboard::Home);
-            press_key(sf::Keyboard::LShift);
-            tap_key(sf::Keyboard::Right);
-            tWrapContainer(check_selection(true, "T", 1, 0, 1));
-            tap_key(sf::Keyboard::Right);
-            tWrapContainer(check_selection(true, "Te", 2, 0, 2));
-            tap_key(sf::Keyboard::Right);
-            tWrapContainer(check_selection(true, "Tex", 3, 0, 3));
-            tap_key(sf::Keyboard::Right);
-            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
-            tap_key(sf::Keyboard::Right);
-            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
-            release_key(sf::Keyboard::LShift);
-            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
-            tap_key(sf::Keyboard::Left);
-            tWrapContainer(check_selection(false, "", 0, -1, -1));
+            TAP_KEY(sf::Keyboard::Home);
+            PRESS_KEY(sf::Keyboard::LShift);
+            TAP_KEY(sf::Keyboard::Right);
+            CHECK_SELECTION(true, "T", 1, 0, 1);
+            TAP_KEY(sf::Keyboard::Right);
+            CHECK_SELECTION(true, "Te", 2, 0, 2);
+            TAP_KEY(sf::Keyboard::Right);
+            CHECK_SELECTION(true, "Tex", 3, 0, 3);
+            TAP_KEY(sf::Keyboard::Right);
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            TAP_KEY(sf::Keyboard::Right);
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            RELEASE_KEY(sf::Keyboard::LShift);
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            TAP_KEY(sf::Keyboard::Left);
+            CHECK_SELECTION(false, "", 0, -1, -1);
 
             tAssertNoErrors();
 
-            tap_key(sf::Keyboard::Right);
-            tap_key(sf::Keyboard::Right);
-            tap_key(sf::Keyboard::Right);
-            press_key(sf::Keyboard::LShift);
-            tap_key(sf::Keyboard::Left);
-            tWrapContainer(check_selection(true, "x", 2, 2, 3));
-            tap_key(sf::Keyboard::Left);
-            tWrapContainer(check_selection(true, "ex", 1, 1, 3));
-            tap_key(sf::Keyboard::Left);
-            tWrapContainer(check_selection(true, "Tex", 0, 0, 3));
-            release_key(sf::Keyboard::LShift);
-            tap_key(sf::Keyboard::Right);
-            tWrapContainer(check_selection(false, "", 3, -1, -1));
+            TAP_KEY(sf::Keyboard::Right);
+            TAP_KEY(sf::Keyboard::Right);
+            TAP_KEY(sf::Keyboard::Right);
+            PRESS_KEY(sf::Keyboard::LShift);
+            TAP_KEY(sf::Keyboard::Left);
+            CHECK_SELECTION(true, "x", 2, 2, 3);
+            TAP_KEY(sf::Keyboard::Left);
+            CHECK_SELECTION(true, "ex", 1, 1, 3);
+            TAP_KEY(sf::Keyboard::Left);
+            CHECK_SELECTION(true, "Tex", 0, 0, 3);
+            RELEASE_KEY(sf::Keyboard::LShift);
+            TAP_KEY(sf::Keyboard::Right);
+            CHECK_SELECTION(false, "", 3, -1, -1);
 
             tAssertNoErrors();
 
-            tap_key(sf::Keyboard::Home);
-            tap_key(sf::Keyboard::Right);
-            press_key(sf::Keyboard::LShift);
-            tap_key(sf::Keyboard::Right);
-            tap_key(sf::Keyboard::Right);
-            release_key(sf::Keyboard::LShift);
-            tWrapContainer(check_selection(true, "ex", 3, 1, 3));
-            select_all();
-            tWrapContainer(check_selection(true, "Text", 4, 0, 4));
+            TAP_KEY(sf::Keyboard::Home);
+            TAP_KEY(sf::Keyboard::Right);
+            PRESS_KEY(sf::Keyboard::LShift);
+            TAP_KEY(sf::Keyboard::Right);
+            TAP_KEY(sf::Keyboard::Right);
+            RELEASE_KEY(sf::Keyboard::LShift);
+            CHECK_SELECTION(true, "ex", 3, 1, 3);
+            SELECT_ALL();
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
         }
     );
 }
