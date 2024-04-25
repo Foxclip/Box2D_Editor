@@ -56,7 +56,6 @@
     textbox_widget->setSize(size); \
     textbox_widget->setValue(value); \
     application.advance(); \
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
 WidgetTests::WidgetTests(test::TestManager& manager) : TestModule("Widgets", manager) { }
 
@@ -935,6 +934,8 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             INIT_TEXTBOX();
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+
             T_CHECK(textbox_widget->isFocused());
             T_CHECK(application.getWidgets().getFocusedWidget() == textbox_widget);
             T_CHECK(textbox_widget->isEditMode());
@@ -977,6 +978,8 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             INIT_TEXTBOX();
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+
             application.keyPress(sf::Keyboard::BackSpace);
             application.textEntered('\b');
             application.advance();
@@ -1035,6 +1038,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             INIT_TEXTBOX();
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
             CHECK_SELECTION(true, "Text", 4, 0, 4);
             TAP_KEY(sf::Keyboard::Left);
@@ -1106,6 +1110,7 @@ void WidgetTests::createWidgetsList() {
         },
         [&](test::Test& test) {
             INIT_TEXTBOX();
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
             auto click_at_char = [&](size_t index) {
                 T_ASSERT_NO_ERRORS();
@@ -1125,6 +1130,58 @@ void WidgetTests::createWidgetsList() {
             CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalTopRight() + sf::Vector2f(10.0f, 0.0f)));
             CHECK_SELECTION(false, "", 0, -1, -1);
             T_CHECK(!textbox_widget->isFocused());
+        }
+    );
+    test::Test* textbox_widget_mouse_drag_test = list->addTest(
+        "textbox_widget_mouse_drag",
+        {
+            textbox_widget_mouse_click_test
+        },
+        [&](test::Test& test) {
+            INIT_TEXTBOX();
+
+            auto get_char_pos = [&](size_t index) {
+                return fw::to2i(textbox_widget->getGlobalCharPos(index));
+            };
+            T_ASSERT(T_CHECK(!textbox_widget->isEditMode()));
+            application.mouseMove(get_char_pos(1));
+            application.mouseLeftPress();
+            application.advance();
+            T_ASSERT(T_CHECK(textbox_widget->isEditMode()));
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            application.mouseMove(get_char_pos(2));
+            application.advance();
+            CHECK_SELECTION(true, "e", 2, 1, 2);
+            application.mouseMove(get_char_pos(3));
+            application.advance();
+            CHECK_SELECTION(true, "ex", 3, 1, 3);
+            application.mouseLeftRelease();
+            application.advance();
+            CHECK_SELECTION(true, "ex", 3, 1, 3);
+
+            T_ASSERT_NO_ERRORS();
+            application.mouseMove(get_char_pos(0));
+            application.mouseLeftPress();
+            application.advance();
+            CHECK_SELECTION(false, "", 0, -1, -1);
+            application.mouseMove(get_char_pos(4));
+            application.advance();
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            application.mouseLeftRelease();
+            application.advance();
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+
+            T_ASSERT_NO_ERRORS();
+            application.mouseMove(get_char_pos(4));
+            application.mouseLeftPress();
+            application.advance();
+            CHECK_SELECTION(false, "", 4, -1, -1);
+            application.mouseMove(get_char_pos(0));
+            application.advance();
+            CHECK_SELECTION(true, "Text", 0, 0, 4);
+            application.mouseLeftRelease();
+            application.advance();
+            CHECK_SELECTION(true, "Text", 0, 0, 4);
         }
     );
 }
