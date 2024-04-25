@@ -35,6 +35,26 @@
     T_COMPARE(textbox_widget->getSelectionLeft(), left); \
     T_COMPARE(textbox_widget->getSelectionRight(), right); \
 
+#define INIT_TEXTBOX() \
+    fw::Application application; \
+    application.init("Test window", 800, 600, 0, false); \
+    application.start(true); \
+    application.mouseMove(400, 300); \
+    application.advance(); \
+    fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>(); \
+    textbox_widget->setCharacterSize(20); \
+    sf::Font font; \
+    font.loadFromFile("fonts/verdana.ttf"); \
+    textbox_widget->setFont(font); \
+    sf::Vector2f position(100.0f, 100.0f); \
+    sf::Vector2f size(40.0f, 20.0f); \
+    std::string value = "Text"; \
+    textbox_widget->setPosition(position); \
+    textbox_widget->setSize(size); \
+    textbox_widget->setValue(value); \
+    application.advance(); \
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+
 WidgetTests::WidgetTests(test::TestManager& manager) : TestModule("Widgets", manager) { }
 
 void WidgetTests::createTestLists() {
@@ -911,26 +931,7 @@ void WidgetTests::createWidgetsList() {
             textbox_widget_basic_test
         },
         [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>();
-            textbox_widget->setCharacterSize(20);
-            sf::Font font;
-            font.loadFromFile("fonts/verdana.ttf");
-            textbox_widget->setFont(font);
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f size(40.0f, 20.0f);
-            std::string value = "Text";
-            textbox_widget->setPosition(position);
-            textbox_widget->setSize(size);
-            textbox_widget->setValue(value);
-            application.advance();
-            application.mouseMove(fw::to2i(textbox_widget->getGlobalCenter()));
-            application.mouseLeftPress();
-            application.advance();
+            INIT_TEXTBOX();
             T_CHECK(textbox_widget->isFocused());
             T_CHECK(application.getWidgets().getFocusedWidget() == textbox_widget);
             T_CHECK(textbox_widget->isEditMode());
@@ -941,8 +942,6 @@ void WidgetTests::createWidgetsList() {
             T_COMPARE(textbox_widget->getSelectedText(), value);
             T_COMPARE(textbox_widget->getSelectionLeft(), 0);
             T_COMPARE(textbox_widget->getSelectionRight(), value.size());
-            application.mouseLeftRelease();
-            application.advance();
             application.keyPress(sf::Keyboard::BackSpace);
             application.textEntered('\b');
             application.advance();
@@ -994,28 +993,7 @@ void WidgetTests::createWidgetsList() {
             textbox_widget_basic_test
         },
         [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>();
-            textbox_widget->setCharacterSize(20);
-            sf::Font font;
-            font.loadFromFile("fonts/verdana.ttf");
-            textbox_widget->setFont(font);
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f size(40.0f, 20.0f);
-            std::string value = "Text";
-            textbox_widget->setPosition(position);
-            textbox_widget->setSize(size);
-            textbox_widget->setValue(value);
-            application.advance();
-            application.mouseMove(fw::to2i(textbox_widget->getGlobalCenter()));
-            application.mouseLeftPress();
-            application.advance();
-            application.mouseLeftRelease();
-            application.advance();
+            INIT_TEXTBOX();
             application.keyPress(sf::Keyboard::BackSpace);
             application.textEntered('\b');
             application.advance();
@@ -1073,24 +1051,8 @@ void WidgetTests::createWidgetsList() {
             textbox_widget_cursor_test
         },
         [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>();
-            textbox_widget->setCharacterSize(20);
-            sf::Font font;
-            font.loadFromFile("fonts/verdana.ttf");
-            textbox_widget->setFont(font);
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f size(40.0f, 20.0f);
-            std::string value = "Text";
-            textbox_widget->setPosition(position);
-            textbox_widget->setSize(size);
-            textbox_widget->setValue(value);
-            application.advance();
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+            INIT_TEXTBOX();
+
             CHECK_SELECTION(true, "Text", 4, 0, 4);
             TAP_KEY(sf::Keyboard::Left);
             CHECK_SELECTION(false, "", 0, -1, -1);
