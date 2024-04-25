@@ -20,6 +20,13 @@
     PRESS_KEY(key) \
     RELEASE_KEY(key)
 
+#define ENTER_TEXT(key, code) \
+    application.keyPress(key); \
+    application.textEntered(code); \
+    application.advance(); \
+    application.keyRelease(key); \
+    application.advance();
+
 #define SELECT_ALL() \
     application.keyPress(sf::Keyboard::LControl); \
     application.keyPress(sf::Keyboard::A); \
@@ -942,29 +949,19 @@ void WidgetTests::createWidgetsList() {
             T_COMPARE(textbox_widget->getValue(), value);
             T_CHECK(textbox_widget->isValidValue());
             CHECK_SELECTION(true, "Text", 4, 0, 4);
-            application.keyPress(sf::Keyboard::BackSpace);
-            application.textEntered('\b');
-            application.advance();
+            ENTER_TEXT(sf::Keyboard::BackSpace, '\b');
             T_COMPARE(textbox_widget->getValue(), "");
             CHECK_SELECTION(false, "", 0, -1, -1);
-            application.keyPress(sf::Keyboard::A);
-            application.textEntered('a');
-            application.advance();
+            ENTER_TEXT(sf::Keyboard::A, 'a');
             T_COMPARE(textbox_widget->getValue(), "a");
             CHECK_SELECTION(false, "", 1, -1, -1);
-            application.keyPress(sf::Keyboard::B);
-            application.textEntered('b');
-            application.advance();
+            ENTER_TEXT(sf::Keyboard::B, 'b');
             T_COMPARE(textbox_widget->getValue(), "ab");
             CHECK_SELECTION(false, "", 2, -1, -1);
-            application.keyPress(sf::Keyboard::C);
-            application.textEntered('c');
-            application.advance();
+            ENTER_TEXT(sf::Keyboard::C, 'c');
             T_COMPARE(textbox_widget->getValue(), "abc");
             CHECK_SELECTION(false, "", 3, -1, -1);
-            application.keyPress(sf::Keyboard::Enter);
-            application.textEntered('\n');
-            application.advance();
+            ENTER_TEXT(sf::Keyboard::Enter, '\n');
             T_CHECK(!textbox_widget->isEditMode());
             T_COMPARE(textbox_widget->getValue(), "abc");
             T_CHECK(textbox_widget->isFocused());
@@ -980,30 +977,18 @@ void WidgetTests::createWidgetsList() {
             INIT_TEXTBOX();
             CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
-            application.keyPress(sf::Keyboard::BackSpace);
-            application.textEntered('\b');
-            application.advance();
-            application.keyPress(sf::Keyboard::Left);
-            application.advance();
+            ENTER_TEXT(sf::Keyboard::BackSpace, '\b');
+            TAP_KEY(sf::Keyboard::Left);
             T_COMPARE(textbox_widget->getValue(), "");
             CHECK_SELECTION(false, "", 0, -1, -1);
-            application.keyPress(sf::Keyboard::Right);
-            application.advance();
+            TAP_KEY(sf::Keyboard::Right);
             T_COMPARE(textbox_widget->getValue(), "");
             CHECK_SELECTION(false, "", 0, -1, -1);
-            application.keyPress(sf::Keyboard::A);
-            application.textEntered('a');
-            application.advance();
-            application.keyPress(sf::Keyboard::B);
-            application.textEntered('b');
-            application.advance();
-            application.keyPress(sf::Keyboard::C);
-            application.textEntered('c');
-            application.advance();
-            application.keyPress(sf::Keyboard::D);
-            application.textEntered('d');
-            application.advance();
-            T_COMPARE(textbox_widget->getValue(), "abcd");
+            ENTER_TEXT(sf::Keyboard::A, 'a');
+            ENTER_TEXT(sf::Keyboard::B, 'b');
+            ENTER_TEXT(sf::Keyboard::C, 'c');
+            ENTER_TEXT(sf::Keyboard::D, 'd');
+            T_ASSERT(T_COMPARE(textbox_widget->getValue(), "abcd"));
             CHECK_SELECTION(false, "", 4, -1, -1);
             auto move_cursor = [&](sf::Keyboard::Key key, size_t pos) {
                 application.keyPress(key);
