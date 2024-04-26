@@ -484,7 +484,7 @@ namespace fw {
 				}
 			} else if (event.key.code == sf::Keyboard::C) {
 				if (ctrl_pressed) {
-					if (getStringSize() > 0) {
+					if (getSelectedText().getSize() > 0) {
 						if (!clip::set_text(getSelectedText())) {
 							throw std::runtime_error("Unable to copy text to clipboard");
 						}
@@ -507,7 +507,7 @@ namespace fw {
 				}
 			} else if (event.key.code == sf::Keyboard::X) {
 				if (ctrl_pressed) {
-					if (getStringSize() > 0) {
+					if (getSelectedText().getSize() > 0) {
 						if (!clip::set_text(getSelectedText())) {
 							throw std::runtime_error("Unable to copy text to clipboard");
 						}
