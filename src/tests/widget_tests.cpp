@@ -968,6 +968,52 @@ void WidgetTests::createWidgetsList() {
             T_CHECK(application.getWidgets().getFocusedWidget() == textbox_widget);
         }
     );
+    test::Test* textbox_widget_events_test = list->addTest(
+        "textbox_widget_events",
+        {
+            textbox_widget_input_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+            bool edit_mode = false;
+            sf::String value;
+            bool confirmed = false;
+            bool cancelled = false;
+            textbox_widget->OnEditModeToggle = [&](bool value) {
+                edit_mode = value;
+            };
+            textbox_widget->OnValueChanged = [&](const sf::String& new_value) {
+                value = new_value;
+            };
+            textbox_widget->OnConfirm = [&](const sf::String& value) {
+                confirmed = true;
+            };
+            textbox_widget->OnCancel = [&]() {
+                cancelled = true;
+            };
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+            T_CHECK(edit_mode);
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalTopRight() + sf::Vector2f(10.0f, 0.0f)));
+            T_CHECK(!edit_mode);
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+            T_CHECK(edit_mode);
+            ENTER_TEXT(sf::Keyboard::A, 'a');
+            T_COMPARE(value, "a");
+            ENTER_TEXT(sf::Keyboard::A, 'b');
+            T_COMPARE(value, "ab");
+            ENTER_TEXT(sf::Keyboard::A, 'c');
+            T_COMPARE(value, "abc");
+            ENTER_TEXT(sf::Keyboard::Enter, '\n');
+            T_CHECK(!edit_mode);
+            T_CHECK(confirmed);
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+            T_CHECK(edit_mode);
+            TAP_KEY(sf::Keyboard::Escape);
+            T_CHECK(!edit_mode);
+            T_CHECK(cancelled);
+        }
+    );
     test::Test* textbox_widget_cursor_test = list->addTest(
         "textbox_widget_cursor",
         {
