@@ -46,25 +46,25 @@ namespace fw {
 	}
 
 	bool parseLL(const std::string& str, long long& result) {
-		const char* start = str.c_str();
-		char* end;
-		result = std::strtoll(start, &end, 10);
-		if (end == start) {
-			result = 0;
+		if (str.size() == 0) {
 			return false;
 		}
-		return true;
+		const char* start = str.c_str();
+		const char* end = start + str.size();
+		char* pos;
+		result = std::strtoll(start, &pos, 10);
+		return pos == end;
 	}
 
 	bool parseFloat(const std::string& str, float& result) {
-		const char* start = str.c_str();
-		char* end;
-		result = std::strtof(start, &end);
-		if (end == start) {
-			result = 0.0f;
+		if (str.size() == 0) {
 			return false;
 		}
-		return true;
+		const char* start = str.c_str();
+		const char* end = start + str.size();
+		char* pos;
+		result = std::strtof(start, &pos);
+		return pos == end;
 	}
 
 	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point) {
