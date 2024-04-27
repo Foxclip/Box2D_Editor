@@ -1391,6 +1391,56 @@ void WidgetTests::createWidgetsList() {
             CHECK_SELECTION(false, "", 3, -1, -1);
         }
     );
+    test::Test* textbox_widget_integer_test = list->addTest(
+        "textbox_widget_integer",
+        {
+            textbox_widget_copypaste_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+
+            T_CHECK(textbox_widget->isValidValue());
+            textbox_widget->setType(fw::TextBoxWidget::TextBoxType::INTEGER);
+            T_CHECK(!textbox_widget->isValidValue());
+            SELECT_ALL();
+            CUT();
+            T_CHECK(!textbox_widget->isValidValue());
+            ENTER_TEXT(sf::Keyboard::Num1, '1');
+            ENTER_TEXT(sf::Keyboard::Num2, '2');
+            ENTER_TEXT(sf::Keyboard::Num3, '3');
+            ENTER_TEXT(sf::Keyboard::Num4, '4');
+            T_COMPARE(textbox_widget->getValue(), "1234");
+            T_CHECK(textbox_widget->isValidValue());
+            ENTER_TEXT(sf::Keyboard::E, 'e');
+            T_COMPARE(textbox_widget->getValue(), "1234");
+            T_CHECK(textbox_widget->isValidValue());
+            ENTER_TEXT(sf::Keyboard::Period, '.');
+            T_COMPARE(textbox_widget->getValue(), "1234");
+            T_CHECK(textbox_widget->isValidValue());
+            ENTER_TEXT(sf::Keyboard::Comma, ',');
+            T_COMPARE(textbox_widget->getValue(), "1234");
+            T_CHECK(textbox_widget->isValidValue());
+            ENTER_TEXT(sf::Keyboard::Dash, '-');
+            T_COMPARE(textbox_widget->getValue(), "1234-");
+            T_CHECK(textbox_widget->isValidValue());
+            ENTER_TEXT(sf::Keyboard::Num5, '5');
+            ENTER_TEXT(sf::Keyboard::Num6, '6');
+            ENTER_TEXT(sf::Keyboard::Num7, '7');
+            ENTER_TEXT(sf::Keyboard::Num8, '8');
+            ENTER_TEXT(sf::Keyboard::Num9, '9');
+            T_COMPARE(textbox_widget->getValue(), "1234-56789");
+            T_CHECK(textbox_widget->isValidValue());
+            TAP_KEY(sf::Keyboard::Home);
+            ENTER_TEXT(sf::Keyboard::Dash, '-');
+            T_COMPARE(textbox_widget->getValue(), "-1234-56789");
+            T_CHECK(textbox_widget->isValidValue());
+            ENTER_TEXT(sf::Keyboard::Num0, '0');
+            T_COMPARE(textbox_widget->getValue(), "-01234-56789");
+            T_CHECK(textbox_widget->isValidValue());
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
