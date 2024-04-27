@@ -44,6 +44,8 @@ int main() {
     run_tests();
     //execute_app();
 
+    // TODO: textbox float input test
+    // TODO: textbox events test
     // TODO: Widget tests
     // TODO: blinking textbox cursor
     // TODO: remove global.h

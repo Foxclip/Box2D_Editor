@@ -35,6 +35,21 @@
     application.keyRelease(sf::Keyboard::LControl); \
     application.advance();
 
+#define COPY() \
+    PRESS_KEY(sf::Keyboard::LControl); \
+    ENTER_TEXT(sf::Keyboard::C, 'c'); \
+    RELEASE_KEY(sf::Keyboard::LControl);
+
+#define PASTE() \
+    PRESS_KEY(sf::Keyboard::LControl); \
+    ENTER_TEXT(sf::Keyboard::V, 'v'); \
+    RELEASE_KEY(sf::Keyboard::LControl);
+
+#define CUT() \
+    PRESS_KEY(sf::Keyboard::LControl); \
+    ENTER_TEXT(sf::Keyboard::X, 'x'); \
+    RELEASE_KEY(sf::Keyboard::LControl);
+
 #define _CHECK_SELECTION(active, text, cursor_pos, left, right) \
     T_CHECK(textbox_widget->isSelectionActive() == active); \
     T_COMPARE(textbox_widget->getSelectedText(), text); \
@@ -1217,33 +1232,18 @@ void WidgetTests::createWidgetsList() {
             fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
             CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
-            auto copy = [&]() {
-                PRESS_KEY(sf::Keyboard::LControl);
-                ENTER_TEXT(sf::Keyboard::C, 'c');
-                RELEASE_KEY(sf::Keyboard::LControl);
-            };
-            auto paste = [&]() {
-                PRESS_KEY(sf::Keyboard::LControl);
-                ENTER_TEXT(sf::Keyboard::V, 'v');
-                RELEASE_KEY(sf::Keyboard::LControl);
-            };
-            auto cut = [&]() {
-                PRESS_KEY(sf::Keyboard::LControl);
-                ENTER_TEXT(sf::Keyboard::X, 'x');
-                RELEASE_KEY(sf::Keyboard::LControl);
-            };
-            copy();
+            COPY();
             T_COMPARE(textbox_widget->getValue(), "Text");
             ENTER_TEXT(sf::Keyboard::Backspace, '\b');
             T_COMPARE(textbox_widget->getValue(), "");
-            paste();
+            PASTE();
             T_COMPARE(textbox_widget->getValue(), "Text");
 
             T_ASSERT_NO_ERRORS();
             SELECT_ALL();
-            cut();
+            CUT();
             T_COMPARE(textbox_widget->getValue(), "");
-            paste();
+            PASTE();
             T_COMPARE(textbox_widget->getValue(), "Text");
 
             T_ASSERT_NO_ERRORS();
@@ -1253,10 +1253,10 @@ void WidgetTests::createWidgetsList() {
             TAP_KEY(sf::Keyboard::Right);
             TAP_KEY(sf::Keyboard::Right);
             RELEASE_KEY(sf::Keyboard::LShift);
-            copy();
+            COPY();
             T_COMPARE(textbox_widget->getValue(), "Text");
             TAP_KEY(sf::Keyboard::Home);
-            paste();
+            PASTE();
             T_COMPARE(textbox_widget->getValue(), "exText");
 
             T_ASSERT_NO_ERRORS();
@@ -1264,33 +1264,131 @@ void WidgetTests::createWidgetsList() {
             TAP_KEY(sf::Keyboard::Right);
             TAP_KEY(sf::Keyboard::Right);
             RELEASE_KEY(sf::Keyboard::LShift);
-            cut();
+            CUT();
             T_COMPARE(textbox_widget->getValue(), "exxt");
             TAP_KEY(sf::Keyboard::Left);
             PRESS_KEY(sf::Keyboard::LShift);
             TAP_KEY(sf::Keyboard::Right);
             TAP_KEY(sf::Keyboard::Right);
             RELEASE_KEY(sf::Keyboard::LShift);
-            paste();
+            PASTE();
             T_COMPARE(textbox_widget->getValue(), "eTet");
 
             T_ASSERT_NO_ERRORS();
-            copy();
-            paste();
+            COPY();
+            PASTE();
             T_COMPARE(textbox_widget->getValue(), "eTeTet");
-            cut();
-            paste();
+            CUT();
+            PASTE();
             T_COMPARE(textbox_widget->getValue(), "eTeTeTet");
 
             T_ASSERT_NO_ERRORS();
             SELECT_ALL();
-            cut();
-            copy();
-            paste();
+            CUT();
+            COPY();
+            PASTE();
             T_COMPARE(textbox_widget->getValue(), "eTeTeTet");
-            cut();
-            paste();
+            CUT();
+            PASTE();
             T_COMPARE(textbox_widget->getValue(), "eTeTeTeteTeTeTet");
+        }
+    );
+    test::Test* textbox_widget_history_test = list->addTest(
+        "textbox_widget_history",
+        {
+            textbox_widget_copypaste_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+
+            auto undo = [&]() {
+                PRESS_KEY(sf::Keyboard::LControl);
+                ENTER_TEXT(sf::Keyboard::Z, 'z');
+                RELEASE_KEY(sf::Keyboard::LControl);
+            };
+            auto redo = [&]() {
+                PRESS_KEY(sf::Keyboard::LControl);
+                PRESS_KEY(sf::Keyboard::LShift);
+                ENTER_TEXT(sf::Keyboard::Z, 'z');
+                RELEASE_KEY(sf::Keyboard::LShift);
+                RELEASE_KEY(sf::Keyboard::LControl);
+            };
+
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+            T_COMPARE(textbox_widget->getValue(), "");
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            redo();
+            T_COMPARE(textbox_widget->getValue(), "");
+
+            T_ASSERT_NO_ERRORS();
+            ENTER_TEXT(sf::Keyboard::A, 'a');
+            ENTER_TEXT(sf::Keyboard::B, 'b');
+            ENTER_TEXT(sf::Keyboard::C, 'c');
+            T_COMPARE(textbox_widget->getValue(), "abc");
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "");
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            CHECK_SELECTION(true, "Text", 4, 0, 4);
+            redo();
+            T_COMPARE(textbox_widget->getValue(), "");
+            redo();
+            T_COMPARE(textbox_widget->getValue(), "abc");
+            CHECK_SELECTION(false, "", 3, -1, -1);
+
+            T_ASSERT_NO_ERRORS();
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "");
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            TAP_KEY(sf::Keyboard::Left);
+            TAP_KEY(sf::Keyboard::Right);
+            TAP_KEY(sf::Keyboard::Right);
+            TAP_KEY(sf::Keyboard::Right);
+            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+            T_COMPARE(textbox_widget->getValue(), "Tt");
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            CHECK_SELECTION(false, "", 3, -1, -1);
+
+            T_ASSERT_NO_ERRORS();
+            PRESS_KEY(sf::Keyboard::LShift);
+            TAP_KEY(sf::Keyboard::Left);
+            TAP_KEY(sf::Keyboard::Left);
+            RELEASE_KEY(sf::Keyboard::LShift);
+            CUT();
+            T_COMPARE(textbox_widget->getValue(), "Tt");
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            CHECK_SELECTION(true, "ex", 1, 1, 3);
+
+            T_ASSERT_NO_ERRORS();
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            TAP_KEY(sf::Keyboard::Right);
+            PASTE();
+            T_COMPARE(textbox_widget->getValue(), "Texext");
+            PASTE();
+            T_COMPARE(textbox_widget->getValue(), "Texexext");
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "Texext");
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            undo();
+            T_COMPARE(textbox_widget->getValue(), "Text");
+            CHECK_SELECTION(false, "", 3, -1, -1);
         }
     );
 }
