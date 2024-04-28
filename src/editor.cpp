@@ -107,12 +107,9 @@ ChainObject* Editor::createChain(
 }
 
 void Editor::onInit() {
-    sf::ContextSettings cs_world;
-    world_texture.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_world);
     sf::ContextSettings cs_mask;
     selection_mask.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_mask);
     window_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
-    world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     if (!desat_shader.loadFromFile("shaders/desat.frag", sf::Shader::Fragment)) {
         throw std::runtime_error("Shader loading error");
     }
@@ -164,7 +161,8 @@ void Editor::onProcessWindowEvent(const sf::Event& event) {
         window.close();
     } else if (event.type == sf::Event::Resized) {
         sf::ContextSettings cs_world;
-        world_texture.create(event.size.width, event.size.height, cs_world);
+        world_widget->setSize((float)event.size.width, (float)event.size.height);
+        world_widget->setTextureSize(event.size.width, event.size.height);
         ui_widget->setSize((float)event.size.width, (float)event.size.height);
         ui_widget->setTextureSize(event.size.width, event.size.height);
         sf::ContextSettings cs_mask;
@@ -218,7 +216,13 @@ void Editor::initUi() {
 }
 
 void Editor::initWidgets() {
+    world_widget = widgets.createWidget<fw::CanvasWidget>();
+    world_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    world_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    world_widget->setName("world_canvas");
     ui_widget = widgets.createWidget<fw::CanvasWidget>();
+    ui_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    ui_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     ui_widget->setName("ui_canvas");
 
     toolbox_widget = widgets.createWidget<Toolbox>(*this);
@@ -704,34 +708,23 @@ void Editor::onRender() {
 }
 
 void Editor::renderWorld() {
-    world_texture.clear(sf::Color::Transparent);
-    world_view.setCenter(viewCenterX, viewCenterY);
-    world_view.setSize(world_texture.getSize().x / zoomFactor, -1.0f * world_texture.getSize().y / zoomFactor);
-    world_texture.setView(world_view);
-
-    selection_mask.clear();
-    selection_mask.setView(world_view);
-
+    world_widget->clear(sf::Color::Transparent);
+    world_widget->setViewCenter(viewCenterX, viewCenterY);
+    world_widget->setViewSize(world_widget->getSize().x / zoomFactor, -1.0f * world_widget->getSize().y / zoomFactor);
     for (size_t i = 0; i < simulation.getTopSize(); i++) {
         GameObject* gameobject = simulation.getFromTop(i);
         gameobject->draw_varray = selected_tool == &edit_tool && gameobject == active_object;
-        gameobject->render(world_texture);
+        gameobject->render(world_widget->getRenderTexture());
     }
+    world_widget->display();
 
+    selection_mask.clear();
+    selection_mask.setView(world_widget->getView());
     if (selected_tool != &edit_tool) {
         for (auto obj : select_tool.getSelectedObjects()) {
             obj->renderMask(selection_mask);
         }
     }
-
-    world_texture.display();
-    sf::Sprite world_sprite(world_texture.getTexture());
-    desat_shader.setUniform("texture", sf::Shader::CurrentTexture);
-    desat_shader.setUniform("saturation", WORLD_SATURATION);
-    desat_shader.setUniform("vcenter", WORLD_COLOR_SCALE_CENTER);
-    desat_shader.setUniform("vpercent", WORLD_COLOR_SCALE_PERCENT);
-    window.draw(world_sprite, &desat_shader);
-
     selection_mask.display();
     sf::Sprite selection_sprite(selection_mask.getTexture());
     selection_shader.setUniform("selection_mask", sf::Shader::CurrentTexture);
@@ -1035,7 +1028,7 @@ void Editor::loadFont(sf::Font& font, const std::string& filename, bool smooth) 
 }
 
 sf::Vector2f Editor::screenToWorld(const sf::Vector2f& screen_pos) const {
-    sf::Transform combined = world_view.getInverseTransform() * ui_widget->getView().getTransform();
+    sf::Transform combined = world_widget->getView().getInverseTransform() * ui_widget->getView().getTransform();
     sf::Vector2f result = combined.transformPoint(screen_pos);
     return result;
 }
@@ -1045,7 +1038,7 @@ sf::Vector2f Editor::pixelToWorld(const sf::Vector2i& screen_pos) const {
 }
 
 sf::Vector2f Editor::worldToScreen(const sf::Vector2f& world_pos) const {
-    sf::Transform combined = ui_widget->getView().getInverseTransform() * world_view.getTransform();
+    sf::Transform combined = ui_widget->getView().getInverseTransform() * world_widget->getView().getTransform();
     sf::Vector2f result = combined.transformPoint(world_pos);
     return result;
 }

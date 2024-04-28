@@ -102,8 +102,7 @@ private:
 	friend class FloatParameter;
 	friend class Toolbox;
 	friend class CreatePanel;
-	sf::View world_view;
-	sf::RenderTexture world_texture;
+	fw::CanvasWidget* world_widget = nullptr;
 	fw::CanvasWidget* ui_widget = nullptr;
 	sf::RenderTexture selection_mask;
 	sf::Shader desat_shader;

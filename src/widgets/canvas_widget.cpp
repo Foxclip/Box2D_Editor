@@ -8,6 +8,10 @@ sf::RenderTexture& fw::CanvasWidget::getRenderTexture() {
 	return texture;
 }
 
+sf::Vector2f fw::CanvasWidget::getTextureSize() const {
+	return sf::Vector2f((float)texture.getSize().x, (float)texture.getSize().y);
+}
+
 const sf::View& fw::CanvasWidget::getView() const {
 	return view;
 }
@@ -20,19 +24,27 @@ void fw::CanvasWidget::setTextureSize(unsigned int width, unsigned int height) {
 	rect.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(texture.getSize().x, texture.getSize().y)));
 }
 
-void fw::CanvasWidget::setViewCenter(const sf::Vector2f& center) {
-	view.setCenter(center);
+void fw::CanvasWidget::setViewCenter(float x, float y) {
+	view.setCenter(x, y);
 	texture.setView(view);
+}
+
+void fw::CanvasWidget::setViewCenter(const sf::Vector2f& center) {
+	setViewCenter(center.x, center.y);
+}
+
+void fw::CanvasWidget::setViewSize(float width, float height) {
+	view.setSize(width, height);
+	texture.setView(view);
+}
+
+void fw::CanvasWidget::setViewSize(const sf::Vector2f& size) {
+	setViewSize(size.x, size.y);
 }
 
 void fw::CanvasWidget::resetView() {
 	view.setCenter(texture.getSize().x / 2.0f, texture.getSize().y / 2.0f);
 	view.setSize((float)texture.getSize().x, (float)texture.getSize().y);
-	texture.setView(view);
-}
-
-void fw::CanvasWidget::setViewSize(const sf::Vector2f& size) {
-	view.setSize(size);
 	texture.setView(view);
 }
 
