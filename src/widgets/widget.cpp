@@ -572,6 +572,7 @@ namespace fw {
 		if (!unclipped_region.isQuantizedNonZero()) {
 			return;
 		}
+		OnBeforeRender();
 		updateRenderTexture(unclipped_region.getQuantized());
 		sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
 		sprite.setPosition(unclipped_region.getQuantized().getPosition());

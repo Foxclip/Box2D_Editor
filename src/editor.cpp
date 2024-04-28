@@ -220,6 +220,13 @@ void Editor::initWidgets() {
     world_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     world_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     world_widget->setName("world_canvas");
+    world_widget->setShader(&desat_shader);
+    world_widget->OnBeforeRender = [&]() {
+        desat_shader.setUniform("texture", sf::Shader::CurrentTexture);
+        desat_shader.setUniform("saturation", WORLD_SATURATION);
+        desat_shader.setUniform("vcenter", WORLD_COLOR_SCALE_CENTER);
+        desat_shader.setUniform("vpercent", WORLD_COLOR_SCALE_PERCENT);
+    };
     ui_widget = widgets.createWidget<fw::CanvasWidget>();
     ui_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     ui_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);

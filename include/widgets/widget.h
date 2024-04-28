@@ -61,6 +61,7 @@ namespace fw {
 		std::function<void(const sf::Vector2f& pos)> OnMouseExit = [](const sf::Vector2f& pos) { };
 		std::function<void()> OnFocused = []() { };
 		std::function<void()> OnFocusLost = []() { };
+		std::function<void()> OnBeforeRender = []() { };
 
 		Widget(WidgetList& list);
 		bool isMouseOver() const;
