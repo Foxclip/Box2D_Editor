@@ -110,6 +110,10 @@ namespace fw {
 		return layer;
 	}
 
+	sf::Shader* Widget::getShader() const {
+		return shader;
+	}
+
 	Widget* Widget::getParent() const {
 		return parent;
 	}
@@ -446,6 +450,10 @@ namespace fw {
 		widget_list.render_queue.invalidate();
 	}
 
+	void Widget::setShader(sf::Shader* shader) {
+		this->shader = shader;
+	}
+
 	void Widget::removeFocus() {
 		wAssert(!widget_list.isLocked());
 		if (isFocused()) {
@@ -567,7 +575,11 @@ namespace fw {
 		updateRenderTexture(unclipped_region.getQuantized());
 		sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
 		sprite.setPosition(unclipped_region.getQuantized().getPosition());
-		target.draw(sprite);
+		if (shader) {
+			target.draw(sprite, shader);
+		} else {
+			target.draw(sprite);
+		}
 	}
 
 	void Widget::renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children) {

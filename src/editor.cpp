@@ -109,13 +109,10 @@ ChainObject* Editor::createChain(
 void Editor::onInit() {
     sf::ContextSettings cs_world;
     world_texture.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_world);
-    sf::ContextSettings cs_ui;
-    ui_texture.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_ui);
     sf::ContextSettings cs_mask;
     selection_mask.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_mask);
     window_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     world_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
-    ui_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     if (!desat_shader.loadFromFile("shaders/desat.frag", sf::Shader::Fragment)) {
         throw std::runtime_error("Shader loading error");
     }
@@ -168,8 +165,8 @@ void Editor::onProcessWindowEvent(const sf::Event& event) {
     } else if (event.type == sf::Event::Resized) {
         sf::ContextSettings cs_world;
         world_texture.create(event.size.width, event.size.height, cs_world);
-        sf::ContextSettings cs_ui;
-        ui_texture.create(event.size.width, event.size.height, cs_ui);
+        ui_widget->setSize((float)event.size.width, (float)event.size.height);
+        ui_widget->setTextureSize(event.size.width, event.size.height);
         sf::ContextSettings cs_mask;
         selection_mask.create(event.size.width, event.size.height, cs_mask);
     }
@@ -221,6 +218,9 @@ void Editor::initUi() {
 }
 
 void Editor::initWidgets() {
+    ui_widget = widgets.createWidget<fw::CanvasWidget>();
+    ui_widget->setName("ui_canvas");
+
     toolbox_widget = widgets.createWidget<Toolbox>(*this);
     edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(*this);
     create_tool.create_panel_widget = widgets.createWidget<CreatePanel>(*this);
@@ -741,11 +741,9 @@ void Editor::renderWorld() {
 }
 
 void Editor::renderUi() {
-    ui_texture.clear(sf::Color::Transparent);
-    ui_view.setCenter(ui_texture.getSize().x / 2.0f, ui_texture.getSize().y / 2.0f);
-    ui_view.setSize((float)ui_texture.getSize().x, (float)ui_texture.getSize().y);
-    ui_texture.setView(ui_view);
-    sf::RenderTarget& target = ui_texture;
+    ui_widget->clear(sf::Color::Transparent);
+    ui_widget->resetView();
+    sf::RenderTarget& target = ui_widget->getRenderTexture();
 
     if (render_object_info) {
         // parent relation lines
@@ -872,9 +870,7 @@ void Editor::renderUi() {
         }
     }
 
-    ui_texture.display();
-    sf::Sprite ui_sprite(ui_texture.getTexture());
-    window.draw(ui_sprite);
+    ui_widget->display();
 }
 
 std::string Editor::serialize() const {
@@ -1039,7 +1035,7 @@ void Editor::loadFont(sf::Font& font, const std::string& filename, bool smooth) 
 }
 
 sf::Vector2f Editor::screenToWorld(const sf::Vector2f& screen_pos) const {
-    sf::Transform combined = world_view.getInverseTransform() * ui_view.getTransform();
+    sf::Transform combined = world_view.getInverseTransform() * ui_widget->getView().getTransform();
     sf::Vector2f result = combined.transformPoint(screen_pos);
     return result;
 }
@@ -1049,7 +1045,7 @@ sf::Vector2f Editor::pixelToWorld(const sf::Vector2i& screen_pos) const {
 }
 
 sf::Vector2f Editor::worldToScreen(const sf::Vector2f& world_pos) const {
-    sf::Transform combined = ui_view.getInverseTransform() * world_view.getTransform();
+    sf::Transform combined = ui_widget->getView().getInverseTransform() * world_view.getTransform();
     sf::Vector2f result = combined.transformPoint(world_pos);
     return result;
 }

@@ -80,6 +80,7 @@ namespace fw {
 		const std::string& getFullName() const;
 		bool getClipChildren() const;
 		RenderLayer getRenderLayer() const;
+		sf::Shader* getShader() const;
 		Widget* getParent() const;
 		CompVector<Widget*> getParentChain() const;
 		const CompVector<Widget*>& getChildren() const;
@@ -141,6 +142,7 @@ namespace fw {
 		void setName(const std::string& new_name);
 		void setClipChildren(bool value);
 		void setRenderLayer(RenderLayer layer);
+		void setShader(sf::Shader* shader);
 		void removeFocus();
 		void processKeyboardEvent(const sf::Event& event);
 		void render(sf::RenderTarget& target);
@@ -158,6 +160,7 @@ namespace fw {
 		Widget* parent = nullptr;
 		CompVector<Widget*> children;
 		SearchIndexMultiple<std::string, Widget*> children_names;
+		sf::Shader* shader = nullptr;
 		RenderLayer layer = RenderLayer::BASE;
 		Anchor origin_anchor = Anchor::CUSTOM;
 		Anchor parent_anchor = Anchor::CUSTOM;

@@ -44,6 +44,7 @@ int main() {
     execute_app();
 
     // TODO: CanvasWidget as a replacement to screen textures
+    // TODO: remove Application reference from Toolbox and other ui elements
     // TODO: make tool panel with move, rotate and duplicate tools
     // TODO: Window widget
     // TODO: align textboxes in EditWindow to the right

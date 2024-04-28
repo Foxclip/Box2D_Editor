@@ -103,9 +103,8 @@ private:
 	friend class Toolbox;
 	friend class CreatePanel;
 	sf::View world_view;
-	sf::View ui_view;
 	sf::RenderTexture world_texture;
-	sf::RenderTexture ui_texture;
+	fw::CanvasWidget* ui_widget = nullptr;
 	sf::RenderTexture selection_mask;
 	sf::Shader desat_shader;
 	sf::Shader selection_shader;
