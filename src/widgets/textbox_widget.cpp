@@ -238,6 +238,10 @@ namespace fw {
 		if (cursor_pos == selection_pos) {
 			selection_pos = -1;
 		}
+		if (edit_mode) {
+			cursor_timer.reset();
+			cursor_widget->setVisible(true);
+		}
 	}
 
 	void TextBoxWidget::typeChar(sf::Uint32 code) {
@@ -281,6 +285,12 @@ namespace fw {
 		Widget::update();
 		sf::Vector2f char_pos = text_widget->getLocalCharPos(cursor_pos, true, true);
 		cursor_widget->setPosition(char_pos - sf::Vector2f(0.0f, CURSOR_MARGIN) + CURSOR_OFFSET);
+		if (edit_mode) {
+			if (cursor_timer.get() > CURSOR_BLINK_INTERVAL) {
+				cursor_timer.reset();
+				cursor_widget->toggleVisible();
+			}
+		}
 		updateSelection();
 		process_text_entered_event = true;
 	}
@@ -784,6 +794,20 @@ namespace fw {
 		} else {
 			history.save(tag);
 		}
+	}
+
+	Timer::Timer() {
+		reset();
+	}
+
+	void Timer::reset() {
+		begin = std::chrono::high_resolution_clock::now();
+	}
+
+	double Timer::get() const {
+		auto now = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> duration = now - begin;
+		return duration.count();
 	}
 
 }

@@ -4,8 +4,18 @@
 #include "text_widget.h"
 #include "clip/clip.h"
 #include "history.h"
+#include <chrono>
 
 namespace fw {
+
+	class Timer {
+	public:
+		Timer();
+		void reset();
+		double get() const;
+	private:
+		std::chrono::steady_clock::time_point begin;
+	};
 
 	class WidgetList;
 
@@ -15,6 +25,7 @@ namespace fw {
 		const sf::Vector2f TEXT_VIEW_ZERO_POS = sf::Vector2f(2.0f, 0.0f);
 		const sf::Vector2f CURSOR_OFFSET = sf::Vector2f(0.0f, 0.0f);
 		const float CURSOR_MARGIN = 2.0f; // cursor sticking out above and below text
+		const float CURSOR_BLINK_INTERVAL = 0.5f;
 		const float SELECTION_MARGIN = 2.0f; // selection sticking out above and below text
 		const std::string VALID_INTEGER_CHARS = "+-0123456789";
 		const std::string VALID_FLOAT_CHARS = "+-.e0123456789";
@@ -130,6 +141,7 @@ namespace fw {
 			ptrdiff_t selection_pos = -1;
 		};
 		History<TextBoxHistoryEntry> history;
+		Timer cursor_timer;
 		size_t cursor_pos = 0;
 		ptrdiff_t last_action_pos = -1;
 		std::string last_action_tag;

@@ -24,8 +24,7 @@ void execute_app() {
     Editor app;
     try {
         app.init();
-        //app.load("levels/level.txt");
-        box_parent(app);
+        app.load("levels/level.txt");
         app.start();
     } catch (std::string msg) {
         logger << "ERROR: " << msg << "\n";
@@ -41,15 +40,14 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
-    run_tests();
-    //execute_app();
+    //run_tests();
+    execute_app();
 
-    // TODO: blinking textbox cursor
     // TODO: remove global.h
     // TODO: don't fill window with black color in Application::Render
     // TODO: CanvasWidget as a replacement to screen textures
-    // TODO: EventRecorder for ui tests
     // TODO: make tool panel with move, rotate and duplicate tools
+    // TODO: Window widget
     // TODO: align textboxes in EditWindow to the right
     // TODO: Dropdown widget
     // TODO: object list window (outliner)

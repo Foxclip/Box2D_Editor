@@ -133,6 +133,7 @@ namespace fw {
 		virtual void setPosition(const sf::Vector2f& position);
 		void setRotation(float angle);
 		void setVisible(bool value);
+		void toggleVisible();
 		void setClickThrough(bool value);
 		void setParentSilent(Widget* new_parent);
 		void setParent(Widget* new_parent);

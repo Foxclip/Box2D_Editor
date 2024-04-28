@@ -363,6 +363,12 @@ namespace fw {
 		widget_list.render_queue.invalidate();
 	}
 
+	void Widget::toggleVisible() {
+		wAssert(!widget_list.isLocked());
+		this->visible = !this->visible;
+		widget_list.render_queue.invalidate();
+	}
+
 	void Widget::setClickThrough(bool value) {
 		wAssert(!widget_list.isLocked());
 		this->click_through = value;
