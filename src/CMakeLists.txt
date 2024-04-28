@@ -6,7 +6,6 @@ add_subdirectory(tests)
 set(SRC_HEADER_FILES
     "${INCLUDE_DIR}/compvector.h"
     "${INCLUDE_DIR}/editor.h"
-    "${INCLUDE_DIR}/global.h"
     "${INCLUDE_DIR}/history.h"
     "${INCLUDE_DIR}/logger.h"
     "${INCLUDE_DIR}/main.h"
@@ -29,7 +28,6 @@ set(SRC_HEADER_FILES
 )
 set(SRC_SOURCE_FILES
     "editor.cpp"
-    "global.cpp"
     "logger.cpp"
     "main.cpp"
     "serializer.cpp"

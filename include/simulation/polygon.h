@@ -1,13 +1,10 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "global.h"
 #include "logger.h"
+#include "utils.h"
 
 extern sf::Text vertex_text;
-
-Logger& operator<<(Logger& lg, const b2Vec2& value);
-Logger& operator<<(Logger& lg, const sf::Vector2f& value);
 
 struct CutInfo {
 	size_t from;

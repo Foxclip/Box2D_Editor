@@ -10,6 +10,10 @@ const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
 const auto to2i = fw::to2i;
 
+Logger& operator<<(Logger& lg, const b2Vec2& value) {
+    return lg << "(" << value.x << " " << value.y << ")";
+}
+
 sf::Vector2f to2f(sf::Vector2i vec) {
     return fw::to2f(vec);
 }
@@ -747,7 +751,7 @@ void Editor::renderUi() {
             for (GameObject* child : object->getChildren()) {
                 sf::Vector2f v1 = worldToScreen(object->getGlobalPosition());
                 sf::Vector2f v2 = worldToScreen(child->getGlobalPosition());
-                draw_line(target, v1, v2, sf::Color(128, 128, 128));
+                fw::draw_line(target, v1, v2, sf::Color(128, 128, 128));
             }
         }
         // object origin circles
@@ -793,18 +797,18 @@ void Editor::renderUi() {
     } else if (selected_tool == &drag_tool) {
         if (drag_tool.mouse_joint) {
             sf::Vector2f grabbed_point = worldToScreen(drag_tool.mouse_joint->GetAnchorB());
-            draw_line(target, grabbed_point, getMousePosf(), sf::Color::Yellow);
+            fw::draw_line(target, grabbed_point, getMousePosf(), sf::Color::Yellow);
         }
     } else if (selected_tool == &rotate_tool) {
         for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
-            draw_line(target, worldToScreen(rotate_tool.pivot_pos), getMousePosf(), sf::Color::Yellow);
+            fw::draw_line(target, worldToScreen(rotate_tool.pivot_pos), getMousePosf(), sf::Color::Yellow);
         }
     } else if (selected_tool == &edit_tool && active_object) {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             // ghost edge
             sf::Vector2i v1 = worldToPixel(active_object->getGlobalVertexPos(edit_tool.edge_vertex));
             sf::Vector2i v2 = getMousePos();
-            draw_line(target, to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
+            fw::draw_line(target, to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
             // ghost edge normal
             sf::Vector2f norm_v1, norm_v2;
             if (edit_tool.edge_vertex == 0) {
@@ -812,7 +816,7 @@ void Editor::renderUi() {
             } else {
                 getScreenNormal(v2, v1, norm_v1, norm_v2);
             }
-            draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
+            fw::draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
             // ghost vertex
             sf::Vector2f ghost_vertex_pos = to2f(getMousePos());
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
@@ -853,7 +857,7 @@ void Editor::renderUi() {
                 norm_v1, 
                 norm_v2
             );
-            draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255));
+            fw::draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255));
         }
         if (edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) {
             // highlighted vertex

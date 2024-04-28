@@ -3,10 +3,6 @@
 
 sf::Text vertex_text;
 
-Logger& operator<<(Logger& lg, const b2Vec2& value) {
-	return lg << "(" << value.x << " " << value.y << ")";
-}
-
 Logger& operator<<(Logger& lg, const sf::Vector2f& value) {
 	return lg << "(" << value.x << " " << value.y << ")";
 }
