@@ -741,7 +741,7 @@ void Editor::renderWorld() {
 }
 
 void Editor::renderUi() {
-    ui_texture.clear(sf::Color(0, 0, 0, 0));
+    ui_texture.clear(sf::Color::Transparent);
     ui_view.setCenter(ui_texture.getSize().x / 2.0f, ui_texture.getSize().y / 2.0f);
     ui_view.setSize((float)ui_texture.getSize().x, (float)ui_texture.getSize().y);
     ui_texture.setView(ui_view);

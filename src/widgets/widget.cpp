@@ -50,7 +50,8 @@ namespace fw {
 			}
 		}
 		v.visibleSetting = visible;
-		v.onScreen = widget_list.getRootWidget()->getGlobalBounds().intersects(global_bounds);
+		sf::FloatRect root_bounds = widget_list.getRootWidget()->getGlobalBounds();
+		v.onScreen = root_bounds.intersects(global_bounds);
 		v.nonZeroSize = global_bounds.width > 0 && global_bounds.height > 0;
 		v.hasUnclippedRegion = unclipped_region.isQuantizedNonZero();
 		v.opaque = getFillColor().a > 0;

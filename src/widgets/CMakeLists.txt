@@ -1,6 +1,7 @@
 add_library(widgets_lib)
 target_sources(widgets_lib PRIVATE
     "${INCLUDE_DIR}/widgets/application.h"
+    "${INCLUDE_DIR}/widgets/canvas_widget.h"
     "${INCLUDE_DIR}/widgets/checkbox_widget.h"
     "${INCLUDE_DIR}/widgets/container_widget.h"
     "${INCLUDE_DIR}/widgets/drawing.h"
@@ -18,6 +19,7 @@ target_sources(widgets_lib PRIVATE
 )
 target_sources(widgets_lib PRIVATE
     application.cpp
+    canvas_widget.cpp
     checkbox_widget.cpp
     container_widget.cpp
     drawing.cpp
