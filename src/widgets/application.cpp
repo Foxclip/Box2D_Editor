@@ -2,11 +2,11 @@
 #include <Windows.h>
 #include <winuser.h>
 
-Logger& operator<<(Logger& lg, const sf::Vector2f& value) {
-    return lg << "(" << value.x << " " << value.y << ")";
-}
-
 namespace fw {
+
+    Logger& operator<<(Logger& lg, const sf::Vector2f& value) {
+        return lg << "(" << value.x << " " << value.y << ")";
+    }
 
     void Application::init(
         const sf::String& window_title,

@@ -2,10 +2,6 @@
 
 sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
 
-Logger& operator<<(Logger& lg, const b2Vec2& value) {
-	return lg << "(" << value.x << " " << value.y << ")";
-}
-
 void draw_line(
 	sf::RenderTarget& target,
 	const sf::Vector2f& v1,

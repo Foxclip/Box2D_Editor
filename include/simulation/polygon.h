@@ -6,6 +6,9 @@
 
 extern sf::Text vertex_text;
 
+Logger& operator<<(Logger& lg, const b2Vec2& value);
+Logger& operator<<(Logger& lg, const sf::Vector2f& value);
+
 struct CutInfo {
 	size_t from;
 	size_t to;

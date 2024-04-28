@@ -4,9 +4,9 @@
 #include "widget_list.h"
 #include <queue>
 
-Logger& operator<<(Logger& lg, const sf::Vector2f& value);
-
 namespace fw {
+
+	Logger& operator<<(Logger& lg, const sf::Vector2f& value);
 
 	struct MouseGesture {
 		enum MouseGestureType {

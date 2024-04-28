@@ -6,9 +6,6 @@
 
 extern sf::VertexArray line_primitive;
 
-Logger& operator<<(Logger& lg, const b2Vec2& value);
-Logger& operator<<(Logger& lg, const sf::Vector2f& value);
-
 void draw_line(
 	sf::RenderTarget& target,
 	const sf::Vector2f& v1,

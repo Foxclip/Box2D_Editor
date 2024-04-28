@@ -3,6 +3,14 @@
 
 sf::Text vertex_text;
 
+Logger& operator<<(Logger& lg, const b2Vec2& value) {
+	return lg << "(" << value.x << " " << value.y << ")";
+}
+
+Logger& operator<<(Logger& lg, const sf::Vector2f& value) {
+	return lg << "(" << value.x << " " << value.y << ")";
+}
+
 bool CutInfo::isGG() const {
 	return green_zone && has_reciprocal && green_reciprocal;
 }
