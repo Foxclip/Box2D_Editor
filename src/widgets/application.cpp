@@ -171,6 +171,10 @@ namespace fw {
         return widgets;
     }
 
+    void Application::setBackgroundColor(const sf::Color& color) {
+        background_color = color;
+    }
+
     void Application::close() {
         window.close();
         onClose();
@@ -396,7 +400,7 @@ namespace fw {
     }
 
     void Application::render() {
-        window.clear(sf::Color(0, 0, 0));
+        window.clear(background_color);
         window_view.setCenter(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
         window_view.setSize((float)window.getSize().x, (float)window.getSize().y);
         window.setView(window_view);

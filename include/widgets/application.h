@@ -59,6 +59,7 @@ namespace fw {
 		sf::Vector2f getMousePosf() const;
 		const sf::Vector2f& getMousePressPosf() const;
 		WidgetList& getWidgets();
+		void setBackgroundColor(const sf::Color& color);
 		void close();
 
 	protected:
@@ -78,6 +79,7 @@ namespace fw {
 		bool external_lalt_pressed = false;
 		bool external_lshift_pressed = false;
 		std::queue<sf::Event> external_event_queue;
+		sf::Color background_color = sf::Color::Black;
 
 		virtual void onInit();
 		virtual void onStart();

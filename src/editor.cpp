@@ -215,6 +215,8 @@ void Editor::initUi() {
     object_info_text.setCharacterSize(16);
     object_info_text.setFillColor(sf::Color::White);
 
+    setBackgroundColor(sf::Color(25, 25, 25));
+
     initWidgets();
 }
 
@@ -702,7 +704,7 @@ void Editor::onRender() {
 }
 
 void Editor::renderWorld() {
-    world_texture.clear(sf::Color(0, 0, 0));
+    world_texture.clear(sf::Color::Transparent);
     world_view.setCenter(viewCenterX, viewCenterY);
     world_view.setSize(world_texture.getSize().x / zoomFactor, -1.0f * world_texture.getSize().y / zoomFactor);
     world_texture.setView(world_view);

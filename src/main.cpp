@@ -43,8 +43,6 @@ int main() {
     //run_tests();
     execute_app();
 
-    // TODO: remove global.h
-    // TODO: don't fill window with black color in Application::Render
     // TODO: CanvasWidget as a replacement to screen textures
     // TODO: make tool panel with move, rotate and duplicate tools
     // TODO: Window widget
