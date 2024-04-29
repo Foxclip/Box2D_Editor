@@ -44,6 +44,8 @@ namespace fw {
 		void advance();
 		void maximizeWindow() const;
 		sf::Vector2u getWindowSize() const;
+		void setWindowSize(unsigned int width, unsigned int height);
+		void setWindowSize(const sf::Vector2u& size);
 		void addExternalEvent(const sf::Event& event);
 		void mouseMove(int x, int y);
 		void mouseMove(const sf::Vector2i& pos);

@@ -560,6 +560,44 @@ void WidgetTests::createWidgetsList() {
             T_CHECK(mouse_exited_2);
         }
     );
+    test::Test* events_test = list->addTest(
+        "events",
+        {
+            root_widget_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0, false);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            bool updated = false;
+            bool before_render = false;
+            unsigned int window_width = 0;
+            unsigned int window_height = 0;
+            fw::RectangleWidget* widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+            widget->setSize(100.0f, 100.0f);
+            widget->OnUpdate = [&]() {
+                updated = true;
+            };
+            widget->OnBeforeRender = [&]() {
+                before_render = true;
+            };
+            widget->OnWindowResized = [&](unsigned int width, unsigned int height) {
+                window_width = width;
+                window_height = height;
+            };
+            application.advance();
+            T_CHECK(updated);
+            T_CHECK(before_render);
+            T_COMPARE(window_width, 0);
+            T_COMPARE(window_height, 0);
+            application.setWindowSize(640, 480);
+            application.advance();
+            T_COMPARE(window_width, 640);
+            T_COMPARE(window_height, 480);
+        }
+    );
     test::Test* coordinates_test = list->addTest(
         "coordinates",
         {

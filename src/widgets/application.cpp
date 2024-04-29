@@ -50,6 +50,21 @@ namespace fw {
         return window.getSize();
     }
 
+    void Application::setWindowSize(unsigned int width, unsigned int height) {
+        window.setSize(sf::Vector2u(width, height));
+        if (external_control) {
+            sf::Event event;
+            event.type = sf::Event::Resized;
+            event.size.width = width;
+            event.size.height = height;
+            addExternalEvent(event);
+        }
+    }
+
+    void Application::setWindowSize(const sf::Vector2u& size) {
+        window.setSize(size);
+    }
+
     void Application::addExternalEvent(const sf::Event& event) {
         wAssert(external_control);
         external_event_queue.push(event);
