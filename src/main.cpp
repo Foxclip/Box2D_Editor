@@ -43,7 +43,8 @@ int main() {
     //run_tests();
     execute_app();
 
-    // TODO: CanvasWidget as a replacement to screen textures
+    // TODO: OnWindowResize event for widgets
+    // TODO: CanvasWidget tests
     // TODO: remove Application reference from Toolbox and other ui elements
     // TODO: make tool panel with move, rotate and duplicate tools
     // TODO: Window widget

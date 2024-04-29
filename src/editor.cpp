@@ -108,7 +108,6 @@ ChainObject* Editor::createChain(
 
 void Editor::onInit() {
     sf::ContextSettings cs_mask;
-    selection_mask.create(WINDOW_WIDTH, WINDOW_HEIGHT, cs_mask);
     window_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
     if (!desat_shader.loadFromFile("shaders/desat.frag", sf::Shader::Fragment)) {
         throw std::runtime_error("Shader loading error");
@@ -163,10 +162,10 @@ void Editor::onProcessWindowEvent(const sf::Event& event) {
         sf::ContextSettings cs_world;
         world_widget->setSize((float)event.size.width, (float)event.size.height);
         world_widget->setTextureSize(event.size.width, event.size.height);
+        selection_mask_widget->setSize((float)event.size.width, (float)event.size.height);
+        selection_mask_widget->setTextureSize(event.size.width, event.size.height);
         ui_widget->setSize((float)event.size.width, (float)event.size.height);
         ui_widget->setTextureSize(event.size.width, event.size.height);
-        sf::ContextSettings cs_mask;
-        selection_mask.create(event.size.width, event.size.height, cs_mask);
     }
 }
 
@@ -226,6 +225,16 @@ void Editor::initWidgets() {
         desat_shader.setUniform("saturation", WORLD_SATURATION);
         desat_shader.setUniform("vcenter", WORLD_COLOR_SCALE_CENTER);
         desat_shader.setUniform("vpercent", WORLD_COLOR_SCALE_PERCENT);
+    };
+    selection_mask_widget = widgets.createWidget<fw::CanvasWidget>();
+    selection_mask_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    selection_mask_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    selection_mask_widget->setName("selection_mask_canvas");
+    selection_mask_widget->setShader(&selection_shader);
+    selection_mask_widget->OnBeforeRender = [&]() {
+        selection_shader.setUniform("selection_mask", sf::Shader::CurrentTexture);
+        selection_shader.setUniform("outline_color", SELECTION_OUTLINE_COLOR);
+        selection_shader.setUniform("offset", SELECTION_OUTLINE_THICKNESS);
     };
     ui_widget = widgets.createWidget<fw::CanvasWidget>();
     ui_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -725,19 +734,14 @@ void Editor::renderWorld() {
     }
     world_widget->display();
 
-    selection_mask.clear();
-    selection_mask.setView(world_widget->getView());
+    selection_mask_widget->clear();
+    selection_mask_widget->setView(world_widget->getView());
     if (selected_tool != &edit_tool) {
         for (auto obj : select_tool.getSelectedObjects()) {
-            obj->renderMask(selection_mask);
+            obj->renderMask(selection_mask_widget->getRenderTexture());
         }
     }
-    selection_mask.display();
-    sf::Sprite selection_sprite(selection_mask.getTexture());
-    selection_shader.setUniform("selection_mask", sf::Shader::CurrentTexture);
-    selection_shader.setUniform("outline_color", SELECTION_OUTLINE_COLOR);
-    selection_shader.setUniform("offset", SELECTION_OUTLINE_THICKNESS);
-    window.draw(selection_sprite, &selection_shader);
+    selection_mask_widget->display();
 }
 
 void Editor::renderUi() {

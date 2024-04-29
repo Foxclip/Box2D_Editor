@@ -104,7 +104,7 @@ private:
 	friend class CreatePanel;
 	fw::CanvasWidget* world_widget = nullptr;
 	fw::CanvasWidget* ui_widget = nullptr;
-	sf::RenderTexture selection_mask;
+	fw::CanvasWidget* selection_mask_widget = nullptr;
 	sf::Shader desat_shader;
 	sf::Shader selection_shader;
 	sf::Vector2f sfMousePosWorld;

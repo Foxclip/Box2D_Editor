@@ -13,6 +13,7 @@ namespace fw {
 		sf::Vector2f getTextureSize() const;
 		const sf::View& getView() const;
 		void setTextureSize(unsigned int width, unsigned int height);
+		void setView(const sf::View& view);
 		void setViewCenter(float x, float y);
 		void setViewCenter(const sf::Vector2f& center);
 		void setViewSize(float width, float height);

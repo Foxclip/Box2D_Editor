@@ -24,6 +24,11 @@ void fw::CanvasWidget::setTextureSize(unsigned int width, unsigned int height) {
 	rect.setTextureRect(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(texture.getSize().x, texture.getSize().y)));
 }
 
+void fw::CanvasWidget::setView(const sf::View& view) {
+	this->view = view;
+	texture.setView(view);
+}
+
 void fw::CanvasWidget::setViewCenter(float x, float y) {
 	view.setCenter(x, y);
 	texture.setView(view);
