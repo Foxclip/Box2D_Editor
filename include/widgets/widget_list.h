@@ -41,6 +41,7 @@ namespace fw {
 		void processClick(const sf::Vector2f pos);
 		void processRelease(const sf::Vector2f pos);
 		void processMouse(const sf::Vector2f pos);
+		void processWindowEvent(const sf::Event& event);
 		void processKeyboardEvent(const sf::Event& event);
 		void updateRenderQueue();
 		void updateWidgets();

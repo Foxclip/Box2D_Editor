@@ -485,13 +485,17 @@ namespace fw {
 		if (!visible) {
 			return;
 		}
+		OnUpdate();
 		updateAnchoredPosition();
 		setOrigin(origin_anchor);
 		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->update();
 		}
 		widget_list.render_queue.invalidate();
+		internalUpdate();
 	}
+
+	void Widget::internalUpdate() { }
 
 	void Widget::internalOnSetParent(Widget* parent) { }
 

@@ -24,7 +24,7 @@ namespace fw {
 		void toggleValue();
 
 	protected:
-		void update() override;
+		void internalUpdate() override;
 		void internalOnClick(const sf::Vector2f& pos) override;
 		void internalOnMouseEnter(const sf::Vector2f& pos) override;
 		void internalOnMouseExit(const sf::Vector2f& pos) override;

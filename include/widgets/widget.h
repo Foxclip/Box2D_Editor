@@ -61,7 +61,9 @@ namespace fw {
 		std::function<void(const sf::Vector2f& pos)> OnMouseExit = [](const sf::Vector2f& pos) { };
 		std::function<void()> OnFocused = []() { };
 		std::function<void()> OnFocusLost = []() { };
+		std::function<void()> OnUpdate = []() { };
 		std::function<void()> OnBeforeRender = []() { };
+		std::function<void(unsigned int, unsigned int)> OnWindowResized = [](unsigned int width, unsigned int height) { };
 
 		Widget(WidgetList& list);
 		bool isMouseOver() const;
@@ -184,7 +186,8 @@ namespace fw {
 		virtual const sf::Transformable& getTransformable() const = 0;
 		virtual sf::Vector2f getRenderPositionOffset() const;
 		void updateAnchoredPosition();
-		virtual void update();
+		void update();
+		virtual void internalUpdate();
 		virtual void internalOnSetParent(Widget* parent);
 		virtual void internalOnClick(const sf::Vector2f& pos);
 		virtual void internalOnRelease(const sf::Vector2f& pos);

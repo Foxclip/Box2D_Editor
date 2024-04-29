@@ -42,7 +42,7 @@ namespace fw {
 		const sf::Drawable& getDrawable() const override;
 		sf::Transformable& getTransformable() override;
 		const sf::Transformable& getTransformable() const override;
-		void update() override;
+		void internalUpdate() override;
 
 	private:
 		sf::Text text;

@@ -158,14 +158,6 @@ void Editor::onProcessWidgets() {
 void Editor::onProcessWindowEvent(const sf::Event& event) {
     if (event.type == sf::Event::Closed) {
         window.close();
-    } else if (event.type == sf::Event::Resized) {
-        sf::ContextSettings cs_world;
-        world_widget->setSize((float)event.size.width, (float)event.size.height);
-        world_widget->setTextureSize(event.size.width, event.size.height);
-        selection_mask_widget->setSize((float)event.size.width, (float)event.size.height);
-        selection_mask_widget->setTextureSize(event.size.width, event.size.height);
-        ui_widget->setSize((float)event.size.width, (float)event.size.height);
-        ui_widget->setTextureSize(event.size.width, event.size.height);
     }
 }
 
@@ -215,6 +207,7 @@ void Editor::initUi() {
 }
 
 void Editor::initWidgets() {
+
     world_widget = widgets.createWidget<fw::CanvasWidget>();
     world_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     world_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -226,6 +219,11 @@ void Editor::initWidgets() {
         desat_shader.setUniform("vcenter", WORLD_COLOR_SCALE_CENTER);
         desat_shader.setUniform("vpercent", WORLD_COLOR_SCALE_PERCENT);
     };
+    world_widget->OnUpdate = [&]() {
+        world_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
+        world_widget->setTextureSize(window.getSize().x, window.getSize().y);
+    };
+
     selection_mask_widget = widgets.createWidget<fw::CanvasWidget>();
     selection_mask_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     selection_mask_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -236,10 +234,19 @@ void Editor::initWidgets() {
         selection_shader.setUniform("outline_color", SELECTION_OUTLINE_COLOR);
         selection_shader.setUniform("offset", SELECTION_OUTLINE_THICKNESS);
     };
+    selection_mask_widget->OnUpdate = [&]() {
+        selection_mask_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
+        selection_mask_widget->setTextureSize(window.getSize().x, window.getSize().y);
+    };
+
     ui_widget = widgets.createWidget<fw::CanvasWidget>();
     ui_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     ui_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     ui_widget->setName("ui_canvas");
+    ui_widget->OnUpdate = [&]() {
+        ui_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
+        ui_widget->setTextureSize(window.getSize().x, window.getSize().y);
+    };
 
     toolbox_widget = widgets.createWidget<Toolbox>(*this);
     edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(*this);

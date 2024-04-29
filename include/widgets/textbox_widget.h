@@ -94,7 +94,7 @@ namespace fw {
 			ACTION_BACKSPACE,
 			ACTION_TYPE,
 		};
-		void update() override;
+		void internalUpdate() override;
 		void updateColors();
 		void internalOnClick(const sf::Vector2f& pos) override;
 		void internalOnRelease(const sf::Vector2f& pos) override;

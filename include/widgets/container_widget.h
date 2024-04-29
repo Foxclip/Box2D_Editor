@@ -18,7 +18,7 @@ namespace fw {
 		void setHorizontalAlignment(Alignment alignment);
 
 	protected:
-		void update() override;
+		void internalUpdate() override;
 		Anchor alignmentToAnchor(Alignment alignment) const;
 		float alignmentToOffset(Alignment alignment, float max_size) const;
 

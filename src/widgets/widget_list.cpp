@@ -141,6 +141,16 @@ namespace fw {
 		render_queue.invalidate();
 	}
 
+	void WidgetList::processWindowEvent(const sf::Event& event) {
+		if (event.type == sf::Event::Resized) {
+			for (RenderQueueLayer layer : render_queue.getSilent()) {
+				for (Widget* widget : layer.widgets) {
+					widget->OnWindowResized(event.size.width, event.size.height);
+				}
+			}
+		}
+	}
+
 	void WidgetList::processKeyboardEvent(const sf::Event& event) {
 		wAssert(!isLocked());
 		if (focused_widget) {

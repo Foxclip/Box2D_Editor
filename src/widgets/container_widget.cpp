@@ -36,8 +36,7 @@ namespace fw {
 		this->horizontal_alignment = alignment;
 	}
 
-	void ContainerWidget::update() {
-		Widget::update();
+	void ContainerWidget::internalUpdate() {
 		sf::FloatRect container_bounds = sf::FloatRect();
 		float max_width = 0.0f, max_height = 0.0f;
 		for (size_t i = 0; i < children.size(); i++) {

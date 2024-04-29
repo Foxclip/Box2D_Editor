@@ -256,6 +256,7 @@ namespace fw {
     }
 
     void Application::processWindowEvent(const sf::Event& event) {
+        widgets.processWindowEvent(event);
         onProcessWindowEvent(event);
     }
 

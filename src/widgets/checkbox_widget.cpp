@@ -65,8 +65,7 @@ namespace fw {
 		OnValueChanged(checked);
 	}
 
-	void CheckboxWidget::update() {
-		Widget::update();
+	void CheckboxWidget::internalUpdate() {
 		check_widget->setSize(rect.getSize() * check_size);
 	}
 
