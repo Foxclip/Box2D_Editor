@@ -45,6 +45,30 @@ public:
 	void onClose() override;
 };
 
+struct GenericWidgetTest {
+	GenericWidgetTest(fw::Application& application, test::Test& test);
+	fw::Application& application;
+	test::Test& test;
+	fw::Widget* widget = nullptr;
+    size_t total_widgets = 0;
+    std::string name;
+    std::string fullname;
+    bool is_visual_position_quantized = false;
+    bool is_visible = false;
+    bool opaque = false;
+	bool is_click_through = false;
+	bool is_mouse_over = false;
+	bool is_focusable = false;
+	bool is_focused = false;
+	bool clip_children = false;
+	bool force_custom_cursor = false;
+	bool has_parent = false;
+	sf::FloatRect local_bounds;
+	sf::FloatRect parent_local_bounds;
+	sf::FloatRect visual_local_bounds;
+	sf::FloatRect visual_parent_local_bounds;
+};
+
 class WidgetTests : public test::TestModule {
 public:
 	WidgetTests(test::TestManager& manager);
@@ -64,5 +88,6 @@ private:
 	static std::string colorToStr(const sf::Color& color);
 	static std::string anchorToStr(fw::Widget::Anchor anchor);
 	fw::TextBoxWidget* initTextBox(fw::Application& application, float width, float height) const;
+	void genericWidgetTest(const GenericWidgetTest& gwt);
 
 };
