@@ -707,50 +707,42 @@ void WidgetTests::createWidgetsList() {
             application.mouseMove(400, 300);
             application.advance();
             fw::CheckboxWidget* checkbox_widget = application.getWidgets().createWidget<fw::CheckboxWidget>();
+            fw::Widget* root_widget = application.getWidgets().getRootWidget();
             T_ASSERT(T_CHECK(checkbox_widget));
             sf::Vector2f position(100.0f, 100.0f);
             sf::Vector2f size(20.0f, 20.0f);
             checkbox_widget->setPosition(position);
             checkbox_widget->setSize(size);
-            T_COMPARE(application.getWidgets().getSize(), 3);
-            T_COMPARE(checkbox_widget->getName(), "checkbox");
-            T_COMPARE(checkbox_widget->getFullName(), "root|checkbox");
-            T_CHECK(!checkbox_widget->isVisualPositionQuantized());
-            T_CHECK(checkbox_widget->isVisible());
-            fw::WidgetVisibility wv = checkbox_widget->checkVisibility();
-            T_CHECK(wv.addedToRoot);
-            T_CHECK(wv.allParentsVisible);
-            T_CHECK(wv.hasUnclippedRegion);
-            T_CHECK(wv.nonZeroSize);
-            T_CHECK(wv.onScreen);
-            T_CHECK(wv.opaque);
-            T_CHECK(wv.visibleSetting);
-            T_CHECK(!checkbox_widget->isClickThrough());
-            T_CHECK(!checkbox_widget->isMouseOver());
-            T_CHECK(checkbox_widget->isFocusable());
-            T_CHECK(!checkbox_widget->isFocused());
-            T_CHECK(!checkbox_widget->getClipChildren());
-            T_CHECK(!checkbox_widget->getForceCustomCursor());
+
+            GenericWidgetTest gwt(application, test);
+            gwt.widget = checkbox_widget;
+            gwt.total_widgets = 3;
+            gwt.name = "checkbox";
+            gwt.fullname = "root|checkbox";
+            gwt.is_visual_position_quantized = false;
+            gwt.is_visible = true;
+            gwt.opaque = true;
+            gwt.is_click_through = false;
+            gwt.is_mouse_over = false;
+            gwt.is_focusable = true;
+            gwt.is_focused = false;
+            gwt.clip_children = false;
+            gwt.force_custom_cursor = false;
+            gwt.parent = root_widget;
+            gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+            gwt.global_bounds = sf::FloatRect(position, size);
+            gwt.parent_local_bounds = gwt.global_bounds;
+            gwt.visual_local_bounds = gwt.local_bounds;
+            gwt.visual_global_bounds = gwt.global_bounds;
+            gwt.visual_parent_local_bounds = gwt.global_bounds;
+            T_WRAP_CONTAINER(genericWidgetTest(gwt));
+
             if (T_COMPARE(checkbox_widget->getChildren().size(), 1)) {
                 fw::RectangleWidget* check_widget = dynamic_cast<fw::RectangleWidget*>(checkbox_widget->getChild(0));
                 T_CHECK(check_widget, "Check widget is not a RectangleWidget");
                 T_COMPARE(check_widget->getParentAnchor(), fw::Widget::Anchor::CENTER, &WidgetTests::anchorToStr);
             }
-            sf::FloatRect local_bounds = sf::FloatRect(sf::Vector2f(), size);
-            sf::FloatRect parent_local_bounds = sf::FloatRect(position, size);
-            auto rect_to_str = &WidgetTests::floatRectToStr;
-            T_COMPARE(checkbox_widget->getLocalBounds(), local_bounds, rect_to_str);
-            T_COMPARE(checkbox_widget->getParentLocalBounds(), parent_local_bounds, rect_to_str);
-            T_COMPARE(checkbox_widget->getGlobalBounds(), parent_local_bounds, rect_to_str);
-            T_COMPARE(checkbox_widget->getVisualLocalBounds(), local_bounds, rect_to_str);
-            T_COMPARE(checkbox_widget->getVisualParentLocalBounds(), parent_local_bounds, rect_to_str);
-            T_COMPARE(checkbox_widget->getVisualGlobalBounds(), parent_local_bounds, rect_to_str);
-            T_COMPARE(checkbox_widget->getUnclippedRegion(), parent_local_bounds, rect_to_str);
-            T_COMPARE(checkbox_widget->getQuantizedUnclippedRegion(), parent_local_bounds, rect_to_str);
-            T_COMPARE(checkbox_widget->getWidth(), parent_local_bounds.width);
-            T_COMPARE(checkbox_widget->getHeight(), parent_local_bounds.height);
-            auto vec2f_to_str = &WidgetTests::sfVec2fToStr;
-            T_COMPARE(checkbox_widget->getSize(), size, vec2f_to_str);
+
             T_COMPARE(checkbox_widget->getFillColor(), sf::Color(50, 50, 50), &WidgetTests::colorToStr);
         }
     );
