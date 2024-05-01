@@ -17,11 +17,7 @@ namespace fw {
 
 	WidgetRenderQueue::WidgetRenderQueue(WidgetList& widget_list) : widget_list(widget_list) { }
 
-	bool WidgetRenderQueue::isValid() const {
-		return valid;
-	}
-
-	void WidgetRenderQueue::update() const {
+	void WidgetRenderQueue::update() {
 		layers.clear();
 		std::function<void(Widget*)> add_widget = [&](Widget* widget) {
 			if (!widget->isVisible()) {
@@ -41,22 +37,10 @@ namespace fw {
 			}
 		};
 		add_widget(widget_list.getRootWidget());
-		valid = true;
-	}
-
-	const std::set<RenderQueueLayer>& WidgetRenderQueue::getSilent() const {
-		return layers;
 	}
 
 	const std::set<RenderQueueLayer>& WidgetRenderQueue::get() const {
-		if (!valid) {
-			update();
-		}
-		return getSilent();
-	}
-
-	void WidgetRenderQueue::invalidate() {
-		valid = false;
+		return layers;
 	}
 
 }

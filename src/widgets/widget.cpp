@@ -365,13 +365,11 @@ namespace fw {
 	void Widget::setVisible(bool value) {
 		wAssert(!widget_list.isLocked());
 		this->visible = value;
-		widget_list.render_queue.invalidate();
 	}
 
 	void Widget::toggleVisible() {
 		wAssert(!widget_list.isLocked());
 		this->visible = !this->visible;
-		widget_list.render_queue.invalidate();
 	}
 
 	void Widget::setClickThrough(bool value) {
@@ -412,7 +410,6 @@ namespace fw {
 		this->parent = new_parent;
 		transforms.invalidateGlobalTransform();
 		updateFullName();
-		widget_list.render_queue.invalidate();
 	}
 
 	void Widget::setParent(Widget* new_parent) {
@@ -447,10 +444,10 @@ namespace fw {
 	void Widget::setRenderLayer(RenderLayer layer) {
 		wAssert(!widget_list.isLocked());
 		this->layer = layer;
-		widget_list.render_queue.invalidate();
 	}
 
 	void Widget::setShader(sf::Shader* shader) {
+		wAssert(!widget_list.isLocked());
 		this->shader = shader;
 	}
 
@@ -491,7 +488,6 @@ namespace fw {
 		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->update();
 		}
-		widget_list.render_queue.invalidate();
 		internalUpdate();
 	}
 

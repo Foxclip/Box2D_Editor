@@ -26,16 +26,12 @@ namespace fw {
 	class WidgetRenderQueue {
 	public:
 		WidgetRenderQueue(WidgetList& widget_list);
-		bool isValid() const;
-		void update() const;
-		const std::set<RenderQueueLayer>& getSilent() const;
+		void update();
 		const std::set<RenderQueueLayer>& get() const;
-		void invalidate();
 
 	private:
 		WidgetList& widget_list;
-		mutable std::set<RenderQueueLayer> layers;
-		mutable bool valid = false;
+		std::set<RenderQueueLayer> layers;
 
 	};
 

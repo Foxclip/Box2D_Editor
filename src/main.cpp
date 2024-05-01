@@ -43,8 +43,6 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: CanvasWidget tests
-    // TODO: remove RenderQueue cache, store previous RenderQueue
     // TODO: remove Application reference from Toolbox and other ui elements
     // TODO: make tool panel with move, rotate and duplicate tools
     // TODO: Window widget

@@ -76,7 +76,6 @@ namespace fw {
 			ptr->setParentSilent(root_widget);
 		}
 		widgets.add(std::move(uptr));
-		render_queue.invalidate();
 		return ptr;
 	}
 

@@ -34,10 +34,8 @@ namespace fw {
         onFrameBegin();
         processWidgets();
         processInput();
-        widgets.lock();
         processWorld();
         render();
-        widgets.unlock();
         onFrameEnd();
     }
 
@@ -260,8 +258,6 @@ namespace fw {
         processKeyboard();
         processMouse();
         afterProcessInput();
-        widgets.updateWidgets();
-        widgets.updateRenderQueue();
     }
 
     void Application::processEvent(const sf::Event& event) {
@@ -416,6 +412,9 @@ namespace fw {
     }
 
     void Application::render() {
+        widgets.updateWidgets();
+        widgets.updateRenderQueue();
+        widgets.lock();
         window.clear(background_color);
         window_view.setCenter(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
         window_view.setSize((float)window.getSize().x, (float)window.getSize().y);
@@ -423,6 +422,7 @@ namespace fw {
         onRender();
         widgets.render(window);
         window.display();
+        widgets.unlock();
     }
 
     MouseGesture::MouseGesture() { }

@@ -38,7 +38,7 @@ namespace fw {
 
 	Widget* WidgetList::getTopWidgetUnderCursor() const {
 		// getSilent because render_queue is from previous frame
-		for (RenderQueueLayer layer : render_queue.getSilent() | std::views::reverse) {
+		for (RenderQueueLayer layer : render_queue.get() | std::views::reverse) {
 			for (Widget* widget : layer.widgets | std::views::reverse) {
 				if (widget->isMouseOver()) {
 					return widget;
@@ -51,7 +51,7 @@ namespace fw {
 	CompVector<Widget*> WidgetList::getWidgetsUnderCursor(bool can_block, bool& blocked) const {
 		blocked = false;
 		CompVector<Widget*> result;
-		for (RenderQueueLayer layer : render_queue.getSilent() | std::views::reverse) {
+		for (RenderQueueLayer layer : render_queue.get() | std::views::reverse) {
 			for (Widget* widget : layer.widgets | std::views::reverse) {
 				if (widget->isMouseOver()) {
 					result.add(widget);
@@ -105,10 +105,12 @@ namespace fw {
 	}
 
 	void WidgetList::lock() {
+		wAssert(!locked);
 		locked = true;
 	}
 
 	void WidgetList::unlock() {
+		wAssert(locked);
 		locked = false;
 	}
 
@@ -122,7 +124,6 @@ namespace fw {
 			if (!focused && widget->isFocusable()) {
 				focused = widget;
 			}
-			render_queue.invalidate();
 		}
 		setFocusedWidget(focused);
 	}
@@ -131,19 +132,17 @@ namespace fw {
 		wAssert(!isLocked());
 		if (focused_widget) {
 			focused_widget->processRelease(pos);
-			render_queue.invalidate();
 		}
 	}
 
 	void WidgetList::processMouse(const sf::Vector2f pos) {
 		wAssert(!isLocked());
 		root_widget->processMouse(pos);
-		render_queue.invalidate();
 	}
 
 	void WidgetList::processWindowEvent(const sf::Event& event) {
 		if (event.type == sf::Event::Resized) {
-			for (RenderQueueLayer layer : render_queue.getSilent()) {
+			for (RenderQueueLayer layer : render_queue.get()) {
 				for (Widget* widget : layer.widgets) {
 					widget->OnWindowResized(event.size.width, event.size.height);
 				}
@@ -155,7 +154,6 @@ namespace fw {
 		wAssert(!isLocked());
 		if (focused_widget) {
 			focused_widget->processKeyboardEvent(event);
-			render_queue.invalidate();
 		}
 	}
 
@@ -167,7 +165,6 @@ namespace fw {
 	void WidgetList::updateWidgets() {
 		wAssert(!isLocked());
 		root_widget->update();
-		render_queue.invalidate();
 	}
 
 	void WidgetList::render(sf::RenderTarget& target) {
@@ -220,14 +217,12 @@ namespace fw {
 			logger << focused_widget->getFullName() << " lost focus\n";
 			focused_widget->internalOnFocusLost();
 			focused_widget->OnFocusLost();
-			render_queue.invalidate();
 		}
 		focused_widget = widget;
 		if (focused_widget) {
 			logger << focused_widget->getFullName() << " is focused\n";
 			focused_widget->internalOnFocused();
 			focused_widget->OnFocused();
-			render_queue.invalidate();
 		}
 	}
 
