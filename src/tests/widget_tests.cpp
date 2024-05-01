@@ -1614,6 +1614,55 @@ void WidgetTests::createWidgetsList() {
             T_COMPARE(canvas_widget->getChildren().size(), 0);
         }
     );
+    test::Test* canvas_widget_draw_test = list->addTest(
+        "canvas_widget_draw",
+        {
+            canvas_widget_basic_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0, false);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::CanvasWidget* canvas_widget = application.getWidgets().createWidget<fw::CanvasWidget>();
+            canvas_widget->setSize(100.0f, 100.0f);
+            canvas_widget->setTextureSize(100, 100);
+            auto color_to_str = &WidgetTests::colorToStr;
+            {
+                canvas_widget->clear();
+                sf::Image image = canvas_widget->getRenderTexture().getTexture().copyToImage();
+                T_ASSERT(T_COMPARE(image.getPixel(0, 0), sf::Color::Black, color_to_str));
+            }
+            {
+                canvas_widget->clear(sf::Color(128, 128, 128));
+                sf::Image image = canvas_widget->getRenderTexture().getTexture().copyToImage();
+                T_ASSERT(T_COMPARE(image.getPixel(0, 0), sf::Color(128, 128, 128), color_to_str));
+            }
+            {
+                canvas_widget->clear(sf::Color::Red);
+                sf::RectangleShape rect(sf::Vector2f(30.0f, 30.0f));
+                rect.setPosition(10.0f, 10.0f);
+                rect.setFillColor(sf::Color::Green);
+                canvas_widget->draw(rect);
+                canvas_widget->display();
+                sf::Image image = canvas_widget->getRenderTexture().getTexture().copyToImage();
+                T_COMPARE(image.getPixel(0, 0), sf::Color::Red, color_to_str);
+                T_COMPARE(image.getPixel(5, 5), sf::Color::Red, color_to_str);
+                T_COMPARE(image.getPixel(10, 10), sf::Color::Green, color_to_str);
+                T_COMPARE(image.getPixel(15, 15), sf::Color::Green, color_to_str);
+                T_COMPARE(image.getPixel(20, 20), sf::Color::Green, color_to_str);
+                T_COMPARE(image.getPixel(25, 25), sf::Color::Green, color_to_str);
+                T_COMPARE(image.getPixel(30, 30), sf::Color::Green, color_to_str);
+                T_COMPARE(image.getPixel(35, 35), sf::Color::Green, color_to_str);
+                T_COMPARE(image.getPixel(40, 40), sf::Color::Red, color_to_str);
+                T_COMPARE(image.getPixel(45, 45), sf::Color::Red, color_to_str);
+                T_COMPARE(image.getPixel(50, 50), sf::Color::Red, color_to_str);
+                T_COMPARE(image.getPixel(55, 55), sf::Color::Red, color_to_str);
+                T_COMPARE(image.getPixel(60, 60), sf::Color::Red, color_to_str);
+            }
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
