@@ -1569,6 +1569,51 @@ void WidgetTests::createWidgetsList() {
             ENTER_TEXT(sf::Keyboard::Backspace, '\b');
         }
     );
+    test::Test* canvas_widget_basic_test = list->addTest(
+        "canvas_widget_basic",
+        {
+            rectangle_widget_test
+        },
+        [&](test::Test& test) {
+            fw::Application application;
+            application.init("Test window", 800, 600, 0, false);
+            application.start(true);
+            application.mouseMove(400, 300);
+            application.advance();
+            fw::CanvasWidget* canvas_widget = application.getWidgets().createWidget<fw::CanvasWidget>();
+            fw::Widget* root_widget = application.getWidgets().getRootWidget();
+            T_ASSERT(T_CHECK(canvas_widget));
+            sf::Vector2f position(100.0f, 100.0f);
+            sf::Vector2f size(100.0f, 100.0f);
+            canvas_widget->setPosition(position);
+            canvas_widget->setSize(size);
+
+            GenericWidgetTest gwt(application, test);
+            gwt.widget = canvas_widget;
+            gwt.total_widgets = 2;
+            gwt.name = "canvas";
+            gwt.fullname = "root|canvas";
+            gwt.is_visual_position_quantized = false;
+            gwt.is_visible = true;
+            gwt.opaque = true;
+            gwt.is_click_through = true;
+            gwt.is_mouse_over = false;
+            gwt.is_focusable = false;
+            gwt.is_focused = false;
+            gwt.clip_children = false;
+            gwt.force_custom_cursor = false;
+            gwt.parent = root_widget;
+            gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+            gwt.global_bounds = sf::FloatRect(position, size);
+            gwt.parent_local_bounds = gwt.global_bounds;
+            gwt.visual_local_bounds = gwt.local_bounds;
+            gwt.visual_global_bounds = gwt.global_bounds;
+            gwt.visual_parent_local_bounds = gwt.global_bounds;
+            T_WRAP_CONTAINER(genericWidgetTest(gwt));
+
+            T_COMPARE(canvas_widget->getChildren().size(), 0);
+        }
+    );
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {

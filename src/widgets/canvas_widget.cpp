@@ -1,6 +1,7 @@
 #include "widgets/canvas_widget.h"
 
 fw::CanvasWidget::CanvasWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
+	setName("canvas");
 	rect.setTexture(&texture.getTexture(), true);
 }
 
