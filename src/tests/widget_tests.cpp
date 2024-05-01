@@ -216,6 +216,7 @@ void WidgetTests::createWidgetsList() {
             application.advance();
             fw::RectangleWidget* root_widget = dynamic_cast<fw::RectangleWidget*>(application.getWidgets().getRootWidget());
             T_ASSERT(T_CHECK(root_widget, "Root widget is not a RectangleWidget"));
+
             GenericWidgetTest gwt(application, test);
             gwt.widget = root_widget;
             gwt.total_widgets = 1;
@@ -230,15 +231,17 @@ void WidgetTests::createWidgetsList() {
             gwt.is_focused = false;
             gwt.clip_children = true;
             gwt.force_custom_cursor = false;
-            gwt.has_parent = false;
+            gwt.parent = nullptr;
             gwt.local_bounds = sf::FloatRect(sf::Vector2f(), fw::to2f(application.getWindowSize()));
+            gwt.global_bounds = gwt.local_bounds;
             gwt.parent_local_bounds = gwt.local_bounds;
             gwt.visual_local_bounds = gwt.local_bounds;
+            gwt.visual_global_bounds = gwt.local_bounds;
             gwt.visual_parent_local_bounds = gwt.local_bounds;
             T_WRAP_CONTAINER(genericWidgetTest(gwt));
-            auto vec2f_to_str = &WidgetTests::sfVec2fToStr;
-            T_COMPARE(root_widget->getSize(), fw::to2f(application.getWindowSize()), vec2f_to_str);
+
             T_COMPARE(root_widget->getFillColor(), sf::Color::Transparent, &WidgetTests::colorToStr);
+
             T_COMPARE(root_widget->getParentChain().size(), 0);
             T_COMPARE(root_widget->getChildren().size(), 0);
         }
@@ -261,25 +264,30 @@ void WidgetTests::createWidgetsList() {
             sf::Vector2f size(100.0f, 100.0f);
             rectangle_widget->setPosition(position);
             rectangle_widget->setSize(size);
-            T_COMPARE(application.getWidgets().getSize(), 2);
-            T_COMPARE(rectangle_widget->getName(), "rectangle");
-            T_COMPARE(rectangle_widget->getFullName(), "root|rectangle");
-            T_CHECK(!rectangle_widget->isVisualPositionQuantized());
-            T_CHECK(rectangle_widget->isVisible());
-            fw::WidgetVisibility wv = rectangle_widget->checkVisibility();
-            T_CHECK(wv.addedToRoot);
-            T_CHECK(wv.allParentsVisible);
-            T_CHECK(wv.hasUnclippedRegion);
-            T_CHECK(wv.nonZeroSize);
-            T_CHECK(wv.onScreen);
-            T_CHECK(wv.opaque);
-            T_CHECK(wv.visibleSetting);
-            T_CHECK(rectangle_widget->isClickThrough());
-            T_CHECK(!rectangle_widget->isMouseOver());
-            T_CHECK(!rectangle_widget->isFocusable());
-            T_CHECK(!rectangle_widget->isFocused());
-            T_CHECK(!rectangle_widget->getClipChildren());
-            T_CHECK(!rectangle_widget->getForceCustomCursor());
+
+            GenericWidgetTest gwt(application, test);
+            gwt.widget = rectangle_widget;
+            gwt.total_widgets = 2;
+            gwt.name = "rectangle";
+            gwt.fullname = "root|rectangle";
+            gwt.is_visual_position_quantized = false;
+            gwt.is_visible = true;
+            gwt.opaque = true;
+            gwt.is_click_through = true;
+            gwt.is_mouse_over = false;
+            gwt.is_focusable = false;
+            gwt.is_focused = false;
+            gwt.clip_children = false;
+            gwt.force_custom_cursor = false;
+            gwt.parent = root_widget;
+            gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+            gwt.global_bounds = sf::FloatRect(position, size);
+            gwt.parent_local_bounds = gwt.global_bounds;
+            gwt.visual_local_bounds = gwt.local_bounds;
+            gwt.visual_global_bounds = gwt.global_bounds;
+            gwt.visual_parent_local_bounds = gwt.global_bounds;
+            T_WRAP_CONTAINER(genericWidgetTest(gwt));
+
             T_CHECK(rectangle_widget->getParent() == root_widget);
             CompVector<fw::Widget*> parent_chain = rectangle_widget->getParentChain();
             T_ASSERT(T_COMPARE(parent_chain.size(), 1));
@@ -289,21 +297,7 @@ void WidgetTests::createWidgetsList() {
             T_ASSERT(T_COMPARE(root_children.size(), 1));
             T_CHECK(root_children[0] == rectangle_widget);
             T_CHECK(root_widget->getChild(0) == rectangle_widget);
-            sf::FloatRect local_bounds = sf::FloatRect(sf::Vector2f(), size);
-            sf::FloatRect parent_local_bounds = sf::FloatRect(position, size);
-            auto rect_to_str = &WidgetTests::floatRectToStr;
-            T_COMPARE(rectangle_widget->getLocalBounds(), local_bounds, rect_to_str);
-            T_COMPARE(rectangle_widget->getParentLocalBounds(), parent_local_bounds, rect_to_str);
-            T_COMPARE(rectangle_widget->getGlobalBounds(), parent_local_bounds, rect_to_str);
-            T_COMPARE(rectangle_widget->getVisualLocalBounds(), local_bounds, rect_to_str);
-            T_COMPARE(rectangle_widget->getVisualParentLocalBounds(), parent_local_bounds, rect_to_str);
-            T_COMPARE(rectangle_widget->getVisualGlobalBounds(), parent_local_bounds, rect_to_str);
-            T_COMPARE(rectangle_widget->getUnclippedRegion(), parent_local_bounds, rect_to_str);
-            T_COMPARE(rectangle_widget->getQuantizedUnclippedRegion(), parent_local_bounds, rect_to_str);
-            T_COMPARE(rectangle_widget->getWidth(), parent_local_bounds.width);
-            T_COMPARE(rectangle_widget->getHeight(), parent_local_bounds.height);
-            auto vec2f_to_str = &WidgetTests::sfVec2fToStr;
-            T_COMPARE(rectangle_widget->getSize(), size, vec2f_to_str);
+
             T_COMPARE(rectangle_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
         }
     );
@@ -1717,7 +1711,7 @@ void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
     T_COMPARE(widget->isFocused(), gwt.is_focused);
     T_COMPARE(widget->getClipChildren(), gwt.clip_children);
     T_COMPARE(widget->getForceCustomCursor(), gwt.force_custom_cursor);
-    T_COMPARE(widget->getParent() != nullptr, gwt.has_parent);
+    T_CHECK(widget->getParent() == gwt.parent);
     auto rect_to_str = &WidgetTests::floatRectToStr;
     T_COMPARE(widget->getLocalBounds(), gwt.local_bounds, rect_to_str);
     T_COMPARE(widget->getParentLocalBounds(), gwt.parent_local_bounds, rect_to_str);
@@ -1732,8 +1726,8 @@ void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
     T_COMPARE(widget->getGlobalWidth(), gwt.parent_local_bounds.width);
     T_COMPARE(widget->getGlobalHeight(), gwt.parent_local_bounds.height);
     auto vec2f_to_str = &WidgetTests::sfVec2fToStr;
-    T_COMPARE(widget->getSize(), fw::to2f(application.getWindowSize()), vec2f_to_str);
-    auto get_corners = [&](const sf::FloatRect & bounds) {
+    T_COMPARE(widget->getSize(), gwt.local_bounds.getSize(), vec2f_to_str);
+    auto get_corners = [&](const sf::FloatRect& bounds) {
         std::vector<sf::Vector2f> corners(4);
         corners[0] = bounds.getPosition();
         corners[1] = bounds.getPosition() + sf::Vector2f(gwt.local_bounds.width, 0.0f);
@@ -1741,23 +1735,21 @@ void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
         corners[3] = bounds.getPosition() + bounds.getSize();
         return corners;
     };
-    std::vector<sf::Vector2f> local_corners = get_corners(gwt.local_bounds);
     std::vector<sf::Vector2f> parent_local_corners = get_corners(gwt.parent_local_bounds);
-    std::vector<sf::Vector2f> visual_local_corners = get_corners(gwt.visual_local_bounds);
-    std::vector<sf::Vector2f> visual_parent_local_corners = get_corners(gwt.visual_parent_local_bounds);
-    T_COMPARE(widget->getTopLeft(), local_corners[0], vec2f_to_str);
-    T_COMPARE(widget->getTopRight(), local_corners[1], vec2f_to_str);
-    T_COMPARE(widget->getBottomLeft(), local_corners[2], vec2f_to_str);
-    T_COMPARE(widget->getBottomRight(), local_corners[3], vec2f_to_str);
-    T_COMPARE(widget->getGlobalTopLeft(), parent_local_corners[0], vec2f_to_str);
-    T_COMPARE(widget->getGlobalTopRight(), parent_local_corners[1], vec2f_to_str);
-    T_COMPARE(widget->getGlobalBottomLeft(), parent_local_corners[2], vec2f_to_str);
-    T_COMPARE(widget->getGlobalBottomRight(), parent_local_corners[3], vec2f_to_str);
-    T_COMPARE(widget->getVisualGlobalTopLeft(), visual_parent_local_corners[0], vec2f_to_str);
-    T_COMPARE(widget->getVisualGlobalTopRight(), visual_parent_local_corners[1], vec2f_to_str);
-    T_COMPARE(widget->getVisualGlobalBottomLeft(), visual_parent_local_corners[2], vec2f_to_str);
-    T_COMPARE(widget->getVisualGlobalBottomRight(), visual_parent_local_corners[3], vec2f_to_str);
-    T_COMPARE(widget->getFillColor(), sf::Color::Transparent, &WidgetTests::colorToStr);
+    std::vector<sf::Vector2f> global_corners = get_corners(gwt.global_bounds);
+    std::vector<sf::Vector2f> visual_global_corners = get_corners(gwt.visual_global_bounds);
+    T_COMPARE(widget->getTopLeft(), parent_local_corners[0], vec2f_to_str);
+    T_COMPARE(widget->getTopRight(), parent_local_corners[1], vec2f_to_str);
+    T_COMPARE(widget->getBottomLeft(), parent_local_corners[2], vec2f_to_str);
+    T_COMPARE(widget->getBottomRight(), parent_local_corners[3], vec2f_to_str);
+    T_COMPARE(widget->getGlobalTopLeft(), global_corners[0], vec2f_to_str);
+    T_COMPARE(widget->getGlobalTopRight(), global_corners[1], vec2f_to_str);
+    T_COMPARE(widget->getGlobalBottomLeft(), global_corners[2], vec2f_to_str);
+    T_COMPARE(widget->getGlobalBottomRight(), global_corners[3], vec2f_to_str);
+    T_COMPARE(widget->getVisualGlobalTopLeft(), visual_global_corners[0], vec2f_to_str);
+    T_COMPARE(widget->getVisualGlobalTopRight(), visual_global_corners[1], vec2f_to_str);
+    T_COMPARE(widget->getVisualGlobalBottomLeft(), visual_global_corners[2], vec2f_to_str);
+    T_COMPARE(widget->getVisualGlobalBottomRight(), visual_global_corners[3], vec2f_to_str);
 }
 
 void TestApplication::onInit() {

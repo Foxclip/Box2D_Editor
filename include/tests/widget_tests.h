@@ -62,10 +62,12 @@ struct GenericWidgetTest {
 	bool is_focused = false;
 	bool clip_children = false;
 	bool force_custom_cursor = false;
-	bool has_parent = false;
+	fw::Widget* parent = nullptr;
 	sf::FloatRect local_bounds;
+	sf::FloatRect global_bounds;
 	sf::FloatRect parent_local_bounds;
 	sf::FloatRect visual_local_bounds;
+	sf::FloatRect visual_global_bounds;
 	sf::FloatRect visual_parent_local_bounds;
 };
 
