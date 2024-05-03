@@ -168,12 +168,20 @@ void Editor::initTools() {
     create_tool.OnSetSelected = [&](bool value) {
         create_tool.create_panel_widget->setVisible(value);
     };
+    edit_tool.OnSetSelectedWithButton = [&](bool value) {
+        edit_tool.selected_tool = selected_tool;
+    };
     edit_tool.OnSetSelected = [&](bool value) {
         if (value) {
-            assert(active_object);
-            edit_tool.edit_window_widget->updateParameters();
+            if (active_object) {
+                edit_tool.edit_window_widget->updateParameters();
+                edit_tool.edit_window_widget->setVisible(true);
+            } else {
+                edit_tool.edit_window_widget->setVisible(false);
+            }
+        } else {
+            edit_tool.edit_window_widget->setVisible(false);
         }
-        edit_tool.edit_window_widget->setVisible(value);
     };
 }
 
@@ -333,18 +341,13 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
         switch (event.key.code) {
             case sf::Keyboard::Escape:
                 if (selected_tool == &move_tool) {
-                    for (GameObject* obj : move_tool.moving_objects) {
-                        obj->setGlobalPosition(obj->orig_pos);
-                        obj->setEnabled(obj->was_enabled, true);
-                    }
-                    trySelectTool(&select_tool);
+                    endMove(false);
+                    trySelectTool(move_tool.selected_tool);
+                    endGesture();
                 } else if (selected_tool == &rotate_tool) {
-                    for (GameObject* obj : rotate_tool.rotating_objects) {
-                        obj->setGlobalPosition(obj->orig_pos);
-                        obj->setGlobalAngle(obj->orig_angle);
-                        obj->setEnabled(obj->was_enabled, true);
-                    }
-                    trySelectTool(&select_tool);
+                    endRotate(false);
+                    trySelectTool(rotate_tool.selected_tool);
+                    endGesture();
                 }
                 break;
             case sf::Keyboard::Space: togglePause(); break;
@@ -414,22 +417,25 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                 break;
             case sf::Keyboard::Tab:
                 if (selected_tool == &edit_tool) {
-                    trySelectTool(&select_tool);
-                } else if (selected_tool == &select_tool && active_object) {
+                    trySelectTool(edit_tool.selected_tool);
+                } else if (active_object) {
+                    edit_tool.selected_tool = selected_tool;
                     trySelectTool(&edit_tool);
                 }
                 break;
             case sf::Keyboard::G:
-                if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
+                if (select_tool.selectedCount() > 0) {
+                    Tool* s_tool = selected_tool;
                     trySelectTool(&move_tool);
-                    grabSelected();
+                    grabSelected(s_tool);
                     startMoveGesture();
                 }
                 break;
             case sf::Keyboard::R:
-                if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
+                if (select_tool.selectedCount() > 0) {
+                    Tool* s_tool = selected_tool;
                     trySelectTool(&rotate_tool);
-                    rotateSelected();
+                    rotateSelected(s_tool);
                     startMoveGesture();
                 }
                 break;
@@ -439,8 +445,9 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                         CompVector<GameObject*> old_objects = select_tool.getSelectedObjects();
                         CompVector<GameObject*> new_objects = simulation.duplicate(old_objects);
                         select_tool.setSelected(new_objects);
+                        Tool* s_tool = selected_tool;
                         trySelectTool(&move_tool);
-                        grabSelected();
+                        grabSelected(s_tool);
                         commit_action = true;
                         startMoveGesture();
                     }
@@ -530,19 +537,19 @@ void Editor::onProcessLeftClick() {
                 });
             };
     } else if (selected_tool == &move_tool) {
-        for (GameObject* obj : move_tool.moving_objects) {
-            //TODO: remember state for all children
-            obj->setEnabled(obj->was_enabled, true);
-            commit_action = true;
+        if (move_tool.moving_objects.size() > 0) {
+            endMove(true);
+            trySelectTool(move_tool.selected_tool);
+        } else {
+            grabSelected(selected_tool);
         }
-        trySelectTool(&select_tool);
     } else if (selected_tool == &rotate_tool) {
-        for (GameObject* obj : rotate_tool.rotating_objects) {
-            //TODO: remember state for all children
-            obj->setEnabled(obj->was_enabled, true);
-            commit_action = true;
+        if (rotate_tool.rotating_objects.size() > 0) {
+            endRotate(true);
+            trySelectTool(rotate_tool.selected_tool);
+        } else {
+            rotateSelected(selected_tool);
         }
-        trySelectTool(&select_tool);
     } else if (selected_tool == &edit_tool && active_object) {
         if (edit_tool.mode == EditTool::HOVER) {
             if (edit_tool.highlighted_vertex != -1) {
@@ -590,6 +597,10 @@ void Editor::onProcessLeftRelease() {
                 select_tool.selectSingleObject(object, with_children);
             }
         }
+    } else if (selected_tool == &move_tool) {
+        endMove(true);
+    } else if (selected_tool == &rotate_tool) {
+        endRotate(true);
     }
     if (select_tool.rectangle_select.active) {
         select_tool.rectangle_select.active = false;
@@ -1281,9 +1292,10 @@ bool Editor::isParentSelected(const GameObject* object) const {
     return false;
 }
 
-void Editor::grabSelected() {
+void Editor::grabSelected(Tool* selected_tool) {
     move_tool.orig_cursor_pos = b2MousePosWorld;
     move_tool.moving_objects = CompVector<GameObject*>();
+    move_tool.selected_tool = selected_tool;
     for (GameObject* obj : select_tool.getSelectedObjects()) {
         if (isParentSelected(obj)) {
             continue;
@@ -1298,9 +1310,10 @@ void Editor::grabSelected() {
     }
 }
 
-void Editor::rotateSelected() {
+void Editor::rotateSelected(Tool* selected_tool) {
     rotate_tool.orig_cursor_pos = b2MousePosWorld;
     rotate_tool.rotating_objects = CompVector<GameObject*>();
+    rotate_tool.selected_tool = selected_tool;
     for (GameObject* obj : select_tool.getSelectedObjects()) {
         if (isParentSelected(obj)) {
             continue;
@@ -1320,6 +1333,33 @@ void Editor::rotateSelected() {
     rotate_tool.pivot_pos = avg;
     b2Vec2 mouse_vector = b2MousePosWorld - avg;
     rotate_tool.orig_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
+}
+
+void Editor::endMove(bool confirm) {
+    for (GameObject* obj : move_tool.moving_objects) {
+        if (confirm) {
+            commit_action = true;
+        } else {
+            obj->setGlobalPosition(obj->orig_pos);
+        }
+        //TODO: remember state for all children
+        obj->setEnabled(obj->was_enabled, true);
+    }
+    move_tool.moving_objects.clear();
+}
+
+void Editor::endRotate(bool confirm) {
+    for (GameObject* obj : rotate_tool.rotating_objects) {
+        if (confirm) {
+            commit_action = true;
+        } else {
+            obj->setGlobalPosition(obj->orig_pos);
+            obj->setGlobalAngle(obj->orig_angle);
+        }
+        //TODO: remember state for all children
+        obj->setEnabled(obj->was_enabled, true);
+    }
+    rotate_tool.rotating_objects.clear();
 }
 
 void Editor::deleteObject(GameObject* object, bool remove_children) {

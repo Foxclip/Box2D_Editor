@@ -101,6 +101,7 @@ namespace fw {
 		virtual void onRender();
 		virtual void onClose();
 		void startMoveGesture();
+		void endGesture();
 
 	private:
 		void mainLoop();
@@ -117,7 +118,6 @@ namespace fw {
 		void startMoveGesture(
 			MouseGesture::MouseGestureSource source
 		);
-		void endGesture();
 		void processLeftClick();
 		void processLeftRelease();
 		void processKeyboard();

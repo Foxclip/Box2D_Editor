@@ -40,10 +40,9 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
-    run_tests();
-    //execute_app();
+    //run_tests();
+    execute_app();
 
-    // TODO: remove Application reference from Toolbox and other ui elements
     // TODO: make tool panel with move, rotate and duplicate tools
     // TODO: Window widget
     // TODO: align textboxes in EditWindow to the right

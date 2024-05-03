@@ -214,8 +214,10 @@ private:
 	void getScreenNormal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const;
 	void getScreenNormal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const;
 	bool isParentSelected(const GameObject* object) const;
-	void grabSelected();
-	void rotateSelected();
+	void grabSelected(Tool* selected_tool);
+	void rotateSelected(Tool* selected_tool);
+	void endMove(bool confirm);
+	void endRotate(bool confirm);
 	void deleteObject(GameObject* object, bool remove_children);
 	void checkDebugbreak();
 

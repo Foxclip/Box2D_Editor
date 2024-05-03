@@ -11,14 +11,15 @@ Toolbox::Toolbox(fw::WidgetList& widget_list, Editor& p_app)
     setName("toolbox");
     for (size_t i = 0; i < app.tools.size(); i++) {
         Tool* tool = app.tools[i];
-        if (!tool->showInToolPanel()) {
-            continue;
-        }
         RectangleWidget* tool_widget = app.widgets.createWidget<RectangleWidget>();
         tool_widget->setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
         tool_widget->setFillColor(sf::Color(128, 128, 128));
         tool_widget->setOutlineColor(sf::Color::Yellow);
         tool_widget->OnClick = [=](const sf::Vector2f& pos) {
+            if (app.selected_tool != tool) {
+                app.selected_tool->OnSetSelectedWithButton(false);
+                tool->OnSetSelectedWithButton(true);
+            }
             app.trySelectTool(tool);
         };
         tool_widget->OnMouseEnter = [=](const sf::Vector2f pos) {

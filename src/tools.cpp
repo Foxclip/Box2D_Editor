@@ -8,10 +8,6 @@ CreateTool::CreateTool() : Tool() {
     name = "create";
 }
 
-bool CreateTool::showInToolPanel() const {
-    return true;
-}
-
 std::string CreateTool::create_type_name(ObjectType type) {
     switch (type) {
         case CreateTool::BOX: return "box";
@@ -24,10 +20,6 @@ DragTool::DragTool() : Tool() {
     name = "drag";
 }
 
-bool DragTool::showInToolPanel() const {
-    return true;
-}
-
 void DragTool::reset() {
     mouse_body = nullptr;
     mouse_joint = nullptr;
@@ -37,21 +29,14 @@ MoveTool::MoveTool() : Tool() {
     name = "move";
 }
 
-bool MoveTool::showInToolPanel() const {
-    return false;
-}
-
 void MoveTool::reset() {
     orig_cursor_pos = b2Vec2(0.0f, 0.0f);
     moving_objects = CompVector<GameObject*>();
+    selected_tool = nullptr;
 }
 
 RotateTool::RotateTool() : Tool() {
     name = "rotate";
-}
-
-bool RotateTool::showInToolPanel() const {
-    return false;
 }
 
 void RotateTool::reset() {
@@ -59,6 +44,7 @@ void RotateTool::reset() {
     orig_cursor_pos = b2Vec2(0.0f, 0.0f);
     rotating_objects = CompVector<GameObject*>();
     orig_mouse_angle = 0.0f;
+    selected_tool = nullptr;
 }
 
 EditTool::EditTool() : Tool() {
@@ -77,10 +63,6 @@ EditTool::EditTool() : Tool() {
     edge_highlight.setOrigin(sf::Vector2f(0.0f, 1.5f));
 }
 
-bool EditTool::showInToolPanel() const {
-    return false;
-}
-
 void EditTool::reset() {
     mode = HOVER;
     grabbed_vertex = -1;
@@ -90,6 +72,7 @@ void EditTool::reset() {
     rectangle_select.reset();
     grabbed_vertex_offset = b2Vec2(0.0f, 0.0f);
     insertVertexPos = b2Vec2(0.0f, 0.0f);
+    selected_tool = nullptr;
 }
 
 std::string EditTool::modeToStr(EditToolMode mode) {
@@ -105,10 +88,6 @@ std::string EditTool::modeToStr(EditToolMode mode) {
 
 SelectTool::SelectTool() {
     name = "select";
-}
-
-bool SelectTool::showInToolPanel() const {
-    return true;
 }
 
 size_t SelectTool::selectedCount() const {

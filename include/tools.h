@@ -42,8 +42,7 @@ public:
 	std::string name;
 	fw::Widget* widget = nullptr;
 	std::function<void(bool)> OnSetSelected = [](bool value) { };
-
-	virtual bool showInToolPanel() const = 0;
+	std::function<void(bool)> OnSetSelectedWithButton = [](bool value) { };
 
 	Tool();
 	virtual void reset() = 0;
@@ -58,7 +57,6 @@ public:
 	CompVector<GameObject*> objects_in_rect;
 
 	SelectTool();
-	bool showInToolPanel() const override;
 	size_t selectedCount() const;
 	const CompVector<GameObject*>& getSelectedObjects() const;
 	void setSelected(const CompVector<GameObject*> vec);
@@ -83,7 +81,6 @@ public:
 	std::unique_ptr<b2MouseJoint, std::function<void(b2MouseJoint*)>> mouse_joint = nullptr;
 
 	DragTool();
-	bool showInToolPanel() const override;
 	void reset() override;
 
 private:
@@ -93,9 +90,9 @@ class MoveTool : public Tool {
 public:
 	b2Vec2 orig_cursor_pos = b2Vec2(0.0f, 0.0f);
 	CompVector<GameObject*> moving_objects;
+	Tool* selected_tool = nullptr;
 
 	MoveTool();
-	bool showInToolPanel() const override;
 	void reset() override;
 
 private:
@@ -107,9 +104,9 @@ public:
 	b2Vec2 orig_cursor_pos = b2Vec2(0.0f, 0.0f);
 	CompVector<GameObject*> rotating_objects;
 	float orig_mouse_angle = 0.0f;
+	Tool* selected_tool = nullptr;
 
 	RotateTool();
-	bool showInToolPanel() const override;
 	void reset() override;
 
 private:
@@ -140,9 +137,9 @@ public:
 	sf::RectangleShape vertex_rect;
 	sf::RectangleShape edge_highlight;
 	EditWindow* edit_window_widget = nullptr;
+	Tool* selected_tool = nullptr;
 
 	EditTool();
-	bool showInToolPanel() const override;
 	void reset() override;
 	static std::string modeToStr(EditToolMode mode);
 
@@ -160,7 +157,6 @@ public:
 	fw::ContainerWidget* create_panel_widget = nullptr;
 
 	CreateTool();
-	bool showInToolPanel() const override;
 	void reset() override;
 	static std::string create_type_name(ObjectType type);
 };

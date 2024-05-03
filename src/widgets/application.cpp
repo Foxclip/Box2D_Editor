@@ -231,6 +231,12 @@ namespace fw {
         startMoveGesture(MouseGesture::SCREEN);
     }
 
+    void Application::endGesture() {
+        LoggerTag tag_mouse_gesture("mouseGesture");
+        mouseGesture.active = false;
+        logger << "End gesture\n";
+    }
+
     void Application::mainLoop() {
         while (window.isOpen()) {
             advance();
@@ -345,12 +351,6 @@ namespace fw {
         logger << source_str << "\n";
         logger << type_str << "\n";
         logger << getMousePosf() << "\n";
-    }
-
-    void Application::endGesture() {
-        LoggerTag tag_mouse_gesture("mouseGesture");
-        mouseGesture.active = false;
-        logger << "End gesture\n";
     }
 
     void Application::processLeftClick() {
