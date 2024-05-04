@@ -12,3 +12,4 @@
 #include "text_widget.h"
 #include "textbox_widget.h"
 #include "widget_list.h"
+#include "window_widget.h"

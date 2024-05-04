@@ -316,6 +316,21 @@ void Editor::initWidgets() {
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
 
+    //fw::WindowWidget* some_window = widgets.createWidget<fw::WindowWidget>(10.0f, 10.0f);
+    ////some_window->setOrigin(fw::Widget::Anchor::CENTER);
+    //some_window->setHeaderVisible(false);
+    //some_window->setPosition(0.0f, 0.5f);
+    ////some_window->setParentAnchor(fw::Widget::Anchor::CENTER);
+    //some_window->setHeaderFont(console_font);
+    //some_window->setHeaderTextCharacterSize(15);
+    //some_window->debug_id = 0;
+
+    fw::WindowWidget* some_window = widgets.createWidget<fw::WindowWidget>(300.0f, 200.0f);
+    some_window->setOrigin(fw::Widget::Anchor::CENTER);
+    some_window->setParentAnchor(fw::Widget::Anchor::CENTER);
+    some_window->setHeaderFont(console_font);
+    some_window->setHeaderTextCharacterSize(15);
+
     //RectangleWidget* rect = widgets.createWidget<RectangleWidget>();
     //rect->setFillColor(sf::Color::Black);
     //rect->setSize(sf::Vector2f(100.0f, 100.0f));

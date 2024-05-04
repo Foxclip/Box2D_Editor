@@ -43,8 +43,8 @@ int main() {
     //run_tests();
     execute_app();
 
-    // TODO: make tool panel with move, rotate and duplicate tools
     // TODO: Window widget
+    // TODO: require size for RectangleWidget and font for TextWidget
     // TODO: align textboxes in EditWindow to the right
     // TODO: Dropdown widget
     // TODO: object list window (outliner)

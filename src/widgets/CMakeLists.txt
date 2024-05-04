@@ -16,6 +16,7 @@ target_sources(widgets_lib PRIVATE
     "${INCLUDE_DIR}/widgets/widget_unclipped_region.h"
     "${INCLUDE_DIR}/widgets/widgets.h"
     "${INCLUDE_DIR}/widgets/widgets_common.h"
+    "${INCLUDE_DIR}/widgets/window_widget.h"
 )
 target_sources(widgets_lib PRIVATE
     application.cpp
@@ -33,6 +34,7 @@ target_sources(widgets_lib PRIVATE
     widget_transform.cpp
     widget_unclipped_region.cpp
     widgets_common.cpp
+    window_widget.cpp
 )
 target_include_directories(widgets_lib PRIVATE "${INCLUDE_DIR}")
 target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}")
