@@ -11,11 +11,7 @@ namespace fw {
 		TextWidget(WidgetList& widget_list);
 		bool isVisualPositionQuantized() const override;
 		sf::FloatRect getLocalBounds() const override;
-		sf::FloatRect getParentLocalBounds() const override;
-		sf::FloatRect getGlobalBounds() const override;
 		sf::FloatRect getVisualLocalBounds() const override;
-		sf::FloatRect getVisualParentLocalBounds() const override;
-		sf::FloatRect getVisualGlobalBounds() const override;
 		sf::Vector2f getRenderPositionOffset() const override;
 		const sf::Font* getFont() const;
 		size_t getStringSize() const;

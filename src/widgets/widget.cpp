@@ -164,16 +164,24 @@ namespace fw {
 		return nullptr;
 	}
 
+	sf::FloatRect Widget::getParentLocalBounds() const {
+		return getTransformOffset().transformRect(getLocalBounds());
+	}
+
+	sf::FloatRect Widget::getGlobalBounds() const {
+		return getGlobalTransformOffset().transformRect(getLocalBounds());
+	}
+
 	sf::FloatRect Widget::getVisualLocalBounds() const {
 		return getLocalBounds();
 	}
 
 	sf::FloatRect Widget::getVisualParentLocalBounds() const {
-		return getParentLocalBounds();
+		return getTransformOffset().transformRect(getVisualLocalBounds());
 	}
 
 	sf::FloatRect Widget::getVisualGlobalBounds() const {
-		return getGlobalBounds();
+		return getGlobalTransformOffset().transformRect(getVisualLocalBounds());
 	}
 
 	const sf::FloatRect& Widget::getUnclippedRegion() const {
@@ -221,15 +229,23 @@ namespace fw {
 	}
 
 	const sf::Vector2f& Widget::getOrigin() const {
-		return getTransformable().getOrigin();
+		return transforms.getOrigin();
 	}
 
 	const sf::Vector2f& Widget::getPosition() const {
 		return transforms.getPosition();
 	}
 
+	sf::Vector2f Widget::getOffsetPosition() const {
+		return transforms.getOffsetPosition();
+	}
+
 	sf::Vector2f Widget::getGlobalPosition() const {
-		return toGlobal(sf::Vector2f());
+		return getGlobalTransform().transformPoint(sf::Vector2f());
+	}
+
+	sf::Vector2f Widget::getOffsetGlobalPosition() const {
+		return getGlobalTransformOffset().transformPoint(sf::Vector2f());
 	}
 
 	sf::Vector2f Widget::getTopLeft() const {
@@ -309,7 +325,10 @@ namespace fw {
 
 	void Widget::setOrigin(Anchor anchor) {
 		wAssert(!widget_list.isLocked());
-		sf::Vector2f origin_pos = anchorToPos(anchor, getOrigin(), getSize());
+		sf::Vector2f origin_pos = getOrigin();
+		if (anchor != Anchor::CUSTOM) {
+			origin_pos = anchorToPos(anchor, getSize());
+		}
 		setOrigin(origin_pos);
 		this->origin_anchor = anchor;
 		updateAnchoredPosition();
@@ -317,16 +336,13 @@ namespace fw {
 
 	void Widget::setOrigin(float x, float y) {
 		wAssert(!widget_list.isLocked());
-		getTransformable().setOrigin(x, y);
+		transforms.setOrigin(x, y);
 		this->origin_anchor = Anchor::CUSTOM;
 		updateAnchoredPosition();
 	}
 
 	void Widget::setOrigin(const sf::Vector2f& origin) {
-		wAssert(!widget_list.isLocked());
-		getTransformable().setOrigin(origin);
-		this->origin_anchor = Anchor::CUSTOM;
-		updateAnchoredPosition();
+		setOrigin(origin.x, origin.y);
 	}
 
 	void Widget::setParentAnchor(Anchor anchor) {
@@ -469,11 +485,14 @@ namespace fw {
 
 	void Widget::updateAnchoredPosition() {
 		wAssert(!widget_list.isLocked());
-		sf::Vector2f parent_size;
-		if (parent) {
-			parent_size = parent->getLocalBounds().getSize();
+		if (!parent) {
+			return;
 		}
-		sf::Vector2f anchored_pos = anchorToPos(parent_anchor, getPosition(), parent_size);
+		sf::Vector2f parent_size = parent->getLocalBounds().getSize();
+		sf::Vector2f anchored_pos = getPosition();
+		if (parent_anchor != Anchor::CUSTOM) {
+			anchored_pos = anchorToPos(parent_anchor, parent_size) - parent->getOrigin();
+		}
 		setPosition(anchored_pos + anchor_offset);
 	}
 
@@ -544,24 +563,20 @@ namespace fw {
 		if (size_changed) {
 			render_texture.create((unsigned int)texture_bounds.width, (unsigned int)texture_bounds.height);
 		}
-		sf::Transform parent_transform = getParentGlobalTransform();
-		sf::Transform combined(parent_transform);
-		sf::Vector2f local_origin = getOrigin();
-		sf::Vector2f global_origin = toGlobal(local_origin);
-		sf::Vector2f global_position = getGlobalPosition();
-		sf::Vector2f global_origin_offset = global_position - global_origin;
+		sf::Transform global_transform_offset = getGlobalTransformOffset();
+		sf::Transform combined(global_transform_offset);
 		sf::Vector2f render_position_offset = getRenderPositionOffset();
-		sf::Vector2f position_offset = global_origin_offset + render_position_offset;
-		combined.translate(position_offset);
+		combined.translate(render_position_offset);
 		quantize_position(combined);
 		render_view.setSize(texture_bounds.getSize());
 		sf::Vector2f texture_bounds_center = texture_bounds.getPosition() + texture_bounds.getSize() / 2.0f;
 		render_view.setCenter(texture_bounds_center);
 		render_texture.setView(render_view);
 		render_texture.clear(sf::Color::Transparent);
-		getTransformable().setOrigin(sf::Vector2f());
+		sf::Transform transformable_transform = getTransformable().getTransform();
+		wAssert(transformable_transform == sf::Transform::Identity);
+		wAssert(getTransformable().getOrigin() == sf::Vector2f());
 		render_texture.draw(getDrawable(), combined);
-		getTransformable().setOrigin(local_origin);
 		render_texture.display();
 	}
 
@@ -603,20 +618,22 @@ namespace fw {
 		if (!visible) {
 			return;
 		}
-		sf::Color origin_color = widget_list.render_origin_color;
 		float offset = widget_list.render_origin_size;
 		sf::Vector2f hoffset = sf::Vector2f(offset, 0.0f);
 		sf::Vector2f voffset = sf::Vector2f(0.0f, offset);
-		sf::Vector2f pos = getGlobalPosition();
-		draw_line(target, pos - hoffset, pos + hoffset, origin_color);
-		draw_line(target, pos - voffset, pos + voffset, origin_color);
+		sf::Vector2f transform_pos = getGlobalPosition();
+		draw_line(target, transform_pos - hoffset, transform_pos + hoffset, widget_list.render_origin_color);
+		draw_line(target, transform_pos - voffset, transform_pos + voffset, widget_list.render_origin_color);
+		sf::Vector2f visual_pos = getOffsetGlobalPosition();
+		draw_line(target, visual_pos - hoffset / 2.0f, visual_pos + hoffset / 2.0f, widget_list.render_offset_origin_color);
+		draw_line(target, visual_pos - voffset / 2.0f, visual_pos + voffset / 2.0f, widget_list.render_offset_origin_color);
 		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->renderOrigin(target);
 		}
 	}
 
-	sf::Vector2f Widget::anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size) {
-		float x = orig.x, y = orig.y;
+	sf::Vector2f Widget::anchorToPos(Anchor p_anchor, const sf::Vector2f& size) {
+		float x, y;
 		switch (p_anchor) {
 			case Anchor::TOP_LEFT: x = 0.0f; y = 0.0f; break;
 			case Anchor::TOP_CENTER: x = size.x / 2.0f; y = 0.0f; break;
@@ -627,12 +644,30 @@ namespace fw {
 			case Anchor::BOTTOM_LEFT: x = 0.0f; y = size.y; break;
 			case Anchor::BOTTOM_CENTER: x = size.x / 2.0f; y = size.y; break;
 			case Anchor::BOTTOM_RIGHT: x = size.x; y = size.y; break;
+			case Anchor::CUSTOM: wAssert("Custom anchor is not valid here"); return sf::Vector2f();
+			default: wAssert("Unknown anchor"); return sf::Vector2f();
 		}
 		return sf::Vector2f(x, y);
 	}
 
+	const sf::Transform& Widget::getTransform() const {
+		return transforms.getTransform();
+	}
+
+	const sf::Transform& Widget::getTransformOffset() const {
+		return transforms.getTransformOffset();
+	}
+
+	const sf::Transform& Widget::getInverseTransform() const {
+		return transforms.getInverseTransform();
+	}
+
 	const sf::Transform& Widget::getGlobalTransform() const {
 		return transforms.getGlobalTransform();
+	}
+
+	const sf::Transform& Widget::getGlobalTransformOffset() const {
+		return transforms.getGlobalTransformOffset();
 	}
 
 	const sf::Transform& Widget::getParentGlobalTransform() const {

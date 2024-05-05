@@ -10,8 +10,6 @@ namespace fw {
 	public:
 		ShapeWidget(WidgetList& widget_list);
 		sf::FloatRect getLocalBounds() const override;
-		sf::FloatRect getParentLocalBounds() const override;
-		sf::FloatRect getGlobalBounds() const override;
 		virtual const sf::Color& getFillColor() const override;
 		virtual void setFillColor(const sf::Color& color) override;
 		void setOutlineColor(const sf::Color& color);

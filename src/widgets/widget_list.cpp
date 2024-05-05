@@ -197,8 +197,6 @@ namespace fw {
 		root_widget->updateMouseState(mouse_pos);
 		click_blocked = false;
 		release_blocked = false;
-		//root_widget->unclipped_region.invalidate();
-		//render_queue.invalidate();
 	}
 
 	void WidgetList::setFocusedWidget(Widget* widget) {

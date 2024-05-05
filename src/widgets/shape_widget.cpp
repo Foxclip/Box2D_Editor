@@ -9,14 +9,6 @@ namespace fw {
 		return getShape().getLocalBounds();
 	}
 
-	sf::FloatRect ShapeWidget::getParentLocalBounds() const {
-		return getShape().getGlobalBounds();
-	}
-
-	sf::FloatRect ShapeWidget::getGlobalBounds() const {
-		return getParentGlobalTransform().transformRect(getShape().getGlobalBounds());
-	}
-
 	const sf::Color& ShapeWidget::getFillColor() const {
 		return getShape().getFillColor();
 	}

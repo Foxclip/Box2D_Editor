@@ -23,29 +23,12 @@ namespace fw {
 		return result;
 	}
 
-	sf::FloatRect TextWidget::getParentLocalBounds() const {
-		sf::FloatRect local_bounds = getLocalBounds();
-		return getTransformable().getTransform().transformRect(local_bounds);
-	}
-
-	sf::FloatRect TextWidget::getGlobalBounds() const {
-		return getParentGlobalTransform().transformRect(getParentLocalBounds());
-	}
-
 	sf::FloatRect TextWidget::getVisualLocalBounds() const {
 		sf::FloatRect local_bounds = text.getLocalBounds();
 		sf::Vector2f offset = getRenderPositionOffset();
 		sf::Vector2f offset_pos = local_bounds.getPosition() + offset;
 		sf::FloatRect offset_bounds = sf::FloatRect(offset_pos, local_bounds.getSize());
 		return offset_bounds;
-	}
-
-	sf::FloatRect TextWidget::getVisualParentLocalBounds() const {
-		return getTransformable().getTransform().transformRect(getVisualLocalBounds());
-	}
-
-	sf::FloatRect TextWidget::getVisualGlobalBounds() const {
-		return getParentGlobalTransform().transformRect(getVisualParentLocalBounds());
 	}
 
 	sf::Vector2f TextWidget::getRenderPositionOffset() const {
@@ -90,7 +73,7 @@ namespace fw {
 	sf::Vector2f TextWidget::getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
 		wAssert(getFont());
 		sf::Vector2f parent_local_char_pos = text.findCharacterPos(index);
-		sf::Vector2f local_char_pos = getTransformable().getInverseTransform() * parent_local_char_pos;
+		sf::Vector2f local_char_pos = getInverseTransform() * parent_local_char_pos;
 		if (with_kerning) {
 			local_char_pos.x += getKerning(index);
 		}
@@ -103,7 +86,7 @@ namespace fw {
 
 	sf::Vector2f TextWidget::getParentLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
 		sf::Vector2f local_char_pos = getLocalCharPos(index, top_aligned, with_kerning);
-		sf::Vector2f parent_local_char_pos = getTransformable().getTransform() * local_char_pos;
+		sf::Vector2f parent_local_char_pos = getTransform() * local_char_pos;
 		return parent_local_char_pos;
 	}
 

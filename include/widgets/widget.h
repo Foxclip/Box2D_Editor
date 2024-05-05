@@ -91,11 +91,11 @@ namespace fw {
 		Widget* getChild(size_t index) const;
 		Widget* find(const std::string& name) const;
 		virtual sf::FloatRect getLocalBounds() const = 0;
-		virtual sf::FloatRect getParentLocalBounds() const = 0;
-		virtual sf::FloatRect getGlobalBounds() const = 0;
+		sf::FloatRect getParentLocalBounds() const;
+		sf::FloatRect getGlobalBounds() const;
 		virtual sf::FloatRect getVisualLocalBounds() const;
-		virtual sf::FloatRect getVisualParentLocalBounds() const;
-		virtual sf::FloatRect getVisualGlobalBounds() const;
+		sf::FloatRect getVisualParentLocalBounds() const;
+		sf::FloatRect getVisualGlobalBounds() const;
 		const sf::FloatRect& getUnclippedRegion() const;
 		const sf::FloatRect& getQuantizedUnclippedRegion() const;
 		sf::Vector2f toGlobal(const sf::Vector2f& pos) const;
@@ -108,8 +108,10 @@ namespace fw {
 		Anchor getParentAnchor() const;
 		sf::Vector2f getAnchorOffset() const;
 		const sf::Vector2f& getOrigin() const;
-		virtual const sf::Vector2f& getPosition() const;
-		virtual sf::Vector2f getGlobalPosition() const;
+		const sf::Vector2f& getPosition() const;
+		sf::Vector2f getOffsetPosition() const;
+		sf::Vector2f getGlobalPosition() const;
+		sf::Vector2f getOffsetGlobalPosition() const;
 		sf::Vector2f getCenter() const;
 		sf::Vector2f getGlobalCenter() const;
 		sf::Vector2f getVisualGlobalCenter() const;
@@ -175,8 +177,12 @@ namespace fw {
 		bool mouseIn = false;
 		bool force_custom_cursor = false;
 
-		sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& orig, const sf::Vector2f& size);
+		sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& size);
+		const sf::Transform& getTransform() const;
+		const sf::Transform& getTransformOffset() const;
+		const sf::Transform& getInverseTransform() const;
 		const sf::Transform& getGlobalTransform() const;
+		const sf::Transform& getGlobalTransformOffset() const;
 		const sf::Transform& getParentGlobalTransform() const;
 		const sf::Transform& getInverseGlobalTransform() const;
 		const sf::Transform& getInverseParentGlobalTransform() const;
