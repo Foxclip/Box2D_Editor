@@ -72,8 +72,9 @@ namespace fw {
 
 	sf::Vector2f TextWidget::getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
 		wAssert(getFont());
-		sf::Vector2f parent_local_char_pos = text.findCharacterPos(index);
-		sf::Vector2f local_char_pos = getInverseTransform() * parent_local_char_pos;
+		// Transformable's position is not used,
+		// so findCharacterPos returns position in local coordinates
+		sf::Vector2f local_char_pos = text.findCharacterPos(index);
 		if (with_kerning) {
 			local_char_pos.x += getKerning(index);
 		}
