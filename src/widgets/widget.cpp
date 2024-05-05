@@ -165,11 +165,11 @@ namespace fw {
 	}
 
 	sf::FloatRect Widget::getParentLocalBounds() const {
-		return getTransformOffset().transformRect(getLocalBounds());
+		return getTransform().transformRect(getLocalBounds());
 	}
 
 	sf::FloatRect Widget::getGlobalBounds() const {
-		return getGlobalTransformOffset().transformRect(getLocalBounds());
+		return getGlobalTransform().transformRect(getLocalBounds());
 	}
 
 	sf::FloatRect Widget::getVisualLocalBounds() const {
@@ -177,11 +177,11 @@ namespace fw {
 	}
 
 	sf::FloatRect Widget::getVisualParentLocalBounds() const {
-		return getTransformOffset().transformRect(getVisualLocalBounds());
+		return getTransform().transformRect(getVisualLocalBounds());
 	}
 
 	sf::FloatRect Widget::getVisualGlobalBounds() const {
-		return getGlobalTransformOffset().transformRect(getVisualLocalBounds());
+		return getGlobalTransform().transformRect(getVisualLocalBounds());
 	}
 
 	const sf::FloatRect& Widget::getUnclippedRegion() const {
@@ -236,16 +236,12 @@ namespace fw {
 		return transforms.getPosition();
 	}
 
-	sf::Vector2f Widget::getOffsetPosition() const {
-		return transforms.getOffsetPosition();
-	}
-
 	sf::Vector2f Widget::getGlobalPosition() const {
 		return getGlobalTransform().transformPoint(sf::Vector2f());
 	}
 
-	sf::Vector2f Widget::getOffsetGlobalPosition() const {
-		return getGlobalTransformOffset().transformPoint(sf::Vector2f());
+	sf::Vector2f Widget::getGlobalOriginPosition() const {
+		return getParentGlobalTransform().transformPoint(getPosition());
 	}
 
 	sf::Vector2f Widget::getTopLeft() const {
@@ -491,7 +487,7 @@ namespace fw {
 		sf::Vector2f parent_size = parent->getLocalBounds().getSize();
 		sf::Vector2f anchored_pos = getPosition();
 		if (parent_anchor != Anchor::CUSTOM) {
-			anchored_pos = anchorToPos(parent_anchor, parent_size) - parent->getOrigin();
+			anchored_pos = anchorToPos(parent_anchor, parent_size);
 		}
 		setPosition(anchored_pos + anchor_offset);
 	}
@@ -563,8 +559,8 @@ namespace fw {
 		if (size_changed) {
 			render_texture.create((unsigned int)texture_bounds.width, (unsigned int)texture_bounds.height);
 		}
-		sf::Transform global_transform_offset = getGlobalTransformOffset();
-		sf::Transform combined(global_transform_offset);
+		sf::Transform global_transform = getGlobalTransform();
+		sf::Transform combined(global_transform);
 		sf::Vector2f render_position_offset = getRenderPositionOffset();
 		combined.translate(render_position_offset);
 		quantize_position(combined);
@@ -621,12 +617,12 @@ namespace fw {
 		float offset = widget_list.render_origin_size;
 		sf::Vector2f hoffset = sf::Vector2f(offset, 0.0f);
 		sf::Vector2f voffset = sf::Vector2f(0.0f, offset);
-		sf::Vector2f transform_pos = getGlobalPosition();
-		draw_line(target, transform_pos - hoffset, transform_pos + hoffset, widget_list.render_origin_color);
-		draw_line(target, transform_pos - voffset, transform_pos + voffset, widget_list.render_origin_color);
-		sf::Vector2f visual_pos = getOffsetGlobalPosition();
-		draw_line(target, visual_pos - hoffset / 2.0f, visual_pos + hoffset / 2.0f, widget_list.render_offset_origin_color);
-		draw_line(target, visual_pos - voffset / 2.0f, visual_pos + voffset / 2.0f, widget_list.render_offset_origin_color);
+		sf::Vector2f origin_pos = getGlobalOriginPosition();
+		draw_line(target, origin_pos - hoffset, origin_pos + hoffset, widget_list.render_transform_origin_color);
+		draw_line(target, origin_pos - voffset, origin_pos + voffset, widget_list.render_transform_origin_color);
+		sf::Vector2f pos = getGlobalPosition();
+		draw_line(target, pos - hoffset, pos + hoffset, widget_list.render_origin_color);
+		draw_line(target, pos - voffset, pos + voffset, widget_list.render_origin_color);
 		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->renderOrigin(target);
 		}
@@ -654,20 +650,12 @@ namespace fw {
 		return transforms.getTransform();
 	}
 
-	const sf::Transform& Widget::getTransformOffset() const {
-		return transforms.getTransformOffset();
-	}
-
 	const sf::Transform& Widget::getInverseTransform() const {
 		return transforms.getInverseTransform();
 	}
 
 	const sf::Transform& Widget::getGlobalTransform() const {
 		return transforms.getGlobalTransform();
-	}
-
-	const sf::Transform& Widget::getGlobalTransformOffset() const {
-		return transforms.getGlobalTransformOffset();
 	}
 
 	const sf::Transform& Widget::getParentGlobalTransform() const {

@@ -55,8 +55,7 @@ namespace fw {
 		}
 		for (size_t i = 0; i < children.size(); i++) {
 			Widget* child = children[i];
-			sf::Vector2f child_pos = sf::Vector2f(next_x, next_y) - getOrigin();
-			child->setPosition(child_pos);
+			child->setPosition(next_x, next_y);
 			sf::FloatRect child_bounds = child->getParentLocalBounds();
 			extend_bounds(container_bounds, child_bounds);
 			if (horizontal) {

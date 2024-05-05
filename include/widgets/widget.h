@@ -109,9 +109,8 @@ namespace fw {
 		sf::Vector2f getAnchorOffset() const;
 		const sf::Vector2f& getOrigin() const;
 		const sf::Vector2f& getPosition() const;
-		sf::Vector2f getOffsetPosition() const;
 		sf::Vector2f getGlobalPosition() const;
-		sf::Vector2f getOffsetGlobalPosition() const;
+		sf::Vector2f getGlobalOriginPosition() const;
 		sf::Vector2f getCenter() const;
 		sf::Vector2f getGlobalCenter() const;
 		sf::Vector2f getVisualGlobalCenter() const;
@@ -179,10 +178,8 @@ namespace fw {
 
 		sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& size);
 		const sf::Transform& getTransform() const;
-		const sf::Transform& getTransformOffset() const;
 		const sf::Transform& getInverseTransform() const;
 		const sf::Transform& getGlobalTransform() const;
-		const sf::Transform& getGlobalTransformOffset() const;
 		const sf::Transform& getParentGlobalTransform() const;
 		const sf::Transform& getInverseGlobalTransform() const;
 		const sf::Transform& getInverseParentGlobalTransform() const;
