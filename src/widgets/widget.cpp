@@ -73,6 +73,7 @@ namespace fw {
 			return;
 		}
 		internalProcessMouse(pos);
+		OnProcessMouse(pos);
 		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->processMouse(pos);
 		}

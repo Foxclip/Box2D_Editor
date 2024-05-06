@@ -7,13 +7,13 @@ namespace fw {
 		setName("window");
 		setSize(width, height);
 		setFillColor(DEFAULT_WINDOW_COLOR);
-		//setClipChildren(true);
 		setClickThrough(false);
 		setForceCustomCursor(true);
 		header_widget = widget_list.createWidget<RectangleWidget>();
-		header_widget->setSize(getWidth() / 2.0f, HEADER_HEIGHT);
+		header_widget->setSize(getWidth(), HEADER_HEIGHT);
 		header_widget->setOrigin(Anchor::BOTTOM_LEFT);
 		header_widget->setParentAnchor(Anchor::TOP_LEFT);
+		header_widget->setClickThrough(false);
 		header_widget->setName("header");
 		header_widget->setParent(this);
 		header_text_widget = widget_list.createWidget<TextWidget>();

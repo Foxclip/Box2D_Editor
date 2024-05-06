@@ -326,12 +326,12 @@ void Editor::initWidgets() {
     //some_window->setHeaderTextCharacterSize(15);
     //some_window->debug_id = 0;
 
-    //fw::WindowWidget* some_window = widgets.createWidget<fw::WindowWidget>(300.0f, 200.0f);
-    //some_window->setOrigin(fw::Widget::Anchor::CENTER);
-    ////some_window->setOrigin(50.0f, 50.0f);
-    //some_window->setParentAnchor(fw::Widget::Anchor::CENTER);
-    //some_window->setHeaderFont(console_font);
-    //some_window->setHeaderTextCharacterSize(15);
+    fw::WindowWidget* some_window = widgets.createWidget<fw::WindowWidget>(300.0f, 200.0f);
+    some_window->setOrigin(fw::Widget::Anchor::CENTER);
+    //some_window->setOrigin(50.0f, 50.0f);
+    some_window->setParentAnchor(fw::Widget::Anchor::CENTER);
+    some_window->setHeaderFont(console_font);
+    some_window->setHeaderTextCharacterSize(15);
 
     //RectangleWidget* rect = widgets.createWidget<RectangleWidget>();
     //rect->setFillColor(sf::Color::Black);

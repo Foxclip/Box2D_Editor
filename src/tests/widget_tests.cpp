@@ -363,6 +363,7 @@ void WidgetTests::createWidgetsList() {
             bool mouse_pressed = false;
             bool mouse_released = false;
             bool mouse_exited = false;
+            bool mouse_processed = false;
             rectangle_widget->OnMouseEnter = [&](const sf::Vector2f& pos) {
                 mouse_entered = true;
             };
@@ -375,6 +376,9 @@ void WidgetTests::createWidgetsList() {
             rectangle_widget->OnMouseExit = [&](const sf::Vector2f& pos) {
                 mouse_exited = true;
             };
+            rectangle_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
+                mouse_processed = true;
+            };
             sf::Vector2f position(100.0f, 100.0f);
             sf::Vector2f size(100.0f, 100.0f);
             sf::Vector2i mouse_pos_1(150, 150);
@@ -386,6 +390,7 @@ void WidgetTests::createWidgetsList() {
             T_CHECK(!mouse_pressed);
             T_CHECK(!mouse_released);
             T_CHECK(!mouse_exited);
+            T_CHECK(!mouse_processed);
             application.mouseMove(mouse_pos_1);
             application.advance();
             T_CHECK(rectangle_widget->isMouseOver());
@@ -393,18 +398,21 @@ void WidgetTests::createWidgetsList() {
             T_CHECK(!mouse_pressed);
             T_CHECK(!mouse_released);
             T_CHECK(!mouse_exited);
+            T_CHECK(mouse_processed);
             application.mouseLeftPress();
             application.advance();
             T_CHECK(mouse_entered);
             T_CHECK(mouse_pressed);
             T_CHECK(!mouse_released);
             T_CHECK(!mouse_exited);
+            T_CHECK(mouse_processed);
             application.mouseLeftRelease();
             application.advance();
             T_CHECK(mouse_entered);
             T_CHECK(mouse_pressed);
             T_CHECK(!mouse_released); // clickThrough is on, so release is not processed
             T_CHECK(!mouse_exited);
+            T_CHECK(mouse_processed);
             application.mouseMove(mouse_pos_2);
             application.advance();
             T_CHECK(!rectangle_widget->isMouseOver());
@@ -412,6 +420,7 @@ void WidgetTests::createWidgetsList() {
             T_CHECK(mouse_pressed);
             T_CHECK(!mouse_released);
             T_CHECK(mouse_exited);
+            T_CHECK(mouse_processed);
         }
     );
     test::Test* widget_mouse_events_2_test = list->addTest(
@@ -432,10 +441,12 @@ void WidgetTests::createWidgetsList() {
             bool mouse_pressed_1 = false;
             bool mouse_released_1 = false;
             bool mouse_exited_1 = false;
+            bool mouse_processed_1 = false;
             bool mouse_entered_2 = false;
             bool mouse_pressed_2 = false;
             bool mouse_released_2 = false;
             bool mouse_exited_2 = false;
+            bool mouse_processed_2 = false;
             rectangle_widget_1->OnMouseEnter = [&](const sf::Vector2f& pos) {
                 mouse_entered_1 = true;
             };
@@ -448,6 +459,9 @@ void WidgetTests::createWidgetsList() {
             rectangle_widget_1->OnMouseExit = [&](const sf::Vector2f& pos) {
                 mouse_exited_1 = true;
             };
+            rectangle_widget_1->OnProcessMouse = [&](const sf::Vector2f& pos) {
+                mouse_processed_1 = true;
+            };
             rectangle_widget_2->OnMouseEnter = [&](const sf::Vector2f& pos) {
                 mouse_entered_2 = true;
             };
@@ -459,6 +473,9 @@ void WidgetTests::createWidgetsList() {
             };
             rectangle_widget_2->OnMouseExit = [&](const sf::Vector2f& pos) {
                 mouse_exited_2 = true;
+            };
+            rectangle_widget_2->OnProcessMouse = [&](const sf::Vector2f& pos) {
+                mouse_processed_2 = true;
             };
             sf::Vector2f position(100.0f, 100.0f);
             sf::Vector2f size(100.0f, 100.0f);
@@ -473,11 +490,13 @@ void WidgetTests::createWidgetsList() {
             T_CHECK(!mouse_pressed_1);
             T_CHECK(!mouse_released_1);
             T_CHECK(!mouse_exited_1);
+            T_CHECK(!mouse_processed_1);
             T_CHECK(!rectangle_widget_2->isMouseOver());
             T_CHECK(!mouse_entered_2);
             T_CHECK(!mouse_pressed_2);
             T_CHECK(!mouse_released_2);
             T_CHECK(!mouse_exited_2);
+            T_CHECK(!mouse_processed_2);
             application.mouseMove(mouse_pos_1);
             application.advance();
             T_CHECK(rectangle_widget_1->isMouseOver());
@@ -485,31 +504,37 @@ void WidgetTests::createWidgetsList() {
             T_CHECK(!mouse_pressed_1);
             T_CHECK(!mouse_released_1);
             T_CHECK(!mouse_exited_1);
+            T_CHECK(mouse_processed_1);
             T_CHECK(rectangle_widget_2->isMouseOver());
             T_CHECK(mouse_entered_2);
             T_CHECK(!mouse_pressed_2);
             T_CHECK(!mouse_released_2);
             T_CHECK(!mouse_exited_2);
+            T_CHECK(mouse_processed_2);
             application.mouseLeftPress();
             application.advance();
             T_CHECK(mouse_entered_1);
             T_CHECK(mouse_pressed_1);
             T_CHECK(!mouse_released_1);
             T_CHECK(!mouse_exited_1);
+            T_CHECK(mouse_processed_1);
             T_CHECK(mouse_entered_2);
             T_CHECK(mouse_pressed_2);
             T_CHECK(!mouse_released_2);
             T_CHECK(!mouse_exited_2);
+            T_CHECK(mouse_processed_2);
             application.mouseLeftRelease();
             application.advance();
             T_CHECK(mouse_entered_1);
             T_CHECK(mouse_pressed_1);
             T_CHECK(!mouse_released_1); // no focused widget, so release is not processed
             T_CHECK(!mouse_exited_1);
+            T_CHECK(mouse_processed_1);
             T_CHECK(mouse_entered_2);
             T_CHECK(mouse_pressed_2);
             T_CHECK(!mouse_released_2);
             T_CHECK(!mouse_exited_2);
+            T_CHECK(mouse_processed_2);
             application.mouseMove(mouse_pos_2);
             application.advance();
             T_CHECK(!rectangle_widget_1->isMouseOver());
@@ -517,11 +542,13 @@ void WidgetTests::createWidgetsList() {
             T_CHECK(mouse_pressed_1);
             T_CHECK(!mouse_released_1);
             T_CHECK(mouse_exited_1);
+            T_CHECK(mouse_processed_1);
             T_CHECK(!rectangle_widget_2->isMouseOver());
             T_CHECK(mouse_entered_2);
             T_CHECK(mouse_pressed_2);
             T_CHECK(!mouse_released_2);
             T_CHECK(mouse_exited_2);
+            T_CHECK(mouse_processed_2);
         }
     );
     test::Test* events_test = list->addTest(
