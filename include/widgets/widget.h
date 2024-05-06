@@ -76,7 +76,7 @@ namespace fw {
 		void processClick(const sf::Vector2f& pos);
 		void processRelease(const sf::Vector2f& pos);
 		void processMouse(const sf::Vector2f& pos);
-		virtual bool isFocusable() const;
+		bool isFocusable() const;
 		bool isFocused() const;
 		virtual sf::Cursor::Type getCursorType() const;
 		bool getForceCustomCursor() const;
@@ -141,6 +141,7 @@ namespace fw {
 		void setVisible(bool value);
 		void toggleVisible();
 		void setClickThrough(bool value);
+		void setFocusable(bool value);
 		void setParentSilent(Widget* new_parent);
 		void setParent(Widget* new_parent);
 		void setForceCustomCursor(bool value);
@@ -172,6 +173,7 @@ namespace fw {
 		sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);
 		WidgetUnclippedRegion unclipped_region = WidgetUnclippedRegion(this);
 		bool visible = true;
+		bool is_focusable = false;
 		bool click_through = true;
 		bool clip_children = false;
 		bool mouseIn = false;

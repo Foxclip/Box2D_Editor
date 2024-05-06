@@ -80,7 +80,7 @@ namespace fw {
 	}
 
 	bool Widget::isFocusable() const {
-		return false;
+		return is_focusable;
 	}
 
 	bool Widget::isFocused() const {
@@ -388,6 +388,10 @@ namespace fw {
 	void Widget::setClickThrough(bool value) {
 		wAssert(!widget_list.isLocked());
 		this->click_through = value;
+	}
+
+	void Widget::setFocusable(bool value) {
+		this->is_focusable = value;
 	}
 
 	void Widget::setParentSilent(Widget* new_parent) {

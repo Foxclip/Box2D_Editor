@@ -11,7 +11,6 @@ namespace fw {
 		std::function<void(bool)> OnValueChanged = [](bool new_value) { };
 
 		CheckboxWidget(WidgetList& widget_list);
-		bool isFocusable() const override;
 		bool getValue() const;
 		const sf::Color& getFillColor() const override;
 		const sf::Color& getHighlightFillColor() const;

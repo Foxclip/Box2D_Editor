@@ -751,7 +751,7 @@ void WidgetTests::createWidgetsList() {
             gwt.opaque = true;
             gwt.is_click_through = false;
             gwt.is_mouse_over = false;
-            gwt.is_focusable = true;
+            gwt.is_focusable = false;
             gwt.is_focused = false;
             gwt.clip_children = false;
             gwt.force_custom_cursor = false;

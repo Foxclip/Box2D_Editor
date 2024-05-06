@@ -18,10 +18,6 @@ namespace fw {
 		check_widget->setName("check");
 	}
 
-	bool CheckboxWidget::isFocusable() const {
-		return true;
-	}
-
 	bool CheckboxWidget::getValue() const {
 		return checked;
 	}

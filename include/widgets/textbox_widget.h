@@ -41,7 +41,6 @@ namespace fw {
 		};
 
 		TextBoxWidget(WidgetList& widget_list);
-		bool isFocusable() const override;
 		sf::Cursor::Type getCursorType() const override;
 		const sf::Color& getFillColor() const override;
 		const sf::Color& getHighlightColor() const;

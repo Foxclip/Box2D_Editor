@@ -8,6 +8,7 @@ namespace fw {
 		setName("textbox");
 		setClipChildren(true);
 		setClickThrough(false);
+		setFocusable(true);
 		setForceCustomCursor(true);
 		text_widget = widget_list.createWidget<TextWidget>();
 		text_widget->setFillColor(text_color);
@@ -34,10 +35,6 @@ namespace fw {
 		setCursorPos(getStringSize());
 		deselectAll();
 		updateColors();
-	}
-
-	bool TextBoxWidget::isFocusable() const {
-		return true;
 	}
 
 	sf::Cursor::Type TextBoxWidget::getCursorType() const {
