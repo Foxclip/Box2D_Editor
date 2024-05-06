@@ -13,8 +13,10 @@ public:
 	bool process_window_event = false;
 	bool process_keyboard_event = false;
 	bool before_process_mouse_event = false;
-	bool process_left_click = false;
+	bool process_left_press = false;
+	bool process_right_press = false;
 	bool process_left_release = false;
+	bool process_right_release = false;
 	bool process_mouse_scroll = false;
 	bool process_keyboard = false;
 	bool process_mouse = false;
@@ -22,8 +24,10 @@ public:
 	bool process_world = false;
 	bool rendered = false;
 	bool closed = false;
-	sf::Vector2i click_pos;
-	sf::Vector2i release_pos;
+	sf::Vector2i left_click_pos;
+	sf::Vector2i left_release_pos;
+	sf::Vector2i right_click_pos;
+	sf::Vector2i right_release_pos;
 	bool space_key_pressed = false;
 
 	void onInit() override;
@@ -35,7 +39,9 @@ public:
 	void onProcessKeyboardEvent(const sf::Event& event) override;
 	void beforeProcessMouseEvent(const sf::Event& event) override;
 	void onProcessLeftPress() override;
+	void onProcessRightPress() override;
 	void onProcessLeftRelease() override;
+	void onProcessRightRelease() override;
 	void onProcessMouseScroll(const sf::Event& event) override;
 	void onProcessKeyboard() override;
 	void onProcessMouse() override;

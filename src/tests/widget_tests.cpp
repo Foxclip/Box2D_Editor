@@ -118,7 +118,7 @@ void WidgetTests::createApplicationList() {
             T_CHECK(!application.process_window_event);
             T_CHECK(!application.process_keyboard_event);
             T_CHECK(!application.before_process_mouse_event);
-            T_CHECK(!application.process_left_click);
+            T_CHECK(!application.process_left_press);
             T_CHECK(!application.process_left_release);
             T_CHECK(!application.process_mouse_scroll);
             T_CHECK(application.process_keyboard);
@@ -157,11 +157,10 @@ void WidgetTests::createApplicationList() {
                 application.mouseLeftPress();
                 application.advance();
                 T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
-                T_COMPARE(application.click_pos, pos, &WidgetTests::sfVec2iToStr);
+                T_COMPARE(application.left_click_pos, pos, &WidgetTests::sfVec2iToStr);
             }
             {
                 sf::Vector2i pos(150, 150);
-                application.mouseMove(pos);
                 application.mouseMove(pos);
                 application.advance();
                 T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
@@ -172,7 +171,29 @@ void WidgetTests::createApplicationList() {
                 application.mouseLeftRelease();
                 application.advance();
                 T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
-                T_COMPARE(application.release_pos, pos, &WidgetTests::sfVec2iToStr);
+                T_COMPARE(application.left_release_pos, pos, &WidgetTests::sfVec2iToStr);
+            }
+            {
+                sf::Vector2i pos(100, 100);
+                application.mouseMove(pos);
+                application.mouseRightPress();
+                application.advance();
+                T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+                T_COMPARE(application.right_click_pos, pos, &WidgetTests::sfVec2iToStr);
+            }
+            {
+                sf::Vector2i pos(150, 150);
+                application.mouseMove(pos);
+                application.advance();
+                T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+            }
+            {
+                sf::Vector2i pos(200, 200);
+                application.mouseMove(pos);
+                application.mouseRightRelease();
+                application.advance();
+                T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+                T_COMPARE(application.right_release_pos, pos, &WidgetTests::sfVec2iToStr);
             }
         }
     );
@@ -1879,13 +1900,23 @@ void TestApplication::beforeProcessMouseEvent(const sf::Event& event) {
 }
 
 void TestApplication::onProcessLeftPress() {
-    process_left_click = true;
-    click_pos = getMousePos();
+    process_left_press = true;
+    left_click_pos = getMousePos();
+}
+
+void TestApplication::onProcessRightPress() {
+    process_right_press = true;
+    right_click_pos = getMousePos();
 }
 
 void TestApplication::onProcessLeftRelease() {
     process_left_release = true;
-    release_pos = getMousePos();
+    left_release_pos = getMousePos();
+}
+
+void TestApplication::onProcessRightRelease() {
+    process_right_release = true;
+    right_release_pos = getMousePos();
 }
 
 void TestApplication::onProcessMouseScroll(const sf::Event& event) {

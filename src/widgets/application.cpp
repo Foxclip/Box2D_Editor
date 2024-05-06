@@ -92,11 +92,31 @@ namespace fw {
         addExternalEvent(event);
     }
 
+    void Application::mouseRightPress() {
+        wAssert(external_control);
+        sf::Event event;
+        event.type = sf::Event::MouseButtonPressed;
+        event.mouseButton.button = sf::Mouse::Right;
+        event.mouseButton.x = external_mouse_pos.x;
+        event.mouseButton.y = external_mouse_pos.y;
+        addExternalEvent(event);
+    }
+
     void Application::mouseLeftRelease() {
         wAssert(external_control);
         sf::Event event;
         event.type = sf::Event::MouseButtonReleased;
         event.mouseButton.button = sf::Mouse::Left;
+        event.mouseButton.x = external_mouse_pos.x;
+        event.mouseButton.y = external_mouse_pos.y;
+        addExternalEvent(event);
+    }
+
+    void Application::mouseRightRelease() {
+        wAssert(external_control);
+        sf::Event event;
+        event.type = sf::Event::MouseButtonReleased;
+        event.mouseButton.button = sf::Mouse::Right;
         event.mouseButton.x = external_mouse_pos.x;
         event.mouseButton.y = external_mouse_pos.y;
         addExternalEvent(event);
