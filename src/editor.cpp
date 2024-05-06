@@ -501,7 +501,7 @@ void Editor::onProcessMouseScroll(const sf::Event& event) {
     }
 }
 
-void Editor::onProcessLeftClick() {
+void Editor::onProcessLeftPress() {
     if (selected_tool == &create_tool) {
         std::string id_string = std::to_string(simulation.getMaxId());
         switch (create_tool.type) {

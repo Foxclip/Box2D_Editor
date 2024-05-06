@@ -43,8 +43,9 @@ int main() {
     //run_tests();
     execute_app();
 
-    // TODO: right-click gesture
-    // TODO: Window widget
+    // TODO: right-click gesture event test
+    // TODO: EmptyWidget
+    // TODO: make window with EmptyWidget and two rectangles
     // TODO: require size for RectangleWidget and font for TextWidget
     // TODO: align textboxes in EditWindow to the right
     // TODO: Dropdown widget

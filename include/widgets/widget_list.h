@@ -39,8 +39,10 @@ namespace fw {
 		bool isLocked() const;
 		void lock();
 		void unlock();
-		void processClick(const sf::Vector2f pos);
-		void processRelease(const sf::Vector2f pos);
+		void processLeftPress(const sf::Vector2f pos);
+		void processRightPress(const sf::Vector2f pos);
+		void processLeftRelease(const sf::Vector2f pos);
+		void processRightRelease(const sf::Vector2f pos);
 		void processMouse(const sf::Vector2f pos);
 		void processWindowEvent(const sf::Event& event);
 		void processKeyboardEvent(const sf::Event& event);

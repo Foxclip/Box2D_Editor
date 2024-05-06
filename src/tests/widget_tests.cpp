@@ -367,10 +367,10 @@ void WidgetTests::createWidgetsList() {
             rectangle_widget->OnMouseEnter = [&](const sf::Vector2f& pos) {
                 mouse_entered = true;
             };
-            rectangle_widget->OnClick = [&](const sf::Vector2f& pos) {
+            rectangle_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
                 mouse_pressed = true;
             };
-            rectangle_widget->OnRelease = [&](const sf::Vector2f& pos) {
+            rectangle_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
                 mouse_released = true;
             };
             rectangle_widget->OnMouseExit = [&](const sf::Vector2f& pos) {
@@ -450,10 +450,10 @@ void WidgetTests::createWidgetsList() {
             rectangle_widget_1->OnMouseEnter = [&](const sf::Vector2f& pos) {
                 mouse_entered_1 = true;
             };
-            rectangle_widget_1->OnClick = [&](const sf::Vector2f& pos) {
+            rectangle_widget_1->OnLeftPress = [&](const sf::Vector2f& pos) {
                 mouse_pressed_1 = true;
             };
-            rectangle_widget_1->OnRelease = [&](const sf::Vector2f& pos) {
+            rectangle_widget_1->OnLeftRelease = [&](const sf::Vector2f& pos) {
                 mouse_released_1 = true;
             };
             rectangle_widget_1->OnMouseExit = [&](const sf::Vector2f& pos) {
@@ -465,10 +465,10 @@ void WidgetTests::createWidgetsList() {
             rectangle_widget_2->OnMouseEnter = [&](const sf::Vector2f& pos) {
                 mouse_entered_2 = true;
             };
-            rectangle_widget_2->OnClick = [&](const sf::Vector2f& pos) {
+            rectangle_widget_2->OnLeftPress = [&](const sf::Vector2f& pos) {
                 mouse_pressed_2 = true;
             };
-            rectangle_widget_2->OnRelease = [&](const sf::Vector2f& pos) {
+            rectangle_widget_2->OnLeftRelease = [&](const sf::Vector2f& pos) {
                 mouse_released_2 = true;
             };
             rectangle_widget_2->OnMouseExit = [&](const sf::Vector2f& pos) {
@@ -1878,7 +1878,7 @@ void TestApplication::beforeProcessMouseEvent(const sf::Event& event) {
     before_process_mouse_event = true;
 }
 
-void TestApplication::onProcessLeftClick() {
+void TestApplication::onProcessLeftPress() {
     process_left_click = true;
     click_pos = getMousePos();
 }

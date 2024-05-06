@@ -118,13 +118,13 @@ namespace fw {
 		locked = false;
 	}
 
-	void WidgetList::processClick(const sf::Vector2f pos) {
+	void WidgetList::processLeftPress(const sf::Vector2f pos) {
 		wAssert(!isLocked());
 		CompVector<Widget*> widgets = getWidgetsUnderCursor(true, click_blocked);
 		Widget* focused = nullptr;
 		for (size_t i = 0; i < widgets.size(); i++) {
 			Widget* widget = widgets[i];
-			widget->processClick(pos);
+			widget->processLeftPress(pos);
 			if (!focused && widget->isFocusable()) {
 				focused = widget;
 			}
@@ -132,10 +132,26 @@ namespace fw {
 		setFocusedWidget(focused);
 	}
 
-	void WidgetList::processRelease(const sf::Vector2f pos) {
+	void WidgetList::processRightPress(const sf::Vector2f pos) {
+		wAssert(!isLocked());
+		CompVector<Widget*> widgets = getWidgetsUnderCursor(true, click_blocked);
+		for (size_t i = 0; i < widgets.size(); i++) {
+			Widget* widget = widgets[i];
+			widget->processRightPress(pos);
+		}
+	}
+
+	void WidgetList::processLeftRelease(const sf::Vector2f pos) {
 		wAssert(!isLocked());
 		if (focused_widget) {
-			focused_widget->processRelease(pos);
+			focused_widget->processLeftRelease(pos);
+		}
+	}
+
+	void WidgetList::processRightRelease(const sf::Vector2f pos) {
+		wAssert(!isLocked());
+		if (focused_widget) {
+			focused_widget->processRightRelease(pos);
 		}
 	}
 

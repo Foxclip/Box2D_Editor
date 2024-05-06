@@ -16,7 +16,7 @@ CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
         button_widget->setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
         button_widget->setFillColor(sf::Color(128, 128, 128));
         button_widget->setOutlineColor(sf::Color(0, 175, 255));
-        button_widget->OnClick = [=](const sf::Vector2f& pos) {
+        button_widget->OnLeftPress = [=](const sf::Vector2f& pos) {
             app.selectCreateType(i);
         };
         button_widget->OnMouseEnter = [=](const sf::Vector2f pos) {

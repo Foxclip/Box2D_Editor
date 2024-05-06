@@ -170,7 +170,7 @@ private:
 	void onProcessWindowEvent(const sf::Event& event) override;
 	void onProcessKeyboardEvent(const sf::Event& event) override;
 	void beforeProcessMouseEvent(const sf::Event& event) override;
-	void onProcessLeftClick() override;
+	void onProcessLeftPress() override;
 	void onProcessLeftRelease() override;
 	void onProcessMouseScroll(const sf::Event& event) override;
 	void onProcessMouse() override;

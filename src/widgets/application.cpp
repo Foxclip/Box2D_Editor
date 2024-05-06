@@ -209,9 +209,13 @@ namespace fw {
 
     void Application::beforeProcessMouseEvent(const sf::Event& event) { }
 
-    void Application::onProcessLeftClick() { }
+    void Application::onProcessLeftPress() { }
+
+    void Application::onProcessRightPress() { }
 
     void Application::onProcessLeftRelease() { }
+
+    void Application::onProcessRightRelease() { }
 
     void Application::onProcessMouseScroll(const sf::Event& event) { }
 
@@ -292,11 +296,12 @@ namespace fw {
                 case sf::Mouse::Left:
                     leftButtonPressed = true;
                     mousePressPosf = getMousePosf();
-                    processLeftClick();
+                    processLeftPress();
                     break;
                 case sf::Mouse::Right:
                     rightButtonPressed = true;
                     mousePrevPos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+                    processRightPress();
                     break;
             }
         }
@@ -308,6 +313,7 @@ namespace fw {
                     break;
                 case sf::Mouse::Right:
                     rightButtonPressed = false;
+                    processRightRelease();
                     break;
             }
         }
@@ -353,23 +359,44 @@ namespace fw {
         logger << getMousePosf() << "\n";
     }
 
-    void Application::processLeftClick() {
+    void Application::processLeftPress() {
         if (mouseGesture.active) {
             if (mouseGesture.type == MouseGesture::MOVE) {
                 if (mouseGesture.source == MouseGesture::WIDGETS) {
                     // skipping for now
                 } else if (mouseGesture.source == MouseGesture::SCREEN) {
-                    onProcessLeftClick();
+                    onProcessLeftPress();
                 }
                 endGesture();
             }
         } else {
-            widgets.processClick(getMousePosf());
+            widgets.processLeftPress(getMousePosf());
             if (widgets.isClickBlocked()) {
                 startNormalGesture(MouseGesture::WIDGETS, sf::Mouse::Left);
             } else {
                 startNormalGesture(MouseGesture::SCREEN, sf::Mouse::Left);
-                onProcessLeftClick();
+                onProcessLeftPress();
+            }
+        }
+    }
+
+    void Application::processRightPress() {
+        if (mouseGesture.active) {
+            if (mouseGesture.type == MouseGesture::MOVE) {
+                if (mouseGesture.source == MouseGesture::WIDGETS) {
+                    // skipping for now
+                } else if (mouseGesture.source == MouseGesture::SCREEN) {
+                    onProcessRightPress();
+                }
+                endGesture();
+            }
+        } else {
+            widgets.processRightPress(getMousePosf());
+            if (widgets.isClickBlocked()) {
+                startNormalGesture(MouseGesture::WIDGETS, sf::Mouse::Right);
+            } else {
+                startNormalGesture(MouseGesture::SCREEN, sf::Mouse::Right);
+                onProcessRightPress();
             }
         }
     }
@@ -379,9 +406,21 @@ namespace fw {
             return;
         }
         if (mouseGesture.source == MouseGesture::WIDGETS) {
-            widgets.processRelease(getMousePosf());
+            widgets.processLeftRelease(getMousePosf());
         } else if (mouseGesture.source == MouseGesture::SCREEN) {
             onProcessLeftRelease();
+        }
+        endGesture();
+    }
+
+    void Application::processRightRelease() {
+        if (!mouseGesture.active) {
+            return;
+        }
+        if (mouseGesture.source == MouseGesture::WIDGETS) {
+            widgets.processRightRelease(getMousePosf());
+        } else if (mouseGesture.source == MouseGesture::SCREEN) {
+            onProcessRightRelease();
         }
         endGesture();
     }

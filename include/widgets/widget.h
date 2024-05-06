@@ -55,8 +55,10 @@ namespace fw {
 		};
 		ptrdiff_t debug_id = -1;
 
-		std::function<void(const sf::Vector2f& pos)> OnClick = [](const sf::Vector2f& pos) { };
-		std::function<void(const sf::Vector2f& pos)> OnRelease = [](const sf::Vector2f& pos) { };
+		std::function<void(const sf::Vector2f& pos)> OnLeftPress = [](const sf::Vector2f& pos) { };
+		std::function<void(const sf::Vector2f& pos)> OnRightPress = [](const sf::Vector2f& pos) { };
+		std::function<void(const sf::Vector2f& pos)> OnLeftRelease = [](const sf::Vector2f& pos) { };
+		std::function<void(const sf::Vector2f& pos)> OnRightRelease = [](const sf::Vector2f& pos) { };
 		std::function<void(const sf::Vector2f& pos)> OnMouseEnter = [](const sf::Vector2f& pos) { };
 		std::function<void(const sf::Vector2f& pos)> OnMouseExit = [](const sf::Vector2f& pos) { };
 		std::function<void(const sf::Vector2f& pos)> OnProcessMouse = [](const sf::Vector2f& pos) { };
@@ -73,8 +75,10 @@ namespace fw {
 		bool isVisible() const;
 		bool isClickThrough() const;
 		WidgetVisibility checkVisibility() const;
-		void processClick(const sf::Vector2f& pos);
-		void processRelease(const sf::Vector2f& pos);
+		void processLeftPress(const sf::Vector2f& pos);
+		void processRightPress(const sf::Vector2f& pos);
+		void processLeftRelease(const sf::Vector2f& pos);
+		void processRightRelease(const sf::Vector2f& pos);
 		void processMouse(const sf::Vector2f& pos);
 		bool isFocusable() const;
 		bool isFocused() const;
@@ -197,8 +201,10 @@ namespace fw {
 		void update();
 		virtual void internalUpdate();
 		virtual void internalOnSetParent(Widget* parent);
-		virtual void internalOnClick(const sf::Vector2f& pos);
-		virtual void internalOnRelease(const sf::Vector2f& pos);
+		virtual void internalOnLeftPress(const sf::Vector2f& pos);
+		virtual void internalOnRightPress(const sf::Vector2f& pos);
+		virtual void internalOnLeftRelease(const sf::Vector2f& pos);
+		virtual void internalOnRightRelease(const sf::Vector2f& pos);
 		virtual void internalProcessKeyboardEvent(const sf::Event& event);
 		virtual void internalProcessMouse(const sf::Vector2f& pos);
 		virtual void internalOnMouseEnter(const sf::Vector2f& pos);

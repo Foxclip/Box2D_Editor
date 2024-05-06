@@ -15,7 +15,7 @@ Toolbox::Toolbox(fw::WidgetList& widget_list, Editor& p_app)
         tool_widget->setSize(sf::Vector2f(TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT));
         tool_widget->setFillColor(sf::Color(128, 128, 128));
         tool_widget->setOutlineColor(sf::Color::Yellow);
-        tool_widget->OnClick = [=](const sf::Vector2f& pos) {
+        tool_widget->OnLeftPress = [=](const sf::Vector2f& pos) {
             if (app.selected_tool != tool) {
                 app.selected_tool->OnSetSelectedWithButton(false);
                 tool->OnSetSelectedWithButton(true);

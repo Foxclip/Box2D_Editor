@@ -58,14 +58,24 @@ namespace fw {
 		return v;
 	}
 
-	void Widget::processClick(const sf::Vector2f& pos) {
-		internalOnClick(pos);
-		OnClick(pos);
+	void Widget::processLeftPress(const sf::Vector2f& pos) {
+		internalOnLeftPress(pos);
+		OnLeftPress(pos);
 	}
 
-	void Widget::processRelease(const sf::Vector2f& pos) {
-		internalOnRelease(pos);
-		OnRelease(pos);
+	void Widget::processRightPress(const sf::Vector2f& pos) {
+		internalOnRightPress(pos);
+		OnRightPress(pos);
+	}
+
+	void Widget::processLeftRelease(const sf::Vector2f& pos) {
+		internalOnLeftRelease(pos);
+		OnLeftRelease(pos);
+	}
+
+	void Widget::processRightRelease(const sf::Vector2f& pos) {
+		internalOnRightRelease(pos);
+		OnRightRelease(pos);
 	}
 
 	void Widget::processMouse(const sf::Vector2f& pos) {
@@ -526,9 +536,13 @@ namespace fw {
 
 	void Widget::internalOnSetParent(Widget* parent) { }
 
-	void Widget::internalOnClick(const sf::Vector2f& pos) { }
+	void Widget::internalOnLeftPress(const sf::Vector2f& pos) { }
 
-	void Widget::internalOnRelease(const sf::Vector2f& pos) { }
+	void Widget::internalOnRightPress(const sf::Vector2f& pos) { }
+
+	void Widget::internalOnLeftRelease(const sf::Vector2f& pos) { }
+
+	void Widget::internalOnRightRelease(const sf::Vector2f& pos) { }
 
 	void Widget::internalProcessKeyboardEvent(const sf::Event& event) { }
 

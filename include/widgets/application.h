@@ -91,8 +91,10 @@ namespace fw {
 		virtual void onProcessWindowEvent(const sf::Event& event);
 		virtual void onProcessKeyboardEvent(const sf::Event& event);
 		virtual void beforeProcessMouseEvent(const sf::Event& event);
-		virtual void onProcessLeftClick();
+		virtual void onProcessLeftPress();
+		virtual void onProcessRightPress();
 		virtual void onProcessLeftRelease();
+		virtual void onProcessRightRelease();
 		virtual void onProcessMouseScroll(const sf::Event& event);
 		virtual void onProcessKeyboard();
 		virtual void onProcessMouse();
@@ -118,8 +120,10 @@ namespace fw {
 		void startMoveGesture(
 			MouseGesture::MouseGestureSource source
 		);
-		void processLeftClick();
+		void processLeftPress();
+		void processRightPress();
 		void processLeftRelease();
+		void processRightRelease();
 		void processKeyboard();
 		void processMouse();
 		void processWorld();

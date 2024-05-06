@@ -326,7 +326,7 @@ namespace fw {
 		selection_widget->setFillColor(slct_col);
 	}
 
-	void TextBoxWidget::internalOnClick(const sf::Vector2f& pos) {
+	void TextBoxWidget::internalOnLeftPress(const sf::Vector2f& pos) {
 		drag_start_pos = pos;
 		left_button_pressed = true;
 		trySetCursor(pos);
@@ -337,7 +337,7 @@ namespace fw {
 		history.updateCurrent();
 	}
 
-	void TextBoxWidget::internalOnRelease(const sf::Vector2f& pos) {
+	void TextBoxWidget::internalOnLeftRelease(const sf::Vector2f& pos) {
 		left_button_pressed = false;
 		dragging_begun = false;
 	}

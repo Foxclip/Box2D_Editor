@@ -17,7 +17,7 @@ namespace fw {
 		header_widget->setFocusable(true);
 		header_widget->setName("header");
 		header_widget->setParent(this);
-		header_widget->OnClick = [&](const sf::Vector2f& pos) {
+		header_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
 			is_grabbed = true;
 			header_click_offset = getGlobalPosition() - pos;
 		};
@@ -31,7 +31,7 @@ namespace fw {
 				setGlobalPosition(new_pos);
 			}
 		};
-		header_widget->OnRelease = [&](const sf::Vector2f& pos) {
+		header_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
 			is_grabbed = false;
 			header_widget->removeFocus();
 		};
