@@ -14,8 +14,27 @@ namespace fw {
 		header_widget->setOrigin(Anchor::BOTTOM_LEFT);
 		header_widget->setParentAnchor(Anchor::TOP_LEFT);
 		header_widget->setClickThrough(false);
+		header_widget->setFocusable(true);
 		header_widget->setName("header");
 		header_widget->setParent(this);
+		header_widget->OnClick = [&](const sf::Vector2f& pos) {
+			is_grabbed = true;
+			header_click_offset = getGlobalPosition() - pos;
+		};
+		header_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
+			if (is_grabbed) {
+				sf::Vector2f new_pos = pos + header_click_offset;
+				sf::FloatRect global_bounds = header_widget->getGlobalBounds();
+				sf::Vector2u window_size = widget_list.getWindowSize();
+				new_pos.x = std::clamp(new_pos.x, ONSCREEN_MARGIN - global_bounds.width, window_size.x - ONSCREEN_MARGIN);
+				new_pos.y = std::clamp(new_pos.y, ONSCREEN_MARGIN, window_size.y - ONSCREEN_MARGIN + global_bounds.height);
+				setGlobalPosition(new_pos);
+			}
+		};
+		header_widget->OnRelease = [&](const sf::Vector2f& pos) {
+			is_grabbed = false;
+			header_widget->removeFocus();
+		};
 		header_text_widget = widget_list.createWidget<TextWidget>();
 		header_text_widget->setOrigin(Anchor::TOP_LEFT);
 		header_text_widget->setParentAnchor(Anchor::TOP_LEFT);

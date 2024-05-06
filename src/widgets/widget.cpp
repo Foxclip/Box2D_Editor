@@ -370,6 +370,16 @@ namespace fw {
 		transforms.setPosition(position);
 	}
 
+	void Widget::setGlobalPosition(float x, float y) {
+		wAssert(!widget_list.isLocked());
+		transforms.setPosition(sf::Vector2f(x, y));
+	}
+
+	void Widget::setGlobalPosition(const sf::Vector2f& position) {
+		wAssert(!widget_list.isLocked());
+		transforms.setGlobalPosition(position);
+	}
+
 	void Widget::setRotation(float angle) {
 		wAssert(!widget_list.isLocked());
 		transforms.setRotation(angle);
@@ -391,6 +401,7 @@ namespace fw {
 	}
 
 	void Widget::setFocusable(bool value) {
+		wAssert(!widget_list.isLocked());
 		this->is_focusable = value;
 	}
 

@@ -135,8 +135,10 @@ namespace fw {
 		void setAnchorOffset(float x, float y);
 		void setAnchorOffset(const sf::Vector2f& offset);
 		virtual void setFillColor(const sf::Color& color) = 0;
-		virtual void setPosition(float x, float y);
-		virtual void setPosition(const sf::Vector2f& position);
+		void setPosition(float x, float y);
+		void setPosition(const sf::Vector2f& position);
+		void setGlobalPosition(float x, float y);
+		void setGlobalPosition(const sf::Vector2f& position);
 		void setRotation(float angle);
 		void setVisible(bool value);
 		void toggleVisible();

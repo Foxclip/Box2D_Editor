@@ -81,6 +81,10 @@ namespace fw {
 		return false;
 	}
 
+	sf::Vector2u WidgetList::getWindowSize() const {
+		return application.getWindowSize();
+	}
+
 	bool WidgetList::isLCtrlPressed() const {
 		return application.isLCtrlPressed();
 	}

@@ -15,6 +15,7 @@ namespace fw {
 		const sf::Color DEFAULT_HEADER_COLOR = sf::Color(150, 150, 150);
 		const sf::Color DEFAULT_HEADER_TEXT_COLOR = sf::Color(255, 255, 255);
 		const unsigned int DEFAULT_HEADER_TEXT_CHARACTER_SIZE = 13;
+		const float ONSCREEN_MARGIN = 20.0f;
 
 		WindowWidget(WidgetList& widget_list, float width, float height);
 		bool getHeaderVisible() const;
@@ -35,6 +36,8 @@ namespace fw {
 	private:
 		RectangleWidget* header_widget = nullptr;
 		TextWidget* header_text_widget = nullptr;
+		bool is_grabbed = false;
+		sf::Vector2f header_click_offset;
 	};
 
 }
