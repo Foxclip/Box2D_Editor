@@ -381,18 +381,26 @@ void WidgetTests::createWidgetsList() {
             application.advance();
             fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
             bool mouse_entered = false;
-            bool mouse_pressed = false;
-            bool mouse_released = false;
+            bool mouse_left_pressed = false;
+            bool mouse_right_pressed = false;
+            bool mouse_left_released = false;
+            bool mouse_right_released = false;
             bool mouse_exited = false;
             bool mouse_processed = false;
             rectangle_widget->OnMouseEnter = [&](const sf::Vector2f& pos) {
                 mouse_entered = true;
             };
             rectangle_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
-                mouse_pressed = true;
+                mouse_left_pressed = true;
+            };
+            rectangle_widget->OnRightPress = [&](const sf::Vector2f& pos) {
+                mouse_right_pressed = true;
             };
             rectangle_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
-                mouse_released = true;
+                mouse_left_released = true;
+            };
+            rectangle_widget->OnRightRelease = [&](const sf::Vector2f& pos) {
+                mouse_right_released = true;
             };
             rectangle_widget->OnMouseExit = [&](const sf::Vector2f& pos) {
                 mouse_exited = true;
@@ -408,38 +416,66 @@ void WidgetTests::createWidgetsList() {
             rectangle_widget->setSize(size);
             T_CHECK(!rectangle_widget->isMouseOver());
             T_CHECK(!mouse_entered);
-            T_CHECK(!mouse_pressed);
-            T_CHECK(!mouse_released);
+            T_CHECK(!mouse_left_pressed);
+            T_CHECK(!mouse_left_released);
+            T_CHECK(!mouse_right_pressed);
+            T_CHECK(!mouse_right_released);
             T_CHECK(!mouse_exited);
             T_CHECK(!mouse_processed);
             application.mouseMove(mouse_pos_1);
             application.advance();
             T_CHECK(rectangle_widget->isMouseOver());
             T_CHECK(mouse_entered);
-            T_CHECK(!mouse_pressed);
-            T_CHECK(!mouse_released);
+            T_CHECK(!mouse_left_pressed);
+            T_CHECK(!mouse_left_released);
+            T_CHECK(!mouse_right_pressed);
+            T_CHECK(!mouse_right_released);
             T_CHECK(!mouse_exited);
             T_CHECK(mouse_processed);
             application.mouseLeftPress();
             application.advance();
             T_CHECK(mouse_entered);
-            T_CHECK(mouse_pressed);
-            T_CHECK(!mouse_released);
+            T_CHECK(mouse_left_pressed);
+            T_CHECK(!mouse_left_released);
+            T_CHECK(!mouse_right_pressed);
+            T_CHECK(!mouse_right_released);
             T_CHECK(!mouse_exited);
             T_CHECK(mouse_processed);
             application.mouseLeftRelease();
             application.advance();
             T_CHECK(mouse_entered);
-            T_CHECK(mouse_pressed);
-            T_CHECK(!mouse_released); // clickThrough is on, so release is not processed
+            T_CHECK(mouse_left_pressed);
+            T_CHECK(!mouse_left_released); // clickThrough is on, so release is not processed
+            T_CHECK(!mouse_right_pressed);
+            T_CHECK(!mouse_right_released);
+            T_CHECK(!mouse_exited);
+            T_CHECK(mouse_processed);
+            application.mouseRightPress();
+            application.advance();
+            T_CHECK(mouse_entered);
+            T_CHECK(mouse_left_pressed);
+            T_CHECK(!mouse_left_released);
+            T_CHECK(mouse_right_pressed);
+            T_CHECK(!mouse_right_released);
+            T_CHECK(!mouse_exited);
+            T_CHECK(mouse_processed);
+            application.mouseRightRelease();
+            application.advance();
+            T_CHECK(mouse_entered);
+            T_CHECK(mouse_left_pressed);
+            T_CHECK(!mouse_left_released);
+            T_CHECK(mouse_right_pressed);
+            T_CHECK(!mouse_right_released); // clickThrough is on, so release is not processed
             T_CHECK(!mouse_exited);
             T_CHECK(mouse_processed);
             application.mouseMove(mouse_pos_2);
             application.advance();
             T_CHECK(!rectangle_widget->isMouseOver());
             T_CHECK(mouse_entered);
-            T_CHECK(mouse_pressed);
-            T_CHECK(!mouse_released);
+            T_CHECK(mouse_left_pressed);
+            T_CHECK(!mouse_left_released);
+            T_CHECK(mouse_right_pressed);
+            T_CHECK(!mouse_right_released);
             T_CHECK(mouse_exited);
             T_CHECK(mouse_processed);
         }
