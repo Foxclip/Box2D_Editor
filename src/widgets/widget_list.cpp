@@ -143,16 +143,12 @@ namespace fw {
 
 	void WidgetList::processLeftRelease(const sf::Vector2f pos) {
 		wAssert(!isLocked());
-		if (focused_widget) {
-			focused_widget->processLeftRelease(pos);
-		}
+		root_widget->processLeftRelease(pos);
 	}
 
 	void WidgetList::processRightRelease(const sf::Vector2f pos) {
 		wAssert(!isLocked());
-		if (focused_widget) {
-			focused_widget->processRightRelease(pos);
-		}
+		root_widget->processRightRelease(pos);
 	}
 
 	void WidgetList::processMouse(const sf::Vector2f pos) {

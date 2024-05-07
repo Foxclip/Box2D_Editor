@@ -59,23 +59,41 @@ namespace fw {
 	}
 
 	void Widget::processLeftPress(const sf::Vector2f& pos) {
+		if (!visible) {
+			return;
+		}
 		internalOnLeftPress(pos);
 		OnLeftPress(pos);
 	}
 
 	void Widget::processRightPress(const sf::Vector2f& pos) {
+		if (!visible) {
+			return;
+		}
 		internalOnRightPress(pos);
 		OnRightPress(pos);
 	}
 
 	void Widget::processLeftRelease(const sf::Vector2f& pos) {
+		if (!visible) {
+			return;
+		}
 		internalOnLeftRelease(pos);
 		OnLeftRelease(pos);
+		for (size_t i = 0; i < children.size(); i++) {
+			children[i]->processLeftRelease(pos);
+		}
 	}
 
 	void Widget::processRightRelease(const sf::Vector2f& pos) {
+		if (!visible) {
+			return;
+		}
 		internalOnRightRelease(pos);
 		OnRightRelease(pos);
+		for (size_t i = 0; i < children.size(); i++) {
+			children[i]->processRightRelease(pos);
+		}
 	}
 
 	void Widget::processMouse(const sf::Vector2f& pos) {
