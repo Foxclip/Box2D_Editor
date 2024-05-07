@@ -14,6 +14,10 @@ namespace fw {
 
 #endif // !NDEBUG
 
+	Logger& operator<<(Logger& lg, const sf::Vector2f& value) {
+		return lg << "(" << value.x << " " << value.y << ")";
+	}
+
 	sf::Vector2i to2i(const sf::Vector2f& vec) {
 		return sf::Vector2i((int)vec.x, (int)vec.y);
 	}

@@ -34,10 +34,11 @@ namespace fw {
 	protected:
 
 	private:
-		RectangleWidget* header_widget = nullptr;
+		RectangleWidget* main_widget = nullptr;
 		TextWidget* header_text_widget = nullptr;
 		bool is_grabbed = false;
 		sf::Vector2f header_click_offset;
+		sf::Vector2f header_size;
 	};
 
 }

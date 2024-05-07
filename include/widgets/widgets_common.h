@@ -4,6 +4,7 @@
 #include <cassert>
 #include <string>
 #include <iostream>
+#include "logger.h"
 
 namespace fw {
 
@@ -22,6 +23,7 @@ namespace fw {
 
 #endif // !NDEBUG
 
+	Logger& operator<<(Logger& lg, const sf::Vector2f& value);
 	sf::Vector2i to2i(const sf::Vector2f& vec);
 	sf::Vector2f to2f(const sf::Vector2i& vec);
 	sf::Vector2f to2f(const sf::Vector2u& vec);

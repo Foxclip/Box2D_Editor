@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "widgets_common.h"
 
 namespace fw {
 

@@ -6,8 +6,6 @@
 
 namespace fw {
 
-	Logger& operator<<(Logger& lg, const sf::Vector2f& value);
-
 	struct MouseGesture {
 		enum MouseGestureType {
 			NORMAL,

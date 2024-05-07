@@ -2,7 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 #include <functional>
-#include "logger.h"
 #include "compvector.h"
 #include "searchindex.h"
 #include "widgets_common.h"
@@ -74,6 +73,7 @@ namespace fw {
 		virtual bool isVisualPositionQuantized() const;
 		bool isVisible() const;
 		bool isClickThrough() const;
+		bool getChildrenLocked() const;
 		WidgetVisibility checkVisibility() const;
 		void processLeftPress(const sf::Vector2f& pos);
 		void processRightPress(const sf::Vector2f& pos);
@@ -150,6 +150,8 @@ namespace fw {
 		void setFocusable(bool value);
 		void setParentSilent(Widget* new_parent);
 		void setParent(Widget* new_parent);
+		void lockChildren();
+		void unlockChildren();
 		void setForceCustomCursor(bool value);
 		void setName(const std::string& new_name);
 		void setClipChildren(bool value);
@@ -171,6 +173,7 @@ namespace fw {
 		WidgetTransform transforms = WidgetTransform(this);
 		Widget* parent = nullptr;
 		CompVector<Widget*> children;
+		bool children_locked = false;
 		SearchIndexMultiple<std::string, Widget*> children_names;
 		sf::Shader* shader = nullptr;
 		RenderLayer layer = RenderLayer::BASE;

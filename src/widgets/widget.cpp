@@ -37,6 +37,10 @@ namespace fw {
 		return click_through;
 	}
 
+	bool Widget::getChildrenLocked() const {
+		return children_locked;
+	}
+
 	WidgetVisibility Widget::checkVisibility() const {
 		WidgetVisibility v;
 		sf::FloatRect global_bounds = getGlobalBounds();
@@ -470,8 +474,21 @@ namespace fw {
 
 	void Widget::setParent(Widget* new_parent) {
 		wAssert(!widget_list.isLocked());
+		if (new_parent) {
+			wAssert(!parent->getChildrenLocked());
+		}
 		setParentSilent(new_parent);
 		internalOnSetParent(new_parent);
+	}
+
+	void Widget::lockChildren() {
+		wAssert(!widget_list.isLocked());
+		children_locked = true;
+	}
+
+	void Widget::unlockChildren() {
+		wAssert(!widget_list.isLocked());
+		children_locked = false;
 	}
 
 	void Widget::setForceCustomCursor(bool value) {
@@ -528,11 +545,12 @@ namespace fw {
 		if (!parent) {
 			return;
 		}
+		if (parent_anchor == Anchor::CUSTOM) {
+			return;
+		}
 		sf::Vector2f parent_size = parent->getLocalBounds().getSize();
 		sf::Vector2f anchored_pos = getPosition();
-		if (parent_anchor != Anchor::CUSTOM) {
-			anchored_pos = anchorToPos(parent_anchor, parent_size);
-		}
+		anchored_pos = anchorToPos(parent_anchor, parent_size);
 		setPosition(anchored_pos + anchor_offset);
 	}
 
