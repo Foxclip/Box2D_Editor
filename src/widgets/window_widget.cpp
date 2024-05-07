@@ -14,7 +14,6 @@ namespace fw {
 		header_widget->setOrigin(Anchor::BOTTOM_LEFT);
 		header_widget->setParentAnchor(Anchor::TOP_LEFT);
 		header_widget->setClickThrough(false);
-		header_widget->setFocusable(true);
 		header_widget->setName("header");
 		header_widget->setParent(this);
 		header_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
@@ -33,7 +32,6 @@ namespace fw {
 		};
 		header_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
 			is_grabbed = false;
-			header_widget->removeFocus();
 		};
 		header_text_widget = widget_list.createWidget<TextWidget>();
 		header_text_widget->setOrigin(Anchor::TOP_LEFT);
