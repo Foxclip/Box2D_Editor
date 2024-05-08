@@ -465,18 +465,13 @@ namespace fw {
 			old_parent->children.remove(this);
 			old_parent->children_names.remove(name, this);
 		}
-		new_parent->children.add(this);
-		new_parent->children_names.add(name, this);
-		this->parent = new_parent;
+		new_parent->addChild(this);
 		transforms.invalidateGlobalTransform();
 		updateFullName();
 	}
 
 	void Widget::setParent(Widget* new_parent) {
 		wAssert(!widget_list.isLocked());
-		if (new_parent) {
-			wAssert(!parent->getChildrenLocked());
-		}
 		setParentSilent(new_parent);
 		internalOnSetParent(new_parent);
 	}
@@ -538,6 +533,14 @@ namespace fw {
 
 	sf::Vector2f Widget::getRenderPositionOffset() const {
 		return sf::Vector2f(0.0f, 0.0f);
+	}
+
+	void Widget::addChild(Widget* child) {
+		wAssert(!widget_list.isLocked());
+		wAssert(!children_locked);
+		children.add(child);
+		children_names.add(child->name, child);
+		child->parent = this;
 	}
 
 	void Widget::updateAnchoredPosition() {

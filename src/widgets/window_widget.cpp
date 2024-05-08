@@ -75,6 +75,10 @@ namespace fw {
 		return header_text_widget->getCharacterSize();
 	}
 
+	const CompVector<Widget*>& WindowWidget::getWindowChildren() const {
+		return main_widget->getChildren();
+	}
+
 	void WindowWidget::setHeaderVisible(bool value) {
 		if (value) {
 			setSize(header_size);
@@ -102,6 +106,18 @@ namespace fw {
 
 	void WindowWidget::setHeaderTextCharacterSize(unsigned int size) {
 		header_text_widget->setCharacterSize(size);
+	}
+
+	void WindowWidget::addChild(Widget* child) {
+		if (children_locked) {
+			wAssert(false, "Use window->addWindowChild(child) instead of child->setParent(window)");
+		} else {
+			Widget::addChild(child);
+		}
+	}
+
+	void WindowWidget::addWindowChild(Widget* child) {
+		child->setParent(main_widget);
 	}
 
 }

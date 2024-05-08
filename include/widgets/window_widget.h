@@ -24,12 +24,15 @@ namespace fw {
 		const sf::Color& getHeaderTextColor() const;
 		const sf::Font* getHeaderFont() const;
 		unsigned int getHeaderTextCharacterSize() const;
+		const CompVector<Widget*>& getWindowChildren() const;
 		void setHeaderVisible(bool value);
 		void setHeaderColor(const sf::Color& color);
 		void setHeaderText(const sf::String& text);
 		void setHeaderTextColor(const sf::Color& color);
 		void setHeaderFont(const sf::Font& font);
 		void setHeaderTextCharacterSize(unsigned int size);
+		void addChild(Widget* child) override;
+		void addWindowChild(Widget* child);
 
 	protected:
 
