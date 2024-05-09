@@ -44,12 +44,15 @@ namespace fw {
 		main_widget->setSize(width, height);
 		main_widget->setParentAnchor(Anchor::BOTTOM_LEFT);
 		main_widget->setFillColor(DEFAULT_WINDOW_COLOR);
+		main_widget->setClipChildren(true);
 		main_widget->setClickThrough(false);
 		main_widget->setForceCustomCursor(true);
 		main_widget->setParent(this);
 
 		lockChildren();
 	}
+
+	WindowWidget::WindowWidget(WidgetList& widget_list, const sf::Vector2f& size) : WindowWidget(widget_list, size.x, size.y) { }
 
 	bool WindowWidget::getHeaderVisible() const {
 		return isVisible();

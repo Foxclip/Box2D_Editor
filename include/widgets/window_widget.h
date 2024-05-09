@@ -18,6 +18,7 @@ namespace fw {
 		const float ONSCREEN_MARGIN = 20.0f;
 
 		WindowWidget(WidgetList& widget_list, float width, float height);
+		WindowWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		bool getHeaderVisible() const;
 		void getHeaderColor() const;
 		const sf::String& getHeaderText() const;

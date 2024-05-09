@@ -111,6 +111,7 @@ void WidgetTests::createWidgetsList() {
     test::Test* textbox_widget_float_test = list->addTest("textbox_widget_float", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetFloatTest(test); });
     test::Test* canvas_widget_basic_test = list->addTest("canvas_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { canvasWidgetBasicTest(test); });
     test::Test* canvas_widget_draw_test = list->addTest("canvas_widget_draw", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetDrawTest(test); });
+    test::Test* window_widget_basic_test = list->addTest("window_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { windowWidgetBasicTest(test); });
 }
 
 void WidgetTests::basicTest(test::Test& test) {
@@ -1643,6 +1644,88 @@ void WidgetTests::canvasWidgetDrawTest(test::Test& test) {
     }
 }
 
+void WidgetTests::windowWidgetBasicTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(size);
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(window_widget));
+    window_widget->setPosition(position);
+    window_widget->setHeaderFont(textbox_font);
+    application.advance();
+    sf::Vector2f header_size = sf::Vector2f(size.x, window_widget->HEADER_HEIGHT);
+
+    {
+        GenericWidgetTest gwt(application, test);
+        gwt.widget = window_widget;
+        gwt.total_widgets = 4;
+        gwt.name = "window header";
+        gwt.fullname = "root|window header";
+        gwt.is_visual_position_quantized = false;
+        gwt.is_visible = true;
+        gwt.opaque = true;
+        gwt.is_click_through = false;
+        gwt.is_mouse_over = false;
+        gwt.is_focusable = false;
+        gwt.is_focused = false;
+        gwt.clip_children = false;
+        gwt.force_custom_cursor = false;
+        gwt.parent = root_widget;
+        gwt.local_bounds = sf::FloatRect(sf::Vector2f(), header_size);
+        gwt.global_bounds = sf::FloatRect(position, header_size);
+        gwt.parent_local_bounds = gwt.global_bounds;
+        gwt.visual_local_bounds = gwt.local_bounds;
+        gwt.visual_global_bounds = gwt.global_bounds;
+        gwt.visual_parent_local_bounds = gwt.global_bounds;
+        T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    }
+
+    fw::TextWidget* text_widget = nullptr;
+    fw::RectangleWidget* main_widget = nullptr;
+    T_ASSERT(T_COMPARE(window_widget->getChildren().size(), 2));
+    const CompVector<fw::Widget*>& children = window_widget->getChildren();
+    text_widget = dynamic_cast<fw::TextWidget*>(window_widget->getChild(0));
+    main_widget = dynamic_cast<fw::RectangleWidget*>(window_widget->getChild(1));
+    T_ASSERT(T_CHECK(text_widget));
+    T_ASSERT(T_CHECK(main_widget));
+
+    T_COMPARE(window_widget->getFillColor(), window_widget->DEFAULT_HEADER_COLOR, &WidgetTests::colorToStr);
+
+    {
+        GenericWidgetTest gwt(application, test);
+        gwt.widget = main_widget;
+        gwt.total_widgets = 4;
+        gwt.name = "window area";
+        gwt.fullname = "root|window header|window area";
+        gwt.is_visual_position_quantized = false;
+        gwt.is_visible = true;
+        gwt.opaque = true;
+        gwt.is_click_through = false;
+        gwt.is_mouse_over = false;
+        gwt.is_focusable = false;
+        gwt.is_focused = false;
+        gwt.clip_children = true;
+        gwt.force_custom_cursor = true;
+        gwt.parent = window_widget;
+        gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+        gwt.global_bounds = sf::FloatRect(position + sf::Vector2f(0.0f, window_widget->getHeight()), size);
+        gwt.parent_local_bounds = sf::FloatRect(sf::Vector2f(0.0f, window_widget->getHeight()), size);
+        gwt.visual_local_bounds = gwt.local_bounds;
+        gwt.visual_global_bounds = gwt.global_bounds;
+        gwt.visual_parent_local_bounds = gwt.parent_local_bounds;
+        T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    }
+
+    T_ASSERT(T_COMPARE(main_widget->getChildren().size(), 0));
+
+    T_COMPARE(main_widget->getFillColor(), window_widget->DEFAULT_WINDOW_COLOR, &WidgetTests::colorToStr);
+}
+
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
     return "(" + utils::vec_to_str(vec) + ")";
 }
@@ -1751,12 +1834,12 @@ void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
     auto rect_to_str = &WidgetTests::floatRectToStr;
     T_COMPARE(widget->getLocalBounds(), gwt.local_bounds, rect_to_str);
     T_COMPARE(widget->getParentLocalBounds(), gwt.parent_local_bounds, rect_to_str);
-    T_COMPARE(widget->getGlobalBounds(), gwt.parent_local_bounds, rect_to_str);
+    T_COMPARE(widget->getGlobalBounds(), gwt.global_bounds, rect_to_str);
     T_COMPARE(widget->getVisualLocalBounds(), gwt.visual_local_bounds, rect_to_str);
     T_COMPARE(widget->getVisualParentLocalBounds(), gwt.visual_parent_local_bounds, rect_to_str);
-    T_COMPARE(widget->getVisualGlobalBounds(), gwt.visual_parent_local_bounds, rect_to_str);
-    T_COMPARE(widget->getUnclippedRegion(), gwt.visual_parent_local_bounds, rect_to_str);
-    T_COMPARE(widget->getQuantizedUnclippedRegion(), gwt.visual_parent_local_bounds, rect_to_str);
+    T_COMPARE(widget->getVisualGlobalBounds(), gwt.visual_global_bounds, rect_to_str);
+    T_COMPARE(widget->getUnclippedRegion(), gwt.visual_global_bounds, rect_to_str);
+    T_COMPARE(widget->getQuantizedUnclippedRegion(), gwt.visual_global_bounds, rect_to_str);
     T_COMPARE(widget->getWidth(), gwt.parent_local_bounds.width);
     T_COMPARE(widget->getHeight(), gwt.parent_local_bounds.height);
     T_COMPARE(widget->getGlobalWidth(), gwt.parent_local_bounds.width);
