@@ -126,6 +126,7 @@ private:
 	void canvasWidgetBasicTest(test::Test& test);
 	void canvasWidgetDrawTest(test::Test& test);
 	void windowWidgetBasicTest(test::Test& test);
+	void windowWidgetDragTest(test::Test& test);
 
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);

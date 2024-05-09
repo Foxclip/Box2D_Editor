@@ -112,6 +112,7 @@ void WidgetTests::createWidgetsList() {
     test::Test* canvas_widget_basic_test = list->addTest("canvas_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { canvasWidgetBasicTest(test); });
     test::Test* canvas_widget_draw_test = list->addTest("canvas_widget_draw", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetDrawTest(test); });
     test::Test* window_widget_basic_test = list->addTest("window_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { windowWidgetBasicTest(test); });
+    test::Test* window_widget_drag_test = list->addTest("window_widget_drag", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetDragTest(test); });
 }
 
 void WidgetTests::basicTest(test::Test& test) {
@@ -1724,6 +1725,31 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
     T_ASSERT(T_COMPARE(main_widget->getChildren().size(), 0));
 
     T_COMPARE(main_widget->getFillColor(), window_widget->DEFAULT_WINDOW_COLOR, &WidgetTests::colorToStr);
+}
+
+void WidgetTests::windowWidgetDragTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(size);
+    window_widget->setPosition(position);
+    window_widget->setHeaderFont(textbox_font);
+    sf::Vector2f header_center = window_widget->getGlobalCenter();
+    sf::Vector2f offset_pos = sf::Vector2f(50.0f, 30.0f);
+    sf::Vector2f new_position = position + offset_pos;
+    application.mouseMove(fw::to2i(header_center));
+    application.advance();
+    application.mouseLeftPress();
+    application.advance();
+    application.mouseMove(fw::to2i(header_center + offset_pos));
+    application.advance();
+    application.mouseLeftRelease();
+    application.advance();
+    T_VEC2_APPROX_COMPARE(window_widget->getGlobalPosition(), new_position);
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
