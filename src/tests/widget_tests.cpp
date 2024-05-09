@@ -69,156 +69,13 @@ void WidgetTests::createTestLists() {
 
 void WidgetTests::createApplicationList() {
 	test::TestList* list = createTestList("Application");
-
-    test::Test* basic_test = list->addTest(
-        "basic",
-        [&](test::Test& test) {
-            fw::Application application;
-        }
-    );
-    test::Test* init_test = list->addTest(
-        "init",
-        {
-            basic_test
-        },
-        [&](test::Test& test) {
-            TestApplication application;
-            application.init("Test window", 800, 600, 0, false);
-            T_ASSERT(T_CHECK(application.initialized));
-            T_COMPARE(application.getWindowSize(), sf::Vector2u(800, 600), &WidgetTests::sfVec2uToStr);
-        }
-    );
-    test::Test* start_test = list->addTest(
-        "start",
-        {
-            init_test
-        },
-        [&](test::Test& test) {
-            TestApplication application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            T_ASSERT(T_CHECK(application.started));
-        }
-    );
-    test::Test* advance_test = list->addTest(
-        "advance",
-        {
-            start_test
-        },
-        [&](test::Test& test) {
-            TestApplication application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.advance();
-            T_CHECK(application.initialized);
-            T_CHECK(application.started);
-            T_CHECK(application.frame_begin);
-            T_CHECK(application.frame_end);
-            T_CHECK(application.process_widgets);
-            T_CHECK(!application.process_window_event);
-            T_CHECK(!application.process_keyboard_event);
-            T_CHECK(!application.before_process_mouse_event);
-            T_CHECK(!application.process_left_press);
-            T_CHECK(!application.process_left_release);
-            T_CHECK(!application.process_mouse_scroll);
-            T_CHECK(application.process_keyboard);
-            T_CHECK(application.process_mouse);
-            T_CHECK(application.after_process_input);
-            T_CHECK(application.process_world);
-            T_CHECK(application.rendered);
-        }
-    );
-    test::Test* close_test = list->addTest(
-        "close",
-        {
-            start_test
-        },
-        [&](test::Test& test) {
-            TestApplication application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.advance();
-            application.close();
-            T_CHECK(application.closed);
-        }
-    );
-    test::Test* mouse_events_test = list->addTest(
-        "mouse_events",
-        {
-            advance_test
-        },
-        [&](test::Test& test) {
-            TestApplication application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            {
-                sf::Vector2i pos(100, 100);
-                application.mouseMove(pos);
-                application.mouseLeftPress();
-                application.advance();
-                T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
-                T_COMPARE(application.left_click_pos, pos, &WidgetTests::sfVec2iToStr);
-            }
-            {
-                sf::Vector2i pos(150, 150);
-                application.mouseMove(pos);
-                application.advance();
-                T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
-            }
-            {
-                sf::Vector2i pos(200, 200);
-                application.mouseMove(pos);
-                application.mouseLeftRelease();
-                application.advance();
-                T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
-                T_COMPARE(application.left_release_pos, pos, &WidgetTests::sfVec2iToStr);
-            }
-            {
-                sf::Vector2i pos(100, 100);
-                application.mouseMove(pos);
-                application.mouseRightPress();
-                application.advance();
-                T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
-                T_COMPARE(application.right_click_pos, pos, &WidgetTests::sfVec2iToStr);
-            }
-            {
-                sf::Vector2i pos(150, 150);
-                application.mouseMove(pos);
-                application.advance();
-                T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
-            }
-            {
-                sf::Vector2i pos(200, 200);
-                application.mouseMove(pos);
-                application.mouseRightRelease();
-                application.advance();
-                T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
-                T_COMPARE(application.right_release_pos, pos, &WidgetTests::sfVec2iToStr);
-            }
-        }
-    );
-    test::Test* keyboard_events_test = list->addTest(
-        "keyboard_events",
-        {
-            advance_test
-        },
-        [&](test::Test& test) {
-            TestApplication application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            T_CHECK(!application.space_key_pressed);
-            {
-                application.keyPress(sf::Keyboard::Space);
-                application.advance();
-                T_CHECK(application.space_key_pressed);
-            }
-            {
-                application.keyRelease(sf::Keyboard::Space);
-                application.advance();
-                T_CHECK(!application.space_key_pressed);
-            }
-        }
-    );
+    test::Test* basic_test = list->addTest("basic", [&](test::Test& test) { basicTest(test); });
+    test::Test* init_test = list->addTest("init", { basic_test }, [&](test::Test& test) { initTest(test); });
+    test::Test* start_test = list->addTest("start", { init_test }, [&](test::Test& test) { startTest(test); });
+    test::Test* advance_test = list->addTest("advance", { start_test }, [&](test::Test& test) { advanceTest(test); });
+    test::Test* close_test = list->addTest("close", { start_test }, [&](test::Test& test) { closeTest(test); });
+    test::Test* mouse_events_test = list->addTest("mouse_events", { advance_test }, [&](test::Test& test) { mouseEventsTest(test); });
+    test::Test* keyboard_events_test = list->addTest("keyboard_events", { advance_test }, [&](test::Test& test) { keyboardEventsTest(test); });
 }
 
 void WidgetTests::createWidgetsList() {
@@ -226,1557 +83,1564 @@ void WidgetTests::createWidgetsList() {
     list->OnBeforeRunAllTests = [&]() {
         textbox_font.loadFromFile("fonts/verdana.ttf");
     };
+    test::Test* root_widget_test = list->addTest("root_widget", [&](test::Test& test) { rootWidgetTest(test); });
+    test::Test* rectangle_widget_test = list->addTest("rectangle_widget", { root_widget_test }, [&](test::Test& test) { rectangleWidgetTest(test); });
+    test::Test* set_parent_test = list->addTest("set_parent", { root_widget_test }, [&](test::Test& test) { setParentTest(test); });
+    test::Test* widget_mouse_events_1_test = list->addTest("widget_mouse_events_1", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents1(test); });
+    test::Test* widget_mouse_events_2_test = list->addTest("widget_mouse_events_2", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents2(test); });
+    test::Test* events_test = list->addTest("events", { root_widget_test }, [&](test::Test& test) { eventsTest(test); });
+    test::Test* coordinates_test = list->addTest("coordinates", { set_parent_test }, [&](test::Test& test) { coordinatesTest(test); });
+    test::Test* find_test = list->addTest("find", { set_parent_test }, [&](test::Test& test) { findTest(test); });
+    test::Test* anchor_test = list->addTest("anchor", { set_parent_test }, [&](test::Test& test) { anchorTest(test); });
+    test::Test* text_widget_test = list->addTest("text_widget", { root_widget_test }, [&](test::Test& test) { textWidgetTest(test); });
+    test::Test* checkbox_widget_basic_test = list->addTest("checkbox_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { checkboxWidgetBasicTest(test); });
+    test::Test* checkbox_widget_toggle_test = list->addTest("checkbox_widget_toggle", { checkbox_widget_basic_test }, [&](test::Test& test) { checkboxWidgetToggleTest(test); });
+    test::Test* container_widget_basic_test = list->addTest("container_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { containerWidgetBasicTest(test); });
+    test::Test* container_widget_children_test = list->addTest("container_widget_children", { container_widget_basic_test }, [&](test::Test& test) { containerWidgetChildrenTest(test); });
+    test::Test* textbox_widget_basic_test = list->addTest("textbox_widget_basic", { rectangle_widget_test, text_widget_test }, [&](test::Test& test) { textboxWidgetBasicTest(test); });
+    test::Test* textbox_widget_input_test = list->addTest("textbox_widget_input", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetInputTest(test); });
+    test::Test* textbox_widget_events_test = list->addTest("textbox_widget_events", { textbox_widget_input_test }, [&](test::Test& test) { textboxWidgetEventsTest(test); });
+    test::Test* textbox_widget_cursor_test = list->addTest("textbox_widget_cursor", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetCursorTest(test); });
+    test::Test* textbox_widget_scroll_test = list->addTest("textbox_widget_scroll", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetScrollTest(test); });
+    test::Test* textbox_widget_selection_test = list->addTest("textbox_widget_selection", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetSelectionTest(test); });
+    test::Test* textbox_widget_mouse_click_test = list->addTest("textbox_widget_mouse_click", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetMouseClickTest(test); });
+    test::Test* textbox_widget_mouse_drag_test = list->addTest("textbox_widget_mouse_drag", { textbox_widget_mouse_click_test }, [&](test::Test& test) { textboxWidgetMouseDragTest(test); });
+    test::Test* textbox_widget_copypaste_test = list->addTest("textbox_widget_copypaste", { textbox_widget_selection_test }, [&](test::Test& test) { textboxWidgetCopyPasteTest(test); });
+    test::Test* textbox_widget_history_test = list->addTest("textbox_widget_history", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetHistoryTest(test); });
+    test::Test* textbox_widget_integer_test = list->addTest("textbox_widget_integer", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetIntegerTest(test); });
+    test::Test* textbox_widget_float_test = list->addTest("textbox_widget_float", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetFloatTest(test); });
+    test::Test* canvas_widget_basic_test = list->addTest("canvas_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { canvasWidgetBasicTest(test); });
+    test::Test* canvas_widget_draw_test = list->addTest("canvas_widget_draw", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetDrawTest(test); });
+}
 
-    test::Test* root_widget_test = list->addTest(
-        "root_widget",
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::RectangleWidget* root_widget = dynamic_cast<fw::RectangleWidget*>(application.getWidgets().getRootWidget());
-            T_ASSERT(T_CHECK(root_widget, "Root widget is not a RectangleWidget"));
+void WidgetTests::basicTest(test::Test& test) {
+    fw::Application application;
+}
 
-            GenericWidgetTest gwt(application, test);
-            gwt.widget = root_widget;
-            gwt.total_widgets = 1;
-            gwt.name = "root";
-            gwt.fullname = "root";
-            gwt.is_visual_position_quantized = false;
-            gwt.is_visible = true;
-            gwt.opaque = false;
-            gwt.is_click_through = true;
-            gwt.is_mouse_over = true;
-            gwt.is_focusable = false;
-            gwt.is_focused = false;
-            gwt.clip_children = true;
-            gwt.force_custom_cursor = false;
-            gwt.parent = nullptr;
-            gwt.local_bounds = sf::FloatRect(sf::Vector2f(), fw::to2f(application.getWindowSize()));
-            gwt.global_bounds = gwt.local_bounds;
-            gwt.parent_local_bounds = gwt.local_bounds;
-            gwt.visual_local_bounds = gwt.local_bounds;
-            gwt.visual_global_bounds = gwt.local_bounds;
-            gwt.visual_parent_local_bounds = gwt.local_bounds;
-            T_WRAP_CONTAINER(genericWidgetTest(gwt));
+void WidgetTests::initTest(test::Test& test) {
+    TestApplication application;
+    application.init("Test window", 800, 600, 0, false);
+    T_ASSERT(T_CHECK(application.initialized));
+    T_COMPARE(application.getWindowSize(), sf::Vector2u(800, 600), &WidgetTests::sfVec2uToStr);
+}
 
-            T_COMPARE(root_widget->getFillColor(), sf::Color::Transparent, &WidgetTests::colorToStr);
+void WidgetTests::startTest(test::Test& test) {
+    TestApplication application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    T_ASSERT(T_CHECK(application.started));
+}
 
-            T_COMPARE(root_widget->getParentChain().size(), 0);
-            T_COMPARE(root_widget->getChildren().size(), 0);
-        }
+void WidgetTests::advanceTest(test::Test& test) {
+    TestApplication application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    T_CHECK(application.initialized);
+    T_CHECK(application.started);
+    T_CHECK(application.frame_begin);
+    T_CHECK(application.frame_end);
+    T_CHECK(application.process_widgets);
+    T_CHECK(!application.process_window_event);
+    T_CHECK(!application.process_keyboard_event);
+    T_CHECK(!application.before_process_mouse_event);
+    T_CHECK(!application.process_left_press);
+    T_CHECK(!application.process_left_release);
+    T_CHECK(!application.process_mouse_scroll);
+    T_CHECK(application.process_keyboard);
+    T_CHECK(application.process_mouse);
+    T_CHECK(application.after_process_input);
+    T_CHECK(application.process_world);
+    T_CHECK(application.rendered);
+}
+
+void WidgetTests::closeTest(test::Test& test) {
+    TestApplication application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    application.close();
+    T_CHECK(application.closed);
+}
+
+void WidgetTests::mouseEventsTest(test::Test& test) {
+    TestApplication application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    {
+        sf::Vector2i pos(100, 100);
+        application.mouseMove(pos);
+        application.mouseLeftPress();
+        application.advance();
+        T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+        T_COMPARE(application.left_click_pos, pos, &WidgetTests::sfVec2iToStr);
+    }
+    {
+        sf::Vector2i pos(150, 150);
+        application.mouseMove(pos);
+        application.advance();
+        T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+    }
+    {
+        sf::Vector2i pos(200, 200);
+        application.mouseMove(pos);
+        application.mouseLeftRelease();
+        application.advance();
+        T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+        T_COMPARE(application.left_release_pos, pos, &WidgetTests::sfVec2iToStr);
+    }
+    {
+        sf::Vector2i pos(100, 100);
+        application.mouseMove(pos);
+        application.mouseRightPress();
+        application.advance();
+        T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+        T_COMPARE(application.right_click_pos, pos, &WidgetTests::sfVec2iToStr);
+    }
+    {
+        sf::Vector2i pos(150, 150);
+        application.mouseMove(pos);
+        application.advance();
+        T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+    }
+    {
+        sf::Vector2i pos(200, 200);
+        application.mouseMove(pos);
+        application.mouseRightRelease();
+        application.advance();
+        T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+        T_COMPARE(application.right_release_pos, pos, &WidgetTests::sfVec2iToStr);
+    }
+}
+
+void WidgetTests::keyboardEventsTest(test::Test& test) {
+    TestApplication application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    T_CHECK(!application.space_key_pressed);
+    {
+        application.keyPress(sf::Keyboard::Space);
+        application.advance();
+        T_CHECK(application.space_key_pressed);
+    }
+    {
+        application.keyRelease(sf::Keyboard::Space);
+        application.advance();
+        T_CHECK(!application.space_key_pressed);
+    }
+}
+
+void WidgetTests::rootWidgetTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::RectangleWidget* root_widget = dynamic_cast<fw::RectangleWidget*>(application.getWidgets().getRootWidget());
+    T_ASSERT(T_CHECK(root_widget, "Root widget is not a RectangleWidget"));
+
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = root_widget;
+    gwt.total_widgets = 1;
+    gwt.name = "root";
+    gwt.fullname = "root";
+    gwt.is_visual_position_quantized = false;
+    gwt.is_visible = true;
+    gwt.opaque = false;
+    gwt.is_click_through = true;
+    gwt.is_mouse_over = true;
+    gwt.is_focusable = false;
+    gwt.is_focused = false;
+    gwt.clip_children = true;
+    gwt.force_custom_cursor = false;
+    gwt.parent = nullptr;
+    gwt.local_bounds = sf::FloatRect(sf::Vector2f(), fw::to2f(application.getWindowSize()));
+    gwt.global_bounds = gwt.local_bounds;
+    gwt.parent_local_bounds = gwt.local_bounds;
+    gwt.visual_local_bounds = gwt.local_bounds;
+    gwt.visual_global_bounds = gwt.local_bounds;
+    gwt.visual_parent_local_bounds = gwt.local_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+
+    T_COMPARE(root_widget->getFillColor(), sf::Color::Transparent, &WidgetTests::colorToStr);
+
+    T_COMPARE(root_widget->getParentChain().size(), 0);
+    T_COMPARE(root_widget->getChildren().size(), 0);
+}
+
+void WidgetTests::rectangleWidgetTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(rectangle_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(100.0f, 100.0f);
+    rectangle_widget->setPosition(position);
+    rectangle_widget->setSize(size);
+
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = rectangle_widget;
+    gwt.total_widgets = 2;
+    gwt.name = "rectangle";
+    gwt.fullname = "root|rectangle";
+    gwt.is_visual_position_quantized = false;
+    gwt.is_visible = true;
+    gwt.opaque = true;
+    gwt.is_click_through = true;
+    gwt.is_mouse_over = false;
+    gwt.is_focusable = false;
+    gwt.is_focused = false;
+    gwt.clip_children = false;
+    gwt.force_custom_cursor = false;
+    gwt.parent = root_widget;
+    gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+    gwt.global_bounds = sf::FloatRect(position, size);
+    gwt.parent_local_bounds = gwt.global_bounds;
+    gwt.visual_local_bounds = gwt.local_bounds;
+    gwt.visual_global_bounds = gwt.global_bounds;
+    gwt.visual_parent_local_bounds = gwt.global_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+
+    T_CHECK(rectangle_widget->getParent() == root_widget);
+    CompVector<fw::Widget*> parent_chain = rectangle_widget->getParentChain();
+    T_ASSERT(T_COMPARE(parent_chain.size(), 1));
+    T_CHECK(parent_chain[0] == root_widget);
+    T_COMPARE(rectangle_widget->getChildren().size(), 0);
+    const CompVector<fw::Widget*>& root_children = root_widget->getChildren();
+    T_ASSERT(T_COMPARE(root_children.size(), 1));
+    T_CHECK(root_children[0] == rectangle_widget);
+    T_CHECK(root_widget->getChild(0) == rectangle_widget);
+
+    T_COMPARE(rectangle_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
+}
+
+void WidgetTests::setParentTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    sf::Vector2f parent_local_pos_before = parent_widget->getPosition();
+    sf::Vector2f parent_global_pos_before = parent_widget->getGlobalPosition();
+    sf::Vector2f child_local_pos_before = child_widget->getPosition();
+    sf::Vector2f child_global_pos_before = child_widget->getGlobalPosition();
+    child_widget->setParent(parent_widget);
+    T_CHECK(child_widget->getParent() == parent_widget);
+    CompVector<fw::Widget*> parent_chain = child_widget->getParentChain();
+    T_ASSERT(T_COMPARE(parent_chain.size(), 2));
+    T_CHECK(parent_chain[0] == parent_widget);
+    T_CHECK(parent_chain[1] == root_widget);
+    T_CHECK(parent_widget->getParent() == root_widget);
+    T_ASSERT(T_COMPARE(child_widget->getChildren().size(), 0));
+    const CompVector<fw::Widget*>& parent_children = parent_widget->getChildren();
+    T_ASSERT(T_COMPARE(parent_children.size(), 1));
+    T_CHECK(parent_children[0] == child_widget);
+    T_CHECK(parent_widget->getChild(0) == child_widget);
+    T_ASSERT(T_COMPARE(parent_widget->getChildren().size(), 1));
+    T_CHECK(parent_widget->getChild(0) == child_widget);
+    CompVector<fw::Widget*> root_children = root_widget->getAllChildren();
+    T_ASSERT(T_COMPARE(root_children.size(), 2));
+    T_CHECK(root_children[0] == parent_widget);
+    T_CHECK(root_children[1] == child_widget);
+    sf::Vector2f parent_local_pos_after = parent_widget->getPosition();
+    sf::Vector2f parent_global_pos_after = parent_widget->getGlobalPosition();
+    sf::Vector2f child_local_pos_after = child_widget->getPosition();
+    sf::Vector2f child_global_pos_after = child_widget->getGlobalPosition();
+    T_VEC2_APPROX_COMPARE(parent_local_pos_after, parent_local_pos_before);
+    T_VEC2_APPROX_COMPARE(parent_global_pos_after, parent_global_pos_before);
+    T_VEC2_APPROX_COMPARE(child_local_pos_after, child_local_pos_before - parent_local_pos_before);
+    T_VEC2_APPROX_COMPARE(child_global_pos_after, child_global_pos_before);
+}
+
+void WidgetTests::widgetMouseEvents1(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    bool mouse_entered = false;
+    bool mouse_left_pressed = false;
+    bool mouse_right_pressed = false;
+    bool mouse_left_released = false;
+    bool mouse_right_released = false;
+    bool mouse_exited = false;
+    bool mouse_processed = false;
+    rectangle_widget->OnMouseEnter = [&](const sf::Vector2f& pos) {
+        mouse_entered = true;
+    };
+    rectangle_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
+        mouse_left_pressed = true;
+    };
+    rectangle_widget->OnRightPress = [&](const sf::Vector2f& pos) {
+        mouse_right_pressed = true;
+    };
+    rectangle_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
+        mouse_left_released = true;
+    };
+    rectangle_widget->OnRightRelease = [&](const sf::Vector2f& pos) {
+        mouse_right_released = true;
+    };
+    rectangle_widget->OnMouseExit = [&](const sf::Vector2f& pos) {
+        mouse_exited = true;
+    };
+    rectangle_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
+        mouse_processed = true;
+    };
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(100.0f, 100.0f);
+    sf::Vector2i mouse_pos_1(150, 150);
+    sf::Vector2i mouse_pos_2(300, 300);
+    rectangle_widget->setPosition(position);
+    rectangle_widget->setSize(size);
+    T_CHECK(!rectangle_widget->isMouseOver());
+    T_CHECK(!mouse_entered);
+    T_CHECK(!mouse_left_pressed);
+    T_CHECK(!mouse_left_released);
+    T_CHECK(!mouse_right_pressed);
+    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_exited);
+    T_CHECK(!mouse_processed);
+    application.mouseMove(mouse_pos_1);
+    application.advance();
+    T_CHECK(rectangle_widget->isMouseOver());
+    T_CHECK(mouse_entered);
+    T_CHECK(!mouse_left_pressed);
+    T_CHECK(!mouse_left_released);
+    T_CHECK(!mouse_right_pressed);
+    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_exited);
+    T_CHECK(mouse_processed);
+    application.mouseLeftPress();
+    application.advance();
+    T_CHECK(mouse_entered);
+    T_CHECK(mouse_left_pressed);
+    T_CHECK(!mouse_left_released);
+    T_CHECK(!mouse_right_pressed);
+    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_exited);
+    T_CHECK(mouse_processed);
+    application.mouseLeftRelease();
+    application.advance();
+    T_CHECK(mouse_entered);
+    T_CHECK(mouse_left_pressed);
+    T_CHECK(!mouse_left_released); // clickThrough is on, so release is not processed
+    T_CHECK(!mouse_right_pressed);
+    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_exited);
+    T_CHECK(mouse_processed);
+    application.mouseRightPress();
+    application.advance();
+    T_CHECK(mouse_entered);
+    T_CHECK(mouse_left_pressed);
+    T_CHECK(!mouse_left_released);
+    T_CHECK(mouse_right_pressed);
+    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_exited);
+    T_CHECK(mouse_processed);
+    application.mouseRightRelease();
+    application.advance();
+    T_CHECK(mouse_entered);
+    T_CHECK(mouse_left_pressed);
+    T_CHECK(!mouse_left_released);
+    T_CHECK(mouse_right_pressed);
+    T_CHECK(!mouse_right_released); // clickThrough is on, so release is not processed
+    T_CHECK(!mouse_exited);
+    T_CHECK(mouse_processed);
+    application.mouseMove(mouse_pos_2);
+    application.advance();
+    T_CHECK(!rectangle_widget->isMouseOver());
+    T_CHECK(mouse_entered);
+    T_CHECK(mouse_left_pressed);
+    T_CHECK(!mouse_left_released);
+    T_CHECK(mouse_right_pressed);
+    T_CHECK(!mouse_right_released);
+    T_CHECK(mouse_exited);
+    T_CHECK(mouse_processed);
+}
+
+void WidgetTests::widgetMouseEvents2(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::RectangleWidget* rectangle_widget_1 = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* rectangle_widget_2 = application.getWidgets().createWidget<fw::RectangleWidget>();
+    rectangle_widget_1->setClickThrough(false);
+    bool mouse_entered_1 = false;
+    bool mouse_pressed_1 = false;
+    bool mouse_released_1 = false;
+    bool mouse_exited_1 = false;
+    bool mouse_processed_1 = false;
+    bool mouse_entered_2 = false;
+    bool mouse_pressed_2 = false;
+    bool mouse_released_2 = false;
+    bool mouse_exited_2 = false;
+    bool mouse_processed_2 = false;
+    rectangle_widget_1->OnMouseEnter = [&](const sf::Vector2f& pos) {
+        mouse_entered_1 = true;
+    };
+    rectangle_widget_1->OnLeftPress = [&](const sf::Vector2f& pos) {
+        mouse_pressed_1 = true;
+    };
+    rectangle_widget_1->OnLeftRelease = [&](const sf::Vector2f& pos) {
+        mouse_released_1 = true;
+    };
+    rectangle_widget_1->OnMouseExit = [&](const sf::Vector2f& pos) {
+        mouse_exited_1 = true;
+    };
+    rectangle_widget_1->OnProcessMouse = [&](const sf::Vector2f& pos) {
+        mouse_processed_1 = true;
+    };
+    rectangle_widget_2->OnMouseEnter = [&](const sf::Vector2f& pos) {
+        mouse_entered_2 = true;
+    };
+    rectangle_widget_2->OnLeftPress = [&](const sf::Vector2f& pos) {
+        mouse_pressed_2 = true;
+    };
+    rectangle_widget_2->OnLeftRelease = [&](const sf::Vector2f& pos) {
+        mouse_released_2 = true;
+    };
+    rectangle_widget_2->OnMouseExit = [&](const sf::Vector2f& pos) {
+        mouse_exited_2 = true;
+    };
+    rectangle_widget_2->OnProcessMouse = [&](const sf::Vector2f& pos) {
+        mouse_processed_2 = true;
+    };
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(100.0f, 100.0f);
+    sf::Vector2i mouse_pos_1(150, 150);
+    sf::Vector2i mouse_pos_2(300, 300);
+    rectangle_widget_1->setPosition(position);
+    rectangle_widget_1->setSize(size);
+    rectangle_widget_2->setPosition(position);
+    rectangle_widget_2->setSize(size);
+    T_CHECK(!rectangle_widget_1->isMouseOver());
+    T_CHECK(!mouse_entered_1);
+    T_CHECK(!mouse_pressed_1);
+    T_CHECK(!mouse_released_1);
+    T_CHECK(!mouse_exited_1);
+    T_CHECK(!mouse_processed_1);
+    T_CHECK(!rectangle_widget_2->isMouseOver());
+    T_CHECK(!mouse_entered_2);
+    T_CHECK(!mouse_pressed_2);
+    T_CHECK(!mouse_released_2);
+    T_CHECK(!mouse_exited_2);
+    T_CHECK(!mouse_processed_2);
+    application.mouseMove(mouse_pos_1);
+    application.advance();
+    T_CHECK(rectangle_widget_1->isMouseOver());
+    T_CHECK(mouse_entered_1);
+    T_CHECK(!mouse_pressed_1);
+    T_CHECK(!mouse_released_1);
+    T_CHECK(!mouse_exited_1);
+    T_CHECK(mouse_processed_1);
+    T_CHECK(rectangle_widget_2->isMouseOver());
+    T_CHECK(mouse_entered_2);
+    T_CHECK(!mouse_pressed_2);
+    T_CHECK(!mouse_released_2);
+    T_CHECK(!mouse_exited_2);
+    T_CHECK(mouse_processed_2);
+    rectangle_widget_2->setClickThrough(true);
+    application.mouseLeftPress();
+    application.advance();
+    T_CHECK(mouse_entered_1);
+    T_CHECK(mouse_pressed_1);
+    T_CHECK(!mouse_released_1);
+    T_CHECK(!mouse_exited_1);
+    T_CHECK(mouse_processed_1);
+    T_CHECK(mouse_entered_2);
+    T_CHECK(mouse_pressed_2);
+    T_CHECK(!mouse_released_2);
+    T_CHECK(!mouse_exited_2);
+    T_CHECK(mouse_processed_2);
+    application.mouseLeftRelease();
+    application.advance();
+    T_CHECK(mouse_entered_1);
+    T_CHECK(mouse_pressed_1);
+    T_CHECK(mouse_released_1);
+    T_CHECK(!mouse_exited_1);
+    T_CHECK(mouse_processed_1);
+    T_CHECK(mouse_entered_2);
+    T_CHECK(mouse_pressed_2);
+    T_CHECK(mouse_released_2);
+    T_CHECK(!mouse_exited_2);
+    T_CHECK(mouse_processed_2);
+    mouse_pressed_1 = false;
+    mouse_pressed_2 = false;
+    mouse_released_1 = false;
+    mouse_released_2 = false;
+    rectangle_widget_2->setClickThrough(false);
+    application.mouseLeftPress();
+    application.advance();
+    T_CHECK(mouse_entered_1);
+    T_CHECK(!mouse_pressed_1);
+    T_CHECK(!mouse_released_1);
+    T_CHECK(!mouse_exited_1);
+    T_CHECK(mouse_processed_1);
+    T_CHECK(mouse_entered_2);
+    T_CHECK(mouse_pressed_2);
+    T_CHECK(!mouse_released_2);
+    T_CHECK(!mouse_exited_2);
+    T_CHECK(mouse_processed_2);
+    application.mouseLeftRelease();
+    application.advance();
+    T_CHECK(mouse_entered_1);
+    T_CHECK(!mouse_pressed_1);
+    T_CHECK(mouse_released_1);
+    T_CHECK(!mouse_exited_1);
+    T_CHECK(mouse_processed_1);
+    T_CHECK(mouse_entered_2);
+    T_CHECK(mouse_pressed_2);
+    T_CHECK(mouse_released_2);
+    T_CHECK(!mouse_exited_2);
+    T_CHECK(mouse_processed_2);
+    application.mouseMove(mouse_pos_2);
+    application.advance();
+    T_CHECK(!rectangle_widget_1->isMouseOver());
+    T_CHECK(mouse_entered_1);
+    T_CHECK(!mouse_pressed_1);
+    T_CHECK(mouse_released_1);
+    T_CHECK(mouse_exited_1);
+    T_CHECK(mouse_processed_1);
+    T_CHECK(!rectangle_widget_2->isMouseOver());
+    T_CHECK(mouse_entered_2);
+    T_CHECK(mouse_pressed_2);
+    T_CHECK(mouse_released_2);
+    T_CHECK(mouse_exited_2);
+    T_CHECK(mouse_processed_2);
+}
+
+void WidgetTests::eventsTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    bool updated = false;
+    bool before_render = false;
+    unsigned int window_width = 0;
+    unsigned int window_height = 0;
+    fw::RectangleWidget* widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    widget->setSize(100.0f, 100.0f);
+    widget->OnUpdate = [&]() {
+        updated = true;
+    };
+    widget->OnBeforeRender = [&]() {
+        before_render = true;
+    };
+    widget->OnWindowResized = [&](unsigned int width, unsigned int height) {
+        window_width = width;
+        window_height = height;
+    };
+    application.advance();
+    T_CHECK(updated);
+    T_CHECK(before_render);
+    T_COMPARE(window_width, 0);
+    T_COMPARE(window_height, 0);
+    application.setWindowSize(640, 480);
+    application.advance();
+    T_COMPARE(window_width, 640);
+    T_COMPARE(window_height, 480);
+}
+
+void WidgetTests::coordinatesTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    sf::Vector2f parent_pos(100.0f, 100.0f);
+    sf::Vector2f child_local_pos(30.0f, 30.0f);
+    child_widget->setParent(parent_widget);
+    parent_widget->setPosition(parent_pos);
+    child_widget->setPosition(child_local_pos);
+    T_VEC2_APPROX_COMPARE(child_widget->toGlobal(sf::Vector2f(10.0f, 5.0f)), sf::Vector2f(140.0f, 135.0f));
+    T_VEC2_APPROX_COMPARE(child_widget->toLocal(sf::Vector2f(140.0f, 135.0f)), sf::Vector2f(10.0f, 5.0f));
+
+}
+
+void WidgetTests::findTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    parent_widget->setName("parent");
+    child_widget->setName("child");
+    child_widget->setParent(parent_widget);
+    T_CHECK(application.getWidgets().find("root") == application.getWidgets().getRootWidget());
+    T_CHECK(application.getWidgets().find("parent") == parent_widget);
+    T_CHECK(application.getWidgets().find("child") == child_widget);
+}
+
+void WidgetTests::anchorTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    child_widget->setParent(parent_widget);
+    sf::Vector2f parent_size(100.0f, 100.0f);
+    sf::Vector2f child_size(30.0f, 30.0f);
+    sf::Vector2f anchor_offset(5.0f, 7.0f);
+    parent_widget->setSize(parent_size);
+    child_widget->setSize(child_size);
+    child_widget->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
+    child_widget->setAnchorOffset(anchor_offset);
+    T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f() + anchor_offset);
+    child_widget->setParentAnchor(fw::Widget::Anchor::TOP_CENTER);
+    T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, 0.0f) + anchor_offset);
+    child_widget->setParentAnchor(fw::Widget::Anchor::TOP_RIGHT);
+    T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x, 0.0f) + anchor_offset);
+    child_widget->setParentAnchor(fw::Widget::Anchor::CENTER_LEFT);
+    T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(0.0f, parent_size.y / 2.0f) + anchor_offset);
+    child_widget->setParentAnchor(fw::Widget::Anchor::CENTER);
+    T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y / 2.0f) + anchor_offset);
+    child_widget->setParentAnchor(fw::Widget::Anchor::CENTER_RIGHT);
+    T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y / 2.0f) + anchor_offset);
+    child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_LEFT);
+    T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(0.0f, parent_size.y) + anchor_offset);
+    child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_CENTER);
+    T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y) + anchor_offset);
+    child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_RIGHT);
+    T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y) + anchor_offset);
+}
+
+void WidgetTests::textWidgetTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::TextWidget* text_widget = application.getWidgets().createWidget<fw::TextWidget>();
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(text_widget));
+    text_widget->setCharacterSize(20);
+    text_widget->setFont(textbox_font);
+    text_widget->setString("Text");
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(41.0f, 20.0f);
+    sf::Vector2f local_bounds_offset(0.0f, 6.0f);
+    text_widget->setPosition(position);
+
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = text_widget;
+    gwt.total_widgets = 2;
+    gwt.name = "text";
+    gwt.fullname = "root|text";
+    gwt.is_visual_position_quantized = true;
+    gwt.is_visible = true;
+    gwt.opaque = true;
+    gwt.is_click_through = true;
+    gwt.is_mouse_over = false;
+    gwt.is_focusable = false;
+    gwt.is_focused = false;
+    gwt.clip_children = false;
+    gwt.force_custom_cursor = false;
+    gwt.parent = root_widget;
+    gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+    gwt.global_bounds = sf::FloatRect(position, size);
+    gwt.parent_local_bounds = gwt.global_bounds;
+    gwt.visual_local_bounds = sf::FloatRect(local_bounds_offset, size - local_bounds_offset);
+    gwt.visual_global_bounds = sf::FloatRect(position + local_bounds_offset, size - local_bounds_offset);
+    gwt.visual_parent_local_bounds = gwt.visual_global_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+
+    T_COMPARE(text_widget->getChildren().size(), 0);
+
+    T_COMPARE(text_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
+}
+
+void WidgetTests::checkboxWidgetBasicTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::CheckboxWidget* checkbox_widget = application.getWidgets().createWidget<fw::CheckboxWidget>();
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(checkbox_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(20.0f, 20.0f);
+    checkbox_widget->setPosition(position);
+    checkbox_widget->setSize(size);
+
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = checkbox_widget;
+    gwt.total_widgets = 3;
+    gwt.name = "checkbox";
+    gwt.fullname = "root|checkbox";
+    gwt.is_visual_position_quantized = false;
+    gwt.is_visible = true;
+    gwt.opaque = true;
+    gwt.is_click_through = false;
+    gwt.is_mouse_over = false;
+    gwt.is_focusable = false;
+    gwt.is_focused = false;
+    gwt.clip_children = false;
+    gwt.force_custom_cursor = false;
+    gwt.parent = root_widget;
+    gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+    gwt.global_bounds = sf::FloatRect(position, size);
+    gwt.parent_local_bounds = gwt.global_bounds;
+    gwt.visual_local_bounds = gwt.local_bounds;
+    gwt.visual_global_bounds = gwt.global_bounds;
+    gwt.visual_parent_local_bounds = gwt.global_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+
+    if (T_COMPARE(checkbox_widget->getChildren().size(), 1)) {
+        fw::RectangleWidget* check_widget = dynamic_cast<fw::RectangleWidget*>(checkbox_widget->getChild(0));
+        T_CHECK(check_widget, "Check widget is not a RectangleWidget");
+        T_COMPARE(check_widget->getParentAnchor(), fw::Widget::Anchor::CENTER, &WidgetTests::anchorToStr);
+    }
+
+    T_COMPARE(checkbox_widget->getFillColor(), sf::Color(50, 50, 50), &WidgetTests::colorToStr);
+}
+
+void WidgetTests::checkboxWidgetToggleTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    fw::CheckboxWidget* checkbox_widget = application.getWidgets().createWidget<fw::CheckboxWidget>();
+    T_CHECK(!checkbox_widget->getValue());
+    application.mouseMove(fw::to2i(checkbox_widget->getGlobalCenter()));
+    application.advance();
+    application.mouseLeftPress();
+    application.advance();
+    T_CHECK(checkbox_widget->getValue());
+    application.mouseLeftRelease();
+    application.advance();
+    T_CHECK(checkbox_widget->getValue());
+}
+
+void WidgetTests::containerWidgetBasicTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>();
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(container_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(100.0f, 100.0f);
+    container_widget->setPosition(position);
+    container_widget->setSize(size);
+
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = container_widget;
+    gwt.total_widgets = 2;
+    gwt.name = "container";
+    gwt.fullname = "root|container";
+    gwt.is_visual_position_quantized = false;
+    gwt.is_visible = true;
+    gwt.opaque = true;
+    gwt.is_click_through = true;
+    gwt.is_mouse_over = false;
+    gwt.is_focusable = false;
+    gwt.is_focused = false;
+    gwt.clip_children = false;
+    gwt.force_custom_cursor = false;
+    gwt.parent = root_widget;
+    gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+    gwt.global_bounds = sf::FloatRect(position, size);
+    gwt.parent_local_bounds = gwt.global_bounds;
+    gwt.visual_local_bounds = gwt.local_bounds;
+    gwt.visual_global_bounds = gwt.global_bounds;
+    gwt.visual_parent_local_bounds = gwt.global_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+
+    T_COMPARE(container_widget->getChildren().size(), 0);
+
+    T_COMPARE(container_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
+}
+
+void WidgetTests::containerWidgetChildrenTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>();
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f container_size(100.0f, 100.0f);
+    float horizontal_padding = 5.0f;
+    float vertical_padding = 10.0f;
+    container_widget->setPosition(position);
+    container_widget->setSize(container_size);
+    container_widget->setHorizontalPadding(horizontal_padding);
+    container_widget->setVerticalPadding(vertical_padding);
+    T_VEC2_APPROX_COMPARE(container_widget->getSize(), container_size);
+    application.advance();
+    T_VEC2_APPROX_COMPARE(container_widget->getSize(), sf::Vector2f(horizontal_padding, vertical_padding));
+    fw::RectangleWidget* child_1_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* child_2_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    sf::Vector2f child_1_size(35.0f, 28.0f);
+    sf::Vector2f child_2_size(46.0f, 54.0f);
+    child_1_widget->setSize(child_1_size);
+    child_2_widget->setSize(child_2_size);
+    child_1_widget->setParent(container_widget);
+    child_2_widget->setParent(container_widget);
+    application.advance();
+    sf::Vector2f new_container_size = sf::Vector2f(
+        horizontal_padding + child_1_widget->getWidth() + horizontal_padding + child_2_widget->getWidth() + horizontal_padding,
+        vertical_padding + std::max(child_1_widget->getHeight(), child_2_widget->getHeight()) + vertical_padding
     );
-    test::Test* rectangle_widget_test = list->addTest(
-        "rectangle_widget",
-        {
-            root_widget_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            fw::Widget* root_widget = application.getWidgets().getRootWidget();
-            T_ASSERT(T_CHECK(rectangle_widget));
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f size(100.0f, 100.0f);
-            rectangle_widget->setPosition(position);
-            rectangle_widget->setSize(size);
+    T_VEC2_APPROX_COMPARE(container_widget->getSize(), new_container_size);
+    T_VEC2_APPROX_COMPARE(child_1_widget->getPosition(), sf::Vector2f(horizontal_padding, vertical_padding));
+    T_VEC2_APPROX_COMPARE(child_2_widget->getPosition(), sf::Vector2f(horizontal_padding + child_1_widget->getWidth() + horizontal_padding, vertical_padding));
+}
 
-            GenericWidgetTest gwt(application, test);
-            gwt.widget = rectangle_widget;
-            gwt.total_widgets = 2;
-            gwt.name = "rectangle";
-            gwt.fullname = "root|rectangle";
-            gwt.is_visual_position_quantized = false;
-            gwt.is_visible = true;
-            gwt.opaque = true;
-            gwt.is_click_through = true;
-            gwt.is_mouse_over = false;
-            gwt.is_focusable = false;
-            gwt.is_focused = false;
-            gwt.clip_children = false;
-            gwt.force_custom_cursor = false;
-            gwt.parent = root_widget;
-            gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
-            gwt.global_bounds = sf::FloatRect(position, size);
-            gwt.parent_local_bounds = gwt.global_bounds;
-            gwt.visual_local_bounds = gwt.local_bounds;
-            gwt.visual_global_bounds = gwt.global_bounds;
-            gwt.visual_parent_local_bounds = gwt.global_bounds;
-            T_WRAP_CONTAINER(genericWidgetTest(gwt));
+void WidgetTests::textboxWidgetBasicTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>();
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(textbox_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(40.0f, 20.0f);
+    textbox_widget->setPosition(position);
+    textbox_widget->setSize(size);
 
-            T_CHECK(rectangle_widget->getParent() == root_widget);
-            CompVector<fw::Widget*> parent_chain = rectangle_widget->getParentChain();
-            T_ASSERT(T_COMPARE(parent_chain.size(), 1));
-            T_CHECK(parent_chain[0] == root_widget);
-            T_COMPARE(rectangle_widget->getChildren().size(), 0);
-            const CompVector<fw::Widget*>& root_children = root_widget->getChildren();
-            T_ASSERT(T_COMPARE(root_children.size(), 1));
-            T_CHECK(root_children[0] == rectangle_widget);
-            T_CHECK(root_widget->getChild(0) == rectangle_widget);
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = textbox_widget;
+    gwt.total_widgets = 5;
+    gwt.name = "textbox";
+    gwt.fullname = "root|textbox";
+    gwt.is_visual_position_quantized = false;
+    gwt.is_visible = true;
+    gwt.opaque = true;
+    gwt.is_click_through = false;
+    gwt.is_mouse_over = false;
+    gwt.is_focusable = true;
+    gwt.is_focused = false;
+    gwt.clip_children = true;
+    gwt.force_custom_cursor = true;
+    gwt.parent = root_widget;
+    gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+    gwt.global_bounds = sf::FloatRect(position, size);
+    gwt.parent_local_bounds = gwt.global_bounds;
+    gwt.visual_local_bounds = gwt.local_bounds;
+    gwt.visual_global_bounds = gwt.global_bounds;
+    gwt.visual_parent_local_bounds = gwt.global_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
 
-            T_COMPARE(rectangle_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
-        }
-    );
-    test::Test* set_parent_test = list->addTest(
-        "set_parent",
-        {
-            root_widget_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::Widget* root_widget = application.getWidgets().getRootWidget();
-            fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            sf::Vector2f parent_local_pos_before = parent_widget->getPosition();
-            sf::Vector2f parent_global_pos_before = parent_widget->getGlobalPosition();
-            sf::Vector2f child_local_pos_before = child_widget->getPosition();
-            sf::Vector2f child_global_pos_before = child_widget->getGlobalPosition();
-            child_widget->setParent(parent_widget);
-            T_CHECK(child_widget->getParent() == parent_widget);
-            CompVector<fw::Widget*> parent_chain = child_widget->getParentChain();
-            T_ASSERT(T_COMPARE(parent_chain.size(), 2));
-            T_CHECK(parent_chain[0] == parent_widget);
-            T_CHECK(parent_chain[1] == root_widget);
-            T_CHECK(parent_widget->getParent() == root_widget);
-            T_ASSERT(T_COMPARE(child_widget->getChildren().size(), 0));
-            const CompVector<fw::Widget*>& parent_children = parent_widget->getChildren();
-            T_ASSERT(T_COMPARE(parent_children.size(), 1));
-            T_CHECK(parent_children[0] == child_widget);
-            T_CHECK(parent_widget->getChild(0) == child_widget);
-            T_ASSERT(T_COMPARE(parent_widget->getChildren().size(), 1));
-            T_CHECK(parent_widget->getChild(0) == child_widget);
-            CompVector<fw::Widget*> root_children = root_widget->getAllChildren();
-            T_ASSERT(T_COMPARE(root_children.size(), 2));
-            T_CHECK(root_children[0] == parent_widget);
-            T_CHECK(root_children[1] == child_widget);
-            sf::Vector2f parent_local_pos_after = parent_widget->getPosition();
-            sf::Vector2f parent_global_pos_after = parent_widget->getGlobalPosition();
-            sf::Vector2f child_local_pos_after = child_widget->getPosition();
-            sf::Vector2f child_global_pos_after = child_widget->getGlobalPosition();
-            T_VEC2_APPROX_COMPARE(parent_local_pos_after, parent_local_pos_before);
-            T_VEC2_APPROX_COMPARE(parent_global_pos_after, parent_global_pos_before);
-            T_VEC2_APPROX_COMPARE(child_local_pos_after, child_local_pos_before - parent_local_pos_before);
-            T_VEC2_APPROX_COMPARE(child_global_pos_after, child_global_pos_before);
-        }
-    );
-    test::Test* widget_mouse_events_1_test = list->addTest(
-        "widget_mouse_events_1",
-        {
-            root_widget_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            bool mouse_entered = false;
-            bool mouse_left_pressed = false;
-            bool mouse_right_pressed = false;
-            bool mouse_left_released = false;
-            bool mouse_right_released = false;
-            bool mouse_exited = false;
-            bool mouse_processed = false;
-            rectangle_widget->OnMouseEnter = [&](const sf::Vector2f& pos) {
-                mouse_entered = true;
-            };
-            rectangle_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
-                mouse_left_pressed = true;
-            };
-            rectangle_widget->OnRightPress = [&](const sf::Vector2f& pos) {
-                mouse_right_pressed = true;
-            };
-            rectangle_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
-                mouse_left_released = true;
-            };
-            rectangle_widget->OnRightRelease = [&](const sf::Vector2f& pos) {
-                mouse_right_released = true;
-            };
-            rectangle_widget->OnMouseExit = [&](const sf::Vector2f& pos) {
-                mouse_exited = true;
-            };
-            rectangle_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
-                mouse_processed = true;
-            };
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f size(100.0f, 100.0f);
-            sf::Vector2i mouse_pos_1(150, 150);
-            sf::Vector2i mouse_pos_2(300, 300);
-            rectangle_widget->setPosition(position);
-            rectangle_widget->setSize(size);
-            T_CHECK(!rectangle_widget->isMouseOver());
-            T_CHECK(!mouse_entered);
-            T_CHECK(!mouse_left_pressed);
-            T_CHECK(!mouse_left_released);
-            T_CHECK(!mouse_right_pressed);
-            T_CHECK(!mouse_right_released);
-            T_CHECK(!mouse_exited);
-            T_CHECK(!mouse_processed);
-            application.mouseMove(mouse_pos_1);
-            application.advance();
-            T_CHECK(rectangle_widget->isMouseOver());
-            T_CHECK(mouse_entered);
-            T_CHECK(!mouse_left_pressed);
-            T_CHECK(!mouse_left_released);
-            T_CHECK(!mouse_right_pressed);
-            T_CHECK(!mouse_right_released);
-            T_CHECK(!mouse_exited);
-            T_CHECK(mouse_processed);
-            application.mouseLeftPress();
-            application.advance();
-            T_CHECK(mouse_entered);
-            T_CHECK(mouse_left_pressed);
-            T_CHECK(!mouse_left_released);
-            T_CHECK(!mouse_right_pressed);
-            T_CHECK(!mouse_right_released);
-            T_CHECK(!mouse_exited);
-            T_CHECK(mouse_processed);
-            application.mouseLeftRelease();
-            application.advance();
-            T_CHECK(mouse_entered);
-            T_CHECK(mouse_left_pressed);
-            T_CHECK(!mouse_left_released); // clickThrough is on, so release is not processed
-            T_CHECK(!mouse_right_pressed);
-            T_CHECK(!mouse_right_released);
-            T_CHECK(!mouse_exited);
-            T_CHECK(mouse_processed);
-            application.mouseRightPress();
-            application.advance();
-            T_CHECK(mouse_entered);
-            T_CHECK(mouse_left_pressed);
-            T_CHECK(!mouse_left_released);
-            T_CHECK(mouse_right_pressed);
-            T_CHECK(!mouse_right_released);
-            T_CHECK(!mouse_exited);
-            T_CHECK(mouse_processed);
-            application.mouseRightRelease();
-            application.advance();
-            T_CHECK(mouse_entered);
-            T_CHECK(mouse_left_pressed);
-            T_CHECK(!mouse_left_released);
-            T_CHECK(mouse_right_pressed);
-            T_CHECK(!mouse_right_released); // clickThrough is on, so release is not processed
-            T_CHECK(!mouse_exited);
-            T_CHECK(mouse_processed);
-            application.mouseMove(mouse_pos_2);
-            application.advance();
-            T_CHECK(!rectangle_widget->isMouseOver());
-            T_CHECK(mouse_entered);
-            T_CHECK(mouse_left_pressed);
-            T_CHECK(!mouse_left_released);
-            T_CHECK(mouse_right_pressed);
-            T_CHECK(!mouse_right_released);
-            T_CHECK(mouse_exited);
-            T_CHECK(mouse_processed);
-        }
-    );
-    test::Test* widget_mouse_events_2_test = list->addTest(
-        "widget_mouse_events_2",
-        {
-            root_widget_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::RectangleWidget* rectangle_widget_1 = application.getWidgets().createWidget<fw::RectangleWidget>();
-            fw::RectangleWidget* rectangle_widget_2 = application.getWidgets().createWidget<fw::RectangleWidget>();
-            rectangle_widget_1->setClickThrough(false);
-            bool mouse_entered_1 = false;
-            bool mouse_pressed_1 = false;
-            bool mouse_released_1 = false;
-            bool mouse_exited_1 = false;
-            bool mouse_processed_1 = false;
-            bool mouse_entered_2 = false;
-            bool mouse_pressed_2 = false;
-            bool mouse_released_2 = false;
-            bool mouse_exited_2 = false;
-            bool mouse_processed_2 = false;
-            rectangle_widget_1->OnMouseEnter = [&](const sf::Vector2f& pos) {
-                mouse_entered_1 = true;
-            };
-            rectangle_widget_1->OnLeftPress = [&](const sf::Vector2f& pos) {
-                mouse_pressed_1 = true;
-            };
-            rectangle_widget_1->OnLeftRelease = [&](const sf::Vector2f& pos) {
-                mouse_released_1 = true;
-            };
-            rectangle_widget_1->OnMouseExit = [&](const sf::Vector2f& pos) {
-                mouse_exited_1 = true;
-            };
-            rectangle_widget_1->OnProcessMouse = [&](const sf::Vector2f& pos) {
-                mouse_processed_1 = true;
-            };
-            rectangle_widget_2->OnMouseEnter = [&](const sf::Vector2f& pos) {
-                mouse_entered_2 = true;
-            };
-            rectangle_widget_2->OnLeftPress = [&](const sf::Vector2f& pos) {
-                mouse_pressed_2 = true;
-            };
-            rectangle_widget_2->OnLeftRelease = [&](const sf::Vector2f& pos) {
-                mouse_released_2 = true;
-            };
-            rectangle_widget_2->OnMouseExit = [&](const sf::Vector2f& pos) {
-                mouse_exited_2 = true;
-            };
-            rectangle_widget_2->OnProcessMouse = [&](const sf::Vector2f& pos) {
-                mouse_processed_2 = true;
-            };
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f size(100.0f, 100.0f);
-            sf::Vector2i mouse_pos_1(150, 150);
-            sf::Vector2i mouse_pos_2(300, 300);
-            rectangle_widget_1->setPosition(position);
-            rectangle_widget_1->setSize(size);
-            rectangle_widget_2->setPosition(position);
-            rectangle_widget_2->setSize(size);
-            T_CHECK(!rectangle_widget_1->isMouseOver());
-            T_CHECK(!mouse_entered_1);
-            T_CHECK(!mouse_pressed_1);
-            T_CHECK(!mouse_released_1);
-            T_CHECK(!mouse_exited_1);
-            T_CHECK(!mouse_processed_1);
-            T_CHECK(!rectangle_widget_2->isMouseOver());
-            T_CHECK(!mouse_entered_2);
-            T_CHECK(!mouse_pressed_2);
-            T_CHECK(!mouse_released_2);
-            T_CHECK(!mouse_exited_2);
-            T_CHECK(!mouse_processed_2);
-            application.mouseMove(mouse_pos_1);
-            application.advance();
-            T_CHECK(rectangle_widget_1->isMouseOver());
-            T_CHECK(mouse_entered_1);
-            T_CHECK(!mouse_pressed_1);
-            T_CHECK(!mouse_released_1);
-            T_CHECK(!mouse_exited_1);
-            T_CHECK(mouse_processed_1);
-            T_CHECK(rectangle_widget_2->isMouseOver());
-            T_CHECK(mouse_entered_2);
-            T_CHECK(!mouse_pressed_2);
-            T_CHECK(!mouse_released_2);
-            T_CHECK(!mouse_exited_2);
-            T_CHECK(mouse_processed_2);
-            rectangle_widget_2->setClickThrough(true);
-            application.mouseLeftPress();
-            application.advance();
-            T_CHECK(mouse_entered_1);
-            T_CHECK(mouse_pressed_1);
-            T_CHECK(!mouse_released_1);
-            T_CHECK(!mouse_exited_1);
-            T_CHECK(mouse_processed_1);
-            T_CHECK(mouse_entered_2);
-            T_CHECK(mouse_pressed_2);
-            T_CHECK(!mouse_released_2);
-            T_CHECK(!mouse_exited_2);
-            T_CHECK(mouse_processed_2);
-            application.mouseLeftRelease();
-            application.advance();
-            T_CHECK(mouse_entered_1);
-            T_CHECK(mouse_pressed_1);
-            T_CHECK(mouse_released_1);
-            T_CHECK(!mouse_exited_1);
-            T_CHECK(mouse_processed_1);
-            T_CHECK(mouse_entered_2);
-            T_CHECK(mouse_pressed_2);
-            T_CHECK(mouse_released_2);
-            T_CHECK(!mouse_exited_2);
-            T_CHECK(mouse_processed_2);
-            mouse_pressed_1 = false;
-            mouse_pressed_2 = false;
-            mouse_released_1 = false;
-            mouse_released_2 = false;
-            rectangle_widget_2->setClickThrough(false);
-            application.mouseLeftPress();
-            application.advance();
-            T_CHECK(mouse_entered_1);
-            T_CHECK(!mouse_pressed_1);
-            T_CHECK(!mouse_released_1);
-            T_CHECK(!mouse_exited_1);
-            T_CHECK(mouse_processed_1);
-            T_CHECK(mouse_entered_2);
-            T_CHECK(mouse_pressed_2);
-            T_CHECK(!mouse_released_2);
-            T_CHECK(!mouse_exited_2);
-            T_CHECK(mouse_processed_2);
-            application.mouseLeftRelease();
-            application.advance();
-            T_CHECK(mouse_entered_1);
-            T_CHECK(!mouse_pressed_1);
-            T_CHECK(mouse_released_1);
-            T_CHECK(!mouse_exited_1);
-            T_CHECK(mouse_processed_1);
-            T_CHECK(mouse_entered_2);
-            T_CHECK(mouse_pressed_2);
-            T_CHECK(mouse_released_2);
-            T_CHECK(!mouse_exited_2);
-            T_CHECK(mouse_processed_2);
-            application.mouseMove(mouse_pos_2);
-            application.advance();
-            T_CHECK(!rectangle_widget_1->isMouseOver());
-            T_CHECK(mouse_entered_1);
-            T_CHECK(!mouse_pressed_1);
-            T_CHECK(mouse_released_1);
-            T_CHECK(mouse_exited_1);
-            T_CHECK(mouse_processed_1);
-            T_CHECK(!rectangle_widget_2->isMouseOver());
-            T_CHECK(mouse_entered_2);
-            T_CHECK(mouse_pressed_2);
-            T_CHECK(mouse_released_2);
-            T_CHECK(mouse_exited_2);
-            T_CHECK(mouse_processed_2);
-        }
-    );
-    test::Test* events_test = list->addTest(
-        "events",
-        {
-            root_widget_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            bool updated = false;
-            bool before_render = false;
-            unsigned int window_width = 0;
-            unsigned int window_height = 0;
-            fw::RectangleWidget* widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            widget->setSize(100.0f, 100.0f);
-            widget->OnUpdate = [&]() {
-                updated = true;
-            };
-            widget->OnBeforeRender = [&]() {
-                before_render = true;
-            };
-            widget->OnWindowResized = [&](unsigned int width, unsigned int height) {
-                window_width = width;
-                window_height = height;
-            };
-            application.advance();
-            T_CHECK(updated);
-            T_CHECK(before_render);
-            T_COMPARE(window_width, 0);
-            T_COMPARE(window_height, 0);
-            application.setWindowSize(640, 480);
-            application.advance();
-            T_COMPARE(window_width, 640);
-            T_COMPARE(window_height, 480);
-        }
-    );
-    test::Test* coordinates_test = list->addTest(
-        "coordinates",
-        {
-            set_parent_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            sf::Vector2f parent_pos(100.0f, 100.0f);
-            sf::Vector2f child_local_pos(30.0f, 30.0f);
-            child_widget->setParent(parent_widget);
-            parent_widget->setPosition(parent_pos);
-            child_widget->setPosition(child_local_pos);
-            T_VEC2_APPROX_COMPARE(child_widget->toGlobal(sf::Vector2f(10.0f, 5.0f)), sf::Vector2f(140.0f, 135.0f));
-            T_VEC2_APPROX_COMPARE(child_widget->toLocal(sf::Vector2f(140.0f, 135.0f)), sf::Vector2f(10.0f, 5.0f));
-        }
-    );
-    test::Test* find_test = list->addTest(
-        "find",
-        {
-            set_parent_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            parent_widget->setName("parent");
-            child_widget->setName("child");
-            child_widget->setParent(parent_widget);
-            T_CHECK(application.getWidgets().find("root") == application.getWidgets().getRootWidget());
-            T_CHECK(application.getWidgets().find("parent") == parent_widget);
-            T_CHECK(application.getWidgets().find("child") == child_widget);
-        }
-    );
-    test::Test* anchor_test = list->addTest(
-        "anchor",
-        {
-            set_parent_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            child_widget->setParent(parent_widget);
-            sf::Vector2f parent_size(100.0f, 100.0f);
-            sf::Vector2f child_size(30.0f, 30.0f);
-            sf::Vector2f anchor_offset(5.0f, 7.0f);
-            parent_widget->setSize(parent_size);
-            child_widget->setSize(child_size);
-            child_widget->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
-            child_widget->setAnchorOffset(anchor_offset);
-            T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f() + anchor_offset);
-            child_widget->setParentAnchor(fw::Widget::Anchor::TOP_CENTER);
-            T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, 0.0f) + anchor_offset);
-            child_widget->setParentAnchor(fw::Widget::Anchor::TOP_RIGHT);
-            T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x, 0.0f) + anchor_offset);
-            child_widget->setParentAnchor(fw::Widget::Anchor::CENTER_LEFT);
-            T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(0.0f, parent_size.y / 2.0f) + anchor_offset);
-            child_widget->setParentAnchor(fw::Widget::Anchor::CENTER);
-            T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y / 2.0f) + anchor_offset);
-            child_widget->setParentAnchor(fw::Widget::Anchor::CENTER_RIGHT);
-            T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y / 2.0f) + anchor_offset);
-            child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_LEFT);
-            T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(0.0f, parent_size.y) + anchor_offset);
-            child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_CENTER);
-            T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y) + anchor_offset);
-            child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_RIGHT);
-            T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y) + anchor_offset);
-        }
-    );
-    test::Test* text_widget_test = list->addTest(
-        "text_widget",
-        {
-            root_widget_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::TextWidget* text_widget = application.getWidgets().createWidget<fw::TextWidget>();
-            fw::Widget* root_widget = application.getWidgets().getRootWidget();
-            T_ASSERT(T_CHECK(text_widget));
-            text_widget->setCharacterSize(20);
-            text_widget->setFont(textbox_font);
-            text_widget->setString("Text");
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f size(41.0f, 20.0f);
-            sf::Vector2f local_bounds_offset(0.0f, 6.0f);
-            text_widget->setPosition(position);
+    T_COMPARE(textbox_widget->getFillColor(), sf::Color(50, 50, 50), &WidgetTests::colorToStr);
+}
 
-            GenericWidgetTest gwt(application, test);
-            gwt.widget = text_widget;
-            gwt.total_widgets = 2;
-            gwt.name = "text";
-            gwt.fullname = "root|text";
-            gwt.is_visual_position_quantized = true;
-            gwt.is_visible = true;
-            gwt.opaque = true;
-            gwt.is_click_through = true;
-            gwt.is_mouse_over = false;
-            gwt.is_focusable = false;
-            gwt.is_focused = false;
-            gwt.clip_children = false;
-            gwt.force_custom_cursor = false;
-            gwt.parent = root_widget;
-            gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
-            gwt.global_bounds = sf::FloatRect(position, size);
-            gwt.parent_local_bounds = gwt.global_bounds;
-            gwt.visual_local_bounds = sf::FloatRect(local_bounds_offset, size - local_bounds_offset);
-            gwt.visual_global_bounds = sf::FloatRect(position + local_bounds_offset, size - local_bounds_offset);
-            gwt.visual_parent_local_bounds = gwt.visual_global_bounds;
-            T_WRAP_CONTAINER(genericWidgetTest(gwt));
+void WidgetTests::textboxWidgetInputTest(test::Test& test) {
+    fw::Application application;
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
-            T_COMPARE(text_widget->getChildren().size(), 0);
+    T_CHECK(textbox_widget->isFocused());
+    T_CHECK(application.getWidgets().getFocusedWidget() == textbox_widget);
+    T_CHECK(textbox_widget->isEditMode());
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    T_CHECK(textbox_widget->isValidValue());
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    ENTER_TEXT(sf::Keyboard::BackSpace, '\b');
+    T_COMPARE(textbox_widget->getValue(), "");
+    CHECK_SELECTION(false, "", 0, -1, -1);
+    ENTER_TEXT(sf::Keyboard::A, 'a');
+    T_COMPARE(textbox_widget->getValue(), "a");
+    CHECK_SELECTION(false, "", 1, -1, -1);
+    ENTER_TEXT(sf::Keyboard::B, 'b');
+    T_COMPARE(textbox_widget->getValue(), "ab");
+    CHECK_SELECTION(false, "", 2, -1, -1);
+    ENTER_TEXT(sf::Keyboard::C, 'c');
+    T_COMPARE(textbox_widget->getValue(), "abc");
+    CHECK_SELECTION(false, "", 3, -1, -1);
+    ENTER_TEXT(sf::Keyboard::Enter, '\n');
+    T_CHECK(!textbox_widget->isEditMode());
+    T_COMPARE(textbox_widget->getValue(), "abc");
+    T_CHECK(textbox_widget->isFocused());
+    T_CHECK(application.getWidgets().getFocusedWidget() == textbox_widget);
+}
 
-            T_COMPARE(text_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
-        }
-    );
-    test::Test* checkbox_widget_basic_test = list->addTest(
-        "checkbox_widget_basic",
-        {
-            rectangle_widget_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::CheckboxWidget* checkbox_widget = application.getWidgets().createWidget<fw::CheckboxWidget>();
-            fw::Widget* root_widget = application.getWidgets().getRootWidget();
-            T_ASSERT(T_CHECK(checkbox_widget));
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f size(20.0f, 20.0f);
-            checkbox_widget->setPosition(position);
-            checkbox_widget->setSize(size);
+void WidgetTests::textboxWidgetEventsTest(test::Test& test) {
+    fw::Application application;
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+    bool edit_mode = false;
+    sf::String value;
+    bool confirmed = false;
+    bool cancelled = false;
+    textbox_widget->OnEditModeToggle = [&](bool value) {
+        edit_mode = value;
+    };
+    textbox_widget->OnValueChanged = [&](const sf::String& new_value) {
+        value = new_value;
+    };
+    textbox_widget->OnConfirm = [&](const sf::String& value) {
+        confirmed = true;
+    };
+    textbox_widget->OnCancel = [&]() {
+        cancelled = true;
+    };
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    T_CHECK(edit_mode);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalTopRight() + sf::Vector2f(10.0f, 0.0f)));
+    T_CHECK(!edit_mode);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    T_CHECK(edit_mode);
+    ENTER_TEXT(sf::Keyboard::A, 'a');
+    T_COMPARE(value, "a");
+    ENTER_TEXT(sf::Keyboard::A, 'b');
+    T_COMPARE(value, "ab");
+    ENTER_TEXT(sf::Keyboard::A, 'c');
+    T_COMPARE(value, "abc");
+    ENTER_TEXT(sf::Keyboard::Enter, '\n');
+    T_CHECK(!edit_mode);
+    T_CHECK(confirmed);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    T_CHECK(edit_mode);
+    TAP_KEY(sf::Keyboard::Escape);
+    T_CHECK(!edit_mode);
+    T_CHECK(cancelled);
+}
 
-            GenericWidgetTest gwt(application, test);
-            gwt.widget = checkbox_widget;
-            gwt.total_widgets = 3;
-            gwt.name = "checkbox";
-            gwt.fullname = "root|checkbox";
-            gwt.is_visual_position_quantized = false;
-            gwt.is_visible = true;
-            gwt.opaque = true;
-            gwt.is_click_through = false;
-            gwt.is_mouse_over = false;
-            gwt.is_focusable = false;
-            gwt.is_focused = false;
-            gwt.clip_children = false;
-            gwt.force_custom_cursor = false;
-            gwt.parent = root_widget;
-            gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
-            gwt.global_bounds = sf::FloatRect(position, size);
-            gwt.parent_local_bounds = gwt.global_bounds;
-            gwt.visual_local_bounds = gwt.local_bounds;
-            gwt.visual_global_bounds = gwt.global_bounds;
-            gwt.visual_parent_local_bounds = gwt.global_bounds;
-            T_WRAP_CONTAINER(genericWidgetTest(gwt));
+void WidgetTests::textboxWidgetCursorTest(test::Test& test) {
+    fw::Application application;
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
-            if (T_COMPARE(checkbox_widget->getChildren().size(), 1)) {
-                fw::RectangleWidget* check_widget = dynamic_cast<fw::RectangleWidget*>(checkbox_widget->getChild(0));
-                T_CHECK(check_widget, "Check widget is not a RectangleWidget");
-                T_COMPARE(check_widget->getParentAnchor(), fw::Widget::Anchor::CENTER, &WidgetTests::anchorToStr);
-            }
+    ENTER_TEXT(sf::Keyboard::BackSpace, '\b');
+    TAP_KEY(sf::Keyboard::Left);
+    T_COMPARE(textbox_widget->getValue(), "");
+    CHECK_SELECTION(false, "", 0, -1, -1);
+    TAP_KEY(sf::Keyboard::Right);
+    T_COMPARE(textbox_widget->getValue(), "");
+    CHECK_SELECTION(false, "", 0, -1, -1);
+    ENTER_TEXT(sf::Keyboard::A, 'a');
+    ENTER_TEXT(sf::Keyboard::B, 'b');
+    ENTER_TEXT(sf::Keyboard::C, 'c');
+    ENTER_TEXT(sf::Keyboard::D, 'd');
+    T_ASSERT(T_COMPARE(textbox_widget->getValue(), "abcd"));
+    CHECK_SELECTION(false, "", 4, -1, -1);
+    auto move_cursor = [&](sf::Keyboard::Key key, size_t pos) {
+        application.keyPress(key);
+        application.advance();
+        T_COMPARE(textbox_widget->getValue(), "abcd");
+        CHECK_SELECTION(false, "", pos, -1, -1);
+    };
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 4));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 4));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 3));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 2));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 1));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 0));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 0));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 0));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 1));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 2));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 3));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 4));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 4));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 4));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Home, 0));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Home, 0));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::End, 4));
+    T_WRAP_CONTAINER(move_cursor(sf::Keyboard::End, 4));
+}
 
-            T_COMPARE(checkbox_widget->getFillColor(), sf::Color(50, 50, 50), &WidgetTests::colorToStr);
-        }
-    );
-    test::Test* checkbox_widget_toggle_test = list->addTest(
-        "checkbox_widget_toggle",
-        {
-            checkbox_widget_basic_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            fw::CheckboxWidget* checkbox_widget = application.getWidgets().createWidget<fw::CheckboxWidget>();
-            T_CHECK(!checkbox_widget->getValue());
-            application.mouseMove(fw::to2i(checkbox_widget->getGlobalCenter()));
-            application.advance();
-            application.mouseLeftPress();
-            application.advance();
-            T_CHECK(checkbox_widget->getValue());
-            application.mouseLeftRelease();
-            application.advance();
-            T_CHECK(checkbox_widget->getValue());
-        }
-    );
-    test::Test* container_widget_basic_test = list->addTest(
-        "container_widget_basic",
-        {
-            rectangle_widget_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>();
-            fw::Widget* root_widget = application.getWidgets().getRootWidget();
-            T_ASSERT(T_CHECK(container_widget));
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f size(100.0f, 100.0f);
-            container_widget->setPosition(position);
-            container_widget->setSize(size);
+void WidgetTests::textboxWidgetScrollTest(test::Test& test) {
+    fw::Application application;
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 20.0f, 20.0f);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
-            GenericWidgetTest gwt(application, test);
-            gwt.widget = container_widget;
-            gwt.total_widgets = 2;
-            gwt.name = "container";
-            gwt.fullname = "root|container";
-            gwt.is_visual_position_quantized = false;
-            gwt.is_visible = true;
-            gwt.opaque = true;
-            gwt.is_click_through = true;
-            gwt.is_mouse_over = false;
-            gwt.is_focusable = false;
-            gwt.is_focused = false;
-            gwt.clip_children = false;
-            gwt.force_custom_cursor = false;
-            gwt.parent = root_widget;
-            gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
-            gwt.global_bounds = sf::FloatRect(position, size);
-            gwt.parent_local_bounds = gwt.global_bounds;
-            gwt.visual_local_bounds = gwt.local_bounds;
-            gwt.visual_global_bounds = gwt.global_bounds;
-            gwt.visual_parent_local_bounds = gwt.global_bounds;
-            T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    const fw::TextWidget* text_widget = textbox_widget->getTextWidget();
+    float zero_pos = textbox_widget->TEXT_VIEW_ZERO_POS.x;
+    float right_margin = textbox_widget->getWidth() - textbox_widget->CURSOR_MOVE_MARGIN;
+    auto calc_text_pos = [&](size_t cursor_pos_index) {
+        float cursor_pos = zero_pos + text_widget->getLocalCharPos(cursor_pos_index).x;
+        float past_right_margin = std::max(0.0f, cursor_pos - right_margin);
+        float text_pos = zero_pos - past_right_margin;
+        return text_pos;
+    };
+    T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(4));
+    TAP_KEY(sf::Keyboard::Home);
+    T_APPROX_COMPARE(text_widget->getPosition().x, zero_pos);
 
-            T_COMPARE(container_widget->getChildren().size(), 0);
+    T_ASSERT_NO_ERRORS();
+    TAP_KEY(sf::Keyboard::Right);
+    T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(1));
+    TAP_KEY(sf::Keyboard::Right);
+    T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(2));
+    TAP_KEY(sf::Keyboard::Right);
+    T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(3));
+    TAP_KEY(sf::Keyboard::Right);
+    T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(4));
+    TAP_KEY(sf::Keyboard::Right);
+    T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(4));
 
-            T_COMPARE(container_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
-        }
-    );
-    test::Test* container_widget_children_test = list->addTest(
-        "container_widget_children",
-        {
-            container_widget_basic_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>();
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f container_size(100.0f, 100.0f);
-            float horizontal_padding = 5.0f;
-            float vertical_padding = 10.0f;
-            container_widget->setPosition(position);
-            container_widget->setSize(container_size);
-            container_widget->setHorizontalPadding(horizontal_padding);
-            container_widget->setVerticalPadding(vertical_padding);
-            T_VEC2_APPROX_COMPARE(container_widget->getSize(), container_size);
-            application.advance();
-            T_VEC2_APPROX_COMPARE(container_widget->getSize(), sf::Vector2f(horizontal_padding, vertical_padding));
-            fw::RectangleWidget* child_1_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            fw::RectangleWidget* child_2_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-            sf::Vector2f child_1_size(35.0f, 28.0f);
-            sf::Vector2f child_2_size(46.0f, 54.0f);
-            child_1_widget->setSize(child_1_size);
-            child_2_widget->setSize(child_2_size);
-            child_1_widget->setParent(container_widget);
-            child_2_widget->setParent(container_widget);
-            application.advance();
-            sf::Vector2f new_container_size = sf::Vector2f(
-                horizontal_padding + child_1_widget->getWidth() + horizontal_padding + child_2_widget->getWidth() + horizontal_padding,
-                vertical_padding + std::max(child_1_widget->getHeight(), child_2_widget->getHeight()) + vertical_padding
-            );
-            T_VEC2_APPROX_COMPARE(container_widget->getSize(), new_container_size);
-            T_VEC2_APPROX_COMPARE(child_1_widget->getPosition(), sf::Vector2f(horizontal_padding, vertical_padding));
-            T_VEC2_APPROX_COMPARE(child_2_widget->getPosition(), sf::Vector2f(horizontal_padding + child_1_widget->getWidth() + horizontal_padding, vertical_padding));
-        }
-    );
-    test::Test* textbox_widget_basic_test = list->addTest(
-        "textbox_widget_basic",
-        {
-            rectangle_widget_test,
-            text_widget_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::TextBoxWidget* textbox_widget = application.getWidgets().createWidget<fw::TextBoxWidget>();
-            fw::Widget* root_widget = application.getWidgets().getRootWidget();
-            T_ASSERT(T_CHECK(textbox_widget));
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f size(40.0f, 20.0f);
-            textbox_widget->setPosition(position);
-            textbox_widget->setSize(size);
+    T_ASSERT_NO_ERRORS();
+    float begin_pos = text_widget->getPosition().x;
+    TAP_KEY(sf::Keyboard::Left);
+    T_COMPARE(text_widget->getPosition().x, begin_pos);
+    TAP_KEY(sf::Keyboard::Left);
+    T_COMPARE(textbox_widget->getLocalCharPos(2).x, zero_pos);
+    TAP_KEY(sf::Keyboard::Left);
+    T_COMPARE(textbox_widget->getLocalCharPos(1).x, zero_pos);
+    TAP_KEY(sf::Keyboard::Left);
+    T_COMPARE(textbox_widget->getLocalCharPos(0).x, zero_pos);
+    TAP_KEY(sf::Keyboard::Left);
+    T_COMPARE(textbox_widget->getLocalCharPos(0).x, zero_pos);
+}
 
-            GenericWidgetTest gwt(application, test);
-            gwt.widget = textbox_widget;
-            gwt.total_widgets = 5;
-            gwt.name = "textbox";
-            gwt.fullname = "root|textbox";
-            gwt.is_visual_position_quantized = false;
-            gwt.is_visible = true;
-            gwt.opaque = true;
-            gwt.is_click_through = false;
-            gwt.is_mouse_over = false;
-            gwt.is_focusable = true;
-            gwt.is_focused = false;
-            gwt.clip_children = true;
-            gwt.force_custom_cursor = true;
-            gwt.parent = root_widget;
-            gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
-            gwt.global_bounds = sf::FloatRect(position, size);
-            gwt.parent_local_bounds = gwt.global_bounds;
-            gwt.visual_local_bounds = gwt.local_bounds;
-            gwt.visual_global_bounds = gwt.global_bounds;
-            gwt.visual_parent_local_bounds = gwt.global_bounds;
-            T_WRAP_CONTAINER(genericWidgetTest(gwt));
+void WidgetTests::textboxWidgetSelectionTest(test::Test& test) {
+    fw::Application application;
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
-            T_COMPARE(textbox_widget->getFillColor(), sf::Color(50, 50, 50), &WidgetTests::colorToStr);
-        }
-    );
-    test::Test* textbox_widget_input_test = list->addTest(
-        "textbox_widget_input",
-        {
-            textbox_widget_basic_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    TAP_KEY(sf::Keyboard::Left);
+    CHECK_SELECTION(false, "", 0, -1, -1);
 
-            T_CHECK(textbox_widget->isFocused());
-            T_CHECK(application.getWidgets().getFocusedWidget() == textbox_widget);
-            T_CHECK(textbox_widget->isEditMode());
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            T_CHECK(textbox_widget->isValidValue());
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            ENTER_TEXT(sf::Keyboard::BackSpace, '\b');
-            T_COMPARE(textbox_widget->getValue(), "");
-            CHECK_SELECTION(false, "", 0, -1, -1);
-            ENTER_TEXT(sf::Keyboard::A, 'a');
-            T_COMPARE(textbox_widget->getValue(), "a");
-            CHECK_SELECTION(false, "", 1, -1, -1);
-            ENTER_TEXT(sf::Keyboard::B, 'b');
-            T_COMPARE(textbox_widget->getValue(), "ab");
-            CHECK_SELECTION(false, "", 2, -1, -1);
-            ENTER_TEXT(sf::Keyboard::C, 'c');
-            T_COMPARE(textbox_widget->getValue(), "abc");
-            CHECK_SELECTION(false, "", 3, -1, -1);
-            ENTER_TEXT(sf::Keyboard::Enter, '\n');
-            T_CHECK(!textbox_widget->isEditMode());
-            T_COMPARE(textbox_widget->getValue(), "abc");
-            T_CHECK(textbox_widget->isFocused());
-            T_CHECK(application.getWidgets().getFocusedWidget() == textbox_widget);
-        }
-    );
-    test::Test* textbox_widget_events_test = list->addTest(
-        "textbox_widget_events",
-        {
-            textbox_widget_input_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-            bool edit_mode = false;
-            sf::String value;
-            bool confirmed = false;
-            bool cancelled = false;
-            textbox_widget->OnEditModeToggle = [&](bool value) {
-                edit_mode = value;
-            };
-            textbox_widget->OnValueChanged = [&](const sf::String& new_value) {
-                value = new_value;
-            };
-            textbox_widget->OnConfirm = [&](const sf::String& value) {
-                confirmed = true;
-            };
-            textbox_widget->OnCancel = [&]() {
-                cancelled = true;
-            };
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
-            T_CHECK(edit_mode);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalTopRight() + sf::Vector2f(10.0f, 0.0f)));
-            T_CHECK(!edit_mode);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
-            T_CHECK(edit_mode);
-            ENTER_TEXT(sf::Keyboard::A, 'a');
-            T_COMPARE(value, "a");
-            ENTER_TEXT(sf::Keyboard::A, 'b');
-            T_COMPARE(value, "ab");
-            ENTER_TEXT(sf::Keyboard::A, 'c');
-            T_COMPARE(value, "abc");
-            ENTER_TEXT(sf::Keyboard::Enter, '\n');
-            T_CHECK(!edit_mode);
-            T_CHECK(confirmed);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
-            T_CHECK(edit_mode);
-            TAP_KEY(sf::Keyboard::Escape);
-            T_CHECK(!edit_mode);
-            T_CHECK(cancelled);
-        }
-    );
-    test::Test* textbox_widget_cursor_test = list->addTest(
-        "textbox_widget_cursor",
-        {
-            textbox_widget_basic_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    T_ASSERT_NO_ERRORS();
+    SELECT_ALL();
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    TAP_KEY(sf::Keyboard::Right);
+    CHECK_SELECTION(false, "", 4, -1, -1);
+    SELECT_ALL();
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    TAP_KEY(sf::Keyboard::Home);
+    CHECK_SELECTION(false, "", 0, -1, -1);
+    SELECT_ALL();
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    TAP_KEY(sf::Keyboard::End);
+    CHECK_SELECTION(false, "", 4, -1, -1);
 
-            ENTER_TEXT(sf::Keyboard::BackSpace, '\b');
-            TAP_KEY(sf::Keyboard::Left);
-            T_COMPARE(textbox_widget->getValue(), "");
-            CHECK_SELECTION(false, "", 0, -1, -1);
-            TAP_KEY(sf::Keyboard::Right);
-            T_COMPARE(textbox_widget->getValue(), "");
-            CHECK_SELECTION(false, "", 0, -1, -1);
-            ENTER_TEXT(sf::Keyboard::A, 'a');
-            ENTER_TEXT(sf::Keyboard::B, 'b');
-            ENTER_TEXT(sf::Keyboard::C, 'c');
-            ENTER_TEXT(sf::Keyboard::D, 'd');
-            T_ASSERT(T_COMPARE(textbox_widget->getValue(), "abcd"));
-            CHECK_SELECTION(false, "", 4, -1, -1);
-            auto move_cursor = [&](sf::Keyboard::Key key, size_t pos) {
-                application.keyPress(key);
-                application.advance();
-                T_COMPARE(textbox_widget->getValue(), "abcd");
-                CHECK_SELECTION(false, "", pos, -1, -1);
-            };
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 4));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 4));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 3));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 2));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 1));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 0));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 0));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Left, 0));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 1));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 2));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 3));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 4));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 4));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Right, 4));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Home, 0));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::Home, 0));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::End, 4));
-            T_WRAP_CONTAINER(move_cursor(sf::Keyboard::End, 4));
-        }
-    );
-    test::Test* textbox_widget_scroll_test = list->addTest(
-        "textbox_widget_scroll",
-        {
-            textbox_widget_cursor_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            fw::TextBoxWidget* textbox_widget = initTextBox(application, 20.0f, 20.0f);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    T_ASSERT_NO_ERRORS();
+    TAP_KEY(sf::Keyboard::Home);
+    PRESS_KEY(sf::Keyboard::LShift);
+    TAP_KEY(sf::Keyboard::Right);
+    CHECK_SELECTION(true, "T", 1, 0, 1);
+    TAP_KEY(sf::Keyboard::Right);
+    CHECK_SELECTION(true, "Te", 2, 0, 2);
+    TAP_KEY(sf::Keyboard::Right);
+    CHECK_SELECTION(true, "Tex", 3, 0, 3);
+    TAP_KEY(sf::Keyboard::Right);
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    TAP_KEY(sf::Keyboard::Right);
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    RELEASE_KEY(sf::Keyboard::LShift);
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    TAP_KEY(sf::Keyboard::Left);
+    CHECK_SELECTION(false, "", 0, -1, -1);
 
-            const fw::TextWidget* text_widget = textbox_widget->getTextWidget();
-            float zero_pos = textbox_widget->TEXT_VIEW_ZERO_POS.x;
-            float right_margin = textbox_widget->getWidth() - textbox_widget->CURSOR_MOVE_MARGIN;
-            auto calc_text_pos = [&](size_t cursor_pos_index) {
-                float cursor_pos = zero_pos + text_widget->getLocalCharPos(cursor_pos_index).x;
-                float past_right_margin = std::max(0.0f, cursor_pos - right_margin);
-                float text_pos = zero_pos - past_right_margin;
-                return text_pos;
-            };
-            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(4));
-            TAP_KEY(sf::Keyboard::Home);
-            T_APPROX_COMPARE(text_widget->getPosition().x, zero_pos);
+    T_ASSERT_NO_ERRORS();
+    TAP_KEY(sf::Keyboard::Right);
+    TAP_KEY(sf::Keyboard::Right);
+    TAP_KEY(sf::Keyboard::Right);
+    PRESS_KEY(sf::Keyboard::LShift);
+    TAP_KEY(sf::Keyboard::Left);
+    CHECK_SELECTION(true, "x", 2, 2, 3);
+    TAP_KEY(sf::Keyboard::Left);
+    CHECK_SELECTION(true, "ex", 1, 1, 3);
+    TAP_KEY(sf::Keyboard::Left);
+    CHECK_SELECTION(true, "Tex", 0, 0, 3);
+    RELEASE_KEY(sf::Keyboard::LShift);
+    TAP_KEY(sf::Keyboard::Right);
+    CHECK_SELECTION(false, "", 3, -1, -1);
 
-            T_ASSERT_NO_ERRORS();
-            TAP_KEY(sf::Keyboard::Right);
-            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(1));
-            TAP_KEY(sf::Keyboard::Right);
-            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(2));
-            TAP_KEY(sf::Keyboard::Right);
-            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(3));
-            TAP_KEY(sf::Keyboard::Right);
-            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(4));
-            TAP_KEY(sf::Keyboard::Right);
-            T_APPROX_COMPARE(text_widget->getPosition().x, calc_text_pos(4));
+    T_ASSERT_NO_ERRORS();
+    TAP_KEY(sf::Keyboard::Home);
+    TAP_KEY(sf::Keyboard::Right);
+    PRESS_KEY(sf::Keyboard::LShift);
+    TAP_KEY(sf::Keyboard::Right);
+    TAP_KEY(sf::Keyboard::Right);
+    RELEASE_KEY(sf::Keyboard::LShift);
+    CHECK_SELECTION(true, "ex", 3, 1, 3);
+    SELECT_ALL();
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+}
 
-            T_ASSERT_NO_ERRORS();
-            float begin_pos = text_widget->getPosition().x;
-            TAP_KEY(sf::Keyboard::Left);
-            T_COMPARE(text_widget->getPosition().x, begin_pos);
-            TAP_KEY(sf::Keyboard::Left);
-            T_COMPARE(textbox_widget->getLocalCharPos(2).x, zero_pos);
-            TAP_KEY(sf::Keyboard::Left);
-            T_COMPARE(textbox_widget->getLocalCharPos(1).x, zero_pos);
-            TAP_KEY(sf::Keyboard::Left);
-            T_COMPARE(textbox_widget->getLocalCharPos(0).x, zero_pos);
-            TAP_KEY(sf::Keyboard::Left);
-            T_COMPARE(textbox_widget->getLocalCharPos(0).x, zero_pos);
-        }
-    );
-    test::Test* textbox_widget_selection_test = list->addTest(
-        "textbox_widget_selection",
-        {
-            textbox_widget_cursor_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+void WidgetTests::textboxWidgetMouseClickTest(test::Test& test) {
+    fw::Application application;
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            TAP_KEY(sf::Keyboard::Left);
-            CHECK_SELECTION(false, "", 0, -1, -1);
+    auto click_at_char = [&](size_t index) {
+        T_ASSERT_NO_ERRORS();
+        SELECT_ALL();
+        CHECK_SELECTION(true, "Text", 4, 0, 4);
+        CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCharPos(index)));
+        T_CHECK(textbox_widget->isFocused());
+        CHECK_SELECTION(false, "", index, -1, -1);
+    };
+    T_WRAP_CONTAINER(click_at_char(0));
+    T_WRAP_CONTAINER(click_at_char(1));
+    T_WRAP_CONTAINER(click_at_char(2));
+    T_WRAP_CONTAINER(click_at_char(3));
+    T_WRAP_CONTAINER(click_at_char(4));
 
-            T_ASSERT_NO_ERRORS();
-            SELECT_ALL();
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            TAP_KEY(sf::Keyboard::Right);
-            CHECK_SELECTION(false, "", 4, -1, -1);
-            SELECT_ALL();
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            TAP_KEY(sf::Keyboard::Home);
-            CHECK_SELECTION(false, "", 0, -1, -1);
-            SELECT_ALL();
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            TAP_KEY(sf::Keyboard::End);
-            CHECK_SELECTION(false, "", 4, -1, -1);
+    T_ASSERT_NO_ERRORS();
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalTopRight() + sf::Vector2f(10.0f, 0.0f)));
+    CHECK_SELECTION(false, "", 0, -1, -1);
+    T_CHECK(!textbox_widget->isFocused());
+}
 
-            T_ASSERT_NO_ERRORS();
-            TAP_KEY(sf::Keyboard::Home);
-            PRESS_KEY(sf::Keyboard::LShift);
-            TAP_KEY(sf::Keyboard::Right);
-            CHECK_SELECTION(true, "T", 1, 0, 1);
-            TAP_KEY(sf::Keyboard::Right);
-            CHECK_SELECTION(true, "Te", 2, 0, 2);
-            TAP_KEY(sf::Keyboard::Right);
-            CHECK_SELECTION(true, "Tex", 3, 0, 3);
-            TAP_KEY(sf::Keyboard::Right);
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            TAP_KEY(sf::Keyboard::Right);
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            RELEASE_KEY(sf::Keyboard::LShift);
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            TAP_KEY(sf::Keyboard::Left);
-            CHECK_SELECTION(false, "", 0, -1, -1);
+void WidgetTests::textboxWidgetMouseDragTest(test::Test& test) {
+    fw::Application application;
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
 
-            T_ASSERT_NO_ERRORS();
-            TAP_KEY(sf::Keyboard::Right);
-            TAP_KEY(sf::Keyboard::Right);
-            TAP_KEY(sf::Keyboard::Right);
-            PRESS_KEY(sf::Keyboard::LShift);
-            TAP_KEY(sf::Keyboard::Left);
-            CHECK_SELECTION(true, "x", 2, 2, 3);
-            TAP_KEY(sf::Keyboard::Left);
-            CHECK_SELECTION(true, "ex", 1, 1, 3);
-            TAP_KEY(sf::Keyboard::Left);
-            CHECK_SELECTION(true, "Tex", 0, 0, 3);
-            RELEASE_KEY(sf::Keyboard::LShift);
-            TAP_KEY(sf::Keyboard::Right);
-            CHECK_SELECTION(false, "", 3, -1, -1);
+    auto get_char_pos = [&](size_t index) {
+        return fw::to2i(textbox_widget->getGlobalCharPos(index));
+    };
+    auto move_to_char = [&](size_t index) {
+        application.mouseMove(get_char_pos(index));
+        application.advance();
+    };
+    auto drag_from_char = [&](size_t index) {
+        application.mouseMove(get_char_pos(index));
+        application.mouseLeftPress();
+        application.advance();
+    };
+    auto mouse_release = [&]() {
+        application.mouseLeftRelease();
+        application.advance();
+    };
+    T_ASSERT(T_CHECK(!textbox_widget->isEditMode()));
+    drag_from_char(1);
+    T_ASSERT(T_CHECK(textbox_widget->isEditMode()));
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    move_to_char(2);
+    CHECK_SELECTION(true, "e", 2, 1, 2);
+    move_to_char(3);
+    CHECK_SELECTION(true, "ex", 3, 1, 3);
+    mouse_release();
+    CHECK_SELECTION(true, "ex", 3, 1, 3);
 
-            T_ASSERT_NO_ERRORS();
-            TAP_KEY(sf::Keyboard::Home);
-            TAP_KEY(sf::Keyboard::Right);
-            PRESS_KEY(sf::Keyboard::LShift);
-            TAP_KEY(sf::Keyboard::Right);
-            TAP_KEY(sf::Keyboard::Right);
-            RELEASE_KEY(sf::Keyboard::LShift);
-            CHECK_SELECTION(true, "ex", 3, 1, 3);
-            SELECT_ALL();
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-        }
-    );
-    test::Test* textbox_widget_mouse_click_test = list->addTest(
-        "textbox_widget_mouse_click",
-        {
-            textbox_widget_cursor_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    T_ASSERT_NO_ERRORS();
+    drag_from_char(0);
+    CHECK_SELECTION(false, "", 0, -1, -1);
+    move_to_char(4);
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    mouse_release();
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
 
-            auto click_at_char = [&](size_t index) {
-                T_ASSERT_NO_ERRORS();
-                SELECT_ALL();
-                CHECK_SELECTION(true, "Text", 4, 0, 4);
-                CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCharPos(index)));
-                T_CHECK(textbox_widget->isFocused());
-                CHECK_SELECTION(false, "", index, -1, -1);
-            };
-            T_WRAP_CONTAINER(click_at_char(0));
-            T_WRAP_CONTAINER(click_at_char(1));
-            T_WRAP_CONTAINER(click_at_char(2));
-            T_WRAP_CONTAINER(click_at_char(3));
-            T_WRAP_CONTAINER(click_at_char(4));
+    T_ASSERT_NO_ERRORS();
+    drag_from_char(4);
+    CHECK_SELECTION(false, "", 4, -1, -1);
+    move_to_char(0);
+    CHECK_SELECTION(true, "Text", 0, 0, 4);
+    mouse_release();
+    CHECK_SELECTION(true, "Text", 0, 0, 4);
+}
 
-            T_ASSERT_NO_ERRORS();
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalTopRight() + sf::Vector2f(10.0f, 0.0f)));
-            CHECK_SELECTION(false, "", 0, -1, -1);
-            T_CHECK(!textbox_widget->isFocused());
-        }
-    );
-    test::Test* textbox_widget_mouse_drag_test = list->addTest(
-        "textbox_widget_mouse_drag",
-        {
-            textbox_widget_mouse_click_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+void WidgetTests::textboxWidgetCopyPasteTest(test::Test& test) {
+    fw::Application application;
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
-            auto get_char_pos = [&](size_t index) {
-                return fw::to2i(textbox_widget->getGlobalCharPos(index));
-            };
-            auto move_to_char = [&](size_t index) {
-                application.mouseMove(get_char_pos(index));
-                application.advance();
-            };
-            auto drag_from_char = [&](size_t index) {
-                application.mouseMove(get_char_pos(index));
-                application.mouseLeftPress();
-                application.advance();
-            };
-            auto mouse_release = [&]() {
-                application.mouseLeftRelease();
-                application.advance();
-            };
-            T_ASSERT(T_CHECK(!textbox_widget->isEditMode()));
-            drag_from_char(1);
-            T_ASSERT(T_CHECK(textbox_widget->isEditMode()));
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            move_to_char(2);
-            CHECK_SELECTION(true, "e", 2, 1, 2);
-            move_to_char(3);
-            CHECK_SELECTION(true, "ex", 3, 1, 3);
-            mouse_release();
-            CHECK_SELECTION(true, "ex", 3, 1, 3);
+    COPY();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    T_COMPARE(textbox_widget->getValue(), "");
+    PASTE();
+    T_COMPARE(textbox_widget->getValue(), "Text");
 
-            T_ASSERT_NO_ERRORS();
-            drag_from_char(0);
-            CHECK_SELECTION(false, "", 0, -1, -1);
-            move_to_char(4);
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            mouse_release();
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
+    T_ASSERT_NO_ERRORS();
+    SELECT_ALL();
+    CUT();
+    T_COMPARE(textbox_widget->getValue(), "");
+    PASTE();
+    T_COMPARE(textbox_widget->getValue(), "Text");
 
-            T_ASSERT_NO_ERRORS();
-            drag_from_char(4);
-            CHECK_SELECTION(false, "", 4, -1, -1);
-            move_to_char(0);
-            CHECK_SELECTION(true, "Text", 0, 0, 4);
-            mouse_release();
-            CHECK_SELECTION(true, "Text", 0, 0, 4);
-        }
-    );
-    test::Test* textbox_widget_copypaste_test = list->addTest(
-        "textbox_widget_copypaste",
-        {
-            textbox_widget_selection_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    T_ASSERT_NO_ERRORS();
+    TAP_KEY(sf::Keyboard::Home);
+    TAP_KEY(sf::Keyboard::Right);
+    PRESS_KEY(sf::Keyboard::LShift);
+    TAP_KEY(sf::Keyboard::Right);
+    TAP_KEY(sf::Keyboard::Right);
+    RELEASE_KEY(sf::Keyboard::LShift);
+    COPY();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    TAP_KEY(sf::Keyboard::Home);
+    PASTE();
+    T_COMPARE(textbox_widget->getValue(), "exText");
 
-            COPY();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            T_COMPARE(textbox_widget->getValue(), "");
-            PASTE();
-            T_COMPARE(textbox_widget->getValue(), "Text");
+    T_ASSERT_NO_ERRORS();
+    PRESS_KEY(sf::Keyboard::LShift);
+    TAP_KEY(sf::Keyboard::Right);
+    TAP_KEY(sf::Keyboard::Right);
+    RELEASE_KEY(sf::Keyboard::LShift);
+    CUT();
+    T_COMPARE(textbox_widget->getValue(), "exxt");
+    TAP_KEY(sf::Keyboard::Left);
+    PRESS_KEY(sf::Keyboard::LShift);
+    TAP_KEY(sf::Keyboard::Right);
+    TAP_KEY(sf::Keyboard::Right);
+    RELEASE_KEY(sf::Keyboard::LShift);
+    PASTE();
+    T_COMPARE(textbox_widget->getValue(), "eTet");
 
-            T_ASSERT_NO_ERRORS();
-            SELECT_ALL();
-            CUT();
-            T_COMPARE(textbox_widget->getValue(), "");
-            PASTE();
-            T_COMPARE(textbox_widget->getValue(), "Text");
+    T_ASSERT_NO_ERRORS();
+    COPY();
+    PASTE();
+    T_COMPARE(textbox_widget->getValue(), "eTeTet");
+    CUT();
+    PASTE();
+    T_COMPARE(textbox_widget->getValue(), "eTeTeTet");
 
-            T_ASSERT_NO_ERRORS();
-            TAP_KEY(sf::Keyboard::Home);
-            TAP_KEY(sf::Keyboard::Right);
-            PRESS_KEY(sf::Keyboard::LShift);
-            TAP_KEY(sf::Keyboard::Right);
-            TAP_KEY(sf::Keyboard::Right);
-            RELEASE_KEY(sf::Keyboard::LShift);
-            COPY();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            TAP_KEY(sf::Keyboard::Home);
-            PASTE();
-            T_COMPARE(textbox_widget->getValue(), "exText");
+    T_ASSERT_NO_ERRORS();
+    SELECT_ALL();
+    CUT();
+    COPY();
+    PASTE();
+    T_COMPARE(textbox_widget->getValue(), "eTeTeTet");
+    CUT();
+    PASTE();
+    T_COMPARE(textbox_widget->getValue(), "eTeTeTeteTeTeTet");
+}
 
-            T_ASSERT_NO_ERRORS();
-            PRESS_KEY(sf::Keyboard::LShift);
-            TAP_KEY(sf::Keyboard::Right);
-            TAP_KEY(sf::Keyboard::Right);
-            RELEASE_KEY(sf::Keyboard::LShift);
-            CUT();
-            T_COMPARE(textbox_widget->getValue(), "exxt");
-            TAP_KEY(sf::Keyboard::Left);
-            PRESS_KEY(sf::Keyboard::LShift);
-            TAP_KEY(sf::Keyboard::Right);
-            TAP_KEY(sf::Keyboard::Right);
-            RELEASE_KEY(sf::Keyboard::LShift);
-            PASTE();
-            T_COMPARE(textbox_widget->getValue(), "eTet");
+void WidgetTests::textboxWidgetHistoryTest(test::Test& test) {
+    fw::Application application;
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
-            T_ASSERT_NO_ERRORS();
-            COPY();
-            PASTE();
-            T_COMPARE(textbox_widget->getValue(), "eTeTet");
-            CUT();
-            PASTE();
-            T_COMPARE(textbox_widget->getValue(), "eTeTeTet");
+    auto undo = [&]() {
+        PRESS_KEY(sf::Keyboard::LControl);
+        ENTER_TEXT(sf::Keyboard::Z, 'z');
+        RELEASE_KEY(sf::Keyboard::LControl);
+    };
+    auto redo = [&]() {
+        PRESS_KEY(sf::Keyboard::LControl);
+        PRESS_KEY(sf::Keyboard::LShift);
+        ENTER_TEXT(sf::Keyboard::Z, 'z');
+        RELEASE_KEY(sf::Keyboard::LShift);
+        RELEASE_KEY(sf::Keyboard::LControl);
+    };
 
-            T_ASSERT_NO_ERRORS();
-            SELECT_ALL();
-            CUT();
-            COPY();
-            PASTE();
-            T_COMPARE(textbox_widget->getValue(), "eTeTeTet");
-            CUT();
-            PASTE();
-            T_COMPARE(textbox_widget->getValue(), "eTeTeTeteTeTeTet");
-        }
-    );
-    test::Test* textbox_widget_history_test = list->addTest(
-        "textbox_widget_history",
-        {
-            textbox_widget_copypaste_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    T_COMPARE(textbox_widget->getValue(), "");
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    redo();
+    T_COMPARE(textbox_widget->getValue(), "");
 
-            auto undo = [&]() {
-                PRESS_KEY(sf::Keyboard::LControl);
-                ENTER_TEXT(sf::Keyboard::Z, 'z');
-                RELEASE_KEY(sf::Keyboard::LControl);
-            };
-            auto redo = [&]() {
-                PRESS_KEY(sf::Keyboard::LControl);
-                PRESS_KEY(sf::Keyboard::LShift);
-                ENTER_TEXT(sf::Keyboard::Z, 'z');
-                RELEASE_KEY(sf::Keyboard::LShift);
-                RELEASE_KEY(sf::Keyboard::LControl);
-            };
+    T_ASSERT_NO_ERRORS();
+    ENTER_TEXT(sf::Keyboard::A, 'a');
+    ENTER_TEXT(sf::Keyboard::B, 'b');
+    ENTER_TEXT(sf::Keyboard::C, 'c');
+    T_COMPARE(textbox_widget->getValue(), "abc");
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "");
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    CHECK_SELECTION(true, "Text", 4, 0, 4);
+    redo();
+    T_COMPARE(textbox_widget->getValue(), "");
+    redo();
+    T_COMPARE(textbox_widget->getValue(), "abc");
+    CHECK_SELECTION(false, "", 3, -1, -1);
 
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            T_COMPARE(textbox_widget->getValue(), "");
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            redo();
-            T_COMPARE(textbox_widget->getValue(), "");
+    T_ASSERT_NO_ERRORS();
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "");
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    TAP_KEY(sf::Keyboard::Left);
+    TAP_KEY(sf::Keyboard::Right);
+    TAP_KEY(sf::Keyboard::Right);
+    TAP_KEY(sf::Keyboard::Right);
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    T_COMPARE(textbox_widget->getValue(), "Tt");
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    CHECK_SELECTION(false, "", 3, -1, -1);
 
-            T_ASSERT_NO_ERRORS();
-            ENTER_TEXT(sf::Keyboard::A, 'a');
-            ENTER_TEXT(sf::Keyboard::B, 'b');
-            ENTER_TEXT(sf::Keyboard::C, 'c');
-            T_COMPARE(textbox_widget->getValue(), "abc");
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "");
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            CHECK_SELECTION(true, "Text", 4, 0, 4);
-            redo();
-            T_COMPARE(textbox_widget->getValue(), "");
-            redo();
-            T_COMPARE(textbox_widget->getValue(), "abc");
-            CHECK_SELECTION(false, "", 3, -1, -1);
+    T_ASSERT_NO_ERRORS();
+    PRESS_KEY(sf::Keyboard::LShift);
+    TAP_KEY(sf::Keyboard::Left);
+    TAP_KEY(sf::Keyboard::Left);
+    RELEASE_KEY(sf::Keyboard::LShift);
+    CUT();
+    T_COMPARE(textbox_widget->getValue(), "Tt");
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    CHECK_SELECTION(true, "ex", 1, 1, 3);
 
-            T_ASSERT_NO_ERRORS();
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "");
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            TAP_KEY(sf::Keyboard::Left);
-            TAP_KEY(sf::Keyboard::Right);
-            TAP_KEY(sf::Keyboard::Right);
-            TAP_KEY(sf::Keyboard::Right);
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            T_COMPARE(textbox_widget->getValue(), "Tt");
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            CHECK_SELECTION(false, "", 3, -1, -1);
+    T_ASSERT_NO_ERRORS();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    TAP_KEY(sf::Keyboard::Right);
+    PASTE();
+    T_COMPARE(textbox_widget->getValue(), "Texext");
+    PASTE();
+    T_COMPARE(textbox_widget->getValue(), "Texexext");
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "Texext");
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    undo();
+    T_COMPARE(textbox_widget->getValue(), "Text");
+    CHECK_SELECTION(false, "", 3, -1, -1);
+}
 
-            T_ASSERT_NO_ERRORS();
-            PRESS_KEY(sf::Keyboard::LShift);
-            TAP_KEY(sf::Keyboard::Left);
-            TAP_KEY(sf::Keyboard::Left);
-            RELEASE_KEY(sf::Keyboard::LShift);
-            CUT();
-            T_COMPARE(textbox_widget->getValue(), "Tt");
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            CHECK_SELECTION(true, "ex", 1, 1, 3);
+void WidgetTests::textboxWidgetIntegerTest(test::Test& test) {
+    fw::Application application;
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
-            T_ASSERT_NO_ERRORS();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            TAP_KEY(sf::Keyboard::Right);
-            PASTE();
-            T_COMPARE(textbox_widget->getValue(), "Texext");
-            PASTE();
-            T_COMPARE(textbox_widget->getValue(), "Texexext");
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "Texext");
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            undo();
-            T_COMPARE(textbox_widget->getValue(), "Text");
-            CHECK_SELECTION(false, "", 3, -1, -1);
-        }
-    );
-    test::Test* textbox_widget_integer_test = list->addTest(
-        "textbox_widget_integer",
-        {
-            textbox_widget_copypaste_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    T_CHECK(textbox_widget->isValidValue());
+    textbox_widget->setType(fw::TextBoxWidget::TextBoxType::INTEGER);
+    T_CHECK(!textbox_widget->isValidValue());
+    SELECT_ALL();
+    CUT();
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Num1, '1');
+    ENTER_TEXT(sf::Keyboard::Num2, '2');
+    ENTER_TEXT(sf::Keyboard::Num3, '3');
+    ENTER_TEXT(sf::Keyboard::Num4, '4');
+    T_COMPARE(textbox_widget->getValue(), "1234");
+    T_CHECK(textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::E, 'e');
+    T_COMPARE(textbox_widget->getValue(), "1234");
+    T_CHECK(textbox_widget->isValidValue());
+    TAP_KEY(sf::Keyboard::Home);
+    PRESS_KEY(sf::Keyboard::LShift);
+    ENTER_TEXT(sf::Keyboard::Equal, '+');
+    RELEASE_KEY(sf::Keyboard::LShift);
+    T_COMPARE(textbox_widget->getValue(), "+1234");
+    T_CHECK(textbox_widget->isValidValue());
+    PRESS_KEY(sf::Keyboard::LShift);
+    ENTER_TEXT(sf::Keyboard::Equal, '+');
+    RELEASE_KEY(sf::Keyboard::LShift);
+    T_COMPARE(textbox_widget->getValue(), "++1234");
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    TAP_KEY(sf::Keyboard::End);
+    ENTER_TEXT(sf::Keyboard::Period, '.');
+    T_COMPARE(textbox_widget->getValue(), "+1234");
+    T_CHECK(textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Comma, ',');
+    T_COMPARE(textbox_widget->getValue(), "+1234");
+    T_CHECK(textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Dash, '-');
+    T_COMPARE(textbox_widget->getValue(), "+1234-");
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    ENTER_TEXT(sf::Keyboard::Num5, '5');
+    ENTER_TEXT(sf::Keyboard::Num6, '6');
+    ENTER_TEXT(sf::Keyboard::Num7, '7');
+    ENTER_TEXT(sf::Keyboard::Num8, '8');
+    ENTER_TEXT(sf::Keyboard::Num9, '9');
+    T_COMPARE(textbox_widget->getValue(), "+123456789");
+    T_CHECK(textbox_widget->isValidValue());
+    TAP_KEY(sf::Keyboard::Home);
+    ENTER_TEXT(sf::Keyboard::Dash, '-');
+    T_COMPARE(textbox_widget->getValue(), "-+123456789");
+    T_CHECK(!textbox_widget->isValidValue());
+    TAP_KEY(sf::Keyboard::Right);
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    T_COMPARE(textbox_widget->getValue(), "-123456789");
+    T_CHECK(textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Num0, '0');
+    T_COMPARE(textbox_widget->getValue(), "-0123456789");
+    T_CHECK(textbox_widget->isValidValue());
+}
 
-            T_CHECK(textbox_widget->isValidValue());
-            textbox_widget->setType(fw::TextBoxWidget::TextBoxType::INTEGER);
-            T_CHECK(!textbox_widget->isValidValue());
-            SELECT_ALL();
-            CUT();
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Num1, '1');
-            ENTER_TEXT(sf::Keyboard::Num2, '2');
-            ENTER_TEXT(sf::Keyboard::Num3, '3');
-            ENTER_TEXT(sf::Keyboard::Num4, '4');
-            T_COMPARE(textbox_widget->getValue(), "1234");
-            T_CHECK(textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::E, 'e');
-            T_COMPARE(textbox_widget->getValue(), "1234");
-            T_CHECK(textbox_widget->isValidValue());
-            TAP_KEY(sf::Keyboard::Home);
-            PRESS_KEY(sf::Keyboard::LShift);
-            ENTER_TEXT(sf::Keyboard::Equal, '+');
-            RELEASE_KEY(sf::Keyboard::LShift);
-            T_COMPARE(textbox_widget->getValue(), "+1234");
-            T_CHECK(textbox_widget->isValidValue());
-            PRESS_KEY(sf::Keyboard::LShift);
-            ENTER_TEXT(sf::Keyboard::Equal, '+');
-            RELEASE_KEY(sf::Keyboard::LShift);
-            T_COMPARE(textbox_widget->getValue(), "++1234");
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            TAP_KEY(sf::Keyboard::End);
-            ENTER_TEXT(sf::Keyboard::Period, '.');
-            T_COMPARE(textbox_widget->getValue(), "+1234");
-            T_CHECK(textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Comma, ',');
-            T_COMPARE(textbox_widget->getValue(), "+1234");
-            T_CHECK(textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Dash, '-');
-            T_COMPARE(textbox_widget->getValue(), "+1234-");
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            ENTER_TEXT(sf::Keyboard::Num5, '5');
-            ENTER_TEXT(sf::Keyboard::Num6, '6');
-            ENTER_TEXT(sf::Keyboard::Num7, '7');
-            ENTER_TEXT(sf::Keyboard::Num8, '8');
-            ENTER_TEXT(sf::Keyboard::Num9, '9');
-            T_COMPARE(textbox_widget->getValue(), "+123456789");
-            T_CHECK(textbox_widget->isValidValue());
-            TAP_KEY(sf::Keyboard::Home);
-            ENTER_TEXT(sf::Keyboard::Dash, '-');
-            T_COMPARE(textbox_widget->getValue(), "-+123456789");
-            T_CHECK(!textbox_widget->isValidValue());
-            TAP_KEY(sf::Keyboard::Right);
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            T_COMPARE(textbox_widget->getValue(), "-123456789");
-            T_CHECK(textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Num0, '0');
-            T_COMPARE(textbox_widget->getValue(), "-0123456789");
-            T_CHECK(textbox_widget->isValidValue());
-        }
-    );
-    test::Test* textbox_widget_float_test = list->addTest(
-        "textbox_widget_float",
-        {
-            textbox_widget_copypaste_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-            CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+void WidgetTests::textboxWidgetFloatTest(test::Test& test) {
+    fw::Application application;
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
+    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
-            T_CHECK(textbox_widget->isValidValue());
-            textbox_widget->setType(fw::TextBoxWidget::TextBoxType::FLOAT);
-            T_CHECK(!textbox_widget->isValidValue());
-            SELECT_ALL();
-            CUT();
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Num1, '1');
-            ENTER_TEXT(sf::Keyboard::Num2, '2');
-            ENTER_TEXT(sf::Keyboard::Num3, '3');
-            ENTER_TEXT(sf::Keyboard::Num4, '4');
-            T_COMPARE(textbox_widget->getValue(), "1234");
-            T_CHECK(textbox_widget->isValidValue());
-            TAP_KEY(sf::Keyboard::Home);
-            PRESS_KEY(sf::Keyboard::LShift);
-            ENTER_TEXT(sf::Keyboard::Equal, '+');
-            RELEASE_KEY(sf::Keyboard::LShift);
-            T_COMPARE(textbox_widget->getValue(), "+1234");
-            T_CHECK(textbox_widget->isValidValue());
-            PRESS_KEY(sf::Keyboard::LShift);
-            ENTER_TEXT(sf::Keyboard::Equal, '+');
-            RELEASE_KEY(sf::Keyboard::LShift);
-            T_COMPARE(textbox_widget->getValue(), "++1234");
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            TAP_KEY(sf::Keyboard::End);
-            ENTER_TEXT(sf::Keyboard::Dash, '-');
-            T_COMPARE(textbox_widget->getValue(), "+1234-");
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            ENTER_TEXT(sf::Keyboard::A, 'a');
-            T_COMPARE(textbox_widget->getValue(), "+1234");
-            T_CHECK(textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::E, 'e');
-            T_COMPARE(textbox_widget->getValue(), "+1234e");
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Num5, '9');
-            T_COMPARE(textbox_widget->getValue(), "+1234e9");
-            T_CHECK(textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Comma, ',');
-            T_COMPARE(textbox_widget->getValue(), "+1234e9");
-            T_CHECK(textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::E, 'e');
-            T_COMPARE(textbox_widget->getValue(), "+1234e9e");
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            ENTER_TEXT(sf::Keyboard::Period, '.');
-            T_COMPARE(textbox_widget->getValue(), "+1234e9.");
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Num6, '6');
-            T_COMPARE(textbox_widget->getValue(), "+1234e9.6");
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            T_COMPARE(textbox_widget->getValue(), "+1234e9");
-            TAP_KEY(sf::Keyboard::Left);
-            TAP_KEY(sf::Keyboard::Left);
-            TAP_KEY(sf::Keyboard::Left);
-            ENTER_TEXT(sf::Keyboard::Period, '.');
-            T_COMPARE(textbox_widget->getValue(), "+123.4e9");
-            T_CHECK(textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Period, '.');
-            T_COMPARE(textbox_widget->getValue(), "+123..4e9");
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            T_COMPARE(textbox_widget->getValue(), "+123.4e9");
-            TAP_KEY(sf::Keyboard::Right);
-            ENTER_TEXT(sf::Keyboard::Num5, '5');
-            ENTER_TEXT(sf::Keyboard::Num6, '6');
-            ENTER_TEXT(sf::Keyboard::Num7, '7');
-            ENTER_TEXT(sf::Keyboard::Num8, '8');
-            T_COMPARE(textbox_widget->getValue(), "+123.45678e9");
-            T_CHECK(textbox_widget->isValidValue());
-            TAP_KEY(sf::Keyboard::Home);
-            ENTER_TEXT(sf::Keyboard::Dash, '-');
-            T_COMPARE(textbox_widget->getValue(), "-+123.45678e9");
-            T_CHECK(!textbox_widget->isValidValue());
-            TAP_KEY(sf::Keyboard::Right);
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-            ENTER_TEXT(sf::Keyboard::Num0, '0');
-            T_COMPARE(textbox_widget->getValue(), "-0123.45678e9");
-            T_CHECK(textbox_widget->isValidValue());
-            TAP_KEY(sf::Keyboard::Home);
-            ENTER_TEXT(sf::Keyboard::Dash, '-');
-            T_COMPARE(textbox_widget->getValue(), "--0123.45678e9");
-            T_CHECK(!textbox_widget->isValidValue());
-            ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-        }
-    );
-    test::Test* canvas_widget_basic_test = list->addTest(
-        "canvas_widget_basic",
-        {
-            rectangle_widget_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::CanvasWidget* canvas_widget = application.getWidgets().createWidget<fw::CanvasWidget>();
-            fw::Widget* root_widget = application.getWidgets().getRootWidget();
-            T_ASSERT(T_CHECK(canvas_widget));
-            sf::Vector2f position(100.0f, 100.0f);
-            sf::Vector2f size(100.0f, 100.0f);
-            canvas_widget->setPosition(position);
-            canvas_widget->setSize(size);
+    T_CHECK(textbox_widget->isValidValue());
+    textbox_widget->setType(fw::TextBoxWidget::TextBoxType::FLOAT);
+    T_CHECK(!textbox_widget->isValidValue());
+    SELECT_ALL();
+    CUT();
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Num1, '1');
+    ENTER_TEXT(sf::Keyboard::Num2, '2');
+    ENTER_TEXT(sf::Keyboard::Num3, '3');
+    ENTER_TEXT(sf::Keyboard::Num4, '4');
+    T_COMPARE(textbox_widget->getValue(), "1234");
+    T_CHECK(textbox_widget->isValidValue());
+    TAP_KEY(sf::Keyboard::Home);
+    PRESS_KEY(sf::Keyboard::LShift);
+    ENTER_TEXT(sf::Keyboard::Equal, '+');
+    RELEASE_KEY(sf::Keyboard::LShift);
+    T_COMPARE(textbox_widget->getValue(), "+1234");
+    T_CHECK(textbox_widget->isValidValue());
+    PRESS_KEY(sf::Keyboard::LShift);
+    ENTER_TEXT(sf::Keyboard::Equal, '+');
+    RELEASE_KEY(sf::Keyboard::LShift);
+    T_COMPARE(textbox_widget->getValue(), "++1234");
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    TAP_KEY(sf::Keyboard::End);
+    ENTER_TEXT(sf::Keyboard::Dash, '-');
+    T_COMPARE(textbox_widget->getValue(), "+1234-");
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    ENTER_TEXT(sf::Keyboard::A, 'a');
+    T_COMPARE(textbox_widget->getValue(), "+1234");
+    T_CHECK(textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::E, 'e');
+    T_COMPARE(textbox_widget->getValue(), "+1234e");
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Num5, '9');
+    T_COMPARE(textbox_widget->getValue(), "+1234e9");
+    T_CHECK(textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Comma, ',');
+    T_COMPARE(textbox_widget->getValue(), "+1234e9");
+    T_CHECK(textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::E, 'e');
+    T_COMPARE(textbox_widget->getValue(), "+1234e9e");
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    ENTER_TEXT(sf::Keyboard::Period, '.');
+    T_COMPARE(textbox_widget->getValue(), "+1234e9.");
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Num6, '6');
+    T_COMPARE(textbox_widget->getValue(), "+1234e9.6");
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    T_COMPARE(textbox_widget->getValue(), "+1234e9");
+    TAP_KEY(sf::Keyboard::Left);
+    TAP_KEY(sf::Keyboard::Left);
+    TAP_KEY(sf::Keyboard::Left);
+    ENTER_TEXT(sf::Keyboard::Period, '.');
+    T_COMPARE(textbox_widget->getValue(), "+123.4e9");
+    T_CHECK(textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Period, '.');
+    T_COMPARE(textbox_widget->getValue(), "+123..4e9");
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    T_COMPARE(textbox_widget->getValue(), "+123.4e9");
+    TAP_KEY(sf::Keyboard::Right);
+    ENTER_TEXT(sf::Keyboard::Num5, '5');
+    ENTER_TEXT(sf::Keyboard::Num6, '6');
+    ENTER_TEXT(sf::Keyboard::Num7, '7');
+    ENTER_TEXT(sf::Keyboard::Num8, '8');
+    T_COMPARE(textbox_widget->getValue(), "+123.45678e9");
+    T_CHECK(textbox_widget->isValidValue());
+    TAP_KEY(sf::Keyboard::Home);
+    ENTER_TEXT(sf::Keyboard::Dash, '-');
+    T_COMPARE(textbox_widget->getValue(), "-+123.45678e9");
+    T_CHECK(!textbox_widget->isValidValue());
+    TAP_KEY(sf::Keyboard::Right);
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    ENTER_TEXT(sf::Keyboard::Num0, '0');
+    T_COMPARE(textbox_widget->getValue(), "-0123.45678e9");
+    T_CHECK(textbox_widget->isValidValue());
+    TAP_KEY(sf::Keyboard::Home);
+    ENTER_TEXT(sf::Keyboard::Dash, '-');
+    T_COMPARE(textbox_widget->getValue(), "--0123.45678e9");
+    T_CHECK(!textbox_widget->isValidValue());
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+}
 
-            GenericWidgetTest gwt(application, test);
-            gwt.widget = canvas_widget;
-            gwt.total_widgets = 2;
-            gwt.name = "canvas";
-            gwt.fullname = "root|canvas";
-            gwt.is_visual_position_quantized = false;
-            gwt.is_visible = true;
-            gwt.opaque = true;
-            gwt.is_click_through = true;
-            gwt.is_mouse_over = false;
-            gwt.is_focusable = false;
-            gwt.is_focused = false;
-            gwt.clip_children = false;
-            gwt.force_custom_cursor = false;
-            gwt.parent = root_widget;
-            gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
-            gwt.global_bounds = sf::FloatRect(position, size);
-            gwt.parent_local_bounds = gwt.global_bounds;
-            gwt.visual_local_bounds = gwt.local_bounds;
-            gwt.visual_global_bounds = gwt.global_bounds;
-            gwt.visual_parent_local_bounds = gwt.global_bounds;
-            T_WRAP_CONTAINER(genericWidgetTest(gwt));
+void WidgetTests::canvasWidgetBasicTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::CanvasWidget* canvas_widget = application.getWidgets().createWidget<fw::CanvasWidget>();
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(canvas_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(100.0f, 100.0f);
+    canvas_widget->setPosition(position);
+    canvas_widget->setSize(size);
 
-            T_COMPARE(canvas_widget->getChildren().size(), 0);
-        }
-    );
-    test::Test* canvas_widget_draw_test = list->addTest(
-        "canvas_widget_draw",
-        {
-            canvas_widget_basic_test
-        },
-        [&](test::Test& test) {
-            fw::Application application;
-            application.init("Test window", 800, 600, 0, false);
-            application.start(true);
-            application.mouseMove(400, 300);
-            application.advance();
-            fw::CanvasWidget* canvas_widget = application.getWidgets().createWidget<fw::CanvasWidget>();
-            canvas_widget->setSize(100.0f, 100.0f);
-            canvas_widget->setTextureSize(100, 100);
-            auto color_to_str = &WidgetTests::colorToStr;
-            {
-                canvas_widget->clear();
-                sf::Image image = canvas_widget->getRenderTexture().getTexture().copyToImage();
-                T_ASSERT(T_COMPARE(image.getPixel(0, 0), sf::Color::Black, color_to_str));
-            }
-            {
-                canvas_widget->clear(sf::Color(128, 128, 128));
-                sf::Image image = canvas_widget->getRenderTexture().getTexture().copyToImage();
-                T_ASSERT(T_COMPARE(image.getPixel(0, 0), sf::Color(128, 128, 128), color_to_str));
-            }
-            {
-                canvas_widget->clear(sf::Color::Red);
-                sf::RectangleShape rect(sf::Vector2f(30.0f, 30.0f));
-                rect.setPosition(10.0f, 10.0f);
-                rect.setFillColor(sf::Color::Green);
-                canvas_widget->draw(rect);
-                canvas_widget->display();
-                sf::Image image = canvas_widget->getRenderTexture().getTexture().copyToImage();
-                T_COMPARE(image.getPixel(0, 0), sf::Color::Red, color_to_str);
-                T_COMPARE(image.getPixel(5, 5), sf::Color::Red, color_to_str);
-                T_COMPARE(image.getPixel(10, 10), sf::Color::Green, color_to_str);
-                T_COMPARE(image.getPixel(15, 15), sf::Color::Green, color_to_str);
-                T_COMPARE(image.getPixel(20, 20), sf::Color::Green, color_to_str);
-                T_COMPARE(image.getPixel(25, 25), sf::Color::Green, color_to_str);
-                T_COMPARE(image.getPixel(30, 30), sf::Color::Green, color_to_str);
-                T_COMPARE(image.getPixel(35, 35), sf::Color::Green, color_to_str);
-                T_COMPARE(image.getPixel(40, 40), sf::Color::Red, color_to_str);
-                T_COMPARE(image.getPixel(45, 45), sf::Color::Red, color_to_str);
-                T_COMPARE(image.getPixel(50, 50), sf::Color::Red, color_to_str);
-                T_COMPARE(image.getPixel(55, 55), sf::Color::Red, color_to_str);
-                T_COMPARE(image.getPixel(60, 60), sf::Color::Red, color_to_str);
-            }
-        }
-    );
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = canvas_widget;
+    gwt.total_widgets = 2;
+    gwt.name = "canvas";
+    gwt.fullname = "root|canvas";
+    gwt.is_visual_position_quantized = false;
+    gwt.is_visible = true;
+    gwt.opaque = true;
+    gwt.is_click_through = true;
+    gwt.is_mouse_over = false;
+    gwt.is_focusable = false;
+    gwt.is_focused = false;
+    gwt.clip_children = false;
+    gwt.force_custom_cursor = false;
+    gwt.parent = root_widget;
+    gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+    gwt.global_bounds = sf::FloatRect(position, size);
+    gwt.parent_local_bounds = gwt.global_bounds;
+    gwt.visual_local_bounds = gwt.local_bounds;
+    gwt.visual_global_bounds = gwt.global_bounds;
+    gwt.visual_parent_local_bounds = gwt.global_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+
+    T_COMPARE(canvas_widget->getChildren().size(), 0);
+}
+
+void WidgetTests::canvasWidgetDrawTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::CanvasWidget* canvas_widget = application.getWidgets().createWidget<fw::CanvasWidget>();
+    canvas_widget->setSize(100.0f, 100.0f);
+    canvas_widget->setTextureSize(100, 100);
+    auto color_to_str = &WidgetTests::colorToStr;
+    {
+        canvas_widget->clear();
+        sf::Image image = canvas_widget->getRenderTexture().getTexture().copyToImage();
+        T_ASSERT(T_COMPARE(image.getPixel(0, 0), sf::Color::Black, color_to_str));
+    }
+    {
+        canvas_widget->clear(sf::Color(128, 128, 128));
+        sf::Image image = canvas_widget->getRenderTexture().getTexture().copyToImage();
+        T_ASSERT(T_COMPARE(image.getPixel(0, 0), sf::Color(128, 128, 128), color_to_str));
+    }
+    {
+        canvas_widget->clear(sf::Color::Red);
+        sf::RectangleShape rect(sf::Vector2f(30.0f, 30.0f));
+        rect.setPosition(10.0f, 10.0f);
+        rect.setFillColor(sf::Color::Green);
+        canvas_widget->draw(rect);
+        canvas_widget->display();
+        sf::Image image = canvas_widget->getRenderTexture().getTexture().copyToImage();
+        T_COMPARE(image.getPixel(0, 0), sf::Color::Red, color_to_str);
+        T_COMPARE(image.getPixel(5, 5), sf::Color::Red, color_to_str);
+        T_COMPARE(image.getPixel(10, 10), sf::Color::Green, color_to_str);
+        T_COMPARE(image.getPixel(15, 15), sf::Color::Green, color_to_str);
+        T_COMPARE(image.getPixel(20, 20), sf::Color::Green, color_to_str);
+        T_COMPARE(image.getPixel(25, 25), sf::Color::Green, color_to_str);
+        T_COMPARE(image.getPixel(30, 30), sf::Color::Green, color_to_str);
+        T_COMPARE(image.getPixel(35, 35), sf::Color::Green, color_to_str);
+        T_COMPARE(image.getPixel(40, 40), sf::Color::Red, color_to_str);
+        T_COMPARE(image.getPixel(45, 45), sf::Color::Red, color_to_str);
+        T_COMPARE(image.getPixel(50, 50), sf::Color::Red, color_to_str);
+        T_COMPARE(image.getPixel(55, 55), sf::Color::Red, color_to_str);
+        T_COMPARE(image.getPixel(60, 60), sf::Color::Red, color_to_str);
+    }
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {

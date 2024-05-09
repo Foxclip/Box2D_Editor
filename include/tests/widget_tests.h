@@ -88,6 +88,44 @@ protected:
 
 private:
 	sf::Font textbox_font;
+
+	void basicTest(test::Test& test);
+	void initTest(test::Test& test);
+	void startTest(test::Test& test);
+	void advanceTest(test::Test& test);
+	void closeTest(test::Test& test);
+	void mouseEventsTest(test::Test& test);
+	void keyboardEventsTest(test::Test& test);
+
+	void rootWidgetTest(test::Test& test);
+	void rectangleWidgetTest(test::Test& test);
+	void setParentTest(test::Test& test);
+	void widgetMouseEvents1(test::Test& test);
+	void widgetMouseEvents2(test::Test& test);
+	void eventsTest(test::Test& test);
+	void coordinatesTest(test::Test& test);
+	void findTest(test::Test& test);
+	void anchorTest(test::Test& test);
+	void textWidgetTest(test::Test& test);
+	void checkboxWidgetBasicTest(test::Test& test);
+	void checkboxWidgetToggleTest(test::Test& test);
+	void containerWidgetBasicTest(test::Test& test);
+	void containerWidgetChildrenTest(test::Test& test);
+	void textboxWidgetBasicTest(test::Test& test);
+	void textboxWidgetInputTest(test::Test& test);
+	void textboxWidgetEventsTest(test::Test& test);
+	void textboxWidgetCursorTest(test::Test& test);
+	void textboxWidgetScrollTest(test::Test& test);
+	void textboxWidgetSelectionTest(test::Test& test);
+	void textboxWidgetMouseClickTest(test::Test& test);
+	void textboxWidgetMouseDragTest(test::Test& test);
+	void textboxWidgetCopyPasteTest(test::Test& test);
+	void textboxWidgetHistoryTest(test::Test& test);
+	void textboxWidgetIntegerTest(test::Test& test);
+	void textboxWidgetFloatTest(test::Test& test);
+	void canvasWidgetBasicTest(test::Test& test);
+	void canvasWidgetDrawTest(test::Test& test);
+
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);
 	static std::string sfVec2uToStr(const sf::Vector2u& vec);

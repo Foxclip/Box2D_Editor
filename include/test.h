@@ -147,23 +147,23 @@ namespace test {
 
 		virtual void beforeRunModule();
 		virtual void afterRunModule();
-		void testMessage(Test& test, const std::string& file, size_t line, const std::string& message);
-		bool testCheck(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message);
-		bool testCheck(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message, const std::string message);
+		static void testMessage(Test& test, const std::string& file, size_t line, const std::string& message);
+		static bool testCheck(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message);
+		static bool testCheck(Test& test, const std::string& file, size_t line, bool value, const std::string& value_message, const std::string message);
 		template<typename T1, typename T2>
-		bool testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected);
+		static bool testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected);
 		template<typename T1, typename T2, typename TStr>
-		bool testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str);
+		static bool testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str);
 		template<typename T>
-		bool testApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, T epsilon = 0.0001f);
+		static bool testApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, T epsilon = 0.0001f);
 		template<typename T>
-		bool testVec2ApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, double epsilon = 0.0001);
+		static bool testVec2ApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, double epsilon = 0.0001);
 		template<typename T, typename TEps>
 		static bool equals(T left, T right, TEps epsilon = 0.0001f);
 
 	private:
 		template<typename T1, typename T2, typename TStr>
-		void compareFail(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str);
+		static void compareFail(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str);
 
 	};
 

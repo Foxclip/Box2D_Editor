@@ -40,10 +40,9 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
-    //run_tests();
-    execute_app();
+    run_tests();
+    //execute_app();
 
-    // TODO: make window with main area widget parented to header widget
     // TODO: WindowWidget test
     // TODO: require size for RectangleWidget and font for TextWidget
     // TODO: align textboxes in EditWindow to the right
