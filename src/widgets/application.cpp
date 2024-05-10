@@ -449,11 +449,7 @@ namespace fw {
         widgets.processMouse(getMousePosf());
         sf::Cursor::Type cursor_type = sf::Cursor::Arrow;
         widgets.getCurrentCursorType(cursor_type);
-        switch (cursor_type) {
-            case sf::Cursor::Arrow: window.setMouseCursor(arrow_cursor); break;
-            case sf::Cursor::Text: window.setMouseCursor(text_cursor); break;
-            default: window.setMouseCursor(arrow_cursor); break;
-        }
+        setCursorType(cursor_type);
         bool non_screen_gesture = mouseGesture.active && mouseGesture.source != MouseGesture::SCREEN;
         if (!non_screen_gesture) {
             onProcessMouse();
@@ -478,6 +474,18 @@ namespace fw {
         widgets.render(window);
         window.display();
         widgets.unlock();
+    }
+
+    void Application::setCursorType(sf::Cursor::Type type) {
+        if (type == current_cursor_type) {
+            return;
+        }
+        current_cursor_type = type;
+        switch (type) {
+            case sf::Cursor::Arrow: window.setMouseCursor(arrow_cursor); break;
+            case sf::Cursor::Text: window.setMouseCursor(text_cursor); break;
+            default: window.setMouseCursor(arrow_cursor); break;
+        }
     }
 
     MouseGesture::MouseGesture() { }

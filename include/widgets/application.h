@@ -82,6 +82,7 @@ namespace fw {
 		bool external_lshift_pressed = false;
 		std::queue<sf::Event> external_event_queue;
 		sf::Color background_color = sf::Color::Black;
+		sf::Cursor::Type current_cursor_type = sf::Cursor::Arrow;
 
 		virtual void onInit();
 		virtual void onStart();
@@ -128,6 +129,7 @@ namespace fw {
 		void processMouse();
 		void processWorld();
 		void render();
+		void setCursorType(sf::Cursor::Type type);
 	};
 
 }
