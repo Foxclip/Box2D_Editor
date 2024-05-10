@@ -113,6 +113,7 @@ void WidgetTests::createWidgetsList() {
     test::Test* canvas_widget_draw_test = list->addTest("canvas_widget_draw", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetDrawTest(test); });
     test::Test* window_widget_basic_test = list->addTest("window_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { windowWidgetBasicTest(test); });
     test::Test* window_widget_drag_test = list->addTest("window_widget_drag", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetDragTest(test); });
+    test::Test* window_widget_children_test = list->addTest("window_widget_children", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetChildrenTest(test); });
 }
 
 void WidgetTests::basicTest(test::Test& test) {
@@ -1750,6 +1751,28 @@ void WidgetTests::windowWidgetDragTest(test::Test& test) {
     application.mouseLeftRelease();
     application.advance();
     T_VEC2_APPROX_COMPARE(window_widget->getGlobalPosition(), new_position);
+}
+
+void WidgetTests::windowWidgetChildrenTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(size);
+    window_widget->setPosition(position);
+    window_widget->setHeaderFont(textbox_font);
+    fw::RectangleWidget* rect_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    rect_widget->setSize(30.0f, 30.0f);
+    rect_widget->setFillColor(sf::Color::Green);
+    window_widget->addWindowChild(rect_widget);
+    rect_widget->setPosition(10.0f, 10.0f);
+    const CompVector<fw::Widget*>& window_children = window_widget->getWindowChildren();
+    if (T_COMPARE(window_children.size(), 1)) {
+        T_CHECK(window_children[0] == rect_widget);
+    }
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {

@@ -43,7 +43,8 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: WindowWidget test
+    // TODO: WindowWidget resizing
+    // TODO: WindowWidget resize test
     // TODO: require size for RectangleWidget and font for TextWidget
     // TODO: align textboxes in EditWindow to the right
     // TODO: Dropdown widget
