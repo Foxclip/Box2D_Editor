@@ -119,10 +119,6 @@ namespace fw {
 		return widget_list.focused_widget == this;
 	}
 
-	sf::Cursor::Type Widget::getCursorType() const {
-		return sf::Cursor::Arrow;
-	}
-
 	bool Widget::getForceCustomCursor() const {
 		return force_custom_cursor;
 	}

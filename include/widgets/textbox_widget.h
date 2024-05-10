@@ -41,7 +41,6 @@ namespace fw {
 		};
 
 		TextBoxWidget(WidgetList& widget_list);
-		sf::Cursor::Type getCursorType() const override;
 		const sf::Color& getFillColor() const override;
 		const sf::Color& getHighlightColor() const;
 		const sf::Color& getTextColor() const;

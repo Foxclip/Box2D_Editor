@@ -484,6 +484,14 @@ namespace fw {
         switch (type) {
             case sf::Cursor::Arrow: window.setMouseCursor(arrow_cursor); break;
             case sf::Cursor::Text: window.setMouseCursor(text_cursor); break;
+            case sf::Cursor::SizeTopLeft: window.setMouseCursor(size_top_left_cursor); break;
+            case sf::Cursor::SizeTop: window.setMouseCursor(size_top_cursor); break;
+            case sf::Cursor::SizeTopRight: window.setMouseCursor(size_top_right_cursor); break;
+            case sf::Cursor::SizeLeft: window.setMouseCursor(size_left_cursor); break;
+            case sf::Cursor::SizeRight: window.setMouseCursor(size_right_cursor); break;
+            case sf::Cursor::SizeBottomLeft: window.setMouseCursor(size_bottom_left_cursor); break;
+            case sf::Cursor::SizeBottom: window.setMouseCursor(size_bottom_cursor); break;
+            case sf::Cursor::SizeBottomRight: window.setMouseCursor(size_bottom_right_cursor); break;
             default: window.setMouseCursor(arrow_cursor); break;
         }
     }

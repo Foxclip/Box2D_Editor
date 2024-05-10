@@ -66,6 +66,7 @@ namespace fw {
 		std::function<void()> OnUpdate = []() { };
 		std::function<void()> OnBeforeRender = []() { };
 		std::function<void(unsigned int, unsigned int)> OnWindowResized = [](unsigned int width, unsigned int height) { };
+		std::function<sf::Cursor::Type()> GetCursorType = []() { return sf::Cursor::Arrow; };
 
 		Widget(WidgetList& list);
 		bool isMouseOver() const;
@@ -82,7 +83,6 @@ namespace fw {
 		void processMouse(const sf::Vector2f& pos);
 		bool isFocusable() const;
 		bool isFocused() const;
-		virtual sf::Cursor::Type getCursorType() const;
 		bool getForceCustomCursor() const;
 		const std::string& getName() const;
 		const std::string& getFullName() const;

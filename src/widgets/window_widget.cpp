@@ -48,6 +48,46 @@ namespace fw {
 		main_widget->setClickThrough(false);
 		main_widget->setForceCustomCursor(true);
 		main_widget->setParent(this);
+		// resize widget
+		resize_widget = widget_list.createWidget<RectangleWidget>();
+		resize_widget->setName("resize");
+		resize_widget->setSize(width + RESIZE_WIDGET_MARGIN * 2, height + RESIZE_WIDGET_MARGIN * 2);
+		resize_widget->setParentAnchor(Anchor::TOP_LEFT);
+		resize_widget->setAnchorOffset(-RESIZE_WIDGET_MARGIN, -RESIZE_WIDGET_MARGIN);
+		resize_widget->setFillColor(sf::Color::Blue);
+		resize_widget->setClickThrough(false);
+		resize_widget->setForceCustomCursor(true);
+		resize_widget->GetCursorType = [&]() {
+			float r_width = resize_widget->getWidth();
+			float r_height = resize_widget->getHeight();
+			sf::Vector2f mpos = widget_list.getMousePosf() - resize_widget->getGlobalPosition();
+			bool x_left = mpos.x < RESIZE_WIDGET_MARGIN;
+			bool x_center = mpos.x >= RESIZE_WIDGET_MARGIN && mpos.x < r_width - RESIZE_WIDGET_MARGIN;
+			bool x_right = mpos.x >= r_width - RESIZE_WIDGET_MARGIN;
+			bool y_top = mpos.y < RESIZE_WIDGET_MARGIN;
+			bool y_center = mpos.y >= RESIZE_WIDGET_MARGIN && mpos.y < r_height - RESIZE_WIDGET_MARGIN;
+			bool y_bottom = mpos.y >= r_height - RESIZE_WIDGET_MARGIN;
+			if (x_left && y_top) {
+				return sf::Cursor::SizeTopLeft;
+			} else if (x_center && y_top) {
+				return sf::Cursor::SizeTop;
+			} else if (x_right && y_top) {
+				return sf::Cursor::SizeTopRight;
+			} else if (x_left && y_center) {
+				return sf::Cursor::SizeLeft;
+			} else if (x_right && y_center) {
+				return sf::Cursor::SizeRight;
+			} else if (x_left && y_bottom) {
+				return sf::Cursor::SizeBottomLeft;
+			} else if (x_center && y_bottom) {
+				return sf::Cursor::SizeBottom;
+			} else if (x_right && y_bottom) {
+				return sf::Cursor::SizeBottomRight;
+			} else {
+				return sf::Cursor::Arrow;
+			}
+		};
+		resize_widget->setParent(this);
 
 		lockChildren();
 	}

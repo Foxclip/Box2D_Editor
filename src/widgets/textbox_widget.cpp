@@ -10,6 +10,9 @@ namespace fw {
 		setClickThrough(false);
 		setFocusable(true);
 		setForceCustomCursor(true);
+		GetCursorType = []() {
+			return sf::Cursor::Text;
+		};
 		text_widget = widget_list.createWidget<TextWidget>();
 		text_widget->setFillColor(text_color);
 		text_widget->setParentAnchor(Anchor::CENTER_LEFT);
@@ -35,10 +38,6 @@ namespace fw {
 		setCursorPos(getStringSize());
 		deselectAll();
 		updateColors();
-	}
-
-	sf::Cursor::Type TextBoxWidget::getCursorType() const {
-		return sf::Cursor::Text;
 	}
 
 	const sf::Color& TextBoxWidget::getFillColor() const {

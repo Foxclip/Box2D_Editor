@@ -74,11 +74,15 @@ namespace fw {
 		sf::Cursor::Type cursor_type = sf::Cursor::Arrow;
 		for (size_t i = 0; i < cursor_widgets.size(); i++) {
 			if (cursor_widgets[i]->getForceCustomCursor()) {
-				result = cursor_widgets[i]->getCursorType();
+				result = cursor_widgets[i]->GetCursorType();
 				return true;
 			}
 		}
 		return false;
+	}
+
+	sf::Vector2f WidgetList::getMousePosf() const {
+		return application.getMousePosf();
 	}
 
 	sf::Vector2u WidgetList::getWindowSize() const {

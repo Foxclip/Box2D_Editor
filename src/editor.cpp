@@ -194,6 +194,14 @@ void Editor::initUi() {
 
     arrow_cursor.loadFromSystem(sf::Cursor::Arrow);
     text_cursor.loadFromSystem(sf::Cursor::Text);
+    size_top_left_cursor.loadFromSystem(sf::Cursor::SizeTopLeft);
+    size_top_cursor.loadFromSystem(sf::Cursor::SizeTop);
+    size_top_right_cursor.loadFromSystem(sf::Cursor::SizeTopRight);
+    size_left_cursor.loadFromSystem(sf::Cursor::SizeLeft);
+    size_right_cursor.loadFromSystem(sf::Cursor::SizeRight);
+    size_bottom_left_cursor.loadFromSystem(sf::Cursor::SizeBottomLeft);
+    size_bottom_cursor.loadFromSystem(sf::Cursor::SizeBottom);
+    size_bottom_right_cursor.loadFromSystem(sf::Cursor::SizeBottomRight);
     window.setMouseCursor(arrow_cursor);
 
     vertex_text.setFont(ui_font);

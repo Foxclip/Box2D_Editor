@@ -75,6 +75,14 @@ namespace fw {
 		MouseGesture mouseGesture;
 		sf::Cursor arrow_cursor;
 		sf::Cursor text_cursor;
+		sf::Cursor size_top_left_cursor;
+		sf::Cursor size_top_cursor;
+		sf::Cursor size_top_right_cursor;
+		sf::Cursor size_left_cursor;
+		sf::Cursor size_right_cursor;
+		sf::Cursor size_bottom_left_cursor;
+		sf::Cursor size_bottom_cursor;
+		sf::Cursor size_bottom_right_cursor;
 		bool external_control = false;
 		sf::Vector2i external_mouse_pos;
 		bool external_lctrl_pressed = false;
