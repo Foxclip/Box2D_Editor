@@ -87,7 +87,9 @@ namespace fw {
 		const std::string& getName() const;
 		const std::string& getFullName() const;
 		bool getClipChildren() const;
-		RenderLayer getRenderLayer() const;
+		GlobalRenderLayer getGlobalRenderLayer() const;
+		size_t getLocalRenderLayer() const;
+		size_t getParentLocalRenderLayer() const;
 		sf::Shader* getShader() const;
 		Widget* getParent() const;
 		CompVector<Widget*> getParentChain() const;
@@ -95,6 +97,7 @@ namespace fw {
 		CompVector<Widget*> getAllChildren() const;
 		Widget* getChild(size_t index) const;
 		Widget* find(const std::string& name) const;
+		CompVector<Widget*> getRenderQueue() const;
 		virtual sf::FloatRect getLocalBounds() const = 0;
 		sf::FloatRect getParentLocalBounds() const;
 		sf::FloatRect getGlobalBounds() const;
@@ -155,7 +158,9 @@ namespace fw {
 		void setForceCustomCursor(bool value);
 		void setName(const std::string& new_name);
 		void setClipChildren(bool value);
-		void setRenderLayer(RenderLayer layer);
+		void setRenderLayer(GlobalRenderLayer layer);
+		void setLocalRenderLayer(size_t layer);
+		void setParentLocalRenderLayer(size_t layer);
 		void setShader(sf::Shader* shader);
 		void removeFocus();
 		void processKeyboardEvent(const sf::Event& event);
@@ -176,7 +181,8 @@ namespace fw {
 		bool children_locked = false;
 		SearchIndexMultiple<std::string, Widget*> children_names;
 		sf::Shader* shader = nullptr;
-		RenderLayer layer = RenderLayer::BASE;
+		GlobalRenderLayer global_layer = GlobalRenderLayer::BASE;
+		std::map<Widget*, size_t> local_layers;
 		Anchor origin_anchor = Anchor::CUSTOM;
 		Anchor parent_anchor = Anchor::CUSTOM;
 		sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);

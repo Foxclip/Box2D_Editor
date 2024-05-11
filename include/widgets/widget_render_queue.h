@@ -8,17 +8,15 @@ namespace fw {
 	class Widget;
 	class WidgetList;
 
-	enum RenderLayer {
+	enum class GlobalRenderLayer {
 		BASE,
-		TEXTBOX_SELECTION,
-		TEXTBOX_TEXT,
-		TEXTBOX_CURSOR,
+		SECOND,
 	};
 
 	struct RenderQueueLayer {
-		RenderLayer layer;
+		size_t layer;
 		CompVector<Widget*> widgets;
-		RenderQueueLayer(RenderLayer layer);
+		RenderQueueLayer(size_t layer);
 		bool operator<(const RenderQueueLayer& other) const;
 		bool operator==(const RenderQueueLayer& other) const;
 	};

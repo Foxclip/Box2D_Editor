@@ -135,8 +135,19 @@ namespace fw {
 		return clip_children;
 	}
 
-	RenderLayer Widget::getRenderLayer() const {
-		return layer;
+	GlobalRenderLayer Widget::getGlobalRenderLayer() const {
+		return global_layer;
+	}
+
+	size_t Widget::getLocalRenderLayer() const {
+		return local_layers.at(const_cast<Widget*>(this));
+	}
+
+	size_t Widget::getParentLocalRenderLayer() const {
+		if (!parent) {
+			return 0;
+		}
+		return parent->local_layers.at(const_cast<Widget*>(this));
 	}
 
 	sf::Shader* Widget::getShader() const {
@@ -191,6 +202,46 @@ namespace fw {
 			}
 		}
 		return nullptr;
+	}
+
+	CompVector<Widget*> Widget::getRenderQueue() const {
+		CompVector<Widget*> result;
+		if (!isVisible()) {
+			return result;
+		}
+		std::set<RenderQueueLayer> layers;
+		auto get_layer_index = [&](Widget* widget) {
+			size_t layer_index = 0;
+			if (local_layers.contains(widget)) {
+				layer_index = local_layers.at(widget);
+			}
+			return layer_index;
+		};
+		size_t this_layer_index = get_layer_index(const_cast<Widget*>(this));
+		RenderQueueLayer layer(this_layer_index);
+		layer.widgets.add(const_cast<Widget*>(this));
+		layers.insert(layer);
+		for (size_t i = 0; i < getChildren().size(); i++) {
+			Widget* widget = getChild(i);
+			if (!widget->isVisible()) {
+				continue;
+			}
+			size_t layer_index = get_layer_index(widget);
+			CompVector<Widget*> child_render_queue = widget->getRenderQueue();
+			auto it = layers.find(RenderQueueLayer(layer_index));
+			if (it != layers.end()) {
+				RenderQueueLayer* layer = const_cast<RenderQueueLayer*>(&*it);
+				layer->widgets.insert(layer->widgets.end(), child_render_queue.begin(), child_render_queue.end());
+			} else {
+				RenderQueueLayer layer(layer_index);
+				layer.widgets.insert(layer.widgets.end(), child_render_queue.begin(), child_render_queue.end());
+				layers.insert(layer);
+			}
+		}
+		for (const RenderQueueLayer& layer : layers) {
+			result.insert(result.end(), layer.widgets.begin(), layer.widgets.end());
+		}
+		return result;
 	}
 
 	sf::FloatRect Widget::getParentLocalBounds() const {
@@ -505,9 +556,20 @@ namespace fw {
 		this->clip_children = value;
 	}
 
-	void Widget::setRenderLayer(RenderLayer layer) {
+	void Widget::setRenderLayer(GlobalRenderLayer layer) {
 		wAssert(!widget_list.isLocked());
-		this->layer = layer;
+		this->global_layer = layer;
+	}
+
+	void Widget::setLocalRenderLayer(size_t layer) {
+		wAssert(!widget_list.isLocked());
+		local_layers[this] = layer;
+	}
+
+	void Widget::setParentLocalRenderLayer(size_t layer) {
+		wAssert(!widget_list.isLocked());
+		wAssert(parent);
+		parent->local_layers[this] = layer;
 	}
 
 	void Widget::setShader(sf::Shader* shader) {

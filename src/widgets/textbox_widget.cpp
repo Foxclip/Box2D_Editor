@@ -3,7 +3,14 @@
 
 namespace fw {
 
+	enum class TextBoxTextRenderLayers {
+		TEXTBOX_SELECTION,
+		TEXTBOX_CURSOR,
+		TEXTBOX_TEXT,
+	};
+
 	TextBoxWidget::TextBoxWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
+		// textbox
 		setSize(DEFAULT_SIZE);
 		setName("textbox");
 		setClipChildren(true);
@@ -13,27 +20,31 @@ namespace fw {
 		GetCursorType = []() {
 			return sf::Cursor::Text;
 		};
+		// text
 		text_widget = widget_list.createWidget<TextWidget>();
 		text_widget->setFillColor(text_color);
 		text_widget->setParentAnchor(Anchor::CENTER_LEFT);
 		text_widget->setAnchorOffset(TEXT_VIEW_ZERO_POS);
 		text_widget->setOrigin(Anchor::CENTER_LEFT);
-		text_widget->setRenderLayer(RenderLayer::TEXTBOX_TEXT);
+		text_widget->setLocalRenderLayer(static_cast<size_t>(TextBoxTextRenderLayers::TEXTBOX_TEXT));
 		text_widget->setParent(this);
+		// cursor
 		cursor_widget = widget_list.createWidget<RectangleWidget>();
 		cursor_widget->setVisible(false);
 		cursor_widget->setFillColor(editor_text_color);
 		updateCursorSize();
-		cursor_widget->setRenderLayer(RenderLayer::TEXTBOX_CURSOR);
 		cursor_widget->setParent(text_widget);
+		cursor_widget->setParentLocalRenderLayer(static_cast<size_t>(TextBoxTextRenderLayers::TEXTBOX_CURSOR));
 		cursor_widget->setName("cursor");
+		// selection
 		selection_widget = widget_list.createWidget<RectangleWidget>();
 		selection_widget->setVisible(false);
 		selection_widget->setFillColor(selection_color);
 		selection_widget->setSize(sf::Vector2f());
-		selection_widget->setRenderLayer(RenderLayer::TEXTBOX_SELECTION);
 		selection_widget->setParent(text_widget);
+		selection_widget->setParentLocalRenderLayer(static_cast<size_t>(TextBoxTextRenderLayers::TEXTBOX_SELECTION));
 		selection_widget->setName("selection");
+
 		setValueSilent("Text");
 		setCursorPos(getStringSize());
 		deselectAll();

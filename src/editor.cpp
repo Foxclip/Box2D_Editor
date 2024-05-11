@@ -324,17 +324,17 @@ void Editor::initWidgets() {
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
 
-    fw::WindowWidget* some_window = widgets.createWidget<fw::WindowWidget>(300.0f, 200.0f);
-    some_window->setPosition(640.0f, 480.0f);
-    some_window->setHeaderFont(console_font);
-    some_window->setHeaderTextCharacterSize(15);
-    fw::RectangleWidget* rect = widgets.createWidget<fw::RectangleWidget>();
-    rect->setFillColor(sf::Color::Green);
-    rect->setSize(sf::Vector2f(30.0f, 30.0f));
-    rect->setName("green rect");
-    some_window->addWindowChild(rect);
-    rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
-    rect->setAnchorOffset(10.0f, 10.0f);
+    //fw::WindowWidget* some_window = widgets.createWidget<fw::WindowWidget>(300.0f, 200.0f);
+    //some_window->setPosition(640.0f, 480.0f);
+    //some_window->setHeaderFont(console_font);
+    //some_window->setHeaderTextCharacterSize(15);
+    //fw::RectangleWidget* rect = widgets.createWidget<fw::RectangleWidget>();
+    //rect->setFillColor(sf::Color::Green);
+    //rect->setSize(sf::Vector2f(30.0f, 30.0f));
+    //rect->setName("green rect");
+    //some_window->addWindowChild(rect);
+    //rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
+    //rect->setAnchorOffset(10.0f, 10.0f);
 
     //RectangleWidget* rect = widgets.createWidget<RectangleWidget>();
     //rect->setFillColor(sf::Color::Black);
