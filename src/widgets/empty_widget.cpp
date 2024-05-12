@@ -1,23 +1,39 @@
 #include "widgets/empty_widget.h"
 
-fw::EmptyWidget::EmptyWidget(WidgetList& widget_list) : Widget(widget_list) { }
+namespace fw {
 
-sf::FloatRect fw::EmptyWidget::getLocalBounds() const {
-	return sf::FloatRect();
-}
+	EmptyWidget::EmptyWidget(WidgetList& widget_list) : Widget(widget_list) {
+		setName("empty");
+	}
 
-sf::Drawable* fw::EmptyWidget::getDrawable() {
-	return nullptr;
-}
+	sf::FloatRect EmptyWidget::getLocalBounds() const {
+		return sf::FloatRect();
+	}
 
-const sf::Drawable* fw::EmptyWidget::getDrawable() const {
-	return nullptr;
-}
+	const sf::Color& EmptyWidget::getFillColor() const {
+		return sf::Color::Transparent;
+	}
 
-sf::Transformable* fw::EmptyWidget::getTransformable() {
-	return nullptr;
-}
+	CompVector<Widget*> EmptyWidget::getRenderQueue() const {
+		return CompVector<Widget*>();
+	}
 
-const sf::Transformable* fw::EmptyWidget::getTransformable() const {
-	return nullptr;
+	void EmptyWidget::setFillColor(const sf::Color& color) { }
+
+	sf::Drawable* EmptyWidget::getDrawable() {
+		return nullptr;
+	}
+
+	const sf::Drawable* EmptyWidget::getDrawable() const {
+		return nullptr;
+	}
+
+	sf::Transformable* EmptyWidget::getTransformable() {
+		return nullptr;
+	}
+
+	const sf::Transformable* EmptyWidget::getTransformable() const {
+		return nullptr;
+	}
+
 }

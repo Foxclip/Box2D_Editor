@@ -13,3 +13,4 @@
 #include "textbox_widget.h"
 #include "widget_list.h"
 #include "window_widget.h"
+#include "empty_widget.h"

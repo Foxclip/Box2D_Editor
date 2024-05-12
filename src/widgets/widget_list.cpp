@@ -37,7 +37,6 @@ namespace fw {
 	}
 
 	Widget* WidgetList::getTopWidgetUnderCursor() const {
-		// getSilent because render_queue is from previous frame
 		for (RenderQueueLayer layer : render_queue.get() | std::views::reverse) {
 			for (Widget* widget : layer.widgets | std::views::reverse) {
 				if (widget->isMouseOver()) {

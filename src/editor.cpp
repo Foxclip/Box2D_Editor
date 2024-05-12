@@ -368,6 +368,8 @@ void Editor::initWidgets() {
     red_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     red_rect->setAnchorOffset(10.0f, 10.0f);
 
+    fw::EmptyWidget* empty_widget = widgets.createWidget<fw::EmptyWidget>();
+
     //RectangleWidget* rect = widgets.createWidget<RectangleWidget>();
     //rect->setFillColor(sf::Color::Black);
     //rect->setSize(sf::Vector2f(100.0f, 100.0f));

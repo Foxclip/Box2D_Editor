@@ -100,7 +100,7 @@ namespace fw {
 		CompVector<Widget*> getAllChildren() const;
 		Widget* getChild(size_t index) const;
 		Widget* find(const std::string& name) const;
-		CompVector<Widget*> getRenderQueue() const;
+		virtual CompVector<Widget*> getRenderQueue() const;
 		virtual sf::FloatRect getLocalBounds() const = 0;
 		sf::FloatRect getParentLocalBounds() const;
 		sf::FloatRect getGlobalBounds() const;
