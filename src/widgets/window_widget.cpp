@@ -23,12 +23,13 @@ namespace fw {
 		};
 		OnProcessMouse = [&](const sf::Vector2f& pos) {
 			if (is_grabbed) {
-				sf::Vector2f new_pos = pos + header_click_offset;
-				sf::FloatRect global_bounds = getGlobalBounds();
-				sf::Vector2u window_size = widget_list.getWindowSize();
-				new_pos.x = std::clamp(new_pos.x, ONSCREEN_MARGIN - global_bounds.width, window_size.x - ONSCREEN_MARGIN);
-				new_pos.y = std::clamp(new_pos.y, ONSCREEN_MARGIN - global_bounds.height, window_size.y - ONSCREEN_MARGIN);
-				setGlobalPosition(new_pos);
+				sf::Vector2f parent_local_pos = parent->toLocal(pos);
+				sf::Vector2f new_pos = parent_local_pos + header_click_offset;
+				sf::FloatRect parent_local_bounds = getParentLocalBounds();
+				sf::Vector2f parent_size = parent->getSize();
+				new_pos.x = std::clamp(new_pos.x, ONSCREEN_MARGIN - parent_local_bounds.width, parent_size.x - ONSCREEN_MARGIN);
+				new_pos.y = std::clamp(new_pos.y, ONSCREEN_MARGIN - parent_local_bounds.height, parent_size.y - ONSCREEN_MARGIN);
+				setPosition(new_pos);
 			}
 		};
 		OnLeftRelease = [&](const sf::Vector2f& pos) {
@@ -86,28 +87,29 @@ namespace fw {
 			resizing = getResizingType();
 			switch (resizing) {
 				case Resizing::NONE: break;
-				case Resizing::TOP_LEFT: resizing_anchor = main_widget->getGlobalBottomRight(); break;
-				case Resizing::TOP: resizing_anchor = main_widget->getGlobalBottomLeft(); break;
-				case Resizing::TOP_RIGHT: resizing_anchor = main_widget->getGlobalBottomLeft(); break;
-				case Resizing::LEFT: resizing_anchor = getGlobalTopRight(); break;
-				case Resizing::RIGHT: resizing_anchor = getGlobalTopLeft(); break;
-				case Resizing::BOTTOM_LEFT: resizing_anchor = getGlobalTopRight(); break;
-				case Resizing::BOTTOM: resizing_anchor = getGlobalTopLeft(); break;
-				case Resizing::BOTTOM_RIGHT: resizing_anchor = getGlobalTopLeft(); break;
+				case Resizing::TOP_LEFT: resizing_anchor = parent->toLocal(main_widget->getGlobalBottomRight()); break;
+				case Resizing::TOP: resizing_anchor = parent->toLocal(main_widget->getGlobalBottomLeft()); break;
+				case Resizing::TOP_RIGHT: resizing_anchor = parent->toLocal(main_widget->getGlobalBottomLeft()); break;
+				case Resizing::LEFT: resizing_anchor = getTopRight(); break;
+				case Resizing::RIGHT: resizing_anchor = getTopLeft(); break;
+				case Resizing::BOTTOM_LEFT: resizing_anchor = getTopRight(); break;
+				case Resizing::BOTTOM: resizing_anchor = getTopLeft(); break;
+				case Resizing::BOTTOM_RIGHT: resizing_anchor = getTopLeft(); break;
 			}
 		};
 		resize_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
 			if (resizing == Resizing::NONE) {
 				return;
 			}
-			sf::Vector2f mouse_pos = widget_list.getMousePosf();
+			sf::Vector2f global_mouse_pos = widget_list.getMousePosf();
+			sf::Vector2f mouse_pos = parent->toLocal(global_mouse_pos);
 			float x_min = std::min(mouse_pos.x, resizing_anchor.x - MIN_WINDOW_SIZE.x);
 			float x_max = std::max(mouse_pos.x, resizing_anchor.x + MIN_WINDOW_SIZE.x);
 			float y_min = std::min(mouse_pos.y, resizing_anchor.y - MIN_WINDOW_SIZE.y - HEADER_HEIGHT);
 			float y_max = std::max(mouse_pos.y, resizing_anchor.y + MIN_WINDOW_SIZE.y + HEADER_HEIGHT);
-			float clamped_x_min = std::min(x_min, widget_list.getWindowSize().x - ONSCREEN_MARGIN);
+			float clamped_x_min = std::min(x_min, parent->getWidth() - ONSCREEN_MARGIN);
 			float clamped_x_max = std::max(x_max, ONSCREEN_MARGIN);
-			float clamped_y_min = std::clamp(y_min, 0.0f, widget_list.getWindowSize().y - ONSCREEN_MARGIN);
+			float clamped_y_min = std::clamp(y_min, 0.0f, parent->getHeight() - ONSCREEN_MARGIN);
 			float clamped_y_max = y_max;
 			float width_min = resizing_anchor.x - clamped_x_min;
 			float width_max = clamped_x_max - resizing_anchor.x;
@@ -118,21 +120,21 @@ namespace fw {
 			float old_width = main_widget->getWidth();
 			float old_height = main_widget->getHeight();
 			if (resizing == Resizing::TOP_LEFT) {
-				setGlobalPosition(clamped_x_min, clamped_y_min);
+				setPosition(clamped_x_min, clamped_y_min);
 				main_widget->setSize(width_min, height_min);
 			} else if (resizing == Resizing::TOP) {
-				setGlobalPosition(old_x, clamped_y_min);
+				setPosition(old_x, clamped_y_min);
 				main_widget->setSize(old_width, height_min);
 			} else if (resizing == Resizing::TOP_RIGHT) {
-				setGlobalPosition(old_x, clamped_y_min);
+				setPosition(old_x, clamped_y_min);
 				main_widget->setSize(width_max, height_min);
 			} else if (resizing == Resizing::LEFT) {
-				setGlobalPosition(clamped_x_min, old_y);
+				setPosition(clamped_x_min, old_y);
 				main_widget->setSize(width_min, old_height);
 			} else if (resizing == Resizing::RIGHT) {
 				main_widget->setSize(width_max, old_height);
 			} else if (resizing == Resizing::BOTTOM_LEFT) {
-				setGlobalPosition(clamped_x_min, old_y);
+				setPosition(clamped_x_min, old_y);
 				main_widget->setSize(width_min, height_max);
 			} else if (resizing == Resizing::BOTTOM) {
 				main_widget->setSize(old_width, height_max);
