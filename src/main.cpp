@@ -43,6 +43,7 @@ int main() {
     //run_tests();
     execute_app();
 
+    // TODO: remove child's entry from local_layers when removing a child (when doing setParent)
     // TODO: WindowWidget resizing
     // TODO: WindowWidget resize test
     // TODO: require size for RectangleWidget and font for TextWidget
