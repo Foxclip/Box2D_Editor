@@ -10,7 +10,7 @@ namespace fw {
 	}
 
 	void Widget::updateMouseState(const sf::Vector2f& mouse_pos) {
-		sf::FloatRect bounds = getGlobalBounds();
+		sf::FloatRect bounds = getUnclippedRegion();
 		bool is_over = contains_point(bounds, mouse_pos);
 		if (is_over && !mouseIn) {
 			internalOnMouseEnter(mouse_pos);
