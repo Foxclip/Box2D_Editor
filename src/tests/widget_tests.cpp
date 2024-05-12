@@ -1678,7 +1678,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
     {
         GenericWidgetTest gwt(application, test);
         gwt.widget = window_widget;
-        gwt.total_widgets = 4;
+        gwt.total_widgets = 6;
         gwt.name = "window header";
         gwt.fullname = "root|window header";
         gwt.is_visual_position_quantized = false;
@@ -1702,19 +1702,25 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
 
     fw::TextWidget* text_widget = nullptr;
     fw::RectangleWidget* main_widget = nullptr;
-    T_ASSERT(T_COMPARE(window_widget->getChildren().size(), 2));
+    fw::RectangleWidget* resize_widget = nullptr;
+    fw::RectangleWidget* outline_widget = nullptr;
+    T_ASSERT(T_COMPARE(window_widget->getChildren().size(), 4));
     const CompVector<fw::Widget*>& children = window_widget->getChildren();
     text_widget = dynamic_cast<fw::TextWidget*>(window_widget->getChild(0));
     main_widget = dynamic_cast<fw::RectangleWidget*>(window_widget->getChild(1));
+    resize_widget = dynamic_cast<fw::RectangleWidget*>(window_widget->getChild(2));
+    outline_widget = dynamic_cast<fw::RectangleWidget*>(window_widget->getChild(3));
     T_ASSERT(T_CHECK(text_widget));
     T_ASSERT(T_CHECK(main_widget));
+    T_ASSERT(T_CHECK(resize_widget));
+    T_ASSERT(T_CHECK(outline_widget));
 
     T_COMPARE(window_widget->getFillColor(), window_widget->DEFAULT_HEADER_COLOR, &WidgetTests::colorToStr);
 
     {
         GenericWidgetTest gwt(application, test);
         gwt.widget = main_widget;
-        gwt.total_widgets = 4;
+        gwt.total_widgets = 6;
         gwt.name = "window area";
         gwt.fullname = "root|window header|window area";
         gwt.is_visual_position_quantized = false;
