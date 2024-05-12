@@ -340,6 +340,7 @@ void Editor::initWidgets() {
     child_window->setPosition(20.0f, 20.0f);
     child_window->setHeaderFont(console_font);
     child_window->setHeaderTextCharacterSize(15);
+    some_window->addWindowChild(child_window);
     fw::RectangleWidget* blue_rect = widgets.createWidget<fw::RectangleWidget>();
     blue_rect->setFillColor(sf::Color::Blue);
     blue_rect->setSize(sf::Vector2f(20.0f, 20.0f));

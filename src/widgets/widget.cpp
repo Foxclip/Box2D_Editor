@@ -699,7 +699,9 @@ namespace fw {
 		sf::Transform transformable_transform = getTransformable().getTransform();
 		wAssert(transformable_transform == sf::Transform::Identity);
 		wAssert(getTransformable().getOrigin() == sf::Vector2f());
+		OnBeforeRender(render_texture);
 		render_texture.draw(getDrawable(), combined);
+		OnAfterRender(render_texture);
 		render_texture.display();
 	}
 
@@ -710,7 +712,7 @@ namespace fw {
 		if (!unclipped_region.isQuantizedNonZero()) {
 			return;
 		}
-		OnBeforeRender(target);
+		OnBeforeGlobalRender(target);
 		updateRenderTexture(unclipped_region.getQuantized());
 		sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
 		sprite.setPosition(unclipped_region.getQuantized().getPosition());
@@ -719,7 +721,7 @@ namespace fw {
 		} else {
 			target.draw(sprite);
 		}
-		OnAfterRender(target);
+		OnAfterGlobalRender(target);
 	}
 
 	void Widget::renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children) {

@@ -46,6 +46,7 @@ namespace fw {
 		RectangleWidget* main_widget = nullptr;
 		TextWidget* header_text_widget = nullptr;
 		RectangleWidget* resize_widget = nullptr;
+		RectangleWidget* outline_widget = nullptr;
 		bool is_grabbed = false;
 		enum class Resizing {
 			NONE,

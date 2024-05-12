@@ -6,6 +6,7 @@ namespace fw {
 	enum class WindowRenderLayers {
 		RESIZE,
 		WINDOW,
+		OUTLINE,
 	};
 
 	WindowWidget::WindowWidget(WidgetList& widget_list, float width, float height) : RectangleWidget(widget_list) {
@@ -29,14 +30,6 @@ namespace fw {
 				new_pos.y = std::clamp(new_pos.y, ONSCREEN_MARGIN - global_bounds.height, window_size.y - ONSCREEN_MARGIN);
 				setGlobalPosition(new_pos);
 			}
-		};
-		OnAfterRender = [&](sf::RenderTarget& target) {
-			sf::FloatRect bounds;
-			bounds.left = getGlobalPosition().x - 1.0f;
-			bounds.top = getGlobalPosition().y - 1.0f;
-			bounds.width = getWidth() + 1.0f;
-			bounds.height = getHeight() + main_widget->getHeight() + 1.0f;
-			draw_wire_rect(target, bounds, sf::Color::White);
 		};
 		OnLeftRelease = [&](const sf::Vector2f& pos) {
 			is_grabbed = false;
@@ -152,6 +145,20 @@ namespace fw {
 		};
 		resize_widget->setParent(this);
 		resize_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::RESIZE));
+		// outline
+		outline_widget = widget_list.createWidget<RectangleWidget>();
+		outline_widget->setName("outline");
+		outline_widget->setSize(width, HEADER_HEIGHT + height);
+		outline_widget->setFillColor(sf::Color::Transparent);
+		outline_widget->OnAfterRender = [&](sf::RenderTarget& target) {
+			sf::FloatRect quantized_bounds = quantize_rect(
+				outline_widget->getGlobalBounds(),
+				QUANTIZE_MODE_FLOOR_SUBTRACT
+			);
+			draw_wire_rect(target, quantized_bounds, outline_color);
+		};
+		outline_widget->setParent(this);
+		outline_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::OUTLINE));
 
 		lockChildren();
 	}
@@ -236,11 +243,12 @@ namespace fw {
 	}
 
 	void WindowWidget::internalUpdate() {
-		setSize(main_widget->getSize().x, HEADER_HEIGHT);
+		setSize(main_widget->getWidth(), HEADER_HEIGHT);
 		resize_widget->setSize(
 			main_widget->getWidth() + RESIZE_WIDGET_MARGIN * 2,
 			HEADER_HEIGHT + main_widget->getHeight() + RESIZE_WIDGET_MARGIN * 2
 		);
+		outline_widget->setSize(main_widget->getWidth(), HEADER_HEIGHT + main_widget->getHeight());
 	}
 
 	WindowWidget::Resizing WindowWidget::getResizingType() const {

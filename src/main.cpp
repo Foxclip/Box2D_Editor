@@ -44,8 +44,8 @@ int main() {
     execute_app();
 
     // TODO: remove child's entry from local_layers when removing a child (when doing setParent)
-    // TODO: WindowWidget resizing
     // TODO: WindowWidget resize test
+    // TODO: WindowWidget window in window test
     // TODO: require size for RectangleWidget and font for TextWidget
     // TODO: align textboxes in EditWindow to the right
     // TODO: Dropdown widget
