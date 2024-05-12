@@ -1851,7 +1851,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         gwt.is_mouse_over = false;
         gwt.is_focusable = false;
         gwt.is_focused = false;
-        gwt.clip_children = false;
+        gwt.clip_children = true;
         gwt.force_custom_cursor = false;
         gwt.parent = window_widget;
         gwt.local_bounds = sf::FloatRect(sf::Vector2f(), header_size);
@@ -1895,8 +1895,8 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         gwt.force_custom_cursor = true;
         gwt.parent = window_widget;
         gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
-        gwt.global_bounds = sf::FloatRect(position + sf::Vector2f(0.0f, window_widget->getHeight()), size);
-        gwt.parent_local_bounds = sf::FloatRect(sf::Vector2f(0.0f, window_widget->getHeight()), size);
+        gwt.global_bounds = sf::FloatRect(position + sf::Vector2f(0.0f, header_widget->getHeight()), size);
+        gwt.parent_local_bounds = sf::FloatRect(sf::Vector2f(0.0f, header_widget->getHeight()), size);
         gwt.visual_local_bounds = gwt.local_bounds;
         gwt.visual_global_bounds = gwt.global_bounds;
         gwt.visual_parent_local_bounds = gwt.parent_local_bounds;
