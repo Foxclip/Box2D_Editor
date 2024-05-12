@@ -521,8 +521,7 @@ namespace fw {
 		}
 		Widget* old_parent = this->parent;
 		if (old_parent) {
-			old_parent->children.remove(this);
-			old_parent->children_names.remove(name, this);
+			old_parent->removeChild(this);
 		}
 		new_parent->addChild(this);
 		transforms.invalidateGlobalTransform();
@@ -611,6 +610,14 @@ namespace fw {
 		children.add(child);
 		children_names.add(child->name, child);
 		child->parent = this;
+	}
+
+	void Widget::removeChild(Widget* child) {
+		wAssert(!widget_list.isLocked());
+		wAssert(!children_locked);
+		children.remove(child);
+		children_names.remove(child->name, child);
+		local_layers.erase(child);
 	}
 
 	void Widget::updateAnchoredPosition() {

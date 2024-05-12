@@ -214,6 +214,7 @@ namespace fw {
 		virtual const sf::Transformable* getTransformable() const = 0;
 		virtual sf::Vector2f getRenderPositionOffset() const;
 		virtual void addChild(Widget* child);
+		virtual void removeChild(Widget* child);
 		void updateAnchoredPosition();
 		void update();
 		virtual void internalUpdate();
