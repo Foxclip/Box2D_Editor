@@ -59,7 +59,7 @@ namespace fw {
 			BOTTOM,
 			BOTTOM_RIGHT,
 		};
-		Resizing resizing = Resizing::NONE;
+		Resizing active_resizing_type = Resizing::NONE;
 		sf::Vector2f resizing_anchor;
 		sf::Vector2f header_click_offset;
 		sf::Vector2f header_size;

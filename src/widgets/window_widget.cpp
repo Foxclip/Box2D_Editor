@@ -84,8 +84,8 @@ namespace fw {
 			}
 		};
 		resize_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
-			resizing = getResizingType();
-			switch (resizing) {
+			active_resizing_type = getResizingType();
+			switch (active_resizing_type) {
 				case Resizing::NONE: break;
 				case Resizing::TOP_LEFT: resizing_anchor = parent->toLocal(main_widget->getGlobalBottomRight()); break;
 				case Resizing::TOP: resizing_anchor = parent->toLocal(main_widget->getGlobalBottomLeft()); break;
@@ -98,7 +98,7 @@ namespace fw {
 			}
 		};
 		resize_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
-			if (resizing == Resizing::NONE) {
+			if (active_resizing_type == Resizing::NONE) {
 				return;
 			}
 			sf::Vector2f global_mouse_pos = widget_list.getMousePosf();
@@ -119,31 +119,31 @@ namespace fw {
 			float old_y = resizing_anchor.y;
 			float old_width = main_widget->getWidth();
 			float old_height = main_widget->getHeight();
-			if (resizing == Resizing::TOP_LEFT) {
+			if (active_resizing_type == Resizing::TOP_LEFT) {
 				setPosition(clamped_x_min, clamped_y_min);
 				main_widget->setSize(width_min, height_min);
-			} else if (resizing == Resizing::TOP) {
+			} else if (active_resizing_type == Resizing::TOP) {
 				setPosition(old_x, clamped_y_min);
 				main_widget->setSize(old_width, height_min);
-			} else if (resizing == Resizing::TOP_RIGHT) {
+			} else if (active_resizing_type == Resizing::TOP_RIGHT) {
 				setPosition(old_x, clamped_y_min);
 				main_widget->setSize(width_max, height_min);
-			} else if (resizing == Resizing::LEFT) {
+			} else if (active_resizing_type == Resizing::LEFT) {
 				setPosition(clamped_x_min, old_y);
 				main_widget->setSize(width_min, old_height);
-			} else if (resizing == Resizing::RIGHT) {
+			} else if (active_resizing_type == Resizing::RIGHT) {
 				main_widget->setSize(width_max, old_height);
-			} else if (resizing == Resizing::BOTTOM_LEFT) {
+			} else if (active_resizing_type == Resizing::BOTTOM_LEFT) {
 				setPosition(clamped_x_min, old_y);
 				main_widget->setSize(width_min, height_max);
-			} else if (resizing == Resizing::BOTTOM) {
+			} else if (active_resizing_type == Resizing::BOTTOM) {
 				main_widget->setSize(old_width, height_max);
-			} else if (resizing == Resizing::BOTTOM_RIGHT) {
+			} else if (active_resizing_type == Resizing::BOTTOM_RIGHT) {
 				main_widget->setSize(width_max, height_max);
 			}
 		};
 		resize_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
-			resizing = Resizing::NONE;
+			active_resizing_type = Resizing::NONE;
 		};
 		resize_widget->setParent(this);
 		resize_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::RESIZE));
