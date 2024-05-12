@@ -15,10 +15,10 @@ namespace fw {
 	protected:
 		sf::RectangleShape rect;
 
-		sf::Drawable& getDrawable() override;
-		const sf::Drawable& getDrawable() const override;
-		sf::Transformable& getTransformable() override;
-		const sf::Transformable& getTransformable() const override;
+		sf::Drawable* getDrawable() override;
+		const sf::Drawable* getDrawable() const override;
+		sf::Transformable* getTransformable() override;
+		const sf::Transformable* getTransformable() const override;
 		sf::Shape& getShape() override;
 		const sf::Shape& getShape() const override;
 

@@ -146,20 +146,20 @@ namespace fw {
 		text.setString(str);
 	}
 
-	sf::Drawable& TextWidget::getDrawable() {
-		return text;
+	sf::Drawable* TextWidget::getDrawable() {
+		return &text;
 	}
 
-	const sf::Drawable& TextWidget::getDrawable() const {
-		return text;
+	const sf::Drawable* TextWidget::getDrawable() const {
+		return &text;
 	}
 
-	sf::Transformable& TextWidget::getTransformable() {
-		return text;
+	sf::Transformable* TextWidget::getTransformable() {
+		return &text;
 	}
 
-	const sf::Transformable& TextWidget::getTransformable() const {
-		return text;
+	const sf::Transformable* TextWidget::getTransformable() const {
+		return &text;
 	}
 
 	void TextWidget::internalUpdate() {

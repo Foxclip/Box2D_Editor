@@ -204,10 +204,10 @@ namespace fw {
 		const sf::Transform& getParentGlobalTransform() const;
 		const sf::Transform& getInverseGlobalTransform() const;
 		const sf::Transform& getInverseParentGlobalTransform() const;
-		virtual sf::Drawable& getDrawable() = 0;
-		virtual const sf::Drawable& getDrawable() const = 0;
-		virtual sf::Transformable& getTransformable() = 0;
-		virtual const sf::Transformable& getTransformable() const = 0;
+		virtual sf::Drawable* getDrawable() = 0;
+		virtual const sf::Drawable* getDrawable() const = 0;
+		virtual sf::Transformable* getTransformable() = 0;
+		virtual const sf::Transformable* getTransformable() const = 0;
 		virtual sf::Vector2f getRenderPositionOffset() const;
 		virtual void addChild(Widget* child);
 		void updateAnchoredPosition();

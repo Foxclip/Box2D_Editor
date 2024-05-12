@@ -43,6 +43,8 @@ int main() {
     //run_tests();
     execute_app();
 
+    // TODO: EmptyWidget test
+    // TODO: remake WindowWidget with EmptyWidget
     // TODO: remove child's entry from local_layers when removing a child (when doing setParent)
     // TODO: WindowWidget resize test
     // TODO: WindowWidget window in window test

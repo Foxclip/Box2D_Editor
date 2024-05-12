@@ -5,6 +5,7 @@ target_sources(widgets_lib PRIVATE
     "${INCLUDE_DIR}/widgets/checkbox_widget.h"
     "${INCLUDE_DIR}/widgets/container_widget.h"
     "${INCLUDE_DIR}/widgets/drawing.h"
+    "${INCLUDE_DIR}/widgets/empty_widget.h"
     "${INCLUDE_DIR}/widgets/rectangle_widget.h"
     "${INCLUDE_DIR}/widgets/shape_widget.h"
     "${INCLUDE_DIR}/widgets/text_widget.h"
@@ -24,6 +25,7 @@ target_sources(widgets_lib PRIVATE
     checkbox_widget.cpp
     container_widget.cpp
     drawing.cpp
+    empty_widget.cpp
     rectangle_widget.cpp
     shape_widget.cpp
     text_widget.cpp

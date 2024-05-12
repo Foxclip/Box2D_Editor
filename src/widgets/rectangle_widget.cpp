@@ -16,20 +16,20 @@ namespace fw {
 		setOrigin(origin_anchor);
 	}
 
-	sf::Drawable& RectangleWidget::getDrawable() {
-		return rect;
+	sf::Drawable* RectangleWidget::getDrawable() {
+		return &rect;
 	}
 
-	const sf::Drawable& RectangleWidget::getDrawable() const {
-		return rect;
+	const sf::Drawable* RectangleWidget::getDrawable() const {
+		return &rect;
 	}
 
-	sf::Transformable& RectangleWidget::getTransformable() {
-		return rect;
+	sf::Transformable* RectangleWidget::getTransformable() {
+		return &rect;
 	}
 
-	const sf::Transformable& RectangleWidget::getTransformable() const {
-		return rect;
+	const sf::Transformable* RectangleWidget::getTransformable() const {
+		return &rect;
 	}
 
 	sf::Shape& RectangleWidget::getShape() {

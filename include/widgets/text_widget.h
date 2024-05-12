@@ -34,10 +34,10 @@ namespace fw {
 	protected:
 		bool adjust_local_bounds = true;
 
-		sf::Drawable& getDrawable() override;
-		const sf::Drawable& getDrawable() const override;
-		sf::Transformable& getTransformable() override;
-		const sf::Transformable& getTransformable() const override;
+		sf::Drawable* getDrawable() override;
+		const sf::Drawable* getDrawable() const override;
+		sf::Transformable* getTransformable() override;
+		const sf::Transformable* getTransformable() const override;
 		void internalUpdate() override;
 
 	private:

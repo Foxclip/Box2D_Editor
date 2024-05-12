@@ -696,11 +696,15 @@ namespace fw {
 		render_view.setCenter(texture_bounds_center);
 		render_texture.setView(render_view);
 		render_texture.clear(sf::Color::Transparent);
-		sf::Transform transformable_transform = getTransformable().getTransform();
+		sf::Transformable* transformable = getTransformable();
+		wAssert(transformable);
+		const sf::Transform& transformable_transform = transformable->getTransform();
 		wAssert(transformable_transform == sf::Transform::Identity);
-		wAssert(getTransformable().getOrigin() == sf::Vector2f());
+		wAssert(transformable->getOrigin() == sf::Vector2f());
 		OnBeforeRender(render_texture);
-		render_texture.draw(getDrawable(), combined);
+		sf::Drawable* drawable = getDrawable();
+		wAssert(drawable);
+		render_texture.draw(*drawable, combined);
 		OnAfterRender(render_texture);
 		render_texture.display();
 	}
