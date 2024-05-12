@@ -6,53 +6,59 @@ namespace fw {
 	enum class WindowRenderLayers {
 		RESIZE,
 		WINDOW,
+		HEADER,
 		OUTLINE,
 	};
 
-	WindowWidget::WindowWidget(WidgetList& widget_list, float width, float height) : RectangleWidget(widget_list) {
+	WindowWidget::WindowWidget(WidgetList& widget_list, float width, float height) : EmptyWidget(widget_list) {
 		wAssert(ONSCREEN_MARGIN <= MIN_WINDOW_SIZE.x && ONSCREEN_MARGIN <= MIN_WINDOW_SIZE.y);
+		// empty
+		setName("window");
 		// header
-		setSize(width, HEADER_HEIGHT);
-		setOrigin(Anchor::TOP_LEFT);
-		setClickThrough(false);
-		setName("window header");
+		header_widget = widget_list.createWidget<RectangleWidget>();
+		header_widget->setSize(width, HEADER_HEIGHT);
+		header_widget->setOrigin(Anchor::TOP_LEFT);
+		header_widget->setClipChildren(true);
+		header_widget->setClickThrough(false);
+		header_widget->setName("header");
 		header_size = getSize();
-		OnLeftPress = [&](const sf::Vector2f& pos) {
+		header_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
 			is_grabbed = true;
 			header_click_offset = getGlobalPosition() - pos;
 		};
-		OnProcessMouse = [&](const sf::Vector2f& pos) {
+		header_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
 			if (is_grabbed) {
 				sf::Vector2f parent_local_pos = parent->toLocal(pos);
 				sf::Vector2f new_pos = parent_local_pos + header_click_offset;
-				sf::FloatRect parent_local_bounds = getParentLocalBounds();
+				sf::FloatRect parent_local_bounds = header_widget->getParentLocalBounds();
 				sf::Vector2f parent_size = parent->getSize();
 				new_pos.x = std::clamp(new_pos.x, ONSCREEN_MARGIN - parent_local_bounds.width, parent_size.x - ONSCREEN_MARGIN);
 				new_pos.y = std::clamp(new_pos.y, ONSCREEN_MARGIN - parent_local_bounds.height, parent_size.y - ONSCREEN_MARGIN);
 				setPosition(new_pos);
 			}
 		};
-		OnLeftRelease = [&](const sf::Vector2f& pos) {
+		header_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
 			is_grabbed = false;
 		};
-		setLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::WINDOW));
+		header_widget->setParent(this);
+		header_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::HEADER));
 		// header text
 		header_text_widget = widget_list.createWidget<TextWidget>();
 		header_text_widget->setOrigin(Anchor::TOP_LEFT);
 		header_text_widget->setParentAnchor(Anchor::TOP_LEFT);
 		header_text_widget->setAnchorOffset(HEADER_TEXT_PADDING, 0.0f);
-		header_text_widget->setName("header text");
-		header_text_widget->setParent(this);
-		header_text_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::WINDOW));
+		header_text_widget->setName("text");
+		header_text_widget->setParent(header_widget);
 		setHeaderText("New Window");
 		setHeaderColor(DEFAULT_HEADER_COLOR);
 		setHeaderTextColor(DEFAULT_HEADER_TEXT_COLOR);
 		setHeaderTextCharacterSize(DEFAULT_HEADER_TEXT_CHARACTER_SIZE);
 		// main widget
 		main_widget = widget_list.createWidget<RectangleWidget>();
-		main_widget->setName("window area");
+		main_widget->setName("main");
 		main_widget->setSize(width, height);
 		main_widget->setParentAnchor(Anchor::BOTTOM_LEFT);
+		main_widget->setAnchorOffset(0.0f, HEADER_HEIGHT);
 		main_widget->setFillColor(DEFAULT_WINDOW_COLOR);
 		main_widget->setClipChildren(true);
 		main_widget->setClickThrough(false);
@@ -90,11 +96,11 @@ namespace fw {
 				case Resizing::TOP_LEFT: resizing_anchor = parent->toLocal(main_widget->getGlobalBottomRight()); break;
 				case Resizing::TOP: resizing_anchor = parent->toLocal(main_widget->getGlobalBottomLeft()); break;
 				case Resizing::TOP_RIGHT: resizing_anchor = parent->toLocal(main_widget->getGlobalBottomLeft()); break;
-				case Resizing::LEFT: resizing_anchor = getTopRight(); break;
-				case Resizing::RIGHT: resizing_anchor = getTopLeft(); break;
-				case Resizing::BOTTOM_LEFT: resizing_anchor = getTopRight(); break;
-				case Resizing::BOTTOM: resizing_anchor = getTopLeft(); break;
-				case Resizing::BOTTOM_RIGHT: resizing_anchor = getTopLeft(); break;
+				case Resizing::LEFT: resizing_anchor = parent->toLocal(header_widget->getGlobalTopRight()); break;
+				case Resizing::RIGHT: resizing_anchor = parent->toLocal(header_widget->getGlobalTopLeft()); break;
+				case Resizing::BOTTOM_LEFT: resizing_anchor = parent->toLocal(header_widget->getGlobalTopRight()); break;
+				case Resizing::BOTTOM: resizing_anchor = parent->toLocal(header_widget->getGlobalTopLeft()); break;
+				case Resizing::BOTTOM_RIGHT: resizing_anchor = parent->toLocal(header_widget->getGlobalTopLeft()); break;
 			}
 		};
 		resize_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
@@ -201,15 +207,17 @@ namespace fw {
 
 	void WindowWidget::setHeaderVisible(bool value) {
 		if (value) {
-			setSize(header_size);
+			header_widget->setVisible(true);
+			header_widget->setSize(header_size);
 		} else {
-			header_size = getSize();
-			setSize(sf::Vector2f());
+			header_widget->setVisible(false);
+			header_size = header_widget->getSize();
+			header_widget->setSize(sf::Vector2f());
 		}
 	}
 
 	void WindowWidget::setHeaderColor(const sf::Color& color) {
-		setFillColor(color);
+		header_widget->setFillColor(color);
 	}
 
 	void WindowWidget::setHeaderText(const sf::String& text) {
@@ -245,7 +253,7 @@ namespace fw {
 	}
 
 	void WindowWidget::internalUpdate() {
-		setSize(main_widget->getWidth(), HEADER_HEIGHT);
+		header_widget->setSize(main_widget->getWidth(), HEADER_HEIGHT);
 		resize_widget->setSize(
 			main_widget->getWidth() + RESIZE_WIDGET_MARGIN * 2,
 			HEADER_HEIGHT + main_widget->getHeight() + RESIZE_WIDGET_MARGIN * 2

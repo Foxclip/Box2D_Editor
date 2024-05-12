@@ -15,6 +15,7 @@ namespace fw {
 	struct WidgetVisibility {
 		bool addedToRoot = false;
 		bool allParentsVisible = false;
+		bool renderableSetting = false;
 		bool visibleSetting = false;
 		bool onScreen = false;
 		bool nonZeroSize = false;
@@ -75,6 +76,7 @@ namespace fw {
 		bool isMouseOver() const;
 		void updateMouseState(const sf::Vector2f& mouse_pos);
 		virtual bool isVisualPositionQuantized() const;
+		bool isRenderable() const;
 		bool isVisible() const;
 		bool isClickThrough() const;
 		bool getChildrenLocked() const;
@@ -100,7 +102,7 @@ namespace fw {
 		CompVector<Widget*> getAllChildren() const;
 		Widget* getChild(size_t index) const;
 		Widget* find(const std::string& name) const;
-		virtual CompVector<Widget*> getRenderQueue() const;
+		CompVector<Widget*> getRenderQueue() const;
 		virtual sf::FloatRect getLocalBounds() const = 0;
 		sf::FloatRect getParentLocalBounds() const;
 		sf::FloatRect getGlobalBounds() const;
@@ -150,6 +152,7 @@ namespace fw {
 		void setGlobalPosition(float x, float y);
 		void setGlobalPosition(const sf::Vector2f& position);
 		void setRotation(float angle);
+		virtual void setRenderable(bool value);
 		void setVisible(bool value);
 		void toggleVisible();
 		void setClickThrough(bool value);
@@ -191,6 +194,7 @@ namespace fw {
 		sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);
 		WidgetUnclippedRegion unclipped_region = WidgetUnclippedRegion(this);
 		bool visible = true;
+		bool renderable = true;
 		bool is_focusable = false;
 		bool click_through = true;
 		bool clip_children = false;

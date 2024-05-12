@@ -60,7 +60,6 @@ struct GenericWidgetTest {
     std::string name;
     std::string fullname;
     bool is_visual_position_quantized = false;
-    bool is_visible = false;
     fw::WidgetVisibility visibility;
 	bool is_click_through = false;
 	bool is_mouse_over = false;

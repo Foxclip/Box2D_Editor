@@ -11,8 +11,8 @@ namespace fw {
 		EmptyWidget(WidgetList& widget_list);
 		sf::FloatRect getLocalBounds() const override;
 		const sf::Color& getFillColor() const override;
-		CompVector<Widget*> getRenderQueue() const override;
 		void setFillColor(const sf::Color& color) override;
+		void setRenderable(bool value) override;
 
 	protected:
 		sf::Drawable* getDrawable() override;

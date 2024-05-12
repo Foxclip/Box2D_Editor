@@ -1,5 +1,6 @@
 #pragma once
 
+#include "empty_widget.h"
 #include "rectangle_widget.h"
 #include "text_widget.h"
 
@@ -7,7 +8,7 @@ namespace fw {
 
 	class WidgetList;
 
-	class WindowWidget : public RectangleWidget {
+	class WindowWidget : public EmptyWidget {
 	public:
 		const float HEADER_HEIGHT = 20.0f;
 		const float HEADER_TEXT_PADDING = 5.0f;
@@ -43,8 +44,9 @@ namespace fw {
 	protected:
 
 	private:
-		RectangleWidget* main_widget = nullptr;
+		RectangleWidget* header_widget = nullptr;
 		TextWidget* header_text_widget = nullptr;
+		RectangleWidget* main_widget = nullptr;
 		RectangleWidget* resize_widget = nullptr;
 		RectangleWidget* outline_widget = nullptr;
 		bool is_grabbed = false;

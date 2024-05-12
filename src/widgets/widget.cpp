@@ -29,6 +29,10 @@ namespace fw {
 		return false;
 	}
 
+	bool Widget::isRenderable() const {
+		return renderable;
+	}
+
 	bool Widget::isVisible() const {
 		return visible;
 	}
@@ -53,7 +57,8 @@ namespace fw {
 				break;
 			}
 		}
-		v.visibleSetting = visible;
+		v.renderableSetting = isRenderable();
+		v.visibleSetting = isVisible();
 		sf::FloatRect root_bounds = widget_list.getRootWidget()->getGlobalBounds();
 		v.onScreen = root_bounds.intersects(global_bounds);
 		v.nonZeroSize = global_bounds.width > 0 && global_bounds.height > 0;
@@ -217,10 +222,12 @@ namespace fw {
 			}
 			return layer_index;
 		};
-		size_t this_layer_index = get_layer_index(const_cast<Widget*>(this));
-		RenderQueueLayer layer(this_layer_index);
-		layer.widgets.add(const_cast<Widget*>(this));
-		layers.insert(layer);
+		if (isRenderable()) {
+			size_t this_layer_index = get_layer_index(const_cast<Widget*>(this));
+			RenderQueueLayer layer(this_layer_index);
+			layer.widgets.add(const_cast<Widget*>(this));
+			layers.insert(layer);
+		}
 		for (size_t i = 0; i < getChildren().size(); i++) {
 			Widget* widget = getChild(i);
 			if (!widget->isVisible()) {
@@ -462,6 +469,11 @@ namespace fw {
 	void Widget::setRotation(float angle) {
 		wAssert(!widget_list.isLocked());
 		transforms.setRotation(angle);
+	}
+
+	void Widget::setRenderable(bool value) {
+		wAssert(!widget_list.isLocked());
+		this->renderable = value;
 	}
 
 	void Widget::setVisible(bool value) {
