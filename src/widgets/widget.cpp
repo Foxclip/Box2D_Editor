@@ -710,7 +710,7 @@ namespace fw {
 		if (!unclipped_region.isQuantizedNonZero()) {
 			return;
 		}
-		OnBeforeRender();
+		OnBeforeRender(target);
 		updateRenderTexture(unclipped_region.getQuantized());
 		sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
 		sprite.setPosition(unclipped_region.getQuantized().getPosition());
@@ -719,6 +719,7 @@ namespace fw {
 		} else {
 			target.draw(sprite);
 		}
+		OnAfterRender(target);
 	}
 
 	void Widget::renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children) {

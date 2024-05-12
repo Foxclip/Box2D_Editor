@@ -30,6 +30,14 @@ namespace fw {
 				setGlobalPosition(new_pos);
 			}
 		};
+		OnAfterRender = [&](sf::RenderTarget& target) {
+			sf::FloatRect bounds;
+			bounds.left = getGlobalPosition().x - 1.0f;
+			bounds.top = getGlobalPosition().y - 1.0f;
+			bounds.width = getWidth() + 1.0f;
+			bounds.height = getHeight() + main_widget->getHeight() + 1.0f;
+			draw_wire_rect(target, bounds, sf::Color::White);
+		};
 		OnLeftRelease = [&](const sf::Vector2f& pos) {
 			is_grabbed = false;
 		};
@@ -174,6 +182,10 @@ namespace fw {
 		return header_text_widget->getCharacterSize();
 	}
 
+	const sf::Color& WindowWidget::getOutlineColor() const {
+		return outline_color;
+	}
+
 	const CompVector<Widget*>& WindowWidget::getWindowChildren() const {
 		return main_widget->getChildren();
 	}
@@ -205,6 +217,10 @@ namespace fw {
 
 	void WindowWidget::setHeaderTextCharacterSize(unsigned int size) {
 		header_text_widget->setCharacterSize(size);
+	}
+
+	void WindowWidget::setOutlineColor(const sf::Color& color) {
+		this->outline_color = color;
 	}
 
 	void WindowWidget::addChild(Widget* child) {

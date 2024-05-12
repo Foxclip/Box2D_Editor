@@ -64,7 +64,8 @@ namespace fw {
 		std::function<void()> OnFocused = []() { };
 		std::function<void()> OnFocusLost = []() { };
 		std::function<void()> OnUpdate = []() { };
-		std::function<void()> OnBeforeRender = []() { };
+		std::function<void(sf::RenderTarget& target)> OnBeforeRender = [](sf::RenderTarget& target) { };
+		std::function<void(sf::RenderTarget& target)> OnAfterRender = [](sf::RenderTarget& target) { };
 		std::function<void(unsigned int, unsigned int)> OnWindowResized = [](unsigned int width, unsigned int height) { };
 		std::function<sf::Cursor::Type()> GetCursorType = []() { return sf::Cursor::Arrow; };
 

@@ -630,6 +630,7 @@ void WidgetTests::eventsTest(test::Test& test) {
     application.advance();
     bool updated = false;
     bool before_render = false;
+    bool after_render = false;
     unsigned int window_width = 0;
     unsigned int window_height = 0;
     fw::RectangleWidget* widget = application.getWidgets().createWidget<fw::RectangleWidget>();
@@ -637,8 +638,11 @@ void WidgetTests::eventsTest(test::Test& test) {
     widget->OnUpdate = [&]() {
         updated = true;
     };
-    widget->OnBeforeRender = [&]() {
+    widget->OnBeforeRender = [&](sf::RenderTarget& target) {
         before_render = true;
+    };
+    widget->OnAfterRender = [&](sf::RenderTarget& target) {
+        after_render = true;
     };
     widget->OnWindowResized = [&](unsigned int width, unsigned int height) {
         window_width = width;
@@ -647,6 +651,7 @@ void WidgetTests::eventsTest(test::Test& test) {
     application.advance();
     T_CHECK(updated);
     T_CHECK(before_render);
+    T_CHECK(after_render);
     T_COMPARE(window_width, 0);
     T_COMPARE(window_height, 0);
     application.setWindowSize(640, 480);

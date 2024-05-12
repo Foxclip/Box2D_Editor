@@ -229,7 +229,7 @@ void Editor::initWidgets() {
     world_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     world_widget->setName("world_canvas");
     world_widget->setShader(&desat_shader);
-    world_widget->OnBeforeRender = [&]() {
+    world_widget->OnBeforeRender = [&](sf::RenderTarget& target) {
         desat_shader.setUniform("texture", sf::Shader::CurrentTexture);
         desat_shader.setUniform("saturation", WORLD_SATURATION);
         desat_shader.setUniform("vcenter", WORLD_COLOR_SCALE_CENTER);
@@ -245,7 +245,7 @@ void Editor::initWidgets() {
     selection_mask_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     selection_mask_widget->setName("selection_mask_canvas");
     selection_mask_widget->setShader(&selection_shader);
-    selection_mask_widget->OnBeforeRender = [&]() {
+    selection_mask_widget->OnBeforeRender = [&](sf::RenderTarget& target) {
         selection_shader.setUniform("selection_mask", sf::Shader::CurrentTexture);
         selection_shader.setUniform("outline_color", SELECTION_OUTLINE_COLOR);
         selection_shader.setUniform("offset", SELECTION_OUTLINE_THICKNESS);
@@ -328,13 +328,25 @@ void Editor::initWidgets() {
     some_window->setPosition(640.0f, 480.0f);
     some_window->setHeaderFont(console_font);
     some_window->setHeaderTextCharacterSize(15);
-    fw::RectangleWidget* rect = widgets.createWidget<fw::RectangleWidget>();
-    rect->setFillColor(sf::Color::Green);
-    rect->setSize(sf::Vector2f(30.0f, 30.0f));
-    rect->setName("green rect");
-    some_window->addWindowChild(rect);
-    rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
-    rect->setAnchorOffset(10.0f, 10.0f);
+    fw::RectangleWidget* green_rect = widgets.createWidget<fw::RectangleWidget>();
+    green_rect->setFillColor(sf::Color::Green);
+    green_rect->setSize(sf::Vector2f(30.0f, 30.0f));
+    green_rect->setName("green rect");
+    some_window->addWindowChild(green_rect);
+    green_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
+    green_rect->setAnchorOffset(10.0f, 10.0f);
+
+    fw::WindowWidget* child_window = widgets.createWidget<fw::WindowWidget>(120.0f, 80.0f);
+    child_window->setPosition(20.0f, 20.0f);
+    child_window->setHeaderFont(console_font);
+    child_window->setHeaderTextCharacterSize(15);
+    fw::RectangleWidget* blue_rect = widgets.createWidget<fw::RectangleWidget>();
+    blue_rect->setFillColor(sf::Color::Blue);
+    blue_rect->setSize(sf::Vector2f(20.0f, 20.0f));
+    blue_rect->setName("blue rect");
+    child_window->addWindowChild(blue_rect);
+    blue_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
+    blue_rect->setAnchorOffset(10.0f, 10.0f);
 
     //RectangleWidget* rect = widgets.createWidget<RectangleWidget>();
     //rect->setFillColor(sf::Color::Black);

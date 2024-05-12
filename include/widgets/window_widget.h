@@ -27,6 +27,7 @@ namespace fw {
 		const sf::Color& getHeaderTextColor() const;
 		const sf::Font* getHeaderFont() const;
 		unsigned int getHeaderTextCharacterSize() const;
+		const sf::Color& getOutlineColor() const;
 		const CompVector<Widget*>& getWindowChildren() const;
 		void setHeaderVisible(bool value);
 		void setHeaderColor(const sf::Color& color);
@@ -34,6 +35,7 @@ namespace fw {
 		void setHeaderTextColor(const sf::Color& color);
 		void setHeaderFont(const sf::Font& font);
 		void setHeaderTextCharacterSize(unsigned int size);
+		void setOutlineColor(const sf::Color& color);
 		void addChild(Widget* child) override;
 		void addWindowChild(Widget* child);
 		void internalUpdate() override;
@@ -60,6 +62,7 @@ namespace fw {
 		sf::Vector2f resizing_anchor;
 		sf::Vector2f header_click_offset;
 		sf::Vector2f header_size;
+		sf::Color outline_color = sf::Color::White;
 
 		Resizing getResizingType() const;
 	};
