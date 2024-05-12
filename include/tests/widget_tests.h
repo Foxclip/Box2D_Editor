@@ -61,7 +61,7 @@ struct GenericWidgetTest {
     std::string fullname;
     bool is_visual_position_quantized = false;
     bool is_visible = false;
-    bool opaque = false;
+    fw::WidgetVisibility visibility;
 	bool is_click_through = false;
 	bool is_mouse_over = false;
 	bool is_focusable = false;
@@ -98,6 +98,7 @@ private:
 	void keyboardEventsTest(test::Test& test);
 
 	void rootWidgetTest(test::Test& test);
+	void emptyWidgetTest(test::Test& test);
 	void rectangleWidgetTest(test::Test& test);
 	void setParentTest(test::Test& test);
 	void widgetMouseEvents1(test::Test& test);

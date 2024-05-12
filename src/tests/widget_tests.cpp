@@ -84,6 +84,7 @@ void WidgetTests::createWidgetsList() {
         textbox_font.loadFromFile("fonts/verdana.ttf");
     };
     test::Test* root_widget_test = list->addTest("root_widget", [&](test::Test& test) { rootWidgetTest(test); });
+    test::Test* empty_widget_test = list->addTest("empty_widget", { root_widget_test }, [&](test::Test& test) { emptyWidgetTest(test); });
     test::Test* rectangle_widget_test = list->addTest("rectangle_widget", { root_widget_test }, [&](test::Test& test) { rectangleWidgetTest(test); });
     test::Test* set_parent_test = list->addTest("set_parent", { root_widget_test }, [&](test::Test& test) { setParentTest(test); });
     test::Test* widget_mouse_events_1_test = list->addTest("widget_mouse_events_1", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents1(test); });
@@ -240,7 +241,7 @@ void WidgetTests::rootWidgetTest(test::Test& test) {
     application.mouseMove(400, 300);
     application.advance();
     fw::RectangleWidget* root_widget = dynamic_cast<fw::RectangleWidget*>(application.getWidgets().getRootWidget());
-    T_ASSERT(T_CHECK(root_widget, "Root widget is not a RectangleWidget"));
+    T_ASSERT(T_CHECK(root_widget));
 
     GenericWidgetTest gwt(application, test);
     gwt.widget = root_widget;
@@ -249,7 +250,15 @@ void WidgetTests::rootWidgetTest(test::Test& test) {
     gwt.fullname = "root";
     gwt.is_visual_position_quantized = false;
     gwt.is_visible = true;
-    gwt.opaque = false;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
+    visibility.opaque = false;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
     gwt.is_click_through = true;
     gwt.is_mouse_over = true;
     gwt.is_focusable = false;
@@ -269,6 +278,54 @@ void WidgetTests::rootWidgetTest(test::Test& test) {
 
     T_COMPARE(root_widget->getParentChain().size(), 0);
     T_COMPARE(root_widget->getChildren().size(), 0);
+}
+
+void WidgetTests::emptyWidgetTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::EmptyWidget* empty_widget = application.getWidgets().createWidget<fw::EmptyWidget>();
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(empty_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    empty_widget->setPosition(position);
+
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = empty_widget;
+    gwt.total_widgets = 2;
+    gwt.name = "empty";
+    gwt.fullname = "root|empty";
+    gwt.is_visual_position_quantized = false;
+    gwt.is_visible = true;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = false;
+    visibility.nonZeroSize = false;
+    visibility.onScreen = false;
+    visibility.opaque = false;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
+    gwt.is_click_through = true;
+    gwt.is_mouse_over = false;
+    gwt.is_focusable = false;
+    gwt.is_focused = false;
+    gwt.clip_children = false;
+    gwt.force_custom_cursor = false;
+    gwt.parent = root_widget;
+    gwt.local_bounds = sf::FloatRect();
+    gwt.global_bounds = sf::FloatRect(position, sf::Vector2f());
+    gwt.parent_local_bounds = gwt.global_bounds;
+    gwt.visual_local_bounds = gwt.local_bounds;
+    gwt.visual_global_bounds = gwt.global_bounds;
+    gwt.visual_parent_local_bounds = gwt.global_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+
+    T_COMPARE(empty_widget->getFillColor(), sf::Color::Transparent, &WidgetTests::colorToStr);
+
+    T_COMPARE(empty_widget->getChildren().size(), 0);
 }
 
 void WidgetTests::rectangleWidgetTest(test::Test& test) {
@@ -292,7 +349,15 @@ void WidgetTests::rectangleWidgetTest(test::Test& test) {
     gwt.fullname = "root|rectangle";
     gwt.is_visual_position_quantized = false;
     gwt.is_visible = true;
-    gwt.opaque = true;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
+    visibility.opaque = true;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
     gwt.is_click_through = true;
     gwt.is_mouse_over = false;
     gwt.is_focusable = false;
@@ -761,7 +826,15 @@ void WidgetTests::textWidgetTest(test::Test& test) {
     gwt.fullname = "root|text";
     gwt.is_visual_position_quantized = true;
     gwt.is_visible = true;
-    gwt.opaque = true;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
+    visibility.opaque = true;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
     gwt.is_click_through = true;
     gwt.is_mouse_over = false;
     gwt.is_focusable = false;
@@ -803,7 +876,15 @@ void WidgetTests::checkboxWidgetBasicTest(test::Test& test) {
     gwt.fullname = "root|checkbox";
     gwt.is_visual_position_quantized = false;
     gwt.is_visible = true;
-    gwt.opaque = true;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
+    visibility.opaque = true;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
     gwt.is_click_through = false;
     gwt.is_mouse_over = false;
     gwt.is_focusable = false;
@@ -865,7 +946,15 @@ void WidgetTests::containerWidgetBasicTest(test::Test& test) {
     gwt.fullname = "root|container";
     gwt.is_visual_position_quantized = false;
     gwt.is_visible = true;
-    gwt.opaque = true;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
+    visibility.opaque = true;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
     gwt.is_click_through = true;
     gwt.is_mouse_over = false;
     gwt.is_focusable = false;
@@ -941,7 +1030,15 @@ void WidgetTests::textboxWidgetBasicTest(test::Test& test) {
     gwt.fullname = "root|textbox";
     gwt.is_visual_position_quantized = false;
     gwt.is_visible = true;
-    gwt.opaque = true;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
+    visibility.opaque = true;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
     gwt.is_click_through = false;
     gwt.is_mouse_over = false;
     gwt.is_focusable = true;
@@ -1596,7 +1693,15 @@ void WidgetTests::canvasWidgetBasicTest(test::Test& test) {
     gwt.fullname = "root|canvas";
     gwt.is_visual_position_quantized = false;
     gwt.is_visible = true;
-    gwt.opaque = true;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
+    visibility.opaque = true;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
     gwt.is_click_through = true;
     gwt.is_mouse_over = false;
     gwt.is_focusable = false;
@@ -1683,7 +1788,15 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         gwt.fullname = "root|window header";
         gwt.is_visual_position_quantized = false;
         gwt.is_visible = true;
-        gwt.opaque = true;
+        fw::WidgetVisibility visibility;
+        visibility.addedToRoot = true;
+        visibility.allParentsVisible = true;
+        visibility.hasUnclippedRegion = true;
+        visibility.nonZeroSize = true;
+        visibility.onScreen = true;
+        visibility.opaque = true;
+        visibility.visibleSetting = true;
+        gwt.visibility = visibility;
         gwt.is_click_through = false;
         gwt.is_mouse_over = false;
         gwt.is_focusable = false;
@@ -1725,7 +1838,15 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         gwt.fullname = "root|window header|window area";
         gwt.is_visual_position_quantized = false;
         gwt.is_visible = true;
-        gwt.opaque = true;
+        fw::WidgetVisibility visibility;
+        visibility.addedToRoot = true;
+        visibility.allParentsVisible = true;
+        visibility.hasUnclippedRegion = true;
+        visibility.nonZeroSize = true;
+        visibility.onScreen = true;
+        visibility.opaque = true;
+        visibility.visibleSetting = true;
+        gwt.visibility = visibility;
         gwt.is_click_through = false;
         gwt.is_mouse_over = false;
         gwt.is_focusable = false;
@@ -1885,13 +2006,13 @@ void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
     T_COMPARE(widget->isVisualPositionQuantized(), gwt.is_visual_position_quantized);
     T_COMPARE(widget->isVisible(), gwt.is_visible);
     fw::WidgetVisibility wv = widget->checkVisibility();
-    T_CHECK(wv.addedToRoot);
-    T_CHECK(wv.allParentsVisible);
-    T_CHECK(wv.hasUnclippedRegion);
-    T_CHECK(wv.nonZeroSize);
-    T_CHECK(wv.onScreen);
-    T_COMPARE(wv.opaque, gwt.opaque);
-    T_CHECK(wv.visibleSetting);
+    T_COMPARE(wv.addedToRoot, gwt.visibility.addedToRoot);
+    T_COMPARE(wv.allParentsVisible, gwt.visibility.allParentsVisible);
+    T_COMPARE(wv.hasUnclippedRegion, gwt.visibility.hasUnclippedRegion);
+    T_COMPARE(wv.nonZeroSize, gwt.visibility.nonZeroSize);
+    T_COMPARE(wv.onScreen, gwt.visibility.onScreen);
+    T_COMPARE(wv.opaque, gwt.visibility.opaque);
+    T_COMPARE(wv.visibleSetting, gwt.visibility.visibleSetting);
     T_COMPARE(widget->isClickThrough(), gwt.is_click_through);
     T_COMPARE(widget->isMouseOver(), gwt.is_mouse_over);
     T_COMPARE(widget->isFocusable(), gwt.is_focusable);
