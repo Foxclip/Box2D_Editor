@@ -67,6 +67,7 @@ namespace fw {
 		};
 		Resizing active_resizing_type = Resizing::NONE;
 		sf::Vector2f resizing_anchor;
+		sf::Vector2f resizing_cursor_offset;
 		sf::Vector2f header_click_offset;
 		sf::Vector2f header_size;
 		sf::Color outline_color = sf::Color::White;

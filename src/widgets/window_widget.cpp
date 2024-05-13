@@ -90,17 +90,34 @@ namespace fw {
 			}
 		};
 		resize_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
+			sf::Vector2f parent_local_pos = parent->toLocal(pos);
 			active_resizing_type = getResizingType();
-			switch (active_resizing_type) {
-				case Resizing::NONE: break;
-				case Resizing::TOP_LEFT: resizing_anchor = parent->toLocal(main_widget->getGlobalBottomRight()); break;
-				case Resizing::TOP: resizing_anchor = parent->toLocal(main_widget->getGlobalBottomLeft()); break;
-				case Resizing::TOP_RIGHT: resizing_anchor = parent->toLocal(main_widget->getGlobalBottomLeft()); break;
-				case Resizing::LEFT: resizing_anchor = parent->toLocal(header_widget->getGlobalTopRight()); break;
-				case Resizing::RIGHT: resizing_anchor = parent->toLocal(header_widget->getGlobalTopLeft()); break;
-				case Resizing::BOTTOM_LEFT: resizing_anchor = parent->toLocal(header_widget->getGlobalTopRight()); break;
-				case Resizing::BOTTOM: resizing_anchor = parent->toLocal(header_widget->getGlobalTopLeft()); break;
-				case Resizing::BOTTOM_RIGHT: resizing_anchor = parent->toLocal(header_widget->getGlobalTopLeft()); break;
+			if (active_resizing_type == Resizing::NONE) {
+				// skip
+			} else if (active_resizing_type == Resizing::TOP_LEFT) {
+				resizing_anchor = getBottomRight();
+				resizing_cursor_offset = parent_local_pos - getTopLeft();
+			} else if (active_resizing_type == Resizing::TOP) {
+				resizing_anchor = getBottom();
+				resizing_cursor_offset = parent_local_pos - getTop();
+			} else if (active_resizing_type == Resizing::TOP_RIGHT) {
+				resizing_anchor = getBottomLeft();
+				resizing_cursor_offset = parent_local_pos - getTopRight();
+			} else if (active_resizing_type == Resizing::LEFT) {
+				resizing_anchor = getRight();
+				resizing_cursor_offset = parent_local_pos - getLeft();
+			} else if (active_resizing_type == Resizing::RIGHT) {
+				resizing_anchor = getLeft();
+				resizing_cursor_offset = parent_local_pos - getRight();
+			} else if (active_resizing_type == Resizing::BOTTOM_LEFT) {
+				resizing_anchor = getTopRight();
+				resizing_cursor_offset = parent_local_pos - getBottomLeft();
+			} else if (active_resizing_type == Resizing::BOTTOM) {
+				resizing_anchor = getTop();
+				resizing_cursor_offset = parent_local_pos - getBottom();
+			} else if (active_resizing_type == Resizing::BOTTOM_RIGHT) {
+				resizing_anchor = getTopLeft();
+				resizing_cursor_offset = parent_local_pos - getBottomRight();
 			}
 		};
 		resize_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
@@ -108,7 +125,8 @@ namespace fw {
 				return;
 			}
 			sf::Vector2f global_mouse_pos = widget_list.getMousePosf();
-			sf::Vector2f mouse_pos = parent->toLocal(global_mouse_pos);
+			sf::Vector2f anchored_pos = global_mouse_pos - resizing_cursor_offset;
+			sf::Vector2f mouse_pos = parent->toLocal(anchored_pos);
 			float x_min = std::min(mouse_pos.x, resizing_anchor.x - MIN_WINDOW_SIZE.x);
 			float x_max = std::max(mouse_pos.x, resizing_anchor.x + MIN_WINDOW_SIZE.x);
 			float y_min = std::min(mouse_pos.y, resizing_anchor.y - MIN_WINDOW_SIZE.y - HEADER_HEIGHT);
@@ -121,8 +139,8 @@ namespace fw {
 			float width_max = clamped_x_max - resizing_anchor.x;
 			float height_min = resizing_anchor.y - clamped_y_min - HEADER_HEIGHT;
 			float height_max = clamped_y_max - resizing_anchor.y - HEADER_HEIGHT;
-			float old_x = resizing_anchor.x;
-			float old_y = resizing_anchor.y;
+			float old_x = getPosition().x;
+			float old_y = getPosition().y;
 			float old_width = main_widget->getWidth();
 			float old_height = main_widget->getHeight();
 			if (active_resizing_type == Resizing::TOP_LEFT) {
