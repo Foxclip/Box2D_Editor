@@ -8,7 +8,7 @@ namespace fw {
 	}
 
 	sf::FloatRect EmptyWidget::getLocalBounds() const {
-		return sf::FloatRect();
+		return sf::FloatRect(sf::Vector2f(), size);
 	}
 
 	const sf::Color& EmptyWidget::getFillColor() const {
@@ -16,6 +16,15 @@ namespace fw {
 	}
 
 	void EmptyWidget::setFillColor(const sf::Color& color) { }
+
+	void EmptyWidget::setSize(float width, float height) {
+		this->size.x = width;
+		this->size.y = height;
+	}
+
+	void EmptyWidget::setSize(const sf::Vector2f& p_size) {
+		setSize(p_size.x, p_size.y);
+	}
 
 	void EmptyWidget::setRenderable(bool value) {
 		if (value) {

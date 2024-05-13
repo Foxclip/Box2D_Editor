@@ -290,7 +290,9 @@ void WidgetTests::emptyWidgetTest(test::Test& test) {
     fw::Widget* root_widget = application.getWidgets().getRootWidget();
     T_ASSERT(T_CHECK(empty_widget));
     sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(50.0f, 30.0f);
     empty_widget->setPosition(position);
+    empty_widget->setSize(size);
 
     GenericWidgetTest gwt(application, test);
     gwt.widget = empty_widget;
@@ -301,9 +303,9 @@ void WidgetTests::emptyWidgetTest(test::Test& test) {
     fw::WidgetVisibility visibility;
     visibility.addedToRoot = true;
     visibility.allParentsVisible = true;
-    visibility.hasUnclippedRegion = false;
-    visibility.nonZeroSize = false;
-    visibility.onScreen = false;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
     visibility.opaque = false;
     visibility.renderableSetting = false;
     visibility.visibleSetting = true;
@@ -315,8 +317,8 @@ void WidgetTests::emptyWidgetTest(test::Test& test) {
     gwt.clip_children = false;
     gwt.force_custom_cursor = false;
     gwt.parent = root_widget;
-    gwt.local_bounds = sf::FloatRect();
-    gwt.global_bounds = sf::FloatRect(position, sf::Vector2f());
+    gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+    gwt.global_bounds = sf::FloatRect(position, size);
     gwt.parent_local_bounds = gwt.global_bounds;
     gwt.visual_local_bounds = gwt.local_bounds;
     gwt.visual_global_bounds = gwt.global_bounds;
@@ -1773,6 +1775,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
     sf::Vector2f position(100.0f, 100.0f);
     sf::Vector2f size(100.0f, 100.0f);
     fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(size);
+    sf::Vector2f total_size = size + sf::Vector2f(0.0f, window_widget->HEADER_HEIGHT);
     fw::Widget* root_widget = application.getWidgets().getRootWidget();
     T_ASSERT(T_CHECK(window_widget));
     window_widget->setPosition(position);
@@ -1790,9 +1793,9 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         fw::WidgetVisibility visibility;
         visibility.addedToRoot = true;
         visibility.allParentsVisible = true;
-        visibility.hasUnclippedRegion = false;
-        visibility.nonZeroSize = false;
-        visibility.onScreen = false;
+        visibility.hasUnclippedRegion = true;
+        visibility.nonZeroSize = true;
+        visibility.onScreen = true;
         visibility.opaque = false;
         visibility.renderableSetting = false;
         visibility.visibleSetting = true;
@@ -1804,8 +1807,8 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         gwt.clip_children = false;
         gwt.force_custom_cursor = false;
         gwt.parent = root_widget;
-        gwt.local_bounds = sf::FloatRect();
-        gwt.global_bounds = sf::FloatRect(position, sf::Vector2f());
+        gwt.local_bounds = sf::FloatRect(sf::Vector2f(), total_size);
+        gwt.global_bounds = sf::FloatRect(position, total_size);
         gwt.parent_local_bounds = gwt.global_bounds;
         gwt.visual_local_bounds = gwt.local_bounds;
         gwt.visual_global_bounds = gwt.global_bounds;

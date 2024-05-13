@@ -46,6 +46,7 @@ int main() {
     // TODO: WindowWidget resize test
     // TODO: WindowWidget window in window test
     // TODO: require size for RectangleWidget and font for TextWidget
+    // TODO: remake EditWindow with WindowWidget
     // TODO: align textboxes in EditWindow to the right
     // TODO: Dropdown widget
     // TODO: object list window (outliner)

@@ -331,6 +331,46 @@ namespace fw {
 		return getParentGlobalTransform().transformPoint(getPosition());
 	}
 
+	sf::Vector2f Widget::getTop() const {
+		sf::FloatRect bounds = getParentLocalBounds();
+		return sf::Vector2f(bounds.left + bounds.width / 2.0f, bounds.top);
+	}
+
+	sf::Vector2f Widget::getLeft() const {
+		sf::FloatRect bounds = getParentLocalBounds();
+		return sf::Vector2f(bounds.left, bounds.top + bounds.height / 2.0f);
+	}
+
+	sf::Vector2f Widget::getRight() const {
+		sf::FloatRect bounds = getParentLocalBounds();
+		return sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height / 2.0f);
+	}
+
+	sf::Vector2f Widget::getBottom() const {
+		sf::FloatRect bounds = getParentLocalBounds();
+		return sf::Vector2f(bounds.left + bounds.width / 2.0f, bounds.top + bounds.height);
+	}
+
+	sf::Vector2f Widget::getGlobalTop() const {
+		sf::FloatRect bounds = getGlobalBounds();
+		return sf::Vector2f(bounds.left + bounds.width / 2.0f, bounds.top);
+	}
+
+	sf::Vector2f Widget::getGlobalLeft() const {
+		sf::FloatRect bounds = getGlobalBounds();
+		return sf::Vector2f(bounds.left, bounds.top + bounds.height / 2.0f);
+	}
+
+	sf::Vector2f Widget::getGlobalRight() const {
+		sf::FloatRect bounds = getGlobalBounds();
+		return sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height / 2.0f);
+	}
+
+	sf::Vector2f Widget::getGlobalBottom() const {
+		sf::FloatRect bounds = getGlobalBounds();
+		return sf::Vector2f(bounds.left + bounds.width / 2.0f, bounds.top + bounds.height);
+	}
+
 	sf::Vector2f Widget::getTopLeft() const {
 		sf::FloatRect bounds = getParentLocalBounds();
 		return sf::Vector2f(bounds.left, bounds.top);

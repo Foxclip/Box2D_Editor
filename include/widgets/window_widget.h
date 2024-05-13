@@ -30,6 +30,10 @@ namespace fw {
 		unsigned int getHeaderTextCharacterSize() const;
 		const sf::Color& getOutlineColor() const;
 		const CompVector<Widget*>& getWindowChildren() const;
+		RectangleWidget* getHeaderWidget() const;
+		RectangleWidget* getMainWidget() const;
+		RectangleWidget* getResizeWidget() const;
+		RectangleWidget* getOutlineWidget() const;
 		void setHeaderVisible(bool value);
 		void setHeaderColor(const sf::Color& color);
 		void setHeaderText(const sf::String& text);

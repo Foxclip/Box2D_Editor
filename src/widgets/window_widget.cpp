@@ -57,7 +57,7 @@ namespace fw {
 		main_widget = widget_list.createWidget<RectangleWidget>();
 		main_widget->setName("main");
 		main_widget->setSize(width, height);
-		main_widget->setParentAnchor(Anchor::BOTTOM_LEFT);
+		main_widget->setParentAnchor(Anchor::TOP_LEFT);
 		main_widget->setAnchorOffset(0.0f, HEADER_HEIGHT);
 		main_widget->setFillColor(DEFAULT_WINDOW_COLOR);
 		main_widget->setClipChildren(true);
@@ -205,6 +205,22 @@ namespace fw {
 		return main_widget->getChildren();
 	}
 
+	RectangleWidget* WindowWidget::getHeaderWidget() const {
+		return header_widget;
+	}
+
+	RectangleWidget* WindowWidget::getMainWidget() const {
+		return main_widget;
+	}
+
+	RectangleWidget* WindowWidget::getResizeWidget() const {
+		return resize_widget;
+	}
+
+	RectangleWidget* WindowWidget::getOutlineWidget() const {
+		return outline_widget;
+	}
+
 	void WindowWidget::setHeaderVisible(bool value) {
 		if (value) {
 			header_widget->setVisible(true);
@@ -253,12 +269,13 @@ namespace fw {
 	}
 
 	void WindowWidget::internalUpdate() {
-		header_widget->setSize(main_widget->getWidth(), HEADER_HEIGHT);
+		setSize(main_widget->getWidth(), HEADER_HEIGHT + main_widget->getHeight());
+		header_widget->setSize(getWidth(), HEADER_HEIGHT);
 		resize_widget->setSize(
-			main_widget->getWidth() + RESIZE_WIDGET_MARGIN * 2,
-			HEADER_HEIGHT + main_widget->getHeight() + RESIZE_WIDGET_MARGIN * 2
+			getWidth() + RESIZE_WIDGET_MARGIN * 2,
+			getHeight() + RESIZE_WIDGET_MARGIN * 2
 		);
-		outline_widget->setSize(main_widget->getWidth(), HEADER_HEIGHT + main_widget->getHeight());
+		outline_widget->setSize(getSize());
 	}
 
 	WindowWidget::Resizing WindowWidget::getResizingType() const {

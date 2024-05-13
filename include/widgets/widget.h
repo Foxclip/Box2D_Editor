@@ -127,6 +127,14 @@ namespace fw {
 		sf::Vector2f getCenter() const;
 		sf::Vector2f getGlobalCenter() const;
 		sf::Vector2f getVisualGlobalCenter() const;
+		sf::Vector2f getTop() const;
+		sf::Vector2f getLeft() const;
+		sf::Vector2f getRight() const;
+		sf::Vector2f getBottom() const;
+		sf::Vector2f getGlobalTop() const;
+		sf::Vector2f getGlobalLeft() const;
+		sf::Vector2f getGlobalRight() const;
+		sf::Vector2f getGlobalBottom() const;
 		sf::Vector2f getTopLeft() const;
 		sf::Vector2f getTopRight() const;
 		sf::Vector2f getBottomLeft() const;
