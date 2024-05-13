@@ -116,6 +116,7 @@ void WidgetTests::createWidgetsList() {
     test::Test* window_widget_drag_test = list->addTest("window_widget_drag", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetDragTest(test); });
     test::Test* window_widget_children_test = list->addTest("window_widget_children", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetChildrenTest(test); });
     test::Test* window_widget_resize_test = list->addTest("window_widget_resize", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetResizeTest(test); });
+    test::Test* window_widget_chain_test = list->addTest("window_widget_chain", { window_widget_children_test, window_widget_resize_test }, [&](test::Test& test) { windowWidgetChainTest(test); });
 }
 
 void WidgetTests::basicTest(test::Test& test) {
@@ -1971,78 +1972,63 @@ void WidgetTests::windowWidgetResizeTest(test::Test& test) {
     window_widget->setPosition(position);
     window_widget->setHeaderFont(textbox_font);
     application.advance();
+    T_WRAP_CONTAINER(resizeWindowTest(application, test, window_widget));
+}
 
-    auto rect_to_str = &WidgetTests::floatRectToStr;
-    float cursor_offset = window_widget->RESIZE_WIDGET_MARGIN / 2.0f;
-    sf::Vector2f resize_offset(15.0f, 10.0f);
-    auto resize_window = [&](const sf::Vector2f& begin_pos, const sf::FloatRect& new_bounds) {
-        sf::FloatRect old_bounds = window_widget->getGlobalBounds();
-        application.mouseMove(fw::to2i(begin_pos));
-        application.advance();
-        application.mouseLeftPress();
-        application.advance();
-        application.mouseMove(application.getMousePos() + fw::to2i(resize_offset));
-        application.advance();
-        application.mouseLeftRelease();
-        application.advance();
-        T_COMPARE(window_widget->getGlobalBounds(), new_bounds, rect_to_str);
-    };
-    T_WRAP_CONTAINER(resize_window(
-        window_widget->getGlobalTopLeft() + sf::Vector2f(-cursor_offset, -cursor_offset),
-        sf::FloatRect(
-            window_widget->getPosition() + resize_offset,
-            window_widget->getSize() - resize_offset
-        )
-    ));
-    T_WRAP_CONTAINER(resize_window(
-        window_widget->getGlobalTop() + sf::Vector2f(0.0f, -cursor_offset),
-        sf::FloatRect(
-            window_widget->getPosition() + sf::Vector2f(0.0f, resize_offset.y),
-            window_widget->getSize() + sf::Vector2f(0.0f, -resize_offset.y)
-        )
-    ));
-    T_WRAP_CONTAINER(resize_window(
-        window_widget->getGlobalTopRight() + sf::Vector2f(cursor_offset, -cursor_offset),
-        sf::FloatRect(
-            window_widget->getPosition() + sf::Vector2f(0.0f, resize_offset.y),
-            window_widget->getSize() + sf::Vector2f(resize_offset.x, -resize_offset.y)
-        )
-    ));
-    T_WRAP_CONTAINER(resize_window(
-        window_widget->getGlobalLeft() + sf::Vector2f(-cursor_offset, 0.0f),
-        sf::FloatRect(
-            window_widget->getPosition() + sf::Vector2f(resize_offset.x, 0.0f),
-            window_widget->getSize() + sf::Vector2f(-resize_offset.x, 0.0f)
-        )
-    ));
-    T_WRAP_CONTAINER(resize_window(
-        window_widget->getGlobalRight() + sf::Vector2f(cursor_offset, 0.0f),
-        sf::FloatRect(
-            window_widget->getPosition(),
-            window_widget->getSize() + sf::Vector2f(resize_offset.x, 0.0f)
-        )
-    ));
-    T_WRAP_CONTAINER(resize_window(
-        window_widget->getGlobalBottomLeft() + sf::Vector2f(-cursor_offset, cursor_offset),
-        sf::FloatRect(
-            window_widget->getPosition() + sf::Vector2f(resize_offset.x, 0.0f),
-            window_widget->getSize() + sf::Vector2f(-resize_offset.x, resize_offset.y)
-        )
-    ));
-    T_WRAP_CONTAINER(resize_window(
-        window_widget->getGlobalBottom() + sf::Vector2f(0.0f, cursor_offset),
-        sf::FloatRect(
-            window_widget->getPosition(),
-            window_widget->getSize() + sf::Vector2f(0.0f, resize_offset.y)
-        )
-    ));
-    T_WRAP_CONTAINER(resize_window(
-        window_widget->getGlobalBottomRight() + sf::Vector2f(cursor_offset, cursor_offset),
-        sf::FloatRect(
-            window_widget->getPosition(),
-            window_widget->getSize() + resize_offset
-        )
-    ));
+void WidgetTests::windowWidgetChainTest(test::Test& test) {
+    fw::Application application;
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+
+    fw::WindowWidget* parent_window = application.getWidgets().createWidget<fw::WindowWidget>(300.0f, 250.0f);
+    parent_window->setName("parent window");
+    parent_window->setPosition(150.0f, 100.0f);
+    parent_window->setHeaderFont(textbox_font);
+    parent_window->setHeaderText("Parent window");
+    parent_window->setHeaderTextCharacterSize(15);
+    fw::RectangleWidget* red_rect = application.getWidgets().createWidget<fw::RectangleWidget>();
+    red_rect->setFillColor(sf::Color::Red);
+    red_rect->setSize(sf::Vector2f(30.0f, 30.0f));
+    red_rect->setName("red rect");
+    parent_window->addWindowChild(red_rect);
+    red_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
+    red_rect->setAnchorOffset(10.0f, 10.0f);
+
+    fw::WindowWidget* child_window = application.getWidgets().createWidget<fw::WindowWidget>(200.0f, 170.0f);
+    child_window->setName("child window");
+    child_window->setPosition(20.0f, 20.0f);
+    child_window->setHeaderFont(textbox_font);
+    child_window->setHeaderText("Child window");
+    child_window->setHeaderTextCharacterSize(15);
+    parent_window->addWindowChild(child_window);
+    fw::RectangleWidget* green_rect = application.getWidgets().createWidget<fw::RectangleWidget>();
+    green_rect->setFillColor(sf::Color::Green);
+    green_rect->setSize(sf::Vector2f(20.0f, 20.0f));
+    green_rect->setName("green rect");
+    child_window->addWindowChild(green_rect);
+    green_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
+    green_rect->setAnchorOffset(10.0f, 10.0f);
+
+    fw::WindowWidget* another_child_window = application.getWidgets().createWidget<fw::WindowWidget>(80.0f, 60.0f);
+    another_child_window->setName("another child window");
+    another_child_window->setPosition(20.0f, 20.0f);
+    another_child_window->setHeaderFont(textbox_font);
+    another_child_window->setHeaderText("Another child window");
+    another_child_window->setHeaderTextCharacterSize(15);
+    child_window->addWindowChild(another_child_window);
+    fw::RectangleWidget* blue_rect = application.getWidgets().createWidget<fw::RectangleWidget>();
+    blue_rect->setFillColor(sf::Color::Blue);
+    blue_rect->setSize(sf::Vector2f(20.0f, 20.0f));
+    blue_rect->setName("blue rect");
+    another_child_window->addWindowChild(blue_rect);
+    blue_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
+    blue_rect->setAnchorOffset(10.0f, 10.0f);
+
+    application.advance();
+
+    T_WRAP_CONTAINER(resizeWindowTest(application, test, another_child_window));
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
@@ -2124,6 +2110,119 @@ fw::TextBoxWidget* WidgetTests::initTextBox(fw::Application& application, float 
     textbox_widget->setValue(value);
     application.advance();
     return textbox_widget;
+}
+
+void WidgetTests::resizeWindow(
+    fw::Application& application,
+    test::Test& test,
+    fw::WindowWidget* widget,
+    const sf::Vector2f& begin_pos,
+    const sf::Vector2f& resize_offset,
+    const sf::FloatRect& new_bounds
+) {
+    sf::FloatRect old_bounds = widget->getGlobalBounds();
+    application.mouseMove(fw::to2i(begin_pos));
+    application.advance();
+    application.mouseLeftPress();
+    application.advance();
+    application.mouseMove(application.getMousePos() + fw::to2i(resize_offset));
+    application.advance();
+    application.mouseLeftRelease();
+    application.advance();
+    T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
+}
+
+void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget) {
+    float cursor_offset = widget->RESIZE_WIDGET_MARGIN / 2.0f;
+    sf::Vector2f resize_offset(15.0f, 10.0f);
+    T_WRAP_CONTAINER(resizeWindow(
+        application,
+        test,
+        widget,
+        widget->getGlobalTopLeft() + sf::Vector2f(-cursor_offset, -cursor_offset),
+        resize_offset,
+        sf::FloatRect(
+            widget->getPosition() + resize_offset,
+            widget->getSize() - resize_offset
+        )
+    ));
+    T_WRAP_CONTAINER(resizeWindow(
+        application,
+        test,
+        widget,
+        widget->getGlobalTop() + sf::Vector2f(0.0f, -cursor_offset),
+        resize_offset,
+        sf::FloatRect(
+            widget->getPosition() + sf::Vector2f(0.0f, resize_offset.y),
+            widget->getSize() + sf::Vector2f(0.0f, -resize_offset.y)
+        )
+    ));
+    T_WRAP_CONTAINER(resizeWindow(
+        application,
+        test,
+        widget,
+        widget->getGlobalTopRight() + sf::Vector2f(cursor_offset, -cursor_offset),
+        resize_offset,
+        sf::FloatRect(
+            widget->getPosition() + sf::Vector2f(0.0f, resize_offset.y),
+            widget->getSize() + sf::Vector2f(resize_offset.x, -resize_offset.y)
+        )
+    ));
+    T_WRAP_CONTAINER(resizeWindow(
+        application,
+        test,
+        widget,
+        widget->getGlobalLeft() + sf::Vector2f(-cursor_offset, 0.0f),
+        resize_offset,
+        sf::FloatRect(
+            widget->getPosition() + sf::Vector2f(resize_offset.x, 0.0f),
+            widget->getSize() + sf::Vector2f(-resize_offset.x, 0.0f)
+        )
+    ));
+    T_WRAP_CONTAINER(resizeWindow(
+        application,
+        test,
+        widget,
+        widget->getGlobalRight() + sf::Vector2f(cursor_offset, 0.0f),
+        resize_offset,
+        sf::FloatRect(
+            widget->getPosition(),
+            widget->getSize() + sf::Vector2f(resize_offset.x, 0.0f)
+        )
+    ));
+    T_WRAP_CONTAINER(resizeWindow(
+        application,
+        test,
+        widget,
+        widget->getGlobalBottomLeft() + sf::Vector2f(-cursor_offset, cursor_offset),
+        resize_offset,
+        sf::FloatRect(
+            widget->getPosition() + sf::Vector2f(resize_offset.x, 0.0f),
+            widget->getSize() + sf::Vector2f(-resize_offset.x, resize_offset.y)
+        )
+    ));
+    T_WRAP_CONTAINER(resizeWindow(
+        application,
+        test,
+        widget,
+        widget->getGlobalBottom() + sf::Vector2f(0.0f, cursor_offset),
+        resize_offset,
+        sf::FloatRect(
+            widget->getPosition(),
+            widget->getSize() + sf::Vector2f(0.0f, resize_offset.y)
+        )
+    ));
+    T_WRAP_CONTAINER(resizeWindow(
+        application,
+        test,
+        widget,
+        widget->getGlobalBottomRight() + sf::Vector2f(cursor_offset, cursor_offset),
+        resize_offset,
+        sf::FloatRect(
+            widget->getPosition(),
+            widget->getSize() + resize_offset
+        )
+    ));
 }
 
 void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {

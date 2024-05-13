@@ -129,6 +129,7 @@ private:
 	void windowWidgetDragTest(test::Test& test);
 	void windowWidgetChildrenTest(test::Test& test);
 	void windowWidgetResizeTest(test::Test& test);
+	void windowWidgetChainTest(test::Test& test);
 
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);
@@ -138,6 +139,19 @@ private:
 	static std::string colorToStr(const sf::Color& color);
 	static std::string anchorToStr(fw::Widget::Anchor anchor);
 	fw::TextBoxWidget* initTextBox(fw::Application& application, float width, float height) const;
+	void resizeWindow(
+		fw::Application& application,
+		test::Test& test,
+		fw::WindowWidget* widget,
+		const sf::Vector2f& begin_pos,
+		const sf::Vector2f& resize_offset,
+		const sf::FloatRect& new_bounds
+	);
+	void resizeWindowTest(
+		fw::Application& application,
+		test::Test& test,
+		fw::WindowWidget* widget
+	);
 	void genericWidgetTest(const GenericWidgetTest& gwt);
 
 };
