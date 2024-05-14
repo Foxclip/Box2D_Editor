@@ -270,6 +270,15 @@ namespace fw {
 		header_text_widget->setCharacterSize(size);
 	}
 
+	void WindowWidget::setSize(float x, float y) {
+		EmptyWidget::setSize(x, y);
+		main_widget->setSize(x, std::max(0.0f, y - header_widget->getHeight()));
+	}
+
+	void WindowWidget::setSize(const sf::Vector2f& p_size) {
+		setSize(p_size.x, p_size.y);
+	}
+
 	void WindowWidget::setOutlineColor(const sf::Color& color) {
 		this->outline_color = color;
 	}

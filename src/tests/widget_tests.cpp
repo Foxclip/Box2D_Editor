@@ -128,6 +128,7 @@ void WidgetTests::createWidgetsList() {
     test::Test* window_widget_resize_test = list->addTest("window_widget_resize", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetResizeTest(test); });
     test::Test* window_widget_chain_test = list->addTest("window_widget_chain", { window_widget_children_test, window_widget_resize_test }, [&](test::Test& test) { windowWidgetChainTest(test); });
     test::Test* window_widget_drag_limits_test = list->addTest("window_widget_drag_limits", { window_widget_drag_test, window_widget_chain_test }, [&](test::Test& test) { windowWidgetDragLimitsTest(test); });
+    test::Test* window_widget_resize_limits_test = list->addTest("window_widget_resize_limits", { window_widget_chain_test }, [&](test::Test& test) { windowWidgetResizeLimitsTest(test); });
 }
 
 void WidgetTests::beforeRunModule() {
@@ -2104,6 +2105,196 @@ void WidgetTests::windowWidgetDragLimitsTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(child_window->getPosition(), sf::Vector2f(parent_width - margin, parent_height - margin));
 }
 
+void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::WindowWidget* parent_window = application.getWidgets().createWidget<fw::WindowWidget>(300.0f, 250.0f);
+    parent_window->setName("parent window");
+    parent_window->setPosition(150.0f, 100.0f);
+    parent_window->setHeaderFont(textbox_font);
+    parent_window->setHeaderText("Parent window");
+    parent_window->setHeaderTextCharacterSize(15);
+    fw::WindowWidget* child_window = application.getWidgets().createWidget<fw::WindowWidget>(100.0f, 100.0f);
+    child_window->setName("child window");
+    child_window->setPosition(20.0f, 20.0f);
+    child_window->setHeaderFont(textbox_font);
+    child_window->setHeaderText("Child window");
+    child_window->setHeaderTextCharacterSize(15);
+    parent_window->addWindowChild(child_window);
+    application.advance();
+    fw::RectangleWidget* parent_main_widget = parent_window->getMainWidget();
+    sf::Vector2f child_pos = child_window->getPosition();
+    float child_width = child_window->getWidth();
+    float child_height = child_window->getHeight();
+    sf::Vector2f min_size = child_window->MIN_WINDOW_SIZE;
+    float parent_width = parent_main_widget->getWidth();
+    float parent_height = parent_main_widget->getHeight();
+    float parent_width_n = -child_width - 10.0f;
+    float parent_width_p = parent_width + child_width + 10.0f;
+    float parent_height_n = -child_height - 10.0f;
+    float parent_height_p = parent_height + child_height + 10.0f;
+    float parent_center_x = parent_width / 2.0f;
+    float parent_center_y = parent_height / 2.0f;
+    float child_header_height = child_window->getHeaderWidget()->getHeight();
+    sf::Vector2f child_header_center = child_window->getHeaderWidget()->getGlobalCenter();
+    float cursor_offset = child_window->RESIZE_WIDGET_MARGIN / 2.0f;
+    auto reset_child_window = [&]() {
+        child_window->setPosition(child_pos);
+        child_window->setSize(child_width, child_height);
+    };
+
+    // making window smaller than minimum size
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(min_size.x, min_size.y + child_header_height);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalTopLeft() + sf::Vector2f(-cursor_offset, -cursor_offset),
+            sf::Vector2f(child_width, child_height),
+            sf::FloatRect(child_window->getBottomRight() + sf::Vector2f(-new_size.x, -new_size.y), new_size)
+        ));
+    }
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(child_width, min_size.y + child_header_height);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalTop() + sf::Vector2f(0.0f, -cursor_offset),
+            sf::Vector2f(0.0f, child_height),
+            sf::FloatRect(child_window->getBottomLeft() + sf::Vector2f(0.0f, -new_size.y), new_size)
+        ));
+    }
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(min_size.x, min_size.y + child_header_height);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalTopRight() + sf::Vector2f(cursor_offset, -cursor_offset),
+            sf::Vector2f(-child_width, child_height),
+            sf::FloatRect(child_window->getBottomLeft() + sf::Vector2f(0.0f, -new_size.y), new_size)
+        ));
+    }
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(min_size.x, child_height);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalLeft() + sf::Vector2f(-cursor_offset, 0.0f),
+            sf::Vector2f(child_width, 0.0f),
+            sf::FloatRect(child_window->getTopRight() + sf::Vector2f(-new_size.x, 0.0f), new_size)
+        ));
+    }
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(min_size.x, child_height);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalRight() + sf::Vector2f(cursor_offset, 0.0f),
+            sf::Vector2f(-child_width, 0.0f),
+            sf::FloatRect(child_window->getTopLeft(), new_size)
+        ));
+    }
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(min_size.x, min_size.y + child_header_height);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalBottomLeft() + sf::Vector2f(-cursor_offset, cursor_offset),
+            sf::Vector2f(child_width, -child_height),
+            sf::FloatRect(child_window->getTopRight() + sf::Vector2f(-new_size.x, 0.0f), new_size)
+        ));
+    }
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(child_width, min_size.y + child_header_height);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalBottom() + sf::Vector2f(0.0f, cursor_offset),
+            sf::Vector2f(0.0f, -child_height),
+            sf::FloatRect(child_window->getTopLeft(), new_size)
+        ));
+    }
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(min_size.x, min_size.y + child_header_height);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalBottomRight() + sf::Vector2f(cursor_offset, cursor_offset),
+            sf::Vector2f(-child_width, -child_height),
+            sf::FloatRect(child_window->getTopLeft(), new_size)
+        ));
+    }
+
+    // resizing past parent window borders
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(child_width + parent_width, child_window->getBottom().y);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalTopLeft() + sf::Vector2f(-cursor_offset, -cursor_offset),
+            sf::Vector2f(-parent_width, -parent_height),
+            sf::FloatRect(sf::Vector2f(child_pos.x - parent_width, 0.0f), new_size)
+        ));
+    }
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(child_width + parent_width, child_window->getBottom().y);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalTopRight() + sf::Vector2f(cursor_offset, -cursor_offset),
+            sf::Vector2f(parent_width, -parent_height),
+            sf::FloatRect(sf::Vector2f(child_pos.x, 0.0f), new_size)
+        ));
+    }
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(child_width + parent_width, child_height + parent_height);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalBottomLeft() + sf::Vector2f(-cursor_offset, cursor_offset),
+            sf::Vector2f(-parent_width, parent_height),
+            sf::FloatRect(sf::Vector2f(child_pos.x - parent_width, child_pos.y), new_size)
+        ));
+    }
+    {
+        reset_child_window();
+        sf::Vector2f new_size = sf::Vector2f(child_width + parent_width, child_height + parent_height);
+        T_WRAP_CONTAINER(resizeWindow(
+            application,
+            test,
+            child_window,
+            child_window->getGlobalBottomRight() + sf::Vector2f(cursor_offset, cursor_offset),
+            sf::Vector2f(parent_width, parent_height),
+            sf::FloatRect(sf::Vector2f(child_pos.x, child_pos.y), new_size)
+        ));
+    }
+}
+
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
     return "(" + utils::vec_to_str(vec) + ")";
 }
@@ -2193,7 +2384,6 @@ void WidgetTests::resizeWindow(
     const sf::Vector2f& resize_offset,
     const sf::FloatRect& new_bounds
 ) {
-    sf::FloatRect old_bounds = widget->getGlobalBounds();
     application.mouseMove(begin_pos);
     application.advance();
     application.mouseLeftPress();

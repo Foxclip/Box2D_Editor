@@ -40,6 +40,8 @@ namespace fw {
 		void setHeaderTextColor(const sf::Color& color);
 		void setHeaderFont(const sf::Font& font);
 		void setHeaderTextCharacterSize(unsigned int size);
+		void setSize(float width, float height) override;
+		void setSize(const sf::Vector2f& p_size) override;
 		void setOutlineColor(const sf::Color& color);
 		void addChild(Widget* child) override;
 		void addWindowChild(Widget* child);
