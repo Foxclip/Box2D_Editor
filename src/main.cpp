@@ -43,8 +43,8 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: WindowWidget drag limits test
     // TODO: WindowWidget resize limits test
+    // TODO: change window->addWindowChild to child->addToWindow
     // TODO: require size for RectangleWidget and font for TextWidget
     // TODO: remake EditWindow with WindowWidget
     // TODO: align textboxes in EditWindow to the right

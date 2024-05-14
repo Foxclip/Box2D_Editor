@@ -77,17 +77,25 @@ namespace fw {
     }
 
     void Application::mouseMove(int x, int y) {
-        mouseMove(sf::Vector2i(x, y));
+        wAssert(external_control);
+        external_mouse_pos = sf::Vector2i(x, y);
+        sf::Event event;
+        event.type = sf::Event::MouseMoved;
+        event.mouseButton.x = x;
+        event.mouseButton.y = y;
+        addExternalEvent(event);
+    }
+
+    void Application::mouseMove(float x, float y) {
+        mouseMove((int)x, (int)y);
     }
 
     void Application::mouseMove(const sf::Vector2i& pos) {
-        wAssert(external_control);
-        external_mouse_pos = pos;
-        sf::Event event;
-        event.type = sf::Event::MouseMoved;
-        event.mouseButton.x = pos.x;
-        event.mouseButton.y = pos.y;
-        addExternalEvent(event);
+        mouseMove(pos.x, pos.y);
+    }
+
+    void Application::mouseMove(const sf::Vector2f& pos) {
+        mouseMove(pos.x, pos.y);
     }
 
     void Application::mouseLeftPress() {

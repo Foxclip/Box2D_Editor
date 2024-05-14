@@ -1,11 +1,21 @@
 #include "tests/widget_tests.h"
 #include <utils.h>
 
-#define CLICK_MOUSE(pos) \
+#define PRESS_MOUSE_LEFT(pos) \
     application.mouseMove(pos); \
     application.mouseLeftPress(); \
-    application.advance(); \
+    application.advance();
+
+#define RELEASE_MOUSE_LEFT() \
     application.mouseLeftRelease(); \
+    application.advance();
+
+#define CLICK_MOUSE(pos) \
+    PRESS_MOUSE_LEFT(pos); \
+    RELEASE_MOUSE_LEFT();
+
+#define MOVE_MOUSE(pos) \
+    application.mouseMove(pos); \
     application.advance();
 
 #define PRESS_KEY(key) \
@@ -117,6 +127,7 @@ void WidgetTests::createWidgetsList() {
     test::Test* window_widget_children_test = list->addTest("window_widget_children", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetChildrenTest(test); });
     test::Test* window_widget_resize_test = list->addTest("window_widget_resize", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetResizeTest(test); });
     test::Test* window_widget_chain_test = list->addTest("window_widget_chain", { window_widget_children_test, window_widget_resize_test }, [&](test::Test& test) { windowWidgetChainTest(test); });
+    test::Test* window_widget_drag_limits_test = list->addTest("window_widget_drag_limits", { window_widget_drag_test, window_widget_chain_test }, [&](test::Test& test) { windowWidgetDragLimitsTest(test); });
 }
 
 void WidgetTests::beforeRunModule() {
@@ -928,7 +939,7 @@ void WidgetTests::checkboxWidgetToggleTest(test::Test& test) {
     application.start(true);
     fw::CheckboxWidget* checkbox_widget = application.getWidgets().createWidget<fw::CheckboxWidget>();
     T_CHECK(!checkbox_widget->getValue());
-    application.mouseMove(fw::to2i(checkbox_widget->getGlobalCenter()));
+    application.mouseMove(checkbox_widget->getGlobalCenter());
     application.advance();
     application.mouseLeftPress();
     application.advance();
@@ -1073,7 +1084,7 @@ void WidgetTests::textboxWidgetBasicTest(test::Test& test) {
 void WidgetTests::textboxWidgetInputTest(test::Test& test) {
     fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
     T_CHECK(textbox_widget->isFocused());
     T_CHECK(application.getWidgets().getFocusedWidget() == textbox_widget);
@@ -1119,11 +1130,11 @@ void WidgetTests::textboxWidgetEventsTest(test::Test& test) {
     textbox_widget->OnCancel = [&]() {
         cancelled = true;
     };
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
     T_CHECK(edit_mode);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalTopRight() + sf::Vector2f(10.0f, 0.0f)));
+    CLICK_MOUSE(textbox_widget->getGlobalTopRight() + sf::Vector2f(10.0f, 0.0f));
     T_CHECK(!edit_mode);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
     T_CHECK(edit_mode);
     ENTER_TEXT(sf::Keyboard::A, 'a');
     T_COMPARE(value, "a");
@@ -1134,7 +1145,7 @@ void WidgetTests::textboxWidgetEventsTest(test::Test& test) {
     ENTER_TEXT(sf::Keyboard::Enter, '\n');
     T_CHECK(!edit_mode);
     T_CHECK(confirmed);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
     T_CHECK(edit_mode);
     TAP_KEY(sf::Keyboard::Escape);
     T_CHECK(!edit_mode);
@@ -1144,7 +1155,7 @@ void WidgetTests::textboxWidgetEventsTest(test::Test& test) {
 void WidgetTests::textboxWidgetCursorTest(test::Test& test) {
     fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
     ENTER_TEXT(sf::Keyboard::BackSpace, '\b');
     TAP_KEY(sf::Keyboard::Left);
@@ -1188,7 +1199,7 @@ void WidgetTests::textboxWidgetCursorTest(test::Test& test) {
 void WidgetTests::textboxWidgetScrollTest(test::Test& test) {
     fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 20.0f, 20.0f);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
     const fw::TextWidget* text_widget = textbox_widget->getTextWidget();
     float zero_pos = textbox_widget->TEXT_VIEW_ZERO_POS.x;
@@ -1232,7 +1243,7 @@ void WidgetTests::textboxWidgetScrollTest(test::Test& test) {
 void WidgetTests::textboxWidgetSelectionTest(test::Test& test) {
     fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
     CHECK_SELECTION(true, "Text", 4, 0, 4);
     TAP_KEY(sf::Keyboard::Left);
@@ -1300,13 +1311,13 @@ void WidgetTests::textboxWidgetSelectionTest(test::Test& test) {
 void WidgetTests::textboxWidgetMouseClickTest(test::Test& test) {
     fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
     auto click_at_char = [&](size_t index) {
         T_ASSERT_NO_ERRORS();
         SELECT_ALL();
         CHECK_SELECTION(true, "Text", 4, 0, 4);
-        CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCharPos(index)));
+        CLICK_MOUSE(textbox_widget->getGlobalCharPos(index));
         T_CHECK(textbox_widget->isFocused());
         CHECK_SELECTION(false, "", index, -1, -1);
     };
@@ -1317,7 +1328,7 @@ void WidgetTests::textboxWidgetMouseClickTest(test::Test& test) {
     T_WRAP_CONTAINER(click_at_char(4));
 
     T_ASSERT_NO_ERRORS();
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalTopRight() + sf::Vector2f(10.0f, 0.0f)));
+    CLICK_MOUSE(textbox_widget->getGlobalTopRight() + sf::Vector2f(10.0f, 0.0f));
     CHECK_SELECTION(false, "", 0, -1, -1);
     T_CHECK(!textbox_widget->isFocused());
 }
@@ -1327,7 +1338,7 @@ void WidgetTests::textboxWidgetMouseDragTest(test::Test& test) {
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
 
     auto get_char_pos = [&](size_t index) {
-        return fw::to2i(textbox_widget->getGlobalCharPos(index));
+        return textbox_widget->getGlobalCharPos(index);
     };
     auto move_to_char = [&](size_t index) {
         application.mouseMove(get_char_pos(index));
@@ -1373,7 +1384,7 @@ void WidgetTests::textboxWidgetMouseDragTest(test::Test& test) {
 void WidgetTests::textboxWidgetCopyPasteTest(test::Test& test) {
     fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
     COPY();
     T_COMPARE(textbox_widget->getValue(), "Text");
@@ -1439,7 +1450,7 @@ void WidgetTests::textboxWidgetCopyPasteTest(test::Test& test) {
 void WidgetTests::textboxWidgetHistoryTest(test::Test& test) {
     fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
     auto undo = [&]() {
         PRESS_KEY(sf::Keyboard::LControl);
@@ -1532,7 +1543,7 @@ void WidgetTests::textboxWidgetHistoryTest(test::Test& test) {
 void WidgetTests::textboxWidgetIntegerTest(test::Test& test) {
     fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
     T_CHECK(textbox_widget->isValidValue());
     textbox_widget->setType(fw::TextBoxWidget::TextBoxType::INTEGER);
@@ -1595,7 +1606,7 @@ void WidgetTests::textboxWidgetIntegerTest(test::Test& test) {
 void WidgetTests::textboxWidgetFloatTest(test::Test& test) {
     fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
-    CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
+    CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
     T_CHECK(textbox_widget->isValidValue());
     textbox_widget->setType(fw::TextBoxWidget::TextBoxType::FLOAT);
@@ -1936,11 +1947,11 @@ void WidgetTests::windowWidgetDragTest(test::Test& test) {
     sf::Vector2f header_center = window_widget->getGlobalCenter();
     sf::Vector2f offset_pos = sf::Vector2f(50.0f, 30.0f);
     sf::Vector2f new_position = position + offset_pos;
-    application.mouseMove(fw::to2i(header_center));
+    application.mouseMove(header_center);
     application.advance();
     application.mouseLeftPress();
     application.advance();
-    application.mouseMove(fw::to2i(header_center + offset_pos));
+    application.mouseMove(header_center + offset_pos);
     application.advance();
     application.mouseLeftRelease();
     application.advance();
@@ -2040,6 +2051,59 @@ void WidgetTests::windowWidgetChainTest(test::Test& test) {
     T_WRAP_CONTAINER(resizeWindowTest(application, test, another_child_window));
 }
 
+void WidgetTests::windowWidgetDragLimitsTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::WindowWidget* parent_window = application.getWidgets().createWidget<fw::WindowWidget>(300.0f, 250.0f);
+    parent_window->setName("parent window");
+    parent_window->setPosition(150.0f, 100.0f);
+    parent_window->setHeaderFont(textbox_font);
+    parent_window->setHeaderText("Parent window");
+    parent_window->setHeaderTextCharacterSize(15);
+    fw::WindowWidget* child_window = application.getWidgets().createWidget<fw::WindowWidget>(100.0f, 100.0f);
+    child_window->setName("child window");
+    child_window->setPosition(20.0f, 20.0f);
+    child_window->setHeaderFont(textbox_font);
+    child_window->setHeaderText("Child window");
+    child_window->setHeaderTextCharacterSize(15);
+    parent_window->addWindowChild(child_window);
+    application.advance();
+    fw::RectangleWidget* parent_main_widget = parent_window->getMainWidget();
+    float child_width = child_window->getWidth();
+    float child_height = child_window->getHeight();
+    float margin = child_window->ONSCREEN_MARGIN;
+    float parent_width = parent_main_widget->getWidth();
+    float parent_height = parent_main_widget->getHeight();
+    float parent_width_n = -child_width - 10.0f;
+    float parent_width_p = parent_width + child_width + 10.0f;
+    float parent_height_n = -child_height - 10.0f;
+    float parent_height_p = parent_height + child_height + 10.0f;
+    float parent_center_x = parent_width / 2.0f;
+    float parent_center_y = parent_height / 2.0f;
+    float child_header_height = child_window->getHeaderWidget()->getHeight();
+    sf::Vector2f child_header_center = child_window->getHeaderWidget()->getGlobalCenter();
+    PRESS_MOUSE_LEFT(child_header_center);
+    MOVE_MOUSE(parent_main_widget->toGlobal(sf::Vector2f(parent_width_n, parent_height_n))); // top left
+    T_VEC2_APPROX_COMPARE(child_window->getPosition(), sf::Vector2f(margin - child_width, 0.0f));
+    MOVE_MOUSE(parent_main_widget->toGlobal(sf::Vector2f(parent_center_x, parent_height_n))); // top
+    T_VEC2_APPROX_COMPARE(child_window->getPosition(), sf::Vector2f(parent_center_x - child_width / 2.0f, 0.0f));
+    MOVE_MOUSE(parent_main_widget->toGlobal(sf::Vector2f(parent_width_p, parent_height_n))); // top right
+    T_VEC2_APPROX_COMPARE(child_window->getPosition(), sf::Vector2f(parent_width - margin, 0.0f));
+    MOVE_MOUSE(parent_main_widget->toGlobal(sf::Vector2f(parent_width_n, parent_center_y))); // left
+    T_VEC2_APPROX_COMPARE(child_window->getPosition(), sf::Vector2f(margin - child_width, parent_center_y - child_header_height / 2.0f));
+    MOVE_MOUSE(parent_main_widget->toGlobal(sf::Vector2f(parent_width_p, parent_center_y))); // right
+    T_VEC2_APPROX_COMPARE(child_window->getPosition(), sf::Vector2f(parent_width - margin, parent_center_y - child_header_height / 2.0f));
+    MOVE_MOUSE(parent_main_widget->toGlobal(sf::Vector2f(parent_width_n, parent_height_p))); // bottom left
+    T_VEC2_APPROX_COMPARE(child_window->getPosition(), sf::Vector2f(margin - child_width, parent_height - margin));
+    MOVE_MOUSE(parent_main_widget->toGlobal(sf::Vector2f(parent_center_x, parent_height_p))); // bottom
+    T_VEC2_APPROX_COMPARE(child_window->getPosition(), sf::Vector2f(parent_center_x - child_width / 2.0f, parent_height - margin));
+    MOVE_MOUSE(parent_main_widget->toGlobal(sf::Vector2f(parent_width_p, parent_height_p))); // bottom right
+    T_VEC2_APPROX_COMPARE(child_window->getPosition(), sf::Vector2f(parent_width - margin, parent_height - margin));
+}
+
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
     return "(" + utils::vec_to_str(vec) + ")";
 }
@@ -2130,11 +2194,11 @@ void WidgetTests::resizeWindow(
     const sf::FloatRect& new_bounds
 ) {
     sf::FloatRect old_bounds = widget->getGlobalBounds();
-    application.mouseMove(fw::to2i(begin_pos));
+    application.mouseMove(begin_pos);
     application.advance();
     application.mouseLeftPress();
     application.advance();
-    application.mouseMove(application.getMousePos() + fw::to2i(resize_offset));
+    application.mouseMove(application.getMousePosf() + resize_offset);
     application.advance();
     application.mouseLeftRelease();
     application.advance();

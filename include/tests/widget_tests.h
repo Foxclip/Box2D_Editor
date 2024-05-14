@@ -135,6 +135,7 @@ private:
 	void windowWidgetChildrenTest(test::Test& test);
 	void windowWidgetResizeTest(test::Test& test);
 	void windowWidgetChainTest(test::Test& test);
+	void windowWidgetDragLimitsTest(test::Test& test);
 
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);
