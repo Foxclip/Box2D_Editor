@@ -31,6 +31,8 @@ namespace fw {
 
 	class Application {
 	public:
+		Application();
+		Application(sf::RenderWindow& window);
 		virtual void init(
 			const sf::String& window_title,
 			unsigned int window_width,
@@ -65,7 +67,10 @@ namespace fw {
 		void close();
 
 	protected:
-		sf::RenderWindow window;
+		sf::RenderWindow& window;
+		sf::RenderWindow internal_window;
+		bool external_window = false;
+		bool running = true;
 		sf::View window_view;
 		WidgetList widgets = WidgetList(*this);
 		sf::Vector2i mousePrevPos;

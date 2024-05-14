@@ -4,6 +4,12 @@
 
 namespace fw {
 
+    Application::Application() : window(internal_window) { }
+
+    Application::Application(sf::RenderWindow& window) : window(window) {
+        external_window = true;
+    }
+
     void Application::init(
         const sf::String& window_title,
         unsigned int window_width,
@@ -20,6 +26,7 @@ namespace fw {
 
     void Application::start(bool external_control) {
         this->external_control = external_control;
+        running = true;
         onStart();
         if (!external_control) {
             mainLoop();
@@ -205,7 +212,7 @@ namespace fw {
     }
 
     void Application::close() {
-        window.close();
+        running = false;
         onClose();
     }
 
@@ -258,9 +265,11 @@ namespace fw {
     }
 
     void Application::mainLoop() {
-        while (window.isOpen()) {
+        wAssert(!external_window);
+        while (window.isOpen() && running) {
             advance();
         }
+        window.close();
     }
 
     void Application::processWidgets() {
