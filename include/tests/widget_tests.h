@@ -5,6 +5,8 @@
 
 class TestApplication : public fw::Application {
 public:
+	TestApplication(sf::RenderWindow& window);
+
 	bool initialized = false;
 	bool started = false;
 	bool frame_begin = false;
@@ -84,8 +86,11 @@ public:
 protected:
 	void createApplicationList();
 	void createWidgetsList();
+	void beforeRunModule() override;
+	void afterRunModule() override;
 
 private:
+	sf::RenderWindow window;
 	sf::Font textbox_font;
 
 	void basicTest(test::Test& test);

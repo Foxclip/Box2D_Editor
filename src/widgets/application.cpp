@@ -19,7 +19,12 @@ namespace fw {
     ) {
         sf::ContextSettings cs_window;
         cs_window.antialiasingLevel = antialiasing;
-        window.create(sf::VideoMode(window_width, window_height), window_title, sf::Style::Default, cs_window);
+        if (external_window) {
+            window.setSize(sf::Vector2u(window_width, window_height));
+            window.setTitle(window_title);
+        } else {
+            window.create(sf::VideoMode(window_width, window_height), window_title, sf::Style::Default, cs_window);
+        }
         window.setVerticalSyncEnabled(vsync);
         onInit();
     }

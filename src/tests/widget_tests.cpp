@@ -119,26 +119,35 @@ void WidgetTests::createWidgetsList() {
     test::Test* window_widget_chain_test = list->addTest("window_widget_chain", { window_widget_children_test, window_widget_resize_test }, [&](test::Test& test) { windowWidgetChainTest(test); });
 }
 
+void WidgetTests::beforeRunModule() {
+    sf::ContextSettings cs_window;
+    window.create(sf::VideoMode(800, 600), "Test window", sf::Style::Default, cs_window);
+}
+
+void WidgetTests::afterRunModule() {
+    window.close();
+}
+
 void WidgetTests::basicTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
 }
 
 void WidgetTests::initTest(test::Test& test) {
-    TestApplication application;
+    TestApplication application(window);
     application.init("Test window", 800, 600, 0, false);
     T_ASSERT(T_CHECK(application.initialized));
     T_COMPARE(application.getWindowSize(), sf::Vector2u(800, 600), &WidgetTests::sfVec2uToStr);
 }
 
 void WidgetTests::startTest(test::Test& test) {
-    TestApplication application;
+    TestApplication application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     T_ASSERT(T_CHECK(application.started));
 }
 
 void WidgetTests::advanceTest(test::Test& test) {
-    TestApplication application;
+    TestApplication application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -161,7 +170,7 @@ void WidgetTests::advanceTest(test::Test& test) {
 }
 
 void WidgetTests::closeTest(test::Test& test) {
-    TestApplication application;
+    TestApplication application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -170,7 +179,7 @@ void WidgetTests::closeTest(test::Test& test) {
 }
 
 void WidgetTests::mouseEventsTest(test::Test& test) {
-    TestApplication application;
+    TestApplication application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     {
@@ -220,7 +229,7 @@ void WidgetTests::mouseEventsTest(test::Test& test) {
 }
 
 void WidgetTests::keyboardEventsTest(test::Test& test) {
-    TestApplication application;
+    TestApplication application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     T_CHECK(!application.space_key_pressed);
@@ -237,7 +246,7 @@ void WidgetTests::keyboardEventsTest(test::Test& test) {
 }
 
 void WidgetTests::rootWidgetTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -283,7 +292,7 @@ void WidgetTests::rootWidgetTest(test::Test& test) {
 }
 
 void WidgetTests::emptyWidgetTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -333,7 +342,7 @@ void WidgetTests::emptyWidgetTest(test::Test& test) {
 }
 
 void WidgetTests::rectangleWidgetTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -391,7 +400,7 @@ void WidgetTests::rectangleWidgetTest(test::Test& test) {
 }
 
 void WidgetTests::setParentTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -432,7 +441,7 @@ void WidgetTests::setParentTest(test::Test& test) {
 }
 
 void WidgetTests::widgetMouseEvents1(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -539,7 +548,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
 }
 
 void WidgetTests::widgetMouseEvents2(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -692,7 +701,7 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
 }
 
 void WidgetTests::eventsTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -738,7 +747,7 @@ void WidgetTests::eventsTest(test::Test& test) {
 }
 
 void WidgetTests::coordinatesTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -756,7 +765,7 @@ void WidgetTests::coordinatesTest(test::Test& test) {
 }
 
 void WidgetTests::findTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -772,7 +781,7 @@ void WidgetTests::findTest(test::Test& test) {
 }
 
 void WidgetTests::anchorTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -807,7 +816,7 @@ void WidgetTests::anchorTest(test::Test& test) {
 }
 
 void WidgetTests::textWidgetTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -860,7 +869,7 @@ void WidgetTests::textWidgetTest(test::Test& test) {
 }
 
 void WidgetTests::checkboxWidgetBasicTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -914,7 +923,7 @@ void WidgetTests::checkboxWidgetBasicTest(test::Test& test) {
 }
 
 void WidgetTests::checkboxWidgetToggleTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     fw::CheckboxWidget* checkbox_widget = application.getWidgets().createWidget<fw::CheckboxWidget>();
@@ -930,7 +939,7 @@ void WidgetTests::checkboxWidgetToggleTest(test::Test& test) {
 }
 
 void WidgetTests::containerWidgetBasicTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -980,7 +989,7 @@ void WidgetTests::containerWidgetBasicTest(test::Test& test) {
 }
 
 void WidgetTests::containerWidgetChildrenTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>();
@@ -1014,7 +1023,7 @@ void WidgetTests::containerWidgetChildrenTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetBasicTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -1062,7 +1071,7 @@ void WidgetTests::textboxWidgetBasicTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetInputTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
     CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
@@ -1092,7 +1101,7 @@ void WidgetTests::textboxWidgetInputTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetEventsTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
     bool edit_mode = false;
     sf::String value;
@@ -1133,7 +1142,7 @@ void WidgetTests::textboxWidgetEventsTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetCursorTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
     CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
@@ -1177,7 +1186,7 @@ void WidgetTests::textboxWidgetCursorTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetScrollTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 20.0f, 20.0f);
     CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
@@ -1221,7 +1230,7 @@ void WidgetTests::textboxWidgetScrollTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetSelectionTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
     CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
@@ -1289,7 +1298,7 @@ void WidgetTests::textboxWidgetSelectionTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetMouseClickTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
     CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
@@ -1314,7 +1323,7 @@ void WidgetTests::textboxWidgetMouseClickTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetMouseDragTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
 
     auto get_char_pos = [&](size_t index) {
@@ -1362,7 +1371,7 @@ void WidgetTests::textboxWidgetMouseDragTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetCopyPasteTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
     CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
@@ -1428,7 +1437,7 @@ void WidgetTests::textboxWidgetCopyPasteTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetHistoryTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
     CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
@@ -1521,7 +1530,7 @@ void WidgetTests::textboxWidgetHistoryTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetIntegerTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
     CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
@@ -1584,7 +1593,7 @@ void WidgetTests::textboxWidgetIntegerTest(test::Test& test) {
 }
 
 void WidgetTests::textboxWidgetFloatTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     fw::TextBoxWidget* textbox_widget = initTextBox(application, 80.0f, 20.0f);
     CLICK_MOUSE(fw::to2i(textbox_widget->getGlobalCenter()));
 
@@ -1677,7 +1686,7 @@ void WidgetTests::textboxWidgetFloatTest(test::Test& test) {
 }
 
 void WidgetTests::canvasWidgetBasicTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -1725,7 +1734,7 @@ void WidgetTests::canvasWidgetBasicTest(test::Test& test) {
 }
 
 void WidgetTests::canvasWidgetDrawTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -1769,7 +1778,7 @@ void WidgetTests::canvasWidgetDrawTest(test::Test& test) {
 }
 
 void WidgetTests::windowWidgetBasicTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -1914,7 +1923,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
 }
 
 void WidgetTests::windowWidgetDragTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -1939,7 +1948,7 @@ void WidgetTests::windowWidgetDragTest(test::Test& test) {
 }
 
 void WidgetTests::windowWidgetChildrenTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -1961,7 +1970,7 @@ void WidgetTests::windowWidgetChildrenTest(test::Test& test) {
 }
 
 void WidgetTests::windowWidgetResizeTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -1976,7 +1985,7 @@ void WidgetTests::windowWidgetResizeTest(test::Test& test) {
 }
 
 void WidgetTests::windowWidgetChainTest(test::Test& test) {
-    fw::Application application;
+    fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -2288,6 +2297,8 @@ void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
     T_COMPARE(widget->getVisualGlobalBottomLeft(), visual_global_corners[2], vec2f_to_str);
     T_COMPARE(widget->getVisualGlobalBottomRight(), visual_global_corners[3], vec2f_to_str);
 }
+
+TestApplication::TestApplication(sf::RenderWindow& window) : Application(window) { }
 
 void TestApplication::onInit() {
     initialized = true;
