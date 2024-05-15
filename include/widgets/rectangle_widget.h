@@ -23,6 +23,7 @@ namespace fw {
 		const sf::Shape& getShape() const override;
 
 	private:
+		friend class WindowWidget;
 
 	};
 

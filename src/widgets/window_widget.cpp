@@ -285,14 +285,10 @@ namespace fw {
 
 	void WindowWidget::addChild(Widget* child) {
 		if (children_locked) {
-			wAssert(false, "Use window->addWindowChild(child) instead of child->setParent(window)");
+			main_widget->addChild(child);
 		} else {
 			Widget::addChild(child);
 		}
-	}
-
-	void WindowWidget::addWindowChild(Widget* child) {
-		child->setParent(main_widget);
 	}
 
 	void WindowWidget::internalUpdate() {

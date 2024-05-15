@@ -44,7 +44,6 @@ namespace fw {
 		void setSize(const sf::Vector2f& p_size) override;
 		void setOutlineColor(const sf::Color& color);
 		void addChild(Widget* child) override;
-		void addWindowChild(Widget* child);
 		void internalUpdate() override;
 
 	protected:
