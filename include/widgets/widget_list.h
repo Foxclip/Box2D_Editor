@@ -1,7 +1,7 @@
 #pragma once
 
 #include "widget.h"
-#include "rectangle_widget.h"
+#include "empty_widget.h"
 #include "widget_render_queue.h"
 
 namespace fw {
@@ -65,7 +65,7 @@ namespace fw {
 		sf::Color render_transform_origin_color = sf::Color::Blue;
 		sf::Color focused_widget_bounds_color = sf::Color(0, 200, 255);
 		CompVectorUptr<Widget> widgets;
-		RectangleWidget* root_widget = nullptr;
+		EmptyWidget* root_widget = nullptr;
 		Widget* focused_widget = nullptr;
 		WidgetRenderQueue render_queue = WidgetRenderQueue(*this);
 

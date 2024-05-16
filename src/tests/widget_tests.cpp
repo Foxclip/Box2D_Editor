@@ -263,7 +263,7 @@ void WidgetTests::rootWidgetTest(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    fw::RectangleWidget* root_widget = dynamic_cast<fw::RectangleWidget*>(application.getWidgets().getRootWidget());
+    fw::EmptyWidget* root_widget = dynamic_cast<fw::EmptyWidget*>(application.getWidgets().getRootWidget());
     T_ASSERT(T_CHECK(root_widget));
 
     GenericWidgetTest gwt(application, test);

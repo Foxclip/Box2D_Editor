@@ -6,8 +6,7 @@
 namespace fw {
 
 	WidgetList::WidgetList(Application& application) : application(application) {
-		root_widget = createWidget<RectangleWidget>(0.0f, 0.0f);
-		root_widget->setRenderable(false);
+		root_widget = createWidget<EmptyWidget>();
 		root_widget->setFillColor(sf::Color::Transparent);
 		root_widget->setClipChildren(true);
 		root_widget->setName("root");
