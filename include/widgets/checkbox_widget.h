@@ -4,6 +4,8 @@
 
 namespace fw {
 
+	const sf::Vector2f CHECKBOX_DEFAULT_SIZE = sf::Vector2f(20.0f, 20.0f);
+
 	class WidgetList;
 
 	class CheckboxWidget : public RectangleWidget {
@@ -30,7 +32,6 @@ namespace fw {
 
 	private:
 		bool checked = false;
-		const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(20.0f, 20.0f);
 		float check_size = 0.6f;
 		RectangleWidget* check_widget = nullptr;
 		sf::Color background_fill_color = sf::Color(50, 50, 50);

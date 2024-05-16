@@ -224,9 +224,9 @@ void Editor::initUi() {
 
 void Editor::initWidgets() {
 
-    world_widget = widgets.createWidget<fw::CanvasWidget>();
-    world_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    world_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    world_widget = widgets.createWidget<fw::CanvasWidget>(
+        (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
+    );
     world_widget->setName("world_canvas");
     world_widget->setShader(&desat_shader);
     world_widget->OnBeforeRender = [&](sf::RenderTarget& target) {
@@ -240,9 +240,9 @@ void Editor::initWidgets() {
         world_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };
 
-    selection_mask_widget = widgets.createWidget<fw::CanvasWidget>();
-    selection_mask_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    selection_mask_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    selection_mask_widget = widgets.createWidget<fw::CanvasWidget>(
+        (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
+    );
     selection_mask_widget->setName("selection_mask_canvas");
     selection_mask_widget->setShader(&selection_shader);
     selection_mask_widget->OnBeforeRender = [&](sf::RenderTarget& target) {
@@ -255,9 +255,9 @@ void Editor::initWidgets() {
         selection_mask_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };
 
-    ui_widget = widgets.createWidget<fw::CanvasWidget>();
-    ui_widget->setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    ui_widget->setTextureSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    ui_widget = widgets.createWidget<fw::CanvasWidget>(
+        (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
+    );
     ui_widget->setName("ui_canvas");
     ui_widget->OnUpdate = [&]() {
         ui_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
@@ -279,7 +279,7 @@ void Editor::initWidgets() {
     step_widget->setName("step text");
 
     // pause widget
-    paused_rect_widget = widgets.createWidget<fw::ContainerWidget>();
+    paused_rect_widget = widgets.createWidget<fw::ContainerWidget>(20.0f, 20.0f);
     paused_rect_widget->setFillColor(sf::Color(0, 0, 0, 128));
     paused_rect_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     paused_rect_widget->setPadding(10.0f);
@@ -293,7 +293,7 @@ void Editor::initWidgets() {
     paused_text_widget->setParent(paused_rect_widget);
 
     // fps
-    fps_widget = widgets.createWidget<fw::ContainerWidget>();
+    fps_widget = widgets.createWidget<fw::ContainerWidget>(20.0f, 20.0f);
     fps_widget->setFillColor(sf::Color::Yellow);
     fps_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     fps_widget->setPosition(120.0f, 0.0f);
@@ -308,9 +308,8 @@ void Editor::initWidgets() {
     fps_text_widget->setParent(fps_widget);
 
     // logger
-    logger_widget = widgets.createWidget<fw::RectangleWidget>();
+    logger_widget = widgets.createWidget<fw::RectangleWidget>(500.0f, 20.0f);
     logger_widget->setFillColor(sf::Color(0, 0, 0));
-    logger_widget->setSize(sf::Vector2f(500.0f, 20.0f));
     logger_widget->setOrigin(fw::Widget::Anchor::BOTTOM_LEFT);
     logger_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_LEFT);
     logger_widget->setClipChildren(true);
@@ -330,9 +329,8 @@ void Editor::initWidgets() {
     parent_window->setHeaderFont(console_font);
     parent_window->setHeaderText("Parent window");
     parent_window->setHeaderTextCharacterSize(15);
-    fw::RectangleWidget* red_rect = widgets.createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* red_rect = widgets.createWidget<fw::RectangleWidget>(30.0f, 30.0f);
     red_rect->setFillColor(sf::Color::Red);
-    red_rect->setSize(sf::Vector2f(30.0f, 30.0f));
     red_rect->setName("red rect");
     red_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     red_rect->setAnchorOffset(10.0f, 10.0f);
@@ -345,9 +343,8 @@ void Editor::initWidgets() {
     child_window->setHeaderText("Child window");
     child_window->setHeaderTextCharacterSize(15);
     child_window->setParent(parent_window);
-    fw::RectangleWidget* green_rect = widgets.createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* green_rect = widgets.createWidget<fw::RectangleWidget>(20.0f, 20.0f);
     green_rect->setFillColor(sf::Color::Green);
-    green_rect->setSize(sf::Vector2f(20.0f, 20.0f));
     green_rect->setName("green rect");
     green_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     green_rect->setAnchorOffset(10.0f, 10.0f);
@@ -360,9 +357,8 @@ void Editor::initWidgets() {
     another_child_window->setHeaderText("Another child window");
     another_child_window->setHeaderTextCharacterSize(15);
     another_child_window->setParent(child_window);
-    fw::RectangleWidget* blue_rect = widgets.createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* blue_rect = widgets.createWidget<fw::RectangleWidget>(20.0f, 20.0f);
     blue_rect->setFillColor(sf::Color::Blue);
-    blue_rect->setSize(sf::Vector2f(20.0f, 20.0f));
     blue_rect->setName("blue rect");
     blue_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     blue_rect->setAnchorOffset(10.0f, 10.0f);

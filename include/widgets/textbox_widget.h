@@ -8,6 +8,16 @@
 
 namespace fw {
 
+	const sf::Vector2f TEXTBOX_DEFAULT_SIZE = sf::Vector2f(40.0f, 20.0f);
+	const sf::Vector2f TEXTBOX_TEXT_VIEW_ZERO_POS = sf::Vector2f(2.0f, 0.0f);
+	const sf::Vector2f TEXTBOX_CURSOR_OFFSET = sf::Vector2f(0.0f, 0.0f);
+	const float TEXTBOX_CURSOR_MARGIN = 2.0f; // cursor sticking out above and below text
+	const float TEXTBOX_CURSOR_BLINK_INTERVAL = 0.5f;
+	const float TEXTBOX_SELECTION_MARGIN = 2.0f; // selection sticking out above and below text
+	const std::string TEXTBOX_VALID_INTEGER_CHARS = "+-0123456789";
+	const std::string TEXTBOX_VALID_FLOAT_CHARS = "+-.e0123456789";
+	const float TEXTBOX_CURSOR_MOVE_MARGIN = 2.0f; // scroll text when cursor approaches margin
+
 	class Timer {
 	public:
 		Timer();
@@ -21,15 +31,6 @@ namespace fw {
 
 	class TextBoxWidget : public RectangleWidget {
 	public:
-		const sf::Vector2f DEFAULT_SIZE = sf::Vector2f(40.0f, 20.0f);
-		const sf::Vector2f TEXT_VIEW_ZERO_POS = sf::Vector2f(2.0f, 0.0f);
-		const sf::Vector2f CURSOR_OFFSET = sf::Vector2f(0.0f, 0.0f);
-		const float CURSOR_MARGIN = 2.0f; // cursor sticking out above and below text
-		const float CURSOR_BLINK_INTERVAL = 0.5f;
-		const float SELECTION_MARGIN = 2.0f; // selection sticking out above and below text
-		const std::string VALID_INTEGER_CHARS = "+-0123456789";
-		const std::string VALID_FLOAT_CHARS = "+-.e0123456789";
-		const float CURSOR_MOVE_MARGIN = 2.0f; // scroll text when cursor approaches margin
 		std::function<void(bool)> OnEditModeToggle = [](bool new_value) { };
 		std::function<void(const sf::String&)> OnValueChanged = [](const sf::String& new_value) { };
 		std::function<void(const sf::String&)> OnConfirm = [](const sf::String& value) { };
@@ -41,6 +42,8 @@ namespace fw {
 		};
 
 		TextBoxWidget(WidgetList& widget_list);
+		TextBoxWidget(WidgetList& widget_list, float width, float height);
+		TextBoxWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		const sf::Color& getFillColor() const override;
 		const sf::Color& getHighlightColor() const;
 		const sf::Color& getTextColor() const;

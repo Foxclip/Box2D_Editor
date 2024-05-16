@@ -359,13 +359,12 @@ void WidgetTests::rectangleWidgetTest(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>(size);
     fw::Widget* root_widget = application.getWidgets().getRootWidget();
     T_ASSERT(T_CHECK(rectangle_widget));
     sf::Vector2f position(100.0f, 100.0f);
-    sf::Vector2f size(100.0f, 100.0f);
     rectangle_widget->setPosition(position);
-    rectangle_widget->setSize(size);
 
     GenericWidgetTest gwt(application, test);
     gwt.widget = rectangle_widget;
@@ -418,8 +417,8 @@ void WidgetTests::setParentTest(test::Test& test) {
     application.mouseMove(400, 300);
     application.advance();
     fw::Widget* root_widget = application.getWidgets().getRootWidget();
-    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
+    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
     sf::Vector2f parent_local_pos_before = parent_widget->getPosition();
     sf::Vector2f parent_global_pos_before = parent_widget->getGlobalPosition();
     sf::Vector2f child_local_pos_before = child_widget->getPosition();
@@ -458,7 +457,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::RectangleWidget* rectangle_widget = application.getWidgets().createWidget<fw::RectangleWidget>(size);
     bool mouse_entered = false;
     bool mouse_left_pressed = false;
     bool mouse_right_pressed = false;
@@ -488,11 +488,9 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
         mouse_processed = true;
     };
     sf::Vector2f position(100.0f, 100.0f);
-    sf::Vector2f size(100.0f, 100.0f);
     sf::Vector2i mouse_pos_1(150, 150);
     sf::Vector2i mouse_pos_2(300, 300);
     rectangle_widget->setPosition(position);
-    rectangle_widget->setSize(size);
     T_CHECK(!rectangle_widget->isMouseOver());
     T_CHECK(!mouse_entered);
     T_CHECK(!mouse_left_pressed);
@@ -565,8 +563,9 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    fw::RectangleWidget* rectangle_widget_1 = application.getWidgets().createWidget<fw::RectangleWidget>();
-    fw::RectangleWidget* rectangle_widget_2 = application.getWidgets().createWidget<fw::RectangleWidget>();
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::RectangleWidget* rectangle_widget_1 = application.getWidgets().createWidget<fw::RectangleWidget>(size);
+    fw::RectangleWidget* rectangle_widget_2 = application.getWidgets().createWidget<fw::RectangleWidget>(size);
     rectangle_widget_1->setClickThrough(false);
     bool mouse_entered_1 = false;
     bool mouse_pressed_1 = false;
@@ -609,13 +608,10 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
         mouse_processed_2 = true;
     };
     sf::Vector2f position(100.0f, 100.0f);
-    sf::Vector2f size(100.0f, 100.0f);
     sf::Vector2i mouse_pos_1(150, 150);
     sf::Vector2i mouse_pos_2(300, 300);
     rectangle_widget_1->setPosition(position);
-    rectangle_widget_1->setSize(size);
     rectangle_widget_2->setPosition(position);
-    rectangle_widget_2->setSize(size);
     T_CHECK(!rectangle_widget_1->isMouseOver());
     T_CHECK(!mouse_entered_1);
     T_CHECK(!mouse_pressed_1);
@@ -725,8 +721,7 @@ void WidgetTests::eventsTest(test::Test& test) {
     bool after_global_render = false;
     unsigned int window_width = 0;
     unsigned int window_height = 0;
-    fw::RectangleWidget* widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-    widget->setSize(100.0f, 100.0f);
+    fw::RectangleWidget* widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
     widget->OnUpdate = [&]() {
         updated = true;
     };
@@ -764,8 +759,8 @@ void WidgetTests::coordinatesTest(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
+    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
     sf::Vector2f parent_pos(100.0f, 100.0f);
     sf::Vector2f child_local_pos(30.0f, 30.0f);
     child_widget->setParent(parent_widget);
@@ -782,8 +777,8 @@ void WidgetTests::findTest(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
+    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
     parent_widget->setName("parent");
     child_widget->setName("child");
     child_widget->setParent(parent_widget);
@@ -798,14 +793,12 @@ void WidgetTests::anchorTest(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-    child_widget->setParent(parent_widget);
     sf::Vector2f parent_size(100.0f, 100.0f);
     sf::Vector2f child_size(30.0f, 30.0f);
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>(parent_size);
+    fw::RectangleWidget* child_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
+    child_widget->setParent(parent_widget);
     sf::Vector2f anchor_offset(5.0f, 7.0f);
-    parent_widget->setSize(parent_size);
-    child_widget->setSize(child_size);
     child_widget->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     child_widget->setAnchorOffset(anchor_offset);
     T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f() + anchor_offset);
@@ -956,13 +949,12 @@ void WidgetTests::containerWidgetBasicTest(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>();
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>(size);
     fw::Widget* root_widget = application.getWidgets().getRootWidget();
     T_ASSERT(T_CHECK(container_widget));
     sf::Vector2f position(100.0f, 100.0f);
-    sf::Vector2f size(100.0f, 100.0f);
     container_widget->setPosition(position);
-    container_widget->setSize(size);
 
     GenericWidgetTest gwt(application, test);
     gwt.widget = container_widget;
@@ -1004,24 +996,21 @@ void WidgetTests::containerWidgetChildrenTest(test::Test& test) {
     fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
-    fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>();
-    sf::Vector2f position(100.0f, 100.0f);
     sf::Vector2f container_size(100.0f, 100.0f);
+    fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>(container_size);
+    sf::Vector2f position(100.0f, 100.0f);
     float horizontal_padding = 5.0f;
     float vertical_padding = 10.0f;
     container_widget->setPosition(position);
-    container_widget->setSize(container_size);
     container_widget->setHorizontalPadding(horizontal_padding);
     container_widget->setVerticalPadding(vertical_padding);
     T_VEC2_APPROX_COMPARE(container_widget->getSize(), container_size);
     application.advance();
     T_VEC2_APPROX_COMPARE(container_widget->getSize(), sf::Vector2f(horizontal_padding, vertical_padding));
-    fw::RectangleWidget* child_1_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-    fw::RectangleWidget* child_2_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
     sf::Vector2f child_1_size(35.0f, 28.0f);
     sf::Vector2f child_2_size(46.0f, 54.0f);
-    child_1_widget->setSize(child_1_size);
-    child_2_widget->setSize(child_2_size);
+    fw::RectangleWidget* child_1_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_1_size);
+    fw::RectangleWidget* child_2_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_2_size);
     child_1_widget->setParent(container_widget);
     child_2_widget->setParent(container_widget);
     application.advance();
@@ -1203,8 +1192,8 @@ void WidgetTests::textboxWidgetScrollTest(test::Test& test) {
     CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
     const fw::TextWidget* text_widget = textbox_widget->getTextWidget();
-    float zero_pos = textbox_widget->TEXT_VIEW_ZERO_POS.x;
-    float right_margin = textbox_widget->getWidth() - textbox_widget->CURSOR_MOVE_MARGIN;
+    float zero_pos = fw::TEXTBOX_TEXT_VIEW_ZERO_POS.x;
+    float right_margin = textbox_widget->getWidth() - fw::TEXTBOX_CURSOR_MOVE_MARGIN;
     auto calc_text_pos = [&](size_t cursor_pos_index) {
         float cursor_pos = zero_pos + text_widget->getLocalCharPos(cursor_pos_index).x;
         float past_right_margin = std::max(0.0f, cursor_pos - right_margin);
@@ -1703,13 +1692,13 @@ void WidgetTests::canvasWidgetBasicTest(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    fw::CanvasWidget* canvas_widget = application.getWidgets().createWidget<fw::CanvasWidget>();
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::CanvasWidget* canvas_widget =
+        application.getWidgets().createWidget<fw::CanvasWidget>(size, sf::Vector2u(100, 100));
     fw::Widget* root_widget = application.getWidgets().getRootWidget();
     T_ASSERT(T_CHECK(canvas_widget));
     sf::Vector2f position(100.0f, 100.0f);
-    sf::Vector2f size(100.0f, 100.0f);
     canvas_widget->setPosition(position);
-    canvas_widget->setSize(size);
 
     GenericWidgetTest gwt(application, test);
     gwt.widget = canvas_widget;
@@ -1751,9 +1740,7 @@ void WidgetTests::canvasWidgetDrawTest(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    fw::CanvasWidget* canvas_widget = application.getWidgets().createWidget<fw::CanvasWidget>();
-    canvas_widget->setSize(100.0f, 100.0f);
-    canvas_widget->setTextureSize(100, 100);
+    fw::CanvasWidget* canvas_widget = application.getWidgets().createWidget<fw::CanvasWidget>(100.0f, 100.0f, 100, 100);
     auto color_to_str = &WidgetTests::colorToStr;
     {
         canvas_widget->clear();
@@ -1798,13 +1785,13 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
     sf::Vector2f position(100.0f, 100.0f);
     sf::Vector2f size(100.0f, 100.0f);
     fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(size);
-    sf::Vector2f total_size = size + sf::Vector2f(0.0f, window_widget->HEADER_HEIGHT);
+    sf::Vector2f total_size = size + sf::Vector2f(0.0f, fw::WINDOW_HEADER_HEIGHT);
     fw::Widget* root_widget = application.getWidgets().getRootWidget();
     T_ASSERT(T_CHECK(window_widget));
     window_widget->setPosition(position);
     window_widget->setHeaderFont(textbox_font);
     application.advance();
-    sf::Vector2f header_size = sf::Vector2f(size.x, window_widget->HEADER_HEIGHT);
+    sf::Vector2f header_size = sf::Vector2f(size.x, fw::WINDOW_HEADER_HEIGHT);
 
     {
         GenericWidgetTest gwt(application, test);
@@ -1894,7 +1881,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         T_CHECK(text_widget);
     }
 
-    T_COMPARE(header_widget->getFillColor(), window_widget->DEFAULT_HEADER_COLOR, &WidgetTests::colorToStr);
+    T_COMPARE(header_widget->getFillColor(), fw::WINDOW_HEADER_DEFAULT_COLOR, &WidgetTests::colorToStr);
 
     {
         GenericWidgetTest gwt(application, test);
@@ -1931,7 +1918,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
 
     T_ASSERT(T_COMPARE(main_widget->getChildren().size(), 0));
 
-    T_COMPARE(main_widget->getFillColor(), window_widget->DEFAULT_WINDOW_COLOR, &WidgetTests::colorToStr);
+    T_COMPARE(main_widget->getFillColor(), fw::WINDOW_DEFAULT_COLOR, &WidgetTests::colorToStr);
 }
 
 void WidgetTests::windowWidgetDragTest(test::Test& test) {
@@ -1970,8 +1957,7 @@ void WidgetTests::windowWidgetChildrenTest(test::Test& test) {
     fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(size);
     window_widget->setPosition(position);
     window_widget->setHeaderFont(textbox_font);
-    fw::RectangleWidget* rect_widget = application.getWidgets().createWidget<fw::RectangleWidget>();
-    rect_widget->setSize(30.0f, 30.0f);
+    fw::RectangleWidget* rect_widget = application.getWidgets().createWidget<fw::RectangleWidget>(30.0f, 30.0f);
     rect_widget->setFillColor(sf::Color::Green);
     rect_widget->setPosition(10.0f, 10.0f);
     rect_widget->setParent(window_widget);
@@ -2009,9 +1995,8 @@ void WidgetTests::windowWidgetChainTest(test::Test& test) {
     parent_window->setHeaderFont(textbox_font);
     parent_window->setHeaderText("Parent window");
     parent_window->setHeaderTextCharacterSize(15);
-    fw::RectangleWidget* red_rect = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* red_rect = application.getWidgets().createWidget<fw::RectangleWidget>(30.0f, 30.0f);
     red_rect->setFillColor(sf::Color::Red);
-    red_rect->setSize(sf::Vector2f(30.0f, 30.0f));
     red_rect->setName("red rect");
     red_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     red_rect->setAnchorOffset(10.0f, 10.0f);
@@ -2024,9 +2009,8 @@ void WidgetTests::windowWidgetChainTest(test::Test& test) {
     child_window->setHeaderText("Child window");
     child_window->setHeaderTextCharacterSize(15);
     child_window->setParent(parent_window);
-    fw::RectangleWidget* green_rect = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* green_rect = application.getWidgets().createWidget<fw::RectangleWidget>(20.0f, 20.0f);
     green_rect->setFillColor(sf::Color::Green);
-    green_rect->setSize(sf::Vector2f(20.0f, 20.0f));
     green_rect->setName("green rect");
     green_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     green_rect->setAnchorOffset(10.0f, 10.0f);
@@ -2039,9 +2023,8 @@ void WidgetTests::windowWidgetChainTest(test::Test& test) {
     another_child_window->setHeaderText("Another child window");
     another_child_window->setHeaderTextCharacterSize(15);
     another_child_window->setParent(child_window);
-    fw::RectangleWidget* blue_rect = application.getWidgets().createWidget<fw::RectangleWidget>();
+    fw::RectangleWidget* blue_rect = application.getWidgets().createWidget<fw::RectangleWidget>(20.0f, 20.0f);
     blue_rect->setFillColor(sf::Color::Blue);
-    blue_rect->setSize(sf::Vector2f(20.0f, 20.0f));
     blue_rect->setName("blue rect");
     blue_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     blue_rect->setAnchorOffset(10.0f, 10.0f);
@@ -2075,7 +2058,7 @@ void WidgetTests::windowWidgetDragLimitsTest(test::Test& test) {
     fw::RectangleWidget* parent_main_widget = parent_window->getMainWidget();
     float child_width = child_window->getWidth();
     float child_height = child_window->getHeight();
-    float margin = child_window->ONSCREEN_MARGIN;
+    float margin = fw::WINDOW_ONSCREEN_MARGIN;
     float parent_width = parent_main_widget->getWidth();
     float parent_height = parent_main_widget->getHeight();
     float parent_width_n = -child_width - 10.0f;
@@ -2129,7 +2112,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
     sf::Vector2f child_pos = child_window->getPosition();
     float child_width = child_window->getWidth();
     float child_height = child_window->getHeight();
-    sf::Vector2f min_size = child_window->MIN_WINDOW_SIZE;
+    sf::Vector2f min_size = fw::WINDOW_MIN_SIZE;
     float parent_width = parent_main_widget->getWidth();
     float parent_height = parent_main_widget->getHeight();
     float parent_width_n = -child_width - 10.0f;
@@ -2140,7 +2123,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
     float parent_center_y = parent_height / 2.0f;
     float child_header_height = child_window->getHeaderWidget()->getHeight();
     sf::Vector2f child_header_center = child_window->getHeaderWidget()->getGlobalCenter();
-    float cursor_offset = child_window->RESIZE_WIDGET_MARGIN / 2.0f;
+    float cursor_offset = fw::WINDOW_RESIZE_MARGIN / 2.0f;
     auto reset_child_window = [&]() {
         child_window->setPosition(child_pos);
         child_window->setSize(child_width, child_height);
@@ -2396,7 +2379,7 @@ void WidgetTests::resizeWindow(
 }
 
 void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget) {
-    float cursor_offset = widget->RESIZE_WIDGET_MARGIN / 2.0f;
+    float cursor_offset = fw::WINDOW_RESIZE_MARGIN / 2.0f;
     sf::Vector2f resize_offset(15.0f, 10.0f);
     T_WRAP_CONTAINER(resizeWindow(
         application,

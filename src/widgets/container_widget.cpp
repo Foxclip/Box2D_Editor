@@ -3,9 +3,13 @@
 
 namespace fw {
 
-	ContainerWidget::ContainerWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
+	ContainerWidget::ContainerWidget(WidgetList& widget_list, float width, float height)
+		: RectangleWidget(widget_list, width, height) {
 		setName("container");
 	}
+
+	ContainerWidget::ContainerWidget(WidgetList& widget_list, const sf::Vector2f& size) 
+		: ContainerWidget(widget_list, size.x, size.y) { }
 
 	void ContainerWidget::setAutoResize(bool value) {
 		this->auto_resize = value;

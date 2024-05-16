@@ -11,12 +11,11 @@ namespace fw {
 	};
 
 	WindowWidget::WindowWidget(WidgetList& widget_list, float width, float height) : EmptyWidget(widget_list) {
-		wAssert(ONSCREEN_MARGIN <= MIN_WINDOW_SIZE.x && ONSCREEN_MARGIN <= MIN_WINDOW_SIZE.y);
+		wAssert(WINDOW_ONSCREEN_MARGIN <= WINDOW_MIN_SIZE.x && WINDOW_ONSCREEN_MARGIN <= WINDOW_MIN_SIZE.y);
 		// empty
 		setName("window");
 		// header
-		header_widget = widget_list.createWidget<RectangleWidget>();
-		header_widget->setSize(width, HEADER_HEIGHT);
+		header_widget = widget_list.createWidget<RectangleWidget>(width, WINDOW_HEADER_HEIGHT);
 		header_widget->setOrigin(Anchor::TOP_LEFT);
 		header_widget->setClipChildren(true);
 		header_widget->setClickThrough(false);
@@ -32,8 +31,15 @@ namespace fw {
 				sf::Vector2f new_pos = parent_local_pos + header_click_offset;
 				sf::FloatRect parent_local_bounds = header_widget->getParentLocalBounds();
 				sf::Vector2f parent_size = parent->getSize();
-				new_pos.x = std::clamp(new_pos.x, ONSCREEN_MARGIN - parent_local_bounds.width, parent_size.x - ONSCREEN_MARGIN);
-				new_pos.y = std::clamp(new_pos.y, ONSCREEN_MARGIN - parent_local_bounds.height, parent_size.y - ONSCREEN_MARGIN);
+				new_pos.x = std::clamp(
+					new_pos.x,
+					WINDOW_ONSCREEN_MARGIN - parent_local_bounds.width,
+					parent_size.x - WINDOW_ONSCREEN_MARGIN
+				);
+				new_pos.y = std::clamp(new_pos.y,
+					WINDOW_ONSCREEN_MARGIN - parent_local_bounds.height,
+					parent_size.y - WINDOW_ONSCREEN_MARGIN
+				);
 				setPosition(new_pos);
 			}
 		};
@@ -46,32 +52,31 @@ namespace fw {
 		header_text_widget = widget_list.createWidget<TextWidget>();
 		header_text_widget->setOrigin(Anchor::TOP_LEFT);
 		header_text_widget->setParentAnchor(Anchor::TOP_LEFT);
-		header_text_widget->setAnchorOffset(HEADER_TEXT_PADDING, 0.0f);
+		header_text_widget->setAnchorOffset(WINDOW_HEADER_TEXT_PADDING, 0.0f);
 		header_text_widget->setName("text");
 		header_text_widget->setParent(header_widget);
 		setHeaderText("New Window");
-		setHeaderColor(DEFAULT_HEADER_COLOR);
-		setHeaderTextColor(DEFAULT_HEADER_TEXT_COLOR);
-		setHeaderTextCharacterSize(DEFAULT_HEADER_TEXT_CHARACTER_SIZE);
+		setHeaderColor(WINDOW_HEADER_DEFAULT_COLOR);
+		setHeaderTextColor(WINDOW_HEADER_TEXT_DEFAULT_COLOR);
+		setHeaderTextCharacterSize(WINDOW_HEADER_TEXT_DEFAULT_CHARACTER_SIZE);
 		// main widget
-		main_widget = widget_list.createWidget<RectangleWidget>();
+		main_widget = widget_list.createWidget<RectangleWidget>(width, height);
 		main_widget->setName("main");
-		main_widget->setSize(width, height);
 		main_widget->setParentAnchor(Anchor::TOP_LEFT);
-		main_widget->setAnchorOffset(0.0f, HEADER_HEIGHT);
-		main_widget->setFillColor(DEFAULT_WINDOW_COLOR);
+		main_widget->setAnchorOffset(0.0f, WINDOW_HEADER_HEIGHT);
+		main_widget->setFillColor(WINDOW_DEFAULT_COLOR);
 		main_widget->setClipChildren(true);
 		main_widget->setClickThrough(false);
 		main_widget->setForceCustomCursor(true);
 		main_widget->setParent(this);
 		main_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::WINDOW));
 		// resize widget
-		resize_widget = widget_list.createWidget<RectangleWidget>();
+		sf::Vector2f resize_size(width + WINDOW_RESIZE_MARGIN * 2, WINDOW_HEADER_HEIGHT + height + WINDOW_RESIZE_MARGIN * 2);
+		resize_widget = widget_list.createWidget<RectangleWidget>(resize_size);
 		resize_widget->setName("resize");
-		resize_widget->setSize(width + RESIZE_WIDGET_MARGIN * 2, HEADER_HEIGHT + height + RESIZE_WIDGET_MARGIN * 2);
 		resize_widget->setFillColor(sf::Color::Transparent);
 		resize_widget->setParentAnchor(Anchor::TOP_LEFT);
-		resize_widget->setAnchorOffset(-RESIZE_WIDGET_MARGIN, -RESIZE_WIDGET_MARGIN);
+		resize_widget->setAnchorOffset(-WINDOW_RESIZE_MARGIN, -WINDOW_RESIZE_MARGIN);
 		resize_widget->setClickThrough(false);
 		resize_widget->setForceCustomCursor(true);
 		resize_widget->GetCursorType = [&]() {
@@ -127,18 +132,18 @@ namespace fw {
 			sf::Vector2f global_mouse_pos = widget_list.getMousePosf();
 			sf::Vector2f anchored_pos = global_mouse_pos - resizing_cursor_offset;
 			sf::Vector2f mouse_pos = parent->toLocal(anchored_pos);
-			float x_min = std::min(mouse_pos.x, resizing_anchor.x - MIN_WINDOW_SIZE.x);
-			float x_max = std::max(mouse_pos.x, resizing_anchor.x + MIN_WINDOW_SIZE.x);
-			float y_min = std::min(mouse_pos.y, resizing_anchor.y - MIN_WINDOW_SIZE.y - HEADER_HEIGHT);
-			float y_max = std::max(mouse_pos.y, resizing_anchor.y + MIN_WINDOW_SIZE.y + HEADER_HEIGHT);
-			float clamped_x_min = std::min(x_min, parent->getWidth() - ONSCREEN_MARGIN);
-			float clamped_x_max = std::max(x_max, ONSCREEN_MARGIN);
-			float clamped_y_min = std::clamp(y_min, 0.0f, parent->getHeight() - ONSCREEN_MARGIN);
+			float x_min = std::min(mouse_pos.x, resizing_anchor.x - WINDOW_MIN_SIZE.x);
+			float x_max = std::max(mouse_pos.x, resizing_anchor.x + WINDOW_MIN_SIZE.x);
+			float y_min = std::min(mouse_pos.y, resizing_anchor.y - WINDOW_MIN_SIZE.y - WINDOW_HEADER_HEIGHT);
+			float y_max = std::max(mouse_pos.y, resizing_anchor.y + WINDOW_MIN_SIZE.y + WINDOW_HEADER_HEIGHT);
+			float clamped_x_min = std::min(x_min, parent->getWidth() - WINDOW_ONSCREEN_MARGIN);
+			float clamped_x_max = std::max(x_max, WINDOW_ONSCREEN_MARGIN);
+			float clamped_y_min = std::clamp(y_min, 0.0f, parent->getHeight() - WINDOW_ONSCREEN_MARGIN);
 			float clamped_y_max = y_max;
 			float width_min = resizing_anchor.x - clamped_x_min;
 			float width_max = clamped_x_max - resizing_anchor.x;
-			float height_min = resizing_anchor.y - clamped_y_min - HEADER_HEIGHT;
-			float height_max = clamped_y_max - resizing_anchor.y - HEADER_HEIGHT;
+			float height_min = resizing_anchor.y - clamped_y_min - WINDOW_HEADER_HEIGHT;
+			float height_max = clamped_y_max - resizing_anchor.y - WINDOW_HEADER_HEIGHT;
 			float old_x = getPosition().x;
 			float old_y = getPosition().y;
 			float old_width = main_widget->getWidth();
@@ -172,9 +177,8 @@ namespace fw {
 		resize_widget->setParent(this);
 		resize_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::RESIZE));
 		// outline
-		outline_widget = widget_list.createWidget<RectangleWidget>();
+		outline_widget = widget_list.createWidget<RectangleWidget>(width, WINDOW_HEADER_HEIGHT + height);
 		outline_widget->setName("outline");
-		outline_widget->setSize(width, HEADER_HEIGHT + height);
 		outline_widget->setFillColor(sf::Color::Transparent);
 		outline_widget->OnAfterRender = [&](sf::RenderTarget& target) {
 			sf::FloatRect quantized_bounds = quantize_rect(
@@ -292,11 +296,11 @@ namespace fw {
 	}
 
 	void WindowWidget::internalUpdate() {
-		setSize(main_widget->getWidth(), HEADER_HEIGHT + main_widget->getHeight());
-		header_widget->setSize(getWidth(), HEADER_HEIGHT);
+		setSize(main_widget->getWidth(), WINDOW_HEADER_HEIGHT + main_widget->getHeight());
+		header_widget->setSize(getWidth(), WINDOW_HEADER_HEIGHT);
 		resize_widget->setSize(
-			getWidth() + RESIZE_WIDGET_MARGIN * 2,
-			getHeight() + RESIZE_WIDGET_MARGIN * 2
+			getWidth() + WINDOW_RESIZE_MARGIN * 2,
+			getHeight() + WINDOW_RESIZE_MARGIN * 2
 		);
 		outline_widget->setSize(getSize());
 	}
@@ -305,12 +309,12 @@ namespace fw {
 		float r_width = resize_widget->getWidth();
 		float r_height = resize_widget->getHeight();
 		sf::Vector2f mpos = widget_list.getMousePosf() - resize_widget->getGlobalPosition();
-		bool x_left = mpos.x < RESIZE_WIDGET_MARGIN;
-		bool x_center = mpos.x >= RESIZE_WIDGET_MARGIN && mpos.x < r_width - RESIZE_WIDGET_MARGIN;
-		bool x_right = mpos.x >= r_width - RESIZE_WIDGET_MARGIN;
-		bool y_top = mpos.y < RESIZE_WIDGET_MARGIN;
-		bool y_center = mpos.y >= RESIZE_WIDGET_MARGIN && mpos.y < r_height - RESIZE_WIDGET_MARGIN;
-		bool y_bottom = mpos.y >= r_height - RESIZE_WIDGET_MARGIN;
+		bool x_left = mpos.x < WINDOW_RESIZE_MARGIN;
+		bool x_center = mpos.x >= WINDOW_RESIZE_MARGIN && mpos.x < r_width - WINDOW_RESIZE_MARGIN;
+		bool x_right = mpos.x >= r_width - WINDOW_RESIZE_MARGIN;
+		bool y_top = mpos.y < WINDOW_RESIZE_MARGIN;
+		bool y_center = mpos.y >= WINDOW_RESIZE_MARGIN && mpos.y < r_height - WINDOW_RESIZE_MARGIN;
+		bool y_bottom = mpos.y >= r_height - WINDOW_RESIZE_MARGIN;
 		if (x_left && y_top) {
 			return Resizing::TOP_LEFT;
 		} else if (x_center && y_top) {

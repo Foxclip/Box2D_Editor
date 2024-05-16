@@ -5,12 +5,12 @@
 #include "UI/edit_window.h"
 #include <set>
 
-const int TOOL_RECT_WIDTH = 60;
-const int TOOL_RECT_HEIGHT = 40;
+const float TOOL_RECT_WIDTH = 60.0f;
+const float TOOL_RECT_HEIGHT = 40.0f;
 const int TOOLBOX_PADDING = 10;
 const int TOOL_TEXT_SIZE = 16;
-const int CREATE_RECT_WIDTH = 40;
-const int CREATE_RECT_HEIGHT = 40;
+const float CREATE_RECT_WIDTH = 40.0f;
+const float CREATE_RECT_HEIGHT = 40.0f;
 const int CREATE_PANEL_PADDING = 10;
 const b2Vec2 NEW_BOX_SIZE = b2Vec2(1.0f, 1.0f);
 const sf::Color NEW_BOX_COLOR = sf::Color(0, 255, 0);

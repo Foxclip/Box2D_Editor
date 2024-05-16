@@ -8,7 +8,8 @@ namespace fw {
 
 	class RectangleWidget : public ShapeWidget {
 	public:
-		RectangleWidget(WidgetList& widget_list);
+		RectangleWidget(WidgetList& widget_list, float width, float height);
+		RectangleWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		void setSize(float width, float height);
 		void setSize(const sf::Vector2f& size);
 

@@ -6,20 +6,20 @@
 
 namespace fw {
 
+	const float WINDOW_HEADER_HEIGHT = 20.0f;
+	const float WINDOW_HEADER_TEXT_PADDING = 5.0f;
+	const sf::Color WINDOW_DEFAULT_COLOR = sf::Color(128, 128, 128);
+	const sf::Color WINDOW_HEADER_DEFAULT_COLOR = sf::Color(150, 150, 150);
+	const sf::Color WINDOW_HEADER_TEXT_DEFAULT_COLOR = sf::Color(255, 255, 255);
+	const unsigned int WINDOW_HEADER_TEXT_DEFAULT_CHARACTER_SIZE = 13;
+	const float WINDOW_ONSCREEN_MARGIN = 20.0f; // part of the window that cannot be dragged off the screen
+	const float WINDOW_RESIZE_MARGIN = 10.0f;
+	const sf::Vector2f WINDOW_MIN_SIZE = sf::Vector2f(20.0f, 20.0f);
+
 	class WidgetList;
 
 	class WindowWidget : public EmptyWidget {
 	public:
-		const float HEADER_HEIGHT = 20.0f;
-		const float HEADER_TEXT_PADDING = 5.0f;
-		const sf::Color DEFAULT_WINDOW_COLOR = sf::Color(128, 128, 128);
-		const sf::Color DEFAULT_HEADER_COLOR = sf::Color(150, 150, 150);
-		const sf::Color DEFAULT_HEADER_TEXT_COLOR = sf::Color(255, 255, 255);
-		const unsigned int DEFAULT_HEADER_TEXT_CHARACTER_SIZE = 13;
-		const float ONSCREEN_MARGIN = 20.0f; // part of the window that cannot be dragged off the screen
-		const float RESIZE_WIDGET_MARGIN = 10.0f;
-		const sf::Vector2f MIN_WINDOW_SIZE = sf::Vector2f(20.0f, 20.0f);
-
 		WindowWidget(WidgetList& widget_list, float width, float height);
 		WindowWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		bool getHeaderVisible() const;

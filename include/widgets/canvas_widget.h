@@ -8,7 +8,8 @@ namespace fw {
 
 	class CanvasWidget : public RectangleWidget {
 	public:
-		CanvasWidget(WidgetList& widget_list);
+		CanvasWidget(WidgetList& widget_list, float width, float height, unsigned int texture_width, unsigned int texture_height);
+		CanvasWidget(WidgetList& widget_list, const sf::Vector2f& size, const sf::Vector2u& texture_size);
 		sf::RenderTexture& getRenderTexture();
 		sf::Vector2f getTextureSize() const;
 		const sf::View& getView() const;

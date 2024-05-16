@@ -3,14 +3,12 @@
 
 namespace fw {
 
-	CheckboxWidget::CheckboxWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
-		setSize(DEFAULT_SIZE);
+	CheckboxWidget::CheckboxWidget(WidgetList& widget_list) : RectangleWidget(widget_list, CHECKBOX_DEFAULT_SIZE) {
 		setClickThrough(false);
 		RectangleWidget::setFillColor(background_fill_color);
 		setName("checkbox");
-		check_widget = widget_list.createWidget<RectangleWidget>();
+		check_widget = widget_list.createWidget<RectangleWidget>(rect.getSize() * check_size);
 		check_widget->setVisible(checked);
-		check_widget->setSize(rect.getSize() * check_size);
 		check_widget->setFillColor(check_fill_color);
 		check_widget->setOrigin(Anchor::CENTER);
 		check_widget->setParentAnchor(Anchor::CENTER);

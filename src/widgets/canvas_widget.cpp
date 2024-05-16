@@ -1,9 +1,14 @@
 #include "widgets/canvas_widget.h"
 
-fw::CanvasWidget::CanvasWidget(WidgetList& widget_list) : RectangleWidget(widget_list) {
+fw::CanvasWidget::CanvasWidget(WidgetList& widget_list, float width, float height, unsigned int texture_width, unsigned int texture_height)
+	: RectangleWidget(widget_list, width, height) {
 	setName("canvas");
+	setTextureSize(texture_width, texture_height);
 	rect.setTexture(&texture.getTexture(), true);
 }
+
+fw::CanvasWidget::CanvasWidget(WidgetList& widget_list, const sf::Vector2f& size, const sf::Vector2u& texture_size)
+	: CanvasWidget(widget_list, size.x, size.y, texture_size.x, texture_size.y) { }
 
 sf::RenderTexture& fw::CanvasWidget::getRenderTexture() {
 	return texture;

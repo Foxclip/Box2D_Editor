@@ -3,9 +3,13 @@
 
 namespace fw {
 
-	RectangleWidget::RectangleWidget(WidgetList& widget_list) : ShapeWidget(widget_list) {
+	RectangleWidget::RectangleWidget(WidgetList& widget_list, float width, float height) : ShapeWidget(widget_list) {
 		setName("rectangle");
+		setSize(width, height);
 	}
+
+	RectangleWidget::RectangleWidget(WidgetList& widget_list, const sf::Vector2f& size)
+		: RectangleWidget(widget_list, size.x, size.y) { }
 
 	void RectangleWidget::setSize(float width, float height) {
 		setSize(sf::Vector2f(width, height));

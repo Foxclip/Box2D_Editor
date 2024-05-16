@@ -2,7 +2,7 @@
 #include "editor.h"
 
 CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
-    : fw::ContainerWidget(widget_list), app(p_app) {
+    : fw::ContainerWidget(widget_list, 50.0f, 500.0f), app(p_app) {
     setVisible(false);
     setFillColor(sf::Color(255, 0, 0, 0));
     setOrigin(Anchor::CENTER_LEFT);
@@ -12,8 +12,9 @@ CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
     setClickThrough(false);
     setName("create panel");
     for (size_t i = 0; i < CreateTool::mode_count; i++) {
-        RectangleWidget* button_widget = widget_list.createWidget<RectangleWidget>();
-        button_widget->setSize(sf::Vector2f(CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT));
+        RectangleWidget* button_widget = widget_list.createWidget<RectangleWidget>(
+            CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT
+        );
         button_widget->setFillColor(sf::Color(128, 128, 128));
         button_widget->setOutlineColor(sf::Color(0, 175, 255));
         button_widget->OnLeftPress = [=](const sf::Vector2f& pos) {

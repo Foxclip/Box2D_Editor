@@ -8,7 +8,8 @@ namespace fw {
 
 	class ContainerWidget : public RectangleWidget {
 	public:
-		ContainerWidget(WidgetList& widget_list);
+		ContainerWidget(WidgetList& widget_list, float width, float height);
+		ContainerWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		void setAutoResize(bool value);
 		void setHorizontal(bool value);
 		void setPadding(float padding);

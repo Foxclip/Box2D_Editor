@@ -2,9 +2,8 @@
 #include "editor.h"
 
 EditWindow::EditWindow(fw::WidgetList& widget_list, Editor& p_app)
-    : fw::ContainerWidget(widget_list), app(p_app) {
+    : fw::ContainerWidget(widget_list, 200.0f, 300.0f), app(p_app) {
     setVisible(false);
-    setSize(sf::Vector2f(100.0f, 200.0f));
     setHorizontal(false);
     setFillColor(sf::Color(128, 128, 128));
     setOrigin(Anchor::CENTER);
@@ -126,7 +125,7 @@ EditWindowParameter::EditWindowParameter(EditWindow& p_edit_window)
     : edit_window(p_edit_window), app(p_edit_window.app) { }
 
 fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::string& name, const std::string& text) {
-    fw::ContainerWidget* parameter_widget = app.widgets.createWidget<fw::ContainerWidget>();
+    fw::ContainerWidget* parameter_widget = app.widgets.createWidget<fw::ContainerWidget>(100.0f, 20.0f);
     parameter_widget->setFillColor(sf::Color::Transparent);
     parameter_widget->setVerticalAlignment(fw::Widget::Alignment::ALIGN_CENTER);
     parameter_widget->setParent(&edit_window);
@@ -136,8 +135,7 @@ fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::strin
     parameter_text_widget->setCharacterSize(16);
     parameter_text_widget->setString(text);
     parameter_text_widget->setParent(parameter_widget);
-    fw::RectangleWidget* spacing_widget = app.widgets.createWidget<fw::RectangleWidget>();
-    spacing_widget->setSize(sf::Vector2f(10.0f, 1.0f));
+    fw::RectangleWidget* spacing_widget = app.widgets.createWidget<fw::RectangleWidget>(10.0f, 1.0f);
     spacing_widget->setFillColor(sf::Color::Transparent);
     spacing_widget->setParent(parameter_widget);
     spacing_widget->setName("spacing");
@@ -145,9 +143,8 @@ fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::strin
 }
 
 fw::TextBoxWidget* EditWindowParameter::createTextBoxWidget() {
-    fw::TextBoxWidget* textbox_widget = app.widgets.createWidget<fw::TextBoxWidget>();
+    fw::TextBoxWidget* textbox_widget = app.widgets.createWidget<fw::TextBoxWidget>(100.0f, 20.0f);
     textbox_widget->setFont(app.textbox_font);
-    textbox_widget->setSize(100.0f, 20.0f);
     textbox_widget->setCharacterSize(12);
     return textbox_widget;
 }
