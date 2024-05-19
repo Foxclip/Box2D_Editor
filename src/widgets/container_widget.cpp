@@ -6,13 +6,31 @@ namespace fw {
 	ContainerWidget::ContainerWidget(WidgetList& widget_list, float width, float height)
 		: RectangleWidget(widget_list, width, height) {
 		setName("container");
+		setHorizontalSizePolicy(SizePolicy::CHILDREN);
+		setVerticalSizePolicy(SizePolicy::CHILDREN);
 	}
 
 	ContainerWidget::ContainerWidget(WidgetList& widget_list, const sf::Vector2f& size) 
 		: ContainerWidget(widget_list, size.x, size.y) { }
 
-	void ContainerWidget::setAutoResize(bool value) {
-		this->auto_resize = value;
+	bool ContainerWidget::getHorizontal() const {
+		return horizontal;
+	}
+
+	float ContainerWidget::getHorizontalPadding() const {
+		return horizontal_padding;
+	}
+
+	float ContainerWidget::getVerticalPadding() const {
+		return vertical_padding;
+	}
+
+	Widget::Alignment ContainerWidget::getVerticalAlignment() const {
+		return vertical_alignment;
+	}
+
+	Widget::Alignment ContainerWidget::getHorizontalAlignment() const {
+		return horizontal_alignment;
 	}
 
 	void ContainerWidget::setHorizontal(bool value) {
@@ -41,7 +59,6 @@ namespace fw {
 	}
 
 	void ContainerWidget::internalUpdate() {
-		sf::FloatRect container_bounds = sf::FloatRect();
 		float max_width = 0.0f, max_height = 0.0f;
 		for (size_t i = 0; i < children.size(); i++) {
 			if (children[i]->getWidth() > max_width) {
@@ -61,7 +78,7 @@ namespace fw {
 			Widget* child = children[i];
 			child->setPosition(next_x, next_y);
 			sf::FloatRect child_bounds = child->getParentLocalBounds();
-			extend_bounds(container_bounds, child_bounds);
+			extend_bounds(children_bounds, child_bounds);
 			if (horizontal) {
 				child->setOrigin(alignmentToAnchor(vertical_alignment));
 				next_x += child->getWidth() + horizontal_padding;
@@ -70,12 +87,32 @@ namespace fw {
 				next_y += child->getHeight() + vertical_padding;
 			}
 		}
-		if (auto_resize) {
-			setSize(sf::Vector2f(
-				container_bounds.width + horizontal_padding,
-				container_bounds.height + vertical_padding
-			));
+	}
+
+	void ContainerWidget::updateHorizontalSize() {
+		sf::Vector2f new_pos = getPosition();
+		sf::Vector2f new_size = getSize();
+		if (horizontal_size_policy == SizePolicy::CHILDREN) {
+			new_size.x = children_bounds.width + horizontal_padding;
+		} else {
+			Widget::updateHorizontalSize();
+			return;
 		}
+		setPosition(new_pos);
+		setSize(new_size);
+	}
+
+	void ContainerWidget::updateVerticalSize() {
+		sf::Vector2f new_pos = getPosition();
+		sf::Vector2f new_size = getSize();
+		if (vertical_size_policy == SizePolicy::CHILDREN) {
+			new_size.y = children_bounds.height + vertical_padding;
+		} else {
+			Widget::updateVerticalSize();
+			return;
+		}
+		setPosition(new_pos);
+		setSize(new_size);
 	}
 
 	Widget::Anchor ContainerWidget::alignmentToAnchor(Alignment alignment) const {

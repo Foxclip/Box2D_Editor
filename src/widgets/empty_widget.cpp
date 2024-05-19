@@ -17,15 +17,6 @@ namespace fw {
 
 	void EmptyWidget::setFillColor(const sf::Color& color) { }
 
-	void EmptyWidget::setSize(float width, float height) {
-		this->size.x = width;
-		this->size.y = height;
-	}
-
-	void EmptyWidget::setSize(const sf::Vector2f& p_size) {
-		setSize(p_size.x, p_size.y);
-	}
-
 	void EmptyWidget::setRenderable(bool value) {
 		if (value) {
 			wAssert(false, "Cannot set EmptyWidget as renderable");
@@ -49,6 +40,11 @@ namespace fw {
 
 	const sf::Transformable* EmptyWidget::getTransformable() const {
 		return nullptr;
+	}
+
+	void EmptyWidget::setSizeInternal(float width, float height) {
+		this->size.x = width;
+		this->size.y = height;
 	}
 
 }

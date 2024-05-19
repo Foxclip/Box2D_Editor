@@ -41,19 +41,19 @@ namespace fw {
 		void setHeaderFont(const sf::Font& font);
 		void setHeaderTextCharacterSize(unsigned int size);
 		void setSize(float width, float height) override;
-		void setSize(const sf::Vector2f& p_size) override;
 		void setOutlineColor(const sf::Color& color);
 		void addChild(Widget* child) override;
 		void internalUpdate() override;
 
 	protected:
-
-	private:
 		RectangleWidget* header_widget = nullptr;
 		TextWidget* header_text_widget = nullptr;
 		RectangleWidget* main_widget = nullptr;
 		RectangleWidget* resize_widget = nullptr;
 		RectangleWidget* outline_widget = nullptr;
+		void setSizeInternal(float width, float height) override;
+
+	private:
 		bool is_grabbed = false;
 		enum class Resizing {
 			NONE,

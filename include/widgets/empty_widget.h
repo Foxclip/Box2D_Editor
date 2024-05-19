@@ -12,8 +12,6 @@ namespace fw {
 		sf::FloatRect getLocalBounds() const override;
 		const sf::Color& getFillColor() const override;
 		void setFillColor(const sf::Color& color) override;
-		virtual void setSize(float width, float height);
-		virtual void setSize(const sf::Vector2f& p_size);
 		void setRenderable(bool value) override;
 
 	protected:
@@ -21,6 +19,7 @@ namespace fw {
 		const sf::Drawable* getDrawable() const override;
 		sf::Transformable* getTransformable() override;
 		const sf::Transformable* getTransformable() const override;
+		void setSizeInternal(float width, float height) override;
 
 	private:
 		sf::Vector2f size;

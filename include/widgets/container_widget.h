@@ -10,7 +10,11 @@ namespace fw {
 	public:
 		ContainerWidget(WidgetList& widget_list, float width, float height);
 		ContainerWidget(WidgetList& widget_list, const sf::Vector2f& size);
-		void setAutoResize(bool value);
+		bool getHorizontal() const;
+		float getHorizontalPadding() const;
+		float getVerticalPadding() const;
+		Alignment getVerticalAlignment() const;
+		Alignment getHorizontalAlignment() const;
 		void setHorizontal(bool value);
 		void setPadding(float padding);
 		void setHorizontalPadding(float padding);
@@ -20,16 +24,18 @@ namespace fw {
 
 	protected:
 		void internalUpdate() override;
+		void updateHorizontalSize() override;
+		void updateVerticalSize() override;
 		Anchor alignmentToAnchor(Alignment alignment) const;
 		float alignmentToOffset(Alignment alignment, float max_size) const;
 
 	private:
-		bool auto_resize = true;
 		bool horizontal = true;
 		float horizontal_padding = 0.0f;
 		float vertical_padding = 0.0f;
 		Alignment vertical_alignment = Alignment::ALIGN_TOP;
 		Alignment horizontal_alignment = Alignment::ALIGN_LEFT;
+		sf::FloatRect children_bounds;
 
 	};
 

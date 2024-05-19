@@ -40,11 +40,13 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
-    run_tests();
-    //execute_app();
+    //run_tests();
+    execute_app();
 
-    // TODO: require size for RectangleWidget and font for TextWidget
     // TODO: remake EditWindow with WindowWidget
+    // TODO: ContainerWidget sizePolicy test
+    // TODO: make ContainerWidget inherited from EmptyWidget
+    // TODO: fix resizing window with origin in the center
     // TODO: align textboxes in EditWindow to the right
     // TODO: Dropdown widget
     // TODO: object list window (outliner)

@@ -1,4 +1,5 @@
 #include "widgets/widget.h"
+#include "widgets/container_widget.h"
 #include "widgets/widget_list.h"
 
 namespace fw {
@@ -315,6 +316,14 @@ namespace fw {
 		return anchor_offset;
 	}
 
+	Widget::SizePolicy Widget::getHorizontalSizePolicy() const {
+		return horizontal_size_policy;
+	}
+
+	Widget::SizePolicy Widget::getVerticalSizePolicy() const {
+		return vertical_size_policy;
+	}
+
 	const sf::Vector2f& Widget::getOrigin() const {
 		return transforms.getOrigin();
 	}
@@ -446,6 +455,14 @@ namespace fw {
 		return bounds.getPosition() + bounds.getSize() / 2.0f;
 	}
 
+	void Widget::setSize(float width, float height) {
+		setSizeInternal(width, height);
+	}
+
+	void Widget::setSize(const sf::Vector2f& size) {
+		setSize(size.x, size.y);
+	}
+
 	void Widget::setOrigin(Anchor anchor) {
 		wAssert(!widget_list.isLocked());
 		sf::Vector2f origin_pos = getOrigin();
@@ -484,6 +501,16 @@ namespace fw {
 		wAssert(!widget_list.isLocked());
 		this->anchor_offset = offset;
 		updateAnchoredPosition();
+	}
+
+	void Widget::setHorizontalSizePolicy(SizePolicy policy) {
+		wAssert(!widget_list.isLocked());
+		this->horizontal_size_policy = policy;
+	}
+
+	void Widget::setVerticalSizePolicy(SizePolicy policy) {
+		wAssert(!widget_list.isLocked());
+		this->vertical_size_policy = policy;
 	}
 
 	void Widget::setPosition(float x, float y) {
@@ -645,6 +672,10 @@ namespace fw {
 		return sf::Vector2f(0.0f, 0.0f);
 	}
 
+	void Widget::setSizeInternal(const sf::Vector2f& size) {
+		setSizeInternal(size.x, size.y);
+	}
+
 	void Widget::addChild(Widget* child) {
 		wAssert(!widget_list.isLocked());
 		wAssert(!children_locked);
@@ -683,13 +714,102 @@ namespace fw {
 		OnUpdate();
 		updateAnchoredPosition();
 		setOrigin(origin_anchor);
+
+		// size of some widgets should be updated before the parent, and for some after the parent
+		CompVector<Widget*> horizontal_independent;
+		CompVector<Widget*> vertical_independent;
+		CompVector<Widget*> horizontal_children_dependent;
+		CompVector<Widget*> vertical_children_dependent;
+		CompVector<Widget*> horizontal_parent_dependent;
+		CompVector<Widget*> vertical_parent_dependent;
 		for (size_t i = 0; i < children.size(); i++) {
-			children[i]->update();
+			Widget* child = children[i];
+			if (child->getHorizontalSizePolicy() == SizePolicy::NONE) {
+				horizontal_independent.add(child);
+			} else if (child->getHorizontalSizePolicy() == SizePolicy::CHILDREN) {
+				horizontal_children_dependent.add(child);
+			} else if (child->getHorizontalSizePolicy() == SizePolicy::PARENT) {
+				horizontal_parent_dependent.add(child);
+			}
+			if (child->getVerticalSizePolicy() == SizePolicy::NONE) {
+				vertical_independent.add(child);
+			} else if (child->getVerticalSizePolicy() == SizePolicy::CHILDREN) {
+				vertical_children_dependent.add(child);
+			} else if (child->getVerticalSizePolicy() == SizePolicy::PARENT) {
+				vertical_parent_dependent.add(child);
+			}
+		}
+
+		for (size_t i = 0; i < horizontal_independent.size(); i++) {
+			Widget* child = horizontal_independent[i];
+			child->updateHorizontalSize();
+		}
+		for (size_t i = 0; i < vertical_independent.size(); i++) {
+			Widget* child = vertical_independent[i];
+			child->updateVerticalSize();
+		}
+
+		for (size_t i = 0; i < children.size(); i++) {
+			Widget* child = children[i];
+			child->update();
 		}
 		internalUpdate();
+
+		for (size_t i = 0; i < horizontal_children_dependent.size(); i++) {
+			Widget* child = horizontal_children_dependent[i];
+			child->updateHorizontalSize();
+		}
+		for (size_t i = 0; i < vertical_children_dependent.size(); i++) {
+			Widget* child = vertical_children_dependent[i];
+			child->updateVerticalSize();
+		}
+		for (size_t i = 0; i < horizontal_parent_dependent.size(); i++) {
+			Widget* child = horizontal_parent_dependent[i];
+			child->updateHorizontalSize();
+		}
+		for (size_t i = 0; i < vertical_parent_dependent.size(); i++) {
+			Widget* child = vertical_parent_dependent[i];
+			child->updateVerticalSize();
+		}
+	}
+
+	void Widget::updateHorizontalSize() {
+		if (name == "container") {
+			std::cout << "";
+		}
+		sf::Vector2f new_pos = getPosition();
+		sf::Vector2f new_size = getSize();
+		if (horizontal_size_policy == SizePolicy::PARENT) {
+			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(parent)) {
+				new_pos.x = container->getHorizontalPadding();
+				new_size.x = container->getWidth() - container->getHorizontalPadding() * 2;
+			} else {
+				new_pos.x = 0.0f;
+				new_size.x = parent->getWidth();
+			}
+		}
+		setPosition(new_pos);
+		setSizeInternal(new_size);
+	}
+
+	void Widget::updateVerticalSize() {
+		sf::Vector2f new_pos = getPosition();
+		sf::Vector2f new_size = getSize();
+		if (vertical_size_policy == SizePolicy::PARENT) {
+			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(parent)) {
+				new_pos.y = container->getVerticalPadding();
+				new_size.y = container->getHeight() - container->getVerticalPadding() * 2;
+			} else {
+				new_pos.y = 0.0f;
+				new_size.y = parent->getHeight();
+			}
+		}
+		setPosition(new_pos);
+		setSizeInternal(new_size);
 	}
 
 	void Widget::internalUpdate() { }
+
 
 	void Widget::internalOnSetParent(Widget* parent) { }
 

@@ -10,8 +10,6 @@ namespace fw {
 	public:
 		RectangleWidget(WidgetList& widget_list, float width, float height);
 		RectangleWidget(WidgetList& widget_list, const sf::Vector2f& size);
-		void setSize(float width, float height);
-		void setSize(const sf::Vector2f& size);
 
 	protected:
 		sf::RectangleShape rect;
@@ -22,6 +20,7 @@ namespace fw {
 		const sf::Transformable* getTransformable() const override;
 		sf::Shape& getShape() override;
 		const sf::Shape& getShape() const override;
+		void setSizeInternal(float width, float height) override;
 
 	private:
 		friend class WindowWidget;

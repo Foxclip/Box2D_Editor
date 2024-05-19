@@ -175,6 +175,7 @@ void Editor::initTools() {
         if (value) {
             if (active_object) {
                 edit_tool.edit_window_widget->updateParameters();
+                edit_tool.edit_window_widget->setPosition(widgets.getRootWidget()->getGlobalCenter());
                 edit_tool.edit_window_widget->setVisible(true);
             } else {
                 edit_tool.edit_window_widget->setVisible(false);
@@ -322,66 +323,6 @@ void Editor::initWidgets() {
     logger_text_widget->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
-
-    fw::WindowWidget* parent_window = widgets.createWidget<fw::WindowWidget>(300.0f, 200.0f);
-    parent_window->setName("parent window");
-    parent_window->setPosition(640.0f, 480.0f);
-    parent_window->setHeaderFont(console_font);
-    parent_window->setHeaderText("Parent window");
-    parent_window->setHeaderTextCharacterSize(15);
-    fw::RectangleWidget* red_rect = widgets.createWidget<fw::RectangleWidget>(30.0f, 30.0f);
-    red_rect->setFillColor(sf::Color::Red);
-    red_rect->setName("red rect");
-    red_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
-    red_rect->setAnchorOffset(10.0f, 10.0f);
-    red_rect->setParent(parent_window);
-
-    fw::WindowWidget* child_window = widgets.createWidget<fw::WindowWidget>(200.0f, 120.0f);
-    child_window->setName("child window");
-    child_window->setPosition(20.0f, 20.0f);
-    child_window->setHeaderFont(console_font);
-    child_window->setHeaderText("Child window");
-    child_window->setHeaderTextCharacterSize(15);
-    child_window->setParent(parent_window);
-    fw::RectangleWidget* green_rect = widgets.createWidget<fw::RectangleWidget>(20.0f, 20.0f);
-    green_rect->setFillColor(sf::Color::Green);
-    green_rect->setName("green rect");
-    green_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
-    green_rect->setAnchorOffset(10.0f, 10.0f);
-    green_rect->setParent(child_window);
-
-    fw::WindowWidget* another_child_window = widgets.createWidget<fw::WindowWidget>(60.0f, 40.0f);
-    another_child_window->setName("another child window");
-    another_child_window->setPosition(20.0f, 20.0f);
-    another_child_window->setHeaderFont(console_font);
-    another_child_window->setHeaderText("Another child window");
-    another_child_window->setHeaderTextCharacterSize(15);
-    another_child_window->setParent(child_window);
-    fw::RectangleWidget* blue_rect = widgets.createWidget<fw::RectangleWidget>(20.0f, 20.0f);
-    blue_rect->setFillColor(sf::Color::Blue);
-    blue_rect->setName("blue rect");
-    blue_rect->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
-    blue_rect->setAnchorOffset(10.0f, 10.0f);
-    blue_rect->setParent(another_child_window);
-
-    //RectangleWidget* rect = widgets.createWidget<RectangleWidget>();
-    //rect->setFillColor(sf::Color::Black);
-    //rect->setSize(sf::Vector2f(100.0f, 100.0f));
-    //rect->setPosition(0.0f, 0.5f);
-    //rect->setName("black rect");
-
-    //TextWidget* text = widgets.createWidget<TextWidget>();
-    //text->setCharacterSize(15);
-    //text->setFont(textbox_font);
-    //text->setString("Text");
-    //text->setParentAnchor(Widget::CENTER_LEFT);
-    //text->setOrigin(0.0f, 7.0f);
-    //text->setAnchorOffset(2.0f, 0.0f);
-    //text->setName("test text");
-    ////text->setParent(rect);
-    //Widget* textbox = widgets.find("textbox");
-    //text->setParent(textbox);
-
 }
 
 void Editor::onProcessKeyboardEvent(const sf::Event& event) {

@@ -162,6 +162,10 @@ namespace fw {
 		return &text;
 	}
 
+	void TextWidget::setSizeInternal(float width, float height) {
+		// do nothing
+	}
+
 	void TextWidget::internalUpdate() {
 		wAssert(getFont(), "Font is not set for " + full_name);
 	}

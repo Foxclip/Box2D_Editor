@@ -38,6 +38,7 @@ namespace fw {
 		const sf::Drawable* getDrawable() const override;
 		sf::Transformable* getTransformable() override;
 		const sf::Transformable* getTransformable() const override;
+		void setSizeInternal(float width, float height) override;
 		void internalUpdate() override;
 
 	private:

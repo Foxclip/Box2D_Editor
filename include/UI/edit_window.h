@@ -3,6 +3,8 @@
 #include <functional>
 #include "widgets/widgets.h"
 
+const float EDIT_WINDOW_PARAMETER_PADDING = 10.0f;
+
 class Editor;
 class EditWindow;
 
@@ -79,7 +81,7 @@ private:
 	fw::TextBoxWidget* textbox_widget = nullptr;
 };
 
-class EditWindow : public fw::ContainerWidget {
+class EditWindow : public fw::WindowWidget {
 public:
 	EditWindow(fw::WidgetList& widget_list, Editor& p_app);
 	void updateParameters();
@@ -87,6 +89,7 @@ public:
 private:
 	friend class EditWindowParameter;
 	Editor& app;
+	fw::ContainerWidget* container_widget = nullptr;
 	CompVectorUptr<EditWindowParameter> parameters;
 
 	void createParameters();

@@ -274,13 +274,9 @@ namespace fw {
 		header_text_widget->setCharacterSize(size);
 	}
 
-	void WindowWidget::setSize(float x, float y) {
-		EmptyWidget::setSize(x, y);
-		main_widget->setSize(x, std::max(0.0f, y - header_widget->getHeight()));
-	}
-
-	void WindowWidget::setSize(const sf::Vector2f& p_size) {
-		setSize(p_size.x, p_size.y);
+	void WindowWidget::setSize(float width, float height) {
+		setSizeInternal(width, height);
+		main_widget->setSize(width, std::max(0.0f, height - header_widget->getHeight()));
 	}
 
 	void WindowWidget::setOutlineColor(const sf::Color& color) {
@@ -303,6 +299,10 @@ namespace fw {
 			getHeight() + WINDOW_RESIZE_MARGIN * 2
 		);
 		outline_widget->setSize(getSize());
+	}
+
+	void WindowWidget::setSizeInternal(float width, float height) {
+		EmptyWidget::setSizeInternal(width, height);
 	}
 
 	WindowWidget::Resizing WindowWidget::getResizingType() const {

@@ -53,6 +53,11 @@ namespace fw {
 			ALIGN_LEFT,
 			ALIGN_RIGHT
 		};
+		enum class SizePolicy {
+			NONE,
+			CHILDREN,
+			PARENT
+		};
 		ptrdiff_t debug_id = -1;
 
 		std::function<void(const sf::Vector2f& pos)> OnLeftPress = [](const sf::Vector2f& pos) { };
@@ -120,6 +125,8 @@ namespace fw {
 		float getGlobalHeight() const;
 		Anchor getParentAnchor() const;
 		sf::Vector2f getAnchorOffset() const;
+		SizePolicy getHorizontalSizePolicy() const;
+		SizePolicy getVerticalSizePolicy() const;
 		const sf::Vector2f& getOrigin() const;
 		const sf::Vector2f& getPosition() const;
 		sf::Vector2f getGlobalPosition() const;
@@ -148,12 +155,16 @@ namespace fw {
 		sf::Vector2f getVisualGlobalBottomLeft() const;
 		sf::Vector2f getVisualGlobalBottomRight() const;
 		virtual const sf::Color& getFillColor() const = 0;
+		virtual void setSize(float width, float height);
+		void setSize(const sf::Vector2f& size);
 		void setOrigin(Anchor anchor);
 		void setOrigin(float x, float y);
 		void setOrigin(const sf::Vector2f& origin);
 		void setParentAnchor(Anchor anchor);
 		void setAnchorOffset(float x, float y);
 		void setAnchorOffset(const sf::Vector2f& offset);
+		void setHorizontalSizePolicy(SizePolicy policy);
+		void setVerticalSizePolicy(SizePolicy policy);
 		virtual void setFillColor(const sf::Color& color) = 0;
 		void setPosition(float x, float y);
 		void setPosition(const sf::Vector2f& position);
@@ -201,6 +212,8 @@ namespace fw {
 		Anchor parent_anchor = Anchor::CUSTOM;
 		sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);
 		WidgetUnclippedRegion unclipped_region = WidgetUnclippedRegion(this);
+		SizePolicy horizontal_size_policy = SizePolicy::NONE;
+		SizePolicy vertical_size_policy = SizePolicy::NONE;
 		bool visible = true;
 		bool renderable = true;
 		bool is_focusable = false;
@@ -221,10 +234,14 @@ namespace fw {
 		virtual sf::Transformable* getTransformable() = 0;
 		virtual const sf::Transformable* getTransformable() const = 0;
 		virtual sf::Vector2f getRenderPositionOffset() const;
+		virtual void setSizeInternal(float width, float height) = 0;
+		void setSizeInternal(const sf::Vector2f& size);
 		virtual void addChild(Widget* child);
 		virtual void removeChild(Widget* child);
 		void updateAnchoredPosition();
 		void update();
+		virtual void updateHorizontalSize();
+		virtual void updateVerticalSize();
 		virtual void internalUpdate();
 		virtual void internalOnSetParent(Widget* parent);
 		virtual void internalOnLeftPress(const sf::Vector2f& pos);

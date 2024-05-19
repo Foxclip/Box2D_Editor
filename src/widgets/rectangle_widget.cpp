@@ -11,15 +11,6 @@ namespace fw {
 	RectangleWidget::RectangleWidget(WidgetList& widget_list, const sf::Vector2f& size)
 		: RectangleWidget(widget_list, size.x, size.y) { }
 
-	void RectangleWidget::setSize(float width, float height) {
-		setSize(sf::Vector2f(width, height));
-	}
-
-	void RectangleWidget::setSize(const sf::Vector2f& size) {
-		rect.setSize(size);
-		setOrigin(origin_anchor);
-	}
-
 	sf::Drawable* RectangleWidget::getDrawable() {
 		return &rect;
 	}
@@ -42,6 +33,11 @@ namespace fw {
 
 	const sf::Shape& RectangleWidget::getShape() const {
 		return rect;
+	}
+
+	void RectangleWidget::setSizeInternal(float width, float height) {
+		rect.setSize(sf::Vector2f(width, height));
+		setOrigin(origin_anchor);
 	}
 
 }
