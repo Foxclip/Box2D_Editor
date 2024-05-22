@@ -73,12 +73,27 @@
 WidgetTests::WidgetTests(test::TestManager& manager) : TestModule("Widgets", manager) { }
 
 void WidgetTests::createTestLists() {
-	createApplicationList();
-    createWidgetsList();
+    test::TestList* toposort_list = createTestList("Toposort");
+    test::TestList* application_list = createTestList("Application", { toposort_list });
+    test::TestList* widgets_list = createTestList("Widgets", { application_list });
+    createToposortList(toposort_list);
+	createApplicationList(application_list);
+    createWidgetsList(widgets_list);
 }
 
-void WidgetTests::createApplicationList() {
-	test::TestList* list = createTestList("Application");
+void WidgetTests::createToposortList(test::TestList* list) {
+    test::Test* empty_test = list->addTest("empty", [&](test::Test& test) { toposortEmptyTest(test); });
+    test::Test* one_node_test = list->addTest("one_node", { empty_test }, [&](test::Test& test) { toposort1NodeTest(test); });
+    test::Test* three_nodes_test = list->addTest("three_nodes", { one_node_test }, [&](test::Test& test) { toposort3NodesTest(test); });
+    test::Test* four_nodes_diamond_test = list->addTest("four_nodes_diamond", { three_nodes_test }, [&](test::Test& test) { toposort4NodesDiamondTest(test); });
+    test::Test* five_nodes_x_test = list->addTest("five_nodes_x", { three_nodes_test }, [&](test::Test& test) { toposort5NodesXTest(test); });
+    test::Test* five_nodes_random_test = list->addTest("five_nodes_random", { three_nodes_test }, [&](test::Test& test) { toposort5NodesRandomTest(test); });
+    test::Test* hair_test = list->addTest("hair", { three_nodes_test }, [&](test::Test& test) { toposortHairTest(test); });
+    test::Test* inverse_hair_test = list->addTest("inverse_hair", { three_nodes_test }, [&](test::Test& test) { toposortInverseHairTest(test); });
+    test::Test* loop_test = list->addTest("loop", { three_nodes_test }, [&](test::Test& test) { toposortLoopTest(test); });
+}
+
+void WidgetTests::createApplicationList(test::TestList* list) {
     test::Test* basic_test = list->addTest("basic", [&](test::Test& test) { basicTest(test); });
     test::Test* init_test = list->addTest("init", { basic_test }, [&](test::Test& test) { initTest(test); });
     test::Test* start_test = list->addTest("start", { init_test }, [&](test::Test& test) { startTest(test); });
@@ -88,8 +103,7 @@ void WidgetTests::createApplicationList() {
     test::Test* keyboard_events_test = list->addTest("keyboard_events", { advance_test }, [&](test::Test& test) { keyboardEventsTest(test); });
 }
 
-void WidgetTests::createWidgetsList() {
-    test::TestList* list = createTestList("Widgets");
+void WidgetTests::createWidgetsList(test::TestList* list) {
     list->OnBeforeRunAllTests = [&]() {
         textbox_font.loadFromFile("fonts/verdana.ttf");
     };
@@ -138,6 +152,234 @@ void WidgetTests::beforeRunModule() {
 
 void WidgetTests::afterRunModule() {
     window.close();
+}
+
+void WidgetTests::toposortEmptyTest(test::Test& test) {
+    NodeList list;
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        list.getNodes(), &Node::getParents
+    );
+    T_CHECK(sorted.size() == 0);
+}
+
+void WidgetTests::toposort1NodeTest(test::Test& test) {
+    NodeList list;
+    Node* node = list.createNode("A");
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        list.getNodes(), &Node::getParents
+    );
+    if (T_CHECK(sorted.size() == 1)) {
+        if (T_CHECK(sorted[0].size() == 1)) {
+            T_CHECK(layer_contains(sorted[0], "A"));
+        }
+    }
+}
+
+void WidgetTests::toposort3NodesTest(test::Test& test) {
+    NodeList list;
+    Node* nodeA = list.createNode("A");
+    Node* nodeB = list.createNode("B");
+    Node* nodeC = list.createNode("C");
+    nodeC->addParent(nodeA);
+    nodeB->addParent(nodeC);
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        get_shuffled(list.getNodes()), &Node::getParents
+    );
+    if (T_CHECK(sorted.size() == 3)) {
+        if (T_CHECK(sorted[0].size() == 1)) {
+            T_CHECK(layer_contains(sorted[0], "A"));
+        }
+        if (T_CHECK(sorted[1].size() == 1)) {
+            T_CHECK(layer_contains(sorted[1], "C"));
+        }
+        if (T_CHECK(sorted[2].size() == 1)) {
+            T_CHECK(layer_contains(sorted[2], "B"));
+        }
+    }
+}
+
+void WidgetTests::toposort4NodesDiamondTest(test::Test& test) {
+    NodeList list;
+    Node* nodeA = list.createNode("A");
+    Node* nodeB = list.createNode("B");
+    Node* nodeC = list.createNode("C");
+    Node* nodeD = list.createNode("D");
+    nodeB->addParent(nodeA);
+    nodeC->addParent(nodeA);
+    nodeD->addParent(nodeB);
+    nodeD->addParent(nodeC);
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        get_shuffled(list.getNodes()), &Node::getParents
+    );
+    if (T_CHECK(sorted.size() == 3)) {
+        if (T_CHECK(sorted[0].size() == 1)) {
+            T_CHECK(layer_contains(sorted[0], "A"));
+        }
+        if (T_CHECK(sorted[1].size() == 2)) {
+            T_CHECK(layer_contains(sorted[1], "B"));
+            T_CHECK(layer_contains(sorted[1], "C"));
+        }
+        if (T_CHECK(sorted[2].size() == 1)) {
+            T_CHECK(layer_contains(sorted[2], "D"));
+        }
+    }
+}
+
+void WidgetTests::toposort5NodesXTest(test::Test& test) {
+    NodeList list;
+    Node* nodeA = list.createNode("A");
+    Node* nodeB = list.createNode("B");
+    Node* nodeC = list.createNode("C");
+    Node* nodeD = list.createNode("D");
+    Node* nodeE = list.createNode("E");
+    nodeC->addParent(nodeA);
+    nodeC->addParent(nodeB);
+    nodeD->addParent(nodeC);
+    nodeE->addParent(nodeC);
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        get_shuffled(list.getNodes()), &Node::getParents
+    );
+    if (T_CHECK(sorted.size() == 3)) {
+        if (T_CHECK(sorted[0].size() == 2)) {
+            T_CHECK(layer_contains(sorted[0], "A"));
+            T_CHECK(layer_contains(sorted[0], "B"));
+        }
+        if (T_CHECK(sorted[1].size() == 1)) {
+            T_CHECK(layer_contains(sorted[1], "C"));
+        }
+        if (sorted[2].size() == 2) {
+            T_CHECK(layer_contains(sorted[2], "D"));
+            T_CHECK(layer_contains(sorted[2], "E"));
+        }
+    }
+}
+
+void WidgetTests::toposort5NodesRandomTest(test::Test& test) {
+    NodeList list;
+    Node* node0 = list.createNode("N0");
+    Node* node1 = list.createNode("N1");
+    Node* node2 = list.createNode("N2");
+    Node* node3 = list.createNode("N3");
+    Node* node4 = list.createNode("N4");
+    Node* node5 = list.createNode("N5");
+    node0->addParent(node2);
+    node2->addParent(node3);
+    node4->addParent(node0);
+    node4->addParent(node5);
+    node5->addParent(node2);
+    node5->addParent(node1);
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        get_shuffled(list.getNodes()), &Node::getParents
+    );
+    if (T_CHECK(sorted.size() == 4)) {
+        if (T_CHECK(sorted[0].size() == 2)) {
+            T_CHECK(layer_contains(sorted[0], "N1"));
+            T_CHECK(layer_contains(sorted[0], "N3"));
+        }
+        if (T_CHECK(sorted[1].size() == 1)) {
+            T_CHECK(layer_contains(sorted[1], "N2"));
+        }
+        if (T_CHECK(sorted[2].size() == 2)) {
+            T_CHECK(layer_contains(sorted[2], "N0"));
+            T_CHECK(layer_contains(sorted[2], "N5"));
+        }
+        if (T_CHECK(sorted[3].size() == 1)) {
+            T_CHECK(layer_contains(sorted[3], "N4"));
+        }
+    }
+}
+
+void WidgetTests::toposortHairTest(test::Test& test) {
+    NodeList list;
+    Node* center = list.createNode("center");
+    Node* short0 = list.createNode("short0");
+    Node* short1 = list.createNode("short1");
+    Node* short2 = list.createNode("short2");
+    Node* long0 = list.createNode("long0");
+    Node* long1 = list.createNode("long1");
+    Node* long2 = list.createNode("long2");
+    short0->addParent(center);
+    short1->addParent(center);
+    short2->addParent(center);
+    long0->addParent(center);
+    long1->addParent(long0);
+    long2->addParent(long1);
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        get_shuffled(list.getNodes()), &Node::getParents
+    );
+    if (T_CHECK(sorted.size() == 4)) {
+        if (T_CHECK(sorted[0].size() == 1)) {
+            T_CHECK(layer_contains(sorted[0], "center"));
+        }
+        if (T_CHECK(sorted[1].size() == 4)) {
+            T_CHECK(layer_contains(sorted[1], "short0"));
+            T_CHECK(layer_contains(sorted[1], "short1"));
+            T_CHECK(layer_contains(sorted[1], "short2"));
+            T_CHECK(layer_contains(sorted[1], "long0"));
+        }
+        if (T_CHECK(sorted[2].size() == 1)) {
+            T_CHECK(layer_contains(sorted[2], "long1"));
+        }
+        if (T_CHECK(sorted[3].size() == 1)) {
+            T_CHECK(layer_contains(sorted[3], "long2"));
+        }
+    }
+}
+
+void WidgetTests::toposortInverseHairTest(test::Test& test) {
+    NodeList list;
+    Node* center = list.createNode("center");
+    Node* short0 = list.createNode("short0");
+    Node* short1 = list.createNode("short1");
+    Node* short2 = list.createNode("short2");
+    Node* long0 = list.createNode("long0");
+    Node* long1 = list.createNode("long1");
+    Node* long2 = list.createNode("long2");
+    center->addParent(short0);
+    center->addParent(short1);
+    center->addParent(short2);
+    center->addParent(long0);
+    long0->addParent(long1);
+    long1->addParent(long2);
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        get_shuffled(list.getNodes()), &Node::getParents
+    );
+    if (T_CHECK(sorted.size() == 4)) {
+        if (T_CHECK(sorted[0].size() == 4)) {
+            T_CHECK(layer_contains(sorted[0], "long2"));
+            T_CHECK(layer_contains(sorted[0], "short0"));
+            T_CHECK(layer_contains(sorted[0], "short1"));
+            T_CHECK(layer_contains(sorted[0], "short2"));
+        }
+        if (T_CHECK(sorted[1].size() == 1)) {
+            T_CHECK(layer_contains(sorted[1], "long1"));
+        }
+        if (T_CHECK(sorted[2].size() == 1)) {
+            T_CHECK(layer_contains(sorted[2], "long0"));
+        }
+        if (T_CHECK(sorted[3].size() == 1)) {
+            T_CHECK(layer_contains(sorted[3], "center"));
+        }
+    }
+}
+
+void WidgetTests::toposortLoopTest(test::Test& test) {
+    NodeList list;
+    Node* nodeA = list.createNode("A");
+    Node* nodeB = list.createNode("B");
+    Node* nodeC = list.createNode("C");
+    nodeC->addParent(nodeA);
+    nodeB->addParent(nodeC);
+    nodeA->addParent(nodeB);
+    bool exception = false;
+    try {
+        std::vector<std::vector<Node*>> sorted = fw::toposort(
+            get_shuffled(list.getNodes()), &Node::getParents
+        );
+    } catch (std::exception exc) {
+        exception = true;
+    }
+    T_CHECK(exception);
 }
 
 void WidgetTests::basicTest(test::Test& test) {
@@ -2535,6 +2777,15 @@ void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
     T_COMPARE(widget->getVisualGlobalBottomRight(), visual_global_corners[3], vec2f_to_str);
 }
 
+bool WidgetTests::layer_contains(const std::vector<Node*>& layer, const std::string& name) {
+    for (Node* node : layer) {
+        if (node->str == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
 TestApplication::TestApplication(sf::RenderWindow& window) : Application(window) { }
 
 void TestApplication::onInit() {
@@ -2630,3 +2881,26 @@ GenericWidgetTest::GenericWidgetTest(
     fw::Application& application,
     test::Test& test
 ) : application(application), test(test) { }
+
+Node::Node(const std::string& str) {
+    this->str = str;
+}
+
+void Node::addParent(Node* parent) {
+    parents.push_back(parent);
+}
+
+const std::vector<Node*>& Node::getParents(Node* node) {
+    return node->parents;
+}
+
+Node* NodeList::createNode(const std::string& name) {
+    std::unique_ptr<Node> uptr = std::make_unique<Node>(name);
+    Node* ptr = uptr.get();
+    nodes.add(std::move(uptr));
+    return ptr;
+}
+
+const std::vector<Node*>& NodeList::getNodes() const {
+    return nodes.getVector();
+}

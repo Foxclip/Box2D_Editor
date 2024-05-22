@@ -2,6 +2,23 @@
 
 #include "widgets/widgets.h"
 #include "test.h"
+#include <random>
+
+struct Node {
+	std::string str;
+	std::vector<Node*> parents;
+	Node(const std::string& str);
+	void addParent(Node* parent);
+	static const std::vector<Node*>& getParents(Node* node);
+};
+
+class NodeList {
+public:
+	Node* createNode(const std::string& name);
+	const std::vector<Node*>& getNodes() const;
+private:
+	CompVectorUptr<Node> nodes;
+};
 
 class TestApplication : public fw::Application {
 public:
@@ -84,14 +101,26 @@ public:
 	void createTestLists() override;
 
 protected:
-	void createApplicationList();
-	void createWidgetsList();
+	void createToposortList(test::TestList* list);
+	void createApplicationList(test::TestList* list);
+	void createWidgetsList(test::TestList* list);
 	void beforeRunModule() override;
 	void afterRunModule() override;
 
 private:
 	sf::RenderWindow window;
 	sf::Font textbox_font;
+	std::mt19937 rng;
+
+	void toposortEmptyTest(test::Test& test);
+	void toposort1NodeTest(test::Test& test);
+	void toposort3NodesTest(test::Test& test);
+	void toposort4NodesDiamondTest(test::Test& test);
+	void toposort5NodesXTest(test::Test& test);
+	void toposort5NodesRandomTest(test::Test& test);
+	void toposortHairTest(test::Test& test);
+	void toposortInverseHairTest(test::Test& test);
+	void toposortLoopTest(test::Test& test);
 
 	void basicTest(test::Test& test);
 	void initTest(test::Test& test);
@@ -160,5 +189,13 @@ private:
 		fw::WindowWidget* widget
 	);
 	void genericWidgetTest(const GenericWidgetTest& gwt);
+	bool layer_contains(const std::vector<Node*>& layer, const std::string& name);
+
+	template <typename TVec>
+	TVec get_shuffled(const TVec& vec) {
+		TVec copy(vec);
+		std::shuffle(copy.begin(), copy.end(), rng);
+		return copy;
+	}
 
 };
