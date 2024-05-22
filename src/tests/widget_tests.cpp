@@ -122,6 +122,7 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* checkbox_widget_toggle_test = list->addTest("checkbox_widget_toggle", { checkbox_widget_basic_test }, [&](test::Test& test) { checkboxWidgetToggleTest(test); });
     test::Test* container_widget_basic_test = list->addTest("container_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { containerWidgetBasicTest(test); });
     test::Test* container_widget_children_test = list->addTest("container_widget_children", { container_widget_basic_test }, [&](test::Test& test) { containerWidgetChildrenTest(test); });
+    test::Test* size_policy_test = list->addTest("size_policy", { anchor_test }, [&](test::Test& test) { sizePolicyTest(test); });
     test::Test* textbox_widget_basic_test = list->addTest("textbox_widget_basic", { rectangle_widget_test, text_widget_test }, [&](test::Test& test) { textboxWidgetBasicTest(test); });
     test::Test* textbox_widget_input_test = list->addTest("textbox_widget_input", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetInputTest(test); });
     test::Test* textbox_widget_events_test = list->addTest("textbox_widget_events", { textbox_widget_input_test }, [&](test::Test& test) { textboxWidgetEventsTest(test); });
@@ -1269,6 +1270,40 @@ void WidgetTests::containerWidgetChildrenTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(container_widget->getSize(), new_container_size);
     T_VEC2_APPROX_COMPARE(child_1_widget->getPosition(), sf::Vector2f(horizontal_padding, vertical_padding));
     T_VEC2_APPROX_COMPARE(child_2_widget->getPosition(), sf::Vector2f(horizontal_padding + child_1_widget->getWidth() + horizontal_padding, vertical_padding));
+}
+
+void WidgetTests::sizePolicyTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    sf::Vector2f parent_size(150.0f, 150.0f);
+    sf::Vector2f container_size(100.0f, 100.0f);
+    sf::Vector2f child_size(30.0f, 30.0f);
+    float container_padding = 10.0f;
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>(parent_size);
+    fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>(container_size);
+    fw::RectangleWidget* child0_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
+    fw::RectangleWidget* child1_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
+    parent_widget->setFillColor(sf::Color(128, 128, 128));
+    container_widget->setFillColor(sf::Color(100, 100, 100));
+    child0_widget->setFillColor(sf::Color::Red);
+    child1_widget->setFillColor(sf::Color::Green);
+    container_widget->setPadding(container_padding);
+    container_widget->setHorizontal(false);
+    container_widget->setParent(parent_widget);
+    child0_widget->setParent(container_widget);
+    child1_widget->setParent(container_widget);
+    container_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::PARENT);
+    child0_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::PARENT);
+    application.advance();
+    auto rect_to_str = &WidgetTests::floatRectToStr;
+    float container_height = child_size.y * 2 + container_padding * 3;
+    T_COMPARE(parent_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, parent_size.y), rect_to_str);
+    T_COMPARE(container_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, container_height), rect_to_str);
+    T_COMPARE(child0_widget->getParentLocalBounds(), sf::FloatRect(container_padding, container_padding, parent_size.x - container_padding * 2, child_size.y), rect_to_str);
+    T_COMPARE(child1_widget->getParentLocalBounds(), sf::FloatRect(container_padding, container_padding * 2 + child_size.y, child_size.x, child_size.y), rect_to_str);
 }
 
 void WidgetTests::textboxWidgetBasicTest(test::Test& test) {

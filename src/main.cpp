@@ -43,7 +43,6 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: ContainerWidget sizePolicy test
     // TODO: make ContainerWidget inherited from EmptyWidget
     // TODO: fix resizing window with origin in the center
     // TODO: align textboxes in EditWindow to the right
