@@ -511,6 +511,7 @@ void WidgetTests::rootWidgetTest(test::Test& test) {
     GenericWidgetTest gwt(application, test);
     gwt.widget = root_widget;
     gwt.total_widgets = 1;
+    gwt.type = fw::Widget::WidgetType::Empty;
     gwt.name = "root";
     gwt.fullname = "root";
     gwt.is_visual_position_quantized = false;
@@ -562,6 +563,7 @@ void WidgetTests::emptyWidgetTest(test::Test& test) {
     GenericWidgetTest gwt(application, test);
     gwt.widget = empty_widget;
     gwt.total_widgets = 2;
+    gwt.type = fw::Widget::WidgetType::Empty;
     gwt.name = "empty";
     gwt.fullname = "root|empty";
     gwt.is_visual_position_quantized = false;
@@ -611,6 +613,7 @@ void WidgetTests::rectangleWidgetTest(test::Test& test) {
     GenericWidgetTest gwt(application, test);
     gwt.widget = rectangle_widget;
     gwt.total_widgets = 2;
+    gwt.type = fw::Widget::WidgetType::Rectangle;
     gwt.name = "rectangle";
     gwt.fullname = "root|rectangle";
     gwt.is_visual_position_quantized = false;
@@ -1082,6 +1085,7 @@ void WidgetTests::textWidgetTest(test::Test& test) {
     GenericWidgetTest gwt(application, test);
     gwt.widget = text_widget;
     gwt.total_widgets = 2;
+    gwt.type = fw::Widget::WidgetType::Text;
     gwt.name = "text";
     gwt.fullname = "root|text";
     gwt.is_visual_position_quantized = true;
@@ -1132,6 +1136,7 @@ void WidgetTests::checkboxWidgetBasicTest(test::Test& test) {
     GenericWidgetTest gwt(application, test);
     gwt.widget = checkbox_widget;
     gwt.total_widgets = 3;
+    gwt.type = fw::Widget::WidgetType::Checkbox;
     gwt.name = "checkbox";
     gwt.fullname = "root|checkbox";
     gwt.is_visual_position_quantized = false;
@@ -1201,6 +1206,7 @@ void WidgetTests::containerWidgetBasicTest(test::Test& test) {
     GenericWidgetTest gwt(application, test);
     gwt.widget = container_widget;
     gwt.total_widgets = 2;
+    gwt.type = fw::Widget::WidgetType::Container;
     gwt.name = "container";
     gwt.fullname = "root|container";
     gwt.is_visual_position_quantized = false;
@@ -1282,6 +1288,7 @@ void WidgetTests::textboxWidgetBasicTest(test::Test& test) {
     GenericWidgetTest gwt(application, test);
     gwt.widget = textbox_widget;
     gwt.total_widgets = 5;
+    gwt.type = fw::Widget::WidgetType::Textbox;
     gwt.name = "textbox";
     gwt.fullname = "root|textbox";
     gwt.is_visual_position_quantized = false;
@@ -1945,6 +1952,7 @@ void WidgetTests::canvasWidgetBasicTest(test::Test& test) {
     GenericWidgetTest gwt(application, test);
     gwt.widget = canvas_widget;
     gwt.total_widgets = 2;
+    gwt.type = fw::Widget::WidgetType::Canvas;
     gwt.name = "canvas";
     gwt.fullname = "root|canvas";
     gwt.is_visual_position_quantized = false;
@@ -2039,6 +2047,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         GenericWidgetTest gwt(application, test);
         gwt.widget = window_widget;
         gwt.total_widgets = 7;
+        gwt.type = fw::Widget::WidgetType::Window;
         gwt.name = "window";
         gwt.fullname = "root|window";
         gwt.is_visual_position_quantized = false;
@@ -2089,6 +2098,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         GenericWidgetTest gwt(application, test);
         gwt.widget = header_widget;
         gwt.total_widgets = 7;
+        gwt.type = fw::Widget::WidgetType::Rectangle;
         gwt.name = "header";
         gwt.fullname = "root|window|header";
         gwt.is_visual_position_quantized = false;
@@ -2129,6 +2139,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         GenericWidgetTest gwt(application, test);
         gwt.widget = main_widget;
         gwt.total_widgets = 7;
+        gwt.type = fw::Widget::WidgetType::Rectangle;
         gwt.name = "main";
         gwt.fullname = "root|window|main";
         gwt.is_visual_position_quantized = false;
@@ -2718,6 +2729,7 @@ void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
     test::Test& test = gwt.test;
     fw::Widget* widget = gwt.widget;
     T_COMPARE(application.getWidgets().getSize(), gwt.total_widgets);
+    T_CHECK(widget->getType() == gwt.type);
     T_COMPARE(widget->getName(), gwt.name);
     T_COMPARE(widget->getFullName(), gwt.fullname);
     T_COMPARE(widget->isVisualPositionQuantized(), gwt.is_visual_position_quantized);

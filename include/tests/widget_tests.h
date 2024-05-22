@@ -76,6 +76,7 @@ struct GenericWidgetTest {
 	test::Test& test;
 	fw::Widget* widget = nullptr;
     size_t total_widgets = 0;
+	fw::Widget::WidgetType type = fw::Widget::WidgetType::None;
     std::string name;
     std::string fullname;
     bool is_visual_position_quantized = false;
