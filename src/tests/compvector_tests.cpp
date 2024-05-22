@@ -202,6 +202,13 @@ void CompVectorTests::createCompVectorList(test::TestList* list) {
 		vec[1] = 5;
 		T_CHECK(vec == CompVector<int>({ 1, 5, 3 }));
 	});
+	test::Test* modify_cycle_test = list->addTest("modify_cycle", { basic_tests }, [&](test::Test& test) {
+		CompVector<int> vec = { 1, 2, 3 };
+		for (int& n : vec) {
+			n++;
+		}
+		T_CHECK(vec == CompVector<int>({ 2, 3, 4 }));
+	});
 }
 
 void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
@@ -481,5 +488,21 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 		T_COMPARE(*vec[0], 1);
 		T_COMPARE(*vec[1], 2);
 		T_COMPARE(*vec[2], 3);
+	});
+	test::Test* modify_test = list->addTest("modify", { basic_tests }, [&](test::Test& test) {
+		CompVectorUptr<int> vec = { 1, 2, 3 };
+		*vec[1] = 5;
+		T_COMPARE(*vec[0], 1);
+		T_COMPARE(*vec[1], 5);
+		T_COMPARE(*vec[2], 3);
+	});
+	test::Test* modify_cycle_test = list->addTest("modify_cycle", { basic_tests }, [&](test::Test& test) {
+		CompVectorUptr<int> vec = { 1, 2, 3 };
+		for (int* n : vec) {
+			(*n)++;
+		}
+		T_COMPARE(*vec[0], 2);
+		T_COMPARE(*vec[1], 3);
+		T_COMPARE(*vec[2], 4);
 	});
 }

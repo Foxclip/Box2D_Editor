@@ -43,7 +43,6 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: add non-const begin and end methods to CompVector (and test modifying elements of CompVector)
     // TODO: add WidgetType to widget tests
     // TODO: ContainerWidget sizePolicy test
     // TODO: make ContainerWidget inherited from EmptyWidget

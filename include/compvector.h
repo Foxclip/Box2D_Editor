@@ -38,6 +38,10 @@ public:
 	ptrdiff_t remove(const T& value);
 	void removeAt(size_t index);
 	void reverse();
+	std::vector<T>::iterator begin();
+	std::vector<T>::iterator end();
+	std::vector<T>::reverse_iterator rbegin();
+	std::vector<T>::reverse_iterator rend();
 	std::vector<T>::const_iterator begin() const;
 	std::vector<T>::const_iterator end() const;
 	std::vector<T>::const_reverse_iterator rbegin() const;
@@ -90,6 +94,10 @@ public:
 	ptrdiff_t remove(T* value);
 	void removeAt(size_t index);
 	void reverse();
+	std::vector<T*>::iterator begin();
+	std::vector<T*>::iterator end();
+	std::vector<T*>::reverse_iterator rbegin();
+	std::vector<T*>::reverse_iterator rend();
 	std::vector<T*>::const_iterator begin() const;
 	std::vector<T*>::const_iterator end() const;
 	std::vector<T*>::const_reverse_iterator rbegin() const;
@@ -211,6 +219,26 @@ inline void CompVector<T, TCmp>::removeAt(size_t index) {
 template<typename T, typename TCmp>
 inline void CompVector<T, TCmp>::reverse() {
 	std::reverse(vector.begin(), vector.end());
+}
+
+template<typename T, typename TCmp>
+inline std::vector<T>::iterator CompVector<T, TCmp>::begin() {
+	return vector.begin();
+}
+
+template<typename T, typename TCmp>
+inline std::vector<T>::iterator CompVector<T, TCmp>::end() {
+	return vector.end();
+}
+
+template<typename T, typename TCmp>
+inline std::vector<T>::reverse_iterator CompVector<T, TCmp>::rbegin() {
+	return vector.rbegin();
+}
+
+template<typename T, typename TCmp>
+inline std::vector<T>::reverse_iterator CompVector<T, TCmp>::rend() {
+	return vector.rend();
 }
 
 template<typename T, typename TCmp>
@@ -440,6 +468,26 @@ inline void CompVectorUptr<T, TCmp>::reverse() {
 }
 
 template<typename T, typename TCmp>
+inline std::vector<T*>::iterator CompVectorUptr<T, TCmp>::begin() {
+	return comp.begin();
+}
+
+template<typename T, typename TCmp>
+inline std::vector<T*>::iterator CompVectorUptr<T, TCmp>::end() {
+	return comp.end();
+}
+
+template<typename T, typename TCmp>
+inline std::vector<T*>::reverse_iterator CompVectorUptr<T, TCmp>::rbegin() {
+	return comp.rbegin();
+}
+
+template<typename T, typename TCmp>
+inline std::vector<T*>::reverse_iterator CompVectorUptr<T, TCmp>::rend() {
+	return comp.rend();
+}
+
+template<typename T, typename TCmp>
 inline std::vector<T*>::const_iterator CompVectorUptr<T, TCmp>::begin() const {
 	return comp.begin();
 }
@@ -481,12 +529,12 @@ inline T* CompVectorUptr<T, TCmp>::back() const {
 
 template<typename T, typename TCmp>
 inline T* CompVectorUptr<T, TCmp>::at(size_t index) {
-	return comp[index];
+	return comp.at(index);
 }
 
 template<typename T, typename TCmp>
 inline T* CompVectorUptr<T, TCmp>::at(size_t index) const {
-	return comp[index];
+	return comp.at(index);
 }
 
 template<typename T, typename TCmp>
@@ -516,12 +564,12 @@ inline const std::set<T*, TCmp>& CompVectorUptr<T, TCmp>::getSet() const {
 
 template<typename T, typename TCmp>
 inline T* CompVectorUptr<T, TCmp>::operator[](size_t index) {
-	return comp[index];
+	return at(index);
 }
 
 template<typename T, typename TCmp>
 inline T* CompVectorUptr<T, TCmp>::operator[](size_t index) const {
-	return comp[index];
+	return at(index);
 }
 
 template<typename T, typename TCmp>
