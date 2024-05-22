@@ -2,6 +2,7 @@
 
 fw::CanvasWidget::CanvasWidget(WidgetList& widget_list, float width, float height, unsigned int texture_width, unsigned int texture_height)
 	: RectangleWidget(widget_list, width, height) {
+	type = WidgetType::Canvas;
 	setName("canvas");
 	setTextureSize(texture_width, texture_height);
 	rect.setTexture(&texture.getTexture(), true);

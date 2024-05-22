@@ -4,6 +4,7 @@
 namespace fw {
 
 	RectangleWidget::RectangleWidget(WidgetList& widget_list, float width, float height) : ShapeWidget(widget_list) {
+		type = WidgetType::Rectangle;
 		setName("rectangle");
 		setSize(width, height);
 	}

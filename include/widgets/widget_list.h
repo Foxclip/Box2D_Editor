@@ -2,6 +2,7 @@
 
 #include "widget.h"
 #include "empty_widget.h"
+#include "widget_update_queue.h"
 #include "widget_render_queue.h"
 
 namespace fw {
@@ -35,7 +36,7 @@ namespace fw {
 		bool isLShiftPressed() const;
 		Widget* find(const std::string& name) const;
 		template<typename T, typename... Args>
-			requires std::derived_from<T, Widget>
+		requires std::derived_from<T, Widget>
 		T* createWidget(Args&&... args);
 		bool isLocked() const;
 		void lock();
@@ -67,12 +68,13 @@ namespace fw {
 		CompVectorUptr<Widget> widgets;
 		EmptyWidget* root_widget = nullptr;
 		Widget* focused_widget = nullptr;
+		WidgetUpdateQueue update_queue = WidgetUpdateQueue(*this);
 		WidgetRenderQueue render_queue = WidgetRenderQueue(*this);
 
 	};
 
 	template<typename T, typename... Args>
-		requires std::derived_from<T, Widget>
+	requires std::derived_from<T, Widget>
 	inline T* WidgetList::createWidget(Args&&... args) {
 		wAssert(!isLocked());
 		std::unique_ptr<T> uptr = std::make_unique<T>(*this, args...);

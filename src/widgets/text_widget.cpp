@@ -4,6 +4,7 @@
 namespace fw {
 
 	TextWidget::TextWidget(WidgetList& widget_list) : Widget(widget_list) {
+		type = WidgetType::Text;
 		setName("text");
 	}
 

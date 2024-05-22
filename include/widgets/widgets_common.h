@@ -40,4 +40,53 @@ namespace fw {
 	};
 	sf::FloatRect quantize_rect(const sf::FloatRect& rect, QuantizeMode quantize_mode);
 
+	template <typename TPFunc, typename TNode>
+	concept NodeVectorFunc = requires(TPFunc f, TNode n) {
+		{ f(n) } -> std::convertible_to<const std::vector<TNode>&>;
+	};
+
+	template<typename TNode, typename TPFunc>
+	requires NodeVectorFunc<TPFunc, TNode>
+	std::vector<std::vector<TNode>> toposort(
+		const std::vector<TNode>& nodes,
+		const TPFunc& get_parents_func
+	) {
+		std::vector<std::vector<TNode>> result;
+		std::map<TNode, size_t> proceessed_nodes;
+		std::set<TNode> node_stack;
+		std::function<size_t(const TNode&)> process_node = [&](const TNode& node) {
+			node_stack.insert(node);
+			const std::vector<TNode>& parents = get_parents_func(node);
+			ptrdiff_t max_layer = -1;
+			for (const TNode& parent : parents) {
+				if (node_stack.contains(parent)) {
+					throw std::runtime_error("Loop detected");
+				}
+				size_t parent_layer = 0;
+				auto it = proceessed_nodes.find(parent);
+				if (it == proceessed_nodes.end()) {
+					parent_layer = process_node(parent);
+				} else {
+					parent_layer = it->second;
+				}
+				max_layer = std::max(max_layer, (ptrdiff_t)parent_layer);
+			}
+			max_layer++;
+			if (max_layer >= (ptrdiff_t)result.size()) {
+				result.push_back(std::vector<TNode>());
+			}
+			result[max_layer].push_back(node);
+			proceessed_nodes[node] = max_layer;
+			node_stack.erase(node);
+			return max_layer;
+		};
+		for (const TNode& node : nodes) {
+			if (!proceessed_nodes.contains(node)) {
+				process_node(node);
+			}
+		}
+		return result;
+	}
+
+
 }

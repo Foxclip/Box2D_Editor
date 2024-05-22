@@ -11,6 +11,7 @@ namespace fw {
 
 	TextBoxWidget::TextBoxWidget(WidgetList& widget_list, float width, float height)
 		: RectangleWidget(widget_list, width, height) {
+		type = WidgetType::Textbox;
 		// textbox
 		setName("textbox");
 		setClipChildren(true);
@@ -116,12 +117,12 @@ namespace fw {
 
 	bool TextBoxWidget::isValidValue() const {
 		bool result;
-		if (type == TextBoxType::TEXT) {
+		if (textbox_type == TextBoxType::TEXT) {
 			result = true;
-		} else if (type == TextBoxType::INTEGER) {
+		} else if (textbox_type == TextBoxType::INTEGER) {
 			long long number;
 			result = parseLL(getValue(), number);
-		} else if (type == TextBoxType::FLOAT) {
+		} else if (textbox_type == TextBoxType::FLOAT) {
 			float number;
 			result = parseFloat(getValue(), number);
 		} else {
@@ -134,8 +135,8 @@ namespace fw {
 		return text_widget->getStringSize();
 	}
 
-	TextBoxWidget::TextBoxType TextBoxWidget::getType() const {
-		return type;
+	TextBoxWidget::TextBoxType TextBoxWidget::getTextboxType() const {
+		return textbox_type;
 	}
 
 	size_t TextBoxWidget::getCursorPos() const {
@@ -239,7 +240,7 @@ namespace fw {
 	}
 
 	void TextBoxWidget::setType(TextBoxType type) {
-		this->type = type;
+		this->textbox_type = type;
 		updateValid();
 	}
 
@@ -257,11 +258,11 @@ namespace fw {
 	}
 
 	void TextBoxWidget::typeChar(sf::Uint32 code) {
-		if (type == TextBoxType::INTEGER) {
+		if (textbox_type == TextBoxType::INTEGER) {
 			if (TEXTBOX_VALID_INTEGER_CHARS.find(code) == -1) {
 				return;
 			}
-		} else if (type == TextBoxType::FLOAT) {
+		} else if (textbox_type == TextBoxType::FLOAT) {
 			if (TEXTBOX_VALID_FLOAT_CHARS.find(code) == -1) {
 				return;
 			}

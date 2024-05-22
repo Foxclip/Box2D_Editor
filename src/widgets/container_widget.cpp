@@ -5,6 +5,7 @@ namespace fw {
 
 	ContainerWidget::ContainerWidget(WidgetList& widget_list, float width, float height)
 		: RectangleWidget(widget_list, width, height) {
+		type = WidgetType::Container;
 		setName("container");
 		setHorizontalSizePolicy(SizePolicy::CHILDREN);
 		setVerticalSizePolicy(SizePolicy::CHILDREN);
@@ -60,6 +61,7 @@ namespace fw {
 
 	void ContainerWidget::internalUpdate() {
 		float max_width = 0.0f, max_height = 0.0f;
+		children_bounds = sf::FloatRect();
 		for (size_t i = 0; i < children.size(); i++) {
 			if (children[i]->getWidth() > max_width) {
 				max_width = children[i]->getWidth();
@@ -77,8 +79,6 @@ namespace fw {
 		for (size_t i = 0; i < children.size(); i++) {
 			Widget* child = children[i];
 			child->setPosition(next_x, next_y);
-			sf::FloatRect child_bounds = child->getParentLocalBounds();
-			extend_bounds(children_bounds, child_bounds);
 			if (horizontal) {
 				child->setOrigin(alignmentToAnchor(vertical_alignment));
 				next_x += child->getWidth() + horizontal_padding;
@@ -86,6 +86,8 @@ namespace fw {
 				child->setOrigin(alignmentToAnchor(horizontal_alignment));
 				next_y += child->getHeight() + vertical_padding;
 			}
+			sf::FloatRect child_bounds = child->getParentLocalBounds();
+			extend_bounds(children_bounds, child_bounds);
 		}
 	}
 

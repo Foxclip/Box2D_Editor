@@ -3,6 +3,7 @@
 namespace fw {
 
 	EmptyWidget::EmptyWidget(WidgetList& widget_list) : Widget(widget_list) {
+		type = WidgetType::Empty;
 		setName("empty");
 		setRenderable(false);
 	}

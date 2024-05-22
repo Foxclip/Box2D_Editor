@@ -3,8 +3,6 @@
 
 namespace fw {
 
-	
-
 	RenderQueueLayer::RenderQueueLayer(size_t layer) {
 		this->layer = layer;
 	}

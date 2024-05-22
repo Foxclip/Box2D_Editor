@@ -15,6 +15,7 @@ target_sources(widgets_lib PRIVATE
     "${INCLUDE_DIR}/widgets/widget_render_queue.h"
     "${INCLUDE_DIR}/widgets/widget_transform.h"
     "${INCLUDE_DIR}/widgets/widget_unclipped_region.h"
+    "${INCLUDE_DIR}/widgets/widget_update_queue.h"
     "${INCLUDE_DIR}/widgets/widgets.h"
     "${INCLUDE_DIR}/widgets/widgets_common.h"
     "${INCLUDE_DIR}/widgets/window_widget.h"
@@ -35,6 +36,7 @@ target_sources(widgets_lib PRIVATE
     widget_render_queue.cpp
     widget_transform.cpp
     widget_unclipped_region.cpp
+    widget_update_queue.cpp
     widgets_common.cpp
     window_widget.cpp
 )

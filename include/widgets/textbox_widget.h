@@ -59,7 +59,7 @@ namespace fw {
 		const sf::String getSelectedText() const;
 		bool isValidValue() const;
 		size_t getStringSize() const;
-		TextBoxType getType() const;
+		TextBoxType getTextboxType() const;
 		size_t getCursorPos() const;
 		bool isEditMode() const;
 		bool isSelectionActive() const;
@@ -133,7 +133,7 @@ namespace fw {
 		TextWidget* text_widget = nullptr;
 		RectangleWidget* cursor_widget = nullptr;
 		RectangleWidget* selection_widget = nullptr;
-		TextBoxType type = TextBoxType::TEXT;
+		TextBoxType textbox_type = TextBoxType::TEXT;
 		struct TextBoxHistoryEntry {
 			sf::String str;
 			size_t cursor_pos = 0;

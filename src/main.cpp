@@ -43,7 +43,9 @@ int main() {
     //run_tests();
     execute_app();
 
-    // TODO: remake EditWindow with WindowWidget
+    // TODO: add tests for toposort (copy from CppTestProject)
+    // TODO: add non-const begin and end methods to CompVector (and test modifying elements of CompVector)
+    // TODO: add WidgetType to widget tests
     // TODO: ContainerWidget sizePolicy test
     // TODO: make ContainerWidget inherited from EmptyWidget
     // TODO: fix resizing window with origin in the center

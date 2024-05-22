@@ -137,6 +137,7 @@ fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::strin
     parameter_widget->setFillColor(sf::Color::Transparent);
     parameter_widget->setVerticalAlignment(fw::Widget::Alignment::ALIGN_CENTER);
     parameter_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::PARENT);
+    parameter_widget->setVerticalSizePolicy(fw::Widget::SizePolicy::CHILDREN);
     parameter_widget->setParent(edit_window.container_widget);
     parameter_widget->setName(name);
     fw::TextWidget* parameter_text_widget = app.widgets.createWidget<fw::TextWidget>();

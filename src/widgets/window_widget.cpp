@@ -12,6 +12,7 @@ namespace fw {
 
 	WindowWidget::WindowWidget(WidgetList& widget_list, float width, float height) : EmptyWidget(widget_list) {
 		wAssert(WINDOW_ONSCREEN_MARGIN <= WINDOW_MIN_SIZE.x && WINDOW_ONSCREEN_MARGIN <= WINDOW_MIN_SIZE.y);
+		type = WidgetType::Window;
 		// empty
 		setName("window");
 		// header

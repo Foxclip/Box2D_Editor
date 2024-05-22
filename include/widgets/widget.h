@@ -7,6 +7,7 @@
 #include "widgets_common.h"
 #include "drawing.h"
 #include "widget_transform.h"
+#include "widget_update_queue.h"
 #include "widget_render_queue.h"
 #include "widget_unclipped_region.h"
 
@@ -34,6 +35,17 @@ namespace fw {
 
 	class Widget {
 	public:
+		enum class WidgetType {
+			None,
+			Canvas,
+			Checkbox,
+			Container,
+			Empty,
+			Rectangle,
+			Text,
+			Textbox,
+			Window
+		};
 		enum class Anchor {
 			CUSTOM,
 			TOP_LEFT,
@@ -78,6 +90,7 @@ namespace fw {
 		std::function<sf::Cursor::Type()> GetCursorType = []() { return sf::Cursor::Arrow; };
 
 		Widget(WidgetList& list);
+		WidgetType getType() const;
 		bool isMouseOver() const;
 		void updateMouseState(const sf::Vector2f& mouse_pos);
 		virtual bool isVisualPositionQuantized() const;
@@ -197,6 +210,8 @@ namespace fw {
 		friend class WidgetList;
 		friend class WidgetTransform;
 		friend class WidgetUnclippedRegion;
+		friend class WidgetUpdateQueue;
+		WidgetType type = WidgetType::None;
 		std::string name = "<unnamed>";
 		std::string full_name;
 		WidgetList& widget_list;
@@ -214,6 +229,9 @@ namespace fw {
 		WidgetUnclippedRegion unclipped_region = WidgetUnclippedRegion(this);
 		SizePolicy horizontal_size_policy = SizePolicy::NONE;
 		SizePolicy vertical_size_policy = SizePolicy::NONE;
+		WidgetUpdateQueueEntry normal_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::NORMAL);
+		WidgetUpdateQueueEntry size_horizontal_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_HORIZONTAL);
+		WidgetUpdateQueueEntry size_vertical_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_VERTICAL);
 		bool visible = true;
 		bool renderable = true;
 		bool is_focusable = false;

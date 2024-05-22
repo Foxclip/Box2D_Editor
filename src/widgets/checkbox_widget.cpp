@@ -4,6 +4,7 @@
 namespace fw {
 
 	CheckboxWidget::CheckboxWidget(WidgetList& widget_list) : RectangleWidget(widget_list, CHECKBOX_DEFAULT_SIZE) {
+		type = WidgetType::Checkbox;
 		setClickThrough(false);
 		RectangleWidget::setFillColor(background_fill_color);
 		setName("checkbox");
