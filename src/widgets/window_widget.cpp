@@ -41,7 +41,7 @@ namespace fw {
 					WINDOW_ONSCREEN_MARGIN - parent_local_bounds.height,
 					parent_size.y - WINDOW_ONSCREEN_MARGIN
 				);
-				setPosition(new_pos);
+				setTransformPosition(new_pos);
 			}
 		};
 		header_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
@@ -145,31 +145,34 @@ namespace fw {
 			float width_max = clamped_x_max - resizing_anchor.x;
 			float height_min = resizing_anchor.y - clamped_y_min - WINDOW_HEADER_HEIGHT;
 			float height_max = clamped_y_max - resizing_anchor.y - WINDOW_HEADER_HEIGHT;
-			float old_x = getPosition().x;
-			float old_y = getPosition().y;
+			float old_x = getTransformPosition().x;
+			float old_y = getTransformPosition().y;
 			float old_width = main_widget->getWidth();
 			float old_height = main_widget->getHeight();
 			if (active_resizing_type == Resizing::TOP_LEFT) {
-				setPosition(clamped_x_min, clamped_y_min);
-				main_widget->setSize(width_min, height_min);
+				setTransformPosition(clamped_x_min, clamped_y_min);
+				setSizeKeepPos(width_min, height_min + header_widget->getHeight());
 			} else if (active_resizing_type == Resizing::TOP) {
-				setPosition(old_x, clamped_y_min);
-				main_widget->setSize(old_width, height_min);
+				setTransformPosition(old_x, clamped_y_min);
+				setSizeKeepPos(old_width, height_min + header_widget->getHeight());
 			} else if (active_resizing_type == Resizing::TOP_RIGHT) {
-				setPosition(old_x, clamped_y_min);
-				main_widget->setSize(width_max, height_min);
+				setTransformPosition(old_x, clamped_y_min);
+				setSizeKeepPos(width_max, height_min + header_widget->getHeight());
 			} else if (active_resizing_type == Resizing::LEFT) {
-				setPosition(clamped_x_min, old_y);
-				main_widget->setSize(width_min, old_height);
+				setTransformPosition(clamped_x_min, old_y);
+				setSizeKeepPos(width_min, old_height + header_widget->getHeight());
 			} else if (active_resizing_type == Resizing::RIGHT) {
-				main_widget->setSize(width_max, old_height);
+				setTransformPosition(old_x, old_y);
+				setSizeKeepPos(width_max, old_height + header_widget->getHeight());
 			} else if (active_resizing_type == Resizing::BOTTOM_LEFT) {
-				setPosition(clamped_x_min, old_y);
-				main_widget->setSize(width_min, height_max);
+				setTransformPosition(clamped_x_min, old_y);
+				setSizeKeepPos(width_min, height_max + header_widget->getHeight());
 			} else if (active_resizing_type == Resizing::BOTTOM) {
-				main_widget->setSize(old_width, height_max);
+				setTransformPosition(old_x, old_y);
+				setSizeKeepPos(old_width, height_max + header_widget->getHeight());
 			} else if (active_resizing_type == Resizing::BOTTOM_RIGHT) {
-				main_widget->setSize(width_max, height_max);
+				setTransformPosition(old_x, old_y);
+				setSizeKeepPos(width_max, height_max + header_widget->getHeight());
 			}
 		};
 		resize_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {

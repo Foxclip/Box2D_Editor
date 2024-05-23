@@ -3,14 +3,15 @@
 
 EditWindow::EditWindow(fw::WidgetList& widget_list, Editor& p_app)
     : fw::WindowWidget(widget_list, 200.0f, 300.0f), app(p_app) {
+    setName("edit window");
     setVisible(false);
+    setOrigin(Anchor::CENTER);
     setFillColor(sf::Color(128, 128, 128));
     //setOrigin(Anchor::CENTER);
     setClickThrough(false);
     setHeaderFont(app.console_font);
     setHeaderTextCharacterSize(15);
     setHeaderText("Edit Window");
-    setName("edit window");
     container_widget = widget_list.createWidget<fw::ContainerWidget>(main_widget->getSize());
     container_widget->setHorizontal(false);
     container_widget->setPadding(EDIT_WINDOW_PARAMETER_PADDING);

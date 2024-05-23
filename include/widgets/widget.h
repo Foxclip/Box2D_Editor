@@ -141,7 +141,9 @@ namespace fw {
 		SizePolicy getHorizontalSizePolicy() const;
 		SizePolicy getVerticalSizePolicy() const;
 		const sf::Vector2f& getOrigin() const;
+		Anchor getOriginAnchor() const;
 		const sf::Vector2f& getPosition() const;
+		sf::Vector2f getTransformPosition() const;
 		sf::Vector2f getGlobalPosition() const;
 		sf::Vector2f getGlobalOriginPosition() const;
 		sf::Vector2f getCenter() const;
@@ -170,9 +172,14 @@ namespace fw {
 		virtual const sf::Color& getFillColor() const = 0;
 		virtual void setSize(float width, float height);
 		void setSize(const sf::Vector2f& size);
+		void setSizeKeepPos(float width, float height);
+		void setSizeKeepPos(const sf::Vector2f& size);
 		void setOrigin(Anchor anchor);
 		void setOrigin(float x, float y);
 		void setOrigin(const sf::Vector2f& origin);
+		void setOriginKeepPos(Anchor anchor);
+		void setOriginKeepPos(float x, float y);
+		void setOriginKeepPos(const sf::Vector2f& origin);
 		void setParentAnchor(Anchor anchor);
 		void setAnchorOffset(float x, float y);
 		void setAnchorOffset(const sf::Vector2f& offset);
@@ -181,6 +188,8 @@ namespace fw {
 		virtual void setFillColor(const sf::Color& color) = 0;
 		void setPosition(float x, float y);
 		void setPosition(const sf::Vector2f& position);
+		void setTransformPosition(float x, float y);
+		void setTransformPosition(const sf::Vector2f& position);
 		void setGlobalPosition(float x, float y);
 		void setGlobalPosition(const sf::Vector2f& position);
 		void setRotation(float angle);
@@ -253,10 +262,13 @@ namespace fw {
 		virtual const sf::Transformable* getTransformable() const = 0;
 		virtual sf::Vector2f getRenderPositionOffset() const;
 		virtual void setSizeInternal(float width, float height) = 0;
+		void setOriginInternal(float x, float y);
+		void setOriginInternal(const sf::Vector2f& origin);
 		void setSizeInternal(const sf::Vector2f& size);
 		virtual void addChild(Widget* child);
 		virtual void removeChild(Widget* child);
 		void updateAnchoredPosition();
+		void updateOrigin();
 		void update();
 		virtual void updateHorizontalSize();
 		virtual void updateVerticalSize();

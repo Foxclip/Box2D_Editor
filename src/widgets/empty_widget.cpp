@@ -46,6 +46,7 @@ namespace fw {
 	void EmptyWidget::setSizeInternal(float width, float height) {
 		this->size.x = width;
 		this->size.y = height;
+		updateOrigin();
 	}
 
 }

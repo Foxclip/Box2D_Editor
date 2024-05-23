@@ -2261,10 +2261,11 @@ void WidgetTests::windowWidgetResizeTest(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f position(400.0f, 300.0f);
     sf::Vector2f size(300.0f, 200.0f);
     fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(size);
     window_widget->setPosition(position);
+    window_widget->setOrigin(fw::Widget::Anchor::CENTER);
     window_widget->setHeaderFont(textbox_font);
     application.advance();
     T_WRAP_CONTAINER(resizeWindowTest(application, test, window_widget));
@@ -2676,7 +2677,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
         widget->getGlobalTopLeft() + sf::Vector2f(-cursor_offset, -cursor_offset),
         resize_offset,
         sf::FloatRect(
-            widget->getPosition() + resize_offset,
+            widget->getTopLeft() + resize_offset,
             widget->getSize() - resize_offset
         )
     ));
@@ -2687,7 +2688,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
         widget->getGlobalTop() + sf::Vector2f(0.0f, -cursor_offset),
         resize_offset,
         sf::FloatRect(
-            widget->getPosition() + sf::Vector2f(0.0f, resize_offset.y),
+            widget->getTopLeft() + sf::Vector2f(0.0f, resize_offset.y),
             widget->getSize() + sf::Vector2f(0.0f, -resize_offset.y)
         )
     ));
@@ -2698,7 +2699,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
         widget->getGlobalTopRight() + sf::Vector2f(cursor_offset, -cursor_offset),
         resize_offset,
         sf::FloatRect(
-            widget->getPosition() + sf::Vector2f(0.0f, resize_offset.y),
+            widget->getTopLeft() + sf::Vector2f(0.0f, resize_offset.y),
             widget->getSize() + sf::Vector2f(resize_offset.x, -resize_offset.y)
         )
     ));
@@ -2709,7 +2710,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
         widget->getGlobalLeft() + sf::Vector2f(-cursor_offset, 0.0f),
         resize_offset,
         sf::FloatRect(
-            widget->getPosition() + sf::Vector2f(resize_offset.x, 0.0f),
+            widget->getTopLeft() + sf::Vector2f(resize_offset.x, 0.0f),
             widget->getSize() + sf::Vector2f(-resize_offset.x, 0.0f)
         )
     ));
@@ -2720,7 +2721,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
         widget->getGlobalRight() + sf::Vector2f(cursor_offset, 0.0f),
         resize_offset,
         sf::FloatRect(
-            widget->getPosition(),
+            widget->getTopLeft(),
             widget->getSize() + sf::Vector2f(resize_offset.x, 0.0f)
         )
     ));
@@ -2731,7 +2732,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
         widget->getGlobalBottomLeft() + sf::Vector2f(-cursor_offset, cursor_offset),
         resize_offset,
         sf::FloatRect(
-            widget->getPosition() + sf::Vector2f(resize_offset.x, 0.0f),
+            widget->getTopLeft() + sf::Vector2f(resize_offset.x, 0.0f),
             widget->getSize() + sf::Vector2f(-resize_offset.x, resize_offset.y)
         )
     ));
@@ -2742,7 +2743,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
         widget->getGlobalBottom() + sf::Vector2f(0.0f, cursor_offset),
         resize_offset,
         sf::FloatRect(
-            widget->getPosition(),
+            widget->getTopLeft(),
             widget->getSize() + sf::Vector2f(0.0f, resize_offset.y)
         )
     ));
@@ -2753,7 +2754,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
         widget->getGlobalBottomRight() + sf::Vector2f(cursor_offset, cursor_offset),
         resize_offset,
         sf::FloatRect(
-            widget->getPosition(),
+            widget->getTopLeft(),
             widget->getSize() + resize_offset
         )
     ));

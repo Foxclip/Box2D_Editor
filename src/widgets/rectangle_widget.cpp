@@ -38,7 +38,7 @@ namespace fw {
 
 	void RectangleWidget::setSizeInternal(float width, float height) {
 		rect.setSize(sf::Vector2f(width, height));
-		setOrigin(origin_anchor);
+		updateOrigin();
 	}
 
 }
