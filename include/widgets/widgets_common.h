@@ -61,6 +61,8 @@ namespace fw {
 		std::map<TNode, size_t> processed_nodes;
 		std::vector<TNode> node_stack;
 		std::set<TNode> node_stack_set;
+		bool loop_detected = false;
+		std::set<std::set<TNode>> loops;
 		std::function<ptrdiff_t(const TNode&)> process_node = [&](const TNode& node) {
 			node_stack.push_back(node);
 			node_stack_set.insert(node);
@@ -70,18 +72,23 @@ namespace fw {
 			for (const TNode& parent : parents) {
 				if (node_stack_set.contains(parent)) {
 					looping = true;
+					loop_detected = true;
 					max_layer = -1;
 					if (OnLoopDetected) {
 						auto it = std::find(node_stack.begin(), node_stack.end(), parent);
 						std::vector<TNode> loop(it, node_stack.end());
-						(*OnLoopDetected)(loop);
+						std::set<TNode> loop_set = std::set<TNode>(loop.begin(), loop.end());
+						if (!loops.contains(loop_set)) {
+							loops.insert(loop_set);
+							(*OnLoopDetected)(loop);
+						}
 					} else {
 						throw std::runtime_error("toposort: loop detected");
 					}
 				} else {
 					ptrdiff_t parent_layer = -1;
 					auto it = processed_nodes.find(parent);
-					if (it == processed_nodes.end()) {
+					if (loop_detected || it == processed_nodes.end()) {
 						parent_layer = process_node(parent);
 					} else {
 						parent_layer = it->second;
@@ -107,7 +114,7 @@ namespace fw {
 			return max_layer;
 		};
 		for (const TNode& node : nodes) {
-			if (!processed_nodes.contains(node)) {
+			if (loop_detected || !processed_nodes.contains(node)) {
 				process_node(node);
 			}
 		}

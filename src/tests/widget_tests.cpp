@@ -509,7 +509,7 @@ void WidgetTests::toposortTrianglesLoopTest(test::Test& test) {
         get_shuffled(list.getNodes()), &Node::getParents, &on_loop_detected
     );
     T_CHECK(sorted.empty());
-    if (T_COMPARE(loops.size(), 3)) {
+    if (T_COMPARE(loops.size(), 5)) {
         if (T_COMPARE(loops[0].size(), 3)) {
             T_CHECK(loops[0][0] == nodeB);
             T_CHECK(loops[0][1] == nodeA);
@@ -527,6 +527,16 @@ void WidgetTests::toposortTrianglesLoopTest(test::Test& test) {
             T_CHECK(loops[2][0] == nodeE);
             T_CHECK(loops[2][1] == nodeD);
             T_CHECK(loops[2][2] == nodeB);
+        }
+        if (T_COMPARE(loops[3].size(), 3)) {
+            T_CHECK(loops[3][0] == nodeE);
+            T_CHECK(loops[3][1] == nodeC);
+            T_CHECK(loops[3][2] == nodeB);
+        }
+        if (T_COMPARE(loops[4].size(), 3)) {
+            T_CHECK(loops[4][0] == nodeE);
+            T_CHECK(loops[4][1] == nodeC);
+            T_CHECK(loops[4][2] == nodeF);
         }
     }
 }
