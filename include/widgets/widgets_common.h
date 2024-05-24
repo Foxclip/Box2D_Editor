@@ -101,7 +101,7 @@ namespace fw {
 					}
 				}
 			}
-			if (!looping) {
+			if (!loop_detected) {
 				max_layer++;
 				if (max_layer >= (ptrdiff_t)result.size()) {
 					result.push_back(std::vector<TNode>());
