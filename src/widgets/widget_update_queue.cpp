@@ -10,6 +10,10 @@ namespace fw {
 		this->update_type = update_type;
 	}
 
+	bool WidgetUpdateQueueEntry::operator==(const WidgetUpdateQueueEntry& other) const {
+		return widget == other.widget && update_type == other.update_type;
+	}
+
 	bool WidgetUpdateQueueEntry::operator<(const WidgetUpdateQueueEntry& other) const {
 		if (widget < other.widget) {
 			return true;

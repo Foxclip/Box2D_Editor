@@ -40,53 +40,78 @@ namespace fw {
 	};
 	sf::FloatRect quantize_rect(const sf::FloatRect& rect, QuantizeMode quantize_mode);
 
+	template <typename TNode>
+	concept NodeLess = requires(const TNode& left, const TNode& right) {
+		left < right;
+	};
+
 	template <typename TPFunc, typename TNode>
 	concept NodeVectorFunc = requires(TPFunc f, TNode n) {
 		{ f(n) } -> std::convertible_to<const std::vector<TNode>&>;
 	};
 
 	template<typename TNode, typename TPFunc>
-	requires NodeVectorFunc<TPFunc, TNode>
+	requires NodeLess<TNode> && std::equality_comparable<TNode> && NodeVectorFunc<TPFunc, TNode>
 	std::vector<std::vector<TNode>> toposort(
 		const std::vector<TNode>& nodes,
-		const TPFunc& get_parents_func
+		const TPFunc& get_parents_func,
+		std::function<void(const std::vector<TNode>&)>* OnLoopDetected = nullptr
 	) {
 		std::vector<std::vector<TNode>> result;
-		std::map<TNode, size_t> proceessed_nodes;
-		std::set<TNode> node_stack;
-		std::function<size_t(const TNode&)> process_node = [&](const TNode& node) {
-			node_stack.insert(node);
+		std::map<TNode, size_t> processed_nodes;
+		std::vector<TNode> node_stack;
+		std::set<TNode> node_stack_set;
+		std::function<ptrdiff_t(const TNode&)> process_node = [&](const TNode& node) {
+			node_stack.push_back(node);
+			node_stack_set.insert(node);
 			const std::vector<TNode>& parents = get_parents_func(node);
 			ptrdiff_t max_layer = -1;
+			bool looping = false;
 			for (const TNode& parent : parents) {
-				if (node_stack.contains(parent)) {
-					throw std::runtime_error("Loop detected");
-				}
-				size_t parent_layer = 0;
-				auto it = proceessed_nodes.find(parent);
-				if (it == proceessed_nodes.end()) {
-					parent_layer = process_node(parent);
+				if (node_stack_set.contains(parent)) {
+					looping = true;
+					max_layer = -1;
+					if (OnLoopDetected) {
+						auto it = std::find(node_stack.begin(), node_stack.end(), parent);
+						std::vector<TNode> loop(it, node_stack.end());
+						(*OnLoopDetected)(loop);
+					} else {
+						throw std::runtime_error("toposort: loop detected");
+					}
 				} else {
-					parent_layer = it->second;
+					ptrdiff_t parent_layer = -1;
+					auto it = processed_nodes.find(parent);
+					if (it == processed_nodes.end()) {
+						parent_layer = process_node(parent);
+					} else {
+						parent_layer = it->second;
+					}
+					if (parent_layer == -1) {
+						looping = true;
+					}
+					if (!looping) {
+						max_layer = std::max(max_layer, parent_layer);
+					}
 				}
-				max_layer = std::max(max_layer, (ptrdiff_t)parent_layer);
 			}
-			max_layer++;
-			if (max_layer >= (ptrdiff_t)result.size()) {
-				result.push_back(std::vector<TNode>());
+			if (!looping) {
+				max_layer++;
+				if (max_layer >= (ptrdiff_t)result.size()) {
+					result.push_back(std::vector<TNode>());
+				}
+				result[max_layer].push_back(node);
 			}
-			result[max_layer].push_back(node);
-			proceessed_nodes[node] = max_layer;
-			node_stack.erase(node);
+			processed_nodes[node] = max_layer;
+			node_stack.pop_back();
+			node_stack_set.erase(node);
 			return max_layer;
 		};
 		for (const TNode& node : nodes) {
-			if (!proceessed_nodes.contains(node)) {
+			if (!processed_nodes.contains(node)) {
 				process_node(node);
 			}
 		}
 		return result;
 	}
-
 
 }

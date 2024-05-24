@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compvector.h"
+#include <vector>
 
 namespace fw {
 
@@ -17,6 +17,7 @@ namespace fw {
 		WidgetUpdateQueueEntry(Widget* widget, WidgetUpdateType update_type);
 		Widget* widget = nullptr;
 		WidgetUpdateType update_type;
+		bool operator==(const WidgetUpdateQueueEntry& other) const;
 		bool operator<(const WidgetUpdateQueueEntry& other) const;
 	};
 

@@ -121,7 +121,11 @@ private:
 	void toposort5NodesRandomTest(test::Test& test);
 	void toposortHairTest(test::Test& test);
 	void toposortInverseHairTest(test::Test& test);
-	void toposortLoopTest(test::Test& test);
+	void toposortLoopExceptionTest(test::Test& test);
+	void toposortLoopEventTest(test::Test& test);
+	void toposortTwoLoopsTest(test::Test& test);
+	void toposortForkingLoopTest(test::Test& test);
+	void toposortTrianglesLoopTest(test::Test& test);
 
 	void basicTest(test::Test& test);
 	void initTest(test::Test& test);

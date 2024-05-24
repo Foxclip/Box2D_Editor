@@ -90,7 +90,11 @@ void WidgetTests::createToposortList(test::TestList* list) {
     test::Test* five_nodes_random_test = list->addTest("five_nodes_random", { three_nodes_test }, [&](test::Test& test) { toposort5NodesRandomTest(test); });
     test::Test* hair_test = list->addTest("hair", { three_nodes_test }, [&](test::Test& test) { toposortHairTest(test); });
     test::Test* inverse_hair_test = list->addTest("inverse_hair", { three_nodes_test }, [&](test::Test& test) { toposortInverseHairTest(test); });
-    test::Test* loop_test = list->addTest("loop", { three_nodes_test }, [&](test::Test& test) { toposortLoopTest(test); });
+    test::Test* loop_exception_test = list->addTest("loop_exception", { three_nodes_test }, [&](test::Test& test) { toposortLoopExceptionTest(test); });
+    test::Test* loop_event_test = list->addTest("loop_event", { three_nodes_test }, [&](test::Test& test) { toposortLoopEventTest(test); });
+    test::Test* two_loops_test = list->addTest("two_loops", { loop_event_test }, [&](test::Test& test) { toposortTwoLoopsTest(test); });
+    test::Test* forking_loop_test = list->addTest("forking_loop", { loop_event_test }, [&](test::Test& test) { toposortForkingLoopTest(test); });
+    test::Test* triangles_loop_test = list->addTest("triangles_loop", { forking_loop_test }, [&](test::Test& test) { toposortTrianglesLoopTest(test); });
 }
 
 void WidgetTests::createApplicationList(test::TestList* list) {
@@ -364,7 +368,7 @@ void WidgetTests::toposortInverseHairTest(test::Test& test) {
     }
 }
 
-void WidgetTests::toposortLoopTest(test::Test& test) {
+void WidgetTests::toposortLoopExceptionTest(test::Test& test) {
     NodeList list;
     Node* nodeA = list.createNode("A");
     Node* nodeB = list.createNode("B");
@@ -381,6 +385,150 @@ void WidgetTests::toposortLoopTest(test::Test& test) {
         exception = true;
     }
     T_CHECK(exception);
+}
+
+void WidgetTests::toposortLoopEventTest(test::Test& test) {
+    NodeList list;
+    Node* nodeA = list.createNode("A");
+    Node* nodeB = list.createNode("B");
+    Node* nodeC = list.createNode("C");
+    nodeC->addParent(nodeA);
+    nodeB->addParent(nodeC);
+    nodeA->addParent(nodeB);
+    std::vector<Node*> loop;
+    std::function<void(const std::vector<Node*>&)> on_loop_detected = [&](const std::vector<Node*>& p_loop) {
+        loop = p_loop;
+    };
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        get_shuffled(list.getNodes()), &Node::getParents, &on_loop_detected
+    );
+    T_CHECK(sorted.empty());
+    if (T_COMPARE(loop.size(), 3)) {
+        T_CHECK(loop[0] == nodeB);
+        T_CHECK(loop[1] == nodeC);
+        T_CHECK(loop[2] == nodeA);
+    }
+}
+
+void WidgetTests::toposortTwoLoopsTest(test::Test& test) {
+    NodeList list;
+    Node* nodeA = list.createNode("A");
+    Node* nodeB = list.createNode("B");
+    Node* nodeC = list.createNode("C");
+    Node* nodeD = list.createNode("D");
+    Node* nodeE = list.createNode("E");
+    Node* nodeF = list.createNode("F");
+    nodeA->addParent(nodeB);
+    nodeB->addParent(nodeC);
+    nodeC->addParent(nodeA);
+    nodeD->addParent(nodeE);
+    nodeE->addParent(nodeF);
+    nodeF->addParent(nodeD);
+    std::vector<std::vector<Node*>> loops;
+    std::function<void(const std::vector<Node*>&)> on_loop_detected = [&](const std::vector<Node*>& p_loop) {
+        loops.push_back(p_loop);
+    };
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        get_shuffled(list.getNodes()), &Node::getParents, &on_loop_detected
+    );
+    T_CHECK(sorted.empty());
+    if (T_COMPARE(loops.size(), 2)) {
+        if (T_COMPARE(loops[0].size(), 3)) {
+            T_CHECK(loops[0][0] == nodeF);
+            T_CHECK(loops[0][1] == nodeD);
+            T_CHECK(loops[0][2] == nodeE);
+        }
+        if (T_COMPARE(loops[1].size(), 3)) {
+            T_CHECK(loops[1][0] == nodeB);
+            T_CHECK(loops[1][1] == nodeC);
+            T_CHECK(loops[1][2] == nodeA);
+        }
+    }
+}
+
+void WidgetTests::toposortForkingLoopTest(test::Test& test) {
+    NodeList list;
+    Node* nodeA = list.createNode("A");
+    Node* nodeB = list.createNode("B");
+    Node* nodeL1 = list.createNode("L1");
+    Node* nodeL2 = list.createNode("L2");
+    Node* nodeR1 = list.createNode("R1");
+    Node* nodeR2 = list.createNode("R2");
+    nodeA->addParent(nodeB);
+    nodeB->addParent(nodeL1);
+    nodeB->addParent(nodeR1);
+    nodeL1->addParent(nodeL2);
+    nodeR1->addParent(nodeR2);
+    nodeL2->addParent(nodeB);
+    nodeR2->addParent(nodeA);
+    std::vector<std::vector<Node*>> loops;
+    std::function<void(const std::vector<Node*>&)> on_loop_detected = [&](const std::vector<Node*>& p_loop) {
+        loops.push_back(p_loop);
+    };
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        get_shuffled(list.getNodes()), &Node::getParents, &on_loop_detected
+    );
+    T_CHECK(sorted.empty());
+    if (T_COMPARE(loops.size(), 2)) {
+        if (T_COMPARE(loops[0].size(), 3)) {
+            T_CHECK(loops[0][0] == nodeB);
+            T_CHECK(loops[0][1] == nodeL1);
+            T_CHECK(loops[0][2] == nodeL2);
+        }
+        if (T_COMPARE(loops[1].size(), 4)) {
+            T_CHECK(loops[1][0] == nodeR2);
+            T_CHECK(loops[1][1] == nodeA);
+            T_CHECK(loops[1][2] == nodeB);
+            T_CHECK(loops[1][3] == nodeR1);
+        }
+    }
+}
+
+void WidgetTests::toposortTrianglesLoopTest(test::Test& test) {
+    NodeList list;
+    Node* nodeA = list.createNode("A");
+    Node* nodeB = list.createNode("B");
+    Node* nodeC = list.createNode("C");
+    Node* nodeD = list.createNode("D");
+    Node* nodeE = list.createNode("E");
+    Node* nodeF = list.createNode("F");
+    nodeA->addParent(nodeC);
+    nodeB->addParent(nodeA);
+    nodeB->addParent(nodeE);
+    nodeC->addParent(nodeB);
+    nodeC->addParent(nodeF);
+    nodeD->addParent(nodeB);
+    nodeE->addParent(nodeD);
+    nodeE->addParent(nodeC);
+    nodeF->addParent(nodeE);
+    std::vector<std::vector<Node*>> loops;
+    std::function<void(const std::vector<Node*>&)> on_loop_detected = [&](const std::vector<Node*>& p_loop) {
+        loops.push_back(p_loop);
+    };
+    std::vector<std::vector<Node*>> sorted = fw::toposort(
+        get_shuffled(list.getNodes()), &Node::getParents, &on_loop_detected
+    );
+    T_CHECK(sorted.empty());
+    if (T_COMPARE(loops.size(), 3)) {
+        if (T_COMPARE(loops[0].size(), 3)) {
+            T_CHECK(loops[0][0] == nodeB);
+            T_CHECK(loops[0][1] == nodeA);
+            T_CHECK(loops[0][2] == nodeC);
+        }
+        if (T_COMPARE(loops[1].size(), 6)) {
+            T_CHECK(loops[1][0] == nodeE);
+            T_CHECK(loops[1][1] == nodeD);
+            T_CHECK(loops[1][2] == nodeB);
+            T_CHECK(loops[1][3] == nodeA);
+            T_CHECK(loops[1][4] == nodeC);
+            T_CHECK(loops[1][5] == nodeF);
+        }
+        if (T_COMPARE(loops[2].size(), 3)) {
+            T_CHECK(loops[2][0] == nodeE);
+            T_CHECK(loops[2][1] == nodeD);
+            T_CHECK(loops[2][2] == nodeB);
+        }
+    }
 }
 
 void WidgetTests::basicTest(test::Test& test) {
