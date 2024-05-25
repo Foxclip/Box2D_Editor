@@ -14,6 +14,8 @@ namespace fw {
 		POS_Y,
 		SIZE_X,
 		SIZE_Y,
+		CHILDREN_X,
+		CHILDREN_Y,
 	};
 
 	struct WidgetUpdateQueueEntry {

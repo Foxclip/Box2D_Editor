@@ -197,6 +197,10 @@ namespace fw {
 					entry->widget->updateSizeX();
 				} else if (entry->update_type == WidgetUpdateType::SIZE_Y) {
 					entry->widget->updateSizeY();
+				} else if (entry->update_type == WidgetUpdateType::CHILDREN_X) {
+					entry->widget->updateChildrenX();
+				} else if (entry->update_type == WidgetUpdateType::CHILDREN_Y) {
+					entry->widget->updateChildrenY();
 				}
 			}
 		}

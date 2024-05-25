@@ -244,6 +244,8 @@ namespace fw {
 		WidgetUpdateQueueEntry pos_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::POS_Y);
 		WidgetUpdateQueueEntry size_x_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_X);
 		WidgetUpdateQueueEntry size_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_Y);
+		WidgetUpdateQueueEntry children_x_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::CHILDREN_X);
+		WidgetUpdateQueueEntry children_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::CHILDREN_Y);
 		bool visible = true;
 		bool renderable = true;
 		bool is_focusable = false;
@@ -276,6 +278,8 @@ namespace fw {
 		void updatePositionY();
 		virtual void updateSizeX();
 		virtual void updateSizeY();
+		virtual void updateChildrenX();
+		virtual void updateChildrenY();
 		virtual void internalUpdate();
 		virtual void internalOnSetParent(Widget* parent);
 		virtual void internalOnLeftPress(const sf::Vector2f& pos);

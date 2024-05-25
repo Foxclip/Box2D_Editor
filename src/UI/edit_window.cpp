@@ -7,7 +7,6 @@ EditWindow::EditWindow(fw::WidgetList& widget_list, Editor& p_app)
     setVisible(false);
     setOrigin(Anchor::CENTER);
     setFillColor(sf::Color(128, 128, 128));
-    //setOrigin(Anchor::CENTER);
     setClickThrough(false);
     setHeaderFont(app.console_font);
     setHeaderTextCharacterSize(15);
@@ -151,6 +150,7 @@ fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::strin
     spacing_widget->setFillColor(sf::Color::Transparent);
     spacing_widget->setParent(parameter_widget);
     spacing_widget->setName("spacing");
+    spacing_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::EXPAND);
     return parameter_widget;
 }
 

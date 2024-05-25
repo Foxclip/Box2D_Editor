@@ -26,10 +26,14 @@ namespace fw {
 		void internalUpdate() override;
 		void updateSizeX() override;
 		void updateSizeY() override;
+		void updateChildrenX() override;
+		void updateChildrenY() override;
 		Anchor alignmentToAnchor(Alignment alignment) const;
 		float alignmentToOffset(Alignment alignment, float max_size) const;
 
 	private:
+		void updatePrimary();
+		void updateSecondary();
 		bool horizontal = true;
 		float horizontal_padding = 0.0f;
 		float vertical_padding = 0.0f;

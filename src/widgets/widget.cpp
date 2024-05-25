@@ -807,6 +807,10 @@ namespace fw {
 		setPosition(getPosition().x, offset_pos.y);
 	}
 
+	void Widget::updateChildrenX() { }
+
+	void Widget::updateChildrenY() { }
+
 	void Widget::updateSizeX() {
 		wAssert(!widget_list.isLocked());
 		sf::Vector2f new_pos = getPosition();
