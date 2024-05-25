@@ -239,6 +239,7 @@ namespace fw {
 		SizePolicy horizontal_size_policy = SizePolicy::NONE;
 		SizePolicy vertical_size_policy = SizePolicy::NONE;
 		WidgetUpdateQueueEntry normal_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::NORMAL);
+		WidgetUpdateQueueEntry position_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::POSITION);
 		WidgetUpdateQueueEntry size_horizontal_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_HORIZONTAL);
 		WidgetUpdateQueueEntry size_vertical_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_VERTICAL);
 		bool visible = true;
@@ -267,9 +268,9 @@ namespace fw {
 		void setSizeInternal(const sf::Vector2f& size);
 		virtual void addChild(Widget* child);
 		virtual void removeChild(Widget* child);
-		void updateAnchoredPosition();
 		void updateOrigin();
 		void update();
+		void updatePosition();
 		virtual void updateHorizontalSize();
 		virtual void updateVerticalSize();
 		virtual void internalUpdate();

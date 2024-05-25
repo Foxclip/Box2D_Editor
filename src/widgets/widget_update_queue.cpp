@@ -33,6 +33,7 @@ namespace fw {
 				return;
 			}
 			entries.push_back(widget->normal_entry);
+			entries.push_back(widget->position_entry);
 			entries.push_back(widget->size_horizontal_entry);
 			entries.push_back(widget->size_vertical_entry);
 			for (size_t i = 0; i < widget->getChildren().size(); i++) {
@@ -59,6 +60,30 @@ namespace fw {
 						result.push_back(child->size_vertical_entry);
 					}
 				}
+			}
+		} else if (entry.update_type == WidgetUpdateType::POSITION) {
+			const WidgetUpdateQueueEntry& horizontal_entry = entry.widget->getParent()->size_horizontal_entry;
+			const WidgetUpdateQueueEntry& vertical_entry = entry.widget->getParent()->size_vertical_entry;
+			if (entry.widget->getParentAnchor() == Widget::Anchor::TOP_CENTER) {
+				result.push_back(horizontal_entry);
+			} else if (entry.widget->getParentAnchor() == Widget::Anchor::TOP_RIGHT) {
+				result.push_back(horizontal_entry);
+			} else if (entry.widget->getParentAnchor() == Widget::Anchor::CENTER_LEFT) {
+				result.push_back(vertical_entry);
+			} else if (entry.widget->getParentAnchor() == Widget::Anchor::CENTER) {
+				result.push_back(horizontal_entry);
+				result.push_back(vertical_entry);
+			} else if (entry.widget->getParentAnchor() == Widget::Anchor::CENTER_RIGHT) {
+				result.push_back(horizontal_entry);
+				result.push_back(vertical_entry);
+			} else if (entry.widget->getParentAnchor() == Widget::Anchor::BOTTOM_LEFT) {
+				result.push_back(vertical_entry);
+			} else if (entry.widget->getParentAnchor() == Widget::Anchor::BOTTOM_CENTER) {
+				result.push_back(horizontal_entry);
+				result.push_back(vertical_entry);
+			} else if (entry.widget->getParentAnchor() == Widget::Anchor::BOTTOM_RIGHT) {
+				result.push_back(horizontal_entry);
+				result.push_back(vertical_entry);
 			}
 		} else if (entry.update_type == WidgetUpdateType::SIZE_HORIZONTAL) {
 			// size might be changed in normal update,

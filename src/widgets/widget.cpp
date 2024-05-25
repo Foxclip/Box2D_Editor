@@ -528,19 +528,19 @@ namespace fw {
 	void Widget::setParentAnchor(Anchor anchor) {
 		wAssert(!widget_list.isLocked());
 		this->parent_anchor = anchor;
-		updateAnchoredPosition();
+		updatePosition();
 	}
 
 	void Widget::setAnchorOffset(float x, float y) {
 		wAssert(!widget_list.isLocked());
 		this->anchor_offset = sf::Vector2f(x, y);
-		updateAnchoredPosition();
+		updatePosition();
 	}
 
 	void Widget::setAnchorOffset(const sf::Vector2f& offset) {
 		wAssert(!widget_list.isLocked());
 		this->anchor_offset = offset;
-		updateAnchoredPosition();
+		updatePosition();
 	}
 
 	void Widget::setHorizontalSizePolicy(SizePolicy policy) {
@@ -727,7 +727,6 @@ namespace fw {
 	void Widget::setOriginInternal(float x, float y) {
 		wAssert(!widget_list.isLocked());
 		transforms.setOrigin(x, y);
-		updateAnchoredPosition();
 	}
 
 	void Widget::setOriginInternal(const sf::Vector2f& origin) {
@@ -756,21 +755,8 @@ namespace fw {
 		local_layers.erase(child);
 	}
 
-	void Widget::updateAnchoredPosition() {
-		wAssert(!widget_list.isLocked());
-		if (!parent) {
-			return;
-		}
-		if (parent_anchor == Anchor::CUSTOM) {
-			return;
-		}
-		sf::Vector2f parent_size = parent->getLocalBounds().getSize();
-		sf::Vector2f anchored_pos = getPosition();
-		anchored_pos = anchorToPos(parent_anchor, parent_size);
-		setPosition(anchored_pos + anchor_offset);
-	}
-
 	void Widget::updateOrigin() {
+		wAssert(!widget_list.isLocked());
 		sf::Vector2f origin_pos = getOrigin();
 		if (origin_anchor != Anchor::CUSTOM) {
 			origin_pos = anchorToPos(origin_anchor, getSize());
@@ -784,12 +770,26 @@ namespace fw {
 			return;
 		}
 		OnUpdate();
-		updateAnchoredPosition();
 		updateOrigin();
 		internalUpdate();
 	}
 
+	void Widget::updatePosition() {
+		wAssert(!widget_list.isLocked());
+		if (!parent) {
+			return;
+		}
+		if (parent_anchor == Anchor::CUSTOM) {
+			return;
+		}
+		sf::Vector2f parent_size = parent->getLocalBounds().getSize();
+		sf::Vector2f anchored_pos = getPosition();
+		anchored_pos = anchorToPos(parent_anchor, parent_size);
+		setPosition(anchored_pos + anchor_offset);
+	}
+
 	void Widget::updateHorizontalSize() {
+		wAssert(!widget_list.isLocked());
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
 		if (horizontal_size_policy == SizePolicy::PARENT) {
@@ -806,6 +806,7 @@ namespace fw {
 	}
 
 	void Widget::updateVerticalSize() {
+		wAssert(!widget_list.isLocked());
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
 		if (vertical_size_policy == SizePolicy::PARENT) {
@@ -822,7 +823,6 @@ namespace fw {
 	}
 
 	void Widget::internalUpdate() { }
-
 
 	void Widget::internalOnSetParent(Widget* parent) { }
 

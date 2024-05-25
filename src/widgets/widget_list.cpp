@@ -189,6 +189,8 @@ namespace fw {
 			for (const WidgetUpdateQueueEntry& entry : layer) {
 				if (entry.update_type == WidgetUpdateType::NORMAL) {
 					entry.widget->update();
+				} else if (entry.update_type == WidgetUpdateType::POSITION) {
+					entry.widget->updatePosition();
 				} else if (entry.update_type == WidgetUpdateType::SIZE_HORIZONTAL) {
 					entry.widget->updateHorizontalSize();
 				} else if (entry.update_type == WidgetUpdateType::SIZE_VERTICAL) {

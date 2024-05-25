@@ -9,6 +9,7 @@ namespace fw {
 
 	enum class WidgetUpdateType {
 		NORMAL,
+		POSITION,
 		SIZE_HORIZONTAL,
 		SIZE_VERTICAL,
 	};
