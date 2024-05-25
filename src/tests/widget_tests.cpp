@@ -127,6 +127,7 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* container_widget_basic_test = list->addTest("container_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { containerWidgetBasicTest(test); });
     test::Test* container_widget_children_test = list->addTest("container_widget_children", { container_widget_basic_test }, [&](test::Test& test) { containerWidgetChildrenTest(test); });
     test::Test* size_policy_test = list->addTest("size_policy", { anchor_test }, [&](test::Test& test) { sizePolicyTest(test); });
+    test::Test* size_policy_position_test = list->addTest("size_policy_position", { anchor_test }, [&](test::Test& test) { sizePolicyPositionTest(test); });
     test::Test* textbox_widget_basic_test = list->addTest("textbox_widget_basic", { rectangle_widget_test, text_widget_test }, [&](test::Test& test) { textboxWidgetBasicTest(test); });
     test::Test* textbox_widget_input_test = list->addTest("textbox_widget_input", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetInputTest(test); });
     test::Test* textbox_widget_events_test = list->addTest("textbox_widget_events", { textbox_widget_input_test }, [&](test::Test& test) { textboxWidgetEventsTest(test); });
@@ -1462,6 +1463,48 @@ void WidgetTests::sizePolicyTest(test::Test& test) {
     T_COMPARE(container_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, container_height), rect_to_str);
     T_COMPARE(child0_widget->getParentLocalBounds(), sf::FloatRect(container_padding, container_padding, parent_size.x - container_padding * 2, child_size.y), rect_to_str);
     T_COMPARE(child1_widget->getParentLocalBounds(), sf::FloatRect(container_padding, container_padding * 2 + child_size.y, child_size.x, child_size.y), rect_to_str);
+}
+
+void WidgetTests::sizePolicyPositionTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    sf::Vector2f parent_size(150.0f, 150.0f);
+    sf::Vector2f child0_size(100.0f, 100.0f);
+    sf::Vector2f child1_size(30.0f, 30.0f);
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>(parent_size);
+    fw::RectangleWidget* child0_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child0_size);
+    fw::RectangleWidget* child1_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child1_size);
+    parent_widget->setName("parent");
+    child0_widget->setName("child0");
+    child1_widget->setName("child1");
+    parent_widget->setFillColor(sf::Color(128, 128, 128));
+    child0_widget->setFillColor(sf::Color::Red);
+    child1_widget->setFillColor(sf::Color::Green);
+    child0_widget->setParent(parent_widget);
+    child1_widget->setParent(child0_widget);
+    auto rect_to_str = &WidgetTests::floatRectToStr;
+
+    child0_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::PARENT);
+    child1_widget->setParentAnchor(fw::Widget::Anchor::TOP_RIGHT);
+    application.advance();
+    T_COMPARE(parent_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, parent_size.y), rect_to_str);
+    T_COMPARE(child0_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, child0_size.y), rect_to_str);
+    T_COMPARE(child1_widget->getParentLocalBounds(), sf::FloatRect(parent_size.x, 0.0f, child1_size.x, child1_size.y), rect_to_str);
+
+    child1_widget->setParentAnchor(fw::Widget::Anchor::CENTER);
+    application.advance();
+    T_COMPARE(parent_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, parent_size.y), rect_to_str);
+    T_COMPARE(child0_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, child0_size.y), rect_to_str);
+    T_COMPARE(child1_widget->getParentLocalBounds(), sf::FloatRect(parent_size.x / 2.0f, child0_size.y / 2.0f, child1_size.x, child1_size.y), rect_to_str);
+
+    child0_widget->setVerticalSizePolicy(fw::Widget::SizePolicy::PARENT);
+    application.advance();
+    T_COMPARE(parent_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, parent_size.y), rect_to_str);
+    T_COMPARE(child0_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, parent_size.y), rect_to_str);
+    T_COMPARE(child1_widget->getParentLocalBounds(), sf::FloatRect(parent_size.x / 2.0f, parent_size.y / 2.0f, child1_size.x, child1_size.y), rect_to_str);
 }
 
 void WidgetTests::textboxWidgetBasicTest(test::Test& test) {

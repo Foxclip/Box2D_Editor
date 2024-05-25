@@ -10,32 +10,18 @@ namespace fw {
 		this->update_type = update_type;
 	}
 
-	bool WidgetUpdateQueueEntry::operator==(const WidgetUpdateQueueEntry& other) const {
-		return widget == other.widget && update_type == other.update_type;
-	}
-
-	bool WidgetUpdateQueueEntry::operator<(const WidgetUpdateQueueEntry& other) const {
-		if (widget < other.widget) {
-			return true;
-		} else if (widget > other.widget) {
-			return false;
-		} else {
-			return update_type < other.update_type;
-		}
-	}
-
 	WidgetUpdateQueue::WidgetUpdateQueue(WidgetList& widget_list) : widget_list(widget_list) { }
 
 	void WidgetUpdateQueue::update() {
-		std::vector<WidgetUpdateQueueEntry> entries;
+		std::vector<WidgetUpdateQueueEntry*> entries;
 		std::function<void(Widget*)> add_widget = [&](Widget* widget) {
 			if (!widget->isVisible()) {
 				return;
 			}
-			entries.push_back(widget->normal_entry);
-			entries.push_back(widget->position_entry);
-			entries.push_back(widget->size_horizontal_entry);
-			entries.push_back(widget->size_vertical_entry);
+			entries.push_back(&widget->normal_entry);
+			entries.push_back(&widget->position_entry);
+			entries.push_back(&widget->size_horizontal_entry);
+			entries.push_back(&widget->size_vertical_entry);
 			for (size_t i = 0; i < widget->getChildren().size(); i++) {
 				add_widget(widget->getChild(i));
 			}
@@ -44,67 +30,69 @@ namespace fw {
 		queue = toposort(entries, &WidgetUpdateQueue::getParents);
 	}
 
-	const std::vector<std::vector<WidgetUpdateQueueEntry>>& WidgetUpdateQueue::get() const {
+	const std::vector<std::vector<WidgetUpdateQueueEntry*>>& WidgetUpdateQueue::get() const {
 		return queue;
 	}
 
-	std::vector<WidgetUpdateQueueEntry> WidgetUpdateQueue::getParents(const WidgetUpdateQueueEntry& entry) {
-		std::vector<WidgetUpdateQueueEntry> result;
-		if (entry.update_type == WidgetUpdateType::NORMAL) {
-			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(entry.widget)) {
-				for (Widget* child : entry.widget->getChildren()) {
-					result.push_back(child->normal_entry);
+	std::vector<WidgetUpdateQueueEntry*> WidgetUpdateQueue::getParents(const WidgetUpdateQueueEntry* entry) {
+		CompVector<WidgetUpdateQueueEntry*> result;
+		if (entry->update_type == WidgetUpdateType::NORMAL) {
+			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(entry->widget)) {
+				for (Widget* child : entry->widget->getChildren()) {
+					result.add(&child->normal_entry);
+					// child's position update is overwritten by container update
+					result.add(&child->position_entry);
 					if (container->getHorizontal()) {
-						result.push_back(child->size_horizontal_entry);
+						result.add(&child->size_horizontal_entry);
 					} else {
-						result.push_back(child->size_vertical_entry);
+						result.add(&child->size_vertical_entry);
 					}
 				}
 			}
-		} else if (entry.update_type == WidgetUpdateType::POSITION) {
-			const WidgetUpdateQueueEntry& horizontal_entry = entry.widget->getParent()->size_horizontal_entry;
-			const WidgetUpdateQueueEntry& vertical_entry = entry.widget->getParent()->size_vertical_entry;
-			if (entry.widget->getParentAnchor() == Widget::Anchor::TOP_CENTER) {
-				result.push_back(horizontal_entry);
-			} else if (entry.widget->getParentAnchor() == Widget::Anchor::TOP_RIGHT) {
-				result.push_back(horizontal_entry);
-			} else if (entry.widget->getParentAnchor() == Widget::Anchor::CENTER_LEFT) {
-				result.push_back(vertical_entry);
-			} else if (entry.widget->getParentAnchor() == Widget::Anchor::CENTER) {
-				result.push_back(horizontal_entry);
-				result.push_back(vertical_entry);
-			} else if (entry.widget->getParentAnchor() == Widget::Anchor::CENTER_RIGHT) {
-				result.push_back(horizontal_entry);
-				result.push_back(vertical_entry);
-			} else if (entry.widget->getParentAnchor() == Widget::Anchor::BOTTOM_LEFT) {
-				result.push_back(vertical_entry);
-			} else if (entry.widget->getParentAnchor() == Widget::Anchor::BOTTOM_CENTER) {
-				result.push_back(horizontal_entry);
-				result.push_back(vertical_entry);
-			} else if (entry.widget->getParentAnchor() == Widget::Anchor::BOTTOM_RIGHT) {
-				result.push_back(horizontal_entry);
-				result.push_back(vertical_entry);
+		} else if (entry->update_type == WidgetUpdateType::POSITION) {
+			WidgetUpdateQueueEntry* horizontal_entry = &entry->widget->getParent()->size_horizontal_entry;
+			WidgetUpdateQueueEntry* vertical_entry = &entry->widget->getParent()->size_vertical_entry;
+			if (entry->widget->getParentAnchor() == Widget::Anchor::TOP_CENTER) {
+				result.add(horizontal_entry);
+			} else if (entry->widget->getParentAnchor() == Widget::Anchor::TOP_RIGHT) {
+				result.add(horizontal_entry);
+			} else if (entry->widget->getParentAnchor() == Widget::Anchor::CENTER_LEFT) {
+				result.add(vertical_entry);
+			} else if (entry->widget->getParentAnchor() == Widget::Anchor::CENTER) {
+				result.add(horizontal_entry);
+				result.add(vertical_entry);
+			} else if (entry->widget->getParentAnchor() == Widget::Anchor::CENTER_RIGHT) {
+				result.add(horizontal_entry);
+				result.add(vertical_entry);
+			} else if (entry->widget->getParentAnchor() == Widget::Anchor::BOTTOM_LEFT) {
+				result.add(vertical_entry);
+			} else if (entry->widget->getParentAnchor() == Widget::Anchor::BOTTOM_CENTER) {
+				result.add(horizontal_entry);
+				result.add(vertical_entry);
+			} else if (entry->widget->getParentAnchor() == Widget::Anchor::BOTTOM_RIGHT) {
+				result.add(horizontal_entry);
+				result.add(vertical_entry);
 			}
-		} else if (entry.update_type == WidgetUpdateType::SIZE_HORIZONTAL) {
+		} else if (entry->update_type == WidgetUpdateType::SIZE_HORIZONTAL) {
 			// size might be changed in normal update,
 			// so normal entries are also set as dependencies
-			if (entry.widget->getHorizontalSizePolicy() == Widget::SizePolicy::PARENT) {
-				result.push_back(entry.widget->getParent()->normal_entry);
-				result.push_back(entry.widget->getParent()->size_horizontal_entry);
-			} else if (entry.widget->getHorizontalSizePolicy() == Widget::SizePolicy::CHILDREN) {
-				for (Widget* child : entry.widget->getChildren()) {
-					result.push_back(child->normal_entry);
-					result.push_back(child->size_horizontal_entry);
+			if (entry->widget->getHorizontalSizePolicy() == Widget::SizePolicy::PARENT) {
+				result.add(&entry->widget->getParent()->normal_entry);
+				result.add(&entry->widget->getParent()->size_horizontal_entry);
+			} else if (entry->widget->getHorizontalSizePolicy() == Widget::SizePolicy::CHILDREN) {
+				for (Widget* child : entry->widget->getChildren()) {
+					result.add(&child->normal_entry);
+					result.add(&child->size_horizontal_entry);
 				}
 			}
-		} else if (entry.update_type == WidgetUpdateType::SIZE_VERTICAL) {
-			if (entry.widget->getVerticalSizePolicy() == Widget::SizePolicy::PARENT) {
-				result.push_back(entry.widget->getParent()->normal_entry);
-				result.push_back(entry.widget->getParent()->size_vertical_entry);
-			} else if (entry.widget->getVerticalSizePolicy() == Widget::SizePolicy::CHILDREN) {
-				for (Widget* child : entry.widget->getChildren()) {
-					result.push_back(child->normal_entry);
-					result.push_back(child->size_vertical_entry);
+		} else if (entry->update_type == WidgetUpdateType::SIZE_VERTICAL) {
+			if (entry->widget->getVerticalSizePolicy() == Widget::SizePolicy::PARENT) {
+				result.add(&entry->widget->getParent()->normal_entry);
+				result.add(&entry->widget->getParent()->size_vertical_entry);
+			} else if (entry->widget->getVerticalSizePolicy() == Widget::SizePolicy::CHILDREN) {
+				for (Widget* child : entry->widget->getChildren()) {
+					result.add(&child->normal_entry);
+					result.add(&child->size_vertical_entry);
 				}
 			}
 		}
