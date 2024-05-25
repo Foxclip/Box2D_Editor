@@ -239,9 +239,10 @@ namespace fw {
 		SizePolicy horizontal_size_policy = SizePolicy::NONE;
 		SizePolicy vertical_size_policy = SizePolicy::NONE;
 		WidgetUpdateQueueEntry normal_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::NORMAL);
-		WidgetUpdateQueueEntry position_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::POSITION);
-		WidgetUpdateQueueEntry size_horizontal_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_HORIZONTAL);
-		WidgetUpdateQueueEntry size_vertical_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_VERTICAL);
+		WidgetUpdateQueueEntry pos_x_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::POS_X);
+		WidgetUpdateQueueEntry pos_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::POS_Y);
+		WidgetUpdateQueueEntry size_x_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_X);
+		WidgetUpdateQueueEntry size_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_Y);
 		bool visible = true;
 		bool renderable = true;
 		bool is_focusable = false;
@@ -270,9 +271,10 @@ namespace fw {
 		virtual void removeChild(Widget* child);
 		void updateOrigin();
 		void update();
-		void updatePosition();
-		virtual void updateHorizontalSize();
-		virtual void updateVerticalSize();
+		void updatePositionX();
+		void updatePositionY();
+		virtual void updateSizeX();
+		virtual void updateSizeY();
 		virtual void internalUpdate();
 		virtual void internalOnSetParent(Widget* parent);
 		virtual void internalOnLeftPress(const sf::Vector2f& pos);

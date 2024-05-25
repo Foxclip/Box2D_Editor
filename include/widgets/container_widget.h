@@ -24,8 +24,8 @@ namespace fw {
 
 	protected:
 		void internalUpdate() override;
-		void updateHorizontalSize() override;
-		void updateVerticalSize() override;
+		void updateSizeX() override;
+		void updateSizeY() override;
 		Anchor alignmentToAnchor(Alignment alignment) const;
 		float alignmentToOffset(Alignment alignment, float max_size) const;
 

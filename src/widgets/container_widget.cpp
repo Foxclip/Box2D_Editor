@@ -91,26 +91,26 @@ namespace fw {
 		}
 	}
 
-	void ContainerWidget::updateHorizontalSize() {
+	void ContainerWidget::updateSizeX() {
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
 		if (horizontal_size_policy == SizePolicy::CHILDREN) {
 			new_size.x = children_bounds.width + horizontal_padding;
 		} else {
-			Widget::updateHorizontalSize();
+			Widget::updateSizeX();
 			return;
 		}
 		setPosition(new_pos);
 		setSize(new_size);
 	}
 
-	void ContainerWidget::updateVerticalSize() {
+	void ContainerWidget::updateSizeY() {
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
 		if (vertical_size_policy == SizePolicy::CHILDREN) {
 			new_size.y = children_bounds.height + vertical_padding;
 		} else {
-			Widget::updateVerticalSize();
+			Widget::updateSizeY();
 			return;
 		}
 		setPosition(new_pos);

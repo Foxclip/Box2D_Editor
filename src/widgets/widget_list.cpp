@@ -187,14 +187,19 @@ namespace fw {
 		const std::vector<std::vector<WidgetUpdateQueueEntry*>>& queue = update_queue.get();
 		for (const auto& layer : queue) {
 			for (const WidgetUpdateQueueEntry* entry : layer) {
+				if (entry->widget->name == "child1") {
+					std::cout << "";
+				}
 				if (entry->update_type == WidgetUpdateType::NORMAL) {
 					entry->widget->update();
-				} else if (entry->update_type == WidgetUpdateType::POSITION) {
-					entry->widget->updatePosition();
-				} else if (entry->update_type == WidgetUpdateType::SIZE_HORIZONTAL) {
-					entry->widget->updateHorizontalSize();
-				} else if (entry->update_type == WidgetUpdateType::SIZE_VERTICAL) {
-					entry->widget->updateVerticalSize();
+				} else if (entry->update_type == WidgetUpdateType::POS_X) {
+					entry->widget->updatePositionX();
+				} else if (entry->update_type == WidgetUpdateType::POS_Y) {
+					entry->widget->updatePositionY();
+				} else if (entry->update_type == WidgetUpdateType::SIZE_X) {
+					entry->widget->updateSizeX();
+				} else if (entry->update_type == WidgetUpdateType::SIZE_Y) {
+					entry->widget->updateSizeY();
 				}
 			}
 		}

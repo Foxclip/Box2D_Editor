@@ -9,9 +9,10 @@ namespace fw {
 
 	enum class WidgetUpdateType {
 		NORMAL,
-		POSITION,
-		SIZE_HORIZONTAL,
-		SIZE_VERTICAL,
+		POS_X,
+		POS_Y,
+		SIZE_X,
+		SIZE_Y,
 	};
 
 	struct WidgetUpdateQueueEntry {

@@ -528,19 +528,22 @@ namespace fw {
 	void Widget::setParentAnchor(Anchor anchor) {
 		wAssert(!widget_list.isLocked());
 		this->parent_anchor = anchor;
-		updatePosition();
+		updatePositionX();
+		updatePositionY();
 	}
 
 	void Widget::setAnchorOffset(float x, float y) {
 		wAssert(!widget_list.isLocked());
 		this->anchor_offset = sf::Vector2f(x, y);
-		updatePosition();
+		updatePositionX();
+		updatePositionY();
 	}
 
 	void Widget::setAnchorOffset(const sf::Vector2f& offset) {
 		wAssert(!widget_list.isLocked());
 		this->anchor_offset = offset;
-		updatePosition();
+		updatePositionX();
+		updatePositionY();
 	}
 
 	void Widget::setHorizontalSizePolicy(SizePolicy policy) {
@@ -774,7 +777,7 @@ namespace fw {
 		internalUpdate();
 	}
 
-	void Widget::updatePosition() {
+	void Widget::updatePositionX() {
 		wAssert(!widget_list.isLocked());
 		if (!parent) {
 			return;
@@ -785,10 +788,26 @@ namespace fw {
 		sf::Vector2f parent_size = parent->getLocalBounds().getSize();
 		sf::Vector2f anchored_pos = getPosition();
 		anchored_pos = anchorToPos(parent_anchor, parent_size);
-		setPosition(anchored_pos + anchor_offset);
+		sf::Vector2f offset_pos = anchored_pos + anchor_offset;
+		setPosition(offset_pos.x, getPosition().y);
 	}
 
-	void Widget::updateHorizontalSize() {
+	void Widget::updatePositionY() {
+		wAssert(!widget_list.isLocked());
+		if (!parent) {
+			return;
+		}
+		if (parent_anchor == Anchor::CUSTOM) {
+			return;
+		}
+		sf::Vector2f parent_size = parent->getLocalBounds().getSize();
+		sf::Vector2f anchored_pos = getPosition();
+		anchored_pos = anchorToPos(parent_anchor, parent_size);
+		sf::Vector2f offset_pos = anchored_pos + anchor_offset;
+		setPosition(getPosition().x, offset_pos.y);
+	}
+
+	void Widget::updateSizeX() {
 		wAssert(!widget_list.isLocked());
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
@@ -805,7 +824,7 @@ namespace fw {
 		setSizeInternal(new_size);
 	}
 
-	void Widget::updateVerticalSize() {
+	void Widget::updateSizeY() {
 		wAssert(!widget_list.isLocked());
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
