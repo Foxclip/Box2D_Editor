@@ -187,9 +187,6 @@ namespace fw {
 		const std::vector<std::vector<WidgetUpdateQueueEntry*>>& queue = update_queue.get();
 		for (const auto& layer : queue) {
 			for (const WidgetUpdateQueueEntry* entry : layer) {
-				if (entry->widget->name == "child1") {
-					std::cout << "";
-				}
 				if (entry->update_type == WidgetUpdateType::NORMAL) {
 					entry->widget->update();
 				} else if (entry->update_type == WidgetUpdateType::POS_X) {

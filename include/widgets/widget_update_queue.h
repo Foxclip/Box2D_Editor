@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 namespace fw {
@@ -16,9 +17,10 @@ namespace fw {
 	};
 
 	struct WidgetUpdateQueueEntry {
-		WidgetUpdateQueueEntry(Widget* widget, WidgetUpdateType update_type);
 		Widget* widget = nullptr;
 		WidgetUpdateType update_type;
+		WidgetUpdateQueueEntry(Widget* widget, WidgetUpdateType update_type);
+		std::string toStr() const;
 	};
 
 	class WidgetUpdateQueue {

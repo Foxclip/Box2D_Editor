@@ -152,6 +152,7 @@ private:
 	void containerWidgetChildrenTest(test::Test& test);
 	void sizePolicyTest(test::Test& test);
 	void sizePolicyPositionTest(test::Test& test);
+	void sizePolicyExpandTest(test::Test& test);
 	void textboxWidgetBasicTest(test::Test& test);
 	void textboxWidgetInputTest(test::Test& test);
 	void textboxWidgetEventsTest(test::Test& test);

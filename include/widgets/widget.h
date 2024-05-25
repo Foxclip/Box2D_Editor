@@ -68,7 +68,8 @@ namespace fw {
 		enum class SizePolicy {
 			NONE,
 			CHILDREN,
-			PARENT
+			PARENT,
+			EXPAND
 		};
 		ptrdiff_t debug_id = -1;
 

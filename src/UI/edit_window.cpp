@@ -146,7 +146,8 @@ fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::strin
     parameter_text_widget->setCharacterSize(16);
     parameter_text_widget->setString(text);
     parameter_text_widget->setParent(parameter_widget);
-    fw::RectangleWidget* spacing_widget = app.widgets.createWidget<fw::RectangleWidget>(10.0f, 1.0f);
+    fw::EmptyWidget* spacing_widget = app.widgets.createWidget<fw::EmptyWidget>();
+    spacing_widget->setSize(10.0f, 0.0f);
     spacing_widget->setFillColor(sf::Color::Transparent);
     spacing_widget->setParent(parameter_widget);
     spacing_widget->setName("spacing");

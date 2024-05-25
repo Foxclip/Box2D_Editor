@@ -10,6 +10,19 @@ namespace fw {
 		this->update_type = update_type;
 	}
 
+	std::string WidgetUpdateQueueEntry::toStr() const {
+		std::string type_str;
+		switch (update_type) {
+			case fw::WidgetUpdateType::NORMAL: type_str = "NORMAL"; break;
+			case fw::WidgetUpdateType::POS_X: type_str = "POS_X"; break;
+			case fw::WidgetUpdateType::POS_Y: type_str = "POS_Y"; break;
+			case fw::WidgetUpdateType::SIZE_X: type_str = "SIZE_X"; break;
+			case fw::WidgetUpdateType::SIZE_Y: type_str = "SIZE_Y"; break;
+			default: wAssert("Unknown update type"); type_str = "<unknown>"; break;
+		}
+		return widget->getFullName() + " (" + type_str + ")";
+	}
+
 	WidgetUpdateQueue::WidgetUpdateQueue(WidgetList& widget_list) : widget_list(widget_list) { }
 
 	void WidgetUpdateQueue::update() {
@@ -28,7 +41,22 @@ namespace fw {
 			}
 		};
 		add_widget(widget_list.getRootWidget());
-		queue = toposort(entries, &WidgetUpdateQueue::getParents);
+		std::vector<std::vector<WidgetUpdateQueueEntry*>> loops;
+		std::function<void(const std::vector<WidgetUpdateQueueEntry*>&)> on_loop_detected =
+			[&](const std::vector<WidgetUpdateQueueEntry*>& loop) {
+			loops.push_back(loop);
+		};
+		queue = toposort(entries, &WidgetUpdateQueue::getParents, &on_loop_detected);
+		if (loops.size() > 0) {
+			std::string msg = "Loops detected:\n";
+			for (size_t i = 0; i < loops.size(); i++) {
+				msg += "    Loop " + std::to_string(i) + ":\n";
+				for (WidgetUpdateQueueEntry* entry : loops[i]) {
+					msg += "        " + entry->toStr() + "\n";
+				}
+			}
+			throw std::runtime_error(msg);
+		}
 	}
 
 	const std::vector<std::vector<WidgetUpdateQueueEntry*>>& WidgetUpdateQueue::get() const {
@@ -41,12 +69,12 @@ namespace fw {
 			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(entry->widget)) {
 				for (Widget* child : entry->widget->getChildren()) {
 					result.add(&child->normal_entry);
-					// child's position update is overwritten by container update
-					result.add(&child->pos_x_entry);
-					result.add(&child->pos_y_entry);
 					if (container->getHorizontal()) {
+						// child's position update is overwritten by container update
+						result.add(&child->pos_x_entry);
 						result.add(&child->size_x_entry);
 					} else {
+						result.add(&child->pos_y_entry);
 						result.add(&child->size_y_entry);
 					}
 				}
@@ -88,20 +116,26 @@ namespace fw {
 				result.add(&entry->widget->getParent()->normal_entry);
 				result.add(&entry->widget->getParent()->size_x_entry);
 			} else if (entry->widget->getHorizontalSizePolicy() == Widget::SizePolicy::CHILDREN) {
+				result.add(&entry->widget->normal_entry);
 				for (Widget* child : entry->widget->getChildren()) {
 					result.add(&child->normal_entry);
 					result.add(&child->size_x_entry);
 				}
+			} else if (entry->widget->getHorizontalSizePolicy() == Widget::SizePolicy::EXPAND) {
+				result.add(&entry->widget->getParent()->size_x_entry);
 			}
 		} else if (entry->update_type == WidgetUpdateType::SIZE_Y) {
 			if (entry->widget->getVerticalSizePolicy() == Widget::SizePolicy::PARENT) {
 				result.add(&entry->widget->getParent()->normal_entry);
 				result.add(&entry->widget->getParent()->size_y_entry);
 			} else if (entry->widget->getVerticalSizePolicy() == Widget::SizePolicy::CHILDREN) {
+				result.add(&entry->widget->normal_entry);
 				for (Widget* child : entry->widget->getChildren()) {
 					result.add(&child->normal_entry);
 					result.add(&child->size_y_entry);
 				}
+			} else if (entry->widget->getVerticalSizePolicy() == Widget::SizePolicy::EXPAND) {
+				result.add(&entry->widget->getParent()->size_y_entry);
 			}
 		}
 		return result;

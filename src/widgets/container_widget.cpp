@@ -60,32 +60,73 @@ namespace fw {
 	}
 
 	void ContainerWidget::internalUpdate() {
-		float max_width = 0.0f, max_height = 0.0f;
-		children_bounds = sf::FloatRect();
+		// helper functions
+		auto get_size_policy = [&](const Widget* widget) {
+			return horizontal ? widget->getHorizontalSizePolicy() : widget->getVerticalSizePolicy();
+		};
+		auto get_size = [&](const Widget* widget) {
+			return horizontal ? widget->getWidth() : widget->getHeight();
+		};
+		auto get_other_size = [&](const Widget* widget) {
+			return horizontal ? widget->getHeight() : widget->getWidth();
+		};
+		auto set_size = [&](Widget* widget, float size) {
+			horizontal ? widget->setSize(size, widget->getHeight()) : widget->setSize(widget->getWidth(), size);
+		};
+		auto get_container_size = [&]() {
+			return horizontal ? getWidth() : getHeight();
+		};
+		auto get_padding = [&]() {
+			return horizontal ? horizontal_padding : vertical_padding;
+		};
+		auto get_other_padding = [&]() {
+			return horizontal ? vertical_padding : horizontal_padding;
+		};
+		auto get_alignment = [&]() {
+			return horizontal ? vertical_alignment : horizontal_alignment;
+		};
+		// calculating size of expanding widgets
+		float fixed_widgets_size = 0.0f;
+		size_t expanding_count = 0;
 		for (size_t i = 0; i < children.size(); i++) {
-			if (children[i]->getWidth() > max_width) {
-				max_width = children[i]->getWidth();
-			}
-			if (children[i]->getHeight() > max_height) {
-				max_height = children[i]->getHeight();
+			if (get_size_policy(children[i]) == Widget::SizePolicy::EXPAND) {
+				expanding_count++;
+			} else {
+				fixed_widgets_size += get_size(children[i]);
 			}
 		}
-		float next_x = horizontal_padding, next_y = vertical_padding;
-		if (horizontal) {
-			next_y += alignmentToOffset(vertical_alignment, max_height);
-		} else {
-			next_x += alignmentToOffset(horizontal_alignment, max_width);
+		float edge_padding = get_padding() * 2.0f;
+		float between_padding = get_padding() * (children.size() - 1);
+		float container_free_space = get_container_size() - edge_padding - between_padding;
+		float expanding_free_space = container_free_space - fixed_widgets_size;
+		float expanding_size = expanding_count != 0 ? expanding_free_space / expanding_count : 0.0f;
+		expanding_size = std::max(0.0f, expanding_size);
+		// expanding widgets
+		for (size_t i = 0; i < children.size(); i++) {
+			if (get_size_policy(children[i]) == Widget::SizePolicy::EXPAND) {
+				set_size(children[i], expanding_size);
+			}
 		}
+		// calculating max widget size
+		float max_other_size = 0.0f;
+		for (size_t i = 0; i < children.size(); i++) {
+			if (get_other_size(children[i]) > max_other_size) {
+				max_other_size = get_other_size(children[i]);
+			}
+		}
+		// setting child positions
+		children_bounds = sf::FloatRect();
+		float next_pos = get_padding();
+		float other_pos = get_other_padding() + alignmentToOffset(get_alignment(), max_other_size);
 		for (size_t i = 0; i < children.size(); i++) {
 			Widget* child = children[i];
-			child->setPosition(next_x, next_y);
-			if (horizontal) {
-				child->setOrigin(alignmentToAnchor(vertical_alignment));
-				next_x += child->getWidth() + horizontal_padding;
-			} else {
-				child->setOrigin(alignmentToAnchor(horizontal_alignment));
-				next_y += child->getHeight() + vertical_padding;
-			}
+			sf::Vector2f child_pos =
+				horizontal
+				? sf::Vector2f(next_pos, other_pos)
+				: sf::Vector2f(other_pos, next_pos);
+			child->setPosition(child_pos);
+			child->setOrigin(alignmentToAnchor(get_alignment()));
+			next_pos += get_size(child) + get_padding();
 			sf::FloatRect child_bounds = child->getParentLocalBounds();
 			extend_bounds(children_bounds, child_bounds);
 		}
