@@ -136,6 +136,7 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* textbox_widget_events_test = list->addTest("textbox_widget_events", { textbox_widget_input_test }, [&](test::Test& test) { textboxWidgetEventsTest(test); });
     test::Test* textbox_widget_cursor_test = list->addTest("textbox_widget_cursor", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetCursorTest(test); });
     test::Test* textbox_widget_scroll_test = list->addTest("textbox_widget_scroll", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetScrollTest(test); });
+    test::Test* textbox_widget_resizing_test = list->addTest("textbox_widget_resizing", { textbox_widget_scroll_test }, [&](test::Test& test) { textboxWidgetResizingTest(test); });
     test::Test* textbox_widget_selection_test = list->addTest("textbox_widget_selection", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetSelectionTest(test); });
     test::Test* textbox_widget_mouse_click_test = list->addTest("textbox_widget_mouse_click", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetMouseClickTest(test); });
     test::Test* textbox_widget_mouse_drag_test = list->addTest("textbox_widget_mouse_drag", { textbox_widget_mouse_click_test }, [&](test::Test& test) { textboxWidgetMouseDragTest(test); });
@@ -1835,6 +1836,27 @@ void WidgetTests::textboxWidgetScrollTest(test::Test& test) {
     T_COMPARE(textbox_widget->getLocalCharPos(0).x, zero_pos);
     TAP_KEY(sf::Keyboard::Left);
     T_COMPARE(textbox_widget->getLocalCharPos(0).x, zero_pos);
+}
+
+void WidgetTests::textboxWidgetResizingTest(test::Test& test) {
+    fw::Application application(window);
+    fw::TextBoxWidget* textbox_widget = initTextBox(application, 150.0f, 20.0f);
+    textbox_widget->setValue("ABCDEFGH");
+    const fw::TextWidget* text_widget = textbox_widget->getTextWidget();
+    float zero_pos = fw::TEXTBOX_TEXT_VIEW_ZERO_POS.x;
+
+    application.advance();
+    T_COMPARE(text_widget->getPosition().x, zero_pos);
+
+    textbox_widget->setWidth(10.0f);
+    application.advance();
+    T_COMPARE(text_widget->getPosition().x, zero_pos);
+
+    textbox_widget->setWidth(0.0f);
+    application.advance();
+    T_COMPARE(text_widget->getPosition().x, zero_pos);
+    application.advance();
+    T_COMPARE(text_widget->getPosition().x, zero_pos);
 }
 
 void WidgetTests::textboxWidgetSelectionTest(test::Test& test) {

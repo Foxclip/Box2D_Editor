@@ -159,6 +159,7 @@ private:
 	void textboxWidgetEventsTest(test::Test& test);
 	void textboxWidgetCursorTest(test::Test& test);
 	void textboxWidgetScrollTest(test::Test& test);
+	void textboxWidgetResizingTest(test::Test& test);
 	void textboxWidgetSelectionTest(test::Test& test);
 	void textboxWidgetMouseClickTest(test::Test& test);
 	void textboxWidgetMouseDragTest(test::Test& test);
