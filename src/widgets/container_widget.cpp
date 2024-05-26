@@ -7,8 +7,8 @@ namespace fw {
 		: RectangleWidget(widget_list, width, height) {
 		type = WidgetType::Container;
 		setName("container");
-		setHorizontalSizePolicy(SizePolicy::CHILDREN);
-		setVerticalSizePolicy(SizePolicy::CHILDREN);
+		setSizeXPolicy(SizePolicy::CHILDREN);
+		setSizeYPolicy(SizePolicy::CHILDREN);
 	}
 
 	ContainerWidget::ContainerWidget(WidgetList& widget_list, const sf::Vector2f& size) 

@@ -546,13 +546,13 @@ namespace fw {
 		updatePositionY();
 	}
 
-	void Widget::setHorizontalSizePolicy(SizePolicy policy) {
+	void Widget::setSizeXPolicy(SizePolicy policy) {
 		wAssert(!widget_list.isLocked());
 		wAssert(this != widget_list.getRootWidget());
 		this->horizontal_size_policy = policy;
 	}
 
-	void Widget::setVerticalSizePolicy(SizePolicy policy) {
+	void Widget::setSizeYPolicy(SizePolicy policy) {
 		wAssert(!widget_list.isLocked());
 		wAssert(this != widget_list.getRootWidget());
 		this->vertical_size_policy = policy;

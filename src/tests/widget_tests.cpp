@@ -1455,8 +1455,8 @@ void WidgetTests::sizePolicyTest(test::Test& test) {
     container_widget->setParent(parent_widget);
     child0_widget->setParent(container_widget);
     child1_widget->setParent(container_widget);
-    container_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::PARENT);
-    child0_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::PARENT);
+    container_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+    child0_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
     application.advance();
     auto rect_to_str = &WidgetTests::floatRectToStr;
     float container_height = child_size.y * 2 + container_padding * 3;
@@ -1488,7 +1488,7 @@ void WidgetTests::sizePolicyPositionTest(test::Test& test) {
     child1_widget->setParent(child0_widget);
     auto rect_to_str = &WidgetTests::floatRectToStr;
 
-    child0_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::PARENT);
+    child0_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
     child1_widget->setParentAnchor(fw::Widget::Anchor::TOP_RIGHT);
     application.advance();
     T_COMPARE(parent_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, parent_size.y), rect_to_str);
@@ -1501,7 +1501,7 @@ void WidgetTests::sizePolicyPositionTest(test::Test& test) {
     T_COMPARE(child0_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, child0_size.y), rect_to_str);
     T_COMPARE(child1_widget->getParentLocalBounds(), sf::FloatRect(parent_size.x / 2.0f, child0_size.y / 2.0f, child1_size.x, child1_size.y), rect_to_str);
 
-    child0_widget->setVerticalSizePolicy(fw::Widget::SizePolicy::PARENT);
+    child0_widget->setSizeYPolicy(fw::Widget::SizePolicy::PARENT);
     application.advance();
     T_COMPARE(parent_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, parent_size.y), rect_to_str);
     T_COMPARE(child0_widget->getParentLocalBounds(), sf::FloatRect(0.0f, 0.0f, parent_size.x, parent_size.y), rect_to_str);
@@ -1537,9 +1537,9 @@ void WidgetTests::sizePolicyExpandTest(test::Test& test) {
     green_widget->setFillColor(sf::Color::Green);
     blue_widget->setFillColor(sf::Color::Blue);
     yellow_widget->setFillColor(sf::Color::Yellow);
-    container_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::NONE);
-    green_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::EXPAND);
-    yellow_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::EXPAND);
+    container_widget->setSizeXPolicy(fw::Widget::SizePolicy::NONE);
+    green_widget->setSizeXPolicy(fw::Widget::SizePolicy::EXPAND);
+    yellow_widget->setSizeXPolicy(fw::Widget::SizePolicy::EXPAND);
     auto rect_to_str = &WidgetTests::floatRectToStr;
 
     float red_x = container_padding;

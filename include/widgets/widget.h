@@ -184,8 +184,8 @@ namespace fw {
 		void setParentAnchor(Anchor anchor);
 		void setAnchorOffset(float x, float y);
 		void setAnchorOffset(const sf::Vector2f& offset);
-		void setHorizontalSizePolicy(SizePolicy policy);
-		void setVerticalSizePolicy(SizePolicy policy);
+		void setSizeXPolicy(SizePolicy policy);
+		void setSizeYPolicy(SizePolicy policy);
 		virtual void setFillColor(const sf::Color& color) = 0;
 		void setPosition(float x, float y);
 		void setPosition(const sf::Vector2f& position);

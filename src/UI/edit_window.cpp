@@ -14,8 +14,8 @@ EditWindow::EditWindow(fw::WidgetList& widget_list, Editor& p_app)
     container_widget = widget_list.createWidget<fw::ContainerWidget>(main_widget->getSize());
     container_widget->setHorizontal(false);
     container_widget->setPadding(EDIT_WINDOW_PARAMETER_PADDING);
-    container_widget->setHorizontalSizePolicy(SizePolicy::PARENT);
-    container_widget->setVerticalSizePolicy(SizePolicy::CHILDREN);
+    container_widget->setSizeXPolicy(SizePolicy::PARENT);
+    container_widget->setSizeYPolicy(SizePolicy::CHILDREN);
     container_widget->setFillColor(sf::Color(75, 75, 75));
     container_widget->setName("container");
     container_widget->setParent(this);
@@ -136,8 +136,8 @@ fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::strin
     fw::ContainerWidget* parameter_widget = app.widgets.createWidget<fw::ContainerWidget>(100.0f, 20.0f);
     parameter_widget->setFillColor(sf::Color::Transparent);
     parameter_widget->setVerticalAlignment(fw::Widget::Alignment::ALIGN_CENTER);
-    parameter_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::PARENT);
-    parameter_widget->setVerticalSizePolicy(fw::Widget::SizePolicy::CHILDREN);
+    parameter_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+    parameter_widget->setSizeYPolicy(fw::Widget::SizePolicy::CHILDREN);
     parameter_widget->setParent(edit_window.container_widget);
     parameter_widget->setName(name);
     fw::TextWidget* parameter_text_widget = app.widgets.createWidget<fw::TextWidget>();
@@ -150,7 +150,7 @@ fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::strin
     spacing_widget->setFillColor(sf::Color::Transparent);
     spacing_widget->setParent(parameter_widget);
     spacing_widget->setName("spacing");
-    spacing_widget->setHorizontalSizePolicy(fw::Widget::SizePolicy::EXPAND);
+    spacing_widget->setSizeXPolicy(fw::Widget::SizePolicy::EXPAND);
     return parameter_widget;
 }
 
