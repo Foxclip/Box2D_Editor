@@ -186,6 +186,10 @@ namespace fw {
 		void setAnchorOffset(const sf::Vector2f& offset);
 		void setSizeXPolicy(SizePolicy policy);
 		void setSizeYPolicy(SizePolicy policy);
+		void setMinSize(float width, float height);
+		void setMinSize(const sf::Vector2f& size);
+		void setMaxSize(float width, float height);
+		void setMaxSize(const sf::Vector2f& size);
 		virtual void setFillColor(const sf::Color& color) = 0;
 		void setPosition(float x, float y);
 		void setPosition(const sf::Vector2f& position);
@@ -246,6 +250,8 @@ namespace fw {
 		WidgetUpdateQueueEntry size_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_Y);
 		WidgetUpdateQueueEntry children_x_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::CHILDREN_X);
 		WidgetUpdateQueueEntry children_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::CHILDREN_Y);
+		sf::Vector2f min_size;
+		sf::Vector2f max_size;
 		bool visible = true;
 		bool renderable = true;
 		bool is_focusable = false;

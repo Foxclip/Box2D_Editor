@@ -558,6 +558,28 @@ namespace fw {
 		this->vertical_size_policy = policy;
 	}
 
+	void Widget::setMinSize(float width, float height) {
+		wAssert(!widget_list.isLocked());
+		this->min_size.x = width;
+		this->min_size.y = height;
+	}
+
+	void Widget::setMinSize(const sf::Vector2f& size) {
+		wAssert(!widget_list.isLocked());
+		setMinSize(size.x, size.y);
+	}
+
+	void Widget::setMaxSize(float width, float height) {
+		wAssert(!widget_list.isLocked());
+		this->max_size.x = width;
+		this->max_size.y = height;
+	}
+
+	void Widget::setMaxSize(const sf::Vector2f& size) {
+		wAssert(!widget_list.isLocked());
+		setMaxSize(size.x, size.y);
+	}
+
 	void Widget::setPosition(float x, float y) {
 		wAssert(!widget_list.isLocked());
 		transforms.setPosition(sf::Vector2f(x, y));
