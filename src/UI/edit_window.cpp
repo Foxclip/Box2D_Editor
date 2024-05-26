@@ -182,6 +182,7 @@ fw::TextBoxWidget* EditWindowParameter::createTextBoxWidget() {
     textbox_widget->setFont(app.textbox_font);
     textbox_widget->setCharacterSize(12);
     textbox_widget->setSizeXPolicy(fw::Widget::SizePolicy::EXPAND);
+    textbox_widget->setMinSize(100.0f, 0.0f);
     return textbox_widget;
 }
 

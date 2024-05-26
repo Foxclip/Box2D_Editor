@@ -320,12 +320,20 @@ namespace fw {
 		return anchor_offset;
 	}
 
-	Widget::SizePolicy Widget::getHorizontalSizePolicy() const {
+	Widget::SizePolicy Widget::getSizeXPolicy() const {
 		return size_policy_x;
 	}
 
-	Widget::SizePolicy Widget::getVerticalSizePolicy() const {
+	Widget::SizePolicy Widget::getSizeYPolicy() const {
 		return size_policy_y;
+	}
+
+	const sf::Vector2f& Widget::getMinSize() const {
+		return min_size;
+	}
+
+	const sf::Vector2f& Widget::getMaxSize() const {
+		return max_size;
 	}
 
 	const sf::Vector2f& Widget::getOrigin() const {

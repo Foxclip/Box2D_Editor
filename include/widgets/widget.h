@@ -139,8 +139,10 @@ namespace fw {
 		float getGlobalHeight() const;
 		Anchor getParentAnchor() const;
 		sf::Vector2f getAnchorOffset() const;
-		SizePolicy getHorizontalSizePolicy() const;
-		SizePolicy getVerticalSizePolicy() const;
+		SizePolicy getSizeXPolicy() const;
+		SizePolicy getSizeYPolicy() const;
+		const sf::Vector2f& getMinSize() const;
+		const sf::Vector2f& getMaxSize() const;
 		const sf::Vector2f& getOrigin() const;
 		Anchor getOriginAnchor() const;
 		const sf::Vector2f& getPosition() const;
@@ -253,7 +255,7 @@ namespace fw {
 		WidgetUpdateQueueEntry children_x_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::CHILDREN_X);
 		WidgetUpdateQueueEntry children_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::CHILDREN_Y);
 		sf::Vector2f min_size;
-		sf::Vector2f max_size;
+		sf::Vector2f max_size = sf::Vector2f(-1.0f, -1.0f); // negative values - unlimited
 		bool visible = true;
 		bool renderable = true;
 		bool is_focusable = false;

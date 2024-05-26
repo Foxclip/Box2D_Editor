@@ -105,46 +105,46 @@ namespace fw {
 				result.add(size_y_entry);
 			}
 		} else if (entry->update_type == WidgetUpdateType::SIZE_X) {
-			if (entry->widget->getHorizontalSizePolicy() == Widget::SizePolicy::PARENT) {
+			if (entry->widget->getSizeXPolicy() == Widget::SizePolicy::PARENT) {
 				// size might be changed in normal update,
 				// so normal entries are also set as dependencies
 				result.add(&entry->widget->getParent()->normal_entry);
 				result.add(&entry->widget->getParent()->size_x_entry);
-			} else if (entry->widget->getHorizontalSizePolicy() == Widget::SizePolicy::CHILDREN) {
+			} else if (entry->widget->getSizeXPolicy() == Widget::SizePolicy::CHILDREN) {
 				// need to calculate children bounds before updating container's size
 				result.add(&entry->widget->children_x_entry);
 				// container's size depends on its children
 				for (Widget* child : entry->widget->getChildren()) {
 					// avoiding a loop
-					if (child->getHorizontalSizePolicy() != Widget::SizePolicy::EXPAND) {
+					if (child->getSizeXPolicy() != Widget::SizePolicy::EXPAND) {
 						result.add(&child->normal_entry);
 						result.add(&child->size_x_entry);
 					}
 				}
-			} else if (entry->widget->getHorizontalSizePolicy() == Widget::SizePolicy::EXPAND) {
+			} else if (entry->widget->getSizeXPolicy() == Widget::SizePolicy::EXPAND) {
 				// expanding widget depends on the parent's size
 				result.add(&entry->widget->getParent()->size_x_entry);
 			}
 		} else if (entry->update_type == WidgetUpdateType::SIZE_Y) {
-			if (entry->widget->getVerticalSizePolicy() == Widget::SizePolicy::PARENT) {
+			if (entry->widget->getSizeYPolicy() == Widget::SizePolicy::PARENT) {
 				result.add(&entry->widget->getParent()->normal_entry);
 				result.add(&entry->widget->getParent()->size_y_entry);
-			} else if (entry->widget->getVerticalSizePolicy() == Widget::SizePolicy::CHILDREN) {
+			} else if (entry->widget->getSizeYPolicy() == Widget::SizePolicy::CHILDREN) {
 				result.add(&entry->widget->children_y_entry);
 				for (Widget* child : entry->widget->getChildren()) {
-					if (child->getVerticalSizePolicy() != Widget::SizePolicy::EXPAND) {
+					if (child->getSizeYPolicy() != Widget::SizePolicy::EXPAND) {
 						result.add(&child->normal_entry);
 						result.add(&child->size_y_entry);
 					}
 				}
-			} else if (entry->widget->getVerticalSizePolicy() == Widget::SizePolicy::EXPAND) {
+			} else if (entry->widget->getSizeYPolicy() == Widget::SizePolicy::EXPAND) {
 				result.add(&entry->widget->getParent()->size_y_entry);
 			}
 		} else if (entry->update_type == WidgetUpdateType::CHILDREN_X) {
 			// If container's size does not depend on its children,
 			// it should be calculated before size update.
 			// The opposite case is in the SIZE_X and SIZE_Y part.
-			if (entry->widget->getHorizontalSizePolicy() != Widget::SizePolicy::CHILDREN) {
+			if (entry->widget->getSizeXPolicy() != Widget::SizePolicy::CHILDREN) {
 				result.add(&entry->widget->size_x_entry);
 			}
 			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(entry->widget)) {
@@ -153,7 +153,7 @@ namespace fw {
 					if (container->getHorizontal()) {
 						result.add(&child->pos_x_entry);
 						// avoiding a loop
-						if (child->getHorizontalSizePolicy() != Widget::SizePolicy::EXPAND) {
+						if (child->getSizeXPolicy() != Widget::SizePolicy::EXPAND) {
 							result.add(&child->size_x_entry);
 						}
 					}
@@ -162,14 +162,14 @@ namespace fw {
 				wAssert("Non-containers should not have CHILDREN_X update entry");
 			}
 		} else if (entry->update_type == WidgetUpdateType::CHILDREN_Y) {
-			if (entry->widget->getVerticalSizePolicy() != Widget::SizePolicy::CHILDREN) {
+			if (entry->widget->getSizeYPolicy() != Widget::SizePolicy::CHILDREN) {
 				result.add(&entry->widget->size_y_entry);
 			}
 			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(entry->widget)) {
 				for (Widget* child : entry->widget->getChildren()) {
 					if (!container->getHorizontal()) {
 						result.add(&child->pos_y_entry);
-						if (child->getHorizontalSizePolicy() != Widget::SizePolicy::EXPAND) {
+						if (child->getSizeXPolicy() != Widget::SizePolicy::EXPAND) {
 							result.add(&child->size_y_entry);
 						}
 					}
