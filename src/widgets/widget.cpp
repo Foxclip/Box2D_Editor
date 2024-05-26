@@ -321,11 +321,11 @@ namespace fw {
 	}
 
 	Widget::SizePolicy Widget::getHorizontalSizePolicy() const {
-		return horizontal_size_policy;
+		return size_policy_x;
 	}
 
 	Widget::SizePolicy Widget::getVerticalSizePolicy() const {
-		return vertical_size_policy;
+		return size_policy_y;
 	}
 
 	const sf::Vector2f& Widget::getOrigin() const {
@@ -566,13 +566,13 @@ namespace fw {
 	void Widget::setSizeXPolicy(SizePolicy policy) {
 		wAssert(!widget_list.isLocked());
 		wAssert(this != widget_list.getRootWidget());
-		this->horizontal_size_policy = policy;
+		this->size_policy_x = policy;
 	}
 
 	void Widget::setSizeYPolicy(SizePolicy policy) {
 		wAssert(!widget_list.isLocked());
 		wAssert(this != widget_list.getRootWidget());
-		this->vertical_size_policy = policy;
+		this->size_policy_y = policy;
 	}
 
 	void Widget::setMinSize(float width, float height) {
@@ -854,10 +854,10 @@ namespace fw {
 		wAssert(!widget_list.isLocked());
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
-		if (horizontal_size_policy == SizePolicy::PARENT) {
+		if (size_policy_x == SizePolicy::PARENT) {
 			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(parent)) {
-				new_pos.x = container->getHorizontalPadding();
-				new_size.x = container->getWidth() - container->getHorizontalPadding() * 2;
+				new_pos.x = container->getPaddingX();
+				new_size.x = container->getWidth() - container->getPaddingX() * 2;
 			} else {
 				new_pos.x = 0.0f;
 				new_size.x = parent->getWidth();
@@ -871,10 +871,10 @@ namespace fw {
 		wAssert(!widget_list.isLocked());
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
-		if (vertical_size_policy == SizePolicy::PARENT) {
+		if (size_policy_y == SizePolicy::PARENT) {
 			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(parent)) {
-				new_pos.y = container->getVerticalPadding();
-				new_size.y = container->getHeight() - container->getVerticalPadding() * 2;
+				new_pos.y = container->getPaddingY();
+				new_size.y = container->getHeight() - container->getPaddingY() * 2;
 			} else {
 				new_pos.y = 0.0f;
 				new_size.y = parent->getHeight();

@@ -18,20 +18,20 @@ namespace fw {
 		return horizontal;
 	}
 
-	float ContainerWidget::getHorizontalPadding() const {
-		return horizontal_padding;
+	float ContainerWidget::getPaddingX() const {
+		return padding_x;
 	}
 
-	float ContainerWidget::getVerticalPadding() const {
-		return vertical_padding;
+	float ContainerWidget::getPaddingY() const {
+		return padding_y;
 	}
 
-	Widget::Alignment ContainerWidget::getVerticalAlignment() const {
-		return vertical_alignment;
+	Widget::Alignment ContainerWidget::getAlignmentY() const {
+		return alignment_y;
 	}
 
-	Widget::Alignment ContainerWidget::getHorizontalAlignment() const {
-		return horizontal_alignment;
+	Widget::Alignment ContainerWidget::getAlignmentX() const {
+		return alignment_x;
 	}
 
 	void ContainerWidget::setHorizontal(bool value) {
@@ -39,24 +39,24 @@ namespace fw {
 	}
 
 	void ContainerWidget::setPadding(float padding) {
-		this->horizontal_padding = padding;
-		this->vertical_padding = padding;
+		this->padding_x = padding;
+		this->padding_y = padding;
 	}
 
-	void ContainerWidget::setHorizontalPadding(float padding) {
-		this->horizontal_padding = padding;
+	void ContainerWidget::setPaddingX(float padding) {
+		this->padding_x = padding;
 	}
 
-	void ContainerWidget::setVerticalPadding(float padding) {
-		this->vertical_padding = padding;
+	void ContainerWidget::setPaddingY(float padding) {
+		this->padding_y = padding;
 	}
 
-	void ContainerWidget::setVerticalAlignment(Alignment alignment) {
-		this->vertical_alignment = alignment;
+	void ContainerWidget::setAlignmentX(Alignment alignment) {
+		this->alignment_y = alignment;
 	}
 
-	void ContainerWidget::setHorizontalAlignment(Alignment alignment) {
-		this->horizontal_alignment = alignment;
+	void ContainerWidget::setAlignmentY(Alignment alignment) {
+		this->alignment_x = alignment;
 	}
 
 	void ContainerWidget::internalUpdate() { }
@@ -64,8 +64,8 @@ namespace fw {
 	void ContainerWidget::updateSizeX() {
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
-		if (horizontal_size_policy == SizePolicy::CHILDREN) {
-			new_size.x = children_bounds.width + horizontal_padding;
+		if (size_policy_x == SizePolicy::CHILDREN) {
+			new_size.x = children_bounds.width + padding_x;
 		} else {
 			Widget::updateSizeX();
 			return;
@@ -77,8 +77,8 @@ namespace fw {
 	void ContainerWidget::updateSizeY() {
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
-		if (vertical_size_policy == SizePolicy::CHILDREN) {
-			new_size.y = children_bounds.height + vertical_padding;
+		if (size_policy_y == SizePolicy::CHILDREN) {
+			new_size.y = children_bounds.height + padding_y;
 		} else {
 			Widget::updateSizeY();
 			return;
@@ -114,14 +114,14 @@ namespace fw {
 
 	float ContainerWidget::alignmentToOffset(Alignment alignment, float max_size) const {
 		if (horizontal) {
-			switch (vertical_alignment) {
+			switch (alignment_y) {
 				case Alignment::ALIGN_TOP: return 0.0f;
 				case Alignment::ALIGN_CENTER: return max_size / 2.0f;
 				case Alignment::ALIGN_BOTTOM: return max_size;
 				default: return 0.0f;
 			}
 		} else {
-			switch (horizontal_alignment) {
+			switch (alignment_x) {
 				case Alignment::ALIGN_LEFT: return 0.0f;
 				case Alignment::ALIGN_CENTER: return max_size / 2.0f;
 				case Alignment::ALIGN_RIGHT: return max_size;
@@ -145,7 +145,7 @@ namespace fw {
 			return horizontal ? getWidth() : getHeight();
 		};
 		auto get_padding = [&]() {
-			return horizontal ? horizontal_padding : vertical_padding;
+			return horizontal ? padding_x : padding_y;
 		};
 		// calculating size of expanding widgets
 		float fixed_widgets_size = 0.0f;
@@ -191,10 +191,10 @@ namespace fw {
 			return horizontal ? widget->getHeight() : widget->getWidth();
 		};
 		auto get_other_padding = [&]() {
-			return horizontal ? vertical_padding : horizontal_padding;
+			return horizontal ? padding_y : padding_x;
 		};
 		auto get_alignment = [&]() {
-			return horizontal ? vertical_alignment : horizontal_alignment;
+			return horizontal ? alignment_y : alignment_x;
 		};
 		// calculating max widget size
 		float max_other_size = 0.0f;

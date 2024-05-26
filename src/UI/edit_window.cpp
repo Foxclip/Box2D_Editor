@@ -144,7 +144,7 @@ void EditWindow::setSpacingWidgets() {
         fw::TextWidget* text_widget = dynamic_cast<fw::TextWidget*>(parameter->getWidget()->find("text"));
         EmptyWidget* spacing_widget = dynamic_cast<fw::EmptyWidget*>(parameter->getWidget()->find("spacing"));
         mAssert(spacing_widget);
-        float padding = container_widget->getHorizontalPadding();
+        float padding = container_widget->getPaddingX();
         spacing_widget->setWidth(max_text_width + padding - text_widget->getWidth());
     }
 }
@@ -160,7 +160,7 @@ fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::strin
     fw::ContainerWidget* parameter_widget = app.widgets.createWidget<fw::ContainerWidget>(100.0f, 20.0f);
     parameter_widget->setName(name);
     parameter_widget->setFillColor(sf::Color::Transparent);
-    parameter_widget->setVerticalAlignment(fw::Widget::Alignment::ALIGN_CENTER);
+    parameter_widget->setAlignmentX(fw::Widget::Alignment::ALIGN_CENTER);
     parameter_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
     parameter_widget->setSizeYPolicy(fw::Widget::SizePolicy::CHILDREN);
     parameter_widget->setParent(edit_window.container_widget);

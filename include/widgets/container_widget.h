@@ -11,16 +11,16 @@ namespace fw {
 		ContainerWidget(WidgetList& widget_list, float width, float height);
 		ContainerWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		bool getHorizontal() const;
-		float getHorizontalPadding() const;
-		float getVerticalPadding() const;
-		Alignment getVerticalAlignment() const;
-		Alignment getHorizontalAlignment() const;
+		float getPaddingX() const;
+		float getPaddingY() const;
+		Alignment getAlignmentY() const;
+		Alignment getAlignmentX() const;
 		void setHorizontal(bool value);
 		void setPadding(float padding);
-		void setHorizontalPadding(float padding);
-		void setVerticalPadding(float padding);
-		void setVerticalAlignment(Alignment alignment);
-		void setHorizontalAlignment(Alignment alignment);
+		void setPaddingX(float padding);
+		void setPaddingY(float padding);
+		void setAlignmentX(Alignment alignment);
+		void setAlignmentY(Alignment alignment);
 
 	protected:
 		void internalUpdate() override;
@@ -35,10 +35,10 @@ namespace fw {
 		void updatePrimary();
 		void updateSecondary();
 		bool horizontal = true;
-		float horizontal_padding = 0.0f;
-		float vertical_padding = 0.0f;
-		Alignment vertical_alignment = Alignment::ALIGN_TOP;
-		Alignment horizontal_alignment = Alignment::ALIGN_LEFT;
+		float padding_x = 0.0f;
+		float padding_y = 0.0f;
+		Alignment alignment_y = Alignment::ALIGN_TOP;
+		Alignment alignment_x = Alignment::ALIGN_LEFT;
 		sf::FloatRect children_bounds;
 
 	};

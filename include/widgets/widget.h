@@ -243,8 +243,8 @@ namespace fw {
 		Anchor parent_anchor = Anchor::CUSTOM;
 		sf::Vector2f anchor_offset = sf::Vector2f(0.0f, 0.0f);
 		WidgetUnclippedRegion unclipped_region = WidgetUnclippedRegion(this);
-		SizePolicy horizontal_size_policy = SizePolicy::NONE;
-		SizePolicy vertical_size_policy = SizePolicy::NONE;
+		SizePolicy size_policy_x = SizePolicy::NONE;
+		SizePolicy size_policy_y = SizePolicy::NONE;
 		WidgetUpdateQueueEntry normal_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::NORMAL);
 		WidgetUpdateQueueEntry pos_x_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::POS_X);
 		WidgetUpdateQueueEntry pos_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::POS_Y);
