@@ -8,13 +8,15 @@
 #include <vector>
 #include <numbers>
 
+namespace utils {
+
 #ifndef NDEBUG
 
-void _print_msg(bool value);
-void _print_msg(bool value, const std::string& message);
+	void _print_msg(bool value);
+	void _print_msg(bool value, const std::string& message);
 
 #define mAssert(value, ...) \
-	_print_msg(value, __VA_ARGS__); \
+	utils::_print_msg(value, __VA_ARGS__); \
 	assert(value);
 
 #else
@@ -22,8 +24,6 @@ void _print_msg(bool value, const std::string& message);
 #define mAssert(value, ...)
 
 #endif // !NDEBUG
-
-namespace utils {
 
 	float to_degrees(float angle);
 	float to_radians(float angle);

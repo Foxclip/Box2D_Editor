@@ -468,14 +468,27 @@ namespace fw {
 	}
 
 	void Widget::setSize(float width, float height) {
+		wAssert(!widget_list.isLocked());
 		setSizeInternal(width, height);
 	}
 
 	void Widget::setSize(const sf::Vector2f& size) {
+		wAssert(!widget_list.isLocked());
 		setSize(size.x, size.y);
 	}
 
+	void Widget::setWidth(float width) {
+		wAssert(!widget_list.isLocked());
+		setSize(width, getHeight());
+	}
+
+	void Widget::setHeight(float height) {
+		wAssert(!widget_list.isLocked());
+		setSize(getWidth(), height);
+	}
+
 	void Widget::setSizeKeepPos(float width, float height) {
+		wAssert(!widget_list.isLocked());
 		sf::Vector2f orig_offset_pos = getTopLeft();
 		setSize(width, height);
 		sf::Vector2f new_offset_pos = getTopLeft();
@@ -484,6 +497,7 @@ namespace fw {
 	}
 
 	void Widget::setSizeKeepPos(const sf::Vector2f& size) {
+		wAssert(!widget_list.isLocked());
 		setSizeKeepPos(size.x, size.y);
 	}
 
@@ -512,15 +526,18 @@ namespace fw {
 	}
 
 	void Widget::setOriginKeepPos(const sf::Vector2f& origin) {
+		wAssert(!widget_list.isLocked());
 		setOriginKeepPos(origin.x, origin.y);
 	}
 
 	void Widget::setOrigin(float x, float y) {
+		wAssert(!widget_list.isLocked());
 		setOriginInternal(x, y);
 		origin_anchor = Anchor::CUSTOM;
 	}
 
 	void Widget::setOrigin(const sf::Vector2f& origin) {
+		wAssert(!widget_list.isLocked());
 		setOrigin(origin.x, origin.y);
 		origin_anchor = Anchor::CUSTOM;
 	}

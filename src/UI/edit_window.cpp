@@ -21,6 +21,7 @@ EditWindow::EditWindow(fw::WidgetList& widget_list, Editor& p_app)
     container_widget->setParent(this);
     lockChildren();
     createParameters();
+    setSpacingWidgets();
 }
 
 void EditWindow::updateParameters() {
@@ -129,28 +130,50 @@ void EditWindow::createParameters() {
     );
 }
 
+void EditWindow::setSpacingWidgets() {
+    // this is to sort the text labels and checkboxes/textboxes into two columns
+    float max_text_width = 0.0f;
+    for (size_t i = 0; i < parameters.size(); i++) {
+        EditWindowParameter* parameter = parameters[i];
+        fw::TextWidget* text_widget = dynamic_cast<fw::TextWidget*>(parameter->getWidget()->find("text"));
+        mAssert(text_widget);
+        max_text_width = std::max(max_text_width, text_widget->getWidth());
+    }
+    for (size_t i = 0; i < parameters.size(); i++) {
+        EditWindowParameter* parameter = parameters[i];
+        fw::TextWidget* text_widget = dynamic_cast<fw::TextWidget*>(parameter->getWidget()->find("text"));
+        EmptyWidget* spacing_widget = dynamic_cast<fw::EmptyWidget*>(parameter->getWidget()->find("spacing"));
+        mAssert(spacing_widget);
+        float padding = container_widget->getHorizontalPadding();
+        spacing_widget->setWidth(max_text_width + padding - text_widget->getWidth());
+    }
+}
+
 EditWindowParameter::EditWindowParameter(EditWindow& p_edit_window)
     : edit_window(p_edit_window), app(p_edit_window.app) { }
 
+fw::ContainerWidget* EditWindowParameter::getWidget() const {
+    return widget;
+}
+
 fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::string& name, const std::string& text) {
     fw::ContainerWidget* parameter_widget = app.widgets.createWidget<fw::ContainerWidget>(100.0f, 20.0f);
+    parameter_widget->setName(name);
     parameter_widget->setFillColor(sf::Color::Transparent);
     parameter_widget->setVerticalAlignment(fw::Widget::Alignment::ALIGN_CENTER);
     parameter_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
     parameter_widget->setSizeYPolicy(fw::Widget::SizePolicy::CHILDREN);
     parameter_widget->setParent(edit_window.container_widget);
-    parameter_widget->setName(name);
     fw::TextWidget* parameter_text_widget = app.widgets.createWidget<fw::TextWidget>();
     parameter_text_widget->setFont(app.ui_font);
     parameter_text_widget->setCharacterSize(16);
     parameter_text_widget->setString(text);
     parameter_text_widget->setParent(parameter_widget);
     fw::EmptyWidget* spacing_widget = app.widgets.createWidget<fw::EmptyWidget>();
+    spacing_widget->setName("spacing");
     spacing_widget->setSize(10.0f, 0.0f);
     spacing_widget->setFillColor(sf::Color::Transparent);
     spacing_widget->setParent(parameter_widget);
-    spacing_widget->setName("spacing");
-    spacing_widget->setSizeXPolicy(fw::Widget::SizePolicy::EXPAND);
     return parameter_widget;
 }
 
@@ -158,6 +181,7 @@ fw::TextBoxWidget* EditWindowParameter::createTextBoxWidget() {
     fw::TextBoxWidget* textbox_widget = app.widgets.createWidget<fw::TextBoxWidget>(100.0f, 20.0f);
     textbox_widget->setFont(app.textbox_font);
     textbox_widget->setCharacterSize(12);
+    textbox_widget->setSizeXPolicy(fw::Widget::SizePolicy::EXPAND);
     return textbox_widget;
 }
 

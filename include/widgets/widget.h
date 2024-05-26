@@ -173,6 +173,8 @@ namespace fw {
 		virtual const sf::Color& getFillColor() const = 0;
 		virtual void setSize(float width, float height);
 		void setSize(const sf::Vector2f& size);
+		void setWidth(float width);
+		void setHeight(float height);
 		void setSizeKeepPos(float width, float height);
 		void setSizeKeepPos(const sf::Vector2f& size);
 		void setOrigin(Anchor anchor);

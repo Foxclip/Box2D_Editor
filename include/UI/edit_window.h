@@ -14,6 +14,7 @@ public:
 		EditWindow& p_edit_window
 	);
 	virtual void getValue() const = 0;
+	fw::ContainerWidget* getWidget() const;
 
 protected:
 	Editor& app;
@@ -93,6 +94,7 @@ private:
 	CompVectorUptr<EditWindowParameter> parameters;
 
 	void createParameters();
+	void setSpacingWidgets();
 	template<typename T, typename... Args>
 	requires std::derived_from<T, EditWindowParameter>
 	void createParameter(Args&&... args);

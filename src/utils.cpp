@@ -3,19 +3,20 @@
 #include <cmath>
 #include <iostream>
 
+namespace utils {
+
 #ifndef NDEBUG
 
-void _print_msg(bool value) { }
+	void _print_msg(bool value) { }
 
-void _print_msg(bool value, const std::string& message) {
-	if (!value) {
-		std::cout << message << "\n";
+	void _print_msg(bool value, const std::string& message) {
+		if (!value) {
+			std::cout << message << "\n";
+		}
 	}
-}
 
 #endif // !NDEBUG
 
-namespace utils {
 
 	const float DEG_IN_RAD = (float)(180.0f / std::numbers::pi);
 	const float RAD_IN_DEG = (float)(std::numbers::pi / 180.0f);
