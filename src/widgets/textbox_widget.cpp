@@ -46,7 +46,7 @@ namespace fw {
 		selection_widget->setName("selection");
 
 		setValueSilent("Text");
-		setCursorPos(getStringSize());
+		setCursorPos(0);
 		deselectAll();
 		updateColors();
 	}
@@ -698,6 +698,9 @@ namespace fw {
 		float cursor_visual_pos = char_pos + TEXTBOX_CURSOR_OFFSET.x;
 		float left_bound = TEXTBOX_CURSOR_MOVE_MARGIN;
 		float right_bound = getWidth() - TEXTBOX_CURSOR_MOVE_MARGIN;
+		if (left_bound > right_bound) {
+			return;
+		}
 		float offset_left = cursor_visual_pos - left_bound;
 		float offset_right = cursor_visual_pos - right_bound;
 		if (offset_left < 0) {
