@@ -84,7 +84,8 @@ private:
 
 class EditWindow : public fw::WindowWidget {
 public:
-	EditWindow(fw::WidgetList& widget_list, Editor& p_app);
+	EditWindow(fw::WidgetList& widget_list, float width, float height, Editor& p_app);
+	EditWindow(fw::WidgetList& widget_list, const sf::Vector2f& size, Editor& p_app);
 	void updateParameters();
 
 private:

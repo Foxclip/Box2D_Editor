@@ -1,11 +1,10 @@
 #include "UI/edit_window.h"
 #include "editor.h"
 
-EditWindow::EditWindow(fw::WidgetList& widget_list, Editor& p_app)
-    : fw::WindowWidget(widget_list, 200.0f, 300.0f), app(p_app) {
+EditWindow::EditWindow(fw::WidgetList& widget_list, float width, float height, Editor& p_app)
+    : fw::WindowWidget(widget_list, width, height), app(p_app) {
     setName("edit window");
     setVisible(false);
-    setOrigin(Anchor::CENTER);
     setFillColor(sf::Color(128, 128, 128));
     setClickThrough(false);
     setHeaderFont(app.console_font);
@@ -23,6 +22,9 @@ EditWindow::EditWindow(fw::WidgetList& widget_list, Editor& p_app)
     createParameters();
     setSpacingWidgets();
 }
+
+EditWindow::EditWindow(fw::WidgetList& widget_list, const sf::Vector2f& size, Editor& p_app) 
+    : fw::WindowWidget(widget_list, size), app(p_app) { }
 
 void EditWindow::updateParameters() {
     for (size_t i = 0; i < parameters.size(); i++) {

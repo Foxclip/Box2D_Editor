@@ -175,7 +175,6 @@ void Editor::initTools() {
         if (value) {
             if (active_object) {
                 edit_tool.edit_window_widget->updateParameters();
-                edit_tool.edit_window_widget->setPosition(widgets.getRootWidget()->getGlobalCenter());
                 edit_tool.edit_window_widget->setVisible(true);
             } else {
                 edit_tool.edit_window_widget->setVisible(false);
@@ -266,7 +265,7 @@ void Editor::initWidgets() {
     };
 
     toolbox_widget = widgets.createWidget<Toolbox>(*this);
-    edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(*this);
+    edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(300.0f, 400.0f, *this);
     create_tool.create_panel_widget = widgets.createWidget<CreatePanel>(*this);
 
     // step text
