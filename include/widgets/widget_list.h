@@ -53,6 +53,7 @@ namespace fw {
 		void render(sf::RenderTarget& target);
 		void reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_pos);
 		void setFocusedWidget(Widget* widget);
+		void removeWidget(Widget* widget, bool with_children = true);
 
 	private:
 		friend class Widget;

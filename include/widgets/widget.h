@@ -40,6 +40,7 @@ namespace fw {
 			Canvas,
 			Checkbox,
 			Container,
+			Dropdown,
 			Empty,
 			Rectangle,
 			Text,
@@ -190,6 +191,7 @@ namespace fw {
 		void setAnchorOffset(const sf::Vector2f& offset);
 		void setSizeXPolicy(SizePolicy policy);
 		void setSizeYPolicy(SizePolicy policy);
+		void setSizePolicy(SizePolicy policy);
 		void setMinSize(float width, float height);
 		void setMinSize(const sf::Vector2f& size);
 		void setMaxSize(float width, float height);
@@ -223,6 +225,7 @@ namespace fw {
 		void render(sf::RenderTarget& target);
 		void renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children);
 		void renderOrigin(sf::RenderTarget& target);
+		void remove();
 
 	protected:
 		friend class WidgetList;

@@ -263,4 +263,18 @@ namespace fw {
 		}
 	}
 
+	void WidgetList::removeWidget(Widget* widget, bool with_children) {
+		wAssert(!isLocked());
+		wAssert(widget);
+		wAssert(widget != root_widget);
+		wAssert(widgets.contains(widget));
+		if (with_children) {
+			for (size_t i = 0; i < widget->getChildren().size(); i++) {
+				removeWidget(widget->getChild(i));
+			}
+		}
+		widget->setParent(nullptr);
+		widgets.remove(widget);
+	}
+
 }

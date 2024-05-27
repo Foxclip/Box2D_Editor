@@ -583,6 +583,13 @@ namespace fw {
 		this->size_policy_y = policy;
 	}
 
+	void Widget::setSizePolicy(SizePolicy policy) {
+		wAssert(!widget_list.isLocked());
+		wAssert(this != widget_list.getRootWidget());
+		setSizeXPolicy(policy);
+		setSizeYPolicy(policy);
+	}
+
 	void Widget::setMinSize(float width, float height) {
 		wAssert(!widget_list.isLocked());
 		this->min_size.x = width;
@@ -1023,6 +1030,11 @@ namespace fw {
 		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->renderOrigin(target);
 		}
+	}
+
+	void Widget::remove() {
+		wAssert(!widget_list.isLocked());
+		widget_list.removeWidget(this);
 	}
 
 	sf::Vector2f Widget::anchorToPos(Anchor p_anchor, const sf::Vector2f& size) {

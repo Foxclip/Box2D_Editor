@@ -44,6 +44,10 @@ int main() {
     execute_app();
 
     // TODO: Dropdown widget
+    // TODO: remake WindowWidget with containers
+    // TODO: with_children option in removeWidget
+    // TODO: WidgetList::removeWidget test, and Widget::remove test
+    // TODO: require font for TextWidget
     // TODO: object list window (outliner)
     // TODO: render polygon indices
     // TODO: make widgets a separate library
