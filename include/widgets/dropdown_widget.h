@@ -17,7 +17,7 @@ namespace fw {
 
 	class DropdownWidget : public EmptyWidget {
 	public:
-		std::function<void(size_t index)> OnOptionSelected = [](size_t index) { };
+		std::function<void(size_t index)> OnValueChanged = [](size_t index) { };
 
 		DropdownWidget(WidgetList& widget_list);
 		const sf::Color& getMainBackgroundColor() const;
@@ -30,8 +30,6 @@ namespace fw {
 		void setPanelTextColor(const sf::Color& color);
 		void setFont(const sf::Font& font);
 		void setCharacterSize(unsigned int size);
-		void setPanelPaddingX(float padding);
-		void setPanelPaddingY(float padding);
 		void togglePanel();
 		void addOption(const sf::String& text, ptrdiff_t index = -1);
 		void setOptionText(size_t index, const sf::String& text);
@@ -41,8 +39,8 @@ namespace fw {
 	protected:
 		RectangleWidget* main_widget = nullptr;
 		TextWidget* text_widget = nullptr;
-		ContainerWidget* panel_widget = nullptr;
-		std::vector<ContainerWidget*> option_widgets;
+		RectangleWidget* panel_widget = nullptr;
+		std::vector<RectangleWidget*> option_widgets;
 
 	private:
 		ptrdiff_t selected = -1;

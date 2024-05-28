@@ -13,6 +13,7 @@ namespace fw {
 		main_widget->setClickThrough(false);
 		main_widget->setFillColor(DROPDOWN_DEFAULT_MAIN_COLOR);
 		main_widget->setSizePolicy(Widget::SizePolicy::PARENT);
+		main_widget->setFocusable(true);
 		main_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
 			togglePanel();
 		};
@@ -23,11 +24,10 @@ namespace fw {
 		text_widget->setFillColor(DROPDOWN_DEFAULT_MAIN_TEXT_COLOR);
 		text_widget->setParent(main_widget);
 		// options panel
-		panel_widget = widget_list.createWidget<ContainerWidget>(100.0f, 100.0f);
+		panel_widget = widget_list.createWidget<RectangleWidget>(100.0f, 100.0f);
 		panel_widget->setClickThrough(false);
 		panel_widget->setFillColor(DROPDOWN_DEFAULT_PANEL_COLOR);
 		panel_widget->setParentAnchor(Anchor::BOTTOM_LEFT);
-		panel_widget->setHorizontal(false);
 		panel_widget->setParent(main_widget);
 	}
 
@@ -52,7 +52,7 @@ namespace fw {
 		if (index < 0) {
 			index = option_widgets.size();
 		}
-		ContainerWidget* option_widget = widget_list.createWidget<ContainerWidget>(100.0f, 20.0f);
+		RectangleWidget* option_widget = widget_list.createWidget<RectangleWidget>(100.0f, 20.0f);
 		option_widget->setParent(panel_widget);
 		option_widget->setFillColor(sf::Color::Transparent);
 		option_widgets.push_back(option_widget);
@@ -69,7 +69,7 @@ namespace fw {
 
 	void DropdownWidget::setOptionText(size_t index, const sf::String& text) {
 		wAssert(index >= 0 && index < option_widgets.size());
-		ContainerWidget* option_widget = option_widgets[index];
+		RectangleWidget* option_widget = option_widgets[index];
 		TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
 		option_text_widget->setString(text);
 	}
@@ -82,7 +82,7 @@ namespace fw {
 
 	void DropdownWidget::removeOption(const sf::String& text) {
 		for (size_t i = 0; i < option_widgets.size(); i++) {
-			ContainerWidget* option_widget = option_widgets[i];
+			RectangleWidget* option_widget = option_widgets[i];
 			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
 			if (option_text_widget->getString() == text) {
 				removeOption(i);
@@ -93,20 +93,34 @@ namespace fw {
 	}
 
 	void DropdownWidget::updateOptions() {
+		float max_text_width = 0.0f;
 		for (size_t i = 0; i < option_widgets.size(); i++) {
-			ContainerWidget* option_widget = option_widgets[i];
+			RectangleWidget* option_widget = option_widgets[i];
 			option_widget->setName("option" + std::to_string(i));
 			option_widget->OnLeftPress = [=](const sf::Vector2f& pos) {
 				selectOption(i);
+				togglePanel();
 			};
+			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
+			float text_width = option_text_widget->getWidth();
+			max_text_width = std::max(max_text_width, text_width);
 		}
+		float options_width = std::max(main_widget->getWidth(), max_text_width);
+		for (size_t i = 0; i < option_widgets.size(); i++) {
+			RectangleWidget* option_widget = option_widgets[i];
+			option_widget->setPosition(0.0f, i * main_widget->getHeight());
+			option_widget->setWidth(options_width);
+			option_widget->setHeight(main_widget->getHeight());
+		}
+		panel_widget->setWidth(options_width);
+		panel_widget->setHeight(main_widget->getHeight() * option_widgets.size());
 	}
 
 	void DropdownWidget::selectOption(size_t index) {
 		wAssert(index >= 0 && index < option_widgets.size());
 		selected = index;
-		OnOptionSelected(index);
-		ContainerWidget* option = option_widgets[index];
+		OnValueChanged(index);
+		RectangleWidget* option = option_widgets[index];
 		std::string text = dynamic_cast<TextWidget*>(option->find("text"))->getString();
 		text_widget->setString(text);
 	}
@@ -126,7 +140,7 @@ namespace fw {
 	void DropdownWidget::setPanelTextColor(const sf::Color& color) {
 		panel_text_color = color;
 		for (size_t i = 0; i < option_widgets.size(); i++) {
-			ContainerWidget* option_widget = option_widgets[i];
+			RectangleWidget* option_widget = option_widgets[i];
 			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
 			option_text_widget->setFillColor(color);
 		}
@@ -135,7 +149,7 @@ namespace fw {
 	void DropdownWidget::setFont(const sf::Font& font) {
 		text_widget->setFont(font);
 		for (size_t i = 0; i < option_widgets.size(); i++) {
-			ContainerWidget* option_widget = option_widgets[i];
+			RectangleWidget* option_widget = option_widgets[i];
 			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
 			option_text_widget->setFont(font);
 		}
@@ -144,18 +158,10 @@ namespace fw {
 	void DropdownWidget::setCharacterSize(unsigned int size) {
 		text_widget->setCharacterSize(size);
 		for (size_t i = 0; i < option_widgets.size(); i++) {
-			ContainerWidget* option_widget = option_widgets[i];
+			RectangleWidget* option_widget = option_widgets[i];
 			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
 			option_text_widget->setCharacterSize(size);
 		}
-	}
-
-	void DropdownWidget::setPanelPaddingX(float padding) {
-		panel_widget->setPaddingX(padding);
-	}
-
-	void DropdownWidget::setPanelPaddingY(float padding) {
-		panel_widget->setPaddingY(padding);
 	}
 
 	void DropdownWidget::togglePanel() {

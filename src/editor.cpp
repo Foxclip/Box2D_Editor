@@ -327,11 +327,9 @@ void Editor::initWidgets() {
     dropdown_widget->setFont(console_font);
     dropdown_widget->setCharacterSize(15);
     dropdown_widget->setSize(100.0f, 20.0f);
-    dropdown_widget->setPanelPaddingX(5.0f);
-    dropdown_widget->setPanelPaddingY(5.0f);
-    dropdown_widget->addOption("option1");
-    dropdown_widget->addOption("option2");
-    dropdown_widget->addOption("option3");
+    dropdown_widget->addOption("option");
+    dropdown_widget->addOption("really long option");
+    dropdown_widget->addOption("another option");
     dropdown_widget->setGlobalPosition(400.0f, 300.0f);
 }
 
