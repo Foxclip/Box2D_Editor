@@ -124,15 +124,20 @@ namespace fw {
 	void WidgetList::processLeftPress(const sf::Vector2f pos) {
 		wAssert(!isLocked());
 		CompVector<Widget*> widgets = getWidgetsUnderCursor(true, click_blocked);
+		// setting focused widget
 		Widget* focused = nullptr;
 		for (size_t i = 0; i < widgets.size(); i++) {
 			Widget* widget = widgets[i];
-			widget->processLeftPress(pos);
 			if (!focused && widget->isFocusable()) {
 				focused = widget;
 			}
 		}
 		setFocusedWidget(focused);
+		// processLeftPress can modify focus after it was set
+		for (size_t i = 0; i < widgets.size(); i++) {
+			Widget* widget = widgets[i];
+			widget->processLeftPress(pos);
+		}
 	}
 
 	void WidgetList::processRightPress(const sf::Vector2f pos) {
@@ -250,12 +255,13 @@ namespace fw {
 			}
 			wAssert(widgets.contains(widget));
 		}
-		if (focused_widget) {
-			logger << focused_widget->getFullName() << " lost focus\n";
-			focused_widget->internalOnFocusLost();
-			focused_widget->OnFocusLost();
-		}
+		Widget* prev_focused = focused_widget;
 		focused_widget = widget;
+		if (prev_focused) {
+			logger << prev_focused->getFullName() << " lost focus\n";
+			prev_focused->internalOnFocusLost();
+			prev_focused->OnFocusLost();
+		}
 		if (focused_widget) {
 			logger << focused_widget->getFullName() << " is focused\n";
 			focused_widget->internalOnFocused();

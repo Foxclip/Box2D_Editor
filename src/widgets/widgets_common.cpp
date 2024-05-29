@@ -71,13 +71,20 @@ namespace fw {
 		return pos == end;
 	}
 
-	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point) {
+	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point, bool include_upper_bound) {
+		auto cmp = [&](float left, float right) {
+			if (include_upper_bound) {
+				return left <= right;
+			} else {
+				return left < right;
+			}
+		};
 		return (
 			point.x >= rect.left
-			&& point.x <= rect.left + rect.width
+			&& cmp(point.x, rect.left + rect.width)
 			&& point.y >= rect.top
-			&& point.y <= rect.top + rect.height
-			);
+			&& cmp(point.y, rect.top + rect.height)
+		);
 	}
 
 	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point) {

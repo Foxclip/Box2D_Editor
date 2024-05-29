@@ -10,12 +10,25 @@ namespace fw {
 		// main
 		setName("main");
 		main_widget = widget_list.createWidget<RectangleWidget>(DROPDOWN_DEFAULT_SIZE);
+		main_widget->setClipChildren(true);
 		main_widget->setClickThrough(false);
 		main_widget->setFillColor(DROPDOWN_DEFAULT_MAIN_COLOR);
 		main_widget->setSizePolicy(Widget::SizePolicy::PARENT);
 		main_widget->setFocusable(true);
 		main_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
 			togglePanel();
+		};
+		main_widget->OnFocused = [&]() {
+			LoggerTag dropdown_tag("dropdown");
+			logger << "OnFocused\n";
+		};
+		main_widget->OnFocusLost = [&]() {
+			LoggerTag dropdown_tag("dropdown");
+			logger << "OnFocusLost\n";
+			if (panel_widget->isVisible()) {
+				hidePanel();
+				logger << "Hiding panel\n";
+			}
 		};
 		main_widget->setParent(this);
 		// main text
@@ -28,11 +41,15 @@ namespace fw {
 		panel_widget->setClickThrough(false);
 		panel_widget->setFillColor(DROPDOWN_DEFAULT_PANEL_COLOR);
 		panel_widget->setParentAnchor(Anchor::BOTTOM_LEFT);
-		panel_widget->setParent(main_widget);
+		panel_widget->setParent(this);
 	}
 
 	const sf::Color& DropdownWidget::getMainBackgroundColor() const {
 		return main_widget->getFillColor();
+	}
+
+	const sf::Color& DropdownWidget::getOptionHoverBackgroundColor() const {
+		return option_hover_background_color;
 	}
 
 	const sf::Color& DropdownWidget::getPanelBackgroundColor() const {
@@ -47,6 +64,10 @@ namespace fw {
 		return panel_text_color;
 	}
 
+	RectangleWidget* DropdownWidget::getMainWidget() const {
+		return main_widget;
+	}
+
 	void DropdownWidget::addOption(const sf::String& text, ptrdiff_t index) {
 		wAssert(index == -1 || index < (ptrdiff_t)option_widgets.size() - 1);
 		if (index < 0) {
@@ -55,6 +76,12 @@ namespace fw {
 		RectangleWidget* option_widget = widget_list.createWidget<RectangleWidget>(100.0f, 20.0f);
 		option_widget->setParent(panel_widget);
 		option_widget->setFillColor(sf::Color::Transparent);
+		option_widget->OnMouseEnter = [&, option_widget](const sf::Vector2f& pos) {
+			option_widget->setFillColor(option_hover_background_color);
+		};
+		option_widget->OnMouseExit = [&, option_widget](const sf::Vector2f& pos) {
+			option_widget->setFillColor(sf::Color::Transparent);
+		};
 		option_widgets.push_back(option_widget);
 		TextWidget* option_text_widget = widget_list.createWidget<TextWidget>();
 		if (text_widget->getFont()) {
@@ -99,7 +126,7 @@ namespace fw {
 			option_widget->setName("option" + std::to_string(i));
 			option_widget->OnLeftPress = [=](const sf::Vector2f& pos) {
 				selectOption(i);
-				togglePanel();
+				hidePanel();
 			};
 			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
 			float text_width = option_text_widget->getWidth();
@@ -127,6 +154,10 @@ namespace fw {
 
 	void DropdownWidget::setMainBackgroundColor(const sf::Color& color) {
 		main_widget->setFillColor(color);
+	}
+
+	void DropdownWidget::setOptionHoverBackgroundColor(const sf::Color& color) {
+		option_hover_background_color = color;
 	}
 
 	void DropdownWidget::setPanelBackgroundColor(const sf::Color& color) {
@@ -164,8 +195,24 @@ namespace fw {
 		}
 	}
 
+	void DropdownWidget::showPanel() {
+		panel_widget->setVisible(true);
+	}
+
+	void DropdownWidget::hidePanel() {
+		if (main_widget->isFocused()) {
+			main_widget->removeFocus();
+		}
+		panel_widget->setVisible(false);
+	}
+
 	void DropdownWidget::togglePanel() {
-		panel_widget->toggleVisible();
+		if (panel_widget->isVisible()) {
+			hidePanel();
+		} else {
+			showPanel();
+		}
+		
 	}
 
 }
