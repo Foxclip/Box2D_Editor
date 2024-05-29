@@ -36,6 +36,19 @@ namespace fw {
 		text_widget->setString("Dropdown");
 		text_widget->setFillColor(DROPDOWN_DEFAULT_MAIN_TEXT_COLOR);
 		text_widget->setParent(main_widget);
+		// main square
+		square_widget = widget_list.createWidget<RectangleWidget>(main_widget->getHeight(), main_widget->getHeight());
+		square_widget->setFillColor(DROPDOWN_DEFAULT_SQUARE_COLOR);
+		square_widget->setParentAnchor(Anchor::TOP_RIGHT);
+		square_widget->setOrigin(Anchor::TOP_RIGHT);
+		square_widget->setSizeYPolicy(SizePolicy::PARENT);
+		square_widget->setParent(main_widget);
+		// main triangle
+		std::vector<sf::Vector2f> vertices = get_regular_polygon<sf::Vector2f>(3, 5.0f, to_radians(90.0f));
+		triangle_widget = widget_list.createWidget<PolygonWidget>(vertices);
+		triangle_widget->setFillColor(DROPDOWN_DEFAULT_TRIANGLE_COLOR);
+		triangle_widget->setParentAnchor(Anchor::CENTER);
+		triangle_widget->setParent(square_widget);
 		// options panel
 		panel_widget = widget_list.createWidget<RectangleWidget>(100.0f, 100.0f);
 		panel_widget->setClickThrough(false);
@@ -50,6 +63,14 @@ namespace fw {
 
 	const sf::Color& DropdownWidget::getOptionHoverBackgroundColor() const {
 		return option_hover_background_color;
+	}
+
+	const sf::Color& DropdownWidget::getTriangleColor() const {
+		return triangle_widget->getFillColor();
+	}
+
+	const sf::Color& DropdownWidget::getSquareColor() const {
+		return square_widget->getFillColor();
 	}
 
 	const sf::Color& DropdownWidget::getPanelBackgroundColor() const {
@@ -158,6 +179,14 @@ namespace fw {
 
 	void DropdownWidget::setOptionHoverBackgroundColor(const sf::Color& color) {
 		option_hover_background_color = color;
+	}
+
+	void DropdownWidget::setTriangleColor(const sf::Color& color) {
+		triangle_widget->setFillColor(color);
+	}
+
+	void DropdownWidget::setSquareColor(const sf::Color& color) {
+		square_widget->setFillColor(color);
 	}
 
 	void DropdownWidget::setPanelBackgroundColor(const sf::Color& color) {

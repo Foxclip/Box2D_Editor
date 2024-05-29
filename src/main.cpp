@@ -43,7 +43,10 @@ int main() {
     //run_tests();
     execute_app();
 
+    // TODO: PolygonWidget
+    // TODO: PolygonWidget test
     // TODO: Dropdown widget
+    // TODO: DropdownWidget test
     // TODO: remake WindowWidget with containers
     // TODO: with_children option in removeWidget
     // TODO: POS_X entry depends on CHILDREN_X entry of the parent

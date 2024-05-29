@@ -18,6 +18,17 @@ namespace fw {
 		return lg << "(" << value.x << " " << value.y << ")";
 	}
 
+	const float DEG_IN_RAD = (float)(180.0f / std::numbers::pi);
+	const float RAD_IN_DEG = (float)(std::numbers::pi / 180.0f);
+
+	float to_degrees(float angle) {
+		return DEG_IN_RAD * angle;
+	}
+
+	float to_radians(float angle) {
+		return RAD_IN_DEG * angle;
+	}
+
 	sf::Vector2i to2i(const sf::Vector2f& vec) {
 		return sf::Vector2i((int)vec.x, (int)vec.y);
 	}

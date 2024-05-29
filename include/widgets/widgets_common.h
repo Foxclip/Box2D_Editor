@@ -4,6 +4,7 @@
 #include <cassert>
 #include <string>
 #include <iostream>
+#include <numbers>
 #include "logger.h"
 
 namespace fw {
@@ -24,6 +25,8 @@ namespace fw {
 #endif // !NDEBUG
 
 	Logger& operator<<(Logger& lg, const sf::Vector2f& value);
+	float to_degrees(float angle);
+	float to_radians(float angle);
 	sf::Vector2i to2i(const sf::Vector2f& vec);
 	sf::Vector2f to2f(const sf::Vector2i& vec);
 	sf::Vector2f to2f(const sf::Vector2u& vec);
@@ -119,6 +122,24 @@ namespace fw {
 			}
 		}
 		return result;
+	}
+
+	template <typename TVec2>
+	TVec2 get_circle_vertex(ptrdiff_t index, size_t point_count, float radius, float angle_offset = 0.0f) {
+		float angle = (float)((float)index / point_count * 2 * std::numbers::pi + angle_offset);
+		float x = std::cos(angle) * radius;
+		float y = std::sin(angle) * radius;
+		return TVec2(x, y);
+	}
+
+	template <typename TVec2>
+	std::vector<TVec2> get_regular_polygon(size_t point_count, float radius, float angle_offset = 0.0f) {
+		std::vector<TVec2> vertices;
+		for (size_t i = 0; i < point_count; i++) {
+			TVec2 vertex = get_circle_vertex<TVec2>(i, point_count, radius, angle_offset);
+			vertices.push_back(vertex);
+		}
+		return vertices;
 	}
 
 }

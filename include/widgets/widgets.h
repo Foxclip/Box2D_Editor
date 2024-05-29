@@ -15,3 +15,4 @@
 #include "window_widget.h"
 #include "empty_widget.h"
 #include "dropdown_widget.h"
+#include "polygon_widget.h"
