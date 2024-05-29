@@ -227,12 +227,10 @@ namespace fw {
 			}
 			return layer_index;
 		};
-		if (isRenderable()) {
-			size_t this_layer_index = get_layer_index(const_cast<Widget*>(this));
-			RenderQueueLayer layer(this_layer_index);
-			layer.widgets.add(const_cast<Widget*>(this));
-			layers.insert(layer);
-		}
+		size_t this_layer_index = get_layer_index(const_cast<Widget*>(this));
+		RenderQueueLayer layer(this_layer_index);
+		layer.widgets.add(const_cast<Widget*>(this));
+		layers.insert(layer);
 		for (size_t i = 0; i < getChildren().size(); i++) {
 			Widget* widget = getChild(i);
 			if (!widget->isVisible()) {
@@ -987,13 +985,15 @@ namespace fw {
 			return;
 		}
 		OnBeforeGlobalRender(target);
-		updateRenderTexture(unclipped_region.getQuantized());
-		sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
-		sprite.setPosition(unclipped_region.getQuantized().getPosition());
-		if (shader) {
-			target.draw(sprite, shader);
-		} else {
-			target.draw(sprite);
+		if (isRenderable()) {
+			updateRenderTexture(unclipped_region.getQuantized());
+			sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
+			sprite.setPosition(unclipped_region.getQuantized().getPosition());
+			if (shader) {
+				target.draw(sprite, shader);
+			} else {
+				target.draw(sprite);
+			}
 		}
 		OnAfterGlobalRender(target);
 	}

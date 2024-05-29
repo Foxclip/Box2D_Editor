@@ -331,7 +331,7 @@ void Editor::initWidgets() {
     dropdown_widget->addOption("really long option");
     dropdown_widget->addOption("another option");
     dropdown_widget->setGlobalPosition(400.0f, 300.0f);
-    widgets.setFocusedWidget(dropdown_widget->getMainWidget());
+    widgets.setFocusedWidget(dropdown_widget);
 }
 
 void Editor::onProcessKeyboardEvent(const sf::Event& event) {

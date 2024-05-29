@@ -7,22 +7,16 @@ namespace fw {
 		// empty
 		type = WidgetType::Dropdown;
 		setName("dropdown");
-		// main
-		setName("main");
-		main_widget = widget_list.createWidget<RectangleWidget>(DROPDOWN_DEFAULT_SIZE);
-		main_widget->setClipChildren(true);
-		main_widget->setClickThrough(false);
-		main_widget->setFillColor(DROPDOWN_DEFAULT_MAIN_COLOR);
-		main_widget->setSizePolicy(Widget::SizePolicy::PARENT);
-		main_widget->setFocusableType(FocusableType::MODAL);
-		main_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
+		setClickThrough(false);
+		setFocusableType(FocusableType::MODAL);
+		OnLeftPress = [&](const sf::Vector2f& pos) {
 			togglePanel();
 		};
-		main_widget->OnFocused = [&]() {
+		OnFocused = [&]() {
 			LoggerTag dropdown_tag("dropdown");
 			logger << "OnFocused\n";
 		};
-		main_widget->OnFocusLost = [&]() {
+		OnFocusLost = [&]() {
 			LoggerTag dropdown_tag("dropdown");
 			logger << "OnFocusLost\n";
 			if (panel_widget->isVisible()) {
@@ -30,6 +24,12 @@ namespace fw {
 				logger << "Hiding panel\n";
 			}
 		};
+		// main
+		setName("main");
+		main_widget = widget_list.createWidget<RectangleWidget>(DROPDOWN_DEFAULT_SIZE);
+		main_widget->setClipChildren(true);
+		main_widget->setFillColor(DROPDOWN_DEFAULT_MAIN_COLOR);
+		main_widget->setSizePolicy(Widget::SizePolicy::PARENT);
 		main_widget->setParent(this);
 		// main text
 		text_widget = widget_list.createWidget<TextWidget>();
