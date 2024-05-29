@@ -32,8 +32,8 @@ namespace fw {
 		const CompVector<Widget*>& getWindowChildren() const;
 		RectangleWidget* getHeaderWidget() const;
 		RectangleWidget* getMainWidget() const;
-		RectangleWidget* getResizeWidget() const;
-		RectangleWidget* getOutlineWidget() const;
+		EmptyWidget* getResizeWidget() const;
+		EmptyWidget* getOutlineWidget() const;
 		void setHeaderVisible(bool value);
 		void setHeaderColor(const sf::Color& color);
 		void setHeaderText(const sf::String& text);
@@ -49,8 +49,8 @@ namespace fw {
 		RectangleWidget* header_widget = nullptr;
 		TextWidget* header_text_widget = nullptr;
 		RectangleWidget* main_widget = nullptr;
-		RectangleWidget* resize_widget = nullptr;
-		RectangleWidget* outline_widget = nullptr;
+		EmptyWidget* resize_widget = nullptr;
+		EmptyWidget* outline_widget = nullptr;
 		void setSizeInternal(float width, float height) override;
 
 	private:

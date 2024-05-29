@@ -73,9 +73,9 @@ namespace fw {
 		main_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::WINDOW));
 		// resize widget
 		sf::Vector2f resize_size(width + WINDOW_RESIZE_MARGIN * 2, WINDOW_HEADER_HEIGHT + height + WINDOW_RESIZE_MARGIN * 2);
-		resize_widget = widget_list.createWidget<RectangleWidget>(resize_size);
+		resize_widget = widget_list.createWidget<EmptyWidget>();
 		resize_widget->setName("resize");
-		resize_widget->setFillColor(sf::Color::Transparent);
+		resize_widget->setSize(resize_size);
 		resize_widget->setParentAnchor(Anchor::TOP_LEFT);
 		resize_widget->setAnchorOffset(-WINDOW_RESIZE_MARGIN, -WINDOW_RESIZE_MARGIN);
 		resize_widget->setClickThrough(false);
@@ -181,10 +181,10 @@ namespace fw {
 		resize_widget->setParent(this);
 		resize_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::RESIZE));
 		// outline
-		outline_widget = widget_list.createWidget<RectangleWidget>(width, WINDOW_HEADER_HEIGHT + height);
+		outline_widget = widget_list.createWidget<EmptyWidget>();
 		outline_widget->setName("outline");
-		outline_widget->setFillColor(sf::Color::Transparent);
-		outline_widget->OnAfterRender = [&](sf::RenderTarget& target) {
+		outline_widget->setSize(width, WINDOW_HEADER_HEIGHT + height);
+		outline_widget->OnAfterGlobalRender = [&](sf::RenderTarget& target) {
 			sf::FloatRect quantized_bounds = quantize_rect(
 				outline_widget->getGlobalBounds(),
 				QUANTIZE_MODE_FLOOR_SUBTRACT
@@ -239,11 +239,11 @@ namespace fw {
 		return main_widget;
 	}
 
-	RectangleWidget* WindowWidget::getResizeWidget() const {
+	EmptyWidget* WindowWidget::getResizeWidget() const {
 		return resize_widget;
 	}
 
-	RectangleWidget* WindowWidget::getOutlineWidget() const {
+	EmptyWidget* WindowWidget::getOutlineWidget() const {
 		return outline_widget;
 	}
 
