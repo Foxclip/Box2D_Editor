@@ -121,8 +121,8 @@ namespace fw {
 		}
 	}
 
-	bool Widget::isFocusable() const {
-		return is_focusable;
+	Widget::FocusableType Widget::getFocusableType() const {
+		return focusable_type;
 	}
 
 	bool Widget::isFocused() const {
@@ -667,9 +667,9 @@ namespace fw {
 		this->click_through = value;
 	}
 
-	void Widget::setFocusable(bool value) {
+	void Widget::setFocusableType(FocusableType value) {
 		wAssert(!widget_list.isLocked());
-		this->is_focusable = value;
+		this->focusable_type = value;
 	}
 
 	void Widget::setParentSilent(Widget* new_parent) {

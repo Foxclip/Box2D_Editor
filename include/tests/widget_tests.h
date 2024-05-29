@@ -83,7 +83,7 @@ struct GenericWidgetTest {
     fw::WidgetVisibility visibility;
 	bool is_click_through = false;
 	bool is_mouse_over = false;
-	bool is_focusable = false;
+	fw::Widget::FocusableType focusable_type = fw::Widget::FocusableType::NOT_FOCUSABLE;
 	bool is_focused = false;
 	bool clip_children = false;
 	bool force_custom_cursor = false;

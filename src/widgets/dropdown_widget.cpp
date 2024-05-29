@@ -14,7 +14,7 @@ namespace fw {
 		main_widget->setClickThrough(false);
 		main_widget->setFillColor(DROPDOWN_DEFAULT_MAIN_COLOR);
 		main_widget->setSizePolicy(Widget::SizePolicy::PARENT);
-		main_widget->setFocusable(true);
+		main_widget->setFocusableType(FocusableType::MODAL);
 		main_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
 			togglePanel();
 		};

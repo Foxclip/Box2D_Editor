@@ -16,7 +16,7 @@ namespace fw {
 		setName("textbox");
 		setClipChildren(true);
 		setClickThrough(false);
-		setFocusable(true);
+		setFocusableType(FocusableType::NORMAL);
 		setForceCustomCursor(true);
 		GetCursorType = []() {
 			return sf::Cursor::Text;

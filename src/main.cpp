@@ -43,12 +43,12 @@ int main() {
     //run_tests();
     execute_app();
 
-    // TODO: PolygonWidget
     // TODO: PolygonWidget test
     // TODO: Dropdown widget
     // TODO: DropdownWidget test
     // TODO: remake WindowWidget with containers
     // TODO: with_children option in removeWidget
+    // TODO: handle out of range floats in textbox (i.e. 2e999999)
     // TODO: POS_X entry depends on CHILDREN_X entry of the parent
     // TODO: WidgetList::removeWidget test, and Widget::remove test
     // TODO: require font for TextWidget

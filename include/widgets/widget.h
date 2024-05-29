@@ -72,6 +72,11 @@ namespace fw {
 			PARENT,
 			EXPAND
 		};
+		enum class FocusableType {
+			NOT_FOCUSABLE,
+			NORMAL, // can click on other widgets right away
+			MODAL // must click away first
+		};
 		ptrdiff_t debug_id = -1;
 
 		std::function<void(const sf::Vector2f& pos)> OnLeftPress = [](const sf::Vector2f& pos) { };
@@ -106,7 +111,7 @@ namespace fw {
 		void processLeftRelease(const sf::Vector2f& pos);
 		void processRightRelease(const sf::Vector2f& pos);
 		void processMouse(const sf::Vector2f& pos);
-		bool isFocusable() const;
+		FocusableType getFocusableType() const;
 		bool isFocused() const;
 		bool getForceCustomCursor() const;
 		const std::string& getName() const;
@@ -208,7 +213,7 @@ namespace fw {
 		void setVisible(bool value);
 		void toggleVisible();
 		void setClickThrough(bool value);
-		void setFocusable(bool value);
+		void setFocusableType(FocusableType value);
 		void setParentSilent(Widget* new_parent);
 		void setParent(Widget* new_parent);
 		void lockChildren();
@@ -261,7 +266,7 @@ namespace fw {
 		sf::Vector2f max_size = sf::Vector2f(-1.0f, -1.0f); // negative values - unlimited
 		bool visible = true;
 		bool renderable = true;
-		bool is_focusable = false;
+		FocusableType focusable_type = FocusableType::NOT_FOCUSABLE;
 		bool click_through = true;
 		bool clip_children = false;
 		bool mouseIn = false;

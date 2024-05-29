@@ -124,18 +124,30 @@ namespace fw {
 	void WidgetList::processLeftPress(const sf::Vector2f pos) {
 		wAssert(!isLocked());
 		CompVector<Widget*> widgets = getWidgetsUnderCursor(true, click_blocked);
+		bool modal_focus = focused_widget && focused_widget->getFocusableType() == Widget::FocusableType::MODAL;
+		if (modal_focus) {
+			click_blocked = true;
+		}
+		CompVector<Widget*> widgets_for_processing;
 		// setting focused widget
 		Widget* focused = nullptr;
 		for (size_t i = 0; i < widgets.size(); i++) {
 			Widget* widget = widgets[i];
-			if (!focused && widget->isFocusable()) {
+			// modal widgets do not allow to interact with other widgets right away
+			if (modal_focus) {
+				if (!widget->getParentChain().contains(focused_widget)) {
+					continue;
+				}
+			}
+			widgets_for_processing.add(widget);
+			if (!focused && widget->getFocusableType() != Widget::FocusableType::NOT_FOCUSABLE) {
 				focused = widget;
 			}
 		}
 		setFocusedWidget(focused);
 		// processLeftPress can modify focus after it was set
-		for (size_t i = 0; i < widgets.size(); i++) {
-			Widget* widget = widgets[i];
+		for (size_t i = 0; i < widgets_for_processing.size(); i++) {
+			Widget* widget = widgets_for_processing[i];
 			widget->processLeftPress(pos);
 		}
 	}
@@ -250,7 +262,7 @@ namespace fw {
 			return;
 		}
 		if (widget) {
-			if (!widget->isFocusable()) {
+			if (widget->getFocusableType() == Widget::FocusableType::NOT_FOCUSABLE) {
 				return;
 			}
 			wAssert(widgets.contains(widget));
