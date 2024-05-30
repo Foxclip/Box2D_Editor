@@ -186,6 +186,7 @@ private:
 	static std::string floatRectToStr(const sf::FloatRect& rect);
 	static std::string colorToStr(const sf::Color& color);
 	static std::string anchorToStr(fw::Widget::Anchor anchor);
+	static bool rectApproxCmp(const sf::FloatRect& left, const sf::FloatRect& right);
 	fw::TextBoxWidget* initTextBox(fw::Application& application, float width, float height) const;
 	void resizeWindow(
 		fw::Application& application,

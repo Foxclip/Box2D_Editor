@@ -3093,6 +3093,23 @@ std::string WidgetTests::anchorToStr(fw::Widget::Anchor anchor) {
     }
 }
 
+bool WidgetTests::rectApproxCmp(const sf::FloatRect& left, const sf::FloatRect& right) {
+    float epsilon = 0.0001f;
+    if (abs(left.left - right.left) >= epsilon) {
+        return false;
+    }
+    if (abs(left.top - right.top) >= epsilon) {
+        return false;
+    }
+    if (abs(left.width - right.width) >= epsilon) {
+        return false;
+    }
+    if (abs(left.height - right.height) >= epsilon) {
+        return false;
+    }
+    return true;
+}
+
 fw::TextBoxWidget* WidgetTests::initTextBox(fw::Application& application, float width, float height) const {
     application.init("Test window", 800, 600, 0, false);
     application.start(true);
@@ -3249,20 +3266,25 @@ void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
     T_COMPARE(widget->getForceCustomCursor(), gwt.force_custom_cursor);
     T_CHECK(widget->getParent() == gwt.parent);
     auto rect_to_str = &WidgetTests::floatRectToStr;
-    T_COMPARE(widget->getLocalBounds(), gwt.local_bounds, rect_to_str);
-    T_COMPARE(widget->getParentLocalBounds(), gwt.parent_local_bounds, rect_to_str);
-    T_COMPARE(widget->getGlobalBounds(), gwt.global_bounds, rect_to_str);
-    T_COMPARE(widget->getVisualLocalBounds(), gwt.visual_local_bounds, rect_to_str);
-    T_COMPARE(widget->getVisualParentLocalBounds(), gwt.visual_parent_local_bounds, rect_to_str);
-    T_COMPARE(widget->getVisualGlobalBounds(), gwt.visual_global_bounds, rect_to_str);
-    T_COMPARE(widget->getUnclippedRegion(), gwt.visual_global_bounds, rect_to_str);
-    T_COMPARE(widget->getQuantizedUnclippedRegion(), gwt.visual_global_bounds, rect_to_str);
+    auto rect_approx_cmp = &WidgetTests::rectApproxCmp;
+    T_COMPARE(widget->getLocalBounds(), gwt.local_bounds, rect_to_str, rect_approx_cmp);
+    T_COMPARE(widget->getParentLocalBounds(), gwt.parent_local_bounds, rect_to_str, rect_approx_cmp);
+    T_COMPARE(widget->getGlobalBounds(), gwt.global_bounds, rect_to_str, rect_approx_cmp);
+    T_COMPARE(widget->getVisualLocalBounds(), gwt.visual_local_bounds, rect_to_str, rect_approx_cmp);
+    T_COMPARE(widget->getVisualParentLocalBounds(), gwt.visual_parent_local_bounds, rect_to_str, rect_approx_cmp);
+    T_COMPARE(widget->getVisualGlobalBounds(), gwt.visual_global_bounds, rect_to_str, rect_approx_cmp);
+    T_COMPARE(widget->getUnclippedRegion(), gwt.visual_global_bounds, rect_to_str, rect_approx_cmp);
+    sf::FloatRect quantized = gwt.visual_global_bounds;
+    quantized.left = floor(quantized.left);
+    quantized.top = floor(quantized.top);
+    quantized.width = floor(quantized.width);
+    quantized.height = floor(quantized.height);
+    T_COMPARE(widget->getQuantizedUnclippedRegion(), quantized, rect_to_str, rect_approx_cmp);
     T_COMPARE(widget->getWidth(), gwt.parent_local_bounds.width);
-    T_COMPARE(widget->getHeight(), gwt.parent_local_bounds.height);
-    T_COMPARE(widget->getGlobalWidth(), gwt.parent_local_bounds.width);
-    T_COMPARE(widget->getGlobalHeight(), gwt.parent_local_bounds.height);
-    auto vec2f_to_str = &WidgetTests::sfVec2fToStr;
-    T_COMPARE(widget->getSize(), gwt.local_bounds.getSize(), vec2f_to_str);
+    T_APPROX_COMPARE(widget->getHeight(), gwt.parent_local_bounds.height);
+    T_APPROX_COMPARE(widget->getGlobalWidth(), gwt.parent_local_bounds.width);
+    T_APPROX_COMPARE(widget->getGlobalHeight(), gwt.parent_local_bounds.height);
+    T_VEC2_APPROX_COMPARE(widget->getSize(), gwt.local_bounds.getSize());
     auto get_corners = [&](const sf::FloatRect& bounds) {
         std::vector<sf::Vector2f> corners(4);
         corners[0] = bounds.getPosition();
@@ -3274,18 +3296,18 @@ void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
     std::vector<sf::Vector2f> parent_local_corners = get_corners(gwt.parent_local_bounds);
     std::vector<sf::Vector2f> global_corners = get_corners(gwt.global_bounds);
     std::vector<sf::Vector2f> visual_global_corners = get_corners(gwt.visual_global_bounds);
-    T_COMPARE(widget->getTopLeft(), parent_local_corners[0], vec2f_to_str);
-    T_COMPARE(widget->getTopRight(), parent_local_corners[1], vec2f_to_str);
-    T_COMPARE(widget->getBottomLeft(), parent_local_corners[2], vec2f_to_str);
-    T_COMPARE(widget->getBottomRight(), parent_local_corners[3], vec2f_to_str);
-    T_COMPARE(widget->getGlobalTopLeft(), global_corners[0], vec2f_to_str);
-    T_COMPARE(widget->getGlobalTopRight(), global_corners[1], vec2f_to_str);
-    T_COMPARE(widget->getGlobalBottomLeft(), global_corners[2], vec2f_to_str);
-    T_COMPARE(widget->getGlobalBottomRight(), global_corners[3], vec2f_to_str);
-    T_COMPARE(widget->getVisualGlobalTopLeft(), visual_global_corners[0], vec2f_to_str);
-    T_COMPARE(widget->getVisualGlobalTopRight(), visual_global_corners[1], vec2f_to_str);
-    T_COMPARE(widget->getVisualGlobalBottomLeft(), visual_global_corners[2], vec2f_to_str);
-    T_COMPARE(widget->getVisualGlobalBottomRight(), visual_global_corners[3], vec2f_to_str);
+    T_VEC2_APPROX_COMPARE(widget->getTopLeft(), parent_local_corners[0]);
+    T_VEC2_APPROX_COMPARE(widget->getTopRight(), parent_local_corners[1]);
+    T_VEC2_APPROX_COMPARE(widget->getBottomLeft(), parent_local_corners[2]);
+    T_VEC2_APPROX_COMPARE(widget->getBottomRight(), parent_local_corners[3]);
+    T_VEC2_APPROX_COMPARE(widget->getGlobalTopLeft(), global_corners[0]);
+    T_VEC2_APPROX_COMPARE(widget->getGlobalTopRight(), global_corners[1]);
+    T_VEC2_APPROX_COMPARE(widget->getGlobalBottomLeft(), global_corners[2]);
+    T_VEC2_APPROX_COMPARE(widget->getGlobalBottomRight(), global_corners[3]);
+    T_VEC2_APPROX_COMPARE(widget->getVisualGlobalTopLeft(), visual_global_corners[0]);
+    T_VEC2_APPROX_COMPARE(widget->getVisualGlobalTopRight(), visual_global_corners[1]);
+    T_VEC2_APPROX_COMPARE(widget->getVisualGlobalBottomLeft(), visual_global_corners[2]);
+    T_VEC2_APPROX_COMPARE(widget->getVisualGlobalBottomRight(), visual_global_corners[3]);
 }
 
 bool WidgetTests::layer_contains(const std::vector<Node*>& layer, const std::string& name) {

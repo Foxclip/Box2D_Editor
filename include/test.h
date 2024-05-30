@@ -154,6 +154,8 @@ namespace test {
 		static bool testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected);
 		template<typename T1, typename T2, typename TStr>
 		static bool testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str);
+		template<typename T1, typename T2, typename TStr, typename TCmp>
+		static bool testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str, TCmp cmp);
 		template<typename T>
 		static bool testApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, T epsilon = 0.0001f);
 		template<typename T>
@@ -199,6 +201,15 @@ namespace test {
 	template<typename T1, typename T2, typename TStr>
 	inline bool TestModule::testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str) {
 		if (actual != expected) {
+			compareFail(test, file, line, name, actual, expected, to_str);
+			return false;
+		}
+		return true;
+	}
+
+	template<typename T1, typename T2, typename TStr, typename TCmp>
+	inline bool TestModule::testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str, TCmp cmp) {
+		if (!cmp(actual, expected)) {
 			compareFail(test, file, line, name, actual, expected, to_str);
 			return false;
 		}
