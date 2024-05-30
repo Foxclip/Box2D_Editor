@@ -102,12 +102,19 @@ namespace fw {
 		return option_widgets[index];
 	}
 
+	TextWidget* DropdownWidget::getOptionTextWidget(size_t index) const {
+		wAssert(index >= 0 && index < option_widgets.size());
+		RectangleWidget* option_widget = option_widgets[index];
+		TextWidget* text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
+		return text_widget;
+	}
+
 	ptrdiff_t DropdownWidget::getValue() const {
 		return selected;
 	}
 
 	void DropdownWidget::addOption(const sf::String& text, ptrdiff_t index) {
-		wAssert(index == -1 || index < (ptrdiff_t)option_widgets.size() - 1);
+		wAssert(index == -1 || index < (ptrdiff_t)option_widgets.size());
 		if (index < 0) {
 			index = option_widgets.size();
 		}
@@ -143,6 +150,7 @@ namespace fw {
 	void DropdownWidget::removeOption(size_t index) {
 		wAssert(index >= 0 && index < option_widgets.size());
 		option_widgets[index]->remove();
+		option_widgets.erase(option_widgets.begin() + index);
 		updateOptions();
 	}
 

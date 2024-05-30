@@ -34,6 +34,7 @@ namespace fw {
 		RectangleWidget* getMainWidget() const;
 		RectangleWidget* getPanelWidget() const;
 		RectangleWidget* getOptionWidget(size_t index) const;
+		TextWidget* getOptionTextWidget(size_t index) const;
 		ptrdiff_t getValue() const;
 		void setMainBackgroundColor(const sf::Color& color);
 		void setOptionHoverBackgroundColor(const sf::Color& color);

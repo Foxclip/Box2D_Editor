@@ -249,7 +249,7 @@ namespace test {
 		std::string location_str = "[" + filename + ":" + std::to_string(line) + "]";
 		Test::Error* error = test.getCurrentError()->add(name + " " + location_str);
 		error->add("Expected value: " + to_str(expected));
-		error->add("  Actual value: " + to_str(actual));
+		error->add("Actual value:   " + to_str(actual));
 		test.result = false;
 	}
 
