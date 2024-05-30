@@ -58,6 +58,7 @@ namespace fw {
 		panel_widget->setClickThrough(false);
 		panel_widget->setFillColor(DROPDOWN_DEFAULT_PANEL_COLOR);
 		panel_widget->setParentAnchor(Anchor::BOTTOM_LEFT);
+		panel_widget->setGlobalRenderLayer(GlobalRenderLayer::DROPDOWN_PANEL);
 		panel_widget->setParent(this);
 	}
 
@@ -117,6 +118,15 @@ namespace fw {
 		return selected;
 	}
 
+	bool DropdownWidget::isPanelOpen() const {
+		return panel_widget->isVisible();
+	}
+
+	void DropdownWidget::setSize(float width, float height) {
+		setSizeInternal(width, height);
+		updateOptionSize();
+	}
+
 	void DropdownWidget::addOption(const sf::String& text, ptrdiff_t index) {
 		wAssert(index == -1 || index < (ptrdiff_t)option_widgets.size());
 		if (index < 0) {
@@ -133,16 +143,29 @@ namespace fw {
 		option_widget->OnMouseExit = [&, option_widget](const sf::Vector2f& pos) {
 			option_widget->setFillColor(sf::Color::Transparent);
 		};
+		option_widget->setGlobalRenderLayer(GlobalRenderLayer::DROPDOWN_PANEL);
 		option_widgets.insert(option_widgets.begin() + index, option_widget);
 		TextWidget* option_text_widget = widget_list.createWidget<TextWidget>();
 		if (text_widget->getFont()) {
 			option_text_widget->setFont(*text_widget->getFont());
 		}
 		option_text_widget->setCharacterSize(text_widget->getCharacterSize());
+		option_text_widget->setParentAnchor(text_widget->getParentAnchor());
+		option_text_widget->setOrigin(text_widget->getOriginAnchor());
 		option_text_widget->setFillColor(panel_text_color);
 		option_text_widget->setString(text);
 		option_text_widget->setParent(option_widget);
+		option_text_widget->setGlobalRenderLayer(GlobalRenderLayer::DROPDOWN_PANEL);
 		updateOptions();
+	}
+
+	void DropdownWidget::selectOption(size_t index) {
+		wAssert(index >= 0 && index < option_widgets.size());
+		selected = index;
+		OnValueChanged(index);
+		RectangleWidget* option = option_widgets[index];
+		std::string text = dynamic_cast<TextWidget*>(option->find("text"))->getString();
+		text_widget->setString(text);
 	}
 
 	void DropdownWidget::setOptionText(size_t index, const sf::String& text) {
@@ -172,7 +195,6 @@ namespace fw {
 	}
 
 	void DropdownWidget::updateOptions() {
-		float max_text_width = 0.0f;
 		for (size_t i = 0; i < option_widgets.size(); i++) {
 			RectangleWidget* option_widget = option_widgets[i];
 			option_widget->setName("option" + std::to_string(i));
@@ -180,6 +202,14 @@ namespace fw {
 				selectOption(i);
 				hidePanel();
 			};
+		}
+		updateOptionSize();
+	}
+
+	void DropdownWidget::updateOptionSize() {
+		float max_text_width = 0.0f;
+		for (size_t i = 0; i < option_widgets.size(); i++) {
+			RectangleWidget* option_widget = option_widgets[i];
 			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
 			float text_width = option_text_widget->getWidth();
 			max_text_width = std::max(max_text_width, text_width);
@@ -193,15 +223,6 @@ namespace fw {
 		}
 		panel_widget->setWidth(options_width);
 		panel_widget->setHeight(main_widget->getHeight() * option_widgets.size());
-	}
-
-	void DropdownWidget::selectOption(size_t index) {
-		wAssert(index >= 0 && index < option_widgets.size());
-		selected = index;
-		OnValueChanged(index);
-		RectangleWidget* option = option_widgets[index];
-		std::string text = dynamic_cast<TextWidget*>(option->find("text"))->getString();
-		text_widget->setString(text);
 	}
 
 	void DropdownWidget::setMainBackgroundColor(const sf::Color& color) {
@@ -252,6 +273,22 @@ namespace fw {
 			RectangleWidget* option_widget = option_widgets[i];
 			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
 			option_text_widget->setCharacterSize(size);
+		}
+	}
+
+	void DropdownWidget::setTextAnchor(Anchor anchor) {
+		text_widget->setParentAnchor(anchor);
+		for (size_t i = 0; i < option_widgets.size(); i++) {
+			TextWidget* option_text_widget = getOptionTextWidget(i);
+			option_text_widget->setParentAnchor(anchor);
+		}
+	}
+
+	void DropdownWidget::setTextOriginAnchor(Anchor anchor) {
+		text_widget->setOrigin(anchor);
+		for (size_t i = 0; i < option_widgets.size(); i++) {
+			TextWidget* option_text_widget = getOptionTextWidget(i);
+			option_text_widget->setOrigin(anchor);
 		}
 	}
 

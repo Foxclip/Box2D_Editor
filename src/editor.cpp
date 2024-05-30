@@ -322,16 +322,6 @@ void Editor::initWidgets() {
     logger_text_widget->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
-
-    fw::DropdownWidget* dropdown_widget = widgets.createWidget<fw::DropdownWidget>();
-    dropdown_widget->setFont(console_font);
-    dropdown_widget->setCharacterSize(15);
-    dropdown_widget->setSize(100.0f, 20.0f);
-    dropdown_widget->addOption("option");
-    dropdown_widget->addOption("really long option");
-    dropdown_widget->addOption("another option");
-    dropdown_widget->setGlobalPosition(400.0f, 300.0f);
-    widgets.setFocusedWidget(dropdown_widget);
 }
 
 void Editor::onProcessKeyboardEvent(const sf::Event& event) {

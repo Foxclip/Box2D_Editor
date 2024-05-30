@@ -40,11 +40,9 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
-    run_tests();
-    //execute_app();
+    //run_tests();
+    execute_app();
 
-    // TODO: DropdownWidget test
-    // TODO: remake EditWindow type parameter with DropdownWidget
     // TODO: remake WindowWidget with containers
     // TODO: with_children option in removeWidget
     // TODO: handle out of range floats in textbox (i.e. 2e999999)

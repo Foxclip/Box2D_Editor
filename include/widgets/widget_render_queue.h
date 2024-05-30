@@ -10,7 +10,7 @@ namespace fw {
 
 	enum class GlobalRenderLayer {
 		BASE,
-		SECOND,
+		DROPDOWN_PANEL,
 	};
 
 	struct RenderQueueLayer {

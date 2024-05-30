@@ -33,15 +33,19 @@ void EditWindow::updateParameters() {
 }
 
 void EditWindow::createParameters() {
-    createParameter<BoolParameter>(
-        "dynamic parameter",
-        "Dynamic:",
-        [=]() {
-            return app.active_object->getBodyType() == b2_dynamicBody;
+    createParameter<ListParameter>(
+        "type parameter",
+        "Type:",
+        std::vector<std::string> {
+            "static",
+            "kinematic",
+            "dynamic"
         },
-        [=](bool value) {
-            b2BodyType type = value ? b2_dynamicBody : b2_staticBody;
-            app.active_object->setType(type, false);
+        [=]() {
+            return app.active_object->getBodyType();
+        },
+        [=](ptrdiff_t value) {
+            app.active_object->setType(static_cast<b2BodyType>(value), false);
             app.commit_action = true;
         }
     );
@@ -192,6 +196,18 @@ fw::CheckboxWidget* EditWindowParameter::createCheckboxWidget() {
     return app.widgets.createWidget<fw::CheckboxWidget>();
 }
 
+fw::DropdownWidget* EditWindowParameter::createDropdownWidget() {
+    fw::DropdownWidget* dropdown_widget = app.widgets.createWidget<fw::DropdownWidget>();
+    dropdown_widget->setFont(app.textbox_font);
+    dropdown_widget->setCharacterSize(12);
+    dropdown_widget->setTextAnchor(fw::Widget::Anchor::CENTER_LEFT);
+    dropdown_widget->setTextOriginAnchor(fw::Widget::Anchor::CENTER_LEFT);
+    dropdown_widget->setSize(100.0f, 20.0f);
+    dropdown_widget->setSizeXPolicy(fw::Widget::SizePolicy::EXPAND);
+    dropdown_widget->setMinSize(100.0f, 0.0f);
+    return dropdown_widget;
+}
+
 TextParameter::TextParameter(
     EditWindow& p_edit_window,
     const std::string& name,
@@ -267,5 +283,34 @@ void FloatParameter::getValue() const {
     if (!textbox_widget->isEditMode()) {
         std::string str = utils::floatToStr(get_value(), 9);
         this->textbox_widget->setValueSilent(str);
+    }
+}
+
+ListParameter::ListParameter(
+    EditWindow& p_edit_window,
+    const std::string& name,
+    const std::string& text,
+    const std::vector<std::string>& value_list,
+    std::function<ptrdiff_t(void)> get_value,
+    std::function<void(ptrdiff_t)> set_value
+) : EditWindowParameter(p_edit_window) {
+    this->get_value = get_value;
+    this->set_value = set_value;
+    this->widget = createParameterWidget(name, text);
+    this->dropdown_widget = createDropdownWidget();
+    for (size_t i = 0; i < value_list.size(); i++) {
+        this->dropdown_widget->addOption(value_list[i]);
+    }
+    this->dropdown_widget->OnValueChanged = [&](ptrdiff_t new_value) {
+        if (this->get_value() != new_value) {
+            this->set_value(new_value);
+        }
+    };
+    this->dropdown_widget->setParent(widget);
+}
+
+void ListParameter::getValue() const {
+    if (!dropdown_widget->isPanelOpen()) {
+        dropdown_widget->selectOption(get_value());
     }
 }

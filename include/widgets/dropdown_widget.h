@@ -21,7 +21,7 @@ namespace fw {
 
 	class DropdownWidget : public EmptyWidget {
 	public:
-		std::function<void(size_t index)> OnValueChanged = [](size_t index) { };
+		std::function<void(size_t index)> OnValueChanged = [](ptrdiff_t index) { };
 
 		DropdownWidget(WidgetList& widget_list);
 		const sf::Color& getMainBackgroundColor() const;
@@ -37,6 +37,9 @@ namespace fw {
 		TextWidget* getOptionTextWidget(size_t index) const;
 		const sf::String& getOptionText(size_t index) const;
 		ptrdiff_t getValue() const;
+		bool isPanelOpen() const;
+		using Widget::setSize;
+		void setSize(float width, float height) override;
 		void setMainBackgroundColor(const sf::Color& color);
 		void setOptionHoverBackgroundColor(const sf::Color& color);
 		void setTriangleColor(const sf::Color& color);
@@ -46,10 +49,13 @@ namespace fw {
 		void setPanelTextColor(const sf::Color& color);
 		void setFont(const sf::Font& font);
 		void setCharacterSize(unsigned int size);
+		void setTextAnchor(Anchor anchor);
+		void setTextOriginAnchor(Anchor anchor);
 		void showPanel();
 		void hidePanel();
 		void togglePanel();
 		void addOption(const sf::String& text, ptrdiff_t index = -1);
+		void selectOption(size_t index);
 		void setOptionText(size_t index, const sf::String& text);
 		void removeOption(size_t index);
 		void removeOption(const sf::String& text);
@@ -68,7 +74,7 @@ namespace fw {
 		sf::Color panel_text_color = DROPDOWN_DEFAULT_PANEL_TEXT_COLOR;
 
 		void updateOptions();
-		void selectOption(size_t index);
+		void updateOptionSize();
 
 	};
 

@@ -760,7 +760,7 @@ namespace fw {
 		this->clip_children = value;
 	}
 
-	void Widget::setRenderLayer(GlobalRenderLayer layer) {
+	void Widget::setGlobalRenderLayer(GlobalRenderLayer layer) {
 		wAssert(!widget_list.isLocked());
 		this->global_layer = layer;
 	}

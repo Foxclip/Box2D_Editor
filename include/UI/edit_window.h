@@ -26,6 +26,7 @@ protected:
 	);
 	fw::TextBoxWidget* createTextBoxWidget();
 	fw::CheckboxWidget* createCheckboxWidget();
+	fw::DropdownWidget* createDropdownWidget();
 
 private:
 	EditWindow& edit_window;
@@ -80,6 +81,24 @@ private:
 	std::function<float(void)> get_value;
 	std::function<void(float)> set_value;
 	fw::TextBoxWidget* textbox_widget = nullptr;
+};
+
+class ListParameter : public EditWindowParameter {
+public:
+	ListParameter(
+		EditWindow& p_edit_window,
+		const std::string& name,
+		const std::string& text,
+		const std::vector<std::string>& value_list,
+		std::function<ptrdiff_t(void)> get_value,
+		std::function<void(ptrdiff_t)> set_value
+	);
+	void getValue() const override;
+
+private:
+	std::function<ptrdiff_t(void)> get_value;
+	std::function<void(ptrdiff_t)> set_value;
+	fw::DropdownWidget* dropdown_widget = nullptr;
 };
 
 class EditWindow : public fw::WindowWidget {

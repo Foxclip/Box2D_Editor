@@ -225,7 +225,7 @@ namespace fw {
 		void setForceCustomCursor(bool value);
 		void setName(const std::string& new_name);
 		void setClipChildren(bool value);
-		void setRenderLayer(GlobalRenderLayer layer);
+		void setGlobalRenderLayer(GlobalRenderLayer layer);
 		void setLocalRenderLayer(size_t layer);
 		void setParentLocalRenderLayer(size_t layer);
 		void setShader(sf::Shader* shader);
