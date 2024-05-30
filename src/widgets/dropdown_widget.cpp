@@ -25,8 +25,8 @@ namespace fw {
 			}
 		};
 		// main
-		setName("main");
 		main_widget = widget_list.createWidget<RectangleWidget>(DROPDOWN_DEFAULT_SIZE);
+		main_widget->setName("main");
 		main_widget->setClipChildren(true);
 		main_widget->setFillColor(DROPDOWN_DEFAULT_MAIN_COLOR);
 		main_widget->setSizePolicy(Widget::SizePolicy::PARENT);
@@ -38,6 +38,7 @@ namespace fw {
 		text_widget->setParent(main_widget);
 		// main square
 		square_widget = widget_list.createWidget<RectangleWidget>(main_widget->getHeight(), main_widget->getHeight());
+		square_widget->setName("square");
 		square_widget->setFillColor(DROPDOWN_DEFAULT_SQUARE_COLOR);
 		square_widget->setParentAnchor(Anchor::TOP_RIGHT);
 		square_widget->setOrigin(Anchor::TOP_RIGHT);
@@ -46,11 +47,13 @@ namespace fw {
 		// main triangle
 		std::vector<sf::Vector2f> vertices = get_regular_polygon<sf::Vector2f>(3, 5.0f, to_radians(90.0f));
 		triangle_widget = widget_list.createWidget<PolygonWidget>(vertices);
+		triangle_widget->setName("triangle");
 		triangle_widget->setFillColor(DROPDOWN_DEFAULT_TRIANGLE_COLOR);
 		triangle_widget->setParentAnchor(Anchor::CENTER);
 		triangle_widget->setParent(square_widget);
 		// options panel
 		panel_widget = widget_list.createWidget<RectangleWidget>(100.0f, 100.0f);
+		panel_widget->setName("panel");
 		panel_widget->setClickThrough(false);
 		panel_widget->setFillColor(DROPDOWN_DEFAULT_PANEL_COLOR);
 		panel_widget->setParentAnchor(Anchor::BOTTOM_LEFT);

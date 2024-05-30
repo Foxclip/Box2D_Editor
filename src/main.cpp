@@ -43,7 +43,6 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: PolygonWidget test
     // TODO: DropdownWidget test
     // TODO: remake EditWindow type parameter with DropdownWidget
     // TODO: remake WindowWidget with containers

@@ -155,6 +155,7 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* window_widget_chain_test = list->addTest("window_widget_chain", { window_widget_children_test, window_widget_resize_test }, [&](test::Test& test) { windowWidgetChainTest(test); });
     test::Test* window_widget_drag_limits_test = list->addTest("window_widget_drag_limits", { window_widget_drag_test, window_widget_chain_test }, [&](test::Test& test) { windowWidgetDragLimitsTest(test); });
     test::Test* window_widget_resize_limits_test = list->addTest("window_widget_resize_limits", { window_widget_chain_test }, [&](test::Test& test) { windowWidgetResizeLimitsTest(test); });
+    test::Test* dropdown_widget_basic_test = list->addTest("dropdown_widget_basic", { rectangle_widget_test, polygon_widget_basic_test, text_widget_test }, [&](test::Test& test) { dropdownWidgetBasicTest(test); });
 }
 
 void WidgetTests::beforeRunModule() {
@@ -3028,6 +3029,52 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
             sf::FloatRect(sf::Vector2f(child_pos.x, child_pos.y), new_size)
         ));
     }
+}
+
+void WidgetTests::dropdownWidgetBasicTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    fw::DropdownWidget* dropdown_widget = application.getWidgets().createWidget<fw::DropdownWidget>();
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(dropdown_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(40.0f, 20.0f);
+    dropdown_widget->setPosition(position);
+    dropdown_widget->setSize(size);
+
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = dropdown_widget;
+    gwt.total_widgets = 7;
+    gwt.type = fw::Widget::WidgetType::Dropdown;
+    gwt.name = "dropdown";
+    gwt.fullname = "root|dropdown";
+    gwt.is_visual_position_quantized = false;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
+    visibility.opaque = false;
+    visibility.renderableSetting = false;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
+    gwt.is_click_through = false;
+    gwt.is_mouse_over = false;
+    gwt.focusable_type = fw::Widget::FocusableType::MODAL;
+    gwt.is_focused = false;
+    gwt.clip_children = false;
+    gwt.force_custom_cursor = false;
+    gwt.parent = root_widget;
+    gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+    gwt.global_bounds = sf::FloatRect(position, size);
+    gwt.parent_local_bounds = gwt.global_bounds;
+    gwt.visual_local_bounds = gwt.local_bounds;
+    gwt.visual_global_bounds = gwt.global_bounds;
+    gwt.visual_parent_local_bounds = gwt.global_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {

@@ -54,7 +54,6 @@ namespace fw {
 		TextWidget* text_widget = nullptr;
 		PolygonWidget* triangle_widget = nullptr;
 		RectangleWidget* square_widget = nullptr;
-
 		RectangleWidget* panel_widget = nullptr;
 		std::vector<RectangleWidget*> option_widgets;
 
