@@ -26,7 +26,7 @@ namespace fw {
 
 	protected:
 		void internalUpdate() override;
-		void internalOnLeftPress(const sf::Vector2f& pos) override;
+		void internalOnLeftPress(const sf::Vector2f& pos, bool became_focused) override;
 		void internalOnMouseEnter(const sf::Vector2f& pos) override;
 		void internalOnMouseExit(const sf::Vector2f& pos) override;
 

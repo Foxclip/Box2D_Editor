@@ -72,11 +72,11 @@ namespace fw {
 		return v;
 	}
 
-	void Widget::processLeftPress(const sf::Vector2f& pos) {
+	void Widget::processLeftPress(const sf::Vector2f& pos, bool became_focused) {
 		if (!visible) {
 			return;
 		}
-		internalOnLeftPress(pos);
+		internalOnLeftPress(pos, became_focused);
 		OnLeftPress(pos);
 	}
 
@@ -901,7 +901,7 @@ namespace fw {
 
 	void Widget::internalOnSetParent(Widget* parent) { }
 
-	void Widget::internalOnLeftPress(const sf::Vector2f& pos) { }
+	void Widget::internalOnLeftPress(const sf::Vector2f& pos, bool became_focused) { }
 
 	void Widget::internalOnRightPress(const sf::Vector2f& pos) { }
 

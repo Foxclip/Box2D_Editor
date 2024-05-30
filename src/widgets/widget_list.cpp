@@ -130,7 +130,7 @@ namespace fw {
 		}
 		CompVector<Widget*> widgets_for_processing;
 		// setting focused widget
-		Widget* focused = nullptr;
+		Widget* new_focused = nullptr;
 		for (size_t i = 0; i < widgets.size(); i++) {
 			Widget* widget = widgets[i];
 			// modal widgets do not allow to interact with other widgets right away
@@ -140,15 +140,17 @@ namespace fw {
 				}
 			}
 			widgets_for_processing.add(widget);
-			if (!focused && widget->getFocusableType() != Widget::FocusableType::NOT_FOCUSABLE) {
-				focused = widget;
+			if (!new_focused && widget->getFocusableType() != Widget::FocusableType::NONE) {
+				new_focused = widget;
 			}
 		}
-		setFocusedWidget(focused);
+		Widget* prev_focused = focused_widget;
+		setFocusedWidget(new_focused);
 		// processLeftPress can modify focus after it was set
 		for (size_t i = 0; i < widgets_for_processing.size(); i++) {
 			Widget* widget = widgets_for_processing[i];
-			widget->processLeftPress(pos);
+			bool became_focused = widget == new_focused && widget != prev_focused;
+			widget->processLeftPress(pos, became_focused);
 		}
 	}
 
@@ -262,7 +264,7 @@ namespace fw {
 			return;
 		}
 		if (widget) {
-			if (widget->getFocusableType() == Widget::FocusableType::NOT_FOCUSABLE) {
+			if (widget->getFocusableType() == Widget::FocusableType::NONE) {
 				return;
 			}
 			wAssert(widgets.contains(widget));

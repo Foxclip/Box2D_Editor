@@ -97,7 +97,7 @@ namespace fw {
 		};
 		void internalUpdate() override;
 		void updateColors();
-		void internalOnLeftPress(const sf::Vector2f& pos) override;
+		void internalOnLeftPress(const sf::Vector2f& pos, bool became_focused) override;
 		void internalOnLeftRelease(const sf::Vector2f& pos) override;
 		void internalOnEditModeToggle(bool value);
 		void internalOnFocused() override;

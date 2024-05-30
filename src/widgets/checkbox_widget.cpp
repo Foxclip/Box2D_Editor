@@ -64,7 +64,7 @@ namespace fw {
 		check_widget->setSize(rect.getSize() * check_size);
 	}
 
-	void CheckboxWidget::internalOnLeftPress(const sf::Vector2f& pos) {
+	void CheckboxWidget::internalOnLeftPress(const sf::Vector2f& pos, bool became_focused) {
 		toggleValue();
 	}
 

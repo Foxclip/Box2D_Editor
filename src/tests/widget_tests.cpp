@@ -692,7 +692,7 @@ void WidgetTests::rootWidgetTest(test::Test& test) {
     gwt.visibility = visibility;
     gwt.is_click_through = true;
     gwt.is_mouse_over = true;
-    gwt.focusable_type = fw::Widget::FocusableType::NOT_FOCUSABLE;
+    gwt.focusable_type = fw::Widget::FocusableType::NONE;
     gwt.is_focused = false;
     gwt.clip_children = true;
     gwt.force_custom_cursor = false;
@@ -744,7 +744,7 @@ void WidgetTests::emptyWidgetTest(test::Test& test) {
     gwt.visibility = visibility;
     gwt.is_click_through = true;
     gwt.is_mouse_over = false;
-    gwt.focusable_type = fw::Widget::FocusableType::NOT_FOCUSABLE;
+    gwt.focusable_type = fw::Widget::FocusableType::NONE;
     gwt.is_focused = false;
     gwt.clip_children = false;
     gwt.force_custom_cursor = false;
@@ -794,7 +794,7 @@ void WidgetTests::rectangleWidgetTest(test::Test& test) {
     gwt.visibility = visibility;
     gwt.is_click_through = true;
     gwt.is_mouse_over = false;
-    gwt.focusable_type = fw::Widget::FocusableType::NOT_FOCUSABLE;
+    gwt.focusable_type = fw::Widget::FocusableType::NONE;
     gwt.is_focused = false;
     gwt.clip_children = false;
     gwt.force_custom_cursor = false;
@@ -1266,7 +1266,7 @@ void WidgetTests::textWidgetTest(test::Test& test) {
     gwt.visibility = visibility;
     gwt.is_click_through = true;
     gwt.is_mouse_over = false;
-    gwt.focusable_type = fw::Widget::FocusableType::NOT_FOCUSABLE;
+    gwt.focusable_type = fw::Widget::FocusableType::NONE;
     gwt.is_focused = false;
     gwt.clip_children = false;
     gwt.force_custom_cursor = false;
@@ -1317,7 +1317,7 @@ void WidgetTests::checkboxWidgetBasicTest(test::Test& test) {
     gwt.visibility = visibility;
     gwt.is_click_through = false;
     gwt.is_mouse_over = false;
-    gwt.focusable_type = fw::Widget::FocusableType::NOT_FOCUSABLE;
+    gwt.focusable_type = fw::Widget::FocusableType::NONE;
     gwt.is_focused = false;
     gwt.clip_children = false;
     gwt.force_custom_cursor = false;
@@ -1387,7 +1387,7 @@ void WidgetTests::containerWidgetBasicTest(test::Test& test) {
     gwt.visibility = visibility;
     gwt.is_click_through = true;
     gwt.is_mouse_over = false;
-    gwt.focusable_type = fw::Widget::FocusableType::NOT_FOCUSABLE;
+    gwt.focusable_type = fw::Widget::FocusableType::NONE;
     gwt.is_focused = false;
     gwt.clip_children = false;
     gwt.force_custom_cursor = false;
@@ -2413,7 +2413,7 @@ void WidgetTests::canvasWidgetBasicTest(test::Test& test) {
     gwt.visibility = visibility;
     gwt.is_click_through = true;
     gwt.is_mouse_over = false;
-    gwt.focusable_type = fw::Widget::FocusableType::NOT_FOCUSABLE;
+    gwt.focusable_type = fw::Widget::FocusableType::NONE;
     gwt.is_focused = false;
     gwt.clip_children = false;
     gwt.force_custom_cursor = false;
@@ -2508,7 +2508,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         gwt.visibility = visibility;
         gwt.is_click_through = true;
         gwt.is_mouse_over = false;
-        gwt.focusable_type = fw::Widget::FocusableType::NOT_FOCUSABLE;
+        gwt.focusable_type = fw::Widget::FocusableType::NONE;
         gwt.is_focused = false;
         gwt.clip_children = false;
         gwt.force_custom_cursor = false;
@@ -2559,7 +2559,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         gwt.visibility = visibility;
         gwt.is_click_through = false;
         gwt.is_mouse_over = false;
-        gwt.focusable_type = fw::Widget::FocusableType::NOT_FOCUSABLE;
+        gwt.focusable_type = fw::Widget::FocusableType::NONE;
         gwt.is_focused = false;
         gwt.clip_children = true;
         gwt.force_custom_cursor = false;
@@ -2600,7 +2600,7 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
         gwt.visibility = visibility;
         gwt.is_click_through = false;
         gwt.is_mouse_over = false;
-        gwt.focusable_type = fw::Widget::FocusableType::NOT_FOCUSABLE;
+        gwt.focusable_type = fw::Widget::FocusableType::NONE;
         gwt.is_focused = false;
         gwt.clip_children = true;
         gwt.force_custom_cursor = true;

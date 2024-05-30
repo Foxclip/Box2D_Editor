@@ -342,11 +342,13 @@ namespace fw {
 		selection_widget->setFillColor(slct_col);
 	}
 
-	void TextBoxWidget::internalOnLeftPress(const sf::Vector2f& pos) {
+	void TextBoxWidget::internalOnLeftPress(const sf::Vector2f& pos, bool became_focused) {
 		drag_start_pos = pos;
 		left_button_pressed = true;
-		trySetCursor(pos);
-		deselectAll();
+		if (!became_focused) {
+			trySetCursor(pos);
+			deselectAll();
+		}
 		enableEditMode();
 		size_t new_cursor_pos = calcCursorPos(pos);
 		dragging_start_char = new_cursor_pos;
