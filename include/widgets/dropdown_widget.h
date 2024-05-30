@@ -35,6 +35,7 @@ namespace fw {
 		RectangleWidget* getPanelWidget() const;
 		RectangleWidget* getOptionWidget(size_t index) const;
 		TextWidget* getOptionTextWidget(size_t index) const;
+		const sf::String& getOptionText(size_t index) const;
 		ptrdiff_t getValue() const;
 		void setMainBackgroundColor(const sf::Color& color);
 		void setOptionHoverBackgroundColor(const sf::Color& color);
@@ -59,7 +60,7 @@ namespace fw {
 		PolygonWidget* triangle_widget = nullptr;
 		RectangleWidget* square_widget = nullptr;
 		RectangleWidget* panel_widget = nullptr;
-		std::vector<RectangleWidget*> option_widgets;
+		CompVector<RectangleWidget*> option_widgets;
 
 	private:
 		ptrdiff_t selected = -1;

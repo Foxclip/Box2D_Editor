@@ -109,6 +109,10 @@ namespace fw {
 		return text_widget;
 	}
 
+	const sf::String& DropdownWidget::getOptionText(size_t index) const {
+		return getOptionTextWidget(index)->getString();
+	}
+
 	ptrdiff_t DropdownWidget::getValue() const {
 		return selected;
 	}
@@ -120,6 +124,7 @@ namespace fw {
 		}
 		RectangleWidget* option_widget = widget_list.createWidget<RectangleWidget>(100.0f, 20.0f);
 		option_widget->setParent(panel_widget);
+		option_widget->moveToIndex(index);
 		option_widget->setFillColor(sf::Color::Transparent);
 		option_widget->setClipChildren(true);
 		option_widget->OnMouseEnter = [&, option_widget](const sf::Vector2f& pos) {
@@ -128,7 +133,7 @@ namespace fw {
 		option_widget->OnMouseExit = [&, option_widget](const sf::Vector2f& pos) {
 			option_widget->setFillColor(sf::Color::Transparent);
 		};
-		option_widgets.push_back(option_widget);
+		option_widgets.insert(option_widgets.begin() + index, option_widget);
 		TextWidget* option_text_widget = widget_list.createWidget<TextWidget>();
 		if (text_widget->getFont()) {
 			option_text_widget->setFont(*text_widget->getFont());
@@ -150,7 +155,7 @@ namespace fw {
 	void DropdownWidget::removeOption(size_t index) {
 		wAssert(index >= 0 && index < option_widgets.size());
 		option_widgets[index]->remove();
-		option_widgets.erase(option_widgets.begin() + index);
+		option_widgets.removeAt(index);
 		updateOptions();
 	}
 
@@ -160,8 +165,8 @@ namespace fw {
 			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
 			if (option_text_widget->getString() == text) {
 				removeOption(i);
+				return;
 			}
-			return;
 		}
 		wAssert(false, "Option not found: " + text); 
 	}

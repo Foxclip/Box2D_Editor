@@ -186,6 +186,10 @@ namespace fw {
 		return children;
 	}
 
+	size_t Widget::getChildrenCount() const {
+		return children.size();
+	}
+
 	CompVector<Widget*> Widget::getAllChildren() const {
 		CompVector<Widget*> result;
 		result.insert(result.end(), children.begin(), children.end());
@@ -707,6 +711,20 @@ namespace fw {
 		wAssert(!widget_list.isLocked());
 		setParentSilent(new_parent);
 		internalOnSetParent(new_parent);
+	}
+
+	void Widget::moveChildToIndex(Widget* child, size_t index) {
+		wAssert(!widget_list.isLocked());
+		wAssert(!children_locked);
+		wAssert(children.contains(child));
+		wAssert(index >= 0 && index < getChildrenCount());
+		children.moveValueToIndex(child, index);
+	}
+
+	void Widget::moveToIndex(size_t index) {
+		wAssert(!widget_list.isLocked());
+		wAssert(parent);
+		parent->moveChildToIndex(this, index);
 	}
 
 	void Widget::lockChildren() {

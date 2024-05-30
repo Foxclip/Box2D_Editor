@@ -125,6 +125,7 @@ namespace fw {
 		Widget* getParent() const;
 		CompVector<Widget*> getParentChain() const;
 		const CompVector<Widget*>& getChildren() const;
+		size_t getChildrenCount() const;
 		CompVector<Widget*> getAllChildren() const;
 		Widget* getChild(size_t index) const;
 		Widget* find(const std::string& name) const;
@@ -217,6 +218,8 @@ namespace fw {
 		void setFocusableType(FocusableType value);
 		void setParentSilent(Widget* new_parent);
 		void setParent(Widget* new_parent);
+		void moveChildToIndex(Widget* child, size_t index);
+		void moveToIndex(size_t index);
 		void lockChildren();
 		void unlockChildren();
 		void setForceCustomCursor(bool value);

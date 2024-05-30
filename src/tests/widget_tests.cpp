@@ -3148,9 +3148,25 @@ void WidgetTests::dropdownWidgetOptions2Test(test::Test& test) {
     dropdown_widget->addOption("option1");
     dropdown_widget->addOption("option2");
     dropdown_widget->addOption("option1.5", 1);
-    T_COMPARE(dropdown_widget->getOptionTextWidget(0)->getString(), "option1");
-    T_COMPARE(dropdown_widget->getOptionTextWidget(0)->getString(), "option1.5");
-    T_COMPARE(dropdown_widget->getOptionTextWidget(0)->getString(), "option2");
+    T_COMPARE(dropdown_widget->getOptionText(0), "option1");
+    T_COMPARE(dropdown_widget->getOptionText(1), "option1.5");
+    T_COMPARE(dropdown_widget->getOptionText(2), "option2");
+    dropdown_widget->removeOption("option1.5");
+    T_COMPARE(dropdown_widget->getOptionText(0), "option1");
+    T_COMPARE(dropdown_widget->getOptionText(1), "option2");
+    dropdown_widget->removeOption("option1");
+    T_COMPARE(dropdown_widget->getOptionText(0), "option2");
+    dropdown_widget->addOption("option1", 0);
+    T_COMPARE(dropdown_widget->getOptionText(0), "option1");
+    T_COMPARE(dropdown_widget->getOptionText(1), "option2");
+    dropdown_widget->addOption("option1.5", 1);
+    T_COMPARE(dropdown_widget->getOptionText(0), "option1");
+    T_COMPARE(dropdown_widget->getOptionText(1), "option1.5");
+    T_COMPARE(dropdown_widget->getOptionText(2), "option2");
+    dropdown_widget->setOptionText(1, "option3");
+    T_COMPARE(dropdown_widget->getOptionText(0), "option1");
+    T_COMPARE(dropdown_widget->getOptionText(1), "option3");
+    T_COMPARE(dropdown_widget->getOptionText(2), "option2");
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
