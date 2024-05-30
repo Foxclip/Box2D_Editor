@@ -3089,6 +3089,7 @@ void WidgetTests::dropdownWidgetOptionsTest(test::Test& test) {
     dropdown_widget->setPosition(position);
     dropdown_widget->setSize(size);
     dropdown_widget->setFont(textbox_font);
+    dropdown_widget->setCharacterSize(15);
     fw::RectangleWidget* panel_widget = dropdown_widget->getPanelWidget();
     application.advance();
 

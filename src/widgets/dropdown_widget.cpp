@@ -114,6 +114,7 @@ namespace fw {
 		RectangleWidget* option_widget = widget_list.createWidget<RectangleWidget>(100.0f, 20.0f);
 		option_widget->setParent(panel_widget);
 		option_widget->setFillColor(sf::Color::Transparent);
+		option_widget->setClipChildren(true);
 		option_widget->OnMouseEnter = [&, option_widget](const sf::Vector2f& pos) {
 			option_widget->setFillColor(option_hover_background_color);
 		};
