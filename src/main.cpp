@@ -44,8 +44,8 @@ int main() {
     //execute_app();
 
     // TODO: PolygonWidget test
-    // TODO: Dropdown widget
     // TODO: DropdownWidget test
+    // TODO: remake EditWindow type parameter with DropdownWidget
     // TODO: remake WindowWidget with containers
     // TODO: with_children option in removeWidget
     // TODO: handle out of range floats in textbox (i.e. 2e999999)

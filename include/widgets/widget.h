@@ -42,10 +42,11 @@ namespace fw {
 			Container,
 			Dropdown,
 			Empty,
+			Polygon,
 			Rectangle,
 			Text,
 			Textbox,
-			Window
+			Window,
 		};
 		enum class Anchor {
 			CUSTOM,

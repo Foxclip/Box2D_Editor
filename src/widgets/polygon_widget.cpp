@@ -2,8 +2,9 @@
 
 namespace fw {
 
-	PolygonWidget::PolygonWidget(WidgetList& widget_list, const std::vector<sf::Vector2f>& vertices)
-		: ShapeWidget(widget_list) {
+	PolygonWidget::PolygonWidget(WidgetList& widget_list, const std::vector<sf::Vector2f>& vertices) : ShapeWidget(widget_list) {
+		type = WidgetType::Polygon;
+		setName("polygon");
 		setVertices(vertices);
 	}
 

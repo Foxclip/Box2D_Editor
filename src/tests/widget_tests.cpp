@@ -114,6 +114,7 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* root_widget_test = list->addTest("root_widget", [&](test::Test& test) { rootWidgetTest(test); });
     test::Test* empty_widget_test = list->addTest("empty_widget", { root_widget_test }, [&](test::Test& test) { emptyWidgetTest(test); });
     test::Test* rectangle_widget_test = list->addTest("rectangle_widget", { root_widget_test }, [&](test::Test& test) { rectangleWidgetTest(test); });
+    test::Test* polygon_widget_basic_test = list->addTest("polygon_widget_basic", { root_widget_test }, [&](test::Test& test) { polygonWidgetBasicTest(test); });
     test::Test* set_parent_test = list->addTest("set_parent", { root_widget_test }, [&](test::Test& test) { setParentTest(test); });
     test::Test* widget_mouse_events_1_test = list->addTest("widget_mouse_events_1", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents1(test); });
     test::Test* widget_mouse_events_2_test = list->addTest("widget_mouse_events_2", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents2(test); });
@@ -818,6 +819,58 @@ void WidgetTests::rectangleWidgetTest(test::Test& test) {
     T_CHECK(root_widget->getChild(0) == rectangle_widget);
 
     T_COMPARE(rectangle_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
+}
+
+void WidgetTests::polygonWidgetBasicTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    std::vector<sf::Vector2f> vertices = fw::get_regular_polygon<sf::Vector2f>(6, 1.0f);
+    fw::PolygonWidget* polygon_widget = application.getWidgets().createWidget<fw::PolygonWidget>(vertices);
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(polygon_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    polygon_widget->setPosition(position);
+
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = polygon_widget;
+    gwt.total_widgets = 2;
+    gwt.type = fw::Widget::WidgetType::Polygon;
+    gwt.name = "polygon";
+    gwt.fullname = "root|polygon";
+    gwt.is_visual_position_quantized = false;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
+    visibility.opaque = true;
+    visibility.renderableSetting = true;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
+    gwt.is_click_through = true;
+    gwt.is_mouse_over = false;
+    gwt.focusable_type = fw::Widget::FocusableType::NONE;
+    gwt.is_focused = false;
+    gwt.clip_children = false;
+    gwt.force_custom_cursor = false;
+    gwt.parent = root_widget;
+    sf::Vector2f local_pos(-1.0f, -vertices[2].y);
+    sf::Vector2f size(2.0f, vertices[2].y * 2);
+    gwt.local_bounds = sf::FloatRect(local_pos, size);
+    gwt.global_bounds = sf::FloatRect(position + local_pos, size);
+    gwt.parent_local_bounds = gwt.global_bounds;
+    gwt.visual_local_bounds = gwt.local_bounds;
+    gwt.visual_global_bounds = gwt.global_bounds;
+    gwt.visual_parent_local_bounds = gwt.global_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+
+    T_CHECK(polygon_widget->getParent() == root_widget);
+    T_COMPARE(polygon_widget->getChildren().size(), 0);
+
+    T_COMPARE(polygon_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
 }
 
 void WidgetTests::setParentTest(test::Test& test) {

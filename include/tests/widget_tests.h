@@ -138,6 +138,7 @@ private:
 	void rootWidgetTest(test::Test& test);
 	void emptyWidgetTest(test::Test& test);
 	void rectangleWidgetTest(test::Test& test);
+	void polygonWidgetBasicTest(test::Test& test);
 	void setParentTest(test::Test& test);
 	void widgetMouseEvents1(test::Test& test);
 	void widgetMouseEvents2(test::Test& test);
