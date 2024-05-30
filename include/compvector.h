@@ -3,6 +3,7 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include <cassert>
 
 template<typename T, typename U>
 concept NotSameAs = !std::same_as<T, U>;
@@ -35,6 +36,9 @@ public:
 	bool insert(const std::vector<T>::const_iterator& where, const T& value);
 	template<std::incrementable TIter>
 	size_t insert(const std::vector<T>::const_iterator& where, const TIter& first, const TIter& last);
+	void moveIndexToIndex(size_t old_index, size_t new_index);
+	void moveValueToIndex(const T& value, size_t new_index);
+	void moveValueToValue(const T& src, const T& dst);
 	ptrdiff_t remove(const T& value);
 	void removeAt(size_t index);
 	void reverse();
@@ -197,6 +201,54 @@ inline size_t CompVector<T, TCmp>::insert(const std::vector<T>::const_iterator& 
 		iter_other++;
 	}
 	return inserted_count;
+}
+
+template<typename T, typename TCmp>
+inline void CompVector<T, TCmp>::moveIndexToIndex(size_t src_index, size_t dst_index) {
+	assert(src_index >= 0 && src_index < vector.size());
+	assert(dst_index >= 0 && dst_index < vector.size());
+	if (dst_index == src_index || dst_index == src_index + 1) {
+		return;
+	}
+	T value = vector[src_index];
+	vector.erase(vector.begin() + src_index);
+	size_t insert_pos = dst_index;
+	if (dst_index > src_index) {
+		insert_pos--;
+	}
+	vector.insert(vector.begin() + insert_pos, value);
+}
+
+template<typename T, typename TCmp>
+inline void CompVector<T, TCmp>::moveValueToIndex(const T& value, size_t dst_index) {
+	assert(dst_index >= 0 && dst_index < vector.size());
+	size_t src_index = getIndex(value);
+	assert(src_index >= 0);
+	if (src_index == dst_index) {
+		return;
+	}
+	moveIndexToIndex(src_index, dst_index);
+}
+
+template<typename T, typename TCmp>
+inline void CompVector<T, TCmp>::moveValueToValue(const T& src, const T& dst) {
+	if (src == dst) {
+		return;
+	}
+	ptrdiff_t src_index = -1, dst_index = -1;
+	for (size_t i = 0; i < vector.size(); i++) {
+		if (vector[i] == src) {
+			src_index = i;
+		}
+		if (vector[i] == dst) {
+			dst_index = i;
+		}
+		if (src_index >= 0 && dst_index >= 0) {
+			break;
+		}
+	}
+	assert(src_index >= 0 && dst_index >= 0);
+	moveIndexToIndex(src_index, dst_index);
 }
 
 template<typename T, typename TCmp>
