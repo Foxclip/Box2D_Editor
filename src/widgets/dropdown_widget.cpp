@@ -54,6 +54,7 @@ namespace fw {
 		// options panel
 		panel_widget = widget_list.createWidget<RectangleWidget>(100.0f, 100.0f);
 		panel_widget->setName("panel");
+		panel_widget->setVisible(false);
 		panel_widget->setClickThrough(false);
 		panel_widget->setFillColor(DROPDOWN_DEFAULT_PANEL_COLOR);
 		panel_widget->setParentAnchor(Anchor::BOTTOM_LEFT);
@@ -90,6 +91,19 @@ namespace fw {
 
 	RectangleWidget* DropdownWidget::getMainWidget() const {
 		return main_widget;
+	}
+
+	RectangleWidget* DropdownWidget::getPanelWidget() const {
+		return panel_widget;
+	}
+
+	RectangleWidget* DropdownWidget::getOptionWidget(size_t index) const {
+		wAssert(index >= 0 && index < option_widgets.size());
+		return option_widgets[index];
+	}
+
+	ptrdiff_t DropdownWidget::getValue() const {
+		return selected;
 	}
 
 	void DropdownWidget::addOption(const sf::String& text, ptrdiff_t index) {

@@ -156,6 +156,7 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* window_widget_drag_limits_test = list->addTest("window_widget_drag_limits", { window_widget_drag_test, window_widget_chain_test }, [&](test::Test& test) { windowWidgetDragLimitsTest(test); });
     test::Test* window_widget_resize_limits_test = list->addTest("window_widget_resize_limits", { window_widget_chain_test }, [&](test::Test& test) { windowWidgetResizeLimitsTest(test); });
     test::Test* dropdown_widget_basic_test = list->addTest("dropdown_widget_basic", { rectangle_widget_test, polygon_widget_basic_test, text_widget_test }, [&](test::Test& test) { dropdownWidgetBasicTest(test); });
+    test::Test* dropdown_widget_options_test = list->addTest("dropdown_widget_options", { dropdown_widget_basic_test }, [&](test::Test& test) { dropdownWidgetOptionsTest(test); });
 }
 
 void WidgetTests::beforeRunModule() {
@@ -3075,6 +3076,51 @@ void WidgetTests::dropdownWidgetBasicTest(test::Test& test) {
     gwt.visual_global_bounds = gwt.global_bounds;
     gwt.visual_parent_local_bounds = gwt.global_bounds;
     T_WRAP_CONTAINER(genericWidgetTest(gwt));
+}
+
+void WidgetTests::dropdownWidgetOptionsTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    fw::DropdownWidget* dropdown_widget = application.getWidgets().createWidget<fw::DropdownWidget>();
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(40.0f, 20.0f);
+    dropdown_widget->setPosition(position);
+    dropdown_widget->setSize(size);
+    dropdown_widget->setFont(textbox_font);
+    fw::RectangleWidget* panel_widget = dropdown_widget->getPanelWidget();
+    application.advance();
+
+    dropdown_widget->addOption("option1");
+    dropdown_widget->addOption("option2");
+    dropdown_widget->addOption("option3");
+    T_COMPARE(dropdown_widget->getValue(), -1);
+    T_CHECK(!panel_widget->isVisible());
+    sf::Vector2f dropdown_center = dropdown_widget->getGlobalCenter();
+
+    auto click_option = [&](size_t index, ptrdiff_t prev) {
+        T_CHECK(!dropdown_widget->isFocused());
+        CLICK_MOUSE(dropdown_center);
+        T_CHECK(dropdown_widget->isFocused());
+        T_COMPARE(dropdown_widget->getValue(), prev);
+        T_CHECK(panel_widget->isVisible());
+        CLICK_MOUSE(dropdown_widget->getOptionWidget(index)->getGlobalCenter());
+        T_CHECK(!dropdown_widget->isFocused());
+        T_COMPARE(dropdown_widget->getValue(), index);
+        T_CHECK(!panel_widget->isVisible());
+    };
+    T_WRAP_CONTAINER(click_option(0, -1));
+    T_WRAP_CONTAINER(click_option(1, 0));
+    T_WRAP_CONTAINER(click_option(2, 1));
+
+    T_ASSERT_NO_ERRORS();
+    CLICK_MOUSE(dropdown_center);
+    ptrdiff_t value = dropdown_widget->getValue();
+    CLICK_MOUSE(dropdown_center);
+    T_CHECK(!dropdown_widget->isFocused());
+    T_COMPARE(dropdown_widget->getValue(), value);
+    T_CHECK(!panel_widget->isVisible());
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {

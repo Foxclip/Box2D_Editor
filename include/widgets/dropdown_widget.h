@@ -32,6 +32,9 @@ namespace fw {
 		const sf::Color& getMainTextColor() const;
 		const sf::Color& getPanelTextColor() const;
 		RectangleWidget* getMainWidget() const;
+		RectangleWidget* getPanelWidget() const;
+		RectangleWidget* getOptionWidget(size_t index) const;
+		ptrdiff_t getValue() const;
 		void setMainBackgroundColor(const sf::Color& color);
 		void setOptionHoverBackgroundColor(const sf::Color& color);
 		void setTriangleColor(const sf::Color& color);

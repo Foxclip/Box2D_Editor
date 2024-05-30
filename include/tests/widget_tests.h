@@ -179,6 +179,7 @@ private:
 	void windowWidgetDragLimitsTest(test::Test& test);
 	void windowWidgetResizeLimitsTest(test::Test& test);
 	void dropdownWidgetBasicTest(test::Test& test);
+	void dropdownWidgetOptionsTest(test::Test& test);
 
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);
