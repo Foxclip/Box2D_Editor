@@ -282,6 +282,17 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 		T_COMPARE(*ptr2, 2);
 		T_COMPARE(*ptr3, 3);
 	});
+	test::Test* insert_ptr_test = list->addTest("insert_ptr", { basic_tests }, [&](test::Test& test) {
+		int* ptr1 = new int(1);
+		int* ptr2 = new int(2);
+		int* ptr3 = new int(3);
+		int* ptr5 = new int(5);
+		CompVectorUptr<int> vec = { ptr1, ptr2, ptr3 };
+		vec.insert(vec.begin() + 2, ptr5);
+		T_CHECK(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr3 }));
+		vec.insert(vec.begin() + 2, ptr5);
+		T_CHECK(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr3 }));
+	});
 	test::Test* insert_value_test = list->addTest("insert_value", { basic_tests }, [&](test::Test& test) {
 		int* ptr1 = new int(1);
 		int* ptr2 = new int(2);

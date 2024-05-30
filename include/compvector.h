@@ -32,9 +32,9 @@ public:
 	CompVector(const std::vector<T>& vec);
 	size_t size() const;
 	bool add(const T& value);
-	bool insert(std::vector<T>::const_iterator where, const T& value);
+	bool insert(const std::vector<T>::const_iterator& where, const T& value);
 	template<std::incrementable TIter>
-	size_t insert(std::vector<T>::const_iterator where, TIter first, TIter last);
+	size_t insert(const std::vector<T>::const_iterator& where, const TIter& first, const TIter& last);
 	ptrdiff_t remove(const T& value);
 	void removeAt(size_t index);
 	void reverse();
@@ -88,9 +88,10 @@ public:
 	T* add(const T& value);
 	T* add(const T* ptr);
 	T* add(std::unique_ptr<T> value);
-	bool insert(std::vector<T*>::const_iterator where, std::unique_ptr<T> value);
+	bool insert(const std::vector<T*>::const_iterator& where, T* ptr);
+	bool insert(const std::vector<T*>::const_iterator& where, std::unique_ptr<T> value);
 	template<std::incrementable TIter>
-	size_t insert(std::vector<T*>::const_iterator where, TIter first, TIter last);
+	size_t insert(const std::vector<T*>::const_iterator& where, const TIter& first, const TIter& last);
 	ptrdiff_t remove(T* value);
 	void removeAt(size_t index);
 	void reverse();
@@ -173,7 +174,7 @@ inline bool CompVector<T, TCmp>::add(const T& value) {
 }
 
 template<typename T, typename TCmp>
-inline bool CompVector<T, TCmp>::insert(std::vector<T>::const_iterator where, const T& value) {
+inline bool CompVector<T, TCmp>::insert(const std::vector<T>::const_iterator& where, const T& value) {
 	auto inserted = set.insert(value);
 	if (inserted.second) {
 		vector.insert(where, value);
@@ -184,7 +185,7 @@ inline bool CompVector<T, TCmp>::insert(std::vector<T>::const_iterator where, co
 
 template<typename T, typename TCmp>
 template<std::incrementable TIter>
-inline size_t CompVector<T, TCmp>::insert(std::vector<T>::const_iterator where, TIter first, TIter last) {
+inline size_t CompVector<T, TCmp>::insert(const std::vector<T>::const_iterator& where, const TIter& first, const TIter& last) {
 	size_t offset = where - vector.begin();
 	TIter iter_other(first);
 	size_t inserted_count = 0;
@@ -412,7 +413,13 @@ inline T* CompVectorUptr<T, TCmp>::add(std::unique_ptr<T> value) {
 }
 
 template<typename T, typename TCmp>
-inline bool CompVectorUptr<T, TCmp>::insert(std::vector<T*>::const_iterator where, std::unique_ptr<T> value) {
+inline bool CompVectorUptr<T, TCmp>::insert(const std::vector<T*>::const_iterator& where, T* ptr) {
+	std::unique_ptr<T> uptr(ptr);
+	return insert(where, std::move(uptr));
+}
+
+template<typename T, typename TCmp>
+inline bool CompVectorUptr<T, TCmp>::insert(const std::vector<T*>::const_iterator& where, std::unique_ptr<T> value) {
 	size_t offset = where - comp.begin();
 	bool inserted = comp.insert(where, value.get());
 	if (inserted) {
@@ -425,7 +432,7 @@ inline bool CompVectorUptr<T, TCmp>::insert(std::vector<T*>::const_iterator wher
 
 template<typename T, typename TCmp>
 template<std::incrementable TIter>
-inline size_t CompVectorUptr<T, TCmp>::insert(std::vector<T*>::const_iterator where, TIter first, TIter last) {
+inline size_t CompVectorUptr<T, TCmp>::insert(const std::vector<T*>::const_iterator& where, const TIter& first, const TIter& last) {
 	size_t offset = where - comp.begin();
 	TIter iter_other(first);
 	size_t inserted_count = 0;
