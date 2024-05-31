@@ -323,6 +323,8 @@ void Editor::initWidgets() {
     logger_text_widget->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
+
+    edit_tool.edit_window_widget->moveToTop();
 }
 
 void Editor::onProcessKeyboardEvent(const sf::Event& event) {
