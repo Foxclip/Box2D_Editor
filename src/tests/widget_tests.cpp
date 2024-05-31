@@ -2686,7 +2686,7 @@ void WidgetTests::windowWidgetDragTest(test::Test& test) {
     fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(size);
     window_widget->setPosition(position);
     window_widget->setHeaderFont(textbox_font);
-    sf::Vector2f header_center = window_widget->getGlobalCenter();
+    sf::Vector2f header_center = window_widget->getHeaderWidget()->getGlobalCenter();
     sf::Vector2f offset_pos = sf::Vector2f(50.0f, 30.0f);
     sf::Vector2f new_position = position + offset_pos;
     application.mouseMove(header_center);

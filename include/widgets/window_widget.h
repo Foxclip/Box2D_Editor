@@ -43,7 +43,6 @@ namespace fw {
 		void setSize(float width, float height) override;
 		void setOutlineColor(const sf::Color& color);
 		void addChild(Widget* child) override;
-		void internalUpdate() override;
 
 	protected:
 		RectangleWidget* header_widget = nullptr;

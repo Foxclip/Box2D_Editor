@@ -15,12 +15,14 @@ namespace fw {
 		type = WidgetType::Window;
 		// empty
 		setName("window");
+		setSizeInternal(width, height + WINDOW_HEADER_HEIGHT);
 		// header
 		header_widget = widget_list.createWidget<RectangleWidget>(width, WINDOW_HEADER_HEIGHT);
 		header_widget->setOrigin(Anchor::TOP_LEFT);
 		header_widget->setClipChildren(true);
 		header_widget->setClickThrough(false);
 		header_widget->setName("header");
+		header_widget->setSizeXPolicy(SizePolicy::PARENT);
 		header_size = getSize();
 		header_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
 			is_grabbed = true;
@@ -184,6 +186,7 @@ namespace fw {
 		outline_widget = widget_list.createWidget<EmptyWidget>();
 		outline_widget->setName("outline");
 		outline_widget->setSize(width, WINDOW_HEADER_HEIGHT + height);
+		outline_widget->setSizePolicy(SizePolicy::PARENT);
 		outline_widget->OnAfterGlobalRender = [&](sf::RenderTarget& target) {
 			sf::FloatRect quantized_bounds = quantize_rect(
 				outline_widget->getGlobalBounds(),
@@ -281,6 +284,10 @@ namespace fw {
 	void WindowWidget::setSize(float width, float height) {
 		setSizeInternal(width, height);
 		main_widget->setSize(width, std::max(0.0f, height - header_widget->getHeight()));
+		resize_widget->setSize(
+			getWidth() + WINDOW_RESIZE_MARGIN * 2,
+			getHeight() + WINDOW_RESIZE_MARGIN * 2
+		);
 	}
 
 	void WindowWidget::setOutlineColor(const sf::Color& color) {
@@ -293,16 +300,6 @@ namespace fw {
 		} else {
 			Widget::addChild(child);
 		}
-	}
-
-	void WindowWidget::internalUpdate() {
-		setSize(main_widget->getWidth(), WINDOW_HEADER_HEIGHT + main_widget->getHeight());
-		header_widget->setSize(getWidth(), WINDOW_HEADER_HEIGHT);
-		resize_widget->setSize(
-			getWidth() + WINDOW_RESIZE_MARGIN * 2,
-			getHeight() + WINDOW_RESIZE_MARGIN * 2
-		);
-		outline_widget->setSize(getSize());
 	}
 
 	void WindowWidget::setSizeInternal(float width, float height) {
