@@ -6,6 +6,9 @@ namespace fw {
 	TextWidget::TextWidget(WidgetList& widget_list) : Widget(widget_list) {
 		type = WidgetType::Text;
 		setName("text");
+		if (widget_list.getDefaultFont()) {
+			setFont(*widget_list.getDefaultFont());
+		}
 	}
 
 	bool TextWidget::isVisualPositionQuantized() const {
@@ -168,7 +171,10 @@ namespace fw {
 	}
 
 	void TextWidget::internalUpdate() {
-		wAssert(getFont(), "Font is not set for " + full_name);
+		wAssert(getFont(), 
+			"Font is not set for " + full_name +
+			", consider setting default font in WidgetList"
+		);
 	}
 
 }

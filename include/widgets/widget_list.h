@@ -35,6 +35,8 @@ namespace fw {
 		bool isLAltPressed() const;
 		bool isLShiftPressed() const;
 		Widget* find(const std::string& name) const;
+		const sf::Font* getDefaultFont() const;
+		void setDefaultFont(const sf::Font& font);
 		template<typename T, typename... Args>
 		requires std::derived_from<T, Widget>
 		T* createWidget(Args&&... args);
@@ -66,6 +68,8 @@ namespace fw {
 		sf::Color render_origin_color = sf::Color::Red;
 		sf::Color render_transform_origin_color = sf::Color::Blue;
 		sf::Color focused_widget_bounds_color = sf::Color(0, 200, 255);
+		sf::Font default_font;
+		bool default_font_set = false;
 		CompVectorUptr<Widget> widgets;
 		EmptyWidget* root_widget = nullptr;
 		Widget* focused_widget = nullptr;

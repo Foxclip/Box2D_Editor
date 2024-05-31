@@ -44,6 +44,7 @@ namespace fw {
 		void advance();
 		void maximizeWindow() const;
 		sf::Vector2u getWindowSize() const;
+		const sf::Font* getDefaultFont() const;
 		void setWindowSize(unsigned int width, unsigned int height);
 		void setWindowSize(const sf::Vector2u& size);
 		void addExternalEvent(const sf::Event& event);
@@ -66,6 +67,7 @@ namespace fw {
 		const sf::Vector2f& getMousePressPosf() const;
 		WidgetList& getWidgets();
 		void setBackgroundColor(const sf::Color& color);
+		void setDefaultFont(const sf::Font& font);
 		void close();
 
 	protected:

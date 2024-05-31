@@ -125,6 +125,7 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* remove_1_test = list->addTest("remove_1", { set_parent_test }, [&](test::Test& test) { remove1Test(test); });
     test::Test* remove_2_test = list->addTest("remove_2", { set_parent_test }, [&](test::Test& test) { remove2Test(test); }); 
     test::Test* text_widget_test = list->addTest("text_widget", { root_widget_test }, [&](test::Test& test) { textWidgetTest(test); });
+    test::Test* text_widget_default_font_test = list->addTest("text_widget_default_font", { root_widget_test }, [&](test::Test& test) { textWidgetDefaultFontTest(test); });
     test::Test* checkbox_widget_basic_test = list->addTest("checkbox_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { checkboxWidgetBasicTest(test); });
     test::Test* checkbox_widget_toggle_test = list->addTest("checkbox_widget_toggle", { checkbox_widget_basic_test }, [&](test::Test& test) { checkboxWidgetToggleTest(test); });
     test::Test* container_widget_basic_test = list->addTest("container_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { containerWidgetBasicTest(test); });
@@ -1429,6 +1430,20 @@ void WidgetTests::textWidgetTest(test::Test& test) {
     T_COMPARE(text_widget->getChildren().size(), 0);
 
     T_COMPARE(text_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
+}
+
+void WidgetTests::textWidgetDefaultFontTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.setDefaultFont(textbox_font);
+    application.start(true);
+    application.advance();
+    fw::TextWidget* text_widget = application.getWidgets().createWidget<fw::TextWidget>();
+    text_widget->setCharacterSize(20);
+    text_widget->setString("Text");
+    sf::Vector2f position(100.0f, 100.0f);
+    text_widget->setPosition(position);
+    application.advance();
 }
 
 void WidgetTests::checkboxWidgetBasicTest(test::Test& test) {

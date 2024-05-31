@@ -149,6 +149,7 @@ private:
 	void remove1Test(test::Test& test);
 	void remove2Test(test::Test& test);
 	void textWidgetTest(test::Test& test);
+	void textWidgetDefaultFontTest(test::Test& test);
 	void checkboxWidgetBasicTest(test::Test& test);
 	void checkboxWidgetToggleTest(test::Test& test);
 	void containerWidgetBasicTest(test::Test& test);

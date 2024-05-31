@@ -107,6 +107,19 @@ namespace fw {
 		return root_widget->find(name);
 	}
 
+	const sf::Font* WidgetList::getDefaultFont() const {
+		if (default_font_set) {
+			return &default_font;
+		} else {
+			return nullptr;
+		}
+	}
+
+	void WidgetList::setDefaultFont(const sf::Font& font) {
+		default_font = font;
+		default_font_set = true;
+	}
+
 	bool WidgetList::isLocked() const {
 		return locked;
 	}

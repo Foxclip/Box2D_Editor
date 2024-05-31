@@ -191,6 +191,7 @@ void Editor::initUi() {
     loadFont(console_font, "fonts/courbd.ttf");
     loadFont(small_font, "fonts/HelvetiPixel.ttf");
     loadFont(textbox_font, "fonts/verdana.ttf");
+    setDefaultFont(textbox_font);
 
     arrow_cursor.loadFromSystem(sf::Cursor::Arrow);
     text_cursor.loadFromSystem(sf::Cursor::Text);

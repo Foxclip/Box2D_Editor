@@ -56,6 +56,10 @@ namespace fw {
         return window.getSize();
     }
 
+    const sf::Font* Application::getDefaultFont() const {
+        return widgets.getDefaultFont();
+    }
+
     void Application::setWindowSize(unsigned int width, unsigned int height) {
         window.setSize(sf::Vector2u(width, height));
         if (external_control) {
@@ -222,6 +226,10 @@ namespace fw {
 
     void Application::setBackgroundColor(const sf::Color& color) {
         background_color = color;
+    }
+
+    void Application::setDefaultFont(const sf::Font& font) {
+        widgets.setDefaultFont(font);
     }
 
     void Application::close() {
