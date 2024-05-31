@@ -2717,13 +2717,13 @@ void WidgetTests::windowWidgetBasicTest(test::Test& test) {
     fw::RectangleWidget* header_widget = nullptr;
     fw::RectangleWidget* main_widget = nullptr;
     fw::EmptyWidget* resize_widget = nullptr;
-    fw::EmptyWidget* outline_widget = nullptr;
+    fw::RectangleWidget* outline_widget = nullptr;
     T_ASSERT(T_COMPARE(window_widget->getChildren().size(), 4));
     const CompVector<fw::Widget*>& children = window_widget->getChildren();
     header_widget = dynamic_cast<fw::RectangleWidget*>(window_widget->getChild(0));
     main_widget = dynamic_cast<fw::RectangleWidget*>(window_widget->getChild(1));
     resize_widget = dynamic_cast<fw::EmptyWidget*>(window_widget->getChild(2));
-    outline_widget = dynamic_cast<fw::EmptyWidget*>(window_widget->getChild(3));
+    outline_widget = dynamic_cast<fw::RectangleWidget*>(window_widget->getChild(3));
     T_CHECK(main_widget);
     T_CHECK(resize_widget);
     T_CHECK(outline_widget);
