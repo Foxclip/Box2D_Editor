@@ -1050,9 +1050,9 @@ namespace fw {
 		}
 	}
 
-	void Widget::remove() {
+	void Widget::remove(bool with_clildren) {
 		wAssert(!widget_list.isLocked());
-		widget_list.removeWidget(this);
+		widget_list.removeWidget(this, with_clildren);
 	}
 
 	sf::Vector2f Widget::anchorToPos(Anchor p_anchor, const sf::Vector2f& size) {

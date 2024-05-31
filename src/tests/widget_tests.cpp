@@ -122,6 +122,7 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* coordinates_test = list->addTest("coordinates", { set_parent_test }, [&](test::Test& test) { coordinatesTest(test); });
     test::Test* find_test = list->addTest("find", { set_parent_test }, [&](test::Test& test) { findTest(test); });
     test::Test* anchor_test = list->addTest("anchor", { set_parent_test }, [&](test::Test& test) { anchorTest(test); });
+    test::Test* remove_1_test = list->addTest("remove_1", { set_parent_test }, [&](test::Test& test) { remove1Test(test); });
     test::Test* text_widget_test = list->addTest("text_widget", { root_widget_test }, [&](test::Test& test) { textWidgetTest(test); });
     test::Test* checkbox_widget_basic_test = list->addTest("checkbox_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { checkboxWidgetBasicTest(test); });
     test::Test* checkbox_widget_toggle_test = list->addTest("checkbox_widget_toggle", { checkbox_widget_basic_test }, [&](test::Test& test) { checkboxWidgetToggleTest(test); });
@@ -156,8 +157,8 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* window_widget_drag_limits_test = list->addTest("window_widget_drag_limits", { window_widget_drag_test, window_widget_chain_test }, [&](test::Test& test) { windowWidgetDragLimitsTest(test); });
     test::Test* window_widget_resize_limits_test = list->addTest("window_widget_resize_limits", { window_widget_chain_test }, [&](test::Test& test) { windowWidgetResizeLimitsTest(test); });
     test::Test* dropdown_widget_basic_test = list->addTest("dropdown_widget_basic", { rectangle_widget_test, polygon_widget_basic_test, text_widget_test }, [&](test::Test& test) { dropdownWidgetBasicTest(test); });
-    test::Test* dropdown_widget_options1_test = list->addTest("dropdown_widget_options1", { dropdown_widget_basic_test }, [&](test::Test& test) { dropdownWidgetOptions1Test(test); });
-    test::Test* dropdown_widget_options2_test = list->addTest("dropdown_widget_options2", { dropdown_widget_options1_test }, [&](test::Test& test) { dropdownWidgetOptions2Test(test); });
+    test::Test* dropdown_widget_options_1_test = list->addTest("dropdown_widget_options_1", { dropdown_widget_basic_test }, [&](test::Test& test) { dropdownWidgetOptions1Test(test); });
+    test::Test* dropdown_widget_options_2_test = list->addTest("dropdown_widget_options_2", { dropdown_widget_options_1_test }, [&](test::Test& test) { dropdownWidgetOptions2Test(test); });
 }
 
 void WidgetTests::beforeRunModule() {
@@ -1284,6 +1285,46 @@ void WidgetTests::anchorTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y) + anchor_offset);
     child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_RIGHT);
     T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y) + anchor_offset);
+}
+
+void WidgetTests::remove1Test(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
+    fw::RectangleWidget* child0_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
+    fw::RectangleWidget* child1_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
+    child0_widget->setParent(parent_widget);
+    child1_widget->setParent(parent_widget);
+    if (T_COMPARE(application.getWidgets().getSize(), 4)) {
+        if (T_COMPARE(root_widget->getChildrenCount(), 1)) {
+            T_CHECK(root_widget->getChild(0) == parent_widget);
+            if (T_COMPARE(parent_widget->getChildrenCount(), 2)) {
+                T_CHECK(parent_widget->getChild(0) == child0_widget);
+                T_CHECK(parent_widget->getChild(1) == child1_widget);
+                T_COMPARE(child0_widget->getChildrenCount(), 0);
+                T_COMPARE(child1_widget->getChildrenCount(), 0);
+            }
+        }
+    }
+    T_ASSERT_NO_ERRORS();
+    child0_widget->remove();
+    if (T_COMPARE(application.getWidgets().getSize(), 3)) {
+        if (T_COMPARE(root_widget->getChildrenCount(), 1)) {
+            T_CHECK(root_widget->getChild(0) == parent_widget);
+            if (T_COMPARE(parent_widget->getChildrenCount(), 1)) {
+                T_CHECK(parent_widget->getChild(0) == child1_widget);
+                T_COMPARE(child1_widget->getChildrenCount(), 0);
+            }
+        }
+    }
+    T_ASSERT_NO_ERRORS();
+    parent_widget->remove();
+    if (T_COMPARE(application.getWidgets().getSize(), 1)) {
+        T_COMPARE(root_widget->getChildrenCount(), 0);
+    }
 }
 
 void WidgetTests::textWidgetTest(test::Test& test) {

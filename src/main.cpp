@@ -43,11 +43,9 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: remake WindowWidget with containers
-    // TODO: with_children option in removeWidget
+    // TODO: WidgetList::removeWidget test, and Widget::remove test
     // TODO: handle out of range floats in textbox (i.e. 2e999999)
     // TODO: POS_X entry depends on CHILDREN_X entry of the parent
-    // TODO: WidgetList::removeWidget test, and Widget::remove test
     // TODO: require font for TextWidget
     // TODO: object list window (outliner)
     // TODO: render polygon indices

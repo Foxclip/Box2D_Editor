@@ -234,7 +234,7 @@ namespace fw {
 		void render(sf::RenderTarget& target);
 		void renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children);
 		void renderOrigin(sf::RenderTarget& target);
-		void remove();
+		void remove(bool with_clildren = true);
 
 	protected:
 		friend class WidgetList;

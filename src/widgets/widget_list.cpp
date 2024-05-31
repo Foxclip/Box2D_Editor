@@ -290,10 +290,10 @@ namespace fw {
 		wAssert(widgets.contains(widget));
 		if (with_children) {
 			for (size_t i = 0; i < widget->getChildren().size(); i++) {
-				removeWidget(widget->getChild(i));
+				removeWidget(widget->getChild(i), true);
 			}
 		}
-		widget->setParent(nullptr);
+		widget->getParent()->removeChild(widget);
 		widgets.remove(widget);
 	}
 
