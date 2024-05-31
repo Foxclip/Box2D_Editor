@@ -218,8 +218,8 @@ namespace fw {
 		void setFocusableType(FocusableType value);
 		void setParentSilent(Widget* new_parent);
 		void setParent(Widget* new_parent);
-		void moveChildToIndex(Widget* child, size_t index);
 		void moveToIndex(size_t index);
+		void moveToTop();
 		void lockChildren();
 		void unlockChildren();
 		void setForceCustomCursor(bool value);
@@ -328,6 +328,7 @@ namespace fw {
 		void updateFullName();
 		void updateVisibility();
 		void updateRenderTexture(const sf::FloatRect& texture_bounds);
+		void moveChildToIndex(Widget* child, size_t index);
 
 	};
 

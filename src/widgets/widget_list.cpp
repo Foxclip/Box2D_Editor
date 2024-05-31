@@ -203,6 +203,22 @@ namespace fw {
 		}
 	}
 
+	void WidgetList::addPendingMove(Widget* widget, size_t index) {
+		wAssert(!isLocked());
+		PendingMove move;
+		move.widget = widget;
+		move.index = index;
+		pending_moves.push_back(move);
+	}
+
+	void WidgetList::processAfterInput() {
+		for (const PendingMove& move : pending_moves) {
+			Widget* parent = move.widget->getParent();
+			parent->moveChildToIndex(move.widget, move.index);
+		}
+		pending_moves = std::vector<PendingMove>();
+	}
+
 	void WidgetList::updateRenderQueue() {
 		wAssert(!isLocked());
 		render_queue.update();

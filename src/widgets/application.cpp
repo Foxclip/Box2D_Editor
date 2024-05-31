@@ -39,11 +39,21 @@ namespace fw {
     }
 
     void Application::advance() {
+        stage = Stage::NONE;
         onFrameBegin();
+        stage = Stage::PROCESS;
         processWidgets();
+        stage = Stage::INPUT;
         processInput();
+        stage = Stage::AFTER_INPUT;
+        processAfterInput();
+        stage = Stage::WORLD;
         processWorld();
+        stage = Stage::UPDATE;
+        widgets.updateWidgets();
+        stage = Stage::RENDER;
         render();
+        stage = Stage::NONE;
         onFrameEnd();
     }
 
@@ -58,6 +68,10 @@ namespace fw {
 
     const fw::Font& Application::getDefaultFont() const {
         return widgets.getDefaultFont();
+    }
+
+    Stage Application::getStage() const {
+        return stage;
     }
 
     void Application::setWindowSize(unsigned int width, unsigned int height) {
@@ -316,6 +330,10 @@ namespace fw {
         afterProcessInput();
     }
 
+    void Application::processAfterInput() {
+        widgets.processAfterInput();
+    }
+
     void Application::processEvent(const sf::Event& event) {
         processWindowEvent(event);
         processKeyboardEvent(event);
@@ -493,7 +511,6 @@ namespace fw {
     }
 
     void Application::render() {
-        widgets.updateWidgets();
         widgets.updateRenderQueue();
         widgets.lock();
         window.clear(background_color);

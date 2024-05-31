@@ -1,6 +1,7 @@
 #include "widgets/widget.h"
 #include "widgets/container_widget.h"
 #include "widgets/widget_list.h"
+#include "widgets/application.h"
 
 namespace fw {
 
@@ -718,13 +719,31 @@ namespace fw {
 		wAssert(!children_locked);
 		wAssert(children.contains(child));
 		wAssert(index >= 0 && index < getChildrenCount());
+		Stage stage = widget_list.application.getStage();
+		wAssert(
+			stage == Stage::NONE || stage == Stage::AFTER_INPUT,
+			"Cannot reorder children in this stage"
+		);
 		children.moveValueToIndex(child, index);
 	}
 
 	void Widget::moveToIndex(size_t index) {
 		wAssert(!widget_list.isLocked());
 		wAssert(parent);
-		parent->moveChildToIndex(this, index);
+		Stage stage = widget_list.application.getStage();
+		if (stage == Stage::INPUT) {
+			widget_list.addPendingMove(this, index);
+		} else if (stage == Stage::NONE || stage == Stage::AFTER_INPUT) {
+			parent->moveChildToIndex(this, index);
+		} else {
+			wAssert(false, "Cannot reorder children in this stage");
+		}
+	}
+
+	void Widget::moveToTop() {
+		wAssert(!widget_list.isLocked());
+		wAssert(parent);
+		moveToIndex(parent->getChildrenCount() - 1);
 	}
 
 	void Widget::lockChildren() {

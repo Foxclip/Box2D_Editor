@@ -13,6 +13,11 @@ namespace fw {
 	// And if if changes render queue:
 	// render_queue.invalidate();
 
+	struct PendingMove {
+		Widget* widget = nullptr;
+		size_t index = 0;
+	};
+
 	class Application;
 
 	class WidgetList {
@@ -50,6 +55,8 @@ namespace fw {
 		void processMouse(const sf::Vector2f pos);
 		void processWindowEvent(const sf::Event& event);
 		void processKeyboardEvent(const sf::Event& event);
+		void addPendingMove(Widget* widget, size_t index);
+		void processAfterInput();
 		void updateRenderQueue();
 		void updateWidgets();
 		void render(sf::RenderTarget& target);
@@ -73,6 +80,7 @@ namespace fw {
 		CompVectorUptr<Widget> widgets;
 		EmptyWidget* root_widget = nullptr;
 		Widget* focused_widget = nullptr;
+		std::vector<PendingMove> pending_moves;
 		WidgetUpdateQueue update_queue = WidgetUpdateQueue(*this);
 		WidgetRenderQueue render_queue = WidgetRenderQueue(*this);
 

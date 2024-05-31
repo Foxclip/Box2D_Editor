@@ -29,6 +29,16 @@ namespace fw {
 		);
 	};
 
+	enum class Stage {
+		NONE,
+		PROCESS,
+		INPUT,
+		AFTER_INPUT,
+		WORLD,
+		UPDATE,
+		RENDER,
+	};
+
 	class Application {
 	public:
 		Application();
@@ -45,6 +55,7 @@ namespace fw {
 		void maximizeWindow() const;
 		sf::Vector2u getWindowSize() const;
 		const fw::Font& getDefaultFont() const;
+		Stage getStage() const;
 		void setWindowSize(unsigned int width, unsigned int height);
 		void setWindowSize(const sf::Vector2u& size);
 		void addExternalEvent(const sf::Event& event);
@@ -124,9 +135,12 @@ namespace fw {
 		void endGesture();
 
 	private:
+		Stage stage = Stage::NONE;
+
 		void mainLoop();
 		void processWidgets();
 		void processInput();
+		void processAfterInput();
 		void processEvent(const sf::Event& event);
 		void processWindowEvent(const sf::Event& event);
 		void processKeyboardEvent(const sf::Event& event);

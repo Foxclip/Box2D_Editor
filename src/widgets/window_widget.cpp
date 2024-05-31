@@ -27,6 +27,7 @@ namespace fw {
 		header_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
 			is_grabbed = true;
 			header_click_offset = getGlobalPosition() - pos;
+			moveToTop();
 		};
 		header_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
 			if (is_grabbed) {
@@ -127,6 +128,7 @@ namespace fw {
 				resizing_anchor = getTopLeft();
 				resizing_cursor_offset = parent_local_pos - getBottomRight();
 			}
+			moveToTop();
 		};
 		resize_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
 			if (active_resizing_type == Resizing::NONE) {
