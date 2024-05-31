@@ -125,6 +125,9 @@ namespace fw {
 		} else if (textbox_type == TextBoxType::FLOAT) {
 			float number;
 			result = parseFloat(getValue(), number);
+			if (!std::isfinite(number)) {
+				result = false;
+			}
 		} else {
 			wAssert(false, "Unknown TextBoxType");
 		}

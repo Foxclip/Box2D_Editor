@@ -2382,21 +2382,25 @@ void WidgetTests::textboxWidgetIntegerTest(test::Test& test) {
     SELECT_ALL();
     CUT();
     T_CHECK(!textbox_widget->isValidValue());
+    // digits
     ENTER_TEXT(sf::Keyboard::Num1, '1');
     ENTER_TEXT(sf::Keyboard::Num2, '2');
     ENTER_TEXT(sf::Keyboard::Num3, '3');
     ENTER_TEXT(sf::Keyboard::Num4, '4');
     T_COMPARE(textbox_widget->getValue(), "1234");
     T_CHECK(textbox_widget->isValidValue());
+    // letter e
     ENTER_TEXT(sf::Keyboard::E, 'e');
     T_COMPARE(textbox_widget->getValue(), "1234");
     T_CHECK(textbox_widget->isValidValue());
+    // plus sign
     TAP_KEY(sf::Keyboard::Home);
     PRESS_KEY(sf::Keyboard::LShift);
     ENTER_TEXT(sf::Keyboard::Equal, '+');
     RELEASE_KEY(sf::Keyboard::LShift);
     T_COMPARE(textbox_widget->getValue(), "+1234");
     T_CHECK(textbox_widget->isValidValue());
+    // two plus signs
     PRESS_KEY(sf::Keyboard::LShift);
     ENTER_TEXT(sf::Keyboard::Equal, '+');
     RELEASE_KEY(sf::Keyboard::LShift);
@@ -2406,13 +2410,15 @@ void WidgetTests::textboxWidgetIntegerTest(test::Test& test) {
     TAP_KEY(sf::Keyboard::End);
     ENTER_TEXT(sf::Keyboard::Period, '.');
     T_COMPARE(textbox_widget->getValue(), "+1234");
-    T_CHECK(textbox_widget->isValidValue());
+    // comma
     ENTER_TEXT(sf::Keyboard::Comma, ',');
     T_COMPARE(textbox_widget->getValue(), "+1234");
     T_CHECK(textbox_widget->isValidValue());
+    // minus sign at the end
     ENTER_TEXT(sf::Keyboard::Dash, '-');
     T_COMPARE(textbox_widget->getValue(), "+1234-");
     T_CHECK(!textbox_widget->isValidValue());
+    // all digits
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
     ENTER_TEXT(sf::Keyboard::Num5, '5');
     ENTER_TEXT(sf::Keyboard::Num6, '6');
@@ -2421,14 +2427,17 @@ void WidgetTests::textboxWidgetIntegerTest(test::Test& test) {
     ENTER_TEXT(sf::Keyboard::Num9, '9');
     T_COMPARE(textbox_widget->getValue(), "+123456789");
     T_CHECK(textbox_widget->isValidValue());
+    // minus sign before plus sign
     TAP_KEY(sf::Keyboard::Home);
     ENTER_TEXT(sf::Keyboard::Dash, '-');
     T_COMPARE(textbox_widget->getValue(), "-+123456789");
     T_CHECK(!textbox_widget->isValidValue());
+    // minus sign
     TAP_KEY(sf::Keyboard::Right);
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
     T_COMPARE(textbox_widget->getValue(), "-123456789");
     T_CHECK(textbox_widget->isValidValue());
+    // zero at the beginning
     ENTER_TEXT(sf::Keyboard::Num0, '0');
     T_COMPARE(textbox_widget->getValue(), "-0123456789");
     T_CHECK(textbox_widget->isValidValue());
@@ -2445,51 +2454,66 @@ void WidgetTests::textboxWidgetFloatTest(test::Test& test) {
     SELECT_ALL();
     CUT();
     T_CHECK(!textbox_widget->isValidValue());
+    // digits
     ENTER_TEXT(sf::Keyboard::Num1, '1');
     ENTER_TEXT(sf::Keyboard::Num2, '2');
     ENTER_TEXT(sf::Keyboard::Num3, '3');
     ENTER_TEXT(sf::Keyboard::Num4, '4');
     T_COMPARE(textbox_widget->getValue(), "1234");
     T_CHECK(textbox_widget->isValidValue());
+    // plus sign
     TAP_KEY(sf::Keyboard::Home);
     PRESS_KEY(sf::Keyboard::LShift);
     ENTER_TEXT(sf::Keyboard::Equal, '+');
     RELEASE_KEY(sf::Keyboard::LShift);
     T_COMPARE(textbox_widget->getValue(), "+1234");
     T_CHECK(textbox_widget->isValidValue());
+    // two plus signs
     PRESS_KEY(sf::Keyboard::LShift);
     ENTER_TEXT(sf::Keyboard::Equal, '+');
     RELEASE_KEY(sf::Keyboard::LShift);
     T_COMPARE(textbox_widget->getValue(), "++1234");
     T_CHECK(!textbox_widget->isValidValue());
+    // minus sign at the end
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
     TAP_KEY(sf::Keyboard::End);
     ENTER_TEXT(sf::Keyboard::Dash, '-');
     T_COMPARE(textbox_widget->getValue(), "+1234-");
     T_CHECK(!textbox_widget->isValidValue());
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+    // letter a
     ENTER_TEXT(sf::Keyboard::A, 'a');
     T_COMPARE(textbox_widget->getValue(), "+1234");
     T_CHECK(textbox_widget->isValidValue());
+    // letter e
     ENTER_TEXT(sf::Keyboard::E, 'e');
     T_COMPARE(textbox_widget->getValue(), "+1234e");
     T_CHECK(!textbox_widget->isValidValue());
+    // exponent
     ENTER_TEXT(sf::Keyboard::Num5, '9');
     T_COMPARE(textbox_widget->getValue(), "+1234e9");
     T_CHECK(textbox_widget->isValidValue());
+    // big exponent
+    ENTER_TEXT(sf::Keyboard::Num5, '9');
+    T_COMPARE(textbox_widget->getValue(), "+1234e99");
+    T_CHECK(!textbox_widget->isValidValue());
+    // letter e after the end
+    ENTER_TEXT(sf::Keyboard::Backspace, '\b');
     ENTER_TEXT(sf::Keyboard::Comma, ',');
     T_COMPARE(textbox_widget->getValue(), "+1234e9");
-    T_CHECK(textbox_widget->isValidValue());
     ENTER_TEXT(sf::Keyboard::E, 'e');
     T_COMPARE(textbox_widget->getValue(), "+1234e9e");
     T_CHECK(!textbox_widget->isValidValue());
+    // dot after the end
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
     ENTER_TEXT(sf::Keyboard::Period, '.');
     T_COMPARE(textbox_widget->getValue(), "+1234e9.");
     T_CHECK(!textbox_widget->isValidValue());
+    // dot in exponent
     ENTER_TEXT(sf::Keyboard::Num6, '6');
     T_COMPARE(textbox_widget->getValue(), "+1234e9.6");
     T_CHECK(!textbox_widget->isValidValue());
+    // dot in mantissa
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
     T_COMPARE(textbox_widget->getValue(), "+1234e9");
@@ -2499,9 +2523,11 @@ void WidgetTests::textboxWidgetFloatTest(test::Test& test) {
     ENTER_TEXT(sf::Keyboard::Period, '.');
     T_COMPARE(textbox_widget->getValue(), "+123.4e9");
     T_CHECK(textbox_widget->isValidValue());
+    // two dots in mantissa
     ENTER_TEXT(sf::Keyboard::Period, '.');
     T_COMPARE(textbox_widget->getValue(), "+123..4e9");
     T_CHECK(!textbox_widget->isValidValue());
+    // more digist in mantissa
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
     T_COMPARE(textbox_widget->getValue(), "+123.4e9");
     TAP_KEY(sf::Keyboard::Right);
@@ -2511,19 +2537,23 @@ void WidgetTests::textboxWidgetFloatTest(test::Test& test) {
     ENTER_TEXT(sf::Keyboard::Num8, '8');
     T_COMPARE(textbox_widget->getValue(), "+123.45678e9");
     T_CHECK(textbox_widget->isValidValue());
+    // minus sign before plus sign
     TAP_KEY(sf::Keyboard::Home);
     ENTER_TEXT(sf::Keyboard::Dash, '-');
     T_COMPARE(textbox_widget->getValue(), "-+123.45678e9");
     T_CHECK(!textbox_widget->isValidValue());
+    // zero in the beginning of mantissa
     TAP_KEY(sf::Keyboard::Right);
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
     ENTER_TEXT(sf::Keyboard::Num0, '0');
     T_COMPARE(textbox_widget->getValue(), "-0123.45678e9");
     T_CHECK(textbox_widget->isValidValue());
+    // two minus signs at the beginning
     TAP_KEY(sf::Keyboard::Home);
     ENTER_TEXT(sf::Keyboard::Dash, '-');
     T_COMPARE(textbox_widget->getValue(), "--0123.45678e9");
     T_CHECK(!textbox_widget->isValidValue());
+
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
 }
 
