@@ -147,6 +147,7 @@ private:
 	void findTest(test::Test& test);
 	void anchorTest(test::Test& test);
 	void remove1Test(test::Test& test);
+	void remove2Test(test::Test& test);
 	void textWidgetTest(test::Test& test);
 	void checkboxWidgetBasicTest(test::Test& test);
 	void checkboxWidgetToggleTest(test::Test& test);

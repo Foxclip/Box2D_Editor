@@ -123,6 +123,7 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* find_test = list->addTest("find", { set_parent_test }, [&](test::Test& test) { findTest(test); });
     test::Test* anchor_test = list->addTest("anchor", { set_parent_test }, [&](test::Test& test) { anchorTest(test); });
     test::Test* remove_1_test = list->addTest("remove_1", { set_parent_test }, [&](test::Test& test) { remove1Test(test); });
+    test::Test* remove_2_test = list->addTest("remove_2", { set_parent_test }, [&](test::Test& test) { remove2Test(test); }); 
     test::Test* text_widget_test = list->addTest("text_widget", { root_widget_test }, [&](test::Test& test) { textWidgetTest(test); });
     test::Test* checkbox_widget_basic_test = list->addTest("checkbox_widget_basic", { rectangle_widget_test }, [&](test::Test& test) { checkboxWidgetBasicTest(test); });
     test::Test* checkbox_widget_toggle_test = list->addTest("checkbox_widget_toggle", { checkbox_widget_basic_test }, [&](test::Test& test) { checkboxWidgetToggleTest(test); });
@@ -1296,7 +1297,10 @@ void WidgetTests::remove1Test(test::Test& test) {
     fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
     fw::RectangleWidget* child0_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
     fw::RectangleWidget* child1_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
+    parent_widget->setName("parent");
+    child0_widget->setName("child0");
     child0_widget->setParent(parent_widget);
+    child1_widget->setName("child1");
     child1_widget->setParent(parent_widget);
     if (T_COMPARE(application.getWidgets().getSize(), 4)) {
         if (T_COMPARE(root_widget->getChildrenCount(), 1)) {
@@ -1324,6 +1328,52 @@ void WidgetTests::remove1Test(test::Test& test) {
     parent_widget->remove();
     if (T_COMPARE(application.getWidgets().getSize(), 1)) {
         T_COMPARE(root_widget->getChildrenCount(), 0);
+    }
+}
+
+void WidgetTests::remove2Test(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    fw::RectangleWidget* parent_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
+    fw::RectangleWidget* subparent_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
+    fw::RectangleWidget* child0_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
+    fw::RectangleWidget* child1_widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
+    parent_widget->setName("parent");
+    subparent_widget->setName("subparent");
+    subparent_widget->setParent(parent_widget);
+    child0_widget->setName("child0");
+    child0_widget->setParent(subparent_widget);
+    child1_widget->setName("child1");
+    child1_widget->setParent(subparent_widget);
+    if (T_COMPARE(application.getWidgets().getSize(), 5)) {
+        if (T_COMPARE(root_widget->getChildrenCount(), 1)) {
+            T_CHECK(root_widget->getChild(0) == parent_widget);
+            if (T_COMPARE(parent_widget->getChildrenCount(), 1)) {
+                T_CHECK(parent_widget->getChild(0) == subparent_widget);
+                if (T_COMPARE(subparent_widget->getChildrenCount(), 2)) {
+                    T_CHECK(subparent_widget->getChild(0) == child0_widget);
+                    T_CHECK(subparent_widget->getChild(1) == child1_widget);
+                    T_COMPARE(child0_widget->getChildrenCount(), 0);
+                    T_COMPARE(child1_widget->getChildrenCount(), 0);
+                }
+            }
+        }
+    }
+    T_ASSERT_NO_ERRORS();
+    subparent_widget->remove(false);
+    if (T_COMPARE(application.getWidgets().getSize(), 4)) {
+        if (T_COMPARE(root_widget->getChildrenCount(), 1)) {
+            T_CHECK(root_widget->getChild(0) == parent_widget);
+            if (T_COMPARE(parent_widget->getChildrenCount(), 2)) {
+                T_CHECK(parent_widget->getChild(0) == child0_widget);
+                T_CHECK(parent_widget->getChild(1) == child1_widget);
+                T_COMPARE(child0_widget->getChildrenCount(), 0);
+                T_COMPARE(child1_widget->getChildrenCount(), 0);
+            }
+        }
     }
 }
 

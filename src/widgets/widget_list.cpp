@@ -288,12 +288,18 @@ namespace fw {
 		wAssert(widget);
 		wAssert(widget != root_widget);
 		wAssert(widgets.contains(widget));
-		if (with_children) {
-			for (size_t i = 0; i < widget->getChildren().size(); i++) {
-				removeWidget(widget->getChild(i), true);
+		Widget* parent = widget->getParent();
+		wAssert(parent);
+		CompVector<Widget*> children = widget->getChildren();
+		for (size_t i = 0; i < children.size(); i++) {
+			Widget* child = children[i];
+			if (with_children) {
+				removeWidget(child, true);
+			} else {
+				child->setParent(parent);
 			}
 		}
-		widget->getParent()->removeChild(widget);
+		parent->removeChild(widget);
 		widgets.remove(widget);
 	}
 
