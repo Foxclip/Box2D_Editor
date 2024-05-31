@@ -185,11 +185,12 @@ namespace fw {
 		resize_widget->setParent(this);
 		resize_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::RESIZE));
 		// outline
-		outline_widget = widget_list.createWidget<EmptyWidget>();
+		outline_widget = widget_list.createWidget<RectangleWidget>(width, height + WINDOW_HEADER_HEIGHT);
 		outline_widget->setName("outline");
 		outline_widget->setSize(width, WINDOW_HEADER_HEIGHT + height);
+		outline_widget->setFillColor(sf::Color::Transparent);
 		outline_widget->setSizePolicy(SizePolicy::PARENT);
-		outline_widget->OnAfterGlobalRender = [&](sf::RenderTarget& target) {
+		outline_widget->OnAfterRender = [&](sf::RenderTarget& target) {
 			sf::FloatRect quantized_bounds = quantize_rect(
 				outline_widget->getGlobalBounds(),
 				QUANTIZE_MODE_FLOOR_SUBTRACT
@@ -248,7 +249,7 @@ namespace fw {
 		return resize_widget;
 	}
 
-	EmptyWidget* WindowWidget::getOutlineWidget() const {
+	RectangleWidget* WindowWidget::getOutlineWidget() const {
 		return outline_widget;
 	}
 
