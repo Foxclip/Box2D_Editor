@@ -718,7 +718,7 @@ namespace fw {
 		wAssert(!widget_list.isLocked());
 		wAssert(!children_locked);
 		wAssert(children.contains(child));
-		wAssert(index >= 0 && index < getChildrenCount());
+		wAssert(index >= 0 && index <= getChildrenCount());
 		Stage stage = widget_list.application.getStage();
 		wAssert(
 			stage == Stage::NONE || stage == Stage::AFTER_INPUT,
@@ -743,7 +743,7 @@ namespace fw {
 	void Widget::moveToTop() {
 		wAssert(!widget_list.isLocked());
 		wAssert(parent);
-		moveToIndex(parent->getChildrenCount() - 1);
+		moveToIndex(parent->getChildrenCount());
 	}
 
 	void Widget::lockChildren() {
