@@ -181,6 +181,7 @@ private:
 	void windowWidgetChainTest(test::Test& test);
 	void windowWidgetDragLimitsTest(test::Test& test);
 	void windowWidgetResizeLimitsTest(test::Test& test);
+	void windowWidgetMoveToTopTest(test::Test& test);
 	void dropdownWidgetBasicTest(test::Test& test);
 	void dropdownWidgetOptions1Test(test::Test& test);
 	void dropdownWidgetOptions2Test(test::Test& test);
