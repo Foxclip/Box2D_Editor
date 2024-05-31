@@ -205,8 +205,8 @@ inline size_t CompVector<T, TCmp>::insert(const std::vector<T>::const_iterator& 
 
 template<typename T, typename TCmp>
 inline void CompVector<T, TCmp>::moveIndexToIndex(size_t src_index, size_t dst_index) {
-	assert(src_index >= 0 && src_index < vector.size());
-	assert(dst_index >= 0 && dst_index < vector.size());
+	assert(src_index >= 0 && src_index <= vector.size());
+	assert(dst_index >= 0 && dst_index <= vector.size());
 	if (dst_index == src_index || dst_index == src_index + 1) {
 		return;
 	}
@@ -221,7 +221,7 @@ inline void CompVector<T, TCmp>::moveIndexToIndex(size_t src_index, size_t dst_i
 
 template<typename T, typename TCmp>
 inline void CompVector<T, TCmp>::moveValueToIndex(const T& value, size_t dst_index) {
-	assert(dst_index >= 0 && dst_index < vector.size());
+	assert(dst_index >= 0 && dst_index <= vector.size());
 	size_t src_index = getIndex(value);
 	assert(src_index >= 0);
 	if (src_index == dst_index) {
