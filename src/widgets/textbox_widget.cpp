@@ -93,7 +93,7 @@ namespace fw {
 		return text_widget;
 	}
 
-	const sf::Font* TextBoxWidget::getFont() const {
+	const fw::Font& TextBoxWidget::getFont() const {
 		return text_widget->getFont();
 	}
 
@@ -165,7 +165,7 @@ namespace fw {
 
 	const sf::Glyph& TextBoxWidget::getGlyph(size_t index) const {
 		sf::Uint32 code = getValue()[index];
-		const sf::Glyph& glyph = text_widget->getFont()->getGlyph(code, getCharacterSize(), false);
+		const sf::Glyph& glyph = text_widget->getFont().getSfmlFont().getGlyph(code, getCharacterSize(), false);
 		return glyph;
 	}
 
@@ -221,7 +221,8 @@ namespace fw {
 		this->editor_fail_background_color = color;
 	}
 
-	void TextBoxWidget::setFont(const sf::Font& font) {
+	void TextBoxWidget::setFont(const fw::Font& font) {
+		this->font = font;
 		text_widget->setFont(font);
 	}
 
@@ -696,7 +697,7 @@ namespace fw {
 	}
 
 	void TextBoxWidget::updateTextScroll() {
-		if (!getFont()) {
+		if (!getFont().isLoaded()) {
 			return;
 		}
 		float char_pos = getLocalCharPos(cursor_pos, true, true).x;

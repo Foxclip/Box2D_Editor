@@ -218,7 +218,7 @@ namespace fw {
 		return header_text_widget->getFillColor();
 	}
 
-	const sf::Font* WindowWidget::getHeaderFont() const {
+	const fw::Font& WindowWidget::getHeaderFont() const {
 		return header_text_widget->getFont();
 	}
 
@@ -273,7 +273,7 @@ namespace fw {
 		header_text_widget->setFillColor(color);
 	}
 
-	void WindowWidget::setHeaderFont(const sf::Font& font) {
+	void WindowWidget::setHeaderFont(const fw::Font& font) {
 		header_text_widget->setFont(font);
 	}
 

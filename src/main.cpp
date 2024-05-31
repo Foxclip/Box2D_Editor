@@ -43,7 +43,6 @@ int main() {
     //run_tests();
     execute_app();
 
-    // TODO: double rendering for text
     // TODO: object list window (outliner)
     // TODO: render polygon indices
     // TODO: make widgets a separate library

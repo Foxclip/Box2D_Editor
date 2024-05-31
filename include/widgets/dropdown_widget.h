@@ -47,7 +47,7 @@ namespace fw {
 		void setPanelBackgroundColor(const sf::Color& color);
 		void setMainTextColor(const sf::Color& color);
 		void setPanelTextColor(const sf::Color& color);
-		void setFont(const sf::Font& font);
+		void setFont(const fw::Font& font);
 		void setCharacterSize(unsigned int size);
 		void setTextAnchor(Anchor anchor);
 		void setTextOriginAnchor(Anchor anchor);

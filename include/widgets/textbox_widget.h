@@ -53,7 +53,7 @@ namespace fw {
 		const sf::Color& getFailFillColor() const;
 		const sf::Color& getEditFailFillColor() const;
 		const TextWidget* getTextWidget() const;
-		const sf::Font* getFont() const;
+		const fw::Font& getFont() const;
 		unsigned int getCharacterSize() const;
 		const sf::String& getValue() const;
 		const sf::String getSelectedText() const;
@@ -76,7 +76,7 @@ namespace fw {
 		void setSelectionColor(const sf::Color& color);
 		void setFailFillColor(const sf::Color& color);
 		void setEditFailFillColor(const sf::Color& color);
-		void setFont(const sf::Font& font);
+		void setFont(const fw::Font& font);
 		void setCharacterSize(unsigned int size);
 		void setValueSilent(const sf::String& value);
 		void setValue(const sf::String& value);
@@ -134,6 +134,7 @@ namespace fw {
 		RectangleWidget* cursor_widget = nullptr;
 		RectangleWidget* selection_widget = nullptr;
 		TextBoxType textbox_type = TextBoxType::TEXT;
+		fw::Font font;
 		struct TextBoxHistoryEntry {
 			sf::String str;
 			size_t cursor_pos = 0;

@@ -109,7 +109,7 @@ void WidgetTests::createApplicationList(test::TestList* list) {
 
 void WidgetTests::createWidgetsList(test::TestList* list) {
     list->OnBeforeRunAllTests = [&]() {
-        textbox_font.loadFromFile("fonts/verdana.ttf");
+        textbox_font = fw::Font("fonts/verdana.ttf");
     };
     test::Test* root_widget_test = list->addTest("root_widget", [&](test::Test& test) { rootWidgetTest(test); });
     test::Test* empty_widget_test = list->addTest("empty_widget", { root_widget_test }, [&](test::Test& test) { emptyWidgetTest(test); });

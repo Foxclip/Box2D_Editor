@@ -292,6 +292,7 @@ namespace fw {
 		void setOriginInternal(float x, float y);
 		void setOriginInternal(const sf::Vector2f& origin);
 		void setSizeInternal(const sf::Vector2f& size);
+		void setRenderIterations(size_t iterations);
 		virtual void addChild(Widget* child);
 		virtual void removeChild(Widget* child);
 		void updateOrigin();
@@ -314,10 +315,13 @@ namespace fw {
 		virtual void internalOnMouseExit(const sf::Vector2f& pos);
 		virtual void internalOnFocused();
 		virtual void internalOnFocusLost();
+		virtual void internalOnBeforeRender();
+		virtual void internalOnAfterRender();
 
 	private:
 		WidgetVisibility visibility;
 		sf::RenderTexture render_texture;
+		size_t render_iterations = 1;
 		sf::View render_view;
 
 		std::string calcFullName() const;

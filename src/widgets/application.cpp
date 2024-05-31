@@ -56,7 +56,7 @@ namespace fw {
         return window.getSize();
     }
 
-    const sf::Font* Application::getDefaultFont() const {
+    const fw::Font& Application::getDefaultFont() const {
         return widgets.getDefaultFont();
     }
 
@@ -228,7 +228,7 @@ namespace fw {
         background_color = color;
     }
 
-    void Application::setDefaultFont(const sf::Font& font) {
+    void Application::setDefaultFont(const fw::Font& font) {
         widgets.setDefaultFont(font);
     }
 

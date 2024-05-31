@@ -110,7 +110,7 @@ protected:
 
 private:
 	sf::RenderWindow window;
-	sf::Font textbox_font;
+	fw::Font textbox_font;
 	std::mt19937 rng;
 
 	void toposortEmptyTest(test::Test& test);

@@ -186,11 +186,11 @@ void Editor::initTools() {
 }
 
 void Editor::initUi() {
-    loadFont(ui_font, "fonts/STAN0757.TTF");
-    loadFont(fps_font, "fonts/fraps.ttf");
-    loadFont(console_font, "fonts/courbd.ttf");
-    loadFont(small_font, "fonts/HelvetiPixel.ttf");
-    loadFont(textbox_font, "fonts/verdana.ttf");
+    ui_font = fw::Font("fonts/STAN0757.TTF");
+    fps_font = fw::Font("fonts/fraps.ttf");
+    console_font = fw::Font("fonts/courbd.ttf");
+    small_font = fw::Font("fonts/HelvetiPixel.ttf");
+    textbox_font = fw::Font("fonts/verdana.ttf", true);
     setDefaultFont(textbox_font);
 
     arrow_cursor.loadFromSystem(sf::Cursor::Arrow);
@@ -205,7 +205,7 @@ void Editor::initUi() {
     size_bottom_right_cursor.loadFromSystem(sf::Cursor::SizeBottomRight);
     window.setMouseCursor(arrow_cursor);
 
-    vertex_text.setFont(ui_font);
+    vertex_text.setFont(ui_font.getSfmlFont());
     vertex_text.setCharacterSize(20);
     vertex_text.setFillColor(sf::Color::White);
 
@@ -214,7 +214,7 @@ void Editor::initUi() {
     origin_shape.setOutlineColor(sf::Color::Black);
     origin_shape.setOutlineThickness(1.0f);
 
-    object_info_text.setFont(small_font);
+    object_info_text.setFont(small_font.getSfmlFont());
     object_info_text.setCharacterSize(16);
     object_info_text.setFillColor(sf::Color::White);
 
@@ -1036,13 +1036,6 @@ void Editor::selectCreateType(size_t type) {
 void Editor::togglePause() {
     paused = !paused;
     paused_rect_widget->setVisible(paused);
-}
-
-void Editor::loadFont(sf::Font& font, const std::string& filename, bool smooth) {
-    if (!font.loadFromFile(filename)) {
-        throw std::runtime_error("Font loading error (" + filename + ")");
-    }
-    font.setSmooth(smooth);
 }
 
 sf::Vector2f Editor::screenToWorld(const sf::Vector2f& screen_pos) const {

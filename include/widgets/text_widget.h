@@ -13,7 +13,7 @@ namespace fw {
 		sf::FloatRect getLocalBounds() const override;
 		sf::FloatRect getVisualLocalBounds() const override;
 		sf::Vector2f getRenderPositionOffset() const override;
-		const sf::Font* getFont() const;
+		const fw::Font& getFont() const;
 		size_t getStringSize() const;
 		unsigned int getCharacterSize() const;
 		const sf::Color& getFillColor() const override;
@@ -23,7 +23,7 @@ namespace fw {
 		sf::Vector2f getParentLocalCharPos(size_t index, bool top_aligned = true, bool with_kerning = true) const;
 		sf::Vector2f getGlobalCharPos(size_t index, bool top_aligned = true, bool with_kerning = true) const;
 		size_t getCharAt(const sf::Vector2f& pos) const;
-		void setFont(const sf::Font& font);
+		void setFont(const fw::Font& font);
 		void setCharacterSize(unsigned int size);
 		void setFillColor(const sf::Color& color) override;
 		void setAdjustLocalBounds(bool value);
@@ -43,7 +43,7 @@ namespace fw {
 
 	private:
 		sf::Text text;
-
+		fw::Font font;
 	};
 
 }

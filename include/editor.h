@@ -124,11 +124,11 @@ private:
 		&edit_tool,
 		&create_tool,
 	};
-	sf::Font ui_font;
-	sf::Font fps_font;
-	sf::Font console_font;
-	sf::Font small_font;
-	sf::Font textbox_font;
+	fw::Font ui_font;
+	fw::Font fps_font;
+	fw::Font console_font;
+	fw::Font small_font;
+	fw::Font textbox_font;
 	fw::ContainerWidget* paused_rect_widget;
 	fw::ContainerWidget* toolbox_widget;
 	Tool* selected_tool = nullptr;

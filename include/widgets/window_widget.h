@@ -26,7 +26,7 @@ namespace fw {
 		void getHeaderColor() const;
 		const sf::String& getHeaderText() const;
 		const sf::Color& getHeaderTextColor() const;
-		const sf::Font* getHeaderFont() const;
+		const fw::Font& getHeaderFont() const;
 		unsigned int getHeaderTextCharacterSize() const;
 		const sf::Color& getOutlineColor() const;
 		const CompVector<Widget*>& getWindowChildren() const;
@@ -38,7 +38,7 @@ namespace fw {
 		void setHeaderColor(const sf::Color& color);
 		void setHeaderText(const sf::String& text);
 		void setHeaderTextColor(const sf::Color& color);
-		void setHeaderFont(const sf::Font& font);
+		void setHeaderFont(const fw::Font& font);
 		void setHeaderTextCharacterSize(unsigned int size);
 		void setSize(float width, float height) override;
 		void setOutlineColor(const sf::Color& color);

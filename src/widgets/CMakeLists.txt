@@ -7,6 +7,7 @@ target_sources(widgets_lib PRIVATE
     "${INCLUDE_DIR}/widgets/drawing.h"
     "${INCLUDE_DIR}/widgets/dropdown_widget.h"
     "${INCLUDE_DIR}/widgets/empty_widget.h"
+    "${INCLUDE_DIR}/widgets/font.h"
     "${INCLUDE_DIR}/widgets/polygon_widget.h"
     "${INCLUDE_DIR}/widgets/rectangle_widget.h"
     "${INCLUDE_DIR}/widgets/shape_widget.h"
@@ -30,6 +31,7 @@ target_sources(widgets_lib PRIVATE
     drawing.cpp
     dropdown_widget.cpp
     empty_widget.cpp
+    font.cpp
     polygon_widget.cpp
     rectangle_widget.cpp
     shape_widget.cpp

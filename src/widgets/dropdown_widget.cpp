@@ -146,8 +146,8 @@ namespace fw {
 		option_widget->setGlobalRenderLayer(GlobalRenderLayer::DROPDOWN_PANEL);
 		option_widgets.insert(option_widgets.begin() + index, option_widget);
 		TextWidget* option_text_widget = widget_list.createWidget<TextWidget>();
-		if (text_widget->getFont()) {
-			option_text_widget->setFont(*text_widget->getFont());
+		if (text_widget->getFont().isLoaded()) {
+			option_text_widget->setFont(text_widget->getFont());
 		}
 		option_text_widget->setCharacterSize(text_widget->getCharacterSize());
 		option_text_widget->setParentAnchor(text_widget->getParentAnchor());
@@ -258,7 +258,7 @@ namespace fw {
 		}
 	}
 
-	void DropdownWidget::setFont(const sf::Font& font) {
+	void DropdownWidget::setFont(const fw::Font& font) {
 		text_widget->setFont(font);
 		for (size_t i = 0; i < option_widgets.size(); i++) {
 			RectangleWidget* option_widget = option_widgets[i];

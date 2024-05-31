@@ -812,6 +812,11 @@ namespace fw {
 		setSizeInternal(size.x, size.y);
 	}
 
+	void Widget::setRenderIterations(size_t iterations) {
+		wAssert(!widget_list.isLocked());
+		this->render_iterations = iterations;
+	}
+
 	void Widget::addChild(Widget* child) {
 		wAssert(!widget_list.isLocked());
 		wAssert(!children_locked);
@@ -945,6 +950,10 @@ namespace fw {
 
 	void Widget::internalOnFocusLost() { }
 
+	void Widget::internalOnBeforeRender() { }
+
+	void Widget::internalOnAfterRender() { }
+
 	std::string Widget::calcFullName() const {
 		CompVector<Widget*> parents = getParentChain();
 		std::string result;
@@ -996,7 +1005,9 @@ namespace fw {
 		OnBeforeRender(render_texture);
 		sf::Drawable* drawable = getDrawable();
 		wAssert(drawable);
-		render_texture.draw(*drawable, combined);
+		for (size_t i = 0; i < render_iterations; i++) {
+			render_texture.draw(*drawable, combined);
+		}
 		OnAfterRender(render_texture);
 		render_texture.display();
 	}

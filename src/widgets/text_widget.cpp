@@ -6,8 +6,8 @@ namespace fw {
 	TextWidget::TextWidget(WidgetList& widget_list) : Widget(widget_list) {
 		type = WidgetType::Text;
 		setName("text");
-		if (widget_list.getDefaultFont()) {
-			setFont(*widget_list.getDefaultFont());
+		if (widget_list.getDefaultFont().isLoaded()) {
+			setFont(widget_list.getDefaultFont());
 		}
 	}
 
@@ -44,8 +44,8 @@ namespace fw {
 		return -offset;
 	}
 
-	const sf::Font* TextWidget::getFont() const {
-		return text.getFont();
+	const fw::Font& TextWidget::getFont() const {
+		return font;
 	}
 
 	size_t TextWidget::getStringSize() const {
@@ -70,12 +70,12 @@ namespace fw {
 		}
 		sf::Uint32 left_char = getString()[index - 1];
 		sf::Uint32 right_char = getString()[index];
-		float kerning = getFont()->getKerning(left_char, right_char, getCharacterSize());
+		float kerning = getFont().getSfmlFont().getKerning(left_char, right_char, getCharacterSize());
 		return kerning;
 	}
 
 	sf::Vector2f TextWidget::getLocalCharPos(size_t index, bool top_aligned, bool with_kerning) const {
-		wAssert(getFont());
+		wAssert(getFont().isLoaded());
 		// Transformable's position is not used,
 		// so findCharacterPos returns position in local coordinates
 		sf::Vector2f local_char_pos = text.findCharacterPos(index);
@@ -112,8 +112,10 @@ namespace fw {
 		return result;
 	}
 
-	void TextWidget::setFont(const sf::Font& font) {
-		text.setFont(font);
+	void TextWidget::setFont(const fw::Font& font) {
+		this->font = font;
+		setRenderIterations(font.isDoubleRendered() ? 2 : 1);
+		text.setFont(font.getSfmlFont());
 	}
 
 	void TextWidget::setCharacterSize(unsigned int size) {
@@ -171,7 +173,7 @@ namespace fw {
 	}
 
 	void TextWidget::internalUpdate() {
-		wAssert(getFont(), 
+		wAssert(getFont().isLoaded(),
 			"Font is not set for " + full_name +
 			", consider setting default font in WidgetList"
 		);

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <numbers>
 #include "logger.h"
+#include "font.h"
 
 namespace fw {
 
