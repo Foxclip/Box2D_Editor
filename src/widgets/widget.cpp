@@ -855,6 +855,9 @@ namespace fw {
 		if (parent_anchor == Anchor::CUSTOM) {
 			return;
 		}
+		if (parent->getType() == WidgetType::Container) {
+			return;
+		}
 		sf::Vector2f parent_size = parent->getLocalBounds().getSize();
 		sf::Vector2f anchored_pos = getPosition();
 		anchored_pos = anchorToPos(parent_anchor, parent_size);
@@ -868,6 +871,9 @@ namespace fw {
 			return;
 		}
 		if (parent_anchor == Anchor::CUSTOM) {
+			return;
+		}
+		if (parent->getType() == WidgetType::Container) {
 			return;
 		}
 		sf::Vector2f parent_size = parent->getLocalBounds().getSize();

@@ -43,7 +43,6 @@ int main() {
     run_tests();
     //execute_app();
 
-    // TODO: POS_X entry depends on CHILDREN_X entry of the parent
     // TODO: require font for TextWidget
     // TODO: object list window (outliner)
     // TODO: render polygon indices

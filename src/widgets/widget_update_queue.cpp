@@ -74,6 +74,12 @@ namespace fw {
 		if (entry->update_type == WidgetUpdateType::NORMAL) {
 			// nothing
 		} else if (entry->update_type == WidgetUpdateType::POS_X) {
+			// pos entry depends on parent's children x entry,
+			// and so all entries dependent on pos entry will be updated
+			// after parent's children x entry
+			if (entry->widget->getParent() && entry->widget->getParent()->getType() == Widget::WidgetType::Container) {
+				result.add(&entry->widget->getParent()->children_x_entry);
+			}
 			// some anchors need parent size
 			WidgetUpdateQueueEntry* size_x_entry = &entry->widget->getParent()->size_x_entry;
 			if (entry->widget->getParentAnchor() == Widget::Anchor::TOP_CENTER) {
@@ -90,6 +96,9 @@ namespace fw {
 				result.add(size_x_entry);
 			}
 		} else if (entry->update_type == WidgetUpdateType::POS_Y) {
+			if (entry->widget->getParent() && entry->widget->getParent()->getType() == Widget::WidgetType::Container) {
+				result.add(&entry->widget->getParent()->children_y_entry);
+			}
 			WidgetUpdateQueueEntry* size_y_entry = &entry->widget->getParent()->size_y_entry;
 			if (entry->widget->getParentAnchor() == Widget::Anchor::CENTER_LEFT) {
 				result.add(size_y_entry);
@@ -151,7 +160,6 @@ namespace fw {
 				for (Widget* child : entry->widget->getChildren()) {
 					// child's position and size update needs to be overwritten by container update
 					if (container->getHorizontal()) {
-						result.add(&child->pos_x_entry);
 						// avoiding a loop
 						if (child->getSizeXPolicy() != Widget::SizePolicy::EXPAND) {
 							result.add(&child->size_x_entry);
@@ -168,7 +176,6 @@ namespace fw {
 			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(entry->widget)) {
 				for (Widget* child : entry->widget->getChildren()) {
 					if (!container->getHorizontal()) {
-						result.add(&child->pos_y_entry);
 						if (child->getSizeXPolicy() != Widget::SizePolicy::EXPAND) {
 							result.add(&child->size_y_entry);
 						}
