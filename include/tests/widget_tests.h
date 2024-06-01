@@ -196,7 +196,18 @@ private:
 	static std::string anchorToStr(fw::Widget::Anchor anchor);
 	static bool rectApproxCmp(const sf::FloatRect& left, const sf::FloatRect& right);
 	fw::TextBoxWidget* initTextBox(fw::Application& application, float width, float height) const;
-	void mouseDrag(fw::Application& application, const sf::Vector2f& begin_pos, const sf::Vector2f& offset);
+	void mouseDragGesture(fw::Application& application, const sf::Vector2f& begin_pos, const sf::Vector2f& offset);
+	enum class ResizePoint {
+		TOP_LEFT,
+		TOP,
+		TOP_RIGHT,
+		LEFT,
+		RIGHT,
+		BOTTOM_LEFT,
+		BOTTOM,
+		BOTTOM_RIGHT
+	};
+	void resizeWindow(fw::WindowWidget* window, ResizePoint resize_point, const sf::Vector2f offset);
 	void resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget);
 	sf::Vector2f getHeaderCenter(fw::WindowWidget* window);
 	void dragWindow(fw::Application& application, fw::WindowWidget* window, const sf::Vector2f& offset);

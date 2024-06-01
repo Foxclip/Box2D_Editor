@@ -3021,11 +3021,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(min_size.x, min_size.y + child_header_height);
         sf::FloatRect new_bounds = sf::FloatRect(child_window->getBottomRight() + sf::Vector2f(-new_size.x, -new_size.y), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalTopLeft() + sf::Vector2f(-cursor_offset, -cursor_offset),
-            sf::Vector2f(child_width, child_height)
-        );
+        resizeWindow(child_window, ResizePoint::TOP_LEFT, sf::Vector2f(child_width, child_height));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3033,11 +3029,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(child_width, min_size.y + child_header_height);
         sf::FloatRect new_bounds = sf::FloatRect(child_window->getBottomLeft() + sf::Vector2f(0.0f, -new_size.y), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalTop() + sf::Vector2f(0.0f, -cursor_offset),
-            sf::Vector2f(0.0f, child_height)
-        );
+        resizeWindow(child_window, ResizePoint::TOP, sf::Vector2f(0.0f, child_height));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3045,11 +3037,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(min_size.x, min_size.y + child_header_height);
         sf::FloatRect new_bounds = sf::FloatRect(child_window->getBottomLeft() + sf::Vector2f(0.0f, -new_size.y), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalTopRight() + sf::Vector2f(cursor_offset, -cursor_offset),
-            sf::Vector2f(-child_width, child_height)
-        );
+        resizeWindow(child_window, ResizePoint::TOP_RIGHT, sf::Vector2f(-child_width, child_height));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3057,11 +3045,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(min_size.x, child_height);
         sf::FloatRect new_bounds = sf::FloatRect(child_window->getTopRight() + sf::Vector2f(-new_size.x, 0.0f), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalLeft() + sf::Vector2f(-cursor_offset, 0.0f),
-            sf::Vector2f(child_width, 0.0f)
-        );
+        resizeWindow(child_window, ResizePoint::LEFT, sf::Vector2f(child_width, 0.0f));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3069,11 +3053,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(min_size.x, child_height);
         sf::FloatRect new_bounds = sf::FloatRect(child_window->getTopLeft(), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalRight() + sf::Vector2f(cursor_offset, 0.0f),
-            sf::Vector2f(-child_width, 0.0f)
-        );
+        resizeWindow(child_window, ResizePoint::RIGHT, sf::Vector2f(-child_width, 0.0f));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3081,11 +3061,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(min_size.x, min_size.y + child_header_height);
         sf::FloatRect new_bounds = sf::FloatRect(child_window->getTopRight() + sf::Vector2f(-new_size.x, 0.0f), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalBottomLeft() + sf::Vector2f(-cursor_offset, cursor_offset),
-            sf::Vector2f(child_width, -child_height)
-        );
+        resizeWindow(child_window, ResizePoint::BOTTOM_LEFT, sf::Vector2f(child_width, -child_height));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3093,11 +3069,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(child_width, min_size.y + child_header_height);
         sf::FloatRect new_bounds = sf::FloatRect(child_window->getTopLeft(), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalBottom() + sf::Vector2f(0.0f, cursor_offset),
-            sf::Vector2f(0.0f, -child_height)
-        );
+        resizeWindow(child_window, ResizePoint::BOTTOM, sf::Vector2f(0.0f, -child_height));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3105,11 +3077,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(min_size.x, min_size.y + child_header_height);
         sf::FloatRect new_bounds = sf::FloatRect(child_window->getTopLeft(), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalBottomRight() + sf::Vector2f(cursor_offset, cursor_offset),
-            sf::Vector2f(-child_width, -child_height)
-        );
+        resizeWindow(child_window, ResizePoint::BOTTOM_RIGHT, sf::Vector2f(-child_width, -child_height));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
 
@@ -3119,11 +3087,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(child_width + parent_width, child_window->getBottom().y);
         sf::FloatRect new_bounds = sf::FloatRect(sf::Vector2f(child_pos.x - parent_width, 0.0f), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalTopLeft() + sf::Vector2f(-cursor_offset, -cursor_offset),
-            sf::Vector2f(-parent_width, -parent_height)
-        );
+        resizeWindow(child_window, ResizePoint::TOP_LEFT, sf::Vector2f(-parent_width, -parent_height));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3131,11 +3095,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(child_width + parent_width, child_window->getBottom().y);
         sf::FloatRect new_bounds = sf::FloatRect(sf::Vector2f(child_pos.x, 0.0f), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalTopRight() + sf::Vector2f(cursor_offset, -cursor_offset),
-            sf::Vector2f(parent_width, -parent_height)
-        );
+        resizeWindow(child_window, ResizePoint::TOP_RIGHT, sf::Vector2f(parent_width, -parent_height));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3143,11 +3103,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(child_width + parent_width, child_height + parent_height);
         sf::FloatRect new_bounds = sf::FloatRect(sf::Vector2f(child_pos.x - parent_width, child_pos.y), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalBottomLeft() + sf::Vector2f(-cursor_offset, cursor_offset),
-            sf::Vector2f(-parent_width, parent_height)
-        );
+        resizeWindow(child_window, ResizePoint::BOTTOM_LEFT, sf::Vector2f(-parent_width, parent_height));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3155,11 +3111,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
         reset_child_window();
         sf::Vector2f new_size = sf::Vector2f(child_width + parent_width, child_height + parent_height);
         sf::FloatRect new_bounds = sf::FloatRect(sf::Vector2f(child_pos.x, child_pos.y), new_size);
-        mouseDrag(
-            application,
-            child_window->getGlobalBottomRight() + sf::Vector2f(cursor_offset, cursor_offset),
-            sf::Vector2f(parent_width, parent_height)
-        );
+        resizeWindow(child_window, ResizePoint::BOTTOM_RIGHT, sf::Vector2f(parent_width, parent_height));
         T_COMPARE(child_window->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
 }
@@ -3214,8 +3166,7 @@ void WidgetTests::windowWidgetMoveToTopResizeTest(test::Test& test) {
     dragWindow(application, window_widget, sf::Vector2f(window_width, 0.0f));
     T_VEC2_APPROX_COMPARE(window_widget->getPosition(), position1);
 
-    float cursor_offset = fw::WINDOW_RESIZE_MARGIN / 2.0f;
-    mouseDrag(application, window_widget->getGlobalBottom() + sf::Vector2f(0.0f, cursor_offset), resize_offset);
+    resizeWindow(window_widget, ResizePoint::BOTTOM, resize_offset);
     dragWindow(application, window_widget, sf::Vector2f(window_width, 0.0f));
     T_VEC2_APPROX_COMPARE(window_widget->getPosition(), position2);
 }
@@ -3454,7 +3405,7 @@ fw::TextBoxWidget* WidgetTests::initTextBox(fw::Application& application, float 
     return textbox_widget;
 }
 
-void WidgetTests::mouseDrag(
+void WidgetTests::mouseDragGesture(
     fw::Application& application,
     const sf::Vector2f& begin_pos,
     const sf::Vector2f& offset
@@ -3469,8 +3420,32 @@ void WidgetTests::mouseDrag(
     application.advance();
 }
 
-void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget) {
+void WidgetTests::resizeWindow(fw::WindowWidget* window, ResizePoint resize_point, const sf::Vector2f offset) {
     float cursor_offset = fw::WINDOW_RESIZE_MARGIN / 2.0f;
+    sf::Vector2f grab_pos;
+    if (resize_point == ResizePoint::TOP_LEFT) {
+        grab_pos = window->getGlobalTopLeft() + sf::Vector2f(-cursor_offset, -cursor_offset);
+    } else if (resize_point == ResizePoint::TOP) {
+        grab_pos = window->getGlobalTop() + sf::Vector2f(0.0f, -cursor_offset);
+    } else if (resize_point == ResizePoint::TOP_RIGHT) {
+        grab_pos = window->getGlobalTopRight() + sf::Vector2f(cursor_offset, -cursor_offset);
+    } else if (resize_point == ResizePoint::LEFT) {
+        grab_pos = window->getGlobalLeft() + sf::Vector2f(-cursor_offset, 0.0f);
+    } else if (resize_point == ResizePoint::RIGHT) {
+        grab_pos = window->getGlobalRight() + sf::Vector2f(cursor_offset, 0.0f);
+    } else if (resize_point == ResizePoint::BOTTOM_LEFT) {
+        grab_pos = window->getGlobalBottomLeft() + sf::Vector2f(-cursor_offset, cursor_offset);
+    } else if (resize_point == ResizePoint::BOTTOM) {
+        grab_pos = window->getGlobalBottom() + sf::Vector2f(0.0f, cursor_offset);
+    } else if (resize_point == ResizePoint::BOTTOM_RIGHT) {
+        grab_pos = window->getGlobalBottomRight() + sf::Vector2f(cursor_offset, cursor_offset);
+    } else {
+        mAssert(false, "Unknown resize point");
+    }
+    mouseDragGesture(window->getWidgetList().getApplication(), grab_pos, offset);
+}
+
+void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget) {
     sf::Vector2f resize_offset(15.0f, 10.0f);
 
     {
@@ -3479,11 +3454,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
             widget->getTopLeft() + resize_offset,
             widget->getSize() - resize_offset
         );
-        mouseDrag(
-            application,
-            widget->getGlobalTopLeft() + sf::Vector2f(-cursor_offset, -cursor_offset),
-            resize_offset
-        );
+        resizeWindow(widget, ResizePoint::TOP_LEFT, resize_offset);
         T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3492,11 +3463,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
             widget->getTopLeft() + sf::Vector2f(0.0f, resize_offset.y),
             widget->getSize() + sf::Vector2f(0.0f, -resize_offset.y)
         );
-        mouseDrag(
-            application,
-            widget->getGlobalTop() + sf::Vector2f(0.0f, -cursor_offset),
-            resize_offset
-        );
+        resizeWindow(widget, ResizePoint::TOP, resize_offset);
         T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3505,11 +3472,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
             widget->getTopLeft() + sf::Vector2f(0.0f, resize_offset.y),
             widget->getSize() + sf::Vector2f(resize_offset.x, -resize_offset.y)
         );
-        mouseDrag(
-            application,
-            widget->getGlobalTopRight() + sf::Vector2f(cursor_offset, -cursor_offset),
-            resize_offset
-        );
+        resizeWindow(widget, ResizePoint::TOP_RIGHT, resize_offset);
         T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3518,11 +3481,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
             widget->getTopLeft() + sf::Vector2f(resize_offset.x, 0.0f),
             widget->getSize() + sf::Vector2f(-resize_offset.x, 0.0f)
         );
-        mouseDrag(
-            application,
-            widget->getGlobalLeft() + sf::Vector2f(-cursor_offset, 0.0f),
-            resize_offset
-        );
+        resizeWindow(widget, ResizePoint::LEFT, resize_offset);
         T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3531,11 +3490,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
             widget->getTopLeft(),
             widget->getSize() + sf::Vector2f(resize_offset.x, 0.0f)
         );
-        mouseDrag(
-            application,
-            widget->getGlobalRight() + sf::Vector2f(cursor_offset, 0.0f),
-            resize_offset
-        );
+        resizeWindow(widget, ResizePoint::RIGHT, resize_offset);
         T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3544,11 +3499,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
             widget->getTopLeft() + sf::Vector2f(resize_offset.x, 0.0f),
             widget->getSize() + sf::Vector2f(-resize_offset.x, resize_offset.y)
         );
-        mouseDrag(
-            application,
-            widget->getGlobalBottomLeft() + sf::Vector2f(-cursor_offset, cursor_offset),
-            resize_offset
-        );
+        resizeWindow(widget, ResizePoint::BOTTOM_LEFT, resize_offset);
         T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3557,11 +3508,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
             widget->getTopLeft(),
             widget->getSize() + sf::Vector2f(0.0f, resize_offset.y)
         );
-        mouseDrag(
-            application,
-            widget->getGlobalBottom() + sf::Vector2f(0.0f, cursor_offset),
-            resize_offset
-        );
+        resizeWindow(widget, ResizePoint::BOTTOM, resize_offset);
         T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
     {
@@ -3570,11 +3517,7 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
             widget->getTopLeft(),
             widget->getSize() + resize_offset
         );
-        mouseDrag(
-            application,
-            widget->getGlobalBottomRight() + sf::Vector2f(cursor_offset, cursor_offset),
-            resize_offset
-        );
+        resizeWindow(widget, ResizePoint::BOTTOM_RIGHT, resize_offset);
         T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
 }
