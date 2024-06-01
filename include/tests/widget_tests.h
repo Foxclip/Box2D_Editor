@@ -181,7 +181,8 @@ private:
 	void windowWidgetChainTest(test::Test& test);
 	void windowWidgetDragLimitsTest(test::Test& test);
 	void windowWidgetResizeLimitsTest(test::Test& test);
-	void windowWidgetMoveToTopTest(test::Test& test);
+	void windowWidgetMoveToTopDragTest(test::Test& test);
+	void windowWidgetMoveToTopResizeTest(test::Test& test);
 	void dropdownWidgetBasicTest(test::Test& test);
 	void dropdownWidgetOptions1Test(test::Test& test);
 	void dropdownWidgetOptions2Test(test::Test& test);
@@ -197,6 +198,8 @@ private:
 	fw::TextBoxWidget* initTextBox(fw::Application& application, float width, float height) const;
 	void mouseDrag(fw::Application& application, const sf::Vector2f& begin_pos, const sf::Vector2f& offset);
 	void resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget);
+	sf::Vector2f getHeaderCenter(fw::WindowWidget* window);
+	void dragWindow(fw::Application& application, fw::WindowWidget* window, const sf::Vector2f& offset);
 	void genericWidgetTest(const GenericWidgetTest& gwt);
 	bool layer_contains(const std::vector<Node*>& layer, const std::string& name);
 

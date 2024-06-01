@@ -158,7 +158,8 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* window_widget_chain_test = list->addTest("window_widget_chain", { window_widget_children_test, window_widget_resize_test }, [&](test::Test& test) { windowWidgetChainTest(test); });
     test::Test* window_widget_drag_limits_test = list->addTest("window_widget_drag_limits", { window_widget_drag_test, window_widget_chain_test }, [&](test::Test& test) { windowWidgetDragLimitsTest(test); });
     test::Test* window_widget_resize_limits_test = list->addTest("window_widget_resize_limits", { window_widget_chain_test }, [&](test::Test& test) { windowWidgetResizeLimitsTest(test); });
-    test::Test* window_widget_move_to_top_test = list->addTest("window_widget_move_to_top", { window_widget_drag_test, window_widget_resize_test }, [&](test::Test& test) { windowWidgetMoveToTopTest(test); });
+    test::Test* window_widget_move_to_top_drag_test = list->addTest("window_widget_move_to_top_drag", { window_widget_drag_test }, [&](test::Test& test) { windowWidgetMoveToTopDragTest(test); });
+    test::Test* window_widget_move_to_top_resize_test = list->addTest("window_widget_move_to_top_resize", { window_widget_drag_test, window_widget_resize_test }, [&](test::Test& test) { windowWidgetMoveToTopResizeTest(test); });
     test::Test* dropdown_widget_basic_test = list->addTest("dropdown_widget_basic", { rectangle_widget_test, polygon_widget_basic_test, text_widget_test }, [&](test::Test& test) { dropdownWidgetBasicTest(test); });
     test::Test* dropdown_widget_options_1_test = list->addTest("dropdown_widget_options_1", { dropdown_widget_basic_test }, [&](test::Test& test) { dropdownWidgetOptions1Test(test); });
     test::Test* dropdown_widget_options_2_test = list->addTest("dropdown_widget_options_2", { dropdown_widget_options_1_test }, [&](test::Test& test) { dropdownWidgetOptions2Test(test); });
@@ -2824,16 +2825,9 @@ void WidgetTests::windowWidgetDragTest(test::Test& test) {
     window_widget->setPosition(position);
     window_widget->setHeaderFont(textbox_font);
     sf::Vector2f header_center = window_widget->getHeaderWidget()->getGlobalCenter();
-    sf::Vector2f offset_pos = sf::Vector2f(50.0f, 30.0f);
-    sf::Vector2f new_position = position + offset_pos;
-    application.mouseMove(header_center);
-    application.advance();
-    application.mouseLeftPress();
-    application.advance();
-    application.mouseMove(header_center + offset_pos);
-    application.advance();
-    application.mouseLeftRelease();
-    application.advance();
+    sf::Vector2f offset = sf::Vector2f(50.0f, 30.0f);
+    sf::Vector2f new_position = position + offset;
+    dragWindow(application, window_widget, offset);
     T_VEC2_APPROX_COMPARE(window_widget->getGlobalPosition(), new_position);
 }
 
@@ -3170,7 +3164,7 @@ void WidgetTests::windowWidgetResizeLimitsTest(test::Test& test) {
     }
 }
 
-void WidgetTests::windowWidgetMoveToTopTest(test::Test& test) {
+void WidgetTests::windowWidgetMoveToTopDragTest(test::Test& test) {
     fw::Application application(window);
     application.init("Test window", 800, 600, 0, false);
     application.setDefaultFont(textbox_font);
@@ -3186,29 +3180,44 @@ void WidgetTests::windowWidgetMoveToTopTest(test::Test& test) {
     fw::WindowWidget* window_2_widget = application.getWidgets().createWidget<fw::WindowWidget>(size2);
     window_1_widget->setPosition(position1);
     window_2_widget->setPosition(position2);
-    sf::Vector2f header_1_center = window_1_widget->getHeaderWidget()->getGlobalCenter();
-    auto get_header_center = [&](fw::WindowWidget* window) {
-        return window->getHeaderWidget()->getGlobalCenter();
-    };
-    auto drag_window = [&](fw::WindowWidget* window, const sf::Vector2f& offset) {
-        sf::Vector2f header_center = get_header_center(window);
-        application.mouseMove(header_center);
-        application.advance();
-        application.mouseLeftPress();
-        application.advance();
-        application.mouseMove(header_center + offset);
-        application.advance();
-        application.mouseLeftRelease();
-        application.advance();
-    };
-    drag_window(window_1_widget, sf::Vector2f(window_width, 0.0f));
+    dragWindow(application, window_1_widget, sf::Vector2f(window_width, 0.0f));
     T_VEC2_APPROX_COMPARE(window_1_widget->getPosition(), window_2_widget->getPosition());
-    drag_window(window_1_widget, sf::Vector2f(window_width, 0.0f));
+    dragWindow(application, window_1_widget, sf::Vector2f(window_width, 0.0f));
     T_VEC2_APPROX_COMPARE(window_1_widget->getPosition(), window_2_widget->getPosition() + sf::Vector2f(window_width, 0.0f));
-    drag_window(window_2_widget, sf::Vector2f(window_width, 0.0f));
+    dragWindow(application, window_2_widget, sf::Vector2f(window_width, 0.0f));
     T_VEC2_APPROX_COMPARE(window_2_widget->getPosition(), window_1_widget->getPosition());
-    drag_window(window_2_widget, sf::Vector2f(window_width, 0.0f));
+    dragWindow(application, window_2_widget, sf::Vector2f(window_width, 0.0f));
     T_VEC2_APPROX_COMPARE(window_2_widget->getPosition(), window_1_widget->getPosition() + sf::Vector2f(window_width, 0.0f));
+}
+
+void WidgetTests::windowWidgetMoveToTopResizeTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.setDefaultFont(textbox_font);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    float window_width = 100.0f;
+    sf::Vector2f position1(100.0f, 100.0f);
+    sf::Vector2f pos_offset(window_width, 0.0f);
+    sf::Vector2f position2(position1.x + window_width, 100.0f);
+    sf::Vector2f square_position = position1;
+    sf::Vector2f window_size(window_width, 100.0f);
+    sf::Vector2f square_size(window_width, window_size.y / 2.0f);
+    sf::Vector2f resize_offset(0.0f, 10.0f);
+    fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(window_size);
+    fw::RectangleWidget* square_widget = application.getWidgets().createWidget<fw::RectangleWidget>(square_size);
+    window_widget->setPosition(position1);
+    square_widget->setPosition(position1);
+    square_widget->setClickThrough(false);
+
+    dragWindow(application, window_widget, sf::Vector2f(window_width, 0.0f));
+    T_VEC2_APPROX_COMPARE(window_widget->getPosition(), position1);
+
+    float cursor_offset = fw::WINDOW_RESIZE_MARGIN / 2.0f;
+    mouseDrag(application, window_widget->getGlobalBottom() + sf::Vector2f(0.0f, cursor_offset), resize_offset);
+    dragWindow(application, window_widget, sf::Vector2f(window_width, 0.0f));
+    T_VEC2_APPROX_COMPARE(window_widget->getPosition(), position2);
 }
 
 void WidgetTests::dropdownWidgetBasicTest(test::Test& test) {
@@ -3568,6 +3577,22 @@ void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& tes
         );
         T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
     }
+}
+
+sf::Vector2f WidgetTests::getHeaderCenter(fw::WindowWidget* window) {
+    return window->getHeaderWidget()->getGlobalCenter();
+}
+
+void WidgetTests::dragWindow(fw::Application& application, fw::WindowWidget* window, const sf::Vector2f& offset) {
+    sf::Vector2f header_center = getHeaderCenter(window);
+    application.mouseMove(header_center);
+    application.advance();
+    application.mouseLeftPress();
+    application.advance();
+    application.mouseMove(header_center + offset);
+    application.advance();
+    application.mouseLeftRelease();
+    application.advance();
 }
 
 void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
