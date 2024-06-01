@@ -269,11 +269,12 @@ namespace fw {
 			}
 		}
 		if (debug_render) {
-			root_widget->renderBounds(target, sf::Color::Green, true);
+			root_widget->renderBounds(target, DEBUG_RENDER_BOUNDS_COLOR, true, false);
+			root_widget->renderBounds(target, DEBUG_RENDER_TRANSFORMED_BOUNDS_COLOR, true, true);
 			root_widget->renderOrigin(target);
 		}
 		if (focused_widget) {
-			focused_widget->renderBounds(target, focused_widget_bounds_color, false);
+			focused_widget->renderBounds(target, DEBUG_RENDER_FOCUSED_WIDGET_BOUNDS_COLOR, false, true);
 		}
 	}
 

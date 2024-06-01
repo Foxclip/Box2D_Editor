@@ -7,11 +7,12 @@
 
 namespace fw {
 
-	// Adding methods:
-	// If method changes widgets, check this:
-	// wAssert(!isLocked());
-	// And if if changes render queue:
-	// render_queue.invalidate();
+	const float DEBUG_RENDER_ORIGIN_SIZE = 10.0f;
+	const sf::Color DEBUG_RENDER_TRANSFORMED_BOUNDS_COLOR = sf::Color(0, 255, 0);
+	const sf::Color DEBUG_RENDER_BOUNDS_COLOR = sf::Color(0, 128, 0);
+	const sf::Color DEBUG_RENDER_POSITION_COLOR = sf::Color(255, 0, 0);
+	const sf::Color DEBUG_RENDER_TRANSFORM_POSITION_COLOR = sf::Color(0, 0, 255);
+	const sf::Color DEBUG_RENDER_FOCUSED_WIDGET_BOUNDS_COLOR = sf::Color(0, 200, 255);
 
 	struct PendingMove {
 		Widget* widget = nullptr;
@@ -20,6 +21,9 @@ namespace fw {
 
 	class Application;
 
+	// Adding methods:
+	// If method changes widgets, check this:
+	// wAssert(!isLocked());
 	class WidgetList {
 	public:
 		bool debug_render = false;
@@ -71,11 +75,6 @@ namespace fw {
 		bool locked = false;
 		bool click_blocked = false;
 		bool release_blocked = false;
-		float render_origin_size = 10.0f;
-		sf::Color render_bounds_color = sf::Color::Green;
-		sf::Color render_origin_color = sf::Color::Red;
-		sf::Color render_transform_origin_color = sf::Color::Blue;
-		sf::Color focused_widget_bounds_color = sf::Color(0, 200, 255);
 		fw::Font default_font;
 		bool default_font_set = false;
 		CompVectorUptr<Widget> widgets;

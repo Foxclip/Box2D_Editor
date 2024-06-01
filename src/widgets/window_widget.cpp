@@ -192,10 +192,10 @@ namespace fw {
 		outline_widget->setSizePolicy(SizePolicy::PARENT);
 		outline_widget->OnAfterRender = [&](sf::RenderTarget& target) {
 			sf::FloatRect quantized_bounds = quantize_rect(
-				outline_widget->getGlobalBounds(),
+				outline_widget->getLocalBounds(),
 				QUANTIZE_MODE_FLOOR_SUBTRACT
 			);
-			draw_wire_rect(target, quantized_bounds, outline_color);
+			draw_wire_rect(target, quantized_bounds, outline_color, outline_widget->getGlobalTransform());
 		};
 		outline_widget->setParent(this);
 		outline_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::OUTLINE));

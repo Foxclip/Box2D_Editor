@@ -343,6 +343,38 @@ namespace fw {
 		return max_size;
 	}
 
+	const sf::Transform& Widget::getTransform() const {
+		return transforms.getTransform();
+	}
+
+	const sf::Transform& Widget::getInverseTransform() const {
+		return transforms.getInverseTransform();
+	}
+
+	const sf::Transform& Widget::getGlobalTransform() const {
+		return transforms.getGlobalTransform();
+	}
+
+	const sf::Transform& Widget::getParentGlobalTransform() const {
+		if (parent) {
+			return parent->getGlobalTransform();
+		} else {
+			return sf::Transform::Identity;
+		}
+	}
+
+	const sf::Transform& Widget::getInverseGlobalTransform() const {
+		return transforms.getInverseGlobalTransform();
+	}
+
+	const sf::Transform& Widget::getInverseParentGlobalTransform() const {
+		if (parent) {
+			return parent->getInverseGlobalTransform();
+		} else {
+			return sf::Transform::Identity;
+		}
+	}
+
 	const sf::Vector2f& Widget::getOrigin() const {
 		return transforms.getOrigin();
 	}
@@ -1056,18 +1088,26 @@ namespace fw {
 		OnAfterGlobalRender(target);
 	}
 
-	void Widget::renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children) {
+	void Widget::renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children, bool transformed) {
 		if (!visible) {
 			return;
 		}
-		sf::FloatRect quantized_bounds = quantize_rect(
-			getGlobalBounds(),
-			QUANTIZE_MODE_FLOOR_SUBTRACT
-		);
-		draw_wire_rect(target, quantized_bounds, color);
+		if (transformed) {
+			sf::FloatRect quantized_local_bounds = quantize_rect(
+				getLocalBounds(),
+				QUANTIZE_MODE_FLOOR_SUBTRACT
+			);
+			draw_wire_rect(target, quantized_local_bounds, color, getGlobalTransform());
+		} else {
+			sf::FloatRect quantized_global_bounds = quantize_rect(
+				getGlobalBounds(),
+				QUANTIZE_MODE_FLOOR_SUBTRACT
+			);
+			draw_wire_rect(target, quantized_global_bounds, color);
+		}
 		if (include_children) {
 			for (size_t i = 0; i < children.size(); i++) {
-				children[i]->renderBounds(target, color, true);
+				children[i]->renderBounds(target, color, true, transformed);
 			}
 		}
 	}
@@ -1076,15 +1116,15 @@ namespace fw {
 		if (!visible) {
 			return;
 		}
-		float offset = widget_list.render_origin_size;
+		float offset = DEBUG_RENDER_ORIGIN_SIZE;
 		sf::Vector2f hoffset = sf::Vector2f(offset, 0.0f);
 		sf::Vector2f voffset = sf::Vector2f(0.0f, offset);
 		sf::Vector2f origin_pos = getGlobalOriginPosition();
-		draw_line(target, origin_pos - hoffset, origin_pos + hoffset, widget_list.render_transform_origin_color);
-		draw_line(target, origin_pos - voffset, origin_pos + voffset, widget_list.render_transform_origin_color);
+		draw_line(target, origin_pos - hoffset, origin_pos + hoffset, DEBUG_RENDER_TRANSFORM_POSITION_COLOR);
+		draw_line(target, origin_pos - voffset, origin_pos + voffset, DEBUG_RENDER_TRANSFORM_POSITION_COLOR);
 		sf::Vector2f pos = getGlobalPosition();
-		draw_line(target, pos - hoffset, pos + hoffset, widget_list.render_origin_color);
-		draw_line(target, pos - voffset, pos + voffset, widget_list.render_origin_color);
+		draw_line(target, pos - hoffset, pos + hoffset, DEBUG_RENDER_POSITION_COLOR);
+		draw_line(target, pos - voffset, pos + voffset, DEBUG_RENDER_POSITION_COLOR);
 		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->renderOrigin(target);
 		}
@@ -1111,38 +1151,6 @@ namespace fw {
 			default: wAssert("Unknown anchor"); return sf::Vector2f();
 		}
 		return sf::Vector2f(x, y);
-	}
-
-	const sf::Transform& Widget::getTransform() const {
-		return transforms.getTransform();
-	}
-
-	const sf::Transform& Widget::getInverseTransform() const {
-		return transforms.getInverseTransform();
-	}
-
-	const sf::Transform& Widget::getGlobalTransform() const {
-		return transforms.getGlobalTransform();
-	}
-
-	const sf::Transform& Widget::getParentGlobalTransform() const {
-		if (parent) {
-			return parent->getGlobalTransform();
-		} else {
-			return sf::Transform::Identity;
-		}
-	}
-
-	const sf::Transform& Widget::getInverseGlobalTransform() const {
-		return transforms.getInverseGlobalTransform();
-	}
-
-	const sf::Transform& Widget::getInverseParentGlobalTransform() const {
-		if (parent) {
-			return parent->getInverseGlobalTransform();
-		} else {
-			return sf::Transform::Identity;
-		}
 	}
 
 }

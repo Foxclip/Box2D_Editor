@@ -152,6 +152,12 @@ namespace fw {
 		SizePolicy getSizeYPolicy() const;
 		const sf::Vector2f& getMinSize() const;
 		const sf::Vector2f& getMaxSize() const;
+		const sf::Transform& getTransform() const;
+		const sf::Transform& getInverseTransform() const;
+		const sf::Transform& getGlobalTransform() const;
+		const sf::Transform& getParentGlobalTransform() const;
+		const sf::Transform& getInverseGlobalTransform() const;
+		const sf::Transform& getInverseParentGlobalTransform() const;
 		const sf::Vector2f& getOrigin() const;
 		Anchor getOriginAnchor() const;
 		const sf::Vector2f& getPosition() const;
@@ -233,7 +239,7 @@ namespace fw {
 		void removeFocus();
 		void processKeyboardEvent(const sf::Event& event);
 		void render(sf::RenderTarget& target);
-		void renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children);
+		void renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children, bool transformed);
 		void renderOrigin(sf::RenderTarget& target);
 		void remove(bool with_clildren = true);
 
@@ -278,12 +284,6 @@ namespace fw {
 		bool force_custom_cursor = false;
 
 		sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& size);
-		const sf::Transform& getTransform() const;
-		const sf::Transform& getInverseTransform() const;
-		const sf::Transform& getGlobalTransform() const;
-		const sf::Transform& getParentGlobalTransform() const;
-		const sf::Transform& getInverseGlobalTransform() const;
-		const sf::Transform& getInverseParentGlobalTransform() const;
 		virtual sf::Drawable* getDrawable() = 0;
 		virtual const sf::Drawable* getDrawable() const = 0;
 		virtual sf::Transformable* getTransformable() = 0;
