@@ -12,6 +12,10 @@ namespace fw {
 		root_widget->setName("root");
 	}
 
+	Application& WidgetList::getApplication() const {
+		return application;
+	}
+
 	size_t WidgetList::getSize() const {
 		return widgets.size();
 	}

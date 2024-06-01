@@ -122,6 +122,10 @@ namespace fw {
 		}
 	}
 
+	WidgetList& Widget::getWidgetList() const {
+		return widget_list;
+	}
+
 	Widget::FocusableType Widget::getFocusableType() const {
 		return focusable_type;
 	}

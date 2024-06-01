@@ -25,6 +25,7 @@ namespace fw {
 		bool debug_render = false;
 
 		WidgetList(Application& application);
+		Application& getApplication() const;
 		size_t getSize() const;
 		bool contains(const Widget* widget);
 		bool isClickBlocked() const;

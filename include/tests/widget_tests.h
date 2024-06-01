@@ -195,19 +195,8 @@ private:
 	static std::string anchorToStr(fw::Widget::Anchor anchor);
 	static bool rectApproxCmp(const sf::FloatRect& left, const sf::FloatRect& right);
 	fw::TextBoxWidget* initTextBox(fw::Application& application, float width, float height) const;
-	void resizeWindow(
-		fw::Application& application,
-		test::Test& test,
-		fw::WindowWidget* widget,
-		const sf::Vector2f& begin_pos,
-		const sf::Vector2f& resize_offset,
-		const sf::FloatRect& new_bounds
-	);
-	void resizeWindowTest(
-		fw::Application& application,
-		test::Test& test,
-		fw::WindowWidget* widget
-	);
+	void mouseDrag(fw::Application& application, const sf::Vector2f& begin_pos, const sf::Vector2f& offset);
+	void resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget);
 	void genericWidgetTest(const GenericWidgetTest& gwt);
 	bool layer_contains(const std::vector<Node*>& layer, const std::string& name);
 

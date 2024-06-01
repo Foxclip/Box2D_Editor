@@ -112,6 +112,7 @@ namespace fw {
 		void processLeftRelease(const sf::Vector2f& pos);
 		void processRightRelease(const sf::Vector2f& pos);
 		void processMouse(const sf::Vector2f& pos);
+		WidgetList& getWidgetList() const;
 		FocusableType getFocusableType() const;
 		bool isFocused() const;
 		bool getForceCustomCursor() const;
