@@ -324,6 +324,9 @@ void Editor::initWidgets() {
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
 
+    fw::ScrollAreaWidget* scroll_area_widget = widgets.createWidget<fw::ScrollAreaWidget>(300.0f, 200.0f);
+    scroll_area_widget->setPosition(400.0f, 300.0f);
+
     edit_tool.edit_window_widget->moveToTop();
 }
 

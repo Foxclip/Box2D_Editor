@@ -16,3 +16,4 @@
 #include "empty_widget.h"
 #include "dropdown_widget.h"
 #include "polygon_widget.h"
+#include "scroll_area_widget.h"

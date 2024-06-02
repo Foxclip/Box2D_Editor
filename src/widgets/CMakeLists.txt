@@ -10,6 +10,7 @@ target_sources(widgets_lib PRIVATE
     "${INCLUDE_DIR}/widgets/font.h"
     "${INCLUDE_DIR}/widgets/polygon_widget.h"
     "${INCLUDE_DIR}/widgets/rectangle_widget.h"
+    "${INCLUDE_DIR}/widgets/scroll_area_widget.h"
     "${INCLUDE_DIR}/widgets/shape_widget.h"
     "${INCLUDE_DIR}/widgets/text_widget.h"
     "${INCLUDE_DIR}/widgets/textbox_widget.h"
@@ -34,6 +35,7 @@ target_sources(widgets_lib PRIVATE
     font.cpp
     polygon_widget.cpp
     rectangle_widget.cpp
+    scroll_area_widget.cpp
     shape_widget.cpp
     text_widget.cpp
     textbox_widget.cpp

@@ -44,6 +44,7 @@ namespace fw {
 			Empty,
 			Polygon,
 			Rectangle,
+			ScrollArea,
 			Text,
 			Textbox,
 			Window,
