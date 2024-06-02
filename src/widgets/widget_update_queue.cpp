@@ -2,6 +2,7 @@
 #include "widgets/widget.h"
 #include "widgets/widget_list.h"
 #include "widgets/container_widget.h"
+#include "widgets/scroll_area_widget.h"
 
 namespace fw {
 
@@ -72,7 +73,11 @@ namespace fw {
 	std::vector<WidgetUpdateQueueEntry*> WidgetUpdateQueue::getParents(const WidgetUpdateQueueEntry* entry) {
 		CompVector<WidgetUpdateQueueEntry*> result;
 		if (entry->update_type == WidgetUpdateType::NORMAL) {
-			// nothing
+			// scroll area updates scrollbars depending on child's size
+			if (ScrollAreaWidget* scroll_area = dynamic_cast<ScrollAreaWidget*>(entry->widget)) {
+				result.add(&scroll_area->getWidget()->size_x_entry);
+				result.add(&scroll_area->getWidget()->size_y_entry);
+			}
 		} else if (entry->update_type == WidgetUpdateType::POS_X) {
 			// pos entry depends on parent's children x entry,
 			// and so all entries dependent on pos entry will be updated

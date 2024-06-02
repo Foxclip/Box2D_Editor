@@ -214,6 +214,8 @@ namespace fw {
 		virtual void setFillColor(const sf::Color& color) = 0;
 		void setPosition(float x, float y);
 		void setPosition(const sf::Vector2f& position);
+		void setPositionX(float x);
+		void setPositionY(float y);
 		void setTransformPosition(float x, float y);
 		void setTransformPosition(const sf::Vector2f& position);
 		void setGlobalPosition(float x, float y);

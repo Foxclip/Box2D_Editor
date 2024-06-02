@@ -325,7 +325,21 @@ void Editor::initWidgets() {
     logger_text_widget->setParent(logger_widget);
 
     fw::ScrollAreaWidget* scroll_area_widget = widgets.createWidget<fw::ScrollAreaWidget>(300.0f, 200.0f);
+    fw::ContainerWidget* container = widgets.createWidget<fw::ContainerWidget>(100.0f, 100.0f);
+    fw::RectangleWidget* red_rect = widgets.createWidget<fw::RectangleWidget>(50.0f, 75.0f);
+    fw::RectangleWidget* green_rect = widgets.createWidget<fw::RectangleWidget>(50.0f, 50.0f);
+    fw::RectangleWidget* blue_rect = widgets.createWidget<fw::RectangleWidget>(600.0f, 50.0f);
     scroll_area_widget->setPosition(400.0f, 300.0f);
+    scroll_area_widget->setWidget(container);
+    container->setFillColor(sf::Color::White);
+    container->setHorizontal(false);
+    container->setPadding(10.0f);
+    red_rect->setFillColor(sf::Color::Red);
+    red_rect->setParent(container);
+    green_rect->setFillColor(sf::Color::Green);
+    green_rect->setParent(container);
+    blue_rect->setFillColor(sf::Color::Blue);
+    blue_rect->setParent(container);
 
     edit_tool.edit_window_widget->moveToTop();
 }

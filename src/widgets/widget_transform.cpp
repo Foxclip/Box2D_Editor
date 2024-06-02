@@ -67,6 +67,12 @@ namespace fw {
 		}
 	}
 
+	void WidgetTransform::setPosition(float x, float y) {
+		this->position.x = x;
+		this->position.y = y;
+		invalidateTransform();
+	}
+
 	void WidgetTransform::setPosition(const sf::Vector2f& position) {
 		this->position = position;
 		invalidateTransform();

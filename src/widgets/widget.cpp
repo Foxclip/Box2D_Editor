@@ -661,6 +661,16 @@ namespace fw {
 		transforms.setPosition(position);
 	}
 
+	void Widget::setPositionX(float x) {
+		wAssert(!widget_list.isLocked());
+		transforms.setPosition(x, getPosition().y);
+	}
+
+	void Widget::setPositionY(float y) {
+		wAssert(!widget_list.isLocked());
+		transforms.setPosition(getPosition().x, y);
+	}
+
 	void Widget::setTransformPosition(float x, float y) {
 		wAssert(!widget_list.isLocked());
 		transforms.setPosition(sf::Vector2f(x, y) + getOrigin());

@@ -19,6 +19,7 @@ namespace fw {
 		const sf::Vector2f& getOrigin() const;
 		void invalidateTransform();
 		void invalidateGlobalTransform();
+		void setPosition(float x, float y);
 		void setPosition(const sf::Vector2f& position);
 		void setGlobalPosition(const sf::Vector2f& position);
 		void setRotation(float angle);

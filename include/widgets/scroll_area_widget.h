@@ -17,9 +17,12 @@ namespace fw {
 	public:
 		ScrollAreaWidget(WidgetList& widget_list, float width, float height);
 		ScrollAreaWidget(WidgetList& widget_list, const sf::Vector2f& size);
+		Widget* getWidget() const;
+		void setWidget(Widget* widget);
 
 	protected:
-		ContainerWidget* container_widget = nullptr;
+		RectangleWidget* area_widget = nullptr;
+		Widget* scrolled_widget = nullptr;
 		RectangleWidget* slider_background_x_widget = nullptr;
 		RectangleWidget* slider_x_widget = nullptr;
 		RectangleWidget* slider_background_y_widget = nullptr;
@@ -27,8 +30,10 @@ namespace fw {
 		RectangleWidget* corner_widget = nullptr;
 
 		void setSize(float width, float height) override;
+		void internalUpdate() override;
 
 	private:
+		void updateScroll();
 
 	};
 
