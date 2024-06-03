@@ -123,6 +123,7 @@ namespace fw {
 		GlobalRenderLayer getGlobalRenderLayer() const;
 		size_t getLocalRenderLayer() const;
 		size_t getParentLocalRenderLayer() const;
+		bool getQuantizeRenderedPosition() const;
 		sf::Shader* getShader() const;
 		Widget* getParent() const;
 		CompVector<Widget*> getParentChain() const;
@@ -204,6 +205,8 @@ namespace fw {
 		void setParentAnchor(Anchor anchor);
 		void setAnchorOffset(float x, float y);
 		void setAnchorOffset(const sf::Vector2f& offset);
+		void setAnchorOffsetX(float x);
+		void setAnchorOffsetY(float y);
 		void setSizeXPolicy(SizePolicy policy);
 		void setSizeYPolicy(SizePolicy policy);
 		void setSizePolicy(SizePolicy policy);
@@ -238,6 +241,7 @@ namespace fw {
 		void setGlobalRenderLayer(GlobalRenderLayer layer);
 		void setLocalRenderLayer(size_t layer);
 		void setParentLocalRenderLayer(size_t layer);
+		void setQuantizeRenderedPosition(bool value);
 		void setShader(sf::Shader* shader);
 		void removeFocus();
 		void processKeyboardEvent(const sf::Event& event);
@@ -280,6 +284,7 @@ namespace fw {
 		sf::Vector2f max_size = sf::Vector2f(-1.0f, -1.0f); // negative values - unlimited
 		bool visible = true;
 		bool renderable = true;
+		bool quantize_position = true;
 		FocusableType focusable_type = FocusableType::NONE;
 		bool click_through = true;
 		bool clip_children = false;

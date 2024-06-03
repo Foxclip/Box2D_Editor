@@ -165,6 +165,10 @@ namespace fw {
 		return parent->local_layers.at(const_cast<Widget*>(this));
 	}
 
+	bool Widget::getQuantizeRenderedPosition() const {
+		return quantize_position;
+	}
+
 	sf::Shader* Widget::getShader() const {
 		return shader;
 	}
@@ -610,6 +614,16 @@ namespace fw {
 		updatePositionY();
 	}
 
+	void Widget::setAnchorOffsetX(float x) {
+		wAssert(!widget_list.isLocked());
+		setAnchorOffset(x, getAnchorOffset().y);
+	}
+
+	void Widget::setAnchorOffsetY(float y) {
+		wAssert(!widget_list.isLocked());
+		setAnchorOffset(getAnchorOffset().x, y);
+	}
+
 	void Widget::setSizeXPolicy(SizePolicy policy) {
 		wAssert(!widget_list.isLocked());
 		wAssert(this != widget_list.getRootWidget());
@@ -841,6 +855,11 @@ namespace fw {
 		parent->local_layers[this] = layer;
 	}
 
+	void Widget::setQuantizeRenderedPosition(bool value) {
+		wAssert(!widget_list.isLocked());
+		this->quantize_position = value;
+	}
+
 	void Widget::setShader(sf::Shader* shader) {
 		wAssert(!widget_list.isLocked());
 		this->shader = shader;
@@ -1056,7 +1075,9 @@ namespace fw {
 		sf::Transform combined(global_transform);
 		sf::Vector2f render_position_offset = getRenderPositionOffset();
 		combined.translate(render_position_offset);
-		quantize_position(combined);
+		if (getQuantizeRenderedPosition()) {
+			fw::quantize_position(combined);
+		}
 		render_view.setSize(texture_bounds.getSize());
 		sf::Vector2f texture_bounds_center = texture_bounds.getPosition() + texture_bounds.getSize() / 2.0f;
 		render_view.setCenter(texture_bounds_center);
