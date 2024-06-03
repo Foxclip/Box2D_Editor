@@ -172,7 +172,7 @@ private:
 	void beforeProcessMouseEvent(const sf::Event& event) override;
 	void onProcessLeftPress() override;
 	void onProcessLeftRelease() override;
-	void onProcessMouseScroll(const sf::Event& event) override;
+	void onProcessMouseScrollY(float delta) override;
 	void onProcessMouse() override;
 	void afterProcessInput() override;
 	void onProcessWorld() override;

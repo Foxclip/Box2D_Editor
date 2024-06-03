@@ -36,7 +36,8 @@ public:
 	bool process_right_press = false;
 	bool process_left_release = false;
 	bool process_right_release = false;
-	bool process_mouse_scroll = false;
+	bool process_mouse_scroll_x = false;
+	bool process_mouse_scroll_y = false;
 	bool process_keyboard = false;
 	bool process_mouse = false;
 	bool after_process_input = false;
@@ -61,7 +62,8 @@ public:
 	void onProcessRightPress() override;
 	void onProcessLeftRelease() override;
 	void onProcessRightRelease() override;
-	void onProcessMouseScroll(const sf::Event& event) override;
+	void onProcessMouseScrollX(float delta) override;
+	void onProcessMouseScrollY(float delta) override;
 	void onProcessKeyboard() override;
 	void onProcessMouse() override;
 	void afterProcessInput() override;

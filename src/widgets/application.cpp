@@ -275,7 +275,9 @@ namespace fw {
 
     void Application::onProcessRightRelease() { }
 
-    void Application::onProcessMouseScroll(const sf::Event& event) { }
+    void Application::onProcessMouseScrollX(float delta) { }
+
+    void Application::onProcessMouseScrollY(float delta) { }
 
     void Application::onProcessKeyboard() { }
 
@@ -382,7 +384,11 @@ namespace fw {
             }
         }
         if (event.type == sf::Event::MouseWheelScrolled) {
-            onProcessMouseScroll(event);
+            if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
+                processScrollX(event.mouseWheelScroll.delta);
+            } else if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
+                processScrollY(event.mouseWheelScroll.delta);
+            }
         }
     }
 
@@ -487,6 +493,14 @@ namespace fw {
             onProcessRightRelease();
         }
         endGesture();
+    }
+
+    void Application::processScrollX(float delta) {
+        onProcessMouseScrollX(delta);
+    }
+
+    void Application::processScrollY(float delta) {
+        onProcessMouseScrollY(delta);
     }
 
     void Application::processKeyboard() {

@@ -495,12 +495,6 @@ void Editor::beforeProcessMouseEvent(const sf::Event& event) {
     b2MousePosWorld = tob2(sfMousePosWorld);
 }
 
-void Editor::onProcessMouseScroll(const sf::Event& event) {
-    if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
-        zoomFactor *= pow(MOUSE_SCROLL_ZOOM, event.mouseWheelScroll.delta);
-    }
-}
-
 void Editor::onProcessLeftPress() {
     if (selected_tool == &create_tool) {
         std::string id_string = std::to_string(simulation.getMaxId());
@@ -631,6 +625,10 @@ void Editor::onProcessLeftRelease() {
         edit_tool.rectangle_select.active = false;
         edit_tool.mode = EditTool::HOVER;
     }
+}
+
+void Editor::onProcessMouseScrollY(float delta) {
+    zoomFactor *= pow(MOUSE_SCROLL_ZOOM, delta);
 }
 
 void Editor::onProcessMouse() {

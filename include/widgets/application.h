@@ -124,7 +124,8 @@ namespace fw {
 		virtual void onProcessRightPress();
 		virtual void onProcessLeftRelease();
 		virtual void onProcessRightRelease();
-		virtual void onProcessMouseScroll(const sf::Event& event);
+		virtual void onProcessMouseScrollX(float delta);
+		virtual void onProcessMouseScrollY(float delta);
 		virtual void onProcessKeyboard();
 		virtual void onProcessMouse();
 		virtual void afterProcessInput();
@@ -156,6 +157,8 @@ namespace fw {
 		void processRightPress();
 		void processLeftRelease();
 		void processRightRelease();
+		void processScrollX(float delta);
+		void processScrollY(float delta);
 		void processKeyboard();
 		void processMouse();
 		void processWorld();
