@@ -936,6 +936,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     bool mouse_right_pressed = false;
     bool mouse_left_released = false;
     bool mouse_right_released = false;
+    bool mouse_scroll_x = false;
+    bool mouse_scroll_y = false;
     bool mouse_exited = false;
     bool mouse_processed = false;
     rectangle_widget->OnMouseEnter = [&](const sf::Vector2f& pos) {
@@ -953,6 +955,12 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     rectangle_widget->OnRightRelease = [&](const sf::Vector2f& pos) {
         mouse_right_released = true;
     };
+    rectangle_widget->OnScrollX = [&](const sf::Vector2f& pos, float delta) {
+        mouse_scroll_x = true;
+    };
+    rectangle_widget->OnScrollY = [&](const sf::Vector2f& pos, float delta) {
+        mouse_scroll_y = true;
+    };
     rectangle_widget->OnMouseExit = [&](const sf::Vector2f& pos) {
         mouse_exited = true;
     };
@@ -969,6 +977,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_scroll_x);
+    T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
     T_CHECK(!mouse_processed);
     application.mouseMove(mouse_pos_1);
@@ -979,6 +989,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_scroll_x);
+    T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
     T_CHECK(mouse_processed);
     application.mouseLeftPress();
@@ -988,6 +1000,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_scroll_x);
+    T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
     T_CHECK(mouse_processed);
     application.mouseLeftRelease();
@@ -997,6 +1011,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released); // clickThrough is on, so release is not processed
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_scroll_x);
+    T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
     T_CHECK(mouse_processed);
     application.mouseRightPress();
@@ -1006,6 +1022,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_scroll_x);
+    T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
     T_CHECK(mouse_processed);
     application.mouseRightRelease();
@@ -1015,6 +1033,30 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(mouse_right_pressed);
     T_CHECK(!mouse_right_released); // clickThrough is on, so release is not processed
+    T_CHECK(!mouse_scroll_x);
+    T_CHECK(!mouse_scroll_y);
+    T_CHECK(!mouse_exited);
+    T_CHECK(mouse_processed);
+    application.mouseScrollX(1.0f);
+    application.advance();
+    T_CHECK(mouse_entered);
+    T_CHECK(mouse_left_pressed);
+    T_CHECK(!mouse_left_released);
+    T_CHECK(mouse_right_pressed);
+    T_CHECK(!mouse_right_released);
+    T_CHECK(mouse_scroll_x);
+    T_CHECK(!mouse_scroll_y);
+    T_CHECK(!mouse_exited);
+    T_CHECK(mouse_processed);
+    application.mouseScrollY(1.0f);
+    application.advance();
+    T_CHECK(mouse_entered);
+    T_CHECK(mouse_left_pressed);
+    T_CHECK(!mouse_left_released);
+    T_CHECK(mouse_right_pressed);
+    T_CHECK(!mouse_right_released);
+    T_CHECK(mouse_scroll_x);
+    T_CHECK(mouse_scroll_y);
     T_CHECK(!mouse_exited);
     T_CHECK(mouse_processed);
     application.mouseMove(mouse_pos_2);
@@ -1025,6 +1067,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(mouse_scroll_x);
+    T_CHECK(mouse_scroll_y);
     T_CHECK(mouse_exited);
     T_CHECK(mouse_processed);
 }

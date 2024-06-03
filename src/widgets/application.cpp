@@ -156,6 +156,26 @@ namespace fw {
         addExternalEvent(event);
     }
 
+    void Application::mouseScrollX(float delta) {
+        wAssert(external_control);
+        sf::Event event;
+        event.type = sf::Event::MouseWheelScrolled;
+        event.mouseWheelScroll.wheel = sf::Mouse::HorizontalWheel;
+        event.mouseWheelScroll.x = external_mouse_pos.x;
+        event.mouseWheelScroll.y = external_mouse_pos.y;
+        addExternalEvent(event);
+    }
+
+    void Application::mouseScrollY(float delta) {
+        wAssert(external_control);
+        sf::Event event;
+        event.type = sf::Event::MouseWheelScrolled;
+        event.mouseWheelScroll.wheel = sf::Mouse::VerticalWheel;
+        event.mouseWheelScroll.x = external_mouse_pos.x;
+        event.mouseWheelScroll.y = external_mouse_pos.y;
+        addExternalEvent(event);
+    }
+
     void Application::keyPress(sf::Keyboard::Key key) {
         wAssert(external_control);
         if (key == sf::Keyboard::LControl) {
@@ -496,11 +516,17 @@ namespace fw {
     }
 
     void Application::processScrollX(float delta) {
-        onProcessMouseScrollX(delta);
+        widgets.processScrollX(getMousePosf(), delta);
+        if (!widgets.isClickBlocked()) {
+            onProcessMouseScrollX(delta);
+        }
     }
 
     void Application::processScrollY(float delta) {
-        onProcessMouseScrollY(delta);
+        widgets.processScrollY(getMousePosf(), delta);
+        if (!widgets.isClickBlocked()) {
+            onProcessMouseScrollY(delta);
+        }
     }
 
     void Application::processKeyboard() {

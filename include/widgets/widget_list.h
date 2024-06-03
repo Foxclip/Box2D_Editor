@@ -57,6 +57,8 @@ namespace fw {
 		void processRightPress(const sf::Vector2f pos);
 		void processLeftRelease(const sf::Vector2f pos);
 		void processRightRelease(const sf::Vector2f pos);
+		void processScrollX(const sf::Vector2f pos, float delta);
+		void processScrollY(const sf::Vector2f pos, float delta);
 		void processMouse(const sf::Vector2f pos);
 		void processWindowEvent(const sf::Event& event);
 		void processKeyboardEvent(const sf::Event& event);

@@ -111,6 +111,22 @@ namespace fw {
 		}
 	}
 
+	void Widget::processScrollX(const sf::Vector2f pos, float delta) {
+		if (!visible) {
+			return;
+		}
+		internalOnScrollX(pos, delta);
+		OnScrollX(pos, delta);
+	}
+
+	void Widget::processScrollY(const sf::Vector2f pos, float delta) {
+		if (!visible) {
+			return;
+		}
+		internalOnScrollY(pos, delta);
+		OnScrollY(pos, delta);
+	}
+
 	void Widget::processMouse(const sf::Vector2f& pos) {
 		if (!visible) {
 			return;
@@ -1021,6 +1037,10 @@ namespace fw {
 	void Widget::internalOnLeftRelease(const sf::Vector2f& pos) { }
 
 	void Widget::internalOnRightRelease(const sf::Vector2f& pos) { }
+
+	void Widget::internalOnScrollX(const sf::Vector2f& pos, float delta) { }
+
+	void Widget::internalOnScrollY(const sf::Vector2f& pos, float delta) { }
 
 	void Widget::internalProcessKeyboardEvent(const sf::Event& event) { }
 
