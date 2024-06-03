@@ -331,6 +331,7 @@ void Editor::initWidgets() {
     fw::RectangleWidget* blue_rect = widgets.createWidget<fw::RectangleWidget>(600.0f, 50.0f);
     scroll_area_widget->setPosition(400.0f, 300.0f);
     scroll_area_widget->setWidget(container);
+    scroll_area_widget->setDeltaY(40.0f);
     container->setFillColor(sf::Color::White);
     container->setHorizontal(false);
     container->setPadding(10.0f);

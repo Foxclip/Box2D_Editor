@@ -3,16 +3,23 @@
 
 namespace fw {
 
+	enum class ScrollAreaRenderLayers {
+		BASE,
+		SCROLL_AREA,
+	};
+
 	ScrollAreaWidget::ScrollAreaWidget(WidgetList& widget_list, float width, float height) : EmptyWidget(widget_list) {
 		// scrollarea
 		type = Widget::WidgetType::ScrollArea;
 		setName("scroll area");
 		setSizeInternal(width, height);
+		setLocalRenderLayer(static_cast<size_t>(ScrollAreaRenderLayers::SCROLL_AREA));
 		// container
 		float default_width = SCROLL_AREA_SCROLLBAR_DEFAULT_WIDTH;
 		float area_width = width - default_width;
 		float area_height = height - default_width;
 		area_widget = widget_list.createWidget<RectangleWidget>(area_width, area_height);
+		area_widget->setName("area");
 		area_widget->setFillColor(SCROLL_AREA_DEFAULT_BACKGROUND_COLOR);
 		area_widget->setParentAnchor(Anchor::TOP_LEFT);
 		area_widget->setClipChildren(true);
@@ -122,6 +129,14 @@ namespace fw {
 		widget->setParent(area_widget);
 	}
 
+	void ScrollAreaWidget::setDeltaX(float delta) {
+		this->delta_x = delta;
+	}
+
+	void ScrollAreaWidget::setDeltaY(float delta) {
+		this->delta_y = delta;
+	}
+
 	void ScrollAreaWidget::setSize(float width, float height) {
 		float area_width = width - slider_background_y_widget->getWidth();
 		float area_height = height - slider_background_x_widget->getHeight();
@@ -135,6 +150,14 @@ namespace fw {
 		float area_y = std::min(area_widget->getAnchorOffset().y, scrolled_widget->getHeight());
 		area_widget->setPosition(area_x, area_y);
 		updateScroll();
+	}
+
+	void ScrollAreaWidget::internalOnScrollX(const sf::Vector2f& pos, float delta) {
+		scrollX(delta_x * -delta);
+	}
+
+	void ScrollAreaWidget::internalOnScrollY(const sf::Vector2f& pos, float delta) {
+		scrollY(delta_y * -delta);
 	}
 
 	void ScrollAreaWidget::updateScroll() {
@@ -255,6 +278,36 @@ namespace fw {
 			float offset = -y_factor * scroll_range;
 			scrolled_widget->setAnchorOffsetY(offset);
 		}
+	}
+
+	void ScrollAreaWidget::moveSliderX(float x_offset) {
+		setSliderX(slider_x_widget->getPosition().x + x_offset);
+	}
+
+	void ScrollAreaWidget::moveSliderY(float y_offset) {
+		setSliderY(slider_y_widget->getPosition().y + y_offset);
+	}
+
+	void ScrollAreaWidget::scrollX(float x_offset) {
+		if (!scrolled_widget) {
+			return;
+		}
+		float pos_x = scrolled_widget->getAnchorOffset().x - x_offset;
+		float scroll_range = getScrollXRange();
+		pos_x = std::clamp(pos_x, -scroll_range, 0.0f);
+		scrolled_widget->setAnchorOffsetX(pos_x);
+		updateScroll();
+	}
+
+	void ScrollAreaWidget::scrollY(float y_offset) {
+		if (!scrolled_widget) {
+			return;
+		}
+		float pos_y = scrolled_widget->getAnchorOffset().y - y_offset;
+		float scroll_range = getScrollYRange();
+		pos_y = std::clamp(pos_y, -scroll_range, 0.0f);
+		scrolled_widget->setAnchorOffsetY(pos_y);
+		updateScroll();
 	}
 
 }

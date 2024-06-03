@@ -6,6 +6,8 @@
 namespace fw {
 
 	const float SCROLL_AREA_SCROLLBAR_DEFAULT_WIDTH = 20.0f;
+	const float SCROLL_AREA_DEFAULT_SCROLL_X_DELTA = 40.0f;
+	const float SCROLL_AREA_DEFAULT_SCROLL_Y_DELTA = 20.0f;
 	const sf::Color SCROLL_AREA_DEFAULT_BACKGROUND_COLOR = sf::Color(100, 100, 100);
 	const sf::Color SCROLL_AREA_DEFAULT_SCROLL_BACKGROUND_COLOR = sf::Color(128, 128, 128);
 	const sf::Color SCROLL_AREA_DEFAULT_SLIDER_COLOR = sf::Color(150, 150, 150);
@@ -21,6 +23,8 @@ namespace fw {
 		ScrollAreaWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		Widget* getWidget() const;
 		void setWidget(Widget* widget);
+		void setDeltaX(float delta);
+		void setDeltaY(float delta);
 
 	protected:
 		RectangleWidget* area_widget = nullptr;
@@ -36,9 +40,13 @@ namespace fw {
 		bool slider_y_grabbed = false;
 		float mouse_grab_pos;
 		float slider_grab_pos;
+		float delta_x = SCROLL_AREA_DEFAULT_SCROLL_X_DELTA;
+		float delta_y = SCROLL_AREA_DEFAULT_SCROLL_Y_DELTA;
 
 		void setSize(float width, float height) override;
 		void internalUpdate() override;
+		void internalOnScrollX(const sf::Vector2f& pos, float delta) override;
+		void internalOnScrollY(const sf::Vector2f& pos, float delta) override;
 
 	private:
 		void updateScroll();
@@ -55,6 +63,10 @@ namespace fw {
 		float getSliderYFromArea() const;
 		void setSliderX(float x);
 		void setSliderY(float y);
+		void moveSliderX(float x_offset);
+		void moveSliderY(float y_offset);
+		void scrollX(float x_offset);
+		void scrollY(float y_offset);
 
 	};
 
