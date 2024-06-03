@@ -2,40 +2,24 @@
 
 #include <string>
 #include <vector>
+#include "widgets/widget_link.h"
 
 namespace fw {
 
 	class Widget;
 	class WidgetList;
 
-	enum class WidgetUpdateType {
-		NORMAL,
-		POS_X,
-		POS_Y,
-		SIZE_X,
-		SIZE_Y,
-		CHILDREN_X,
-		CHILDREN_Y,
-	};
-
-	struct WidgetUpdateQueueEntry {
-		Widget* widget = nullptr;
-		WidgetUpdateType update_type;
-		WidgetUpdateQueueEntry(Widget* widget, WidgetUpdateType update_type);
-		std::string toStr() const;
-	};
-
 	class WidgetUpdateQueue {
 	public:
 		WidgetUpdateQueue(WidgetList& widget_list);
 		void update();
-		const std::vector<std::vector<WidgetUpdateQueueEntry*>>& get() const;
+		const std::vector<std::vector<WidgetUpdateTarget*>>& get() const;
 
 	private:
 		WidgetList& widget_list;
-		std::vector<std::vector<WidgetUpdateQueueEntry*>> queue;
+		std::vector<std::vector<WidgetUpdateTarget*>> queue;
 
-		static std::vector<WidgetUpdateQueueEntry*> getParents(const WidgetUpdateQueueEntry* entry);
+		static std::vector<WidgetUpdateTarget*> getParents(const WidgetUpdateTarget* entry);
 	};
 
 }

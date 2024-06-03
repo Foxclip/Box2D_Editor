@@ -324,14 +324,17 @@ void Editor::initWidgets() {
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
 
+    fw::WindowWidget* window_widget = widgets.createWidget<fw::WindowWidget>(400.0f, 400.0f);
     fw::ScrollAreaWidget* scroll_area_widget = widgets.createWidget<fw::ScrollAreaWidget>(300.0f, 200.0f);
     fw::ContainerWidget* container = widgets.createWidget<fw::ContainerWidget>(100.0f, 100.0f);
     fw::RectangleWidget* red_rect = widgets.createWidget<fw::RectangleWidget>(50.0f, 75.0f);
     fw::RectangleWidget* green_rect = widgets.createWidget<fw::RectangleWidget>(50.0f, 50.0f);
     fw::RectangleWidget* blue_rect = widgets.createWidget<fw::RectangleWidget>(600.0f, 50.0f);
-    scroll_area_widget->setPosition(400.0f, 300.0f);
+    window_widget->setPosition(400.0f, 300.0f);
     scroll_area_widget->setWidget(container);
     scroll_area_widget->setDeltaY(40.0f);
+    scroll_area_widget->setSizePolicy(fw::Widget::SizePolicy::PARENT);
+    scroll_area_widget->setParent(window_widget);
     container->setFillColor(sf::Color::White);
     container->setHorizontal(false);
     container->setPadding(10.0f);

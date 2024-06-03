@@ -143,6 +143,7 @@ namespace fw {
 		area_widget->setSize(area_width, area_height);
 		slider_background_x_widget->setWidth(area_width);
 		slider_background_y_widget->setHeight(area_height);
+		updateScroll();
 	}
 
 	void ScrollAreaWidget::internalUpdate() {

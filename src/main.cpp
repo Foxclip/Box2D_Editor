@@ -40,8 +40,8 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
-    //run_tests();
-    execute_app();
+    run_tests();
+    //execute_app();
 
     // TODO: object list window (outliner)
     // TODO: render polygon indices

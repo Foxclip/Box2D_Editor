@@ -277,13 +277,13 @@ namespace fw {
 		WidgetUnclippedRegion unclipped_region = WidgetUnclippedRegion(this);
 		SizePolicy size_policy_x = SizePolicy::NONE;
 		SizePolicy size_policy_y = SizePolicy::NONE;
-		WidgetUpdateQueueEntry normal_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::NORMAL);
-		WidgetUpdateQueueEntry pos_x_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::POS_X);
-		WidgetUpdateQueueEntry pos_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::POS_Y);
-		WidgetUpdateQueueEntry size_x_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_X);
-		WidgetUpdateQueueEntry size_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::SIZE_Y);
-		WidgetUpdateQueueEntry children_x_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::CHILDREN_X);
-		WidgetUpdateQueueEntry children_y_entry = WidgetUpdateQueueEntry(this, WidgetUpdateType::CHILDREN_Y);
+		WidgetUpdateTarget normal_target = WidgetUpdateTarget(this, WidgetUpdateType::NORMAL);
+		WidgetUpdateTarget pos_x_target = WidgetUpdateTarget(this, WidgetUpdateType::POS_X);
+		WidgetUpdateTarget pos_y_target = WidgetUpdateTarget(this, WidgetUpdateType::POS_Y);
+		WidgetUpdateTarget size_x_target = WidgetUpdateTarget(this, WidgetUpdateType::SIZE_X);
+		WidgetUpdateTarget size_y_target = WidgetUpdateTarget(this, WidgetUpdateType::SIZE_Y);
+		WidgetUpdateTarget children_x_target = WidgetUpdateTarget(this, WidgetUpdateType::CHILDREN_X);
+		WidgetUpdateTarget children_y_target = WidgetUpdateTarget(this, WidgetUpdateType::CHILDREN_Y);
 		sf::Vector2f min_size;
 		sf::Vector2f max_size = sf::Vector2f(-1.0f, -1.0f); // negative values - unlimited
 		bool visible = true;

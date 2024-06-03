@@ -249,23 +249,23 @@ namespace fw {
 	void WidgetList::updateWidgets() {
 		wAssert(!isLocked());
 		update_queue.update();
-		const std::vector<std::vector<WidgetUpdateQueueEntry*>>& queue = update_queue.get();
+		const std::vector<std::vector<WidgetUpdateTarget*>>& queue = update_queue.get();
 		for (const auto& layer : queue) {
-			for (const WidgetUpdateQueueEntry* entry : layer) {
-				if (entry->update_type == WidgetUpdateType::NORMAL) {
-					entry->widget->update();
-				} else if (entry->update_type == WidgetUpdateType::POS_X) {
-					entry->widget->updatePositionX();
-				} else if (entry->update_type == WidgetUpdateType::POS_Y) {
-					entry->widget->updatePositionY();
-				} else if (entry->update_type == WidgetUpdateType::SIZE_X) {
-					entry->widget->updateSizeX();
-				} else if (entry->update_type == WidgetUpdateType::SIZE_Y) {
-					entry->widget->updateSizeY();
-				} else if (entry->update_type == WidgetUpdateType::CHILDREN_X) {
-					entry->widget->updateChildrenX();
-				} else if (entry->update_type == WidgetUpdateType::CHILDREN_Y) {
-					entry->widget->updateChildrenY();
+			for (const WidgetUpdateTarget* entry : layer) {
+				if (entry->getType() == WidgetUpdateType::NORMAL) {
+					entry->getWidget()->update();
+				} else if (entry->getType() == WidgetUpdateType::POS_X) {
+					entry->getWidget()->updatePositionX();
+				} else if (entry->getType() == WidgetUpdateType::POS_Y) {
+					entry->getWidget()->updatePositionY();
+				} else if (entry->getType() == WidgetUpdateType::SIZE_X) {
+					entry->getWidget()->updateSizeX();
+				} else if (entry->getType() == WidgetUpdateType::SIZE_Y) {
+					entry->getWidget()->updateSizeY();
+				} else if (entry->getType() == WidgetUpdateType::CHILDREN_X) {
+					entry->getWidget()->updateChildrenX();
+				} else if (entry->getType() == WidgetUpdateType::CHILDREN_Y) {
+					entry->getWidget()->updateChildrenY();
 				}
 			}
 		}
