@@ -882,6 +882,10 @@ namespace fw {
 		wAssert(!widget_list.isLocked());
 		std::unique_ptr<WidgetLink> uptr = std::make_unique<WidgetLink>(targets, this, update_type, func);
 		WidgetLink* ptr = uptr.get();
+		for (size_t i = 0; i < targets.size(); i++) {
+			WidgetUpdateTarget* target = targets[i];
+			target->getWidget()->dependent_links.add(ptr);
+		}
 		links.add(std::move(uptr));
 		return ptr;
 	}
@@ -894,6 +898,17 @@ namespace fw {
 		wAssert(!widget_list.isLocked());
 		std::vector<WidgetUpdateTarget*> targets = { target };
 		return addLink(targets, update_type, func);
+	}
+
+	void Widget::removeLink(WidgetLink* link) {
+		wAssert(!widget_list.isLocked());
+		wAssert(links.contains(link));
+		for (size_t i = 0; i < link->getTargets().size(); i++) {
+			WidgetUpdateTarget* target = link->getTargets()[i];
+			Widget* widget = target->getWidget();
+			widget->dependent_links.remove(link);
+		}
+		links.remove(link);
 	}
 
 	void Widget::setForceCustomCursor(bool value) {

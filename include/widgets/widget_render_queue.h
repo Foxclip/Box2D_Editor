@@ -25,11 +25,12 @@ namespace fw {
 	public:
 		WidgetRenderQueue(WidgetList& widget_list);
 		void update();
-		const std::set<RenderQueueLayer>& get() const;
+		const std::vector<RenderQueueLayer>& get() const;
+		void remove(Widget* widget);
 
 	private:
 		WidgetList& widget_list;
-		std::set<RenderQueueLayer> layers;
+		std::vector<RenderQueueLayer> layers;
 
 	};
 

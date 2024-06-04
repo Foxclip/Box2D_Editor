@@ -20,22 +20,34 @@ namespace fw {
 	void WidgetRenderQueue::update() {
 		layers.clear();
 		CompVector<Widget*> root_render_queue = widget_list.getRootWidget()->getRenderQueue();
-		for (size_t i = 0; i < root_render_queue.size(); i++) {
-			Widget* widget = root_render_queue[i];
-			auto it = layers.find(RenderQueueLayer(static_cast<size_t>(widget->getGlobalRenderLayer())));
-			if (it != layers.end()) {
-				RenderQueueLayer* layer = const_cast<RenderQueueLayer*>(&*it);
-				layer->widgets.add(widget);
-			} else {
-				RenderQueueLayer layer(static_cast<size_t>(widget->getGlobalRenderLayer()));
+		for (Widget* widget : root_render_queue) {
+			bool found = false;
+			size_t global_layer = static_cast<size_t>(widget->getGlobalRenderLayer());
+			for (RenderQueueLayer& layer : layers) {
+				if (layer.layer == global_layer) {
+					layer.widgets.add(widget);
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				RenderQueueLayer layer(global_layer);
 				layer.widgets.add(widget);
-				layers.insert(layer);
+				layers.push_back(layer);
 			}
 		}
 	}
 
-	const std::set<RenderQueueLayer>& WidgetRenderQueue::get() const {
+	const std::vector<RenderQueueLayer>& WidgetRenderQueue::get() const {
 		return layers;
+	}
+
+	void WidgetRenderQueue::remove(Widget* widget) {
+		for (size_t i = 0; i < layers.size(); i++) {
+			if (layers[i].widgets.remove(widget) > 0) {
+				break;
+			}
+		}
 	}
 
 }

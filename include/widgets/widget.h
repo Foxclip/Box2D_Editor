@@ -259,6 +259,7 @@ namespace fw {
 			WidgetUpdateType update_type,
 			const FuncType& func
 		);
+		void removeLink(WidgetLink* link);
 		void setForceCustomCursor(bool value);
 		void setName(const std::string& new_name);
 		void setClipChildren(bool value);
@@ -307,6 +308,7 @@ namespace fw {
 		WidgetUpdateSocket children_x_target = WidgetUpdateSocket(this, WidgetUpdateType::CHILDREN_X);
 		WidgetUpdateSocket children_y_target = WidgetUpdateSocket(this, WidgetUpdateType::CHILDREN_Y);
 		CompVectorUptr<WidgetLink> links;
+		CompVector<WidgetLink*> dependent_links;
 		sf::Vector2f min_size;
 		sf::Vector2f max_size = sf::Vector2f(-1.0f, -1.0f); // negative values - unlimited
 		bool visible = true;

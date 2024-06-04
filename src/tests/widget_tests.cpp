@@ -138,6 +138,7 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* size_policy_combined_test = list->addTest("size_policy_combined", size_policy_tests, [&](test::Test& test) { sizePolicyCombinedTest(test); });
     test::Test* widget_link_basic_test = list->addTest("widget_link_basic", { size_policy_combined_test }, [&](test::Test& test) { widgetLinkBasicTest(test); });
     test::Test* widget_link_container_test = list->addTest("widget_link_container", { widget_link_basic_test }, [&](test::Test& test) { widgetLinkContainerTest(test); });
+    test::Test* widget_link_remove_test = list->addTest("widget_link_remove", { widget_link_basic_test }, [&](test::Test& test) { widgetLinkRemoveTest(test); });
     test::Test* textbox_widget_basic_test = list->addTest("textbox_widget_basic", { rectangle_widget_test, text_widget_test }, [&](test::Test& test) { textboxWidgetBasicTest(test); });
     test::Test* textbox_widget_input_test = list->addTest("textbox_widget_input", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetInputTest(test); });
     test::Test* textbox_widget_events_test = list->addTest("textbox_widget_events", { textbox_widget_input_test }, [&](test::Test& test) { textboxWidgetEventsTest(test); });
@@ -1363,6 +1364,9 @@ void WidgetTests::remove1Test(test::Test& test) {
             }
         }
     }
+
+    application.advance();
+
     T_ASSERT_NO_ERRORS();
     child0_widget->remove();
     if (T_COMPARE(application.getWidgets().getSize(), 3)) {
@@ -1374,11 +1378,16 @@ void WidgetTests::remove1Test(test::Test& test) {
             }
         }
     }
+
+    application.advance();
+
     T_ASSERT_NO_ERRORS();
     parent_widget->remove();
     if (T_COMPARE(application.getWidgets().getSize(), 1)) {
         T_COMPARE(root_widget->getChildrenCount(), 0);
     }
+
+    application.advance();
 }
 
 void WidgetTests::remove2Test(test::Test& test) {
@@ -1412,6 +1421,9 @@ void WidgetTests::remove2Test(test::Test& test) {
             }
         }
     }
+
+    application.advance();
+
     T_ASSERT_NO_ERRORS();
     subparent_widget->remove(false);
     if (T_COMPARE(application.getWidgets().getSize(), 4)) {
@@ -1425,6 +1437,8 @@ void WidgetTests::remove2Test(test::Test& test) {
             }
         }
     }
+
+    application.advance();
 }
 
 void WidgetTests::textWidgetTest(test::Test& test) {
@@ -1983,6 +1997,56 @@ void WidgetTests::widgetLinkContainerTest(test::Test& test) {
     );
     application.advance();
     T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position1_2);
+}
+
+void WidgetTests::widgetLinkRemoveTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(30.0f, 30.0f);
+    sf::Vector2f position1(100.0f, 100.0f);
+    sf::Vector2f position2(200.0f, 300.0f);
+    sf::Vector2f position1_1(50.0f, 50.0f);
+    sf::Vector2f position1_2(position1.x + size.x, position1.y);
+    sf::Vector2f position2_1(position1.x + size.x, position2.y);
+    sf::Vector2f position3(400.0f, 400.0f);
+    fw::RectangleWidget* rectangle_1_widget = application.getWidgets().createWidget<fw::RectangleWidget>(size);
+    fw::RectangleWidget* rectangle_2_widget = application.getWidgets().createWidget<fw::RectangleWidget>(size);
+    rectangle_1_widget->setName("rect1");
+    rectangle_1_widget->setPosition(position1);
+    rectangle_2_widget->setName("rect2");
+    rectangle_2_widget->setPosition(position1_1);
+    std::vector<fw::WidgetUpdateTarget*> targets = {
+        const_cast<fw::WidgetUpdateSocket*>(&rectangle_1_widget->getPosXTarget()),
+        const_cast<fw::WidgetUpdateSocket*>(&rectangle_1_widget->getSizeXTarget())
+    };
+    fw::WidgetLink* link1 = rectangle_2_widget->addLink(
+        targets,
+        fw::WidgetUpdateType::POS_X,
+        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+            rectangle_2_widget->setGlobalPositionX(rectangle_1_widget->getGlobalTopRight().x);
+        }
+    );
+    fw::WidgetLink* link2 = rectangle_2_widget->addLink(
+        const_cast<fw::WidgetUpdateSocket*>(&rectangle_1_widget->getPosYTarget()),
+        fw::WidgetUpdateType::POS_Y,
+        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+            rectangle_2_widget->setGlobalPositionY(rectangle_1_widget->getGlobalTopRight().y);
+        }
+    );
+    application.advance();
+    T_ASSERT(T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position1_2));
+
+    link1->remove();
+    rectangle_1_widget->setPosition(position2);
+    application.advance();
+    T_ASSERT(T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position2_1));
+
+    rectangle_1_widget->remove();
+    rectangle_2_widget->setPosition(position3);
+    application.advance();
+    T_ASSERT(T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position3));
 }
 
 void WidgetTests::textboxWidgetBasicTest(test::Test& test) {

@@ -23,26 +23,27 @@ namespace fw {
 
 	class WidgetUpdateTarget {
 	public:
+		Widget* getWidget() const;
+		WidgetUpdateType getType() const;
 		virtual void execute() = 0;
 		virtual std::string toStr() const = 0;
 
+	protected:
+		Widget* widget = nullptr;
+		WidgetUpdateType update_type = WidgetUpdateType::NONE;
+
 	private:
+
 	};
 
 	class WidgetUpdateSocket : public WidgetUpdateTarget {
 	public:
 		WidgetUpdateSocket();
 		WidgetUpdateSocket(Widget* widget, WidgetUpdateType type);
-		Widget* getWidget() const;
-		WidgetUpdateType getType() const;
 		std::string toStr() const override;
-		float getValue() const;
-		void setValue(float value) const;
 		void execute() override;
 
 	private:
-		Widget* widget = nullptr;
-		WidgetUpdateType update_type = WidgetUpdateType::NONE;
 
 	};
 
@@ -57,14 +58,12 @@ namespace fw {
 			const FuncType& func
 		);
 		const std::vector<WidgetUpdateTarget*>& getTargets() const;
-		Widget* getWidget() const;
 		std::string toStr() const override;
 		void execute() override;
+		void remove();
 
 	private:
 		std::vector<WidgetUpdateTarget*> targets;
-		Widget* widget = nullptr;
-		WidgetUpdateType update_type;
 		FuncType func;
 
 	};

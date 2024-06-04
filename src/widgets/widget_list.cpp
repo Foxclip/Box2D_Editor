@@ -265,7 +265,7 @@ namespace fw {
 			widgets[i]->updateVisibility();
 		}
 #endif
-		const std::set<RenderQueueLayer>& layers = render_queue.get();
+		const CompVector<RenderQueueLayer>& layers = render_queue.get();
 		for (RenderQueueLayer layer : layers) {
 			for (size_t widget_i = 0; widget_i < layer.widgets.size(); widget_i++) {
 				Widget* widget = layer.widgets[widget_i];
@@ -332,7 +332,12 @@ namespace fw {
 				child->setParent(parent);
 			}
 		}
+		for (size_t i = 0; i < widget->dependent_links.size(); i++) {
+			WidgetLink* link = widget->dependent_links[i];
+			link->remove();
+		}
 		parent->removeChild(widget);
+		render_queue.remove(widget);
 		widgets.remove(widget);
 	}
 
