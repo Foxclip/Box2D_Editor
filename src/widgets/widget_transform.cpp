@@ -78,10 +78,15 @@ namespace fw {
 		invalidateTransform();
 	}
 
-	void WidgetTransform::setGlobalPosition(const sf::Vector2f& position) {
+	void WidgetTransform::setGlobalPosition(float x, float y) {
 		const sf::Transform& inv_parent_global_transform = widget->getInverseParentGlobalTransform();
-		sf::Vector2f local_pos = inv_parent_global_transform * position;
+		sf::Vector2f pos = sf::Vector2f(x, y);
+		sf::Vector2f local_pos = inv_parent_global_transform * pos;
 		setPosition(local_pos);
+	}
+
+	void WidgetTransform::setGlobalPosition(const sf::Vector2f& position) {
+		setGlobalPosition(position.x, position.y);
 	}
 
 	void WidgetTransform::setRotation(float angle) {

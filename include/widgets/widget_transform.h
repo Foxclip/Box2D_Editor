@@ -21,6 +21,7 @@ namespace fw {
 		void invalidateGlobalTransform();
 		void setPosition(float x, float y);
 		void setPosition(const sf::Vector2f& position);
+		void setGlobalPosition(float x, float y);
 		void setGlobalPosition(const sf::Vector2f& position);
 		void setRotation(float angle);
 		void setScale(const sf::Vector2f& scale);

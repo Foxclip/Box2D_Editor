@@ -158,6 +158,14 @@ namespace fw {
 		SizePolicy getSizeYPolicy() const;
 		const sf::Vector2f& getMinSize() const;
 		const sf::Vector2f& getMaxSize() const;
+		const WidgetUpdateSocket& getNormalTarget() const;
+		const WidgetUpdateSocket& getPosXTarget() const;
+		const WidgetUpdateSocket& getPosYTarget() const;
+		const WidgetUpdateSocket& getSizeXTarget() const;
+		const WidgetUpdateSocket& getSizeYTarget() const;
+		const WidgetUpdateSocket& getChildrenXTarget() const;
+		const WidgetUpdateSocket& getChildrenYTarget() const;
+		const CompVector<WidgetLink*>& getLinks() const;
 		const sf::Transform& getTransform() const;
 		const sf::Transform& getInverseTransform() const;
 		const sf::Transform& getGlobalTransform() const;
@@ -227,6 +235,8 @@ namespace fw {
 		void setTransformPosition(const sf::Vector2f& position);
 		void setGlobalPosition(float x, float y);
 		void setGlobalPosition(const sf::Vector2f& position);
+		void setGlobalPositionX(float x);
+		void setGlobalPositionY(float y);
 		void setRotation(float angle);
 		virtual void setRenderable(bool value);
 		void setVisible(bool value);
@@ -239,6 +249,16 @@ namespace fw {
 		void moveToTop();
 		void lockChildren();
 		void unlockChildren();
+		WidgetLink* addLink(
+			const std::vector<WidgetUpdateTarget*>& targets,
+			WidgetUpdateType update_type,
+			const FuncType& func
+		);
+		WidgetLink* addLink(
+			WidgetUpdateTarget* target,
+			WidgetUpdateType update_type,
+			const FuncType& func
+		);
 		void setForceCustomCursor(bool value);
 		void setName(const std::string& new_name);
 		void setClipChildren(bool value);
@@ -258,6 +278,8 @@ namespace fw {
 		friend class WidgetList;
 		friend class WidgetTransform;
 		friend class WidgetUnclippedRegion;
+		friend class WidgetLink;
+		friend class WidgetUpdateSocket;
 		friend class WidgetUpdateQueue;
 		WidgetType type = WidgetType::None;
 		std::string name = "<unnamed>";
@@ -277,13 +299,14 @@ namespace fw {
 		WidgetUnclippedRegion unclipped_region = WidgetUnclippedRegion(this);
 		SizePolicy size_policy_x = SizePolicy::NONE;
 		SizePolicy size_policy_y = SizePolicy::NONE;
-		WidgetUpdateTarget normal_target = WidgetUpdateTarget(this, WidgetUpdateType::NORMAL);
-		WidgetUpdateTarget pos_x_target = WidgetUpdateTarget(this, WidgetUpdateType::POS_X);
-		WidgetUpdateTarget pos_y_target = WidgetUpdateTarget(this, WidgetUpdateType::POS_Y);
-		WidgetUpdateTarget size_x_target = WidgetUpdateTarget(this, WidgetUpdateType::SIZE_X);
-		WidgetUpdateTarget size_y_target = WidgetUpdateTarget(this, WidgetUpdateType::SIZE_Y);
-		WidgetUpdateTarget children_x_target = WidgetUpdateTarget(this, WidgetUpdateType::CHILDREN_X);
-		WidgetUpdateTarget children_y_target = WidgetUpdateTarget(this, WidgetUpdateType::CHILDREN_Y);
+		WidgetUpdateSocket normal_target = WidgetUpdateSocket(this, WidgetUpdateType::NORMAL);
+		WidgetUpdateSocket pos_x_target = WidgetUpdateSocket(this, WidgetUpdateType::POS_X);
+		WidgetUpdateSocket pos_y_target = WidgetUpdateSocket(this, WidgetUpdateType::POS_Y);
+		WidgetUpdateSocket size_x_target = WidgetUpdateSocket(this, WidgetUpdateType::SIZE_X);
+		WidgetUpdateSocket size_y_target = WidgetUpdateSocket(this, WidgetUpdateType::SIZE_Y);
+		WidgetUpdateSocket children_x_target = WidgetUpdateSocket(this, WidgetUpdateType::CHILDREN_X);
+		WidgetUpdateSocket children_y_target = WidgetUpdateSocket(this, WidgetUpdateType::CHILDREN_Y);
+		CompVectorUptr<WidgetLink> links;
 		sf::Vector2f min_size;
 		sf::Vector2f max_size = sf::Vector2f(-1.0f, -1.0f); // negative values - unlimited
 		bool visible = true;

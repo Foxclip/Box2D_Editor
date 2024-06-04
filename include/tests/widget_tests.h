@@ -148,6 +148,7 @@ private:
 	void coordinatesTest(test::Test& test);
 	void findTest(test::Test& test);
 	void anchorTest(test::Test& test);
+	void widgetLinkBasicTest(test::Test& test);
 	void remove1Test(test::Test& test);
 	void remove2Test(test::Test& test);
 	void textWidgetTest(test::Test& test);

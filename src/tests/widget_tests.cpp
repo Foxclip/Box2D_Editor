@@ -122,6 +122,7 @@ void WidgetTests::createWidgetsList(test::TestList* list) {
     test::Test* coordinates_test = list->addTest("coordinates", { set_parent_test }, [&](test::Test& test) { coordinatesTest(test); });
     test::Test* find_test = list->addTest("find", { set_parent_test }, [&](test::Test& test) { findTest(test); });
     test::Test* anchor_test = list->addTest("anchor", { set_parent_test }, [&](test::Test& test) { anchorTest(test); });
+    test::Test* widget_link_test = list->addTest("widget_link", { anchor_test }, [&](test::Test& test) { widgetLinkBasicTest(test); });
     test::Test* remove_1_test = list->addTest("remove_1", { set_parent_test }, [&](test::Test& test) { remove1Test(test); });
     test::Test* remove_2_test = list->addTest("remove_2", { set_parent_test }, [&](test::Test& test) { remove2Test(test); }); 
     test::Test* text_widget_test = list->addTest("text_widget", { root_widget_test }, [&](test::Test& test) { textWidgetTest(test); });
@@ -1334,6 +1335,43 @@ void WidgetTests::anchorTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x / 2.0f, parent_size.y) + anchor_offset);
     child_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_RIGHT);
     T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y) + anchor_offset);
+}
+
+void WidgetTests::widgetLinkBasicTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(30.0f, 30.0f);
+    fw::RectangleWidget* rectangle_1_widget = application.getWidgets().createWidget<fw::RectangleWidget>(size);
+    fw::RectangleWidget* rectangle_2_widget = application.getWidgets().createWidget<fw::RectangleWidget>(size);
+    sf::Vector2f position1(100.0f, 100.0f);
+    sf::Vector2f position1_1(50.0f, 50.0f);
+    sf::Vector2f position1_2(130.0f, 100.0f);
+    rectangle_1_widget->setName("rect1");
+    rectangle_1_widget->setPosition(position1);
+    rectangle_2_widget->setName("rect2");
+    rectangle_2_widget->setPosition(position1_1);
+    std::vector<fw::WidgetUpdateTarget*> targets = {
+        const_cast<fw::WidgetUpdateSocket*>(&rectangle_1_widget->getPosXTarget()),
+        const_cast<fw::WidgetUpdateSocket*>(&rectangle_1_widget->getSizeXTarget())
+    };
+    rectangle_2_widget->addLink(
+        targets,
+        fw::WidgetUpdateType::POS_X,
+        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+        rectangle_2_widget->setGlobalPositionX(rectangle_1_widget->getGlobalTopRight().x);
+    }
+    );
+    rectangle_2_widget->addLink(
+        const_cast<fw::WidgetUpdateSocket*>(&rectangle_1_widget->getPosYTarget()),
+        fw::WidgetUpdateType::POS_Y,
+        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+        rectangle_2_widget->setGlobalPositionY(rectangle_1_widget->getGlobalTopRight().y);
+    }
+    );
+    application.advance();
+    T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position1_2);
 }
 
 void WidgetTests::remove1Test(test::Test& test) {

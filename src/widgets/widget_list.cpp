@@ -251,22 +251,8 @@ namespace fw {
 		update_queue.update();
 		const std::vector<std::vector<WidgetUpdateTarget*>>& queue = update_queue.get();
 		for (const auto& layer : queue) {
-			for (const WidgetUpdateTarget* entry : layer) {
-				if (entry->getType() == WidgetUpdateType::NORMAL) {
-					entry->getWidget()->update();
-				} else if (entry->getType() == WidgetUpdateType::POS_X) {
-					entry->getWidget()->updatePositionX();
-				} else if (entry->getType() == WidgetUpdateType::POS_Y) {
-					entry->getWidget()->updatePositionY();
-				} else if (entry->getType() == WidgetUpdateType::SIZE_X) {
-					entry->getWidget()->updateSizeX();
-				} else if (entry->getType() == WidgetUpdateType::SIZE_Y) {
-					entry->getWidget()->updateSizeY();
-				} else if (entry->getType() == WidgetUpdateType::CHILDREN_X) {
-					entry->getWidget()->updateChildrenX();
-				} else if (entry->getType() == WidgetUpdateType::CHILDREN_Y) {
-					entry->getWidget()->updateChildrenY();
-				}
+			for (WidgetUpdateTarget* target : layer) {
+				target->execute();
 			}
 		}
 	}

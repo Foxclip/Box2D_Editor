@@ -363,6 +363,38 @@ namespace fw {
 		return max_size;
 	}
 
+	const WidgetUpdateSocket& Widget::getNormalTarget() const {
+		return normal_target;
+	}
+
+	const WidgetUpdateSocket& Widget::getPosXTarget() const {
+		return pos_x_target;
+	}
+
+	const WidgetUpdateSocket& Widget::getPosYTarget() const {
+		return pos_y_target;
+	}
+
+	const WidgetUpdateSocket& Widget::getSizeXTarget() const {
+		return size_x_target;
+	}
+
+	const WidgetUpdateSocket& Widget::getSizeYTarget() const {
+		return size_y_target;
+	}
+
+	const WidgetUpdateSocket& Widget::getChildrenXTarget() const {
+		return children_x_target;
+	}
+
+	const WidgetUpdateSocket& Widget::getChildrenYTarget() const {
+		return children_y_target;
+	}
+
+	const CompVector<WidgetLink*>& Widget::getLinks() const {
+		return links.getCompVector();
+	}
+
 	const sf::Transform& Widget::getTransform() const {
 		return transforms.getTransform();
 	}
@@ -721,6 +753,16 @@ namespace fw {
 		transforms.setGlobalPosition(position);
 	}
 
+	void Widget::setGlobalPositionX(float x) {
+		wAssert(!widget_list.isLocked());
+		transforms.setGlobalPosition(x, getGlobalPosition().y);
+	}
+
+	void Widget::setGlobalPositionY(float y) {
+		wAssert(!widget_list.isLocked());
+		transforms.setGlobalPosition(getGlobalPosition().x, y);
+	}
+
 	void Widget::setRotation(float angle) {
 		wAssert(!widget_list.isLocked());
 		transforms.setRotation(angle);
@@ -830,6 +872,28 @@ namespace fw {
 	void Widget::unlockChildren() {
 		wAssert(!widget_list.isLocked());
 		children_locked = false;
+	}
+
+	WidgetLink* Widget::addLink(
+		const std::vector<WidgetUpdateTarget*>& targets,
+		WidgetUpdateType update_type,
+		const FuncType& func
+	) {
+		wAssert(!widget_list.isLocked());
+		std::unique_ptr<WidgetLink> uptr = std::make_unique<WidgetLink>(targets, this, update_type, func);
+		WidgetLink* ptr = uptr.get();
+		links.add(std::move(uptr));
+		return ptr;
+	}
+
+	WidgetLink* Widget::addLink(
+		WidgetUpdateTarget* target,
+		WidgetUpdateType update_type,
+		const FuncType& func
+	) {
+		wAssert(!widget_list.isLocked());
+		std::vector<WidgetUpdateTarget*> targets = { target };
+		return addLink(targets, update_type, func);
 	}
 
 	void Widget::setForceCustomCursor(bool value) {
