@@ -43,8 +43,6 @@ namespace fw {
 		float delta_x = SCROLL_AREA_DEFAULT_SCROLL_X_DELTA;
 		float delta_y = SCROLL_AREA_DEFAULT_SCROLL_Y_DELTA;
 
-		void setSize(float width, float height) override;
-		void internalUpdate() override;
 		void internalOnScrollX(const sf::Vector2f& pos, float delta) override;
 		void internalOnScrollY(const sf::Vector2f& pos, float delta) override;
 

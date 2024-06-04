@@ -363,32 +363,32 @@ namespace fw {
 		return max_size;
 	}
 
-	const WidgetUpdateSocket& Widget::getNormalTarget() const {
-		return normal_target;
+	WidgetUpdateSocket* Widget::getNormalTarget() {
+		return &normal_target;
 	}
 
-	const WidgetUpdateSocket& Widget::getPosXTarget() const {
-		return pos_x_target;
+	WidgetUpdateSocket* Widget::getPosXTarget() {
+		return &pos_x_target;
 	}
 
-	const WidgetUpdateSocket& Widget::getPosYTarget() const {
-		return pos_y_target;
+	WidgetUpdateSocket* Widget::getPosYTarget() {
+		return &pos_y_target;
 	}
 
-	const WidgetUpdateSocket& Widget::getSizeXTarget() const {
-		return size_x_target;
+	WidgetUpdateSocket* Widget::getSizeXTarget() {
+		return &size_x_target;
 	}
 
-	const WidgetUpdateSocket& Widget::getSizeYTarget() const {
-		return size_y_target;
+	WidgetUpdateSocket* Widget::getSizeYTarget() {
+		return &size_y_target;
 	}
 
-	const WidgetUpdateSocket& Widget::getChildrenXTarget() const {
-		return children_x_target;
+	WidgetUpdateSocket* Widget::getChildrenXTarget() {
+		return &children_x_target;
 	}
 
-	const WidgetUpdateSocket& Widget::getChildrenYTarget() const {
-		return children_y_target;
+	WidgetUpdateSocket* Widget::getChildrenYTarget() {
+		return &children_y_target;
 	}
 
 	const CompVector<WidgetLink*>& Widget::getLinks() const {

@@ -112,6 +112,41 @@ namespace fw {
 		corner_widget->setClickThrough(false);
 		corner_widget->setParent(this);
 
+		WidgetLink* area_link_x = area_widget->addLink(
+			{ this->getSizeXTarget(), slider_background_y_widget->getSizeXTarget() },
+			fw::WidgetUpdateType::SIZE_X,
+			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+				area_widget->setWidth(getWidth() - slider_background_y_widget->getWidth());
+			}
+		);
+		WidgetLink* area_link_y = area_widget->addLink(
+			{ this->getSizeYTarget(), slider_background_x_widget->getSizeYTarget() },
+			fw::WidgetUpdateType::SIZE_Y,
+			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+				area_widget->setHeight(getHeight() - slider_background_x_widget->getHeight());
+			}
+		);
+		WidgetLink* slider_bg_link_x = slider_background_x_widget->addLink(
+			{ this->getSizeXTarget(), slider_background_y_widget->getSizeXTarget() },
+			fw::WidgetUpdateType::SIZE_X,
+			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+				slider_background_x_widget->setWidth(getWidth() - slider_background_y_widget->getWidth());
+			}
+		);
+		WidgetLink* slider_bg_link_y = slider_background_y_widget->addLink(
+			{ this->getSizeYTarget(), slider_background_x_widget->getSizeYTarget() },
+			fw::WidgetUpdateType::SIZE_Y,
+			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+				slider_background_y_widget->setHeight(getHeight() - slider_background_x_widget->getHeight());
+			}
+		);
+		area_widget->addLink(
+			{ area_link_x, area_link_y, slider_bg_link_x, slider_bg_link_y },
+			fw::WidgetUpdateType::NONE,
+			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+				updateScroll();
+			}
+		);
 		updateScroll();
 	}
 
@@ -135,22 +170,6 @@ namespace fw {
 
 	void ScrollAreaWidget::setDeltaY(float delta) {
 		this->delta_y = delta;
-	}
-
-	void ScrollAreaWidget::setSize(float width, float height) {
-		float area_width = width - slider_background_y_widget->getWidth();
-		float area_height = height - slider_background_x_widget->getHeight();
-		area_widget->setSize(area_width, area_height);
-		slider_background_x_widget->setWidth(area_width);
-		slider_background_y_widget->setHeight(area_height);
-		updateScroll();
-	}
-
-	void ScrollAreaWidget::internalUpdate() {
-		float area_x = std::min(area_widget->getAnchorOffset().x, scrolled_widget->getWidth());
-		float area_y = std::min(area_widget->getAnchorOffset().y, scrolled_widget->getHeight());
-		area_widget->setPosition(area_x, area_y);
-		updateScroll();
 	}
 
 	void ScrollAreaWidget::internalOnScrollX(const sf::Vector2f& pos, float delta) {

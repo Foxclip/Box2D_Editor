@@ -59,11 +59,7 @@ namespace fw {
 			return link->getTargets();
 		} else if (const WidgetUpdateSocket* socket = dynamic_cast<const WidgetUpdateSocket*>(target)) {
 			if (socket->getType() == WidgetUpdateType::NORMAL) {
-				// scroll area updates scrollbars depending on child's size
-				if (ScrollAreaWidget* scroll_area = dynamic_cast<ScrollAreaWidget*>(socket->getWidget())) {
-					result.add(&scroll_area->getWidget()->size_x_target);
-					result.add(&scroll_area->getWidget()->size_y_target);
-				}
+				// nothing
 			} else if (socket->getType() == WidgetUpdateType::POS_X) {
 				// pos entry depends on parent's children x entry,
 				// and so all entries dependent on pos entry will be updated
