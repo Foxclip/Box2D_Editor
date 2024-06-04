@@ -148,7 +148,6 @@ private:
 	void coordinatesTest(test::Test& test);
 	void findTest(test::Test& test);
 	void anchorTest(test::Test& test);
-	void widgetLinkBasicTest(test::Test& test);
 	void remove1Test(test::Test& test);
 	void remove2Test(test::Test& test);
 	void textWidgetTest(test::Test& test);
@@ -162,6 +161,8 @@ private:
 	void sizePolicyExpandTest(test::Test& test);
 	void sizePolicyLimitsTest(test::Test& test);
 	void sizePolicyCombinedTest(test::Test& test);
+	void widgetLinkBasicTest(test::Test& test);
+	void widgetLinkContainerTest(test::Test& test);
 	void textboxWidgetBasicTest(test::Test& test);
 	void textboxWidgetInputTest(test::Test& test);
 	void textboxWidgetEventsTest(test::Test& test);
