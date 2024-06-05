@@ -233,7 +233,11 @@ namespace fw {
 		float pos_x_factor = 0.0f;
 		if (scrolled_widget) {
 			float scroll_range = getScrollXRange();
-			pos_x_factor = -scrolled_widget->getAnchorOffset().x / scroll_range;
+			if (scroll_range > 0.0f) {
+				pos_x_factor = -scrolled_widget->getAnchorOffset().x / scroll_range;
+			} else {
+				pos_x_factor = 0.0f;
+			}
 		}
 		return pos_x_factor;
 	}
@@ -242,7 +246,11 @@ namespace fw {
 		float pos_y_factor = 0.0f;
 		if (scrolled_widget) {
 			float scroll_range = getScrollYRange();
-			pos_y_factor = -scrolled_widget->getAnchorOffset().y / scroll_range;
+			if (scroll_range > 0.0f) {
+				pos_y_factor = -scrolled_widget->getAnchorOffset().y / scroll_range;
+			} else {
+				pos_y_factor = 0.0f;
+			}
 		}
 		return pos_y_factor;
 	}
