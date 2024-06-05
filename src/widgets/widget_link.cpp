@@ -23,15 +23,15 @@ namespace fw {
 		return widget;
 	}
 
-	WidgetUpdateType WidgetUpdateTarget::getType() const {
-		return update_type;
-	}
-
 	WidgetUpdateSocket::WidgetUpdateSocket() { }
 
 	WidgetUpdateSocket::WidgetUpdateSocket(Widget* widget, WidgetUpdateType type) {
 		this->widget = widget;
 		this->update_type = type;
+	}
+
+	WidgetUpdateType WidgetUpdateSocket::getType() const {
+		return update_type;
 	}
 
 	void WidgetUpdateSocket::execute() {
@@ -53,14 +53,14 @@ namespace fw {
 	}
 
 	WidgetLink::WidgetLink(
+		const std::string& name,
 		const std::vector<WidgetUpdateTarget*>& targets,
 		Widget* widget,
-		WidgetUpdateType update_type,
 		const FuncType& func
 	) {
+		this->name = name;
 		this->targets = targets;
 		this->widget  = widget;
-		this->update_type = update_type;
 		this->func = func;
 	}
 
@@ -69,7 +69,7 @@ namespace fw {
 	}
 
 	std::string WidgetLink::toStr() const {
-		return "[Link] " + widget->getFullName() + " (" + update_type_to_str(update_type) + ")";
+		return "[Link] " + widget->getFullName() + " (" + name + ")";
 	}
 
 	void WidgetLink::execute() {

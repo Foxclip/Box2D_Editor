@@ -250,13 +250,13 @@ namespace fw {
 		void lockChildren();
 		void unlockChildren();
 		WidgetLink* addLink(
+			const std::string& name,
 			const std::vector<WidgetUpdateTarget*>& targets,
-			WidgetUpdateType update_type,
 			const FuncType& func
 		);
 		WidgetLink* addLink(
+			const std::string& name,
 			WidgetUpdateTarget* target,
-			WidgetUpdateType update_type,
 			const FuncType& func
 		);
 		void removeLink(WidgetLink* link);

@@ -111,42 +111,43 @@ namespace fw {
 		corner_widget->setOrigin(Anchor::BOTTOM_RIGHT);
 		corner_widget->setClickThrough(false);
 		corner_widget->setParent(this);
-
+		// links
 		WidgetLink* area_link_x = area_widget->addLink(
+			"SIZE_X",
 			{ this->getSizeXTarget(), slider_background_y_widget->getSizeXTarget() },
-			fw::WidgetUpdateType::SIZE_X,
 			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
 				area_widget->setWidth(getWidth() - slider_background_y_widget->getWidth());
 			}
 		);
 		WidgetLink* area_link_y = area_widget->addLink(
+			"SIZE_Y",
 			{ this->getSizeYTarget(), slider_background_x_widget->getSizeYTarget() },
-			fw::WidgetUpdateType::SIZE_Y,
 			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
 				area_widget->setHeight(getHeight() - slider_background_x_widget->getHeight());
 			}
 		);
 		WidgetLink* slider_bg_link_x = slider_background_x_widget->addLink(
+			"SIZE_X",
 			{ this->getSizeXTarget(), slider_background_y_widget->getSizeXTarget() },
-			fw::WidgetUpdateType::SIZE_X,
 			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
 				slider_background_x_widget->setWidth(getWidth() - slider_background_y_widget->getWidth());
 			}
 		);
 		WidgetLink* slider_bg_link_y = slider_background_y_widget->addLink(
+			"SIZE_Y",
 			{ this->getSizeYTarget(), slider_background_x_widget->getSizeYTarget() },
-			fw::WidgetUpdateType::SIZE_Y,
 			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
 				slider_background_y_widget->setHeight(getHeight() - slider_background_x_widget->getHeight());
 			}
 		);
 		area_widget->addLink(
+			"SCROLL",
 			{ area_link_x, area_link_y, slider_bg_link_x, slider_bg_link_y },
-			fw::WidgetUpdateType::NONE,
 			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
 				updateScroll();
 			}
 		);
+
 		updateScroll();
 	}
 
