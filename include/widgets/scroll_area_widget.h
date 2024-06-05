@@ -42,6 +42,13 @@ namespace fw {
 		float slider_grab_pos;
 		float delta_x = SCROLL_AREA_DEFAULT_SCROLL_X_DELTA;
 		float delta_y = SCROLL_AREA_DEFAULT_SCROLL_Y_DELTA;
+		WidgetLink* area_size_x_link = nullptr;
+		WidgetLink* area_size_y_link = nullptr;
+		WidgetLink* slider_bg_size_x_link = nullptr;
+		WidgetLink* slider_bg_size_y_link = nullptr;
+		WidgetLink* area_scroll_link = nullptr;
+		WidgetLink* widget_pos_x_link = nullptr;
+		WidgetLink* widget_pos_y_link = nullptr;
 
 		void internalOnScrollX(const sf::Vector2f& pos, float delta) override;
 		void internalOnScrollY(const sf::Vector2f& pos, float delta) override;

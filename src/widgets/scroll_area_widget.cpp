@@ -112,37 +112,75 @@ namespace fw {
 		corner_widget->setClickThrough(false);
 		corner_widget->setParent(this);
 		// links
-		WidgetLink* area_link_x = area_widget->addLink(
+		area_size_x_link = addLink(
 			"SIZE_X",
 			{ this->getSizeXTarget(), slider_background_y_widget->getSizeXTarget() },
 			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
 				area_widget->setWidth(getWidth() - slider_background_y_widget->getWidth());
 			}
 		);
-		WidgetLink* area_link_y = area_widget->addLink(
+		area_size_y_link = addLink(
 			"SIZE_Y",
 			{ this->getSizeYTarget(), slider_background_x_widget->getSizeYTarget() },
 			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
 				area_widget->setHeight(getHeight() - slider_background_x_widget->getHeight());
 			}
 		);
-		WidgetLink* slider_bg_link_x = slider_background_x_widget->addLink(
+		slider_bg_size_x_link = addLink(
 			"SIZE_X",
 			{ this->getSizeXTarget(), slider_background_y_widget->getSizeXTarget() },
 			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
 				slider_background_x_widget->setWidth(getWidth() - slider_background_y_widget->getWidth());
 			}
 		);
-		WidgetLink* slider_bg_link_y = slider_background_y_widget->addLink(
+		slider_bg_size_y_link = addLink(
 			"SIZE_Y",
 			{ this->getSizeYTarget(), slider_background_x_widget->getSizeYTarget() },
 			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
 				slider_background_y_widget->setHeight(getHeight() - slider_background_x_widget->getHeight());
 			}
 		);
-		area_widget->addLink(
+		widget_pos_x_link = addLink(
+			"POS_X",
+			area_size_x_link,
+			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+				if (!scrolled_widget) {
+					return;
+				}
+				float right_offset = area_widget->getRight().x - scrolled_widget->getRight().x;
+				if (right_offset > 0.0f) {
+					if (getScrollXRange() > 0.0f) {
+						scrollX(right_offset);
+					} else {
+						scrolled_widget->setAnchorOffsetX(0.0f);
+					}
+				}
+			}
+		);
+		widget_pos_y_link = addLink(
+			"POS_Y",
+			area_size_y_link,
+			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+				if (!scrolled_widget) {
+					return;
+				}
+				float bottom_offset = area_widget->getBottom().y - scrolled_widget->getBottom().y;
+				if (bottom_offset > 0.0f) {
+					if (getScrollYRange() > 0.0f) {
+						scrollY(bottom_offset);
+					} else {
+						scrolled_widget->setAnchorOffsetY(0.0f);
+					}
+				}
+			}
+		);
+		area_scroll_link = addLink(
 			"SCROLL",
-			{ area_link_x, area_link_y, slider_bg_link_x, slider_bg_link_y },
+			{
+				area_size_x_link, area_size_y_link,
+				slider_bg_size_x_link, slider_bg_size_y_link,
+				widget_pos_x_link, widget_pos_y_link
+			},
 			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
 				updateScroll();
 			}
