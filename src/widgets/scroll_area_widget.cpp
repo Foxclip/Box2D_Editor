@@ -50,7 +50,7 @@ namespace fw {
 			slider_grab_pos = slider_x_widget->getPosition().x;
 			updateColors();
 		};
-		slider_x_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
+		slider_x_widget->OnMouseMoved = [&](const sf::Vector2f& pos) {
 			if (slider_x_grabbed) {
 				float x_offset = pos.x - mouse_grab_pos;
 				setSliderX(slider_grab_pos + x_offset);
@@ -89,7 +89,7 @@ namespace fw {
 			slider_grab_pos = slider_y_widget->getPosition().y;
 			updateColors();
 		};
-		slider_y_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
+		slider_y_widget->OnMouseMoved = [&](const sf::Vector2f& pos) {
 			if (slider_y_grabbed) {
 				float y_offset = pos.y - mouse_grab_pos;
 				setSliderY(slider_grab_pos + y_offset);
@@ -282,10 +282,14 @@ namespace fw {
 		float pos_x = std::clamp(x, 0.0f, x_range);
 		slider_x_widget->setPositionX(pos_x);
 		if (scrolled_widget) {
-			float x_factor = pos_x / x_range;
-			float scroll_range = scrolled_widget->getWidth() - area_widget->getWidth();
-			float offset = -x_factor * scroll_range;
-			scrolled_widget->setAnchorOffsetX(offset);
+			if (x_range > 0.0f) {
+				float x_factor = pos_x / x_range;
+				float scroll_range = scrolled_widget->getWidth() - area_widget->getWidth();
+				float offset = -x_factor * scroll_range;
+				scrolled_widget->setAnchorOffsetX(offset);
+			} else {
+				scrolled_widget->setAnchorOffsetX(0.0f);
+			}
 		}
 	}
 
@@ -294,10 +298,14 @@ namespace fw {
 		float pos_y = std::clamp(y, 0.0f, y_range);
 		slider_y_widget->setPositionY(pos_y);
 		if (scrolled_widget) {
-			float y_factor = pos_y / y_range;
-			float scroll_range = scrolled_widget->getHeight() - area_widget->getHeight();
-			float offset = -y_factor * scroll_range;
-			scrolled_widget->setAnchorOffsetY(offset);
+			if (y_range > 0.0f) {
+				float y_factor = pos_y / y_range;
+				float scroll_range = scrolled_widget->getHeight() - area_widget->getHeight();
+				float offset = -y_factor * scroll_range;
+				scrolled_widget->setAnchorOffsetY(offset);
+			} else {
+				scrolled_widget->setAnchorOffsetY(0.0f);
+			}
 		}
 	}
 
