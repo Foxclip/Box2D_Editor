@@ -369,9 +369,11 @@ namespace fw {
 		}
 		float pos_x = scrolled_widget->getAnchorOffset().x - x_offset;
 		float scroll_range = getScrollXRange();
-		pos_x = std::clamp(pos_x, -scroll_range, 0.0f);
-		scrolled_widget->setAnchorOffsetX(pos_x);
-		updateScroll();
+		if (scroll_range > 0.0f) {
+			pos_x = std::clamp(pos_x, -scroll_range, 0.0f);
+			scrolled_widget->setAnchorOffsetX(pos_x);
+			updateScroll();
+		}
 	}
 
 	void ScrollAreaWidget::scrollY(float y_offset) {
@@ -380,9 +382,11 @@ namespace fw {
 		}
 		float pos_y = scrolled_widget->getAnchorOffset().y - y_offset;
 		float scroll_range = getScrollYRange();
-		pos_y = std::clamp(pos_y, -scroll_range, 0.0f);
-		scrolled_widget->setAnchorOffsetY(pos_y);
-		updateScroll();
+		if (scroll_range > 0.0f) {
+			pos_y = std::clamp(pos_y, -scroll_range, 0.0f);
+			scrolled_widget->setAnchorOffsetY(pos_y);
+			updateScroll();
+		}
 	}
 
 }
