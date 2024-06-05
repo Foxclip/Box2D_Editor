@@ -87,6 +87,7 @@ namespace fw {
 		std::function<void(const sf::Vector2f& pos)> OnRightRelease = [](const sf::Vector2f& pos) { };
 		std::function<void(const sf::Vector2f& pos, float delta)> OnScrollX = [](const sf::Vector2f& pos, float delta) { };
 		std::function<void(const sf::Vector2f& pos, float delta)> OnScrollY = [](const sf::Vector2f& pos, float delta) { };
+		std::function<void(const sf::Vector2f& pos)> OnMouseMoved = [](const sf::Vector2f& pos) { };
 		std::function<void(const sf::Vector2f& pos)> OnMouseEnter = [](const sf::Vector2f& pos) { };
 		std::function<void(const sf::Vector2f& pos)> OnMouseExit = [](const sf::Vector2f& pos) { };
 		std::function<void(const sf::Vector2f& pos)> OnProcessMouse = [](const sf::Vector2f& pos) { };
@@ -114,6 +115,7 @@ namespace fw {
 		void processRightPress(const sf::Vector2f& pos);
 		void processLeftRelease(const sf::Vector2f& pos);
 		void processRightRelease(const sf::Vector2f& pos);
+		void processMouseMove(const sf::Vector2f& pos);
 		void processScrollX(const sf::Vector2f pos, float delta);
 		void processScrollY(const sf::Vector2f pos, float delta);
 		void processMouse(const sf::Vector2f& pos);
@@ -353,6 +355,7 @@ namespace fw {
 		virtual void internalOnScrollY(const sf::Vector2f& pos, float delta);
 		virtual void internalProcessKeyboardEvent(const sf::Event& event);
 		virtual void internalProcessMouse(const sf::Vector2f& pos);
+		virtual void internalOnMouseMoved(const sf::Vector2f& pos);
 		virtual void internalOnMouseEnter(const sf::Vector2f& pos);
 		virtual void internalOnMouseExit(const sf::Vector2f& pos);
 		virtual void internalOnFocused();

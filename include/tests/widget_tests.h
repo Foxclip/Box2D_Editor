@@ -36,6 +36,7 @@ public:
 	bool process_right_press = false;
 	bool process_left_release = false;
 	bool process_right_release = false;
+	bool process_mouse_move = false;
 	bool process_mouse_scroll_x = false;
 	bool process_mouse_scroll_y = false;
 	bool process_keyboard = false;
@@ -48,6 +49,8 @@ public:
 	sf::Vector2i left_release_pos;
 	sf::Vector2i right_click_pos;
 	sf::Vector2i right_release_pos;
+	float scroll_x_delta = 0.0f;
+	float scroll_y_delta = 0.0f;
 	bool space_key_pressed = false;
 
 	void onInit() override;
@@ -62,6 +65,7 @@ public:
 	void onProcessRightPress() override;
 	void onProcessLeftRelease() override;
 	void onProcessRightRelease() override;
+	void onProcessMouseMove() override;
 	void onProcessMouseScrollX(float delta) override;
 	void onProcessMouseScrollY(float delta) override;
 	void onProcessKeyboard() override;

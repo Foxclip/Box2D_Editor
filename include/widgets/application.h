@@ -91,6 +91,7 @@ namespace fw {
 		sf::View window_view;
 		WidgetList widgets = WidgetList(*this);
 		sf::Vector2i mousePrevPos;
+		sf::Vector2f mousePrevPosf;
 		sf::Vector2f mousePressPosf;
 		bool leftButtonPressed = false;
 		bool rightButtonPressed = false;
@@ -126,6 +127,7 @@ namespace fw {
 		virtual void onProcessRightPress();
 		virtual void onProcessLeftRelease();
 		virtual void onProcessRightRelease();
+		virtual void onProcessMouseMove();
 		virtual void onProcessMouseScrollX(float delta);
 		virtual void onProcessMouseScrollY(float delta);
 		virtual void onProcessKeyboard();
@@ -159,6 +161,7 @@ namespace fw {
 		void processRightPress();
 		void processLeftRelease();
 		void processRightRelease();
+		void processMouseMove();
 		void processScrollX(float delta);
 		void processScrollY(float delta);
 		void processKeyboard();

@@ -111,6 +111,17 @@ namespace fw {
 		}
 	}
 
+	void Widget::processMouseMove(const sf::Vector2f& pos) {
+		if (!visible) {
+			return;
+		}
+		internalOnMouseMoved(pos);
+		OnMouseMoved(pos);
+		for (size_t i = 0; i < children.size(); i++) {
+			children[i]->processMouseMove(pos);
+		}
+	}
+
 	void Widget::processScrollX(const sf::Vector2f pos, float delta) {
 		if (!visible) {
 			return;
@@ -1135,6 +1146,8 @@ namespace fw {
 	void Widget::internalProcessKeyboardEvent(const sf::Event& event) { }
 
 	void Widget::internalProcessMouse(const sf::Vector2f& pos) { }
+
+	void Widget::internalOnMouseMoved(const sf::Vector2f& pos) { }
 
 	void Widget::internalOnMouseEnter(const sf::Vector2f& pos) { }
 

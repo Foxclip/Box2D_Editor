@@ -592,6 +592,7 @@ void WidgetTests::advanceTest(test::Test& test) {
     T_CHECK(!application.before_process_mouse_event);
     T_CHECK(!application.process_left_press);
     T_CHECK(!application.process_left_release);
+    T_CHECK(!application.process_mouse_move);
     T_CHECK(!application.process_mouse_scroll_x);
     T_CHECK(!application.process_mouse_scroll_y);
     T_CHECK(application.process_keyboard);
@@ -617,6 +618,12 @@ void WidgetTests::mouseEventsTest(test::Test& test) {
     {
         sf::Vector2i pos(100, 100);
         application.mouseMove(pos);
+        application.advance();
+        T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
+        T_CHECK(application.process_mouse_move);
+    }
+    {
+        sf::Vector2i pos(100, 100);
         application.mouseLeftPress();
         application.advance();
         T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
@@ -657,6 +664,18 @@ void WidgetTests::mouseEventsTest(test::Test& test) {
         application.advance();
         T_COMPARE(application.getMousePos(), pos, &WidgetTests::sfVec2iToStr);
         T_COMPARE(application.right_release_pos, pos, &WidgetTests::sfVec2iToStr);
+    }
+    {
+        float delta = 5.5f;
+        application.mouseScrollX(delta);
+        application.advance();
+        T_COMPARE(application.scroll_x_delta, delta);
+    }
+    {
+        float delta = 5.5f;
+        application.mouseScrollY(delta);
+        application.advance();
+        T_COMPARE(application.scroll_y_delta, delta);
     }
 }
 
@@ -939,6 +958,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     bool mouse_right_pressed = false;
     bool mouse_left_released = false;
     bool mouse_right_released = false;
+    bool mouse_moved = false;
     bool mouse_scroll_x = false;
     bool mouse_scroll_y = false;
     bool mouse_exited = false;
@@ -957,6 +977,9 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     };
     rectangle_widget->OnRightRelease = [&](const sf::Vector2f& pos) {
         mouse_right_released = true;
+    };
+    rectangle_widget->OnMouseMoved = [&](const sf::Vector2f& pos) {
+        mouse_moved = true;
     };
     rectangle_widget->OnScrollX = [&](const sf::Vector2f& pos, float delta) {
         mouse_scroll_x = true;
@@ -980,6 +1003,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
@@ -992,6 +1016,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
@@ -1003,6 +1028,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
@@ -1014,6 +1040,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released); // clickThrough is on, so release is not processed
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
@@ -1025,6 +1052,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
@@ -1036,6 +1064,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(mouse_right_pressed);
     T_CHECK(!mouse_right_released); // clickThrough is on, so release is not processed
+    T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
@@ -1047,6 +1076,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(mouse_moved);
     T_CHECK(mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
     T_CHECK(!mouse_exited);
@@ -1058,6 +1088,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(mouse_moved);
     T_CHECK(mouse_scroll_x);
     T_CHECK(mouse_scroll_y);
     T_CHECK(!mouse_exited);
@@ -1070,6 +1101,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_left_released);
     T_CHECK(mouse_right_pressed);
     T_CHECK(!mouse_right_released);
+    T_CHECK(mouse_moved);
     T_CHECK(mouse_scroll_x);
     T_CHECK(mouse_scroll_y);
     T_CHECK(mouse_exited);
@@ -3872,12 +3904,18 @@ void TestApplication::onProcessRightRelease() {
     right_release_pos = getMousePos();
 }
 
+void TestApplication::onProcessMouseMove() {
+    process_mouse_move = true;
+}
+
 void TestApplication::onProcessMouseScrollX(float delta) {
     process_mouse_scroll_x = true;
+    scroll_x_delta = delta;
 }
 
 void TestApplication::onProcessMouseScrollY(float delta) {
     process_mouse_scroll_y = true;
+    scroll_y_delta = delta;
 }
 
 void TestApplication::onProcessKeyboard() {

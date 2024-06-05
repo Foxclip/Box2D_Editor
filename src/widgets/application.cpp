@@ -99,8 +99,8 @@ namespace fw {
         external_mouse_pos = sf::Vector2i(x, y);
         sf::Event event;
         event.type = sf::Event::MouseMoved;
-        event.mouseButton.x = x;
-        event.mouseButton.y = y;
+        event.mouseMove.x = x;
+        event.mouseMove.y = y;
         addExternalEvent(event);
     }
 
@@ -161,6 +161,7 @@ namespace fw {
         sf::Event event;
         event.type = sf::Event::MouseWheelScrolled;
         event.mouseWheelScroll.wheel = sf::Mouse::HorizontalWheel;
+        event.mouseWheelScroll.delta = delta;
         event.mouseWheelScroll.x = external_mouse_pos.x;
         event.mouseWheelScroll.y = external_mouse_pos.y;
         addExternalEvent(event);
@@ -171,6 +172,7 @@ namespace fw {
         sf::Event event;
         event.type = sf::Event::MouseWheelScrolled;
         event.mouseWheelScroll.wheel = sf::Mouse::VerticalWheel;
+        event.mouseWheelScroll.delta = delta;
         event.mouseWheelScroll.x = external_mouse_pos.x;
         event.mouseWheelScroll.y = external_mouse_pos.y;
         addExternalEvent(event);
@@ -295,6 +297,8 @@ namespace fw {
 
     void Application::onProcessRightRelease() { }
 
+    void Application::onProcessMouseMove() { }
+
     void Application::onProcessMouseScrollX(float delta) { }
 
     void Application::onProcessMouseScrollY(float delta) { }
@@ -390,8 +394,7 @@ namespace fw {
                     processRightPress();
                     break;
             }
-        }
-        if (event.type == sf::Event::MouseButtonReleased) {
+        } else if (event.type == sf::Event::MouseButtonReleased) {
             switch (event.mouseButton.button) {
                 case sf::Mouse::Left:
                     leftButtonPressed = false;
@@ -402,8 +405,9 @@ namespace fw {
                     processRightRelease();
                     break;
             }
-        }
-        if (event.type == sf::Event::MouseWheelScrolled) {
+        } else if (event.type == sf::Event::MouseMoved) {
+            processMouseMove();
+        } else if (event.type == sf::Event::MouseWheelScrolled) {
             if (event.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel) {
                 processScrollX(event.mouseWheelScroll.delta);
             } else if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel) {
@@ -515,6 +519,11 @@ namespace fw {
         endGesture();
     }
 
+    void Application::processMouseMove() {
+        widgets.processMouseMove(getMousePosf());
+        onProcessMouseMove();
+    }
+
     void Application::processScrollX(float delta) {
         widgets.processScrollX(getMousePosf(), delta);
         if (!widgets.isClickBlocked()) {
@@ -543,6 +552,7 @@ namespace fw {
             onProcessMouse();
         }
         mousePrevPos = getMousePos();
+        mousePrevPosf = getMousePosf();
     }
 
 

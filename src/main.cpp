@@ -43,6 +43,8 @@ int main() {
     run_tests();
     //execute_app();
 
+    // TODO: ScrollAreaWidget
+    // TODO: remake WindowWidget with links
     // TODO: object list window (outliner)
     // TODO: render polygon indices
     // TODO: make widgets a separate library

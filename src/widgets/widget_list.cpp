@@ -185,6 +185,11 @@ namespace fw {
 		root_widget->processRightRelease(pos);
 	}
 
+	void WidgetList::processMouseMove(const sf::Vector2f pos) {
+		wAssert(!isLocked());
+		root_widget->processMouseMove(pos);
+	}
+
 	void WidgetList::processScrollX(const sf::Vector2f pos, float delta) {
 		wAssert(!isLocked());
 		CompVector<Widget*> widgets = getWidgetsUnderCursor(true, click_blocked);
