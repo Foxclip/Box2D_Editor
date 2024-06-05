@@ -115,35 +115,35 @@ namespace fw {
 		area_size_x_link = addLink(
 			"SIZE_X",
 			{ this->getSizeXTarget(), slider_background_y_widget->getSizeXTarget() },
-			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+			[&]() {
 				area_widget->setWidth(getWidth() - slider_background_y_widget->getWidth());
 			}
 		);
 		area_size_y_link = addLink(
 			"SIZE_Y",
 			{ this->getSizeYTarget(), slider_background_x_widget->getSizeYTarget() },
-			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+			[&]() {
 				area_widget->setHeight(getHeight() - slider_background_x_widget->getHeight());
 			}
 		);
 		slider_bg_size_x_link = addLink(
 			"SIZE_X",
 			{ this->getSizeXTarget(), slider_background_y_widget->getSizeXTarget() },
-			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+			[&]() {
 				slider_background_x_widget->setWidth(getWidth() - slider_background_y_widget->getWidth());
 			}
 		);
 		slider_bg_size_y_link = addLink(
 			"SIZE_Y",
 			{ this->getSizeYTarget(), slider_background_x_widget->getSizeYTarget() },
-			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+			[&]() {
 				slider_background_y_widget->setHeight(getHeight() - slider_background_x_widget->getHeight());
 			}
 		);
 		widget_pos_x_link = addLink(
 			"POS_X",
 			area_size_x_link,
-			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+			[&]() {
 				if (!scrolled_widget) {
 					return;
 				}
@@ -160,7 +160,7 @@ namespace fw {
 		widget_pos_y_link = addLink(
 			"POS_Y",
 			area_size_y_link,
-			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+			[&]() {
 				if (!scrolled_widget) {
 					return;
 				}
@@ -181,7 +181,7 @@ namespace fw {
 				slider_bg_size_x_link, slider_bg_size_y_link,
 				widget_pos_x_link, widget_pos_y_link
 			},
-			[&](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+			[&]() {
 				updateScroll();
 			}
 		);

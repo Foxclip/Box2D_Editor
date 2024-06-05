@@ -52,7 +52,7 @@ namespace fw {
 
 	};
 
-	using FuncType = std::function<void(const std::vector<WidgetUpdateTarget*>& targets)>;
+	using FuncType = std::function<void(void)>;
 
 	class WidgetLink : public WidgetUpdateTarget {
 	public:

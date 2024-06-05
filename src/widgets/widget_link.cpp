@@ -73,7 +73,7 @@ namespace fw {
 	}
 
 	void WidgetLink::execute() {
-		func(targets);
+		func();
 	}
 
 	void WidgetLink::remove() {

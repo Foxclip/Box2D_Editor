@@ -1970,14 +1970,14 @@ void WidgetTests::widgetLinkBasicTest(test::Test& test) {
     rectangle_2_widget->addLink(
         "POS_X",
         { rectangle_1_widget->getPosXTarget(), rectangle_1_widget->getSizeXTarget() },
-        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+        [=]() {
             rectangle_2_widget->setGlobalPositionX(rectangle_1_widget->getGlobalTopRight().x);
         }
     );
     rectangle_2_widget->addLink(
         "POS_Y",
         rectangle_1_widget->getPosYTarget(),
-        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+        [=]() {
             rectangle_2_widget->setGlobalPositionY(rectangle_1_widget->getGlobalTopRight().y);
         }
     );
@@ -2008,14 +2008,14 @@ void WidgetTests::widgetLinkContainerTest(test::Test& test) {
     rectangle_2_widget->addLink(
         "POS_X",
         { rectangle_1_widget->getPosXTarget(), rectangle_1_widget->getSizeXTarget() },
-        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+        [=]() {
             rectangle_2_widget->setGlobalPositionX(rectangle_1_widget->getGlobalTopRight().x);
         }
     );
     rectangle_2_widget->addLink(
         "POS_Y",
         rectangle_1_widget->getPosYTarget(),
-        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+        [=]() {
             rectangle_2_widget->setGlobalPositionY(rectangle_1_widget->getGlobalTopRight().y);
         }
     );
@@ -2044,28 +2044,28 @@ void WidgetTests::widgetLinkRemoveTest(test::Test& test) {
     fw::WidgetLink* link1 = rectangle_2_widget->addLink(
         "POS_X",
         { rectangle_1_widget->getPosXTarget(), rectangle_1_widget->getSizeXTarget() },
-        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+        [=]() {
             rectangle_2_widget->setGlobalPositionX(rectangle_1_widget->getGlobalTopRight().x);
         }
     );
     fw::WidgetLink* link2 = rectangle_2_widget->addLink(
         "POS_Y",
         rectangle_1_widget->getPosYTarget(),
-        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+        [=]() {
             rectangle_2_widget->setGlobalPositionY(rectangle_1_widget->getGlobalTopRight().y);
         }
     );
     fw::WidgetLink* link3 = rectangle_2_widget->addLink(
         "LINK_3",
         link1,
-        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+        [=]() {
             // nothing
         }
     );
     fw::WidgetLink* link4 = rectangle_2_widget->addLink(
         "LINK_4",
         link2,
-        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+        [=]() {
             // nothing
         }
     );
