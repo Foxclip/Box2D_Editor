@@ -884,7 +884,7 @@ namespace fw {
 		WidgetLink* ptr = uptr.get();
 		for (size_t i = 0; i < targets.size(); i++) {
 			WidgetUpdateTarget* target = targets[i];
-			target->getWidget()->dependent_links.add(ptr);
+			target->dependent_links.add(ptr);
 		}
 		links.add(std::move(uptr));
 		return ptr;
@@ -905,8 +905,11 @@ namespace fw {
 		wAssert(links.contains(link));
 		for (size_t i = 0; i < link->getTargets().size(); i++) {
 			WidgetUpdateTarget* target = link->getTargets()[i];
-			Widget* widget = target->getWidget();
-			widget->dependent_links.remove(link);
+			target->dependent_links.remove(link);
+		}
+		for (size_t i = 0; i < link->dependent_links.size(); i++) {
+			WidgetLink* dep_link = link->dependent_links[i];
+			dep_link->remove();
 		}
 		links.remove(link);
 	}
@@ -1010,6 +1013,14 @@ namespace fw {
 		children.remove(child);
 		children_names.remove(child->name, child);
 		local_layers.erase(child);
+	}
+
+	void Widget::removeSocket(WidgetUpdateSocket* socket) {
+		wAssert(!widget_list.isLocked());
+		for (size_t i = 0; i < socket->dependent_links.size(); i++) {
+			WidgetLink* link = socket->dependent_links[i];
+			link->remove();
+		}
 	}
 
 	void Widget::updateOrigin() {

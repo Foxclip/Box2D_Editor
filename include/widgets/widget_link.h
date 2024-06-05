@@ -3,6 +3,7 @@
 #include <string>
 #include <functional>
 #include "widgets_common.h"
+#include "compvector.h"
 
 namespace fw {
 
@@ -20,6 +21,7 @@ namespace fw {
 	std::string update_type_to_str(WidgetUpdateType update_type);
 
 	class Widget;
+	class WidgetLink;
 
 	class WidgetUpdateTarget {
 	public:
@@ -28,7 +30,9 @@ namespace fw {
 		virtual std::string toStr() const = 0;
 
 	protected:
+		friend class Widget;
 		Widget* widget = nullptr;
+		CompVector<WidgetLink*> dependent_links;
 
 	private:
 
@@ -43,6 +47,7 @@ namespace fw {
 		void execute() override;
 
 	private:
+		friend class Widget;
 		WidgetUpdateType update_type = WidgetUpdateType::NONE;
 
 	};
@@ -63,6 +68,7 @@ namespace fw {
 		void remove();
 
 	private:
+		friend class Widget;
 		std::string name;
 		std::vector<WidgetUpdateTarget*> targets;
 		FuncType func;

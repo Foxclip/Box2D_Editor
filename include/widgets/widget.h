@@ -158,6 +158,8 @@ namespace fw {
 		SizePolicy getSizeYPolicy() const;
 		const sf::Vector2f& getMinSize() const;
 		const sf::Vector2f& getMaxSize() const;
+		// adding new targets:
+		// add removeSocket to WidgetList::removeWidget method
 		WidgetUpdateSocket* getNormalTarget();
 		WidgetUpdateSocket* getPosXTarget();
 		WidgetUpdateSocket* getPosYTarget();
@@ -308,7 +310,6 @@ namespace fw {
 		WidgetUpdateSocket children_x_target = WidgetUpdateSocket(this, WidgetUpdateType::CHILDREN_X);
 		WidgetUpdateSocket children_y_target = WidgetUpdateSocket(this, WidgetUpdateType::CHILDREN_Y);
 		CompVectorUptr<WidgetLink> links;
-		CompVector<WidgetLink*> dependent_links;
 		sf::Vector2f min_size;
 		sf::Vector2f max_size = sf::Vector2f(-1.0f, -1.0f); // negative values - unlimited
 		bool visible = true;
@@ -333,6 +334,7 @@ namespace fw {
 		void setRenderIterations(size_t iterations);
 		virtual void addChild(Widget* child);
 		virtual void removeChild(Widget* child);
+		void removeSocket(WidgetUpdateSocket* socket);
 		void updateOrigin();
 		void update();
 		void updatePositionX();

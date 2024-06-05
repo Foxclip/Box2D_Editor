@@ -332,10 +332,13 @@ namespace fw {
 				child->setParent(parent);
 			}
 		}
-		for (size_t i = 0; i < widget->dependent_links.size(); i++) {
-			WidgetLink* link = widget->dependent_links[i];
-			link->remove();
-		}
+		widget->removeSocket(widget->getNormalTarget());
+		widget->removeSocket(widget->getPosXTarget());
+		widget->removeSocket(widget->getPosYTarget());
+		widget->removeSocket(widget->getSizeXTarget());
+		widget->removeSocket(widget->getSizeYTarget());
+		widget->removeSocket(widget->getChildrenXTarget());
+		widget->removeSocket(widget->getChildrenYTarget());
 		parent->removeChild(widget);
 		render_queue.remove(widget);
 		widgets.remove(widget);

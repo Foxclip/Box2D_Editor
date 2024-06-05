@@ -2023,6 +2023,20 @@ void WidgetTests::widgetLinkRemoveTest(test::Test& test) {
             rectangle_2_widget->setGlobalPositionY(rectangle_1_widget->getGlobalTopRight().y);
         }
     );
+    fw::WidgetLink* link3 = rectangle_2_widget->addLink(
+        "LINK_3",
+        link1,
+        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+            // nothing
+        }
+    );
+    fw::WidgetLink* link4 = rectangle_2_widget->addLink(
+        "LINK_4",
+        link2,
+        [=](const std::vector<fw::WidgetUpdateTarget*>& targets) {
+            // nothing
+        }
+    );
     application.advance();
     T_ASSERT(T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position1_2));
 
