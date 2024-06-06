@@ -59,8 +59,6 @@ namespace fw {
 		this->alignment_x = alignment;
 	}
 
-	void ContainerWidget::internalUpdate() { }
-
 	void ContainerWidget::updateSizeX() {
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();

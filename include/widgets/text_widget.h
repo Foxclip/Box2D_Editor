@@ -39,7 +39,7 @@ namespace fw {
 		sf::Transformable* getTransformable() override;
 		const sf::Transformable* getTransformable() const override;
 		void setSizeInternal(float width, float height) override;
-		void internalUpdate() override;
+		void internalPreUpdate() override;
 
 	private:
 		sf::Text text;

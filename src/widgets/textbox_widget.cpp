@@ -298,7 +298,7 @@ namespace fw {
 		deselectAll();
 	}
 
-	void TextBoxWidget::internalUpdate() {
+	void TextBoxWidget::internalPreUpdate() {
 		sf::Vector2f char_pos = text_widget->getLocalCharPos(cursor_pos, true, true);
 		cursor_widget->setPosition(char_pos - sf::Vector2f(0.0f, TEXTBOX_CURSOR_MARGIN) + TEXTBOX_CURSOR_OFFSET);
 		if (edit_mode) {

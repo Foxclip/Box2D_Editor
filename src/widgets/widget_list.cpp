@@ -253,6 +253,7 @@ namespace fw {
 
 	void WidgetList::updateWidgets() {
 		wAssert(!isLocked());
+		root_widget->preUpdate();
 		update_queue.update();
 		const std::vector<std::vector<WidgetUpdateTarget*>>& queue = update_queue.get();
 		for (const auto& layer : queue) {
@@ -260,6 +261,7 @@ namespace fw {
 				target->execute();
 			}
 		}
+		root_widget->postUpdate();
 	}
 
 	void WidgetList::render(sf::RenderTarget& target) {
@@ -337,7 +339,6 @@ namespace fw {
 				child->setParent(parent);
 			}
 		}
-		widget->removeSocket(widget->getNormalTarget());
 		widget->removeSocket(widget->getPosXTarget());
 		widget->removeSocket(widget->getPosYTarget());
 		widget->removeSocket(widget->getSizeXTarget());

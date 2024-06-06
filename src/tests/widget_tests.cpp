@@ -1265,7 +1265,8 @@ void WidgetTests::eventsTest(test::Test& test) {
     application.start(true);
     application.mouseMove(400, 300);
     application.advance();
-    bool updated = false;
+    bool pre_update = false;
+    bool post_update = false;
     bool before_global_render = false;
     bool before_render = false;
     bool after_render = false;
@@ -1273,8 +1274,11 @@ void WidgetTests::eventsTest(test::Test& test) {
     unsigned int window_width = 0;
     unsigned int window_height = 0;
     fw::RectangleWidget* widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
-    widget->OnUpdate = [&]() {
-        updated = true;
+    widget->OnPreUpdate = [&]() {
+        pre_update = true;
+    };
+    widget->OnPostUpdate = [&]() {
+        post_update = true;
     };
     widget->OnBeforeGlobalRender = [&](sf::RenderTarget& target) {
         before_global_render = true;
@@ -1293,7 +1297,8 @@ void WidgetTests::eventsTest(test::Test& test) {
         window_height = height;
     };
     application.advance();
-    T_CHECK(updated);
+    T_CHECK(pre_update);
+    T_CHECK(post_update);
     T_CHECK(before_global_render);
     T_CHECK(after_global_render);
     T_COMPARE(window_width, 0);

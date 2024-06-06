@@ -23,7 +23,6 @@ namespace fw {
 		void setAlignmentY(Alignment alignment);
 
 	protected:
-		void internalUpdate() override;
 		void updateSizeX() override;
 		void updateSizeY() override;
 		void updateChildrenX() override;

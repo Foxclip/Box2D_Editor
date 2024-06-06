@@ -374,10 +374,6 @@ namespace fw {
 		return max_size;
 	}
 
-	WidgetUpdateSocket* Widget::getNormalTarget() {
-		return &normal_target;
-	}
-
 	WidgetUpdateSocket* Widget::getPosXTarget() {
 		return &pos_x_target;
 	}
@@ -1043,14 +1039,29 @@ namespace fw {
 		setOriginInternal(origin_pos);
 	}
 
-	void Widget::update() {
+	void Widget::preUpdate() {
 		wAssert(!widget_list.isLocked());
 		if (!visible) {
 			return;
 		}
-		OnUpdate();
 		updateOrigin();
-		internalUpdate();
+		OnPreUpdate();
+		internalPreUpdate();
+		for (size_t i = 0; i < children.size(); i++) {
+			getChild(i)->preUpdate();
+		}
+	}
+
+	void Widget::postUpdate() {
+		wAssert(!widget_list.isLocked());
+		if (!visible) {
+			return;
+		}
+		OnPostUpdate();
+		internalPostUpdate();
+		for (size_t i = 0; i < children.size(); i++) {
+			getChild(i)->postUpdate();
+		}
 	}
 
 	void Widget::updatePositionX() {
@@ -1093,6 +1104,10 @@ namespace fw {
 
 	void Widget::updateChildrenY() { }
 
+	void Widget::internalPreUpdate() { }
+
+	void Widget::internalPostUpdate() { }
+
 	void Widget::updateSizeX() {
 		wAssert(!widget_list.isLocked());
 		sf::Vector2f new_pos = getPosition();
@@ -1126,8 +1141,6 @@ namespace fw {
 		setPosition(new_pos);
 		setSizeInternal(new_size);
 	}
-
-	void Widget::internalUpdate() { }
 
 	void Widget::internalOnSetParent(Widget* parent) { }
 

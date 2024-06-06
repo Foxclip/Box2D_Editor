@@ -172,7 +172,7 @@ namespace fw {
 		// do nothing
 	}
 
-	void TextWidget::internalUpdate() {
+	void TextWidget::internalPreUpdate() {
 		wAssert(getFont().isLoaded(),
 			"Font is not set for " + full_name +
 			", consider setting default font in WidgetList"

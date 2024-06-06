@@ -95,7 +95,7 @@ namespace fw {
 			ACTION_BACKSPACE,
 			ACTION_TYPE,
 		};
-		void internalUpdate() override;
+		void internalPreUpdate() override;
 		void updateColors();
 		void internalOnLeftPress(const sf::Vector2f& pos, bool became_focused) override;
 		void internalOnLeftRelease(const sf::Vector2f& pos) override;

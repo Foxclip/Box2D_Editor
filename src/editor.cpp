@@ -236,7 +236,7 @@ void Editor::initWidgets() {
         desat_shader.setUniform("vcenter", WORLD_COLOR_SCALE_CENTER);
         desat_shader.setUniform("vpercent", WORLD_COLOR_SCALE_PERCENT);
     };
-    world_widget->OnUpdate = [&]() {
+    world_widget->OnPreUpdate = [&]() {
         world_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
         world_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };
@@ -251,7 +251,7 @@ void Editor::initWidgets() {
         selection_shader.setUniform("outline_color", SELECTION_OUTLINE_COLOR);
         selection_shader.setUniform("offset", SELECTION_OUTLINE_THICKNESS);
     };
-    selection_mask_widget->OnUpdate = [&]() {
+    selection_mask_widget->OnPreUpdate = [&]() {
         selection_mask_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
         selection_mask_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };
@@ -260,7 +260,7 @@ void Editor::initWidgets() {
         (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
     );
     ui_widget->setName("ui_canvas");
-    ui_widget->OnUpdate = [&]() {
+    ui_widget->OnPreUpdate = [&]() {
         ui_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
         ui_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };

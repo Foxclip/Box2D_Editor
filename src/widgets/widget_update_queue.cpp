@@ -14,7 +14,6 @@ namespace fw {
 			if (!widget->isVisible()) {
 				return;
 			}
-			entries.push_back(&widget->normal_target);
 			entries.push_back(&widget->pos_x_target);
 			entries.push_back(&widget->pos_y_target);
 			entries.push_back(&widget->size_x_target);
@@ -58,9 +57,7 @@ namespace fw {
 		if (const WidgetLink* link = dynamic_cast<const WidgetLink*>(target)) {
 			return link->getTargets();
 		} else if (const WidgetUpdateSocket* socket = dynamic_cast<const WidgetUpdateSocket*>(target)) {
-			if (socket->getType() == WidgetUpdateType::NORMAL) {
-				// nothing
-			} else if (socket->getType() == WidgetUpdateType::POS_X) {
+			if (socket->getType() == WidgetUpdateType::POS_X) {
 				// pos entry depends on parent's children x entry,
 				// and so all entries dependent on pos entry will be updated
 				// after parent's children x entry
@@ -102,9 +99,6 @@ namespace fw {
 				}
 			} else if (socket->getType() == WidgetUpdateType::SIZE_X) {
 				if (socket->getWidget()->getSizeXPolicy() == Widget::SizePolicy::PARENT) {
-					// size might be changed in normal update,
-					// so normal entries are also set as dependencies
-					result.add(&socket->getWidget()->getParent()->normal_target);
 					result.add(&socket->getWidget()->getParent()->size_x_target);
 				} else if (socket->getWidget()->getSizeXPolicy() == Widget::SizePolicy::CHILDREN) {
 					// need to calculate children bounds before updating container's size
@@ -113,7 +107,6 @@ namespace fw {
 					for (Widget* child : socket->getWidget()->getChildren()) {
 						// avoiding a loop
 						if (child->getSizeXPolicy() != Widget::SizePolicy::EXPAND) {
-							result.add(&child->normal_target);
 							result.add(&child->size_x_target);
 						}
 					}
@@ -123,13 +116,11 @@ namespace fw {
 				}
 			} else if (socket->getType() == WidgetUpdateType::SIZE_Y) {
 				if (socket->getWidget()->getSizeYPolicy() == Widget::SizePolicy::PARENT) {
-					result.add(&socket->getWidget()->getParent()->normal_target);
 					result.add(&socket->getWidget()->getParent()->size_y_target);
 				} else if (socket->getWidget()->getSizeYPolicy() == Widget::SizePolicy::CHILDREN) {
 					result.add(&socket->getWidget()->children_y_target);
 					for (Widget* child : socket->getWidget()->getChildren()) {
 						if (child->getSizeYPolicy() != Widget::SizePolicy::EXPAND) {
-							result.add(&child->normal_target);
 							result.add(&child->size_y_target);
 						}
 					}

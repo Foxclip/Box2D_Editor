@@ -7,7 +7,6 @@ namespace fw {
 	std::string update_type_to_str(WidgetUpdateType update_type) {
 		std::string type_str;
 		switch (update_type) {
-			case WidgetUpdateType::NORMAL: type_str = "NORMAL"; break;
 			case WidgetUpdateType::POS_X: type_str = "POS_X"; break;
 			case WidgetUpdateType::POS_Y: type_str = "POS_Y"; break;
 			case WidgetUpdateType::SIZE_X: type_str = "SIZE_X"; break;
@@ -37,7 +36,6 @@ namespace fw {
 	void WidgetUpdateSocket::execute() {
 		switch (update_type) {
 			case fw::WidgetUpdateType::NONE: wAssert(false, "Update type is not set") break;
-			case fw::WidgetUpdateType::NORMAL: widget->update(); break;
 			case fw::WidgetUpdateType::POS_X: widget->updatePositionX(); break;
 			case fw::WidgetUpdateType::POS_Y: widget->updatePositionY(); break;
 			case fw::WidgetUpdateType::SIZE_X: widget->updateSizeX(); break;

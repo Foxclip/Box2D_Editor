@@ -93,7 +93,8 @@ namespace fw {
 		std::function<void(const sf::Vector2f& pos)> OnProcessMouse = [](const sf::Vector2f& pos) { };
 		std::function<void()> OnFocused = []() { };
 		std::function<void()> OnFocusLost = []() { };
-		std::function<void()> OnUpdate = []() { };
+		std::function<void()> OnPreUpdate = []() { };
+		std::function<void()> OnPostUpdate = []() { };
 		std::function<void(sf::RenderTarget& target)> OnBeforeGlobalRender = [](sf::RenderTarget& target) { };
 		std::function<void(sf::RenderTarget& target)> OnBeforeRender = [](sf::RenderTarget& target) { };
 		std::function<void(sf::RenderTarget& target)> OnAfterRender = [](sf::RenderTarget& target) { };
@@ -162,7 +163,6 @@ namespace fw {
 		const sf::Vector2f& getMaxSize() const;
 		// adding new targets:
 		// add removeSocket to WidgetList::removeWidget method
-		WidgetUpdateSocket* getNormalTarget();
 		WidgetUpdateSocket* getPosXTarget();
 		WidgetUpdateSocket* getPosYTarget();
 		WidgetUpdateSocket* getSizeXTarget();
@@ -304,7 +304,6 @@ namespace fw {
 		WidgetUnclippedRegion unclipped_region = WidgetUnclippedRegion(this);
 		SizePolicy size_policy_x = SizePolicy::NONE;
 		SizePolicy size_policy_y = SizePolicy::NONE;
-		WidgetUpdateSocket normal_target = WidgetUpdateSocket(this, WidgetUpdateType::NORMAL);
 		WidgetUpdateSocket pos_x_target = WidgetUpdateSocket(this, WidgetUpdateType::POS_X);
 		WidgetUpdateSocket pos_y_target = WidgetUpdateSocket(this, WidgetUpdateType::POS_Y);
 		WidgetUpdateSocket size_x_target = WidgetUpdateSocket(this, WidgetUpdateType::SIZE_X);
@@ -338,14 +337,16 @@ namespace fw {
 		virtual void removeChild(Widget* child);
 		void removeSocket(WidgetUpdateSocket* socket);
 		void updateOrigin();
-		void update();
+		void preUpdate();
+		void postUpdate();
 		void updatePositionX();
 		void updatePositionY();
 		virtual void updateSizeX();
 		virtual void updateSizeY();
 		virtual void updateChildrenX();
 		virtual void updateChildrenY();
-		virtual void internalUpdate();
+		virtual void internalPreUpdate();
+		virtual void internalPostUpdate();
 		virtual void internalOnSetParent(Widget* parent);
 		virtual void internalOnLeftPress(const sf::Vector2f& pos, bool became_focused);
 		virtual void internalOnRightPress(const sf::Vector2f& pos);
