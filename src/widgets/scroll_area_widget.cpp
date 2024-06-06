@@ -111,80 +111,6 @@ namespace fw {
 		corner_widget->setOrigin(Anchor::BOTTOM_RIGHT);
 		corner_widget->setClickThrough(false);
 		corner_widget->setParent(this);
-		// links
-		area_size_x_link = addLink(
-			"SIZE_X",
-			{ this->getSizeXTarget(), slider_background_y_widget->getSizeXTarget() },
-			[&]() {
-				area_widget->setWidth(getWidth() - slider_background_y_widget->getWidth());
-			}
-		);
-		area_size_y_link = addLink(
-			"SIZE_Y",
-			{ this->getSizeYTarget(), slider_background_x_widget->getSizeYTarget() },
-			[&]() {
-				area_widget->setHeight(getHeight() - slider_background_x_widget->getHeight());
-			}
-		);
-		slider_bg_size_x_link = addLink(
-			"SIZE_X",
-			{ this->getSizeXTarget(), slider_background_y_widget->getSizeXTarget() },
-			[&]() {
-				slider_background_x_widget->setWidth(getWidth() - slider_background_y_widget->getWidth());
-			}
-		);
-		slider_bg_size_y_link = addLink(
-			"SIZE_Y",
-			{ this->getSizeYTarget(), slider_background_x_widget->getSizeYTarget() },
-			[&]() {
-				slider_background_y_widget->setHeight(getHeight() - slider_background_x_widget->getHeight());
-			}
-		);
-		widget_pos_x_link = addLink(
-			"POS_X",
-			area_size_x_link,
-			[&]() {
-				if (!scrolled_widget) {
-					return;
-				}
-				float right_offset = area_widget->getRight().x - scrolled_widget->getRight().x;
-				if (right_offset > 0.0f) {
-					if (getScrollXRange() > 0.0f) {
-						scrollX(right_offset);
-					} else {
-						scrolled_widget->setAnchorOffsetX(0.0f);
-					}
-				}
-			}
-		);
-		widget_pos_y_link = addLink(
-			"POS_Y",
-			area_size_y_link,
-			[&]() {
-				if (!scrolled_widget) {
-					return;
-				}
-				float bottom_offset = area_widget->getBottom().y - scrolled_widget->getBottom().y;
-				if (bottom_offset > 0.0f) {
-					if (getScrollYRange() > 0.0f) {
-						scrollY(bottom_offset);
-					} else {
-						scrolled_widget->setAnchorOffsetY(0.0f);
-					}
-				}
-			}
-		);
-		area_scroll_link = addLink(
-			"SCROLL",
-			{
-				area_size_x_link, area_size_y_link,
-				slider_bg_size_x_link, slider_bg_size_y_link,
-				widget_pos_x_link, widget_pos_y_link
-			},
-			[&]() {
-				updateScroll();
-			}
-		);
 
 		updateScroll();
 	}
@@ -209,6 +135,49 @@ namespace fw {
 
 	void ScrollAreaWidget::setDeltaY(float delta) {
 		this->delta_y = delta;
+	}
+
+	void ScrollAreaWidget::setScrollbarXPolicy(ScrollbarPolicy policy) {
+		this->scrollbar_x_policy = policy;
+	}
+
+	void ScrollAreaWidget::setScrollbarYPolicy(ScrollbarPolicy policy) {
+		this->scrollbar_y_policy = policy;
+	}
+
+	void ScrollAreaWidget::internalPreUpdate() {
+		bool x_state = getScrollbarXState();
+		bool y_state = getScrollbarYState();
+		bool corner_state = x_state && y_state;
+		slider_background_x_widget->setVisible(x_state);
+		slider_background_y_widget->setVisible(y_state);
+		corner_widget->setVisible(corner_state);
+	}
+
+	void ScrollAreaWidget::internalPostUpdate() {
+		area_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
+		area_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
+		slider_background_x_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
+		slider_background_y_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
+		if (scrolled_widget) {
+			float right_offset = area_widget->getRight().x - scrolled_widget->getRight().x;
+			if (right_offset > 0.0f) {
+				if (getScrollXRange() > 0.0f) {
+					scrollX(right_offset);
+				} else {
+					scrolled_widget->setAnchorOffsetX(0.0f);
+				}
+			}
+			float bottom_offset = area_widget->getBottom().y - scrolled_widget->getBottom().y;
+			if (bottom_offset > 0.0f) {
+				if (getScrollYRange() > 0.0f) {
+					scrollY(bottom_offset);
+				} else {
+					scrolled_widget->setAnchorOffsetY(0.0f);
+				}
+			}
+		}
+		updateScroll();
 	}
 
 	void ScrollAreaWidget::internalOnScrollX(const sf::Vector2f& pos, float delta) {
@@ -304,11 +273,17 @@ namespace fw {
 	}
 
 	float ScrollAreaWidget::getScrollXRange() const {
+		if (!scrolled_widget) {
+			return 0.0f;
+		}
 		float scroll_range = scrolled_widget->getWidth() - area_widget->getWidth();
 		return scroll_range;
 	}
 
 	float ScrollAreaWidget::getScrollYRange() const {
+		if (!scrolled_widget) {
+			return 0.0f;
+		}
 		float scroll_range = scrolled_widget->getHeight() - area_widget->getHeight();
 		return scroll_range;
 	}
@@ -321,6 +296,64 @@ namespace fw {
 	float ScrollAreaWidget::getSliderYFromArea() const {
 		float pos_y = getYRange() * getYFactorFromArea();
 		return pos_y;
+	}
+
+	bool ScrollAreaWidget::getScrollbarXState() const {
+		if (scrollbar_x_policy == ScrollbarPolicy::OFF) {
+			return false;
+		} else if (scrollbar_x_policy == ScrollbarPolicy::ON) {
+			return true;
+		} else {
+			if (!scrolled_widget) {
+				return false;
+			}
+			if (
+				scrolled_widget->getBottomRight().x < getWidth() &&
+				scrolled_widget->getBottomRight().y < getHeight()
+			) {
+				// to avoid a situation when both scrollbars can switch off,
+				// but don't because both of them switch off only when the other does
+				return false;
+			}
+			float scroll_range = getWidth() - getSliderBgYEffectiveWidth();
+			return scrolled_widget->getWidth() - scroll_range > 0.0f;
+		}
+	}
+
+	bool ScrollAreaWidget::getScrollbarYState() const {
+		if (scrollbar_y_policy == ScrollbarPolicy::OFF) {
+			return false;
+		} else if (scrollbar_y_policy == ScrollbarPolicy::ON) {
+			return true;
+		} else {
+			if (!scrolled_widget) {
+				return false;
+			}
+			if (
+				scrolled_widget->getBottomRight().x < getWidth() &&
+				scrolled_widget->getBottomRight().y < getHeight()
+			) {
+				return false;
+			}
+			float scroll_range = getHeight() - getSliderBgXEffectiveHeight();
+			return scrolled_widget->getHeight() - scroll_range > 0.0f;
+		}
+	}
+
+	float ScrollAreaWidget::getSliderBgYEffectiveWidth() const {
+		float slider_y_bg_width =
+			slider_background_y_widget->isVisible() ?
+			slider_background_y_widget->getWidth() :
+			0.0f;
+		return slider_y_bg_width;
+	}
+
+	float ScrollAreaWidget::getSliderBgXEffectiveHeight() const {
+		float slider_x_bg_height =
+			slider_background_x_widget->isVisible() ?
+			slider_background_x_widget->getHeight() :
+			0.0f;
+		return slider_x_bg_height;
 	}
 
 	void ScrollAreaWidget::setSliderX(float x) {

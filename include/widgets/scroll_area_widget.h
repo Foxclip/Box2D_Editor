@@ -19,12 +19,19 @@ namespace fw {
 
 	class ScrollAreaWidget : public EmptyWidget {
 	public:
+		enum class ScrollbarPolicy {
+			OFF,
+			SIZE,
+			ON,
+		};
 		ScrollAreaWidget(WidgetList& widget_list, float width, float height);
 		ScrollAreaWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		Widget* getWidget() const;
 		void setWidget(Widget* widget);
 		void setDeltaX(float delta);
 		void setDeltaY(float delta);
+		void setScrollbarXPolicy(ScrollbarPolicy policy);
+		void setScrollbarYPolicy(ScrollbarPolicy policy);
 
 	protected:
 		RectangleWidget* area_widget = nullptr;
@@ -49,7 +56,11 @@ namespace fw {
 		WidgetLink* area_scroll_link = nullptr;
 		WidgetLink* widget_pos_x_link = nullptr;
 		WidgetLink* widget_pos_y_link = nullptr;
+		ScrollbarPolicy scrollbar_x_policy = ScrollbarPolicy::SIZE;
+		ScrollbarPolicy scrollbar_y_policy = ScrollbarPolicy::SIZE;
 
+		void internalPreUpdate() override;
+		void internalPostUpdate() override;
 		void internalOnScrollX(const sf::Vector2f& pos, float delta) override;
 		void internalOnScrollY(const sf::Vector2f& pos, float delta) override;
 
@@ -66,6 +77,10 @@ namespace fw {
 		float getScrollYRange() const;
 		float getSliderXFromArea() const;
 		float getSliderYFromArea() const;
+		bool getScrollbarXState() const;
+		bool getScrollbarYState() const;
+		float getSliderBgYEffectiveWidth() const;
+		float getSliderBgXEffectiveHeight() const;
 		void setSliderX(float x);
 		void setSliderY(float y);
 		void moveSliderX(float x_offset);
