@@ -108,9 +108,6 @@ public:
 	void createTestLists() override;
 
 protected:
-	void createToposortList(test::TestList* list);
-	void createApplicationList(test::TestList* list);
-	void createWidgetsList(test::TestList* list);
 	void beforeRunModule() override;
 	void afterRunModule() override;
 

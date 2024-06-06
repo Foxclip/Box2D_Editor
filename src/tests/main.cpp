@@ -1,9 +1,4 @@
-#include "tests/logger_tests.h"
-#include "tests/compvector_tests.h"
-#include "tests/searchindex_tests.h"
-#include "tests/simulation_tests.h"
-#include "tests/widget_tests.h"
-#include "test.h"
+#include "tests/tests.h"
 #include "logger.h"
 
 void run_tests() {
