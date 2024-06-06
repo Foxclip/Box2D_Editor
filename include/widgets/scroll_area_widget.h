@@ -77,8 +77,6 @@ namespace fw {
 		float getScrollYRange() const;
 		float getSliderXFromArea() const;
 		float getSliderYFromArea() const;
-		bool getScrollbarXState() const;
-		bool getScrollbarYState() const;
 		float getSliderBgYEffectiveWidth() const;
 		float getSliderBgXEffectiveHeight() const;
 		void setSliderX(float x);

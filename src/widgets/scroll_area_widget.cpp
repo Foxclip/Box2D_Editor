@@ -146,8 +146,57 @@ namespace fw {
 	}
 
 	void ScrollAreaWidget::internalPreUpdate() {
-		bool x_state = getScrollbarXState();
-		bool y_state = getScrollbarYState();
+		// Calculation of whether scrollbars are visible must be done in two stages:
+		// First, calculate whether scrollbar is visible without taking other scrollbar into account,
+		// second, calculate final states given individual states.
+		// This helps to avoid issue when scroll area is almost as big as scrolled widget,
+		// and the size of the scroll area is changing.
+		bool x_state_individual = false;
+		bool y_state_individual = false;
+		bool x_state_individual_is_final = false;
+		bool y_state_individual_is_final = false;
+		if (scrollbar_x_policy == ScrollbarPolicy::OFF) {
+			x_state_individual = false;
+			x_state_individual_is_final = true;
+		} else if (scrollbar_x_policy == ScrollbarPolicy::ON) {
+			x_state_individual = true;
+			x_state_individual_is_final = true;
+		} else {
+			if (!scrolled_widget) {
+				x_state_individual = false;
+				x_state_individual_is_final = true;
+			} else {
+				x_state_individual = scrolled_widget->getWidth() > getWidth();
+			}
+		}
+		if (scrollbar_y_policy == ScrollbarPolicy::OFF) {
+			y_state_individual = false;
+			y_state_individual_is_final = true;
+		} else if (scrollbar_y_policy == ScrollbarPolicy::ON) {
+			y_state_individual = true;
+			y_state_individual_is_final = true;
+		} else {
+			if (!scrolled_widget) {
+				y_state_individual = false;
+				y_state_individual_is_final = true;
+			} else {
+				y_state_individual = scrolled_widget->getHeight() > getHeight();
+			}
+		}
+		bool x_state = false;
+		bool y_state = false;
+		if (x_state_individual_is_final) {
+			x_state = x_state_individual;
+		} else {
+			float scrollbar_y_effective_width = y_state_individual ? slider_background_y_widget->getWidth() : 0.0f;
+			x_state = scrolled_widget->getWidth() > getWidth() - scrollbar_y_effective_width;
+		}
+		if (y_state_individual_is_final) {
+			y_state = y_state_individual;
+		} else {
+			float scrollbar_x_effective_height = x_state_individual ? slider_background_x_widget->getHeight() : 0.0f;
+			y_state = scrolled_widget->getHeight() > getHeight() - scrollbar_x_effective_height;
+		}
 		bool corner_state = x_state && y_state;
 		slider_background_x_widget->setVisible(x_state);
 		slider_background_y_widget->setVisible(y_state);
@@ -296,48 +345,6 @@ namespace fw {
 	float ScrollAreaWidget::getSliderYFromArea() const {
 		float pos_y = getYRange() * getYFactorFromArea();
 		return pos_y;
-	}
-
-	bool ScrollAreaWidget::getScrollbarXState() const {
-		if (scrollbar_x_policy == ScrollbarPolicy::OFF) {
-			return false;
-		} else if (scrollbar_x_policy == ScrollbarPolicy::ON) {
-			return true;
-		} else {
-			if (!scrolled_widget) {
-				return false;
-			}
-			if (
-				scrolled_widget->getBottomRight().x < getWidth() &&
-				scrolled_widget->getBottomRight().y < getHeight()
-			) {
-				// to avoid a situation when both scrollbars can switch off,
-				// but don't because both of them switch off only when the other does
-				return false;
-			}
-			float scroll_range = getWidth() - getSliderBgYEffectiveWidth();
-			return scrolled_widget->getWidth() - scroll_range > 0.0f;
-		}
-	}
-
-	bool ScrollAreaWidget::getScrollbarYState() const {
-		if (scrollbar_y_policy == ScrollbarPolicy::OFF) {
-			return false;
-		} else if (scrollbar_y_policy == ScrollbarPolicy::ON) {
-			return true;
-		} else {
-			if (!scrolled_widget) {
-				return false;
-			}
-			if (
-				scrolled_widget->getBottomRight().x < getWidth() &&
-				scrolled_widget->getBottomRight().y < getHeight()
-			) {
-				return false;
-			}
-			float scroll_range = getHeight() - getSliderBgXEffectiveHeight();
-			return scrolled_widget->getHeight() - scroll_range > 0.0f;
-		}
 	}
 
 	float ScrollAreaWidget::getSliderBgYEffectiveWidth() const {

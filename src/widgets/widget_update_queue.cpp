@@ -2,7 +2,6 @@
 #include "widgets/widget.h"
 #include "widgets/widget_list.h"
 #include "widgets/container_widget.h"
-#include "widgets/scroll_area_widget.h"
 
 namespace fw {
 
