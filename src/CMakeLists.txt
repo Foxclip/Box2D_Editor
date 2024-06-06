@@ -8,7 +8,6 @@ set(SRC_HEADER_FILES
     "${INCLUDE_DIR}/editor.h"
     "${INCLUDE_DIR}/history.h"
     "${INCLUDE_DIR}/logger.h"
-    "${INCLUDE_DIR}/main.h"
     "${INCLUDE_DIR}/scenes.h"
     "${INCLUDE_DIR}/searchindex.h"
     "${INCLUDE_DIR}/serializer.h"
@@ -29,7 +28,6 @@ set(SRC_HEADER_FILES
 set(SRC_SOURCE_FILES
     "editor.cpp"
     "logger.cpp"
-    "main.cpp"
     "serializer.cpp"
     "test.cpp"
     "tools.cpp"
@@ -53,8 +51,7 @@ target_include_directories(src_lib PUBLIC "${INCLUDE_DIR}")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(src_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
-target_link_libraries(src_lib PRIVATE widgets_lib)
-target_link_libraries(src_lib PRIVATE tests_lib)
+target_link_libraries(src_lib PUBLIC widgets_lib)
 target_link_libraries(src_lib PUBLIC sfml-graphics sfml-system sfml-window)
-target_link_libraries(src_lib PRIVATE box2d)
-target_link_libraries(src_lib PRIVATE clip)
+target_link_libraries(src_lib PUBLIC box2d)
+target_link_libraries(src_lib PUBLIC clip)

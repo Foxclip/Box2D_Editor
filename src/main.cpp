@@ -1,23 +1,10 @@
 #include <cstdio>
 #include <iostream>
-#include "main.h"
 #include "editor.h"
 #include "logger.h"
 #include "scenes.h"
 #include "tests/tests.h"
 #include <tests/widget_tests.h>
-
-void run_tests() {
-    logger << "Running tests\n";
-    LoggerIndent test_modules_indent;
-    test::TestManager test_manager;
-    test_manager.addModule<LoggerTests>();
-    test_manager.addModule<CompVectorTests>();
-    test_manager.addModule<SearchIndexTests>();
-    test_manager.addModule<SimulationTests>();
-    test_manager.addModule<WidgetTests>();
-    test_manager.runAllModules();
-}
 
 void execute_app() {
     logger << "Starting app\n";
@@ -40,8 +27,7 @@ int main() {
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
-    run_tests();
-    //execute_app();
+    execute_app();
 
     // TODO: ScrollAreaWidget
     // TODO: ScrollAreaWidget test
