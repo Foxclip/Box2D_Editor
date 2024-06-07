@@ -171,6 +171,10 @@ void WidgetTests::createTestLists() {
     test::Test* dropdown_widget_basic_test = dropdown_widget_list->addTest("basic", [&](test::Test& test) { dropdownWidgetBasicTest(test); });
     test::Test* dropdown_widget_options_1_test = dropdown_widget_list->addTest("options_1", { dropdown_widget_basic_test }, [&](test::Test& test) { dropdownWidgetOptions1Test(test); });
     test::Test* dropdown_widget_options_2_test = dropdown_widget_list->addTest("options_2", { dropdown_widget_options_1_test }, [&](test::Test& test) { dropdownWidgetOptions2Test(test); });
+
+    test::TestList* scroll_area_widget_list = createTestList("ScrollAreaWidget", { widgets_basic_list });
+    test::Test* scroll_area_widget_basic_test = scroll_area_widget_list->addTest("basic", [&](test::Test& test) { scrollAreaWidgetBasicTest(test); });
+
 }
 
 void WidgetTests::beforeRunModule() {
@@ -3540,6 +3544,51 @@ void WidgetTests::dropdownWidgetOptions2Test(test::Test& test) {
     T_COMPARE(dropdown_widget->getOptionText(0), "option1");
     T_COMPARE(dropdown_widget->getOptionText(1), "option3");
     T_COMPARE(dropdown_widget->getOptionText(2), "option2");
+}
+
+void WidgetTests::scrollAreaWidgetBasicTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(300.0f, 200.0f);
+    fw::ScrollAreaWidget* scroll_area_widget = application.getWidgets().createWidget<fw::ScrollAreaWidget>(size);
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(scroll_area_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    scroll_area_widget->setPosition(position);
+
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = scroll_area_widget;
+    gwt.total_widgets = 8;
+    gwt.type = fw::Widget::WidgetType::ScrollArea;
+    gwt.name = "scroll area";
+    gwt.fullname = "root|scroll area";
+    gwt.is_visual_position_quantized = false;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
+    visibility.opaque = false;
+    visibility.renderableSetting = false;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
+    gwt.is_click_through = true;
+    gwt.is_mouse_over = false;
+    gwt.focusable_type = fw::Widget::FocusableType::NONE;
+    gwt.is_focused = false;
+    gwt.clip_children = false;
+    gwt.force_custom_cursor = false;
+    gwt.parent = root_widget;
+    gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+    gwt.global_bounds = sf::FloatRect(position, size);
+    gwt.parent_local_bounds = gwt.global_bounds;
+    gwt.visual_local_bounds = gwt.local_bounds;
+    gwt.visual_global_bounds = gwt.global_bounds;
+    gwt.visual_parent_local_bounds = gwt.global_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {

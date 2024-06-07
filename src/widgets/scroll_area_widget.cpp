@@ -14,7 +14,7 @@ namespace fw {
 		setName("scroll area");
 		setSizeInternal(width, height);
 		setLocalRenderLayer(static_cast<size_t>(ScrollAreaRenderLayers::SCROLL_AREA));
-		// container
+		// area
 		float default_width = SCROLL_AREA_SCROLLBAR_DEFAULT_WIDTH;
 		float area_width = width - default_width;
 		float area_height = height - default_width;
