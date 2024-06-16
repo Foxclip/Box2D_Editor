@@ -3,7 +3,7 @@
 #include <string>
 #include <functional>
 #include "widgets_common.h"
-#include "compvector.h"
+#include "common/compvector.h"
 
 namespace fw {
 

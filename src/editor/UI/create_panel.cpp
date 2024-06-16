@@ -1,5 +1,5 @@
-#include "UI/create_panel.h"
-#include "editor.h"
+#include "editor/UI/create_panel.h"
+#include "editor/editor.h"
 
 CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
     : fw::ContainerWidget(widget_list, 50.0f, 500.0f), app(p_app) {

@@ -1,5 +1,5 @@
 #include "tests/tests.h"
-#include "logger.h"
+#include "common/logger.h"
 
 void run_tests() {
     logger << "Running tests\n";

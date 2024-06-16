@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compvector.h"
+#include "common/compvector.h"
 #include "test.h"
 
 class CompVectorTests : public test::TestModule {

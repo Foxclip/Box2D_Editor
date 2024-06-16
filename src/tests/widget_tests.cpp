@@ -1,5 +1,5 @@
 #include "tests/widget_tests.h"
-#include <utils.h>
+#include <common/utils.h>
 
 #define PRESS_MOUSE_LEFT(pos) \
     application.mouseMove(pos); \

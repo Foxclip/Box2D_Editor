@@ -1,4 +1,5 @@
 add_library(widgets_lib)
+
 target_sources(widgets_lib PRIVATE
     "${INCLUDE_DIR}/widgets/application.h"
     "${INCLUDE_DIR}/widgets/canvas_widget.h"
@@ -53,4 +54,5 @@ target_sources(widgets_lib PRIVATE
 target_include_directories(widgets_lib PRIVATE "${INCLUDE_DIR}")
 target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}")
 target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
-target_link_libraries(widgets_lib PUBLIC sfml-window)
+target_link_libraries(widgets_lib PUBLIC sfml-graphics sfml-system sfml-window)
+target_link_libraries(widgets_lib PUBLIC clip)

@@ -6,7 +6,7 @@
 #include <vector>
 #include <sstream>
 #include <iomanip>
-#include "utils.h"
+#include "common/utils.h"
 
 class WordToken {
 public:

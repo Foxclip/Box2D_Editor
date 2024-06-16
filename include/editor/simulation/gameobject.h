@@ -3,13 +3,13 @@
 #include <set>
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
-#include "compvector.h"
-#include "serializer.h"
+#include "editor/serializer.h"
 #include "polygon.h"
-#include "utils.h"
 #include "shapes.h"
 #include "joint.h"
 #include "gameobject_transform.h"
+#include "common/compvector.h"
+#include "common/utils.h"
 
 struct BodyDef {
 	b2BodyDef body_def;

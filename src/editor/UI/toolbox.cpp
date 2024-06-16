@@ -1,5 +1,5 @@
-#include "UI/toolbox.h"
-#include "editor.h"
+#include "editor/UI/toolbox.h"
+#include "editor/editor.h"
 
 Toolbox::Toolbox(fw::WidgetList& widget_list, Editor& p_app)
     : fw::ContainerWidget(widget_list, 500.0f, 100.0f), app(p_app) {

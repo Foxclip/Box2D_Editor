@@ -1,6 +1,6 @@
 #pragma once
 
-#include "editor.h"
+#include "editor/editor.h"
 
 void scene1(Editor& app) {
     std::vector<b2Vec2> ground_vertices = {

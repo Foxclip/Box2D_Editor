@@ -2,11 +2,11 @@
 
 #include <functional>
 #include <set>
-#include "logger.h"
 #include "tools.h"
-#include "history.h"
-#include "widgets/widgets.h"
 #include "simulation/simulation.h"
+#include "widgets/widgets.h"
+#include "common/history.h"
+#include "common/logger.h"
 
 const sf::String WINDOW_TITLE = "Box2D Editor";
 const int WINDOW_WIDTH = 800;

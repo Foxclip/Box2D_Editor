@@ -1,5 +1,5 @@
-#include "test.h"
-#include "logger.h"
+#include "tests/test.h"
+#include "common/logger.h"
 #include <cassert>
 #include <algorithm>
 

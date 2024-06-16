@@ -1,5 +1,5 @@
-#include "UI/edit_window.h"
-#include "editor.h"
+#include "editor/UI/edit_window.h"
+#include "editor/editor.h"
 
 EditWindow::EditWindow(fw::WidgetList& widget_list, float width, float height, Editor& p_app)
     : fw::WindowWidget(widget_list, width, height), app(p_app) {

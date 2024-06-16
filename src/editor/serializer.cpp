@@ -1,4 +1,4 @@
-#include "serializer.h"
+#include "editor/serializer.h"
 
 WordToken::WordToken() { }
 

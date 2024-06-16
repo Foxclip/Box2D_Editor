@@ -1,8 +1,8 @@
 #include <cstdio>
 #include <iostream>
-#include "editor.h"
-#include "logger.h"
-#include "scenes.h"
+#include "editor/editor.h"
+#include "editor/scenes.h"
+#include "common/logger.h"
 
 void execute_app() {
     logger << "Starting app\n";
@@ -27,8 +27,6 @@ int main() {
 
     execute_app();
 
-    // TODO: ScrollAreaWidget test
-    // TODO: WindowWidget: use pre update and post update
     // TODO: object list window (outliner)
     // TODO: render polygon indices
     // TODO: make widgets a separate library

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "simulation/simulation.h"
+#include "editor/simulation/simulation.h"
 #include "test.h"
 
 class SimulationTests : public test::TestModule {

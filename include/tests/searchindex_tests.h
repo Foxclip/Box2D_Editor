@@ -1,6 +1,6 @@
 #pragma once
 
-#include "searchindex.h"
+#include "common/searchindex.h"
 #include "test.h"
 
 class SearchIndexTests : public test::TestModule {

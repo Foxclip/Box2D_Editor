@@ -1,6 +1,6 @@
-#include "simulation/shapes.h"
+#include "editor/simulation/shapes.h"
+#include "common/utils.h"
 #include <numbers>
-#include <utils.h>
 
 LineStripShape::LineStripShape() { }
 

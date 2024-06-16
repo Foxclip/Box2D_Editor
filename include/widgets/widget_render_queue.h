@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "compvector.h"
+#include "common/compvector.h"
 
 namespace fw {
 

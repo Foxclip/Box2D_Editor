@@ -1,4 +1,4 @@
-#include "simulation/objectlist.h"
+#include "editor/simulation/objectlist.h"
 
 b2World* GameObjectList::getWorld() const {
     return world.get();

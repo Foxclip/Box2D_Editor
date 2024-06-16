@@ -1,9 +1,9 @@
 #pragma once
 
 #include "gameobject.h"
-#include "compvector.h"
-#include "searchindex.h"
-#include "utils.h"
+#include "common/compvector.h"
+#include "common/searchindex.h"
+#include "common/utils.h"
 
 class GameObjectList {
 public:
