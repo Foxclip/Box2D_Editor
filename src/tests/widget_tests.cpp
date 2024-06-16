@@ -175,6 +175,7 @@ void WidgetTests::createTestLists() {
     test::TestList* scroll_area_widget_list = createTestList("ScrollAreaWidget", { widgets_basic_list });
     test::Test* scroll_area_widget_basic_test = scroll_area_widget_list->addTest("basic", [&](test::Test& test) { scrollAreaWidgetBasicTest(test); });
     test::Test* scroll_area_widget_scroll_test = scroll_area_widget_list->addTest("scroll", [&](test::Test& test) { scrollAreaWidgetScrollTest(test); });
+    test::Test* scroll_area_widget_scrollbar_visibility_test = scroll_area_widget_list->addTest("scrollbar_visibility", [&](test::Test& test) { scrollAreaWidgetScrollbarVisibilityTest(test); });
 
 }
 
@@ -3600,15 +3601,12 @@ void WidgetTests::scrollAreaWidgetScrollTest(test::Test& test) {
     sf::Vector2f scroll_area_size(300.0f, 200.0f);
     sf::Vector2f container_size(100.0f, 100.0f);
     sf::Vector2f child_size(350.0f, 100.0f);
-    fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(scroll_area_size);
     fw::ScrollAreaWidget* scroll_area_widget = application.getWidgets().createWidget<fw::ScrollAreaWidget>(scroll_area_size);
     fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>(container_size);
     fw::RectangleWidget* red_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
     fw::RectangleWidget* green_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
     fw::RectangleWidget* blue_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
     scroll_area_widget->setScrolledWidget(container_widget);
-    scroll_area_widget->setSizePolicy(fw::Widget::SizePolicy::PARENT);
-    scroll_area_widget->setParent(window_widget);
     container_widget->setFillColor(sf::Color(100, 100, 100));
     container_widget->setHorizontal(false);
     red_widget->setFillColor(sf::Color::Red);
@@ -3710,6 +3708,98 @@ void WidgetTests::scrollAreaWidgetScrollTest(test::Test& test) {
         float slider_y_factor = container_widget->getHeight() / scroll_area_widget->getScrollbarYWidget()->getHeight();
         float container_pos_y = -y_range * slider_y_factor;
         T_APPROX_COMPARE(container_widget->getPosition().y, container_pos_y);
+    }
+}
+
+void WidgetTests::scrollAreaWidgetScrollbarVisibilityTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.setDefaultFont(textbox_font);
+    sf::Vector2f scroll_area_size(300.0f, 200.0f);
+    sf::Vector2f container_size(100.0f, 100.0f);
+    sf::Vector2f child_size(350.0f, 100.0f);
+    fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(scroll_area_size);
+    fw::ScrollAreaWidget* scroll_area_widget = application.getWidgets().createWidget<fw::ScrollAreaWidget>(scroll_area_size);
+    fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>(container_size);
+    fw::RectangleWidget* red_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
+    fw::RectangleWidget* green_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
+    fw::RectangleWidget* blue_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
+    scroll_area_widget->setScrolledWidget(container_widget);
+    scroll_area_widget->setSizePolicy(fw::Widget::SizePolicy::PARENT);
+    scroll_area_widget->setParent(window_widget);
+    container_widget->setFillColor(sf::Color(100, 100, 100));
+    container_widget->setHorizontal(false);
+    red_widget->setFillColor(sf::Color::Red);
+    red_widget->setParent(container_widget);
+    green_widget->setFillColor(sf::Color::Green);
+    green_widget->setParent(container_widget);
+    blue_widget->setFillColor(sf::Color::Blue);
+    blue_widget->setParent(container_widget);
+
+    // scrollbar visibility is updated before container size
+    application.advance();
+    T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
+    T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
+    application.advance();
+    T_CHECK(scroll_area_widget->getScrollbarXWidget()->isVisible());
+    T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
+
+    {
+        float margin = 100.0f;
+        float offset = container_widget->getWidth() - scroll_area_widget->getWidth() + margin;
+        resizeWindow(window_widget, ResizePoint::RIGHT, sf::Vector2f(offset, 0.0f));
+        T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
+        T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
+    }
+    {
+        float margin = 100.0f;
+        float offset = container_widget->getHeight() - scroll_area_widget->getHeight() + margin;
+        resizeWindow(window_widget, ResizePoint::BOTTOM, sf::Vector2f(0.0f, offset));
+        T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
+        T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
+    }
+    {
+        // testing behaviour near the corner
+        float margin = fw::SCROLL_AREA_SCROLLBAR_DEFAULT_WIDTH / 2.0f;
+        float offset_x = container_widget->getWidth() - scroll_area_widget->getWidth() + margin;
+        float offset_y = container_widget->getHeight() - scroll_area_widget->getHeight() + margin;
+        resizeWindow(window_widget, ResizePoint::BOTTOM_RIGHT, sf::Vector2f(offset_x, offset_y));
+        T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
+        T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
+        resizeWindow(window_widget, ResizePoint::RIGHT, sf::Vector2f(-margin * 2.0f, 0.0f));
+        T_CHECK(scroll_area_widget->getScrollbarXWidget()->isVisible());
+        T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
+    }
+    {
+        // testing a case where scrollbar becomes invisible in one position,
+        // and becomes visible again in another position
+        float margin_1 = -50.0f;
+        float margin_2 = 100.0f;
+        float offset_x = container_widget->getWidth() - scroll_area_widget->getWidth() + margin_1;
+        float offset_y = container_widget->getHeight() - scroll_area_widget->getHeight() + margin_1;
+        resizeWindow(window_widget, ResizePoint::BOTTOM_RIGHT, sf::Vector2f(offset_x, offset_y));
+        T_CHECK(scroll_area_widget->getScrollbarXWidget()->isVisible());
+        T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
+        resizeWindow(window_widget, ResizePoint::BOTTOM, sf::Vector2f(0.0f, margin_2));
+        resizeWindow(window_widget, ResizePoint::RIGHT, sf::Vector2f(margin_2, 0.0f));
+        // not using resizeWindow because it calls advance one more time
+        sf::Vector2f grab_pos = getGrabPos(window_widget, ResizePoint::BOTTOM);
+        application.mouseMove(grab_pos);
+        application.advance();
+        application.mouseLeftPress();
+        application.advance();
+        application.mouseMove(sf::Vector2f(grab_pos.x, grab_pos.y - margin_2));
+        application.advance();
+        float scrollbar_pos = scroll_area_widget->getWidth();
+        // if it is visible right away, then it should be in the right position
+        if (scroll_area_widget->getScrollbarYWidget()->isVisible()) {
+            T_COMPARE(scroll_area_widget->getScrollbarYWidget()->getPosition().x, scrollbar_pos);
+        }
+        application.mouseLeftRelease();
+        application.advance();
+        // after one more advance it definetely should be in the right position
+        T_COMPARE(scroll_area_widget->getScrollbarYWidget()->getPosition().x, scrollbar_pos);
     }
 }
 
@@ -3826,7 +3916,7 @@ void WidgetTests::mouseDragGesture(
     application.advance();
 }
 
-void WidgetTests::resizeWindow(fw::WindowWidget* window, ResizePoint resize_point, const sf::Vector2f offset) {
+sf::Vector2f WidgetTests::getGrabPos(fw::WindowWidget* window, ResizePoint resize_point) {
     float cursor_offset = fw::WINDOW_RESIZE_MARGIN / 2.0f;
     sf::Vector2f grab_pos;
     if (resize_point == ResizePoint::TOP_LEFT) {
@@ -3848,6 +3938,11 @@ void WidgetTests::resizeWindow(fw::WindowWidget* window, ResizePoint resize_poin
     } else {
         mAssert(false, "Unknown resize point");
     }
+    return grab_pos;
+}
+
+void WidgetTests::resizeWindow(fw::WindowWidget* window, ResizePoint resize_point, const sf::Vector2f offset) {
+    sf::Vector2f grab_pos = getGrabPos(window, resize_point);
     mouseDragGesture(window->getWidgetList().getApplication(), grab_pos, offset);
 }
 

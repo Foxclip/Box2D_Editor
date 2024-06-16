@@ -194,6 +194,7 @@ private:
 	void dropdownWidgetOptions2Test(test::Test& test);
 	void scrollAreaWidgetBasicTest(test::Test& test);
 	void scrollAreaWidgetScrollTest(test::Test& test);
+	void scrollAreaWidgetScrollbarVisibilityTest(test::Test& test);
 
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);
@@ -215,6 +216,7 @@ private:
 		BOTTOM,
 		BOTTOM_RIGHT
 	};
+	sf::Vector2f getGrabPos(fw::WindowWidget* window, ResizePoint resize_point);
 	void resizeWindow(fw::WindowWidget* window, ResizePoint resize_point, const sf::Vector2f offset);
 	void resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget);
 	sf::Vector2f getHeaderCenter(fw::WindowWidget* window);
