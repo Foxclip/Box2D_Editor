@@ -26,8 +26,15 @@ namespace fw {
 		};
 		ScrollAreaWidget(WidgetList& widget_list, float width, float height);
 		ScrollAreaWidget(WidgetList& widget_list, const sf::Vector2f& size);
-		Widget* getWidget() const;
-		void setWidget(Widget* widget);
+		Widget* getScrolledWidget() const;
+		Widget* getAreaWidget() const;
+		Widget* getScrollbarXWidget() const;
+		Widget* getScrollbarYWidget() const;
+		Widget* getSliderXWidget() const;
+		Widget* getSliderYWidget() const;
+		Widget* getCornerWidget() const;
+		void setScrolledWidget(Widget* widget);
+		Widget* takeScrolledWidget();
 		void setDeltaX(float delta);
 		void setDeltaY(float delta);
 		void setScrollbarXPolicy(ScrollbarPolicy policy);
@@ -49,13 +56,6 @@ namespace fw {
 		float slider_grab_pos;
 		float delta_x = SCROLL_AREA_DEFAULT_SCROLL_X_DELTA;
 		float delta_y = SCROLL_AREA_DEFAULT_SCROLL_Y_DELTA;
-		WidgetLink* area_size_x_link = nullptr;
-		WidgetLink* area_size_y_link = nullptr;
-		WidgetLink* slider_bg_size_x_link = nullptr;
-		WidgetLink* slider_bg_size_y_link = nullptr;
-		WidgetLink* area_scroll_link = nullptr;
-		WidgetLink* widget_pos_x_link = nullptr;
-		WidgetLink* widget_pos_y_link = nullptr;
 		ScrollbarPolicy scrollbar_x_policy = ScrollbarPolicy::SIZE;
 		ScrollbarPolicy scrollbar_y_policy = ScrollbarPolicy::SIZE;
 
@@ -65,6 +65,7 @@ namespace fw {
 		void internalOnScrollY(const sf::Vector2f& pos, float delta) override;
 
 	private:
+		void updateScrollbarVisibility();
 		void updateScroll();
 		void updateColors();
 		float getSizeXFactor() const;

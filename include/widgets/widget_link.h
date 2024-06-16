@@ -27,10 +27,14 @@ namespace fw {
 		Widget* getWidget() const;
 		virtual void execute() = 0;
 		virtual std::string toStr() const = 0;
+		const CompVector<WidgetUpdateTarget*>& getTargets() const;
+		void addTarget(WidgetUpdateTarget* target);
+		void removeTarget(WidgetUpdateTarget* target);
 
 	protected:
 		friend class Widget;
 		Widget* widget = nullptr;
+		CompVector<WidgetUpdateTarget*> targets;
 		CompVector<WidgetLink*> dependent_links;
 
 	private:
@@ -57,11 +61,10 @@ namespace fw {
 	public:
 		WidgetLink(
 			const std::string& name,
-			const std::vector<WidgetUpdateTarget*>& targets,
+			const CompVector<WidgetUpdateTarget*>& targets,
 			Widget* widget,
 			const FuncType& func
 		);
-		const std::vector<WidgetUpdateTarget*>& getTargets() const;
 		std::string toStr() const override;
 		void execute() override;
 		void remove();
@@ -69,7 +72,6 @@ namespace fw {
 	private:
 		friend class Widget;
 		std::string name;
-		std::vector<WidgetUpdateTarget*> targets;
 		FuncType func;
 
 	};

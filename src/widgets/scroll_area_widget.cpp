@@ -118,15 +118,46 @@ namespace fw {
 	ScrollAreaWidget::ScrollAreaWidget(WidgetList& widget_list, const sf::Vector2f& size)
 		: ScrollAreaWidget(widget_list, size.x, size.y) { }
 
-	Widget* ScrollAreaWidget::getWidget() const {
+	Widget* ScrollAreaWidget::getScrolledWidget() const {
 		return scrolled_widget;
 	}
 
-	void ScrollAreaWidget::setWidget(Widget* widget) {
+	Widget* ScrollAreaWidget::getAreaWidget() const {
+		return area_widget;
+	}
+
+	Widget* ScrollAreaWidget::getScrollbarXWidget() const {
+		return slider_background_x_widget;
+	}
+
+	Widget* ScrollAreaWidget::getScrollbarYWidget() const {
+		return slider_background_y_widget;
+	}
+
+	Widget* ScrollAreaWidget::getSliderXWidget() const {
+		return slider_x_widget;
+	}
+
+	Widget* ScrollAreaWidget::getSliderYWidget() const {
+		return slider_y_widget;
+	}
+
+	Widget* ScrollAreaWidget::getCornerWidget() const {
+		return corner_widget;
+	}
+
+	void ScrollAreaWidget::setScrolledWidget(Widget* widget) {
 		this->scrolled_widget = widget;
 		widget->setParentAnchor(Anchor::TOP_LEFT);
 		widget->setAnchorOffset(0.0f, 0.0f);
 		widget->setParent(area_widget);
+	}
+
+	Widget* ScrollAreaWidget::takeScrolledWidget() {
+		Widget* widget = scrolled_widget;
+		widget->setParent(getParent());
+		scrolled_widget = nullptr;
+		return widget;
 	}
 
 	void ScrollAreaWidget::setDeltaX(float delta) {
@@ -146,6 +177,44 @@ namespace fw {
 	}
 
 	void ScrollAreaWidget::internalPreUpdate() {
+		updateScrollbarVisibility();
+	}
+
+	void ScrollAreaWidget::internalPostUpdate() {
+		area_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
+		area_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
+		slider_background_x_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
+		slider_background_y_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
+		if (scrolled_widget) {
+			float right_offset = area_widget->getRight().x - scrolled_widget->getRight().x;
+			if (right_offset > 0.0f) {
+				if (getScrollXRange() > 0.0f) {
+					scrollX(right_offset);
+				} else {
+					scrolled_widget->setAnchorOffsetX(0.0f);
+				}
+			}
+			float bottom_offset = area_widget->getBottom().y - scrolled_widget->getBottom().y;
+			if (bottom_offset > 0.0f) {
+				if (getScrollYRange() > 0.0f) {
+					scrollY(bottom_offset);
+				} else {
+					scrolled_widget->setAnchorOffsetY(0.0f);
+				}
+			}
+		}
+		updateScroll();
+	}
+
+	void ScrollAreaWidget::internalOnScrollX(const sf::Vector2f& pos, float delta) {
+		scrollX(delta_x * -delta);
+	}
+
+	void ScrollAreaWidget::internalOnScrollY(const sf::Vector2f& pos, float delta) {
+		scrollY(delta_y * -delta);
+	}
+
+	void ScrollAreaWidget::updateScrollbarVisibility() {
 		// Calculation of whether scrollbars are visible must be done in two stages:
 		// First, calculate whether scrollbar is visible without taking other scrollbar into account,
 		// second, calculate final states given individual states.
@@ -201,40 +270,6 @@ namespace fw {
 		slider_background_x_widget->setVisible(x_state);
 		slider_background_y_widget->setVisible(y_state);
 		corner_widget->setVisible(corner_state);
-	}
-
-	void ScrollAreaWidget::internalPostUpdate() {
-		area_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
-		area_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
-		slider_background_x_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
-		slider_background_y_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
-		if (scrolled_widget) {
-			float right_offset = area_widget->getRight().x - scrolled_widget->getRight().x;
-			if (right_offset > 0.0f) {
-				if (getScrollXRange() > 0.0f) {
-					scrollX(right_offset);
-				} else {
-					scrolled_widget->setAnchorOffsetX(0.0f);
-				}
-			}
-			float bottom_offset = area_widget->getBottom().y - scrolled_widget->getBottom().y;
-			if (bottom_offset > 0.0f) {
-				if (getScrollYRange() > 0.0f) {
-					scrollY(bottom_offset);
-				} else {
-					scrolled_widget->setAnchorOffsetY(0.0f);
-				}
-			}
-		}
-		updateScroll();
-	}
-
-	void ScrollAreaWidget::internalOnScrollX(const sf::Vector2f& pos, float delta) {
-		scrollX(delta_x * -delta);
-	}
-
-	void ScrollAreaWidget::internalOnScrollY(const sf::Vector2f& pos, float delta) {
-		scrollY(delta_y * -delta);
 	}
 
 	void ScrollAreaWidget::updateScroll() {

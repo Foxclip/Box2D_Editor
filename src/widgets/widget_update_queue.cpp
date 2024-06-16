@@ -56,6 +56,7 @@ namespace fw {
 		if (const WidgetLink* link = dynamic_cast<const WidgetLink*>(target)) {
 			return link->getTargets();
 		} else if (const WidgetUpdateSocket* socket = dynamic_cast<const WidgetUpdateSocket*>(target)) {
+			result.insert(result.end(), socket->getTargets().begin(), socket->getTargets().end());
 			if (socket->getType() == WidgetUpdateType::POS_X) {
 				// pos entry depends on parent's children x entry,
 				// and so all entries dependent on pos entry will be updated

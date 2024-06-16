@@ -22,6 +22,18 @@ namespace fw {
 		return widget;
 	}
 
+	const CompVector<WidgetUpdateTarget*>& WidgetUpdateTarget::getTargets() const {
+		return targets;
+	}
+
+	void WidgetUpdateTarget::addTarget(WidgetUpdateTarget* target) {
+		targets.add(target);
+	}
+
+	void WidgetUpdateTarget::removeTarget(WidgetUpdateTarget* target) {
+		targets.remove(target);
+	}
+
 	WidgetUpdateSocket::WidgetUpdateSocket() { }
 
 	WidgetUpdateSocket::WidgetUpdateSocket(Widget* widget, WidgetUpdateType type) {
@@ -52,7 +64,7 @@ namespace fw {
 
 	WidgetLink::WidgetLink(
 		const std::string& name,
-		const std::vector<WidgetUpdateTarget*>& targets,
+		const CompVector<WidgetUpdateTarget*>& targets,
 		Widget* widget,
 		const FuncType& func
 	) {
@@ -60,10 +72,6 @@ namespace fw {
 		this->targets = targets;
 		this->widget  = widget;
 		this->func = func;
-	}
-
-	const std::vector<WidgetUpdateTarget*>& WidgetLink::getTargets() const {
-		return targets;
 	}
 
 	std::string WidgetLink::toStr() const {

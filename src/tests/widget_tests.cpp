@@ -174,6 +174,7 @@ void WidgetTests::createTestLists() {
 
     test::TestList* scroll_area_widget_list = createTestList("ScrollAreaWidget", { widgets_basic_list });
     test::Test* scroll_area_widget_basic_test = scroll_area_widget_list->addTest("basic", [&](test::Test& test) { scrollAreaWidgetBasicTest(test); });
+    test::Test* scroll_area_widget_scroll_test = scroll_area_widget_list->addTest("scroll", [&](test::Test& test) { scrollAreaWidgetScrollTest(test); });
 
 }
 
@@ -3589,6 +3590,127 @@ void WidgetTests::scrollAreaWidgetBasicTest(test::Test& test) {
     gwt.visual_global_bounds = gwt.global_bounds;
     gwt.visual_parent_local_bounds = gwt.global_bounds;
     T_WRAP_CONTAINER(genericWidgetTest(gwt));
+}
+
+void WidgetTests::scrollAreaWidgetScrollTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.setDefaultFont(textbox_font);
+    sf::Vector2f scroll_area_size(300.0f, 200.0f);
+    sf::Vector2f container_size(100.0f, 100.0f);
+    sf::Vector2f child_size(350.0f, 100.0f);
+    fw::WindowWidget* window_widget = application.getWidgets().createWidget<fw::WindowWidget>(scroll_area_size);
+    fw::ScrollAreaWidget* scroll_area_widget = application.getWidgets().createWidget<fw::ScrollAreaWidget>(scroll_area_size);
+    fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>(container_size);
+    fw::RectangleWidget* red_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
+    fw::RectangleWidget* green_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
+    fw::RectangleWidget* blue_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
+    scroll_area_widget->setScrolledWidget(container_widget);
+    scroll_area_widget->setSizePolicy(fw::Widget::SizePolicy::PARENT);
+    scroll_area_widget->setParent(window_widget);
+    container_widget->setFillColor(sf::Color(100, 100, 100));
+    container_widget->setHorizontal(false);
+    red_widget->setFillColor(sf::Color::Red);
+    red_widget->setParent(container_widget);
+    green_widget->setFillColor(sf::Color::Green);
+    green_widget->setParent(container_widget);
+    blue_widget->setFillColor(sf::Color::Blue);
+    blue_widget->setParent(container_widget);
+
+    auto check_slider_x = [&](float x, bool scrollbar_y_visible) {
+        T_APPROX_COMPARE(scroll_area_widget->getSliderXWidget()->getPosition().x, x);
+        float scrollbar_x_width = scroll_area_widget->getScrollbarXWidget()->getWidth();
+        float scroll_area_width = scroll_area_widget->getWidth();
+        if (scrollbar_y_visible) {
+            float scrollbar_y_width = scroll_area_widget->getScrollbarYWidget()->getWidth();
+            scroll_area_width -= scrollbar_y_width;
+        }
+        float x_factor = scroll_area_width / container_widget->getWidth();
+        float slider_x_width = scrollbar_x_width * x_factor;
+        T_APPROX_COMPARE(scroll_area_widget->getSliderXWidget()->getWidth(), slider_x_width);
+    };
+    auto check_slider_y = [&](float y, bool scrollbar_x_visible) {
+        T_APPROX_COMPARE(scroll_area_widget->getSliderYWidget()->getPosition().y, y);
+        float scrollbar_y_height = scroll_area_widget->getScrollbarYWidget()->getHeight();
+        float scroll_area_height = scroll_area_widget->getHeight();
+        if (scrollbar_x_visible) {
+            float scrollbar_x_height = scroll_area_widget->getScrollbarXWidget()->getHeight();
+            scroll_area_height -= scrollbar_x_height;
+        }
+        float y_factor = scroll_area_height / container_widget->getHeight();
+        float slider_y_height = scrollbar_y_height * y_factor;
+        T_APPROX_COMPARE(scroll_area_widget->getSliderYWidget()->getHeight(), slider_y_height);
+    };
+
+    // scrollbar visibility is updated before container size
+    application.advance();
+    T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
+    T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
+    application.advance();
+    T_CHECK(scroll_area_widget->getScrollbarXWidget()->isVisible());
+    T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
+    T_WRAP_CONTAINER(check_slider_x(0.0f, true));
+    T_WRAP_CONTAINER(check_slider_y(0.0f, true));
+
+    T_ASSERT_NO_ERRORS();
+    float slider_x_offset = 10.0f;
+    float slider_y_offset = 10.0f;
+    float slider_x_big_offset = 100.0f;
+    float slider_y_big_offset = 100.0f;
+    {
+        // scrolling x slider
+        mouseDragGesture(application, scroll_area_widget->getSliderXWidget()->getGlobalCenter(), sf::Vector2f(slider_x_offset, 0.0f));
+        T_WRAP_CONTAINER(check_slider_x(slider_x_offset, true));
+        T_WRAP_CONTAINER(check_slider_y(0.0f, true));
+        float slider_x_factor = container_widget->getWidth() / scroll_area_widget->getScrollbarXWidget()->getWidth();
+        float container_pos_x = -slider_x_offset * slider_x_factor;
+        T_APPROX_COMPARE(container_widget->getPosition().x, container_pos_x);
+    }
+    {
+        // scrolling y slider
+        mouseDragGesture(application, scroll_area_widget->getSliderYWidget()->getGlobalCenter(), sf::Vector2f(0.0f, slider_y_offset));
+        T_WRAP_CONTAINER(check_slider_y(slider_x_offset, true));
+        T_WRAP_CONTAINER(check_slider_y(slider_y_offset, true));
+        float slider_y_factor = container_widget->getHeight() / scroll_area_widget->getScrollbarYWidget()->getHeight();
+        float container_pos_y = -slider_y_offset * slider_y_factor;
+        T_APPROX_COMPARE(container_widget->getPosition().y, container_pos_y);
+    }
+    {
+        // scrolling x slider to the beginning
+        mouseDragGesture(application, scroll_area_widget->getSliderXWidget()->getGlobalCenter(), sf::Vector2f(-slider_x_big_offset, 0.0f));
+        T_WRAP_CONTAINER(check_slider_x(0.0f, true));
+        T_WRAP_CONTAINER(check_slider_y(slider_y_offset, true));
+        T_APPROX_COMPARE(container_widget->getPosition().x, 0.0f);
+    }
+    {
+        // scrolling y slider to the beginning
+        mouseDragGesture(application, scroll_area_widget->getSliderYWidget()->getGlobalCenter(), sf::Vector2f(0.0f, -slider_y_big_offset));
+        T_WRAP_CONTAINER(check_slider_x(0.0f, true));
+        T_WRAP_CONTAINER(check_slider_y(0.0f, true));
+        T_APPROX_COMPARE(container_widget->getPosition().y, 0.0f);
+    }
+    {
+        // scrolling x slider to the end
+        mouseDragGesture(application, scroll_area_widget->getSliderXWidget()->getGlobalCenter(), sf::Vector2f(slider_x_big_offset, 0.0f));
+        float x_range = scroll_area_widget->getScrollbarXWidget()->getWidth() - scroll_area_widget->getSliderXWidget()->getWidth();
+        T_WRAP_CONTAINER(check_slider_x(x_range, true));
+        T_WRAP_CONTAINER(check_slider_y(0.0f, true));
+        float slider_x_factor = container_widget->getWidth() / scroll_area_widget->getScrollbarXWidget()->getWidth();
+        float container_pos_x = -x_range * slider_x_factor;
+        T_APPROX_COMPARE(container_widget->getPosition().x, container_pos_x);
+    }
+    {
+        // scrolling y slider to the end
+        mouseDragGesture(application, scroll_area_widget->getSliderYWidget()->getGlobalCenter(), sf::Vector2f(0.0f, slider_y_big_offset));
+        float x_range = scroll_area_widget->getScrollbarXWidget()->getWidth() - scroll_area_widget->getSliderXWidget()->getWidth();
+        float y_range = scroll_area_widget->getScrollbarYWidget()->getHeight() - scroll_area_widget->getSliderYWidget()->getHeight();
+        T_WRAP_CONTAINER(check_slider_x(x_range, true));
+        T_WRAP_CONTAINER(check_slider_y(y_range, true));
+        float slider_y_factor = container_widget->getHeight() / scroll_area_widget->getScrollbarYWidget()->getHeight();
+        float container_pos_y = -y_range * slider_y_factor;
+        T_APPROX_COMPARE(container_widget->getPosition().y, container_pos_y);
+    }
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {

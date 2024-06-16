@@ -331,7 +331,7 @@ void Editor::initWidgets() {
     fw::RectangleWidget* green_rect = widgets.createWidget<fw::RectangleWidget>(50.0f, 50.0f);
     fw::RectangleWidget* blue_rect = widgets.createWidget<fw::RectangleWidget>(600.0f, 50.0f);
     window_widget->setPosition(400.0f, 300.0f);
-    scroll_area_widget->setWidget(container);
+    scroll_area_widget->setScrolledWidget(container);
     scroll_area_widget->setDeltaY(40.0f);
     scroll_area_widget->setSizePolicy(fw::Widget::SizePolicy::PARENT);
     scroll_area_widget->setParent(window_widget);
