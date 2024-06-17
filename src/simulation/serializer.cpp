@@ -223,7 +223,7 @@ std::vector<WordToken> TokenReader::tokenize(const std::string& str) const {
 		);
 	};
 	try {
-		for (size_t i = 0; i < str.size(); i++) {
+		for (size_t i = 0; i <= str.size(); i++) {
 			char c = EOF;
 			if (i < str.size()) {
 				c = str[i];
