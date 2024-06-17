@@ -45,6 +45,7 @@ void SimulationTests::createTestLists() {
     test::Test* remove_joint_test = objectlist_list->addTest("remove_joint", { add_joint_test }, [&](test::Test& test) { removeJointTest(test); });
     test::Test* remove_test = objectlist_list->addTest("remove", { add_test, remove_joint_test }, [&](test::Test& test) { removeTest(test); });
     test::Test* remove_with_children_test = objectlist_list->addTest("remove_with_children", { remove_test }, [&](test::Test& test) { removeWithChildrenTest(test); });
+    test::Test* event_test = objectlist_list->addTest("event", { remove_test }, [&](test::Test& test) { eventTest(test); });
     test::Test* clear_test = objectlist_list->addTest("clear", { objects_test }, [&](test::Test& test) { clearTest(test); });
 }
 
@@ -771,6 +772,47 @@ void SimulationTests::removeWithChildrenTest(test::Test& test) {
     T_ASSERT(T_COMPARE(box0->getChildren().size(), 0));
     T_CHECK(box0->getParent() == nullptr);
     T_ASSERT(T_COMPARE(simulation.getJointsSize(), 0));
+}
+
+void SimulationTests::eventTest(test::Test& test) {
+    Simulation simulation;
+    std::vector<GameObject*> added_objects;
+    std::vector<GameObject*> removed_objects;
+    std::vector<ptrdiff_t> removed_object_ids;
+    bool on_clear = false;
+    simulation.OnObjectAdded += [&](GameObject* object) {
+        added_objects.push_back(object);
+    };
+    simulation.OnObjectRemoved += [&](GameObject* object) {
+        removed_objects.push_back(object);
+        removed_object_ids.push_back(object->getId());
+    };
+    simulation.OnClear += [&]() {
+        on_clear = true;
+    };
+    BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
+    BoxObject* box1 = createBox(simulation, "box1", b2Vec2(1.1f, 1.1f));
+    BoxObject* box2 = createBox(simulation, "box2", b2Vec2(1.75f, 1.75f));
+    T_ASSERT(T_COMPARE(added_objects.size(), 3));
+    T_CHECK(added_objects[0] == box0);
+    T_CHECK(added_objects[1] == box1);
+    T_CHECK(added_objects[2] == box2);
+    T_COMPARE(removed_objects.size(), 0);
+    T_CHECK(!on_clear);
+    simulation.remove(box0, true);
+    simulation.remove(box1, true);
+    simulation.remove(box2, true);
+    T_ASSERT(T_COMPARE(removed_objects.size(), 3));
+    T_CHECK(removed_objects[0] == box0);
+    T_CHECK(removed_objects[1] == box1);
+    T_CHECK(removed_objects[2] == box2);
+    T_ASSERT(T_COMPARE(removed_object_ids.size(), 3));
+    T_COMPARE(removed_object_ids[0], 0);
+    T_COMPARE(removed_object_ids[1], 1);
+    T_COMPARE(removed_object_ids[2], 2);
+    T_CHECK(!on_clear);
+    simulation.clear();
+    T_CHECK(on_clear);
 }
 
 void SimulationTests::clearTest(test::Test& test) {

@@ -206,6 +206,7 @@ void GameObjectList::transformFromRigidbody() {
 void GameObjectList::remove(GameObject* object, bool remove_children) {
     mAssert(object);
     mAssert(all_objects.contains(object));
+    OnObjectRemoved(object);
     std::vector<Joint*> joints_copy = object->joints.getVector();
     for (Joint* joint : joints_copy) {
         removeJoint(joint);
@@ -227,7 +228,6 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
     ids.remove(object->id);
     names.remove(object->name, object);
     all_objects.remove(object);
-    OnObjectRemoved(object);
 }
 
 void GameObjectList::removeJoint(Joint* joint) {
