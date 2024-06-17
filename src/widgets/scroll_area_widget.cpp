@@ -40,27 +40,27 @@ namespace fw {
 		slider_x_widget->setClickThrough(false);
 		slider_x_widget->setQuantizeRenderedPosition(false); // slider might be in non-integer positions
 		slider_x_widget->setParent(slider_background_x_widget);
-		slider_x_widget->OnMouseEnter = [&](const sf::Vector2f& pos) {
+		slider_x_widget->OnMouseEnter += [&](const sf::Vector2f& pos) {
 			slider_x_hover = true;
 			updateColors();
 		};
-		slider_x_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
+		slider_x_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
 			slider_x_grabbed = true;
 			mouse_grab_pos = pos.x;
 			slider_grab_pos = slider_x_widget->getPosition().x;
 			updateColors();
 		};
-		slider_x_widget->OnMouseMoved = [&](const sf::Vector2f& pos) {
+		slider_x_widget->OnMouseMoved += [&](const sf::Vector2f& pos) {
 			if (slider_x_grabbed) {
 				float x_offset = pos.x - mouse_grab_pos;
 				setSliderX(slider_grab_pos + x_offset);
 			}
 		};
-		slider_x_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
+		slider_x_widget->OnLeftRelease += [&](const sf::Vector2f& pos) {
 			slider_x_grabbed = false;
 			updateColors();
 		};
-		slider_x_widget->OnMouseExit = [&](const sf::Vector2f& pos) {
+		slider_x_widget->OnMouseExit += [&](const sf::Vector2f& pos) {
 			slider_x_hover = false;
 			updateColors();
 		};
@@ -79,27 +79,27 @@ namespace fw {
 		slider_y_widget->setClickThrough(false);
 		slider_y_widget->setQuantizeRenderedPosition(false);
 		slider_y_widget->setParent(slider_background_y_widget);
-		slider_y_widget->OnMouseEnter = [&](const sf::Vector2f& pos) {
+		slider_y_widget->OnMouseEnter += [&](const sf::Vector2f& pos) {
 			slider_y_hover = true;
 			updateColors();
 		};
-		slider_y_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
+		slider_y_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
 			slider_y_grabbed = true;
 			mouse_grab_pos = pos.y;
 			slider_grab_pos = slider_y_widget->getPosition().y;
 			updateColors();
 		};
-		slider_y_widget->OnMouseMoved = [&](const sf::Vector2f& pos) {
+		slider_y_widget->OnMouseMoved += [&](const sf::Vector2f& pos) {
 			if (slider_y_grabbed) {
 				float y_offset = pos.y - mouse_grab_pos;
 				setSliderY(slider_grab_pos + y_offset);
 			}
 		};
-		slider_y_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
+		slider_y_widget->OnLeftRelease += [&](const sf::Vector2f& pos) {
 			slider_y_grabbed = false;
 			updateColors();
 		};
-		slider_y_widget->OnMouseExit = [&](const sf::Vector2f& pos) {
+		slider_y_widget->OnMouseExit += [&](const sf::Vector2f& pos) {
 			slider_y_hover = false;
 			updateColors();
 		};

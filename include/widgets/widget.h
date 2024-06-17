@@ -10,6 +10,7 @@
 #include "widget_unclipped_region.h"
 #include "common/compvector.h"
 #include "common/searchindex.h"
+#include "common/event.h"
 
 namespace fw {
 
@@ -81,25 +82,25 @@ namespace fw {
 		};
 		ptrdiff_t debug_id = -1;
 
-		std::function<void(const sf::Vector2f& pos)> OnLeftPress = [](const sf::Vector2f& pos) { };
-		std::function<void(const sf::Vector2f& pos)> OnRightPress = [](const sf::Vector2f& pos) { };
-		std::function<void(const sf::Vector2f& pos)> OnLeftRelease = [](const sf::Vector2f& pos) { };
-		std::function<void(const sf::Vector2f& pos)> OnRightRelease = [](const sf::Vector2f& pos) { };
-		std::function<void(const sf::Vector2f& pos, float delta)> OnScrollX = [](const sf::Vector2f& pos, float delta) { };
-		std::function<void(const sf::Vector2f& pos, float delta)> OnScrollY = [](const sf::Vector2f& pos, float delta) { };
-		std::function<void(const sf::Vector2f& pos)> OnMouseMoved = [](const sf::Vector2f& pos) { };
-		std::function<void(const sf::Vector2f& pos)> OnMouseEnter = [](const sf::Vector2f& pos) { };
-		std::function<void(const sf::Vector2f& pos)> OnMouseExit = [](const sf::Vector2f& pos) { };
-		std::function<void(const sf::Vector2f& pos)> OnProcessMouse = [](const sf::Vector2f& pos) { };
-		std::function<void()> OnFocused = []() { };
-		std::function<void()> OnFocusLost = []() { };
-		std::function<void()> OnPreUpdate = []() { };
-		std::function<void()> OnPostUpdate = []() { };
-		std::function<void(sf::RenderTarget& target)> OnBeforeGlobalRender = [](sf::RenderTarget& target) { };
-		std::function<void(sf::RenderTarget& target)> OnBeforeRender = [](sf::RenderTarget& target) { };
-		std::function<void(sf::RenderTarget& target)> OnAfterRender = [](sf::RenderTarget& target) { };
-		std::function<void(sf::RenderTarget& target)> OnAfterGlobalRender = [](sf::RenderTarget& target) { };
-		std::function<void(unsigned int, unsigned int)> OnWindowResized = [](unsigned int width, unsigned int height) { };
+		Event<void(const sf::Vector2f& pos)> OnLeftPress;
+		Event<void(const sf::Vector2f& pos)> OnRightPress;
+		Event<void(const sf::Vector2f& pos)> OnLeftRelease;
+		Event<void(const sf::Vector2f& pos)> OnRightRelease;
+		Event<void(const sf::Vector2f& pos, float delta)> OnScrollX;
+		Event<void(const sf::Vector2f& pos, float delta)> OnScrollY;
+		Event<void(const sf::Vector2f& pos)> OnMouseMoved;
+		Event<void(const sf::Vector2f& pos)> OnMouseEnter;
+		Event<void(const sf::Vector2f& pos)> OnMouseExit;
+		Event<void(const sf::Vector2f& pos)> OnProcessMouse;
+		Event<void()> OnFocused;
+		Event<void()> OnFocusLost;
+		Event<void()> OnPreUpdate;
+		Event<void()> OnPostUpdate;
+		Event<void(sf::RenderTarget& target)> OnBeforeGlobalRender;
+		Event<void(sf::RenderTarget& target)> OnBeforeRender;
+		Event<void(sf::RenderTarget& target)> OnAfterRender;
+		Event<void(sf::RenderTarget& target)> OnAfterGlobalRender;
+		Event<void(unsigned int, unsigned int)> OnWindowResized;
 		std::function<sf::Cursor::Type()> GetCursorType = []() { return sf::Cursor::Arrow; };
 
 		Widget(WidgetList& list);

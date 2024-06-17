@@ -24,12 +24,12 @@ namespace fw {
 		header_widget->setName("header");
 		header_widget->setSizeXPolicy(SizePolicy::PARENT);
 		header_size = getSize();
-		header_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
+		header_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
 			is_grabbed = true;
 			header_click_offset = getGlobalPosition() - pos;
 			moveToTop();
 		};
-		header_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
+		header_widget->OnProcessMouse += [&](const sf::Vector2f& pos) {
 			if (is_grabbed) {
 				sf::Vector2f parent_local_pos = parent->toLocal(pos);
 				sf::Vector2f new_pos = parent_local_pos + header_click_offset;
@@ -47,7 +47,7 @@ namespace fw {
 				setTransformPosition(new_pos);
 			}
 		};
-		header_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
+		header_widget->OnLeftRelease += [&](const sf::Vector2f& pos) {
 			is_grabbed = false;
 		};
 		header_widget->setParent(this);
@@ -98,7 +98,7 @@ namespace fw {
 				default: return sf::Cursor::Arrow;
 			}
 		};
-		resize_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
+		resize_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
 			sf::Vector2f parent_local_pos = parent->toLocal(pos);
 			active_resizing_type = getResizingType();
 			if (active_resizing_type == Resizing::NONE) {
@@ -130,7 +130,7 @@ namespace fw {
 			}
 			moveToTop();
 		};
-		resize_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
+		resize_widget->OnProcessMouse += [&](const sf::Vector2f& pos) {
 			if (active_resizing_type == Resizing::NONE) {
 				return;
 			}
@@ -179,7 +179,7 @@ namespace fw {
 				setSizeKeepPos(width_max, height_max + header_widget->getHeight());
 			}
 		};
-		resize_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
+		resize_widget->OnLeftRelease += [&](const sf::Vector2f& pos) {
 			active_resizing_type = Resizing::NONE;
 		};
 		resize_widget->setParent(this);
@@ -190,7 +190,7 @@ namespace fw {
 		outline_widget->setSize(width, WINDOW_HEADER_HEIGHT + height);
 		outline_widget->setFillColor(sf::Color::Transparent);
 		outline_widget->setSizePolicy(SizePolicy::PARENT);
-		outline_widget->OnAfterRender = [&](sf::RenderTarget& target) {
+		outline_widget->OnAfterRender += [&](sf::RenderTarget& target) {
 			sf::FloatRect quantized_bounds = quantize_rect(
 				outline_widget->getLocalBounds(),
 				QUANTIZE_MODE_FLOOR_SUBTRACT

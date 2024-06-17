@@ -231,13 +231,13 @@ void Editor::initWidgets() {
     );
     world_widget->setName("world_canvas");
     world_widget->setShader(&desat_shader);
-    world_widget->OnBeforeRender = [&](sf::RenderTarget& target) {
+    world_widget->OnBeforeRender += [&](sf::RenderTarget& target) {
         desat_shader.setUniform("texture", sf::Shader::CurrentTexture);
         desat_shader.setUniform("saturation", WORLD_SATURATION);
         desat_shader.setUniform("vcenter", WORLD_COLOR_SCALE_CENTER);
         desat_shader.setUniform("vpercent", WORLD_COLOR_SCALE_PERCENT);
     };
-    world_widget->OnPreUpdate = [&]() {
+    world_widget->OnPreUpdate += [&]() {
         world_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
         world_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };
@@ -247,12 +247,12 @@ void Editor::initWidgets() {
     );
     selection_mask_widget->setName("selection_mask_canvas");
     selection_mask_widget->setShader(&selection_shader);
-    selection_mask_widget->OnBeforeRender = [&](sf::RenderTarget& target) {
+    selection_mask_widget->OnBeforeRender += [&](sf::RenderTarget& target) {
         selection_shader.setUniform("selection_mask", sf::Shader::CurrentTexture);
         selection_shader.setUniform("outline_color", SELECTION_OUTLINE_COLOR);
         selection_shader.setUniform("offset", SELECTION_OUTLINE_THICKNESS);
     };
-    selection_mask_widget->OnPreUpdate = [&]() {
+    selection_mask_widget->OnPreUpdate += [&]() {
         selection_mask_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
         selection_mask_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };
@@ -261,7 +261,7 @@ void Editor::initWidgets() {
         (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
     );
     ui_widget->setName("ui_canvas");
-    ui_widget->OnPreUpdate = [&]() {
+    ui_widget->OnPreUpdate += [&]() {
         ui_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
         ui_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };

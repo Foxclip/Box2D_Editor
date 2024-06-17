@@ -9,14 +9,14 @@ namespace fw {
 		setName("dropdown");
 		setClickThrough(false);
 		setFocusableType(FocusableType::MODAL);
-		OnLeftPress = [&](const sf::Vector2f& pos) {
+		OnLeftPress += [&](const sf::Vector2f& pos) {
 			togglePanel();
 		};
-		OnFocused = [&]() {
+		OnFocused += [&]() {
 			LoggerTag dropdown_tag("dropdown");
 			logger << "OnFocused\n";
 		};
-		OnFocusLost = [&]() {
+		OnFocusLost += [&]() {
 			LoggerTag dropdown_tag("dropdown");
 			logger << "OnFocusLost\n";
 			if (panel_widget->isVisible()) {
@@ -137,10 +137,10 @@ namespace fw {
 		option_widget->moveToIndex(index);
 		option_widget->setFillColor(sf::Color::Transparent);
 		option_widget->setClipChildren(true);
-		option_widget->OnMouseEnter = [&, option_widget](const sf::Vector2f& pos) {
+		option_widget->OnMouseEnter += [&, option_widget](const sf::Vector2f& pos) {
 			option_widget->setFillColor(option_hover_background_color);
 		};
-		option_widget->OnMouseExit = [&, option_widget](const sf::Vector2f& pos) {
+		option_widget->OnMouseExit += [&, option_widget](const sf::Vector2f& pos) {
 			option_widget->setFillColor(sf::Color::Transparent);
 		};
 		option_widget->setGlobalRenderLayer(GlobalRenderLayer::DROPDOWN_PANEL);
@@ -198,7 +198,7 @@ namespace fw {
 		for (size_t i = 0; i < option_widgets.size(); i++) {
 			RectangleWidget* option_widget = option_widgets[i];
 			option_widget->setName("option" + std::to_string(i));
-			option_widget->OnLeftPress = [=](const sf::Vector2f& pos) {
+			option_widget->OnLeftPress += [=](const sf::Vector2f& pos) {
 				selectOption(i);
 				hidePanel();
 			};

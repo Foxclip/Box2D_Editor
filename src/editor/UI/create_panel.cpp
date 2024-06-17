@@ -17,13 +17,13 @@ CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
         );
         button_widget->setFillColor(sf::Color(128, 128, 128));
         button_widget->setOutlineColor(sf::Color(0, 175, 255));
-        button_widget->OnLeftPress = [=](const sf::Vector2f& pos) {
+        button_widget->OnLeftPress += [=](const sf::Vector2f& pos) {
             app.selectCreateType(i);
         };
-        button_widget->OnMouseEnter = [=](const sf::Vector2f pos) {
+        button_widget->OnMouseEnter += [=](const sf::Vector2f pos) {
             button_widget->setOutlineThickness(-1.0f);
         };
-        button_widget->OnMouseExit = [=](const sf::Vector2f pos) {
+        button_widget->OnMouseExit += [=](const sf::Vector2f pos) {
             button_widget->setOutlineThickness(0.0f);
         };
         button_widget->setName("button " + std::to_string(i));

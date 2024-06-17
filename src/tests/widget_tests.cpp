@@ -975,34 +975,34 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     bool mouse_scroll_y = false;
     bool mouse_exited = false;
     bool mouse_processed = false;
-    rectangle_widget->OnMouseEnter = [&](const sf::Vector2f& pos) {
+    rectangle_widget->OnMouseEnter += [&](const sf::Vector2f& pos) {
         mouse_entered = true;
     };
-    rectangle_widget->OnLeftPress = [&](const sf::Vector2f& pos) {
+    rectangle_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
         mouse_left_pressed = true;
     };
-    rectangle_widget->OnRightPress = [&](const sf::Vector2f& pos) {
+    rectangle_widget->OnRightPress += [&](const sf::Vector2f& pos) {
         mouse_right_pressed = true;
     };
-    rectangle_widget->OnLeftRelease = [&](const sf::Vector2f& pos) {
+    rectangle_widget->OnLeftRelease += [&](const sf::Vector2f& pos) {
         mouse_left_released = true;
     };
-    rectangle_widget->OnRightRelease = [&](const sf::Vector2f& pos) {
+    rectangle_widget->OnRightRelease += [&](const sf::Vector2f& pos) {
         mouse_right_released = true;
     };
-    rectangle_widget->OnMouseMoved = [&](const sf::Vector2f& pos) {
+    rectangle_widget->OnMouseMoved += [&](const sf::Vector2f& pos) {
         mouse_moved = true;
     };
-    rectangle_widget->OnScrollX = [&](const sf::Vector2f& pos, float delta) {
+    rectangle_widget->OnScrollX += [&](const sf::Vector2f& pos, float delta) {
         mouse_scroll_x = true;
     };
-    rectangle_widget->OnScrollY = [&](const sf::Vector2f& pos, float delta) {
+    rectangle_widget->OnScrollY += [&](const sf::Vector2f& pos, float delta) {
         mouse_scroll_y = true;
     };
-    rectangle_widget->OnMouseExit = [&](const sf::Vector2f& pos) {
+    rectangle_widget->OnMouseExit += [&](const sf::Vector2f& pos) {
         mouse_exited = true;
     };
-    rectangle_widget->OnProcessMouse = [&](const sf::Vector2f& pos) {
+    rectangle_widget->OnProcessMouse += [&](const sf::Vector2f& pos) {
         mouse_processed = true;
     };
     sf::Vector2f position(100.0f, 100.0f);
@@ -1140,34 +1140,34 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     bool mouse_released_2 = false;
     bool mouse_exited_2 = false;
     bool mouse_processed_2 = false;
-    rectangle_widget_1->OnMouseEnter = [&](const sf::Vector2f& pos) {
+    rectangle_widget_1->OnMouseEnter += [&](const sf::Vector2f& pos) {
         mouse_entered_1 = true;
     };
-    rectangle_widget_1->OnLeftPress = [&](const sf::Vector2f& pos) {
+    rectangle_widget_1->OnLeftPress += [&](const sf::Vector2f& pos) {
         mouse_pressed_1 = true;
     };
-    rectangle_widget_1->OnLeftRelease = [&](const sf::Vector2f& pos) {
+    rectangle_widget_1->OnLeftRelease += [&](const sf::Vector2f& pos) {
         mouse_released_1 = true;
     };
-    rectangle_widget_1->OnMouseExit = [&](const sf::Vector2f& pos) {
+    rectangle_widget_1->OnMouseExit += [&](const sf::Vector2f& pos) {
         mouse_exited_1 = true;
     };
-    rectangle_widget_1->OnProcessMouse = [&](const sf::Vector2f& pos) {
+    rectangle_widget_1->OnProcessMouse += [&](const sf::Vector2f& pos) {
         mouse_processed_1 = true;
     };
-    rectangle_widget_2->OnMouseEnter = [&](const sf::Vector2f& pos) {
+    rectangle_widget_2->OnMouseEnter += [&](const sf::Vector2f& pos) {
         mouse_entered_2 = true;
     };
-    rectangle_widget_2->OnLeftPress = [&](const sf::Vector2f& pos) {
+    rectangle_widget_2->OnLeftPress += [&](const sf::Vector2f& pos) {
         mouse_pressed_2 = true;
     };
-    rectangle_widget_2->OnLeftRelease = [&](const sf::Vector2f& pos) {
+    rectangle_widget_2->OnLeftRelease += [&](const sf::Vector2f& pos) {
         mouse_released_2 = true;
     };
-    rectangle_widget_2->OnMouseExit = [&](const sf::Vector2f& pos) {
+    rectangle_widget_2->OnMouseExit += [&](const sf::Vector2f& pos) {
         mouse_exited_2 = true;
     };
-    rectangle_widget_2->OnProcessMouse = [&](const sf::Vector2f& pos) {
+    rectangle_widget_2->OnProcessMouse += [&](const sf::Vector2f& pos) {
         mouse_processed_2 = true;
     };
     sf::Vector2f position(100.0f, 100.0f);
@@ -1286,25 +1286,25 @@ void WidgetTests::eventsTest(test::Test& test) {
     unsigned int window_width = 0;
     unsigned int window_height = 0;
     fw::RectangleWidget* widget = application.getWidgets().createWidget<fw::RectangleWidget>(100.0f, 100.0f);
-    widget->OnPreUpdate = [&]() {
+    widget->OnPreUpdate += [&]() {
         pre_update = true;
     };
-    widget->OnPostUpdate = [&]() {
+    widget->OnPostUpdate += [&]() {
         post_update = true;
     };
-    widget->OnBeforeGlobalRender = [&](sf::RenderTarget& target) {
+    widget->OnBeforeGlobalRender += [&](sf::RenderTarget& target) {
         before_global_render = true;
     };
-    widget->OnBeforeRender = [&](sf::RenderTarget& target) {
+    widget->OnBeforeRender += [&](sf::RenderTarget& target) {
         before_render = true;
     };
-    widget->OnAfterRender = [&](sf::RenderTarget& target) {
+    widget->OnAfterRender += [&](sf::RenderTarget& target) {
         after_render = true;
     };
-    widget->OnAfterGlobalRender = [&](sf::RenderTarget& target) {
+    widget->OnAfterGlobalRender += [&](sf::RenderTarget& target) {
         after_global_render = true;
     };
-    widget->OnWindowResized = [&](unsigned int width, unsigned int height) {
+    widget->OnWindowResized += [&](unsigned int width, unsigned int height) {
         window_width = width;
         window_height = height;
     };
