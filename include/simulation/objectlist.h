@@ -2,15 +2,16 @@
 
 #include "gameobject.h"
 #include "common/compvector.h"
+#include "common/event.h"
 #include "common/searchindex.h"
 #include "common/utils.h"
 
 class GameObjectList {
 public:
 	std::unique_ptr<b2World> world;
-	std::function<void(GameObject*)> OnObjectAdded = [](GameObject*) { };
-	std::function<void(GameObject*)> OnObjectRemoved = [](GameObject*) { };
-	std::function<void(void)> OnClear = []() { };
+	Event<void(GameObject*)> OnObjectAdded;
+	Event<void(GameObject*)> OnObjectRemoved;
+	Event<void(void)> OnClear;
 
 	b2World* getWorld() const;
 	size_t getTopSize() const;

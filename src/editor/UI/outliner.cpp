@@ -16,13 +16,13 @@ Outliner::Outliner(fw::WidgetList& widget_list, Editor& p_app)
 	container_widget->setPadding(OUTLINER_CONTAINER_PADDING);
 	container_widget->setSizeXPolicy(SizePolicy::PARENT);
 
-	object_list.OnObjectAdded = [&](GameObject* object) {
+	object_list.OnObjectAdded += [&](GameObject* object) {
 		addObject(object);
 	};
-	object_list.OnObjectRemoved = [&](GameObject* object) {
+	object_list.OnObjectRemoved += [&](GameObject* object) {
 		removeObject(object);
 	};
-	object_list.OnClear = [&]() {
+	object_list.OnClear += [&]() {
 		clear();
 	};
 }
