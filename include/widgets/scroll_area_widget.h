@@ -36,6 +36,8 @@ namespace fw {
 		void setScrolledWidget(Widget* widget);
 		Widget* takeScrolledWidget();
 		void setBackgroundColor(const sf::Color& color);
+		void setScrollbarColor(const sf::Color& color);
+		void setSliderColor(const sf::Color& color);
 		void setDeltaX(float delta);
 		void setDeltaY(float delta);
 		void setScrollbarXPolicy(ScrollbarPolicy policy);
@@ -44,9 +46,9 @@ namespace fw {
 	protected:
 		RectangleWidget* area_widget = nullptr;
 		Widget* scrolled_widget = nullptr;
-		RectangleWidget* slider_background_x_widget = nullptr;
+		RectangleWidget* scrollbar_x_widget = nullptr;
 		RectangleWidget* slider_x_widget = nullptr;
-		RectangleWidget* slider_background_y_widget = nullptr;
+		RectangleWidget* scrollbar_y_widget = nullptr;
 		RectangleWidget* slider_y_widget = nullptr;
 		RectangleWidget* corner_widget = nullptr;
 		bool slider_x_hover = false;

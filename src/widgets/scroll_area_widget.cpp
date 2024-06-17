@@ -26,20 +26,20 @@ namespace fw {
 		area_widget->setClickThrough(false);
 		area_widget->setParent(this);
 		// slider x bg
-		slider_background_x_widget = widget_list.createWidget<RectangleWidget>(area_width, default_width);
-		slider_background_x_widget->setName("slider bg x");
-		slider_background_x_widget->setFillColor(SCROLL_AREA_DEFAULT_SCROLL_BACKGROUND_COLOR);
-		slider_background_x_widget->setParentAnchor(Anchor::BOTTOM_LEFT);
-		slider_background_x_widget->setOrigin(Anchor::BOTTOM_LEFT);
-		slider_background_x_widget->setClickThrough(false);
-		slider_background_x_widget->setParent(this);
+		scrollbar_x_widget = widget_list.createWidget<RectangleWidget>(area_width, default_width);
+		scrollbar_x_widget->setName("slider bg x");
+		scrollbar_x_widget->setFillColor(SCROLL_AREA_DEFAULT_SCROLL_BACKGROUND_COLOR);
+		scrollbar_x_widget->setParentAnchor(Anchor::BOTTOM_LEFT);
+		scrollbar_x_widget->setOrigin(Anchor::BOTTOM_LEFT);
+		scrollbar_x_widget->setClickThrough(false);
+		scrollbar_x_widget->setParent(this);
 		// slider x
 		slider_x_widget = widget_list.createWidget<RectangleWidget>(area_width / 2.0f, default_width);
 		slider_x_widget->setName("slider x");
 		slider_x_widget->setFillColor(SCROLL_AREA_DEFAULT_SLIDER_COLOR);
 		slider_x_widget->setClickThrough(false);
 		slider_x_widget->setQuantizeRenderedPosition(false); // slider might be in non-integer positions
-		slider_x_widget->setParent(slider_background_x_widget);
+		slider_x_widget->setParent(scrollbar_x_widget);
 		slider_x_widget->OnMouseEnter += [&](const sf::Vector2f& pos) {
 			slider_x_hover = true;
 			updateColors();
@@ -65,20 +65,20 @@ namespace fw {
 			updateColors();
 		};
 		// slider y bg
-		slider_background_y_widget = widget_list.createWidget<RectangleWidget>(default_width, area_height);
-		slider_background_y_widget->setName("slider bg y");
-		slider_background_y_widget->setFillColor(SCROLL_AREA_DEFAULT_SCROLL_BACKGROUND_COLOR);
-		slider_background_y_widget->setParentAnchor(Anchor::TOP_RIGHT);
-		slider_background_y_widget->setOrigin(Anchor::TOP_RIGHT);
-		slider_background_y_widget->setClickThrough(false);
-		slider_background_y_widget->setParent(this);
+		scrollbar_y_widget = widget_list.createWidget<RectangleWidget>(default_width, area_height);
+		scrollbar_y_widget->setName("slider bg y");
+		scrollbar_y_widget->setFillColor(SCROLL_AREA_DEFAULT_SCROLL_BACKGROUND_COLOR);
+		scrollbar_y_widget->setParentAnchor(Anchor::TOP_RIGHT);
+		scrollbar_y_widget->setOrigin(Anchor::TOP_RIGHT);
+		scrollbar_y_widget->setClickThrough(false);
+		scrollbar_y_widget->setParent(this);
 		// slider y
 		slider_y_widget = widget_list.createWidget<RectangleWidget>(default_width, area_height / 2.0f);
 		slider_y_widget->setName("slider y");
 		slider_y_widget->setFillColor(SCROLL_AREA_DEFAULT_SLIDER_COLOR);
 		slider_y_widget->setClickThrough(false);
 		slider_y_widget->setQuantizeRenderedPosition(false);
-		slider_y_widget->setParent(slider_background_y_widget);
+		slider_y_widget->setParent(scrollbar_y_widget);
 		slider_y_widget->OnMouseEnter += [&](const sf::Vector2f& pos) {
 			slider_y_hover = true;
 			updateColors();
@@ -127,11 +127,11 @@ namespace fw {
 	}
 
 	Widget* ScrollAreaWidget::getScrollbarXWidget() const {
-		return slider_background_x_widget;
+		return scrollbar_x_widget;
 	}
 
 	Widget* ScrollAreaWidget::getScrollbarYWidget() const {
-		return slider_background_y_widget;
+		return scrollbar_y_widget;
 	}
 
 	Widget* ScrollAreaWidget::getSliderXWidget() const {
@@ -165,6 +165,16 @@ namespace fw {
 		area_widget->setFillColor(color);
 	}
 
+	void ScrollAreaWidget::setScrollbarColor(const sf::Color& color) {
+		scrollbar_x_widget->setFillColor(color);
+		scrollbar_y_widget->setFillColor(color);
+	}
+
+	void ScrollAreaWidget::setSliderColor(const sf::Color& color) {
+		slider_x_widget->setFillColor(color);
+		slider_y_widget->setFillColor(color);
+	}
+
 	void ScrollAreaWidget::setDeltaX(float delta) {
 		this->delta_x = delta;
 	}
@@ -188,8 +198,8 @@ namespace fw {
 	void ScrollAreaWidget::internalPostUpdate() {
 		area_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
 		area_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
-		slider_background_x_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
-		slider_background_y_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
+		scrollbar_x_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
+		scrollbar_y_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
 		if (scrolled_widget) {
 			float right_offset = area_widget->getRight().x - scrolled_widget->getRight().x;
 			if (right_offset > 0.0f) {
@@ -262,25 +272,25 @@ namespace fw {
 		if (x_state_individual_is_final) {
 			x_state = x_state_individual;
 		} else {
-			float scrollbar_y_effective_width = y_state_individual ? slider_background_y_widget->getWidth() : 0.0f;
+			float scrollbar_y_effective_width = y_state_individual ? scrollbar_y_widget->getWidth() : 0.0f;
 			x_state = scrolled_widget->getWidth() > getWidth() - scrollbar_y_effective_width;
 		}
 		if (y_state_individual_is_final) {
 			y_state = y_state_individual;
 		} else {
-			float scrollbar_x_effective_height = x_state_individual ? slider_background_x_widget->getHeight() : 0.0f;
+			float scrollbar_x_effective_height = x_state_individual ? scrollbar_x_widget->getHeight() : 0.0f;
 			y_state = scrolled_widget->getHeight() > getHeight() - scrollbar_x_effective_height;
 		}
 		bool corner_state = x_state && y_state;
-		slider_background_x_widget->setVisible(x_state);
-		slider_background_y_widget->setVisible(y_state);
+		scrollbar_x_widget->setVisible(x_state);
+		scrollbar_y_widget->setVisible(y_state);
 		corner_widget->setVisible(corner_state);
 	}
 
 	void ScrollAreaWidget::updateScroll() {
 		// size
-		float x_width = slider_background_x_widget->getWidth() * getSizeXFactor();
-		float y_height = slider_background_y_widget->getHeight() * getSizeYFactor();
+		float x_width = scrollbar_x_widget->getWidth() * getSizeXFactor();
+		float y_height = scrollbar_y_widget->getHeight() * getSizeYFactor();
 		slider_x_widget->setWidth(x_width);
 		slider_y_widget->setHeight(y_height);
 		// position
@@ -352,12 +362,12 @@ namespace fw {
 	}
 
 	float ScrollAreaWidget::getXRange() const {
-		float x_range = slider_background_x_widget->getWidth() - slider_x_widget->getWidth();
+		float x_range = scrollbar_x_widget->getWidth() - slider_x_widget->getWidth();
 		return x_range;
 	}
 
 	float ScrollAreaWidget::getYRange() const {
-		float y_range = slider_background_y_widget->getHeight() - slider_y_widget->getHeight();
+		float y_range = scrollbar_y_widget->getHeight() - slider_y_widget->getHeight();
 		return y_range;
 	}
 
@@ -389,16 +399,16 @@ namespace fw {
 
 	float ScrollAreaWidget::getSliderBgYEffectiveWidth() const {
 		float slider_y_bg_width =
-			slider_background_y_widget->isVisible() ?
-			slider_background_y_widget->getWidth() :
+			scrollbar_y_widget->isVisible() ?
+			scrollbar_y_widget->getWidth() :
 			0.0f;
 		return slider_y_bg_width;
 	}
 
 	float ScrollAreaWidget::getSliderBgXEffectiveHeight() const {
 		float slider_x_bg_height =
-			slider_background_x_widget->isVisible() ?
-			slider_background_x_widget->getHeight() :
+			scrollbar_x_widget->isVisible() ?
+			scrollbar_x_widget->getHeight() :
 			0.0f;
 		return slider_x_bg_height;
 	}

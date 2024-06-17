@@ -8,6 +8,7 @@ Outliner::Outliner(fw::WidgetList& widget_list, Editor& p_app)
 	setOrigin(Anchor::TOP_RIGHT);
 	setParentAnchor(Anchor::TOP_RIGHT);
 	setBackgroundColor(OUTLINER_BACKGROUND_COLOR);
+	setScrollbarColor(OUTLINER_SCROLLBAR_COLOR);
 	// container
 	container_widget = widget_list.createWidget<fw::ContainerWidget>(OUTLINER_DEFAULT_SIZE);
 	setScrolledWidget(container_widget);
