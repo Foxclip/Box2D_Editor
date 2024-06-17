@@ -1,5 +1,5 @@
-#include "editor/simulation/gameobject_transform.h"
-#include "editor/simulation/gameobject.h"
+#include "simulation/gameobject_transform.h"
+#include "simulation/gameobject.h"
 
 GameObjectTransform::GameObjectTransform(const GameObject* object) {
 	this->object = object;

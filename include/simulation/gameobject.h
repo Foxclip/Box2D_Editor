@@ -3,7 +3,7 @@
 #include <set>
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
-#include "editor/serializer.h"
+#include "serializer.h"
 #include "polygon.h"
 #include "shapes.h"
 #include "joint.h"

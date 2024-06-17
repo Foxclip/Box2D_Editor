@@ -1,6 +1,6 @@
-#include "editor/simulation/joint.h"
-#include "editor/simulation/gameobject.h"
-#include "editor/simulation/objectlist.h"
+#include "simulation/joint.h"
+#include "simulation/gameobject.h"
+#include "simulation/objectlist.h"
 
 Joint::~Joint() {
 	size_t object_a_id = GameObject::getGameobject(joint->GetBodyA())->getId();

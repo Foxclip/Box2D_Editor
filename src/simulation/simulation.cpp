@@ -1,4 +1,4 @@
-#include "editor/simulation/simulation.h"
+#include "simulation/simulation.h"
 
 Simulation::Simulation() {
     reset();

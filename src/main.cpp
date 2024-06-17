@@ -28,6 +28,7 @@ int main() {
     execute_app();
 
     // TODO: Event class
+    // TODO: fix bug with deserializing empty simulation
     // TODO: objectlist event test
     // TODO: object list window (outliner)
     // TODO: render polygon indices

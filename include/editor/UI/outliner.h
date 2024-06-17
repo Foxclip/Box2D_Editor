@@ -1,7 +1,7 @@
 #pragma once
 
 #include "widgets/widgets.h"
-#include "editor/simulation/objectlist.h"
+#include "simulation/objectlist.h"
 #include <map>
 
 const sf::Vector2f OUTLINER_DEFAULT_SIZE = sf::Vector2f(300.0f, 200.0f);
