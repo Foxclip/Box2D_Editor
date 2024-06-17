@@ -129,19 +129,20 @@ private:
 	fw::Font console_font;
 	fw::Font small_font;
 	fw::Font textbox_font;
-	fw::ContainerWidget* paused_rect_widget;
-	fw::ContainerWidget* toolbox_widget;
+	fw::ContainerWidget* paused_rect_widget = nullptr;
+	fw::ContainerWidget* toolbox_widget = nullptr;
 	Tool* selected_tool = nullptr;
 	std::vector<Tool*> tools_in_tool_panel;
 	FpsCounter fps_counter;
-	fw::ContainerWidget* fps_widget;
-	fw::TextWidget* fps_text_widget;
-	fw::RectangleWidget* logger_widget;
-	fw::TextWidget* logger_text_widget;
-	fw::TextWidget* step_widget;
+	fw::ContainerWidget* fps_widget = nullptr;
+	fw::TextWidget* fps_text_widget = nullptr;
+	fw::RectangleWidget* logger_widget = nullptr;
+	fw::TextWidget* logger_text_widget = nullptr;
+	fw::TextWidget* step_widget = nullptr;
 	sf::CircleShape origin_shape;
 	sf::Text object_info_text;
 	sf::Text id_text;
+	fw::ScrollAreaWidget* outliner_widget = nullptr;
 
 	const float MOUSE_FORCE_SCALE = 50.0f;
 	float timeStep = 1.0f / FPS;
@@ -194,7 +195,6 @@ private:
 	Tool* trySelectTool(Tool* tool);
 	void selectCreateType(size_t type);
 	void togglePause();
-	void loadFont(sf::Font& font, const std::string& filename, bool smooth = false);
 	sf::Vector2f screenToWorld(const sf::Vector2f& screen_pos) const;
 	sf::Vector2f pixelToWorld(const sf::Vector2i& screen_pos) const;
 	sf::Vector2f worldToScreen(const sf::Vector2f& world_pos) const;

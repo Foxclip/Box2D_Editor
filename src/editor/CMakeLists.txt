@@ -14,6 +14,7 @@ set(EDITOR_HEADER_FILES
     "${EDITOR_INCLUDE_DIR}/simulation/simulation.h"
     "${EDITOR_INCLUDE_DIR}/UI/create_panel.h"
     "${EDITOR_INCLUDE_DIR}/UI/edit_window.h"
+    "${EDITOR_INCLUDE_DIR}/UI/outliner.h"
     "${EDITOR_INCLUDE_DIR}/UI/toolbox.h"
 )
 set(EDITOR_SOURCE_FILES
@@ -29,6 +30,7 @@ set(EDITOR_SOURCE_FILES
     "simulation/simulation.cpp"
     "UI/create_panel.cpp"
     "UI/edit_window.cpp"
+    "UI/outliner.cpp"
     "UI/toolbox.cpp"
 )
 add_library(editor ${EDITOR_HEADER_FILES} ${EDITOR_SOURCE_FILES})

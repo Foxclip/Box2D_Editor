@@ -148,6 +148,7 @@ namespace fw {
 
 	void ScrollAreaWidget::setScrolledWidget(Widget* widget) {
 		this->scrolled_widget = widget;
+		widget->setOrigin(Anchor::TOP_LEFT);
 		widget->setParentAnchor(Anchor::TOP_LEFT);
 		widget->setAnchorOffset(0.0f, 0.0f);
 		widget->setParent(area_widget);
@@ -158,6 +159,10 @@ namespace fw {
 		widget->setParent(getParent());
 		scrolled_widget = nullptr;
 		return widget;
+	}
+
+	void ScrollAreaWidget::setBackgroundColor(const sf::Color& color) {
+		area_widget->setFillColor(color);
 	}
 
 	void ScrollAreaWidget::setDeltaX(float delta) {

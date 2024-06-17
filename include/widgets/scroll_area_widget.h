@@ -35,6 +35,7 @@ namespace fw {
 		Widget* getCornerWidget() const;
 		void setScrolledWidget(Widget* widget);
 		Widget* takeScrolledWidget();
+		void setBackgroundColor(const sf::Color& color);
 		void setDeltaX(float delta);
 		void setDeltaY(float delta);
 		void setScrollbarXPolicy(ScrollbarPolicy policy);

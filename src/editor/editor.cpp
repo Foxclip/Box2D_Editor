@@ -1,6 +1,7 @@
 #include "editor/editor.h"
 #include "editor/UI/toolbox.h"
 #include "editor/UI/create_panel.h"
+#include "editor/UI/outliner.h"
 #include "common/utils.h"
 #include <numbers>
 #include <iostream>
@@ -268,6 +269,7 @@ void Editor::initWidgets() {
     toolbox_widget = widgets.createWidget<Toolbox>(*this);
     edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(300.0f, 400.0f, *this);
     create_tool.create_panel_widget = widgets.createWidget<CreatePanel>(*this);
+    outliner_widget = widgets.createWidget<Outliner>(*this);
 
     // step text
     step_widget = widgets.createWidget<fw::TextWidget>();
@@ -323,27 +325,6 @@ void Editor::initWidgets() {
     logger_text_widget->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
-
-    fw::WindowWidget* window_widget = widgets.createWidget<fw::WindowWidget>(400.0f, 400.0f);
-    fw::ScrollAreaWidget* scroll_area_widget = widgets.createWidget<fw::ScrollAreaWidget>(300.0f, 200.0f);
-    fw::ContainerWidget* container = widgets.createWidget<fw::ContainerWidget>(100.0f, 100.0f);
-    fw::RectangleWidget* red_rect = widgets.createWidget<fw::RectangleWidget>(50.0f, 75.0f);
-    fw::RectangleWidget* green_rect = widgets.createWidget<fw::RectangleWidget>(50.0f, 50.0f);
-    fw::RectangleWidget* blue_rect = widgets.createWidget<fw::RectangleWidget>(600.0f, 50.0f);
-    window_widget->setPosition(400.0f, 300.0f);
-    scroll_area_widget->setScrolledWidget(container);
-    scroll_area_widget->setDeltaY(40.0f);
-    scroll_area_widget->setSizePolicy(fw::Widget::SizePolicy::PARENT);
-    scroll_area_widget->setParent(window_widget);
-    container->setFillColor(sf::Color::White);
-    container->setHorizontal(false);
-    container->setPadding(10.0f);
-    red_rect->setFillColor(sf::Color::Red);
-    red_rect->setParent(container);
-    green_rect->setFillColor(sf::Color::Green);
-    green_rect->setParent(container);
-    blue_rect->setFillColor(sf::Color::Blue);
-    blue_rect->setParent(container);
 
     edit_tool.edit_window_widget->moveToTop();
 }

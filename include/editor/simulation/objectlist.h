@@ -8,6 +8,9 @@
 class GameObjectList {
 public:
 	std::unique_ptr<b2World> world;
+	std::function<void(GameObject*)> OnObjectAdded = [](GameObject*) { };
+	std::function<void(GameObject*)> OnObjectRemoved = [](GameObject*) { };
+	std::function<void(void)> OnClear = []() { };
 
 	b2World* getWorld() const;
 	size_t getTopSize() const;

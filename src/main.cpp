@@ -27,6 +27,8 @@ int main() {
 
     execute_app();
 
+    // TODO: Event class
+    // TODO: objectlist event test
     // TODO: object list window (outliner)
     // TODO: render polygon indices
     // TODO: make widgets a separate library

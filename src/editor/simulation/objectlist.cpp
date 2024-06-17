@@ -94,6 +94,7 @@ GameObject* GameObjectList::add(std::unique_ptr<GameObject> object, bool assign_
         }
         names.add(ptr->name, ptr);
         all_objects.add(std::move(object));
+        OnObjectAdded(ptr);
         return ptr;
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
@@ -226,6 +227,7 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
     ids.remove(object->id);
     names.remove(object->name, object);
     all_objects.remove(object);
+    OnObjectRemoved(object);
 }
 
 void GameObjectList::removeJoint(Joint* joint) {
@@ -241,4 +243,5 @@ void GameObjectList::clear() {
     top_objects.clear();
     ids.clear();
     names.clear();
+    OnClear();
 }

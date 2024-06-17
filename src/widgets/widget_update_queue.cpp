@@ -36,7 +36,7 @@ namespace fw {
 		};
 		queue = toposort(entries, &WidgetUpdateQueue::getParents, &on_loop_detected);
 		if (loops.size() > 0) {
-			std::string msg = "Loops detected:\n";
+			std::string msg = std::to_string(loops.size()) + " loops detected:\n";
 			for (size_t i = 0; i < loops.size(); i++) {
 				msg += "    Loop " + std::to_string(i) + ":\n";
 				for (WidgetUpdateTarget* entry : loops[i]) {
