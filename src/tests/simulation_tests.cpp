@@ -11,6 +11,7 @@ void SimulationTests::createTestLists() {
     test::Test* chain_test = simulation_list->addTest("chain", { basic_test }, [&](test::Test& test) { chainTest(test); });
     test::Test* revolute_joint_test = simulation_list->addTest("revolute_joint", { box_test }, [&](test::Test& test) { revoluteJointTest(test); });
     test::Test* car_test = simulation_list->addTest("car", { ball_test, polygon_test, revolute_joint_test }, [&](test::Test& test) { carTest(test); });
+    test::Test* serialize_test = simulation_list->addTest("serialize", { basic_test }, [&](test::Test& test) { serializeTest(test); });
     test::Test* box_serialize_test = simulation_list->addTest("box_serialize", { box_test }, [&](test::Test& test) { boxSerializeTest(test); });
     test::Test* ball_serialize_test = simulation_list->addTest("ball_serialize", { ball_test }, [&](test::Test& test) { ballSerializeTest(test); });
     test::Test* polygon_serialize_test = simulation_list->addTest("polygon_serialize", { polygon_test }, [&](test::Test& test) { polygonSerializeTest(test); });
@@ -168,6 +169,14 @@ void SimulationTests::carTest(test::Test& test) {
         T_CHECK(wheel2->getParent() == car);
         T_VEC2_APPROX_COMPARE(wheel2->getGlobalPosition(), b2Vec2(-2.49999952f, -4.33012724f));
     }
+}
+
+void SimulationTests::serializeTest(test::Test& test) {
+    Simulation simulationA;
+    Simulation simulationB;
+    std::string str = simulationA.serialize();
+    simulationB.deserialize(str);
+    simCmp(test, simulationA, simulationB);
 }
 
 void SimulationTests::boxSerializeTest(test::Test& test) {

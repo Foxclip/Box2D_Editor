@@ -16,6 +16,7 @@ private:
 	void chainTest(test::Test& test);
 	void revoluteJointTest(test::Test& test);
 	void carTest(test::Test& test);
+	void serializeTest(test::Test& test);
 	void boxSerializeTest(test::Test& test);
 	void ballSerializeTest(test::Test& test);
 	void polygonSerializeTest(test::Test& test);
