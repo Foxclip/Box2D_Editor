@@ -5,13 +5,14 @@
 #include <map>
 
 const sf::Vector2f OUTLINER_DEFAULT_SIZE = sf::Vector2f(300.0f, 200.0f);
-const float OUTLINER_ENTRY_HEIGHT = 30.0f;
+const float OUTLINER_ENTRY_HEIGHT = 20.0f;
+const unsigned int OUTLINER_ENTRY_FONT_SIZE = 12;
 const sf::Color OUTLINER_BACKGROUND_COLOR = sf::Color(128, 128, 128);
 const sf::Color OUTLINER_SCROLLBAR_COLOR = sf::Color(110, 110, 110);
 const sf::Color OUTLINER_ENTRY_BACKGROUND_COLOR = sf::Color(100, 100, 100);
 const sf::Color OUTLINER_ENTRY_TEXT_COLOR = sf::Color(255, 255, 255);
-const sf::Color OUTLINER_ENTRY_SELECTION_COLOR = sf::Color(255, 255, 0);
-const float OUTLINER_CONTAINER_PADDING = 5.0f;
+const sf::Color OUTLINER_ENTRY_SELECTION_COLOR = sf::Color(200, 100, 0);
+const float OUTLINER_CONTAINER_PADDING = 2.0f;
 
 class Editor;
 

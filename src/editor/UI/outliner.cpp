@@ -75,10 +75,18 @@ fw::RectangleWidget* Outliner::createEntryWidget(GameObject* object) {
 	fw::RectangleWidget* entry_widget = widget_list.createWidget<fw::RectangleWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
 	entry_widget->setName(name + " entry");
 	entry_widget->setFillColor(OUTLINER_ENTRY_BACKGROUND_COLOR);
-	entry_widget->setOutlineColor(OUTLINER_ENTRY_SELECTION_COLOR);
 	entry_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+	entry_widget->OnLeftPress += [&, object](const sf::Vector2f& pos) {
+		app.setActiveObject(object);
+		bool with_children = app.isLCtrlPressed();
+		if (app.isLShiftPressed()) {
+			app.select_tool.toggleSelect(object, with_children);
+		} else {
+			app.select_tool.selectSingleObject(object, with_children);
+		}
+	};
 	fw::TextWidget* text_widget = widget_list.createWidget<fw::TextWidget>();
-	text_widget->setCharacterSize(15);
+	text_widget->setCharacterSize(OUTLINER_ENTRY_FONT_SIZE);
 	text_widget->setFillColor(OUTLINER_ENTRY_TEXT_COLOR);
 	text_widget->setString(name);
 	text_widget->setOrigin(Anchor::CENTER_LEFT);
@@ -97,9 +105,9 @@ Outliner::Entry::~Entry() {
 }
 
 void Outliner::Entry::select() {
-	widget->setOutlineThickness(-1.0f);
+	widget->setFillColor(OUTLINER_ENTRY_SELECTION_COLOR);
 }
 
 void Outliner::Entry::deselect() {
-	widget->setOutlineThickness(0.0f);
+	widget->setFillColor(OUTLINER_ENTRY_BACKGROUND_COLOR);
 }
