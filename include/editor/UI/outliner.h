@@ -10,24 +10,37 @@ const sf::Color OUTLINER_BACKGROUND_COLOR = sf::Color(128, 128, 128);
 const sf::Color OUTLINER_SCROLLBAR_COLOR = sf::Color(110, 110, 110);
 const sf::Color OUTLINER_ENTRY_BACKGROUND_COLOR = sf::Color(100, 100, 100);
 const sf::Color OUTLINER_ENTRY_TEXT_COLOR = sf::Color(255, 255, 255);
+const sf::Color OUTLINER_ENTRY_SELECTION_COLOR = sf::Color(255, 255, 0);
 const float OUTLINER_CONTAINER_PADDING = 5.0f;
 
 class Editor;
 
 class Outliner : public fw::ScrollAreaWidget {
 public:
+	class Entry {
+	public:
+		Entry(GameObject* object, fw::RectangleWidget* widget);
+		~Entry();
+		void select();
+		void deselect();
+	private:
+		GameObject* object = nullptr;
+		fw::RectangleWidget* widget = nullptr;
+	};
+
 	Outliner(fw::WidgetList& widget_list, Editor& p_app);
 
 private:
 	Editor& app;
 	GameObjectList& object_list;
 	fw::ContainerWidget* container_widget = nullptr;
-	CompVector<Widget*> widgets;
-	std::map<GameObject*, Widget*> object_widget;
+	CompVectorUptr<Entry> entries;
+	std::map<GameObject*, Entry*> object_entry;
 
 	void addObject(GameObject* object);
 	void removeObject(GameObject* object);
+	void selectObject(GameObject* object);
+	void deselectObject(GameObject* object);
 	void clear();
-	void updateList();
 	fw::RectangleWidget* createEntryWidget(GameObject* object);
 };

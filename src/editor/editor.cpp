@@ -166,13 +166,13 @@ void Editor::initTools() {
     for (size_t i = 0; i < tools.size(); i++) {
         tools[i]->reset();
     }
-    create_tool.OnSetSelected = [&](bool value) {
+    create_tool.OnSetSelected += [&](bool value) {
         create_tool.create_panel_widget->setVisible(value);
     };
-    edit_tool.OnSetSelectedWithButton = [&](bool value) {
+    edit_tool.OnSetSelectedWithButton += [&](bool value) {
         edit_tool.selected_tool = selected_tool;
     };
-    edit_tool.OnSetSelected = [&](bool value) {
+    edit_tool.OnSetSelected += [&](bool value) {
         if (value) {
             if (active_object) {
                 edit_tool.edit_window_widget->updateParameters();

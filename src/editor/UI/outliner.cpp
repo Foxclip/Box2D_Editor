@@ -26,36 +26,48 @@ Outliner::Outliner(fw::WidgetList& widget_list, Editor& p_app)
 	object_list.OnClear += [&]() {
 		clear();
 	};
+	app.select_tool.OnObjectSelected += [&](GameObject* object) {
+		selectObject(object);
+	};
+	app.select_tool.OnObjectDeselected += [&](GameObject* object) {
+		deselectObject(object);
+	};
 }
 
 void Outliner::addObject(GameObject* object) {
 	fw::RectangleWidget* entry_widget = createEntryWidget(object);
 	entry_widget->setParent(container_widget);
-	widgets.add(entry_widget);
-	object_widget[object] = entry_widget;
+	std::unique_ptr<Entry> entry_uptr = std::make_unique<Entry>(object, entry_widget);
+	object_entry[object] = entry_uptr.get();
+	entries.add(std::move(entry_uptr));
 }
 
 void Outliner::removeObject(GameObject* object) {
-	Widget* entry_widget = object_widget[object];
-	entry_widget->remove();
-	widgets.remove(entry_widget);
-	object_widget.erase(object);
+	auto it = object_entry.find(object);
+	if (it != object_entry.end()) {
+		Entry* entry = it->second;
+		entries.remove(entry);
+		object_entry.erase(object);
+	}
+}
+
+void Outliner::selectObject(GameObject* object) {
+	auto it = object_entry.find(object);
+	if (it != object_entry.end()) {
+		it->second->select();
+	}
+}
+
+void Outliner::deselectObject(GameObject* object) {
+	auto it = object_entry.find(object);
+	if (it != object_entry.end()) {
+		it->second->deselect();
+	}
 }
 
 void Outliner::clear() {
-	for (size_t i = 0; i < widgets.size(); i++) {
-		Widget* widget = widgets[i];
-		widget->remove();
-	}
-	widgets.clear();
-	object_widget.clear();
-}
-
-void Outliner::updateList() {
-	for (size_t i = 0; i < object_list.getTopSize(); i++) {
-		GameObject* object = object_list.getFromTop(i);
-		addObject(object);
-	}
+	entries.clear();
+	object_entry.clear();
 }
 
 fw::RectangleWidget* Outliner::createEntryWidget(GameObject* object) {
@@ -63,6 +75,7 @@ fw::RectangleWidget* Outliner::createEntryWidget(GameObject* object) {
 	fw::RectangleWidget* entry_widget = widget_list.createWidget<fw::RectangleWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
 	entry_widget->setName(name + " entry");
 	entry_widget->setFillColor(OUTLINER_ENTRY_BACKGROUND_COLOR);
+	entry_widget->setOutlineColor(OUTLINER_ENTRY_SELECTION_COLOR);
 	entry_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
 	fw::TextWidget* text_widget = widget_list.createWidget<fw::TextWidget>();
 	text_widget->setCharacterSize(15);
@@ -72,4 +85,21 @@ fw::RectangleWidget* Outliner::createEntryWidget(GameObject* object) {
 	text_widget->setParentAnchor(Anchor::CENTER_LEFT);
 	text_widget->setParent(entry_widget);
 	return entry_widget;
+}
+
+Outliner::Entry::Entry(GameObject* object, fw::RectangleWidget* widget) {
+	this->object = object;
+	this->widget = widget;
+}
+
+Outliner::Entry::~Entry() {
+	widget->remove();
+}
+
+void Outliner::Entry::select() {
+	widget->setOutlineThickness(-1.0f);
+}
+
+void Outliner::Entry::deselect() {
+	widget->setOutlineThickness(0.0f);
 }

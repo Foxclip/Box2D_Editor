@@ -102,6 +102,7 @@ private:
 	friend class FloatParameter;
 	friend class Toolbox;
 	friend class CreatePanel;
+	friend class Outliner;
 	fw::CanvasWidget* world_widget = nullptr;
 	fw::CanvasWidget* ui_widget = nullptr;
 	fw::CanvasWidget* selection_mask_widget = nullptr;

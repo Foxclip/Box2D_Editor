@@ -98,10 +98,12 @@ const CompVector<GameObject*>& SelectTool::getSelectedObjects() const {
     return selected_objects;
 }
 
-void SelectTool::setSelected(const CompVector<GameObject*> vec) {
+void SelectTool::setSelected(const CompVector<GameObject*>& vec) {
     clearSelected();
     for (size_t i = 0; i < vec.size(); i++) {
-        selected_objects.add(vec[i]);
+        GameObject* object = vec[i];
+        selected_objects.add(object);
+        OnObjectSelected(object);
     }
 }
 
@@ -109,6 +111,7 @@ void SelectTool::selectObject(GameObject* object, bool with_children) {
     if (object) {
         object->selected = true;
         selected_objects.add(object);
+        OnObjectSelected(object);
         if (with_children) {
             for (size_t i = 0; i < object->getChildren().size(); i++) {
                 selectObject(object->getChild(i), true);
@@ -121,6 +124,7 @@ void SelectTool::deselectObject(GameObject* object, bool with_children) {
     if (object) {
         object->selected = false;
         selected_objects.remove(object);
+        OnObjectDeselected(object);
         if (with_children) {
             for (size_t i = 0; i < object->getChildren().size(); i++) {
                 deselectObject(object->getChild(i), true);
@@ -149,6 +153,7 @@ void SelectTool::clearSelected() {
     for (GameObject* obj : selected_objects) {
         if (obj) {
             obj->selected = false;
+            OnObjectDeselected(obj);
         }
     }
     selected_objects.clear();
