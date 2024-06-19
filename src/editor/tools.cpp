@@ -72,7 +72,6 @@ void EditTool::reset() {
     rectangle_select.reset();
     grabbed_vertex_offset = b2Vec2(0.0f, 0.0f);
     insertVertexPos = b2Vec2(0.0f, 0.0f);
-    selected_tool = nullptr;
 }
 
 std::string EditTool::modeToStr(EditToolMode mode) {
