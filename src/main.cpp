@@ -27,7 +27,7 @@ int main() {
 
     execute_app();
 
-    // TODO: objectlist event test
+    // TODO: add isHierarchyRendered to Widget and use it in ScrollAreaWidget
     // TODO: object list window (outliner)
     // TODO: render polygon indices
     // TODO: make widgets a separate library

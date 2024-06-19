@@ -331,146 +331,141 @@ void Editor::initWidgets() {
 
 void Editor::onProcessKeyboardEvent(const sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
-        switch (event.key.code) {
-            case sf::Keyboard::Escape:
-                if (selected_tool == &move_tool) {
-                    endMove(false);
-                    trySelectTool(move_tool.selected_tool);
-                    endGesture();
-                } else if (selected_tool == &rotate_tool) {
-                    endRotate(false);
-                    trySelectTool(rotate_tool.selected_tool);
-                    endGesture();
+        if (event.key.code == sf::Keyboard::Escape) {
+            if (selected_tool == &move_tool) {
+                endMove(false);
+                trySelectTool(move_tool.selected_tool);
+                endGesture();
+            } else if (selected_tool == &rotate_tool) {
+                endRotate(false);
+                trySelectTool(rotate_tool.selected_tool);
+                endGesture();
+            }
+        } else if (event.key.code == sf::Keyboard::Space) {
+            togglePause();
+        } else if (event.key.code == sf::Keyboard::Num1) {
+            trySelectToolByIndex(0);
+        } else if (event.key.code == sf::Keyboard::Num2) {
+            trySelectToolByIndex(1);
+        } else if (event.key.code == sf::Keyboard::Num3) {
+            trySelectToolByIndex(2);
+        } else if (event.key.code == sf::Keyboard::Num4) {
+            trySelectToolByIndex(3);
+        } else if (event.key.code == sf::Keyboard::Num5) {
+            trySelectToolByIndex(4);
+        } else if (event.key.code == sf::Keyboard::Num6) {
+            trySelectToolByIndex(5);
+        } else if (event.key.code == sf::Keyboard::Num7) {
+            trySelectToolByIndex(6);
+        } else if (event.key.code == sf::Keyboard::Num8) {
+            trySelectToolByIndex(7);
+        } else if (event.key.code == sf::Keyboard::Num9) {
+            trySelectToolByIndex(8);
+        } else if (event.key.code == sf::Keyboard::Num0) {
+            trySelectToolByIndex(9);
+        } else if (event.key.code == sf::Keyboard::X) {
+            if (selected_tool == &select_tool) {
+                CompVector<GameObject*> selected_copy = select_tool.getSelectedObjects();
+                for (GameObject* obj : selected_copy | std::views::reverse) {
+                    deleteObject(obj, false);
+                    commit_action = true;
                 }
-                break;
-            case sf::Keyboard::Space: togglePause(); break;
-            case sf::Keyboard::Num1: trySelectToolByIndex(0); break;
-            case sf::Keyboard::Num2: trySelectToolByIndex(1); break;
-            case sf::Keyboard::Num3: trySelectToolByIndex(2); break;
-            case sf::Keyboard::Num4: trySelectToolByIndex(3); break;
-            case sf::Keyboard::Num5: trySelectToolByIndex(4); break;
-            case sf::Keyboard::Num6: trySelectToolByIndex(5); break;
-            case sf::Keyboard::Num7: trySelectToolByIndex(6); break;
-            case sf::Keyboard::Num8: trySelectToolByIndex(7); break;
-            case sf::Keyboard::Num9: trySelectToolByIndex(8); break;
-            case sf::Keyboard::Num0: trySelectToolByIndex(9); break;
-            case sf::Keyboard::X:
-                if (selected_tool == &select_tool) {
-                    CompVector<GameObject*> selected_copy = select_tool.getSelectedObjects();
-                    for (GameObject* obj : selected_copy | std::views::reverse) {
-                        deleteObject(obj, false);
-                        commit_action = true;
+            } else if (selected_tool == &edit_tool && active_object) {
+                if (active_object->tryDeleteVertex(edit_tool.highlighted_vertex)) {
+                    commit_action = true;
+                }
+            }
+        } else if (event.key.code == sf::Keyboard::LControl) {
+            edit_tool.mode = EditTool::ADD;
+        } else if (event.key.code == sf::Keyboard::LAlt) {
+            edit_tool.mode = EditTool::INSERT;
+        } else if (event.key.code == sf::Keyboard::S) {
+            if (isLCtrlPressed()) {
+                saveToFile("levels/level.txt");
+            }
+        } else if (event.key.code == sf::Keyboard::Z) {
+            if (isLCtrlPressed()) {
+                if (isLShiftPressed()) {
+                    history.redo();
+                } else {
+                    history.undo();
+                }
+            }
+        } else if (event.key.code == sf::Keyboard::Z) {
+            quicksave();
+        } else if (event.key.code == sf::Keyboard::W) {
+            quickload_requested = true;
+        } else if (event.key.code == sf::Keyboard::A) {
+            if (selected_tool == &select_tool) {
+                if (isLAltPressed()) {
+                    for (GameObject* obj : simulation.getAllVector()) {
+                        select_tool.deselectObject(obj);
                     }
-                } else if (selected_tool == &edit_tool && active_object) {
-                    if (active_object->tryDeleteVertex(edit_tool.highlighted_vertex)) {
-                        commit_action = true;
+                } else {
+                    for (GameObject* obj : simulation.getAllVector()) {
+                        select_tool.selectObject(obj);
                     }
                 }
-                break;
-            case sf::Keyboard::LControl: edit_tool.mode = EditTool::ADD; break;
-            case sf::Keyboard::LAlt: edit_tool.mode = EditTool::INSERT; break;
-            case sf::Keyboard::S:
-                if (isLCtrlPressed()) {
-                    saveToFile("levels/level.txt");
+            } else if (selected_tool == &edit_tool && active_object) {
+                if (isLAltPressed()) {
+                    active_object->deselectAllVertices();
+                } else {
+                    active_object->selectAllVertices();
                 }
-                break;
-            case sf::Keyboard::Z:
-                if (isLCtrlPressed()) {
-                    if (isLShiftPressed()) {
-                        history.redo();
-                    } else {
-                        history.undo();
-                    }
-                }
-                break;
-            case sf::Keyboard::Q:
-                quicksave();
-                break;
-            case sf::Keyboard::W:
-                quickload_requested = true;
-                break;
-            case sf::Keyboard::A:
-                if (selected_tool == &select_tool) {
-                    if (isLAltPressed()) {
-                        for (GameObject* obj : simulation.getAllVector()) {
-                            select_tool.deselectObject(obj);
-                        }
-                    } else {
-                        for (GameObject* obj : simulation.getAllVector()) {
-                            select_tool.selectObject(obj);
-                        }
-                    }
-                } else if (selected_tool == &edit_tool && active_object) {
-                    if (isLAltPressed()) {
-                        active_object->deselectAllVertices();
-                    } else {
-                        active_object->selectAllVertices();
-                    }
-                }
-                break;
-            case sf::Keyboard::Tab:
-                if (selected_tool == &edit_tool) {
-                    trySelectTool(edit_tool.selected_tool);
-                } else if (active_object) {
-                    edit_tool.selected_tool = selected_tool;
-                    trySelectTool(&edit_tool);
-                }
-                break;
-            case sf::Keyboard::G:
-                if (select_tool.selectedCount() > 0) {
+            }
+        } else if (event.key.code == sf::Keyboard::Tab) {
+            if (selected_tool == &edit_tool) {
+                trySelectTool(edit_tool.selected_tool);
+            } else if (active_object) {
+                edit_tool.selected_tool = selected_tool;
+                trySelectTool(&edit_tool);
+            }
+        } else if (event.key.code == sf::Keyboard::G) {
+            if (select_tool.selectedCount() > 0) {
+                Tool* s_tool = selected_tool;
+                trySelectTool(&move_tool);
+                grabSelected(s_tool);
+                startMoveGesture();
+            }
+        } else if (event.key.code == sf::Keyboard::R) {
+            if (select_tool.selectedCount() > 0) {
+                Tool* s_tool = selected_tool;
+                trySelectTool(&rotate_tool);
+                rotateSelected(s_tool);
+                startMoveGesture();
+            }
+        } else if (event.key.code == sf::Keyboard::D) {
+            if (isLShiftPressed()) {
+                if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
+                    CompVector<GameObject*> old_objects = select_tool.getSelectedObjects();
+                    CompVector<GameObject*> new_objects = simulation.duplicate(old_objects);
+                    select_tool.setSelected(new_objects);
                     Tool* s_tool = selected_tool;
                     trySelectTool(&move_tool);
                     grabSelected(s_tool);
+                    commit_action = true;
                     startMoveGesture();
                 }
-                break;
-            case sf::Keyboard::R:
-                if (select_tool.selectedCount() > 0) {
-                    Tool* s_tool = selected_tool;
-                    trySelectTool(&rotate_tool);
-                    rotateSelected(s_tool);
-                    startMoveGesture();
-                }
-                break;
-            case sf::Keyboard::D:
-                if (isLShiftPressed()) {
-                    if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
-                        CompVector<GameObject*> old_objects = select_tool.getSelectedObjects();
-                        CompVector<GameObject*> new_objects = simulation.duplicate(old_objects);
-                        select_tool.setSelected(new_objects);
-                        Tool* s_tool = selected_tool;
-                        trySelectTool(&move_tool);
-                        grabSelected(s_tool);
-                        commit_action = true;
-                        startMoveGesture();
-                    }
-                } else {
-                    widgets.debug_render = !widgets.debug_render;
-                }
-                break;
-            case sf::Keyboard::I:
-                render_object_info = !render_object_info;
-                break;
-            case sf::Keyboard::B:
-                debug_break = true;
-                break;
-            case sf::Keyboard::E:
-                simulation.advance(timeStep);
-                break;
+            } else {
+                widgets.debug_render = !widgets.debug_render;
+            }
+        } else if (event.key.code == sf::Keyboard::I) {
+            render_object_info = !render_object_info;
+        } else if (event.key.code == sf::Keyboard::B) {
+            debug_break = true;
+        } else if (event.key.code == sf::Keyboard::E) {
+            simulation.advance(timeStep);
         }
     }
     if (event.type == sf::Event::KeyReleased) {
-        switch (event.key.code) {
-            case sf::Keyboard::LControl:
-                if (edit_tool.mode == EditTool::ADD) {
-                    edit_tool.mode = EditTool::HOVER;
-                }
-                break;
-            case sf::Keyboard::LAlt:
-                if (edit_tool.mode == EditTool::INSERT) {
-                    edit_tool.mode = EditTool::HOVER;
-                }
-                break;
+        if (event.key.code == sf::Keyboard::LControl) {
+            if (edit_tool.mode == EditTool::ADD) {
+                edit_tool.mode = EditTool::HOVER;
+            }
+        } else if (event.key.code == sf::Keyboard::LAlt) {
+            if (edit_tool.mode == EditTool::INSERT) {
+                edit_tool.mode = EditTool::HOVER;
+            }
         }
     }
 }
