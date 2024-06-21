@@ -71,3 +71,7 @@ void fw::CanvasWidget::draw(const sf::Drawable& drawable, const sf::RenderStates
 void fw::CanvasWidget::display() {
 	texture.display();
 }
+
+void fw::CanvasWidget::saveToFile(std::filesystem::path path) {
+	texture.getTexture().copyToImage().saveToFile(path.string());
+}

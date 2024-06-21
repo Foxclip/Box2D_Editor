@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rectangle_widget.h"
+#include <filesystem>
 
 namespace fw {
 
@@ -23,6 +24,7 @@ namespace fw {
 		void clear(const sf::Color& color = sf::Color::Black);
 		void draw(const sf::Drawable& drawable, const sf::RenderStates& states = sf::RenderStates::Default);
 		void display();
+		void saveToFile(std::filesystem::path path);
 
 	protected:
 		sf::RenderTexture texture;
