@@ -46,7 +46,6 @@ public:
 	};
 	bool hover = false;
 	bool selected = false;
-	bool draw_varray = false;
 	bool draw_indices = false;
 	b2Vec2 cursor_offset = b2Vec2_zero;
 	b2Vec2 orig_pos = b2Vec2_zero;
@@ -89,8 +88,8 @@ public:
 	float toParentLocalAngle(float angle);
 	ptrdiff_t getChildIndex(const GameObject* object) const;
 	void updateVisual();
-	virtual void render(sf::RenderTarget& target);
 	void renderMask(sf::RenderTarget& mask);
+	virtual void setDrawVarray(bool value);
 	void setParent(GameObject* new_parent);
 	void setName(const std::string& new_name);
 	void setEnabled(bool enabled, bool include_children);
@@ -145,6 +144,7 @@ protected:
 	GameObject* parent = nullptr;
 	GameObjectList* object_list = nullptr;
 	sf::Color color;
+	bool draw_varray = false;
 
 	virtual void drawMask(sf::RenderTarget& mask) = 0;
 	std::vector<b2Vec2> getPositions() const;
@@ -226,8 +226,8 @@ public:
 	SplittablePolygon* getSplittablePolygon() const;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
-	void render(sf::RenderTarget& target) override;
 	void drawMask(sf::RenderTarget& mask) override;
+	void setDrawVarray(bool value) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<PolygonObject> deserialize(const std::string& str, GameObjectList* object_list);

@@ -733,8 +733,15 @@ void Editor::renderWorld() {
     world_widget->setViewSize(world_widget->getSize().x / zoomFactor, -1.0f * world_widget->getSize().y / zoomFactor);
     for (size_t i = 0; i < simulation.getTopSize(); i++) {
         GameObject* gameobject = simulation.getFromTop(i);
-        gameobject->draw_varray = selected_tool == &edit_tool && gameobject == active_object;
-        gameobject->render(world_widget->getRenderTexture());
+        gameobject->setDrawVarray(selected_tool == &edit_tool && gameobject == active_object);
+        std::function<void(GameObject*)> render_object = [&](GameObject* object) {
+            for (size_t i = 0; i < object->getChildren().size(); i++) {
+                render_object(object->getChild(i));
+            }
+            object->updateVisual();
+            world_widget->draw(*object->getDrawable());
+        };
+        render_object(gameobject);
     }
     world_widget->display();
 
@@ -751,7 +758,6 @@ void Editor::renderWorld() {
 void Editor::renderUi() {
     ui_widget->clear(sf::Color::Transparent);
     ui_widget->resetView();
-    sf::RenderTarget& target = ui_widget->getRenderTexture();
 
     if (render_object_info) {
         // parent relation lines
@@ -759,7 +765,7 @@ void Editor::renderUi() {
             for (GameObject* child : object->getChildren()) {
                 sf::Vector2f v1 = worldToScreen(object->getGlobalPosition());
                 sf::Vector2f v2 = worldToScreen(child->getGlobalPosition());
-                fw::draw_line(target, v1, v2, sf::Color(128, 128, 128));
+                fw::draw_line(ui_widget, v1, v2, sf::Color(128, 128, 128));
             }
         }
         // object origin circles
@@ -768,7 +774,7 @@ void Editor::renderUi() {
             sf::Color circle_color = gameobject == active_object ? sf::Color(255, 255, 0) : sf::Color(255, 159, 44);
             origin_shape.setFillColor(circle_color);
             origin_shape.setPosition(worldToScreen(gameobject->getGlobalPosition()));
-            target.draw(origin_shape);
+            ui_widget->draw(origin_shape);
         }
         // object info
         for (size_t i = 0; i < simulation.getAllSize(); i++) {
@@ -781,7 +787,7 @@ void Editor::renderUi() {
                 sf::Vector2f pos = object_screen_pos + offset;
                 object_info_text.setPosition(utils::quantize(pos));
                 object_info_text.setString(str);
-                target.draw(object_info_text);
+                ui_widget->draw(object_info_text);
                 info_index++;
             };
             render_info("id: " + std::to_string(gameobject->getId()));
@@ -800,23 +806,23 @@ void Editor::renderUi() {
 
     if (selected_tool == &select_tool) {
         if (select_tool.rectangle_select.active) {
-            renderRectangleSelect(target, select_tool.rectangle_select);
+            renderRectangleSelect(ui_widget, select_tool.rectangle_select);
         }
     } else if (selected_tool == &drag_tool) {
         if (drag_tool.mouse_joint) {
             sf::Vector2f grabbed_point = worldToScreen(drag_tool.mouse_joint->GetAnchorB());
-            fw::draw_line(target, grabbed_point, getMousePosf(), sf::Color::Yellow);
+            fw::draw_line(ui_widget, grabbed_point, getMousePosf(), sf::Color::Yellow);
         }
     } else if (selected_tool == &rotate_tool) {
         for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
-            fw::draw_line(target, worldToScreen(rotate_tool.pivot_pos), getMousePosf(), sf::Color::Yellow);
+            fw::draw_line(ui_widget, worldToScreen(rotate_tool.pivot_pos), getMousePosf(), sf::Color::Yellow);
         }
     } else if (selected_tool == &edit_tool && active_object) {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             // ghost edge
             sf::Vector2i v1 = worldToPixel(active_object->getGlobalVertexPos(edit_tool.edge_vertex));
             sf::Vector2i v2 = getMousePos();
-            fw::draw_line(target, to2f(v1), to2f(v2), sf::Color(255, 255, 255, 128));
+            fw::draw_line(ui_widget, to2f(v1), to2f(v2), sf::Color(255, 0, 0, 128));
             // ghost edge normal
             sf::Vector2f norm_v1, norm_v2;
             if (edit_tool.edge_vertex == 0) {
@@ -824,12 +830,12 @@ void Editor::renderUi() {
             } else {
                 getScreenNormal(v2, v1, norm_v1, norm_v2);
             }
-            fw::draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
+            fw::draw_line(ui_widget, norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
             // ghost vertex
             sf::Vector2f ghost_vertex_pos = to2f(getMousePos());
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
-            target.draw(edit_tool.vertex_rect);
+            ui_widget->draw(edit_tool.vertex_rect);
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
             // edge highlight
             b2Vec2 v1 = active_object->getGlobalVertexPos(edit_tool.highlighted_edge);
@@ -841,12 +847,12 @@ void Editor::renderUi() {
             edit_tool.edge_highlight.setPosition(v1_screen);
             edit_tool.edge_highlight.setRotation(utils::to_degrees(angle));
             edit_tool.edge_highlight.setSize(sf::Vector2f(utils::length(vec), 3.0f));
-            target.draw(edit_tool.edge_highlight);
+            ui_widget->draw(edit_tool.edge_highlight);
             // ghost vertex on the edge
             sf::Vector2f ghost_vertex_pos = worldToScreen(edit_tool.insertVertexPos);
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
-            target.draw(edit_tool.vertex_rect);
+            ui_widget->draw(edit_tool.vertex_rect);
         }
         // vertices
         for (size_t i = 0; i < active_object->getVertexCount(); i++) {
@@ -854,7 +860,7 @@ void Editor::renderUi() {
             bool selected = active_object->isVertexSelected(i);
             sf::Color vertex_color = selected ? sf::Color(255, 255, 0) : sf::Color(255, 0, 0);
             edit_tool.vertex_rect.setFillColor(vertex_color);
-            target.draw(edit_tool.vertex_rect);
+            ui_widget->draw(edit_tool.vertex_rect);
         }
         // edge normals
         for (size_t i = 0; i < active_object->getEdgeCount(); i++) {
@@ -865,16 +871,16 @@ void Editor::renderUi() {
                 norm_v1, 
                 norm_v2
             );
-            fw::draw_line(target, norm_v1, norm_v2, sf::Color(0, 255, 255));
+            fw::draw_line(ui_widget, norm_v1, norm_v2, sf::Color(0, 255, 255));
         }
         if (edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) {
             // highlighted vertex
             sf::Vector2f vertex_pos = worldToScreen(active_object->getGlobalVertexPos(edit_tool.highlighted_vertex));
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
-            target.draw(edit_tool.vertex_highlight_rect);
+            ui_widget->draw(edit_tool.vertex_highlight_rect);
         } else if (edit_tool.mode == EditTool::SELECT && edit_tool.rectangle_select.active) {
             //selection box
-            renderRectangleSelect(target, edit_tool.rectangle_select);
+            renderRectangleSelect(ui_widget, edit_tool.rectangle_select);
         }
     }
 
@@ -1240,6 +1246,13 @@ void Editor::renderRectangleSelect(sf::RenderTarget& target, RectangleSelect& re
     rectangle_select.select_rect.setPosition(pos);
     rectangle_select.select_rect.setSize(getMousePosf() - pos);
     target.draw(rectangle_select.select_rect);
+}
+
+void Editor::renderRectangleSelect(fw::CanvasWidget* canvas, RectangleSelect& rectangle_select) {
+    sf::Vector2f pos = worldToScreen(rectangle_select.select_origin);
+    rectangle_select.select_rect.setPosition(pos);
+    rectangle_select.select_rect.setSize(getMousePosf() - pos);
+    canvas->draw(rectangle_select.select_rect);
 }
 
 void Editor::getScreenNormal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {

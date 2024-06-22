@@ -1227,8 +1227,10 @@ namespace fw {
 		OnBeforeRender(render_texture);
 		sf::Drawable* drawable = getDrawable();
 		wAssert(drawable);
+		sf::RenderStates states(combined);
+		states.blendMode = sf::BlendNone;
 		for (size_t i = 0; i < render_iterations; i++) {
-			render_texture.draw(*drawable, combined);
+			render_texture.draw(*drawable, states);
 		}
 		OnAfterRender(render_texture);
 		render_texture.display();

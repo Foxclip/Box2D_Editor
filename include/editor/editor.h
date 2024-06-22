@@ -212,6 +212,7 @@ private:
 	void selectVerticesInRect(const RectangleSelect& rectangle_select);
 	void selectObjectsInRect(const RectangleSelect& rectangle_select);
 	void renderRectangleSelect(sf::RenderTarget& target, RectangleSelect& rectangle_select);
+	void renderRectangleSelect(fw::CanvasWidget* canvas, RectangleSelect& rectangle_select);
 	void getScreenNormal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const;
 	void getScreenNormal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const;
 	bool isParentSelected(const GameObject* object) const;

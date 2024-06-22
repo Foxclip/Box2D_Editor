@@ -65,7 +65,9 @@ void fw::CanvasWidget::clear(const sf::Color& color) {
 }
 
 void fw::CanvasWidget::draw(const sf::Drawable& drawable, const sf::RenderStates& states) {
-	texture.draw(drawable, states);
+	sf::RenderStates states_copy(states);
+	states_copy.blendMode = sf::BlendNone;
+	texture.draw(drawable, states_copy);
 }
 
 void fw::CanvasWidget::display() {

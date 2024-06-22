@@ -237,17 +237,13 @@ void GameObject::updateVisual() {
 	setVisualRotation(utils::to_degrees(angle));
 }
 
-void GameObject::render(sf::RenderTarget& target) {
-	for (size_t i = 0; i < children.size(); i++) {
-		children[i]->render(target);
-	}
-	updateVisual();
-	target.draw(*getDrawable());
-}
-
 void GameObject::renderMask(sf::RenderTarget& mask) {
 	updateVisual();
 	drawMask(mask);
+}
+
+void GameObject::setDrawVarray(bool value) {
+	draw_varray = value;
 }
 
 void GameObject::setVisualPosition(const sf::Vector2f& pos) {
@@ -973,16 +969,16 @@ sf::Transformable* PolygonObject::getTransformable() const {
 	return polygon.get();
 }
 
-void PolygonObject::render(sf::RenderTarget& target) {
-	polygon->draw_varray = draw_varray;
-	GameObject::render(target);
-}
-
 void PolygonObject::drawMask(sf::RenderTarget& mask) {
 	sf::Color orig_color = polygon->getFillColor();
 	polygon->setFillColor(sf::Color::White);
 	mask.draw(*polygon);
 	polygon->setFillColor(orig_color);
+}
+
+void PolygonObject::setDrawVarray(bool value) {
+	draw_varray = value;
+	polygon->draw_varray = value;
 }
 
 TokenWriter& PolygonObject::serialize(TokenWriter& tw) const {
