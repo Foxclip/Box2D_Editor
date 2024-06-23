@@ -9,7 +9,6 @@
 
 const auto tob2 = utils::tob2;
 const auto tosf = utils::tosf;
-const auto to2i = fw::to2i;
 
 Logger& operator<<(Logger& lg, const b2Vec2& value) {
     return lg << "(" << value.x << " " << value.y << ")";
@@ -1065,11 +1064,11 @@ sf::Vector2f Editor::worldToScreen(const b2Vec2& world_pos) const {
 }
 
 sf::Vector2i Editor::worldToPixel(const sf::Vector2f& world_pos) const {
-    return to2i(worldToScreen(world_pos));
+    return fw::to2i(worldToScreen(world_pos));
 }
 
 sf::Vector2i Editor::worldToPixel(const b2Vec2& world_pos) const {
-    return to2i(worldToScreen(tosf(world_pos)));
+    return fw::to2i(worldToScreen(tosf(world_pos)));
 }
 
 sf::Vector2f Editor::worldDirToScreenf(const b2Vec2& world_dir) const {

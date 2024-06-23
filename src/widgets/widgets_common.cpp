@@ -33,6 +33,10 @@ namespace fw {
 		return sf::Vector2i((int)vec.x, (int)vec.y);
 	}
 
+	sf::Vector2i to2i(const sf::Vector2u& vec) {
+		return sf::Vector2i((int)vec.x, (int)vec.y);
+	}
+
 	sf::Vector2f to2f(const sf::Vector2i& vec) {
 		return sf::Vector2f((float)vec.x, (float)vec.y);
 	}

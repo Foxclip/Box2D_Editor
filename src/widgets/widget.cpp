@@ -1201,13 +1201,7 @@ namespace fw {
 		if (texture_bounds.width == 0 || texture_bounds.height == 0) {
 			return;
 		}
-		bool size_changed =
-			texture_bounds.width != render_texture.getSize().x
-			|| texture_bounds.height != render_texture.getSize().y;
-		if (size_changed) {
-			render_texture.create((unsigned int)texture_bounds.width, (unsigned int)texture_bounds.height);
-			render_texture_premultiplied.create((unsigned int)texture_bounds.width, (unsigned int)texture_bounds.height);
-		}
+		render_textures.create((unsigned int)texture_bounds.width, (unsigned int)texture_bounds.height);
 		sf::Transform global_transform = getGlobalTransform();
 		sf::Transform combined(global_transform);
 		sf::Vector2f render_position_offset = getRenderPositionOffset();
@@ -1215,17 +1209,19 @@ namespace fw {
 		if (getQuantizeRenderedPosition()) {
 			fw::quantize_position(combined);
 		}
-		render_view.setSize(texture_bounds.getSize());
-		sf::Vector2f texture_bounds_center = texture_bounds.getPosition() + texture_bounds.getSize() / 2.0f;
-		render_view.setCenter(texture_bounds_center);
-		render_texture.setView(render_view);
-		render_texture.clear(sf::Color::Transparent);
+		sf::Vector2f physical_size = to2f(render_textures.getPhysicalSize());
+		render_view.setSize(physical_size);
+		sf::Vector2f bounds_center = texture_bounds.getPosition() + physical_size / 2.0f;
+		render_view.setCenter(bounds_center);
+		sf::RenderTexture& normal_texture = render_textures.getNormal();
+		normal_texture.setView(render_view);
+		normal_texture.clear(sf::Color::Transparent);
 		sf::Transformable* transformable = getTransformable();
 		wAssert(transformable);
 		const sf::Transform& transformable_transform = transformable->getTransform();
 		wAssert(transformable_transform == sf::Transform::Identity);
 		wAssert(transformable->getOrigin() == sf::Vector2f());
-		OnBeforeRender(render_texture);
+		OnBeforeRender(normal_texture);
 		sf::Drawable* drawable = getDrawable();
 		wAssert(drawable);
 		sf::RenderStates states(combined);
@@ -1233,10 +1229,10 @@ namespace fw {
 		// Using this blend mode instead of sf::BlendAlpha gives same result for all widgets
 		states.blendMode = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add);
 		for (size_t i = 0; i < render_iterations; i++) {
-			render_texture.draw(*drawable, states);
+			normal_texture.draw(*drawable, states);
 		}
-		OnAfterRender(render_texture);
-		render_texture.display();
+		OnAfterRender(normal_texture);
+		normal_texture.display();
 	}
 
 	void Widget::render(sf::RenderTarget& target) {
@@ -1251,19 +1247,22 @@ namespace fw {
 			{
 				// render with straight alpha
 				updateRenderTexture(unclipped_region.getQuantized());
-				sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
+				sf::Sprite sprite = sf::Sprite(render_textures.getNormal().getTexture());
+				sprite.setTextureRect(sf::IntRect(sf::Vector2i(), to2i(render_textures.getSize())));
 				sf::RenderStates states;
 				states.blendMode = sf::BlendNone;
 				if (shader) {
 					states.shader = shader;
 				}
-				render_texture_premultiplied.clear(sf::Color::Transparent);
-				render_texture_premultiplied.draw(sprite, states);
-				render_texture_premultiplied.display();
+				sf::RenderTexture& premultiplied_texture = render_textures.getPremultiplied();
+				premultiplied_texture.clear(sf::Color::Transparent);
+				premultiplied_texture.draw(sprite, states);
+				premultiplied_texture.display();
 			}
 			{
 				// render with premultiplied alpha
-				sf::Sprite sprite = sf::Sprite(render_texture_premultiplied.getTexture());
+				sf::Sprite sprite = sf::Sprite(render_textures.getPremultiplied().getTexture());
+				sprite.setTextureRect(sf::IntRect(sf::Vector2i(), to2i(render_textures.getSize())));
 				sprite.setPosition(unclipped_region.getQuantized().getPosition());
 				sf::RenderStates states;
 				states.blendMode = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add);

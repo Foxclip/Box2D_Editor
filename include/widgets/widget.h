@@ -4,6 +4,7 @@
 #include <functional>
 #include "widgets_common.h"
 #include "drawing.h"
+#include "render_texture.h"
 #include "widget_transform.h"
 #include "widget_update_queue.h"
 #include "widget_render_queue.h"
@@ -367,8 +368,7 @@ namespace fw {
 
 	private:
 		WidgetVisibility visibility;
-		sf::RenderTexture render_texture;
-		sf::RenderTexture render_texture_premultiplied;
+		RenderTexture render_textures;
 		size_t render_iterations = 1;
 		sf::View render_view;
 
