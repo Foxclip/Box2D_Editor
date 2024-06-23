@@ -140,7 +140,10 @@ namespace fw {
 		void endGesture();
 
 	private:
+		friend class Widget;
+		friend class CanvasWidget;
 		Stage stage = Stage::NONE;
+		sf::Shader premultiply;
 
 		void mainLoop();
 		void processWidgets();

@@ -88,7 +88,7 @@ public:
 	float toParentLocalAngle(float angle);
 	ptrdiff_t getChildIndex(const GameObject* object) const;
 	void updateVisual();
-	void renderMask(sf::RenderTarget& mask);
+	void renderMask(const std::function<void(const sf::Drawable& drawable)>& draw_func);
 	virtual void setDrawVarray(bool value);
 	void setParent(GameObject* new_parent);
 	void setName(const std::string& new_name);
@@ -146,7 +146,7 @@ protected:
 	sf::Color color;
 	bool draw_varray = false;
 
-	virtual void drawMask(sf::RenderTarget& mask) = 0;
+	virtual void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) = 0;
 	std::vector<b2Vec2> getPositions() const;
 	void setVisualPosition(const sf::Vector2f& pos);
 	void setVisualRotation(float angle);
@@ -172,7 +172,7 @@ public:
 	bool isClosed() const override;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
-	void drawMask(sf::RenderTarget& mask) override;
+	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<BoxObject> deserialize(const std::string& str, GameObjectList* object_list);
@@ -199,7 +199,7 @@ public:
 	bool isClosed() const override;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
-	void drawMask(sf::RenderTarget& mask) override;
+	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<BallObject> deserialize(const std::string& str, GameObjectList* object_list);
@@ -226,7 +226,7 @@ public:
 	SplittablePolygon* getSplittablePolygon() const;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
-	void drawMask(sf::RenderTarget& mask) override;
+	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
 	void setDrawVarray(bool value) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
@@ -246,7 +246,7 @@ public:
 	bool isClosed() const override;
 	sf::Drawable* getDrawable() const override;
 	sf::Transformable* getTransformable() const override;
-	void drawMask(sf::RenderTarget& mask) override;
+	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static std::unique_ptr<ChainObject> deserialize(const std::string& str, GameObjectList* object_list);

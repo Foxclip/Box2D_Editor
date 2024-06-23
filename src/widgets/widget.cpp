@@ -1206,6 +1206,7 @@ namespace fw {
 			|| texture_bounds.height != render_texture.getSize().y;
 		if (size_changed) {
 			render_texture.create((unsigned int)texture_bounds.width, (unsigned int)texture_bounds.height);
+			render_texture_premultiplied.create((unsigned int)texture_bounds.width, (unsigned int)texture_bounds.height);
 		}
 		sf::Transform global_transform = getGlobalTransform();
 		sf::Transform combined(global_transform);
@@ -1228,7 +1229,9 @@ namespace fw {
 		sf::Drawable* drawable = getDrawable();
 		wAssert(drawable);
 		sf::RenderStates states(combined);
-		states.blendMode = sf::BlendNone;
+		// CanvasWidget is premultiplied at this stage, the rest of widgets are not
+		// Using this blend mode instead of sf::BlendAlpha gives same result for all widgets
+		states.blendMode = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add);
 		for (size_t i = 0; i < render_iterations; i++) {
 			render_texture.draw(*drawable, states);
 		}
@@ -1245,13 +1248,32 @@ namespace fw {
 		}
 		OnBeforeGlobalRender(target);
 		if (isRenderable()) {
-			updateRenderTexture(unclipped_region.getQuantized());
-			sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
-			sprite.setPosition(unclipped_region.getQuantized().getPosition());
-			if (shader) {
-				target.draw(sprite, shader);
-			} else {
-				target.draw(sprite);
+			{
+				// render with straight alpha
+				updateRenderTexture(unclipped_region.getQuantized());
+				sf::Sprite sprite = sf::Sprite(render_texture.getTexture());
+				sf::RenderStates states;
+				states.blendMode = sf::BlendNone;
+				if (shader) {
+					states.shader = shader;
+				}
+				render_texture_premultiplied.clear(sf::Color::Transparent);
+				render_texture_premultiplied.draw(sprite, states);
+				render_texture_premultiplied.display();
+			}
+			{
+				// render with premultiplied alpha
+				sf::Sprite sprite = sf::Sprite(render_texture_premultiplied.getTexture());
+				sprite.setPosition(unclipped_region.getQuantized().getPosition());
+				sf::RenderStates states;
+				states.blendMode = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add);
+				if (type != WidgetType::Canvas) { // canvas is already premultiplied
+					sf::Shader* premultiply = &widget_list.getApplication().premultiply;
+					premultiply->setUniform("textured", true);
+					premultiply->setUniform("src_texture", sf::Shader::CurrentTexture);
+					states.shader = premultiply;
+				}
+				target.draw(sprite, states);
 			}
 		}
 		OnAfterGlobalRender(target);

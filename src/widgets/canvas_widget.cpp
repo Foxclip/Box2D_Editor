@@ -1,4 +1,6 @@
 #include "widgets/canvas_widget.h"
+#include "widgets/widget_list.h"
+#include "widgets/application.h"
 
 fw::CanvasWidget::CanvasWidget(WidgetList& widget_list, float width, float height, unsigned int texture_width, unsigned int texture_height)
 	: RectangleWidget(widget_list, width, height) {
@@ -64,9 +66,15 @@ void fw::CanvasWidget::clear(const sf::Color& color) {
 	texture.clear(color);
 }
 
-void fw::CanvasWidget::draw(const sf::Drawable& drawable, const sf::RenderStates& states) {
+void fw::CanvasWidget::draw(const sf::Drawable& drawable, bool textured, const sf::RenderStates& states) {
 	sf::RenderStates states_copy(states);
-	states_copy.blendMode = sf::BlendNone;
+	states_copy.blendMode = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add);
+	sf::Shader* premultiply = &widget_list.getApplication().premultiply;
+	premultiply->setUniform("textured", textured);
+	if (textured) {
+		premultiply->setUniform("src_texture", sf::Shader::CurrentTexture);
+	}
+	states_copy.shader = premultiply;
 	texture.draw(drawable, states_copy);
 }
 

@@ -17,6 +17,9 @@ namespace fw {
         unsigned int antialiasing,
         bool vsync
     ) {
+        if (!premultiply.loadFromFile("shaders/premultiply.frag", sf::Shader::Fragment)) {
+            throw std::runtime_error("Shader loading error");
+        }
         sf::ContextSettings cs_window;
         cs_window.antialiasingLevel = antialiasing;
         if (external_window) {

@@ -368,6 +368,7 @@ namespace fw {
 	private:
 		WidgetVisibility visibility;
 		sf::RenderTexture render_texture;
+		sf::RenderTexture render_texture_premultiplied;
 		size_t render_iterations = 1;
 		sf::View render_view;
 

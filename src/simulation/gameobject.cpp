@@ -237,9 +237,9 @@ void GameObject::updateVisual() {
 	setVisualRotation(utils::to_degrees(angle));
 }
 
-void GameObject::renderMask(sf::RenderTarget& mask) {
+void GameObject::renderMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) {
 	updateVisual();
-	drawMask(mask);
+	drawMask(draw_func);
 }
 
 void GameObject::setDrawVarray(bool value) {
@@ -694,10 +694,10 @@ sf::Transformable* BoxObject::getTransformable() const {
 	return rect_shape.get();
 }
 
-void BoxObject::drawMask(sf::RenderTarget& mask) {
+void BoxObject::drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) {
 	sf::Color orig_color = rect_shape->getFillColor();
 	rect_shape->setFillColor(sf::Color::White);
-	mask.draw(*rect_shape);
+	draw_func(*rect_shape);
 	rect_shape->setFillColor(orig_color);
 }
 
@@ -823,8 +823,14 @@ sf::Transformable* BallObject::getTransformable() const {
 	return circle_notch_shape.get();
 }
 
-void BallObject::drawMask(sf::RenderTarget& mask) {
-	circle_notch_shape->drawMask(mask);
+void BallObject::drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) {
+	sf::Color orig_circle_color = circle_notch_shape->getCircleColor();
+	sf::Color orig_notch_color = circle_notch_shape->getNotchColor();
+	circle_notch_shape->setCircleColor(sf::Color::White);
+	circle_notch_shape->setNotchColor(sf::Color::White);
+	draw_func(*circle_notch_shape);
+	circle_notch_shape->setCircleColor(orig_circle_color);
+	circle_notch_shape->setNotchColor(orig_notch_color);
 }
 
 TokenWriter& BallObject::serialize(TokenWriter& tw) const {
@@ -969,10 +975,10 @@ sf::Transformable* PolygonObject::getTransformable() const {
 	return polygon.get();
 }
 
-void PolygonObject::drawMask(sf::RenderTarget& mask) {
+void PolygonObject::drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) {
 	sf::Color orig_color = polygon->getFillColor();
 	polygon->setFillColor(sf::Color::White);
-	mask.draw(*polygon);
+	draw_func(*polygon);
 	polygon->setFillColor(orig_color);
 }
 
@@ -1120,8 +1126,8 @@ sf::Transformable* ChainObject::getTransformable() const {
 	return line_strip_shape.get();
 }
 
-void ChainObject::drawMask(sf::RenderTarget& mask) {
-	line_strip_shape->drawMask(mask);
+void ChainObject::drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) {
+	draw_func(*line_strip_shape);
 }
 
 TokenWriter& ChainObject::serialize(TokenWriter& tw) const {

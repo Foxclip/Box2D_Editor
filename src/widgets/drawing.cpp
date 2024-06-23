@@ -28,7 +28,7 @@ namespace fw {
 		line_primitive[0].color = color;
 		line_primitive[1].position = quantize_and_offset(v2);
 		line_primitive[1].color = color;
-		canvas->draw(line_primitive);
+		canvas->draw(line_primitive, false);
 	}
 
 	void draw_line(
@@ -56,7 +56,7 @@ namespace fw {
 		line_primitive[0].color = color;
 		line_primitive[1].position = quantize_and_offset(transform.transformPoint(v2));
 		line_primitive[1].color = color;
-		canvas->draw(line_primitive);
+		canvas->draw(line_primitive, false);
 	}
 
 	void draw_wire_rect(

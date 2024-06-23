@@ -35,6 +35,6 @@ void main()
     hsv.y = hsv.y * saturation;
     hsv.z = ((hsv.z - vcenter) * vpercent) + vcenter;
     vec3 rgb = hsv2rgb(hsv);
-    vec4 color = vec4(rgb, tex_color.a);
+    vec4 color = vec4(rgb * tex_color.a, tex_color.a); // premultiplied alpha
     gl_FragColor = color;
 }

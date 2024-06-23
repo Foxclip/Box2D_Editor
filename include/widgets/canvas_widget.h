@@ -22,7 +22,7 @@ namespace fw {
 		void setViewSize(const sf::Vector2f& size);
 		void resetView();
 		void clear(const sf::Color& color = sf::Color::Black);
-		void draw(const sf::Drawable& drawable, const sf::RenderStates& states = sf::RenderStates::Default);
+		void draw(const sf::Drawable& drawable, bool textured, const sf::RenderStates& states = sf::RenderStates::Default);
 		void display();
 		void saveToFile(std::filesystem::path path);
 
