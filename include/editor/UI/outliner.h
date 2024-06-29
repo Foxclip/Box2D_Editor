@@ -1,6 +1,8 @@
 #pragma once
 
-#include "widgets/widgets.h"
+#include "widgets/rectangle_widget.h"
+#include "widgets/container_widget.h"
+#include "widgets/scroll_area_widget.h"
 #include "simulation/objectlist.h"
 #include <map>
 

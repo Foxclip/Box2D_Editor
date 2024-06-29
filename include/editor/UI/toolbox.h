@@ -1,6 +1,6 @@
 #pragma once
 
-#include "widgets/widgets.h"
+#include "widgets/container_widget.h"
 
 class Editor;
 
