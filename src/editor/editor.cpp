@@ -224,7 +224,7 @@ void Editor::initUi() {
 }
 
 void Editor::initWidgets() {
-
+    // canvas widgets
     world_widget = widgets.createWidget<fw::CanvasWidget>(
         (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
     );
@@ -265,6 +265,7 @@ void Editor::initWidgets() {
         ui_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };
 
+    // ui widgets that have separate classes
     toolbox_widget = widgets.createWidget<Toolbox>(*this);
     edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(300.0f, 400.0f, *this);
     create_tool.create_panel_widget = widgets.createWidget<CreatePanel>(*this);

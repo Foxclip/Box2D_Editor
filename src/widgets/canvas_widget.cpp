@@ -67,11 +67,19 @@ void fw::CanvasWidget::clear(const sf::Color& color) {
 }
 
 void fw::CanvasWidget::draw(const sf::Drawable& drawable, bool textured, const sf::RenderStates& states) {
+	ColorType color_type = ColorType::VERTEX;
+	if (textured) {
+		color_type = ColorType::TEXTURE;
+	}
+	if (dynamic_cast<const sf::Text*>(&drawable)) {
+		// text in SFML multiplies texture mask by vertex color
+		color_type = ColorType::MULTIPLIED;
+	}
 	sf::RenderStates states_copy(states);
 	states_copy.blendMode = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add);
 	sf::Shader* premultiply = &widget_list.getApplication().premultiply;
-	premultiply->setUniform("textured", textured);
-	if (textured) {
+	premultiply->setUniform("type", static_cast<int>(color_type));
+	if (color_type == ColorType::TEXTURE || color_type == ColorType::MULTIPLIED) {
 		premultiply->setUniform("src_texture", sf::Shader::CurrentTexture);
 	}
 	states_copy.shader = premultiply;

@@ -1245,7 +1245,7 @@ namespace fw {
 		OnBeforeGlobalRender(target);
 		if (isRenderable()) {
 			{
-				// render with straight alpha
+				// render with straight alpha to texture
 				updateRenderTexture(unclipped_region.getQuantized());
 				sf::Sprite sprite = sf::Sprite(render_textures.getNormal().getTexture());
 				sprite.setTextureRect(sf::IntRect(sf::Vector2i(), to2i(render_textures.getSize())));
@@ -1260,7 +1260,7 @@ namespace fw {
 				premultiplied_texture.display();
 			}
 			{
-				// render with premultiplied alpha
+				// premultiply alpha
 				sf::Sprite sprite = sf::Sprite(render_textures.getPremultiplied().getTexture());
 				sprite.setTextureRect(sf::IntRect(sf::Vector2i(), to2i(render_textures.getSize())));
 				sprite.setPosition(unclipped_region.getQuantized().getPosition());
@@ -1268,7 +1268,7 @@ namespace fw {
 				states.blendMode = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcAlpha, sf::BlendMode::Add);
 				if (type != WidgetType::Canvas) { // canvas is already premultiplied
 					sf::Shader* premultiply = &widget_list.getApplication().premultiply;
-					premultiply->setUniform("textured", true);
+					premultiply->setUniform("type", static_cast<int>(ColorType::TEXTURE));
 					premultiply->setUniform("src_texture", sf::Shader::CurrentTexture);
 					states.shader = premultiply;
 				}

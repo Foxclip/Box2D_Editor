@@ -27,6 +27,12 @@ namespace fw {
 		//bool notCovered = false;
 	};
 
+	enum class ColorType {
+		VERTEX,
+		TEXTURE,
+		MULTIPLIED
+	};
+
 	class WidgetList;
 
 	// Adding methods:

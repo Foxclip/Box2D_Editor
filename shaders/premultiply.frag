@@ -1,12 +1,12 @@
-uniform bool textured;
+uniform int type;
 uniform sampler2D src_texture;
 
 void main() {
     vec4 src_color4;
-    if (textured) {
-        src_color4 = texture2D(src_texture, gl_TexCoord[0].xy);
-    } else {
-        src_color4 = gl_Color;
+    switch (type) {
+        case 0: src_color4 = gl_Color; break; // non-textured
+        case 1: src_color4 = texture2D(src_texture, gl_TexCoord[0].xy); break; // textured
+        case 2: src_color4 = gl_Color * texture2D(src_texture, gl_TexCoord[0].xy); break; // textured and using vertex color
     }
     gl_FragColor = vec4(src_color4.rgb * src_color4.a, src_color4.a);
 }
