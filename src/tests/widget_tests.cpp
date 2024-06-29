@@ -155,6 +155,7 @@ void WidgetTests::createTestLists() {
     test::TestList* canvas_widget_list = createTestList("CanvasWidget", { widgets_basic_list });
     test::Test* canvas_widget_basic_test = canvas_widget_list->addTest("basic", [&](test::Test& test) { canvasWidgetBasicTest(test); });
     test::Test* canvas_widget_draw_test = canvas_widget_list->addTest("draw", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetDrawTest(test); });
+    test::Test* canvas_widget_alpha_test = canvas_widget_list->addTest("alpha", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetAlphaTest(test); });
 
     test::TestList* window_widget_list = createTestList("WindowWidget", { widgets_basic_list, text_widget_list });
     test::Test* window_widget_basic_test = window_widget_list->addTest("basic", [&](test::Test& test) { windowWidgetBasicTest(test); });
@@ -2903,6 +2904,27 @@ void WidgetTests::canvasWidgetDrawTest(test::Test& test) {
         T_COMPARE(image.getPixel(50, 50), sf::Color::Red, color_to_str);
         T_COMPARE(image.getPixel(55, 55), sf::Color::Red, color_to_str);
         T_COMPARE(image.getPixel(60, 60), sf::Color::Red, color_to_str);
+    }
+}
+
+void WidgetTests::canvasWidgetAlphaTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    fw::CanvasWidget* canvas_widget = application.getWidgets().createWidget<fw::CanvasWidget>(100.0f, 100.0f, 100, 100);
+    auto color_to_str = &WidgetTests::colorToStr;
+    {
+        sf::RectangleShape rect(sf::Vector2f(100.0f, 100.0f));
+        canvas_widget->clear();
+        rect.setFillColor(sf::Color(255, 0, 0, 128));
+        canvas_widget->draw(rect);
+        rect.setFillColor(sf::Color(0, 255, 0, 128));
+        canvas_widget->draw(rect);
+        rect.setFillColor(sf::Color(0, 0, 255, 128));
+        canvas_widget->draw(rect);
+        sf::Image image = canvas_widget->getRenderTexture().getTexture().copyToImage();
+        T_ASSERT(T_COMPARE(image.getPixel(0, 0), sf::Color(32, 64, 128), color_to_str));
     }
 }
 
