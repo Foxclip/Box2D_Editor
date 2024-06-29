@@ -22,7 +22,10 @@ namespace fw {
 		void setViewSize(const sf::Vector2f& size);
 		void resetView();
 		void clear(const sf::Color& color = sf::Color::Black);
-		void draw(const sf::Drawable& drawable, bool textured, const sf::RenderStates& states = sf::RenderStates::Default);
+		void draw(const sf::Drawable& drawable, ColorType color_type, const sf::RenderStates& states = sf::RenderStates::Default);
+		void draw(const sf::VertexArray& varray, const sf::RenderStates& states = sf::RenderStates::Default);
+		void draw(const sf::Shape& shape, const sf::RenderStates& states = sf::RenderStates::Default);
+		void draw(const sf::Text& text, const sf::RenderStates& states = sf::RenderStates::Default);
 		void display();
 		void saveToFile(std::filesystem::path path);
 
@@ -31,6 +34,7 @@ namespace fw {
 		sf::View view;
 
 	private:
+		void intenalDraw(const sf::Drawable& drawable, ColorType color_type, const sf::RenderStates& states);
 
 	};
 

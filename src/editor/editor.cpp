@@ -739,7 +739,7 @@ void Editor::renderWorld() {
                 render_object(object->getChild(i));
             }
             object->updateVisual();
-            world_widget->draw(*object->getDrawable(), false);
+            canvasDraw(world_widget, *object->getDrawable());
         };
         render_object(gameobject);
     }
@@ -748,7 +748,7 @@ void Editor::renderWorld() {
     selection_mask_widget->clear();
     selection_mask_widget->setView(world_widget->getView());
     auto render_func = [&](const sf::Drawable& drawable) {
-        selection_mask_widget->draw(drawable, false);
+        canvasDraw(selection_mask_widget, drawable);
     };
     if (selected_tool != &edit_tool) {
         for (auto obj : select_tool.getSelectedObjects()) {
@@ -777,7 +777,7 @@ void Editor::renderUi() {
             sf::Color circle_color = gameobject == active_object ? sf::Color(255, 255, 0) : sf::Color(255, 159, 44);
             origin_shape.setFillColor(circle_color);
             origin_shape.setPosition(worldToScreen(gameobject->getGlobalPosition()));
-            ui_widget->draw(origin_shape, false);
+            ui_widget->draw(origin_shape);
         }
         // object info
         for (size_t i = 0; i < simulation.getAllSize(); i++) {
@@ -790,7 +790,7 @@ void Editor::renderUi() {
                 sf::Vector2f pos = object_screen_pos + offset;
                 object_info_text.setPosition(utils::quantize(pos));
                 object_info_text.setString(str);
-                ui_widget->draw(object_info_text, true);
+                ui_widget->draw(object_info_text);
                 info_index++;
             };
             render_info("id: " + std::to_string(gameobject->getId()));
@@ -838,7 +838,7 @@ void Editor::renderUi() {
             sf::Vector2f ghost_vertex_pos = to2f(getMousePos());
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
-            ui_widget->draw(edit_tool.vertex_rect, false);
+            ui_widget->draw(edit_tool.vertex_rect);
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
             // edge highlight
             b2Vec2 v1 = active_object->getGlobalVertexPos(edit_tool.highlighted_edge);
@@ -850,12 +850,12 @@ void Editor::renderUi() {
             edit_tool.edge_highlight.setPosition(v1_screen);
             edit_tool.edge_highlight.setRotation(utils::to_degrees(angle));
             edit_tool.edge_highlight.setSize(sf::Vector2f(utils::length(vec), 3.0f));
-            ui_widget->draw(edit_tool.edge_highlight, false);
+            ui_widget->draw(edit_tool.edge_highlight);
             // ghost vertex on the edge
             sf::Vector2f ghost_vertex_pos = worldToScreen(edit_tool.insertVertexPos);
             edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
-            ui_widget->draw(edit_tool.vertex_rect, false);
+            ui_widget->draw(edit_tool.vertex_rect);
         }
         // vertices
         for (size_t i = 0; i < active_object->getVertexCount(); i++) {
@@ -863,7 +863,7 @@ void Editor::renderUi() {
             bool selected = active_object->isVertexSelected(i);
             sf::Color vertex_color = selected ? sf::Color(255, 255, 0) : sf::Color(255, 0, 0);
             edit_tool.vertex_rect.setFillColor(vertex_color);
-            ui_widget->draw(edit_tool.vertex_rect, false);
+            ui_widget->draw(edit_tool.vertex_rect);
         }
         // edge normals
         for (size_t i = 0; i < active_object->getEdgeCount(); i++) {
@@ -880,7 +880,7 @@ void Editor::renderUi() {
             // highlighted vertex
             sf::Vector2f vertex_pos = worldToScreen(active_object->getGlobalVertexPos(edit_tool.highlighted_vertex));
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
-            ui_widget->draw(edit_tool.vertex_highlight_rect, false);
+            ui_widget->draw(edit_tool.vertex_highlight_rect);
         } else if (edit_tool.mode == EditTool::SELECT && edit_tool.rectangle_select.active) {
             //selection box
             renderRectangleSelect(ui_widget, edit_tool.rectangle_select);
@@ -1255,7 +1255,7 @@ void Editor::renderRectangleSelect(fw::CanvasWidget* canvas, RectangleSelect& re
     sf::Vector2f pos = worldToScreen(rectangle_select.select_origin);
     rectangle_select.select_rect.setPosition(pos);
     rectangle_select.select_rect.setSize(getMousePosf() - pos);
-    canvas->draw(rectangle_select.select_rect, false);
+    canvas->draw(rectangle_select.select_rect);
 }
 
 void Editor::getScreenNormal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
@@ -1372,6 +1372,20 @@ void Editor::checkDebugbreak() {
     if (debug_break) {
         __debugbreak();
         debug_break = false;
+    }
+}
+
+void Editor::canvasDraw(fw::CanvasWidget* canvas, const sf::Drawable& drawable, const sf::RenderStates& states) {
+    if (const sf::Shape* shape = dynamic_cast<const sf::Shape*>(&drawable)) {
+        canvas->draw(*shape);
+    } else if (dynamic_cast<const LineStripShape*>(&drawable)) {
+        canvas->draw(drawable, fw::ColorType::VERTEX);
+    } else if (dynamic_cast<const CircleNotchShape*>(&drawable)) {
+        canvas->draw(drawable, fw::ColorType::VERTEX);
+    } else if (dynamic_cast<const SplittablePolygon*>(&drawable)) {
+        canvas->draw(drawable, fw::ColorType::VERTEX);
+    } else {
+        mAssert(false, "This Drawable is not implemented yet");
     }
 }
 

@@ -222,5 +222,6 @@ private:
 	void endRotate(bool confirm);
 	void deleteObject(GameObject* object, bool remove_children);
 	void checkDebugbreak();
+	void canvasDraw(fw::CanvasWidget* canvas, const sf::Drawable& drawable, const sf::RenderStates& states = sf::RenderStates::Default);
 
 };

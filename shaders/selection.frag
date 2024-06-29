@@ -24,9 +24,7 @@ void main() {
     ivec2 pixel_coord = toPixel(coord);
     vec4 mask_value = texture2D(selection_mask, coord);
     vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
-    if (mask_value == vec4(1.0, 1.0, 1.0, 1.0)) {
-        gl_FragColor = color;
-    } else {
+    if (mask_value != vec4(1.0, 1.0, 1.0, 1.0)) {
         for (int y = pixel_coord.y - offset; y <= pixel_coord.y + offset; y++) {
             bool exit = false;
             for (int x = pixel_coord.x - offset; x <= pixel_coord.x + offset; x++) {
@@ -46,6 +44,6 @@ void main() {
                 break;
             }
         }
-        gl_FragColor = color;
     }
+    gl_FragColor = color;
 }
