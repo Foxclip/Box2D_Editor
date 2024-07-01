@@ -177,6 +177,7 @@ void WidgetTests::createTestLists() {
     test::Test* scroll_area_widget_basic_test = scroll_area_widget_list->addTest("basic", [&](test::Test& test) { scrollAreaWidgetBasicTest(test); });
     test::Test* scroll_area_widget_scroll_test = scroll_area_widget_list->addTest("scroll", [&](test::Test& test) { scrollAreaWidgetScrollTest(test); });
     test::Test* scroll_area_widget_scrollbar_visibility_test = scroll_area_widget_list->addTest("scrollbar_visibility", [&](test::Test& test) { scrollAreaWidgetScrollbarVisibilityTest(test); });
+    test::Test* scroll_area_widget_scrollbar_container_test = scroll_area_widget_list->addTest("scrollbar_container", [&](test::Test& test) { scrollAreaWidgetScrollbarContainerTest(test); });
 
 }
 
@@ -3823,6 +3824,31 @@ void WidgetTests::scrollAreaWidgetScrollbarVisibilityTest(test::Test& test) {
         // after one more advance it definetely should be in the right position
         T_COMPARE(scroll_area_widget->getScrollbarYWidget()->getPosition().x, scrollbar_pos);
     }
+}
+
+void WidgetTests::scrollAreaWidgetScrollbarContainerTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.setDefaultFont(textbox_font);
+    sf::Vector2f scroll_area_size(300.0f, 200.0f);
+    sf::Vector2f container_size(100.0f, 100.0f);
+    sf::Vector2f child_size(100.0f, 200.0f);
+    fw::ScrollAreaWidget* scroll_area_widget = application.getWidgets().createWidget<fw::ScrollAreaWidget>(scroll_area_size);
+    fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>(container_size);
+    fw::RectangleWidget* red_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
+    scroll_area_widget->setScrolledWidget(container_widget);
+    container_widget->setFillColor(sf::Color(100, 100, 100));
+    container_widget->setHorizontal(false);
+    container_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+    red_widget->setFillColor(sf::Color::Red);
+    red_widget->setParent(container_widget);
+    application.advance();
+
+    red_widget->setHeight(red_widget->getHeight() + 50.0f);
+    application.advance();
+    T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
+    T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
