@@ -62,7 +62,6 @@ namespace fw {
 		ScrollbarPolicy scrollbar_x_policy = ScrollbarPolicy::SIZE;
 		ScrollbarPolicy scrollbar_y_policy = ScrollbarPolicy::SIZE;
 
-		void internalPreUpdate() override;
 		void internalPostUpdate() override;
 		void internalOnScrollX(const sf::Vector2f& pos, float delta) override;
 		void internalOnScrollY(const sf::Vector2f& pos, float delta) override;
@@ -72,7 +71,9 @@ namespace fw {
 		bool getScrollbarYVisibleIndividual();
 		bool getScrollbarXVisible();
 		bool getScrollbarYVisible();
-		void updateScrollbarVisibility();
+		void updateScrollbarXVisibility();
+		void updateScrollbarYVisibility();
+		void updateCornerVisibility();
 		void updateScroll();
 		void updateColors();
 		float getSizeXFactor() const;

@@ -111,6 +111,47 @@ namespace fw {
 		corner_widget->setOrigin(Anchor::BOTTOM_RIGHT);
 		corner_widget->setClickThrough(false);
 		corner_widget->setParent(this);
+		// links
+		WidgetLink* scrollbar_x_visiblility_link = addLink(
+			"SCROLLBAR_X_VISIBILITY",
+			[&]() {
+				if (scrolled_widget) {
+					return CompVector<WidgetUpdateTarget*>{ scrolled_widget->getSizeXTarget() };
+				} else {
+					return CompVector<WidgetUpdateTarget*>{ };
+				}
+			},
+			[&]() {
+				updateScrollbarXVisibility();
+			}
+		);
+		WidgetLink* scrollbar_y_visiblility_link = addLink(
+			"SCROLLBAR_Y_VISIBILITY",
+			[&]() {
+				if (scrolled_widget) {
+					return CompVector<WidgetUpdateTarget*>{ scrolled_widget->getSizeYTarget() };
+				} else {
+					return CompVector<WidgetUpdateTarget*>{ };
+				}
+			},
+			[&]() {
+				updateScrollbarYVisibility();
+			}
+		);
+		WidgetLink* area_size_x_link = addLink(
+			"AREA_SIZE_X",
+			{ getSizeXTarget(), scrollbar_x_visiblility_link },
+			[&]() {
+				area_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
+			}
+		);
+		WidgetLink* area_size_y_link = addLink(
+			"AREA_SIZE_Y",
+			{ getSizeYTarget(), scrollbar_y_visiblility_link },
+			[&]() {
+				area_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
+			}
+		);
 
 		updateScroll();
 	}
@@ -191,13 +232,7 @@ namespace fw {
 		this->scrollbar_y_policy = policy;
 	}
 
-	void ScrollAreaWidget::internalPreUpdate() {
-		updateScrollbarVisibility();
-	}
-
 	void ScrollAreaWidget::internalPostUpdate() {
-		area_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
-		area_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
 		scrollbar_x_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
 		scrollbar_y_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
 		if (scrolled_widget) {
@@ -218,6 +253,7 @@ namespace fw {
 				}
 			}
 		}
+		updateCornerVisibility();
 		updateScroll();
 	}
 
@@ -288,12 +324,21 @@ namespace fw {
 		}
 	}
 
-	void ScrollAreaWidget::updateScrollbarVisibility() {
+	void ScrollAreaWidget::updateScrollbarXVisibility() {
 		bool x_state = getScrollbarXVisible();
-		bool y_state = getScrollbarYVisible();
-		bool corner_state = x_state && y_state;
 		scrollbar_x_widget->setVisible(x_state);
+	}
+
+	void ScrollAreaWidget::updateScrollbarYVisibility() {
+		bool y_state = getScrollbarYVisible();
 		scrollbar_y_widget->setVisible(y_state);
+
+	}
+
+	void ScrollAreaWidget::updateCornerVisibility() {
+		bool x_state = scrollbar_x_widget->isVisible();
+		bool y_state = scrollbar_y_widget->isVisible();
+		bool corner_state = x_state && y_state;
 		corner_widget->setVisible(corner_state);
 	}
 

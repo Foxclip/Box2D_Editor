@@ -3702,10 +3702,6 @@ void WidgetTests::scrollAreaWidgetScrollTest(test::Test& test) {
         T_APPROX_COMPARE(scroll_area_widget->getSliderYWidget()->getHeight(), slider_y_height);
     };
 
-    // scrollbar visibility is updated before container size
-    application.advance();
-    T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
-    T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
     application.advance();
     T_CHECK(scroll_area_widget->getScrollbarXWidget()->isVisible());
     T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
@@ -3798,10 +3794,6 @@ void WidgetTests::scrollAreaWidgetScrollbarVisibilityTest(test::Test& test) {
     blue_widget->setFillColor(sf::Color::Blue);
     blue_widget->setParent(container_widget);
 
-    // scrollbar visibility is updated before container size
-    application.advance();
-    T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
-    T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
     application.advance();
     T_CHECK(scroll_area_widget->getScrollbarXWidget()->isVisible());
     T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
@@ -3853,14 +3845,11 @@ void WidgetTests::scrollAreaWidgetScrollbarVisibilityTest(test::Test& test) {
         application.mouseMove(sf::Vector2f(grab_pos.x, grab_pos.y - margin_2));
         application.advance();
         float scrollbar_pos = scroll_area_widget->getWidth();
-        // if it is visible right away, then it should be in the right position
-        if (scroll_area_widget->getScrollbarYWidget()->isVisible()) {
+        if (T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible())) {
             T_COMPARE(scroll_area_widget->getScrollbarYWidget()->getPosition().x, scrollbar_pos);
         }
         application.mouseLeftRelease();
         application.advance();
-        // after one more advance it definetely should be in the right position
-        T_COMPARE(scroll_area_widget->getScrollbarYWidget()->getPosition().x, scrollbar_pos);
     }
 }
 
