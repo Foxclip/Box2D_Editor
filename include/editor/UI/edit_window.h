@@ -1,16 +1,18 @@
 #pragma once
 
 #include <functional>
-#include "widgets/container_widget.h"
-#include "widgets/textbox_widget.h"
-#include "widgets/checkbox_widget.h"
-#include "widgets/dropdown_widget.h"
 #include "widgets/window_widget.h"
 
 const float EDIT_WINDOW_PARAMETER_PADDING = 10.0f;
 
 class Editor;
 class EditWindow;
+namespace fw {
+	class ContainerWidget;
+	class TextBoxWidget;
+	class CheckboxWidget;
+	class DropdownWidget;
+}
 
 class EditWindowParameter {
 public:

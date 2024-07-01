@@ -1,4 +1,5 @@
 #include "editor/UI/create_panel.h"
+#include "widgets/text_widget.h"
 #include "editor/editor.h"
 
 CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)

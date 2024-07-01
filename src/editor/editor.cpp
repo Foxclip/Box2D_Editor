@@ -1,6 +1,9 @@
 #include "editor/editor.h"
+#include "widgets/text_widget.h"
+#include "widgets/canvas_widget.h"
 #include "editor/UI/toolbox.h"
 #include "editor/UI/create_panel.h"
+#include "editor/UI/edit_window.h"
 #include "editor/UI/outliner.h"
 #include "common/utils.h"
 #include <numbers>

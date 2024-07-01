@@ -1,8 +1,7 @@
 #pragma once
 
 #include "simulation/gameobject.h"
-#include "widgets/widget.h"
-#include "UI/edit_window.h"
+#include "common/event.h"
 #include <set>
 
 const float TOOL_RECT_WIDTH = 60.0f;
@@ -36,6 +35,10 @@ public:
 //     add it to tools vector in tools.cpp
 //     set it's display name in the contructor
 //     write reset method which resets all fields that need to be reset during scene deserialization
+
+namespace fw {
+	class Widget;
+}
 
 class Tool {
 public:
@@ -114,6 +117,8 @@ public:
 private:
 };
 
+class EditWindow;
+
 class EditTool : public Tool {
 public:
 	static const int VERTEX_SIZE = 9;
@@ -146,6 +151,8 @@ public:
 	static std::string modeToStr(EditToolMode mode);
 
 };
+
+class CreatePanel;
 
 class CreateTool : public Tool {
 public:

@@ -1,4 +1,8 @@
 #include "editor/UI/edit_window.h"
+#include "widgets/container_widget.h"
+#include "widgets/textbox_widget.h"
+#include "widgets/checkbox_widget.h"
+#include "widgets/dropdown_widget.h"
 #include "editor/editor.h"
 
 EditWindow::EditWindow(fw::WidgetList& widget_list, float width, float height, Editor& p_app)

@@ -7,8 +7,6 @@
 #include "common/history.h"
 #include "common/logger.h"
 #include "widgets/application.h"
-#include "widgets/scroll_area_widget.h"
-#include "widgets/canvas_widget.h"
 
 const sf::String WINDOW_TITLE = "Box2D Editor";
 const int WINDOW_WIDTH = 800;
@@ -50,6 +48,13 @@ private:
 
 sf::Vector2f to2f(sf::Vector2i vec);
 sf::Vector2f to2f(sf::Vector2u vec);
+
+namespace fw {
+	class RectangleWidget;
+	class TextWidget;
+	class ContainerWidget;
+}
+class Outliner;
 
 class Editor : public fw::Application {
 public:

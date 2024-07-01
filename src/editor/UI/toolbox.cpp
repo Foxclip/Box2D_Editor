@@ -1,4 +1,5 @@
 #include "editor/UI/toolbox.h"
+#include "widgets/text_widget.h"
 #include "editor/editor.h"
 
 Toolbox::Toolbox(fw::WidgetList& widget_list, Editor& p_app)

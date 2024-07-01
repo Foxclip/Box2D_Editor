@@ -1,4 +1,5 @@
 #include "editor/UI/outliner.h"
+#include "widgets/text_widget.h"
 #include "editor/editor.h"
 
 Outliner::Outliner(fw::WidgetList& widget_list, Editor& p_app) 
