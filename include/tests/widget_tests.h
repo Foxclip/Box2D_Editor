@@ -163,6 +163,7 @@ private:
 	void sizePolicyLimitsTest(test::Test& test);
 	void sizePolicyCombinedTest(test::Test& test);
 	void widgetLinkBasicTest(test::Test& test);
+	void widgetLinkTargetsFuncTest(test::Test& test);
 	void widgetLinkContainerTest(test::Test& test);
 	void widgetLinkRemoveTest(test::Test& test);
 	void textboxWidgetBasicTest(test::Test& test);

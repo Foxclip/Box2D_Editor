@@ -264,12 +264,17 @@ namespace fw {
 		WidgetLink* addLink(
 			const std::string& name,
 			const std::vector<WidgetUpdateTarget*>& targets,
-			const FuncType& func
+			const ExecuteFuncType& func
 		);
 		WidgetLink* addLink(
 			const std::string& name,
 			WidgetUpdateTarget* target,
-			const FuncType& func
+			const ExecuteFuncType& func
+		);
+		WidgetLink* addLink(
+			const std::string& name,
+			const TargetsFuncType& targets_func,
+			const ExecuteFuncType& func
 		);
 		void removeLink(WidgetLink* link);
 		void setForceCustomCursor(bool value);

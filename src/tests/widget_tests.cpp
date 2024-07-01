@@ -134,6 +134,7 @@ void WidgetTests::createTestLists() {
 
     test::TestList* widget_link_list = createTestList("WidgetLink", { widgets_basic_list, size_policy_list });
     test::Test* widget_link_basic_test = widget_link_list->addTest("basic", [&](test::Test& test) { widgetLinkBasicTest(test); });
+    test::Test* widget_link_targets_func_test = widget_link_list->addTest("target_func", [&](test::Test& test) { widgetLinkTargetsFuncTest(test); });
     test::Test* widget_link_container_test = widget_link_list->addTest("container", { widget_link_basic_test }, [&](test::Test& test) { widgetLinkContainerTest(test); });
     test::Test* widget_link_remove_test = widget_link_list->addTest("remove", { widget_link_basic_test }, [&](test::Test& test) { widgetLinkRemoveTest(test); });
 
@@ -175,9 +176,9 @@ void WidgetTests::createTestLists() {
 
     test::TestList* scroll_area_widget_list = createTestList("ScrollAreaWidget", { widgets_basic_list });
     test::Test* scroll_area_widget_basic_test = scroll_area_widget_list->addTest("basic", [&](test::Test& test) { scrollAreaWidgetBasicTest(test); });
-    test::Test* scroll_area_widget_scroll_test = scroll_area_widget_list->addTest("scroll", [&](test::Test& test) { scrollAreaWidgetScrollTest(test); });
-    test::Test* scroll_area_widget_scrollbar_visibility_test = scroll_area_widget_list->addTest("scrollbar_visibility", [&](test::Test& test) { scrollAreaWidgetScrollbarVisibilityTest(test); });
-    test::Test* scroll_area_widget_scrollbar_container_test = scroll_area_widget_list->addTest("scrollbar_container", [&](test::Test& test) { scrollAreaWidgetScrollbarContainerTest(test); });
+    test::Test* scroll_area_widget_scroll_test = scroll_area_widget_list->addTest("scroll", { scroll_area_widget_basic_test }, [&](test::Test& test) { scrollAreaWidgetScrollTest(test); });
+    test::Test* scroll_area_widget_scrollbar_visibility_test = scroll_area_widget_list->addTest("scrollbar_visibility", { scroll_area_widget_basic_test }, [&](test::Test& test) { scrollAreaWidgetScrollbarVisibilityTest(test); });
+    test::Test* scroll_area_widget_scrollbar_container_test = scroll_area_widget_list->addTest("scrollbar_container", { scroll_area_widget_scrollbar_visibility_test }, [&](test::Test& test) { scrollAreaWidgetScrollbarContainerTest(test); });
 
 }
 
@@ -1996,6 +1997,43 @@ void WidgetTests::widgetLinkBasicTest(test::Test& test) {
     rectangle_2_widget->addLink(
         "POS_Y",
         rectangle_1_widget->getPosYTarget(),
+        [=]() {
+            rectangle_2_widget->setGlobalPositionY(rectangle_1_widget->getGlobalTopRight().y);
+        }
+    );
+    application.advance();
+    T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position1_2);
+}
+
+void WidgetTests::widgetLinkTargetsFuncTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(30.0f, 30.0f);
+    sf::Vector2f position1(100.0f, 100.0f);
+    sf::Vector2f position1_1(50.0f, 50.0f);
+    sf::Vector2f position1_2(position1.x + size.x, position1.y);
+    fw::RectangleWidget* rectangle_1_widget = application.getWidgets().createWidget<fw::RectangleWidget>(size);
+    fw::RectangleWidget* rectangle_2_widget = application.getWidgets().createWidget<fw::RectangleWidget>(size);
+    rectangle_1_widget->setName("rect1");
+    rectangle_1_widget->setPosition(position1);
+    rectangle_2_widget->setName("rect2");
+    rectangle_2_widget->setPosition(position1_1);
+    rectangle_2_widget->addLink(
+        "POS_X",
+        [=]() {
+            return CompVector<fw::WidgetUpdateTarget*>{ rectangle_1_widget->getPosXTarget(), rectangle_1_widget->getSizeXTarget() };
+        },
+        [=]() {
+            rectangle_2_widget->setGlobalPositionX(rectangle_1_widget->getGlobalTopRight().x);
+        }
+    );
+    rectangle_2_widget->addLink(
+        "POS_Y",
+        [=]() {
+            return CompVector<fw::WidgetUpdateTarget*>{ rectangle_1_widget->getPosYTarget() };
+        },
         [=]() {
             rectangle_2_widget->setGlobalPositionY(rectangle_1_widget->getGlobalTopRight().y);
         }

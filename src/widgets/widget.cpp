@@ -884,7 +884,7 @@ namespace fw {
 	WidgetLink* Widget::addLink(
 		const std::string& name,
 		const std::vector<WidgetUpdateTarget*>& targets,
-		const FuncType& func
+		const ExecuteFuncType& func
 	) {
 		wAssert(!widget_list.isLocked());
 		std::unique_ptr<WidgetLink> uptr = std::make_unique<WidgetLink>(name, targets, this, func);
@@ -900,11 +900,23 @@ namespace fw {
 	WidgetLink* Widget::addLink(
 		const std::string& name,
 		WidgetUpdateTarget* target,
-		const FuncType& func
+		const ExecuteFuncType& func
 	) {
 		wAssert(!widget_list.isLocked());
 		std::vector<WidgetUpdateTarget*> targets = { target };
 		return addLink(name, targets, func);
+	}
+
+	WidgetLink* Widget::addLink(
+		const std::string& name,
+		const TargetsFuncType& targets_func,
+		const ExecuteFuncType& func
+	) {
+		wAssert(!widget_list.isLocked());
+		std::unique_ptr<WidgetLink> uptr = std::make_unique<WidgetLink>(name, targets_func, this, func);
+		WidgetLink* ptr = uptr.get();
+		links.add(std::move(uptr));
+		return ptr;
 	}
 
 	void Widget::removeLink(WidgetLink* link) {

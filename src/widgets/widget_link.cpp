@@ -22,7 +22,7 @@ namespace fw {
 		return widget;
 	}
 
-	const CompVector<WidgetUpdateTarget*>& WidgetUpdateTarget::getTargets() const {
+	const CompVector<WidgetUpdateTarget*> WidgetUpdateTarget::getTargets() const {
 		return targets;
 	}
 
@@ -66,12 +66,34 @@ namespace fw {
 		const std::string& name,
 		const CompVector<WidgetUpdateTarget*>& targets,
 		Widget* widget,
-		const FuncType& func
+		const ExecuteFuncType& func
 	) {
 		this->name = name;
 		this->targets = targets;
 		this->widget  = widget;
 		this->func = func;
+		this->fixed_targets = true;
+	}
+
+	WidgetLink::WidgetLink(
+		const std::string& name,
+		const TargetsFuncType& targets_func,
+		Widget* widget,
+		const ExecuteFuncType& func
+	) {
+		this->name = name;
+		this->targets_func = targets_func;
+		this->widget = widget;
+		this->func = func;
+		this->fixed_targets = false;
+	}
+
+	const CompVector<WidgetUpdateTarget*> WidgetLink::getTargets() const {
+		if (fixed_targets) {
+			return targets;
+		} else {
+			return targets_func();
+		}
 	}
 
 	std::string WidgetLink::toStr() const {

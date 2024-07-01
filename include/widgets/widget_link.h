@@ -27,7 +27,7 @@ namespace fw {
 		Widget* getWidget() const;
 		virtual void execute() = 0;
 		virtual std::string toStr() const = 0;
-		const CompVector<WidgetUpdateTarget*>& getTargets() const;
+		virtual const CompVector<WidgetUpdateTarget*> getTargets() const;
 		void addTarget(WidgetUpdateTarget* target);
 		void removeTarget(WidgetUpdateTarget* target);
 
@@ -55,7 +55,8 @@ namespace fw {
 
 	};
 
-	using FuncType = std::function<void(void)>;
+	using ExecuteFuncType = std::function<void(void)>;
+	using TargetsFuncType = std::function<CompVector<WidgetUpdateTarget*>(void)>;
 
 	class WidgetLink : public WidgetUpdateTarget {
 	public:
@@ -63,16 +64,25 @@ namespace fw {
 			const std::string& name,
 			const CompVector<WidgetUpdateTarget*>& targets,
 			Widget* widget,
-			const FuncType& func
+			const ExecuteFuncType& func
 		);
+		WidgetLink(
+			const std::string& name,
+			const TargetsFuncType& targets_func,
+			Widget* widget,
+			const ExecuteFuncType& func
+		);
+		const CompVector<WidgetUpdateTarget*> getTargets() const override;
 		std::string toStr() const override;
 		void execute() override;
 		void remove();
 
 	private:
 		friend class Widget;
+		bool fixed_targets = true;
+		TargetsFuncType targets_func;
 		std::string name;
-		FuncType func;
+		ExecuteFuncType func;
 
 	};
 
