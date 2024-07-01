@@ -325,13 +325,22 @@ namespace fw {
 	}
 
 	void ScrollAreaWidget::updateScrollbarXVisibility() {
-		bool x_state = getScrollbarXVisible();
-		scrollbar_x_widget->setVisible(x_state);
+		bool old_visible = scrollbar_x_widget->isVisible();
+		bool new_visible = getScrollbarXVisible();
+		scrollbar_x_widget->setVisible(new_visible);
+		if (!old_visible && new_visible) {
+			// if scrollbar was not visible, update was skipped, so updating it now
+			scrollbar_x_widget->getPosYTarget()->execute();
+		}
 	}
 
 	void ScrollAreaWidget::updateScrollbarYVisibility() {
-		bool y_state = getScrollbarYVisible();
-		scrollbar_y_widget->setVisible(y_state);
+		bool old_visible = scrollbar_y_widget->isVisible();
+		bool new_visible = getScrollbarYVisible();
+		scrollbar_y_widget->setVisible(new_visible);
+		if (!old_visible && new_visible) {
+			scrollbar_y_widget->getPosXTarget()->execute();
+		}
 
 	}
 
