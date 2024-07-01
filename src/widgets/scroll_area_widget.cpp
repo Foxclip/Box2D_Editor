@@ -259,30 +259,38 @@ namespace fw {
 		}
 	}
 
-	void ScrollAreaWidget::updateScrollbarVisibility() {
-		// Calculation of whether scrollbars are visible must be done in two stages:
-		// First, calculate whether scrollbar is visible without taking other scrollbar into account,
-		// second, calculate final states given individual states.
+	bool ScrollAreaWidget::getScrollbarXVisible() {
+		// Calculation of whether scrollbar is visible must be done in two stages:
+		// First, calculate whether scrollbar is visible without taking the other scrollbar into account,
+		// second, calculate final state given individual state.
 		// This helps to avoid issue when scroll area is almost as big as scrolled widget,
 		// and the size of the scroll area is changing.
-		bool x_state = false;
-		bool y_state = false;
 		bool x_state_individual = getScrollbarXVisibleIndividual();
 		bool y_state_individual = getScrollbarYVisibleIndividual();
 		bool x_state_individual_is_final = !scrolled_widget || (scrollbar_x_policy != ScrollbarPolicy::SIZE);
-		bool y_state_individual_is_final = !scrolled_widget || (scrollbar_y_policy != ScrollbarPolicy::SIZE);
 		if (x_state_individual_is_final) {
-			x_state = x_state_individual;
+			return x_state_individual;
 		} else {
 			float scrollbar_y_effective_width = y_state_individual ? scrollbar_y_widget->getWidth() : 0.0f;
-			x_state = scrolled_widget->getWidth() > getWidth() - scrollbar_y_effective_width;
+			return scrolled_widget->getWidth() > getWidth() - scrollbar_y_effective_width;
 		}
+	}
+
+	bool ScrollAreaWidget::getScrollbarYVisible() {
+		bool x_state_individual = getScrollbarXVisibleIndividual();
+		bool y_state_individual = getScrollbarYVisibleIndividual();
+		bool y_state_individual_is_final = !scrolled_widget || (scrollbar_y_policy != ScrollbarPolicy::SIZE);
 		if (y_state_individual_is_final) {
-			y_state = y_state_individual;
+			return y_state_individual;
 		} else {
 			float scrollbar_x_effective_height = x_state_individual ? scrollbar_x_widget->getHeight() : 0.0f;
-			y_state = scrolled_widget->getHeight() > getHeight() - scrollbar_x_effective_height;
+			return scrolled_widget->getHeight() > getHeight() - scrollbar_x_effective_height;
 		}
+	}
+
+	void ScrollAreaWidget::updateScrollbarVisibility() {
+		bool x_state = getScrollbarXVisible();
+		bool y_state = getScrollbarYVisible();
 		bool corner_state = x_state && y_state;
 		scrollbar_x_widget->setVisible(x_state);
 		scrollbar_y_widget->setVisible(y_state);
@@ -290,12 +298,10 @@ namespace fw {
 	}
 
 	void ScrollAreaWidget::updateScroll() {
-		// size
 		float x_width = scrollbar_x_widget->getWidth() * getSizeXFactor();
 		float y_height = scrollbar_y_widget->getHeight() * getSizeYFactor();
 		slider_x_widget->setWidth(x_width);
 		slider_y_widget->setHeight(y_height);
-		// position
 		float pos_x = getSliderXFromArea();
 		float pos_y = getSliderYFromArea();
 		slider_x_widget->setPositionX(pos_x);

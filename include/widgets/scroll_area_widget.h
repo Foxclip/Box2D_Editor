@@ -70,6 +70,8 @@ namespace fw {
 	private:
 		bool getScrollbarXVisibleIndividual();
 		bool getScrollbarYVisibleIndividual();
+		bool getScrollbarXVisible();
+		bool getScrollbarYVisible();
 		void updateScrollbarVisibility();
 		void updateScroll();
 		void updateColors();
