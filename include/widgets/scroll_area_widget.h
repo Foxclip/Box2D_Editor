@@ -68,6 +68,8 @@ namespace fw {
 		void internalOnScrollY(const sf::Vector2f& pos, float delta) override;
 
 	private:
+		bool getScrollbarXVisibleIndividual();
+		bool getScrollbarYVisibleIndividual();
 		void updateScrollbarVisibility();
 		void updateScroll();
 		void updateColors();

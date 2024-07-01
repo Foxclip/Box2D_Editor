@@ -156,7 +156,7 @@ public:
 	};
 	ObjectType type = BOX;
 	CompVector<fw::Widget*> create_buttons;
-	fw::ContainerWidget* create_panel_widget = nullptr;
+	CreatePanel* create_panel_widget = nullptr;
 
 	CreateTool();
 	void reset() override;

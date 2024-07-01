@@ -133,7 +133,7 @@ private:
 	fw::Font small_font;
 	fw::Font textbox_font;
 	fw::ContainerWidget* paused_rect_widget = nullptr;
-	fw::ContainerWidget* toolbox_widget = nullptr;
+	Toolbox* toolbox_widget = nullptr;
 	Tool* selected_tool = nullptr;
 	std::vector<Tool*> tools_in_tool_panel;
 	FpsCounter fps_counter;
@@ -145,7 +145,7 @@ private:
 	sf::CircleShape origin_shape;
 	sf::Text object_info_text;
 	sf::Text id_text;
-	fw::ScrollAreaWidget* outliner_widget = nullptr;
+	Outliner* outliner_widget = nullptr;
 
 	const float MOUSE_FORCE_SCALE = 50.0f;
 	float timeStep = 1.0f / FPS;

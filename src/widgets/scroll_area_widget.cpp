@@ -229,46 +229,48 @@ namespace fw {
 		scrollY(delta_y * -delta);
 	}
 
+	bool ScrollAreaWidget::getScrollbarXVisibleIndividual() {
+		if (scrollbar_x_policy == ScrollbarPolicy::OFF) {
+			return false;
+		} else if (scrollbar_x_policy == ScrollbarPolicy::ON) {
+			return false;
+		} else {
+			if (!scrolled_widget) {
+				return false;
+			} else {
+				float scrolled_width = scrolled_widget->getWidth();
+				float width = getWidth();
+				return scrolled_widget->getWidth() > getWidth();
+			}
+		}
+	}
+
+	bool ScrollAreaWidget::getScrollbarYVisibleIndividual() {
+		if (scrollbar_y_policy == ScrollbarPolicy::OFF) {
+			return false;
+		} else if (scrollbar_y_policy == ScrollbarPolicy::ON) {
+			return true;
+		} else {
+			if (!scrolled_widget) {
+				return false;
+			} else {
+				return scrolled_widget->getHeight() > getHeight();
+			}
+		}
+	}
+
 	void ScrollAreaWidget::updateScrollbarVisibility() {
 		// Calculation of whether scrollbars are visible must be done in two stages:
 		// First, calculate whether scrollbar is visible without taking other scrollbar into account,
 		// second, calculate final states given individual states.
 		// This helps to avoid issue when scroll area is almost as big as scrolled widget,
 		// and the size of the scroll area is changing.
-		bool x_state_individual = false;
-		bool y_state_individual = false;
-		bool x_state_individual_is_final = false;
-		bool y_state_individual_is_final = false;
-		if (scrollbar_x_policy == ScrollbarPolicy::OFF) {
-			x_state_individual = false;
-			x_state_individual_is_final = true;
-		} else if (scrollbar_x_policy == ScrollbarPolicy::ON) {
-			x_state_individual = true;
-			x_state_individual_is_final = true;
-		} else {
-			if (!scrolled_widget) {
-				x_state_individual = false;
-				x_state_individual_is_final = true;
-			} else {
-				x_state_individual = scrolled_widget->getWidth() > getWidth();
-			}
-		}
-		if (scrollbar_y_policy == ScrollbarPolicy::OFF) {
-			y_state_individual = false;
-			y_state_individual_is_final = true;
-		} else if (scrollbar_y_policy == ScrollbarPolicy::ON) {
-			y_state_individual = true;
-			y_state_individual_is_final = true;
-		} else {
-			if (!scrolled_widget) {
-				y_state_individual = false;
-				y_state_individual_is_final = true;
-			} else {
-				y_state_individual = scrolled_widget->getHeight() > getHeight();
-			}
-		}
 		bool x_state = false;
 		bool y_state = false;
+		bool x_state_individual = getScrollbarXVisibleIndividual();
+		bool y_state_individual = getScrollbarYVisibleIndividual();
+		bool x_state_individual_is_final = !scrolled_widget || (scrollbar_x_policy != ScrollbarPolicy::SIZE);
+		bool y_state_individual_is_final = !scrolled_widget || (scrollbar_y_policy != ScrollbarPolicy::SIZE);
 		if (x_state_individual_is_final) {
 			x_state = x_state_individual;
 		} else {
