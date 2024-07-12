@@ -27,7 +27,6 @@ int main() {
 
     execute_app();
 
-    // TODO: fix blinking x scrollbar on outliner
     // TODO: object list window (outliner)
     // TODO: render polygon indices
     // TODO: make widgets a separate library

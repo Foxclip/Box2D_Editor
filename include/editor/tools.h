@@ -44,8 +44,8 @@ class Tool {
 public:
 	std::string name;
 	fw::Widget* widget = nullptr;
-	Event<void(bool)> OnSetSelected;
-	Event<void(bool)> OnSetSelectedWithButton;
+	Event<bool> OnSetSelected;
+	Event<bool> OnSetSelectedWithButton;
 
 	Tool();
 	virtual void reset() = 0;
@@ -58,8 +58,8 @@ public:
 	GameObject* hover_object = nullptr;
 	RectangleSelect rectangle_select;
 	CompVector<GameObject*> objects_in_rect;
-	Event<void(GameObject*)> OnObjectSelected;
-	Event<void(GameObject*)> OnObjectDeselected;
+	Event<GameObject*> OnObjectSelected;
+	Event<GameObject*> OnObjectDeselected;
 
 	SelectTool();
 	size_t selectedCount() const;

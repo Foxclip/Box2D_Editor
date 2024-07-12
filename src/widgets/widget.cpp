@@ -1233,7 +1233,7 @@ namespace fw {
 		const sf::Transform& transformable_transform = transformable->getTransform();
 		wAssert(transformable_transform == sf::Transform::Identity);
 		wAssert(transformable->getOrigin() == sf::Vector2f());
-		OnBeforeRender(normal_texture);
+		OnBeforeRender(static_cast<sf::RenderTarget&>(normal_texture));
 		sf::Drawable* drawable = getDrawable();
 		wAssert(drawable);
 		sf::RenderStates states(combined);
@@ -1243,7 +1243,7 @@ namespace fw {
 		for (size_t i = 0; i < render_iterations; i++) {
 			normal_texture.draw(*drawable, states);
 		}
-		OnAfterRender(normal_texture);
+		OnAfterRender(static_cast<sf::RenderTarget&>(normal_texture));
 		normal_texture.display();
 	}
 

@@ -9,9 +9,9 @@
 class GameObjectList {
 public:
 	std::unique_ptr<b2World> world;
-	Event<void(GameObject*)> OnObjectAdded;
-	Event<void(GameObject*)> OnObjectRemoved;
-	Event<void(void)> OnClear;
+	Event<GameObject*> OnObjectAdded;
+	Event<GameObject*> OnObjectRemoved;
+	Event<> OnClear;
 
 	b2World* getWorld() const;
 	size_t getTopSize() const;
