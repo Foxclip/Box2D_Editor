@@ -217,7 +217,10 @@ namespace fw {
 		if (event.type == sf::Event::Resized) {
 			for (RenderQueueLayer layer : render_queue.get()) {
 				for (Widget* widget : layer.widgets) {
-					widget->OnWindowResized(event.size.width, event.size.height);
+					widget->OnWindowResized(
+						static_cast<unsigned int>(event.size.width),
+						static_cast<unsigned int>(event.size.height)
+					);
 				}
 			}
 		}

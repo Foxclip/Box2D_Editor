@@ -26,7 +26,7 @@ inline void Event<TArgs...>::operator+=(const std::function<void(TArgs...)>& fun
 template<typename ...TArgs>
 template<typename ...TFuncArgs>
 inline void Event<TArgs...>::operator()(TFuncArgs&&... args) {
-	invoke(std::forward<TArgs&&>(const_cast<TArgs&&>(args))...);
+	invoke(std::forward<TArgs&&>(args)...);
 }
 
 template<typename ...TArgs>
