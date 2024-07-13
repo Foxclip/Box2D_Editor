@@ -24,12 +24,16 @@ public:
 	public:
 		Entry(GameObject* object, fw::ContainerWidget* widget);
 		~Entry();
+		fw::ContainerWidget* getWidget() const;
+		fw::RectangleWidget* getRectangleWidget() const;
+		fw::ContainerWidget* getChildrenWidget() const;
 		void select();
 		void deselect();
 	private:
 		GameObject* object = nullptr;
 		fw::ContainerWidget* widget = nullptr;
 		fw::RectangleWidget* rectangle_widget = nullptr;
+		fw::ContainerWidget* children_widget = nullptr;
 	};
 
 	Outliner(fw::WidgetList& widget_list, Editor& p_app);

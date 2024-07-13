@@ -785,7 +785,7 @@ void SimulationTests::eventTest(test::Test& test) {
     simulation.OnObjectAdded += [&](GameObject* object) {
         added_objects.push_back(object);
     };
-    simulation.OnObjectRemoved += [&](GameObject* object) {
+    simulation.OnBeforeObjectRemoved += [&](GameObject* object) {
         removed_objects.push_back(object);
         removed_object_ids.push_back(object->getId());
     };

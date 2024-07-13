@@ -113,7 +113,7 @@ simulation
 
     object polygon
         id 5
-        name "car0"
+        name "car bottom"
         vertices 5 0 0.49999997 0.866025448 -2.50000024 4.33012676 -1 -8.74227766e-08 -2.49999952 -4.33012724 0.499999911 -0.866025448
         color 255 0 0 255
         body
@@ -145,7 +145,7 @@ simulation
     object ball
         id 6
         parent_id 5
-        name "car0 wheel0"
+        name "car bottom wheel right"
         radius 1
         color 255 255 0 255
         notch_color 64 64 0 255
@@ -168,7 +168,7 @@ simulation
     object ball
         id 7
         parent_id 5
-        name "car0 wheel1"
+        name "car bottom wheel top"
         radius 1
         color 255 255 0 255
         notch_color 64 64 0 255
@@ -191,7 +191,7 @@ simulation
     object ball
         id 8
         parent_id 5
-        name "car0 wheel2"
+        name "car bottom wheel left"
         radius 1
         color 255 255 0 255
         notch_color 64 64 0 255
@@ -213,7 +213,7 @@ simulation
 
     object polygon
         id 9
-        name "car0"
+        name "car left"
         vertices 5 0 0.49999997 0.866025448 -2.50000024 4.33012676 -1 -8.74227766e-08 -2.49999952 -4.33012724 0.499999911 -0.866025448
         color 255 0 0 255
         body
@@ -245,7 +245,7 @@ simulation
     object ball
         id 11
         parent_id 9
-        name "car0 wheel1"
+        name "car left wheel left"
         radius 1
         color 255 255 0 255
         notch_color 64 64 0 255
@@ -268,7 +268,7 @@ simulation
     object ball
         id 12
         parent_id 9
-        name "car0 wheel2"
+        name "car left wheel right"
         radius 1
         color 255 255 0 255
         notch_color 64 64 0 255
@@ -290,7 +290,7 @@ simulation
 
     object polygon
         id 13
-        name "car0"
+        name "car right"
         vertices 5 0 0.49999997 0.866025448 -2.50000024 4.33012676 -1 -8.74227766e-08 -2.49999952 -4.33012724 0.499999911 -0.866025448
         color 255 0 0 255
         body
@@ -322,7 +322,7 @@ simulation
     object ball
         id 14
         parent_id 13
-        name "car0 wheel1"
+        name "car right wheel left"
         radius 1
         color 255 255 0 255
         notch_color 64 64 0 255
@@ -345,7 +345,7 @@ simulation
     object ball
         id 15
         parent_id 13
-        name "car0 wheel2"
+        name "car right wheel right"
         radius 1
         color 255 255 0 255
         notch_color 64 64 0 255
@@ -371,6 +371,7 @@ simulation
         anchor_a 5 0
         anchor_b 0 0
         collide_connected false
+        reference_angle 0
         angle_lower_limit 0
         angle_upper_limit 0
         angle_limit_enabled false
@@ -385,6 +386,7 @@ simulation
         anchor_a -2.50000024 4.33012676
         anchor_b 0 0
         collide_connected false
+        reference_angle 0
         angle_lower_limit 0
         angle_upper_limit 0
         angle_limit_enabled false
@@ -399,6 +401,7 @@ simulation
         anchor_a -2.49999952 -4.33012724
         anchor_b 0 0
         collide_connected false
+        reference_angle 0
         angle_lower_limit 0
         angle_upper_limit 0
         angle_limit_enabled false
@@ -413,6 +416,7 @@ simulation
         anchor_a -2.50000024 4.33012676
         anchor_b 0 0
         collide_connected false
+        reference_angle 0
         angle_lower_limit 0
         angle_upper_limit 0
         angle_limit_enabled false
@@ -427,6 +431,7 @@ simulation
         anchor_a -2.49999952 -4.33012724
         anchor_b 0 0
         collide_connected false
+        reference_angle 0
         angle_lower_limit 0
         angle_upper_limit 0
         angle_limit_enabled false
@@ -441,6 +446,7 @@ simulation
         anchor_a -2.50000024 4.33012676
         anchor_b 0 0
         collide_connected false
+        reference_angle 0
         angle_lower_limit 0
         angle_upper_limit 0
         angle_limit_enabled false
@@ -455,6 +461,7 @@ simulation
         anchor_a -2.49999952 -4.33012724
         anchor_b 0 0
         collide_connected false
+        reference_angle 0
         angle_lower_limit 0
         angle_upper_limit 0
         angle_limit_enabled false

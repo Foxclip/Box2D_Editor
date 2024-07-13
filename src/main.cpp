@@ -28,6 +28,8 @@ int main() {
     execute_app();
 
     // TODO: object list window (outliner)
+    // TODO: OnAfterObjectRemoved test
+    // TODO: OnObjectRenamed event in GameObjectList
     // TODO: render polygon indices
     // TODO: make widgets a separate library
     // TODO: delay editing polygons with many vertices

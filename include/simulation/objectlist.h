@@ -10,7 +10,8 @@ class GameObjectList {
 public:
 	std::unique_ptr<b2World> world;
 	Event<GameObject*> OnObjectAdded;
-	Event<GameObject*> OnObjectRemoved;
+	Event<GameObject*> OnBeforeObjectRemoved;
+	Event<GameObject*> OnAfterObjectRemoved;
 	Event<GameObject*, GameObject*> OnParentSet;
 	Event<> OnClear;
 

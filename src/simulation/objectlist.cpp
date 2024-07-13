@@ -88,13 +88,15 @@ GameObject* GameObjectList::add(std::unique_ptr<GameObject> object, bool assign_
                     + std::to_string(ptr->parent_id)
                 );
             }
-            ptr->setParent(parent);
         } else {
             top_objects.add(ptr);
         }
         names.add(ptr->name, ptr);
         all_objects.add(std::move(object));
         OnObjectAdded(ptr);
+        if (ptr->parent_id >= 0) {
+            ptr->setParent(parent);
+        }
         return ptr;
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
@@ -206,12 +208,12 @@ void GameObjectList::transformFromRigidbody() {
 void GameObjectList::remove(GameObject* object, bool remove_children) {
     mAssert(object);
     mAssert(all_objects.contains(object));
-    OnObjectRemoved(object);
+    OnBeforeObjectRemoved(object);
+    object->setParent(nullptr);
     std::vector<Joint*> joints_copy = object->joints.getVector();
     for (Joint* joint : joints_copy) {
         removeJoint(joint);
     }
-    object->setParent(nullptr);
     CompVector<GameObject*> children_copy = object->getChildren();
     if (remove_children) {
         for (size_t i = 0; i < children_copy.size(); i++) {
@@ -228,6 +230,7 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
     ids.remove(object->id);
     names.remove(object->name, object);
     all_objects.remove(object);
+    OnAfterObjectRemoved(object);
 }
 
 void GameObjectList::removeJoint(Joint* joint) {

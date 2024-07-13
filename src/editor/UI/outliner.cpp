@@ -21,7 +21,7 @@ Outliner::Outliner(fw::WidgetList& widget_list, Editor& p_app)
 	object_list.OnObjectAdded += [&](GameObject* object) {
 		addObject(object);
 	};
-	object_list.OnObjectRemoved += [&](GameObject* object) {
+	object_list.OnAfterObjectRemoved += [&](GameObject* object) {
 		removeObject(object);
 	};
 	object_list.OnParentSet += [&](GameObject* object, GameObject* parent) {
@@ -39,6 +39,7 @@ Outliner::Outliner(fw::WidgetList& widget_list, Editor& p_app)
 }
 
 void Outliner::addObject(GameObject* object) {
+	logger << "AddObject: " << object->getId() << " \"" << object->getName() << "\"" << "\n";
 	fw::ContainerWidget* entry_widget = createEntryWidget(object);
 	entry_widget->setParent(container_widget);
 	std::unique_ptr<Entry> entry_uptr = std::make_unique<Entry>(object, entry_widget);
@@ -56,12 +57,21 @@ void Outliner::removeObject(GameObject* object) {
 }
 
 void Outliner::setParentToObject(GameObject* object, GameObject* parent) {
-	logger
-		<< "SetParent: "
-		<< object->getId() << " \"" << object->getName() << "\""
-		<< " -> "
-		<< parent->getId() << " \"" << parent->getName() << "\""
-		<< "\n";
+	std::string child_str = std::to_string(object->getId()) + " \"" + object->getName() + "\"";
+	std::string parent_str = "null";
+	if (parent) {
+		parent_str = std::to_string(parent->getId()) + " \"" + parent->getName() + "\"";
+	}
+	logger << "SetParent: " << child_str << " -> " << parent_str << "\n";
+	Entry* entry = object_entry[object];
+	fw::ContainerWidget* object_widget = entry->getWidget();
+	if (parent) {
+		Entry* parent_entry = object_entry[parent];
+		fw::ContainerWidget* children_widget = parent_entry->getChildrenWidget();
+		object_widget->setParent(children_widget);
+	} else {
+		object_widget->setParent(container_widget);
+	}
 }
 
 void Outliner::selectObject(GameObject* object) {
@@ -88,6 +98,7 @@ fw::ContainerWidget* Outliner::createEntryWidget(GameObject* object) {
 	// container
 	fw::ContainerWidget* entry_container_widget = widget_list.createWidget<fw::ContainerWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
 	entry_container_widget->setName(name + " entry");
+	entry_container_widget->setHorizontal(false);
 	entry_container_widget->setFillColor(sf::Color::Transparent);
 	entry_container_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
 	// rectangle
@@ -112,6 +123,13 @@ fw::ContainerWidget* Outliner::createEntryWidget(GameObject* object) {
 	text_widget->setOrigin(Anchor::CENTER_LEFT);
 	text_widget->setParentAnchor(Anchor::CENTER_LEFT);
 	text_widget->setParent(entry_rectangle_widget);
+	// children
+	fw::ContainerWidget* entry_children_widget = widget_list.createWidget<fw::ContainerWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
+	entry_children_widget->setName("children");
+	entry_children_widget->setHorizontal(false);
+	entry_children_widget->setFillColor(sf::Color::Red);
+	entry_children_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+	entry_children_widget->setParent(entry_container_widget);
 	return entry_container_widget;
 }
 
@@ -119,10 +137,25 @@ Outliner::Entry::Entry(GameObject* object, fw::ContainerWidget* widget) {
 	this->object = object;
 	this->widget = widget;
 	this->rectangle_widget = dynamic_cast<fw::RectangleWidget*>(widget->find("rectangle"));
+	mAssert(this->rectangle_widget);
+	this->children_widget = dynamic_cast<fw::ContainerWidget*>(widget->find("children"));
+	mAssert(this->children_widget);
 }
 
 Outliner::Entry::~Entry() {
 	widget->remove();
+}
+
+fw::ContainerWidget* Outliner::Entry::getWidget() const {
+	return widget;
+}
+
+fw::RectangleWidget* Outliner::Entry::getRectangleWidget() const {
+	return rectangle_widget;
+}
+
+fw::ContainerWidget* Outliner::Entry::getChildrenWidget() const {
+	return children_widget;
 }
 
 void Outliner::Entry::select() {
