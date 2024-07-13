@@ -212,6 +212,7 @@ void GameObject::setParent(GameObject* new_parent) {
 				object_list->top_objects.add(this);
 			}
 		}
+		object_list->OnParentSet(this, new_parent);
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
 	}

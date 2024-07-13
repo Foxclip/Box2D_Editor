@@ -780,12 +780,18 @@ void SimulationTests::eventTest(test::Test& test) {
     std::vector<GameObject*> removed_objects;
     std::vector<ptrdiff_t> removed_object_ids;
     bool on_clear = false;
+    GameObject* object = nullptr;
+    GameObject* parent = nullptr;
     simulation.OnObjectAdded += [&](GameObject* object) {
         added_objects.push_back(object);
     };
     simulation.OnObjectRemoved += [&](GameObject* object) {
         removed_objects.push_back(object);
         removed_object_ids.push_back(object->getId());
+    };
+    simulation.OnParentSet += [&](GameObject* p_object, GameObject* p_parent) {
+        object = p_object;
+        parent = p_parent;
     };
     simulation.OnClear += [&]() {
         on_clear = true;
@@ -798,10 +804,18 @@ void SimulationTests::eventTest(test::Test& test) {
     T_CHECK(added_objects[1] == box1);
     T_CHECK(added_objects[2] == box2);
     T_COMPARE(removed_objects.size(), 0);
+    T_CHECK(!object);
+    T_CHECK(!parent);
     T_CHECK(!on_clear);
-    simulation.remove(box0, true);
-    simulation.remove(box1, true);
-    simulation.remove(box2, true);
+    box1->setParent(box0);
+    T_ASSERT(T_COMPARE(added_objects.size(), 3));
+    T_COMPARE(removed_objects.size(), 0);
+    T_CHECK(object == box1);
+    T_CHECK(parent == box0);
+    T_CHECK(!on_clear);
+    simulation.remove(box0, false);
+    simulation.remove(box1, false);
+    simulation.remove(box2, false);
     T_ASSERT(T_COMPARE(removed_objects.size(), 3));
     T_CHECK(removed_objects[0] == box0);
     T_CHECK(removed_objects[1] == box1);
