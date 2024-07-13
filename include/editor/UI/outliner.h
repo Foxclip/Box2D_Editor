@@ -22,13 +22,14 @@ class Outliner : public fw::ScrollAreaWidget {
 public:
 	class Entry {
 	public:
-		Entry(GameObject* object, fw::RectangleWidget* widget);
+		Entry(GameObject* object, fw::ContainerWidget* widget);
 		~Entry();
 		void select();
 		void deselect();
 	private:
 		GameObject* object = nullptr;
-		fw::RectangleWidget* widget = nullptr;
+		fw::ContainerWidget* widget = nullptr;
+		fw::RectangleWidget* rectangle_widget = nullptr;
 	};
 
 	Outliner(fw::WidgetList& widget_list, Editor& p_app);
@@ -42,8 +43,9 @@ private:
 
 	void addObject(GameObject* object);
 	void removeObject(GameObject* object);
+	void setParentToObject(GameObject* object, GameObject* parent);
 	void selectObject(GameObject* object);
 	void deselectObject(GameObject* object);
 	void clear();
-	fw::RectangleWidget* createEntryWidget(GameObject* object);
+	fw::ContainerWidget* createEntryWidget(GameObject* object);
 };
