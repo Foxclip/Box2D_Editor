@@ -789,7 +789,7 @@ void SimulationTests::eventTest(test::Test& test) {
         removed_objects.push_back(object);
         removed_object_ids.push_back(object->getId());
     };
-    simulation.OnParentSet += [&](GameObject* p_object, GameObject* p_parent) {
+    simulation.OnSetParent += [&](GameObject* p_object, GameObject* p_parent) {
         object = p_object;
         parent = p_parent;
     };

@@ -165,8 +165,13 @@ namespace fw {
 			}
 		};
 		std::vector<Widget*> expanding_widgets;
+		size_t visible_count = 0;
 		for (size_t i = 0; i < children.size(); i++) {
 			Widget* child = children[i];
+			if (!child->isVisible()) {
+				continue;
+			}
+			visible_count++;
 			if (get_size_policy(child) == Widget::SizePolicy::EXPAND) {
 				wAssert(child->getMinSize().x <= child->getMaxSize().x || child->getMaxSize().x < 0.0f);
 				wAssert(child->getMinSize().y <= child->getMaxSize().y || child->getMaxSize().y < 0.0f);
@@ -177,7 +182,7 @@ namespace fw {
 			}
 		}
 		float edge_padding = get_padding() * 2.0f;
-		float between_padding = get_padding() * (children.size() - 1);
+		float between_padding = get_padding() * (visible_count - 1);
 		float container_free_space = get_container_size() - edge_padding - between_padding;
 		float expanding_free_space = container_free_space - fixed_size;
 		// setting widgets to their minimum size
@@ -221,6 +226,9 @@ namespace fw {
 		float next_pos = get_padding();
 		for (size_t i = 0; i < children.size(); i++) {
 			Widget* child = children[i];
+			if (!child->isVisible()) {
+				continue;
+			}
 			sf::Vector2f child_pos =
 				horizontal
 				? sf::Vector2f(next_pos, child->getPosition().y)

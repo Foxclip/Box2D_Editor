@@ -8,6 +8,7 @@
 
 const sf::Vector2f OUTLINER_DEFAULT_SIZE = sf::Vector2f(300.0f, 200.0f);
 const float OUTLINER_ENTRY_HEIGHT = 20.0f;
+const float OUTLINER_ENTRY_CHILDREN_OFFSET = 20.0f;
 const unsigned int OUTLINER_ENTRY_FONT_SIZE = 12;
 const sf::Color OUTLINER_BACKGROUND_COLOR = sf::Color(128, 128, 128);
 const sf::Color OUTLINER_SCROLLBAR_COLOR = sf::Color(110, 110, 110);
@@ -22,23 +23,30 @@ class Outliner : public fw::ScrollAreaWidget {
 public:
 	class Entry {
 	public:
-		Entry(GameObject* object, fw::ContainerWidget* widget);
+		Entry(Outliner& outliner, GameObject* object);
 		~Entry();
 		fw::ContainerWidget* getWidget() const;
 		fw::RectangleWidget* getRectangleWidget() const;
+		fw::ContainerWidget* getChildrenBoxWidget() const;
+		fw::EmptyWidget* getChildrenSpacingWidget() const;
 		fw::ContainerWidget* getChildrenWidget() const;
 		void select();
 		void deselect();
 	private:
+		Outliner& outliner;
 		GameObject* object = nullptr;
 		fw::ContainerWidget* widget = nullptr;
 		fw::RectangleWidget* rectangle_widget = nullptr;
+		fw::ContainerWidget* children_box_widget = nullptr;
+		fw::EmptyWidget* children_spacing_widget = nullptr;
 		fw::ContainerWidget* children_widget = nullptr;
+
 	};
 
 	Outliner(fw::WidgetList& widget_list, Editor& p_app);
 
 private:
+	friend class Entry;
 	Editor& app;
 	GameObjectList& object_list;
 	fw::ContainerWidget* container_widget = nullptr;
@@ -51,5 +59,4 @@ private:
 	void selectObject(GameObject* object);
 	void deselectObject(GameObject* object);
 	void clear();
-	fw::ContainerWidget* createEntryWidget(GameObject* object);
 };

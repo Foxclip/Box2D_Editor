@@ -12,7 +12,7 @@ public:
 	Event<GameObject*> OnObjectAdded;
 	Event<GameObject*> OnBeforeObjectRemoved;
 	Event<GameObject*> OnAfterObjectRemoved;
-	Event<GameObject*, GameObject*> OnParentSet;
+	Event<GameObject*, GameObject*> OnSetParent;
 	Event<> OnClear;
 
 	b2World* getWorld() const;

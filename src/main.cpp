@@ -30,6 +30,7 @@ int main() {
     // TODO: object list window (outliner)
     // TODO: OnAfterObjectRemoved test
     // TODO: OnObjectRenamed event in GameObjectList
+    // TODOL test invisible widgets in container
     // TODO: render polygon indices
     // TODO: make widgets a separate library
     // TODO: delay editing polygons with many vertices

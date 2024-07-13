@@ -24,7 +24,7 @@ Outliner::Outliner(fw::WidgetList& widget_list, Editor& p_app)
 	object_list.OnAfterObjectRemoved += [&](GameObject* object) {
 		removeObject(object);
 	};
-	object_list.OnParentSet += [&](GameObject* object, GameObject* parent) {
+	object_list.OnSetParent += [&](GameObject* object, GameObject* parent) {
 		setParentToObject(object, parent);
 	};
 	object_list.OnClear += [&]() {
@@ -40,9 +40,7 @@ Outliner::Outliner(fw::WidgetList& widget_list, Editor& p_app)
 
 void Outliner::addObject(GameObject* object) {
 	logger << "AddObject: " << object->getId() << " \"" << object->getName() << "\"" << "\n";
-	fw::ContainerWidget* entry_widget = createEntryWidget(object);
-	entry_widget->setParent(container_widget);
-	std::unique_ptr<Entry> entry_uptr = std::make_unique<Entry>(object, entry_widget);
+	std::unique_ptr<Entry> entry_uptr = std::make_unique<Entry>(*this, object);
 	object_entry[object] = entry_uptr.get();
 	entries.add(std::move(entry_uptr));
 }
@@ -67,6 +65,7 @@ void Outliner::setParentToObject(GameObject* object, GameObject* parent) {
 	fw::ContainerWidget* object_widget = entry->getWidget();
 	if (parent) {
 		Entry* parent_entry = object_entry[parent];
+		parent_entry->getChildrenBoxWidget()->setVisible(true);
 		fw::ContainerWidget* children_widget = parent_entry->getChildrenWidget();
 		object_widget->setParent(children_widget);
 	} else {
@@ -93,53 +92,58 @@ void Outliner::clear() {
 	object_entry.clear();
 }
 
-fw::ContainerWidget* Outliner::createEntryWidget(GameObject* object) {
+Outliner::Entry::Entry(Outliner& outliner, GameObject* object) : outliner(outliner) {
+	this->object = object;
 	sf::String name = object->getName();
 	// container
-	fw::ContainerWidget* entry_container_widget = widget_list.createWidget<fw::ContainerWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
-	entry_container_widget->setName(name + " entry");
-	entry_container_widget->setHorizontal(false);
-	entry_container_widget->setFillColor(sf::Color::Transparent);
-	entry_container_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+	widget = outliner.widget_list.createWidget<fw::ContainerWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
+	widget->setName(name + " entry");
+	widget->setHorizontal(false);
+	widget->setFillColor(sf::Color::Transparent);
+	widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+	widget->setParent(outliner.container_widget);
 	// rectangle
-	fw::RectangleWidget* entry_rectangle_widget = widget_list.createWidget<fw::RectangleWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
-	entry_rectangle_widget->setFillColor(OUTLINER_ENTRY_BACKGROUND_COLOR);
-	entry_rectangle_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
-	entry_rectangle_widget->OnLeftPress += [&, object](const sf::Vector2f& pos) {
-		app.setActiveObject(object);
-		bool with_children = app.isLCtrlPressed();
-		if (app.isLShiftPressed()) {
-			app.select_tool.toggleSelect(object, with_children);
+	rectangle_widget = outliner.widget_list.createWidget<fw::RectangleWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
+	rectangle_widget->setFillColor(OUTLINER_ENTRY_BACKGROUND_COLOR);
+	rectangle_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+	rectangle_widget->OnLeftPress += [&, object](const sf::Vector2f& pos) {
+		this->outliner.app.setActiveObject(object);
+		bool with_children = this->outliner.app.isLCtrlPressed();
+		if (this->outliner.app.isLShiftPressed()) {
+			this->outliner.app.select_tool.toggleSelect(object, with_children);
 		} else {
-			app.select_tool.selectSingleObject(object, with_children);
+			this->outliner.app.select_tool.selectSingleObject(object, with_children);
 		}
 	};
-	entry_rectangle_widget->setParent(entry_container_widget);
+	rectangle_widget->setParent(widget);
 	// text
-	fw::TextWidget* text_widget = widget_list.createWidget<fw::TextWidget>();
+	fw::TextWidget* text_widget = outliner.widget_list.createWidget<fw::TextWidget>();
 	text_widget->setCharacterSize(OUTLINER_ENTRY_FONT_SIZE);
 	text_widget->setFillColor(OUTLINER_ENTRY_TEXT_COLOR);
 	text_widget->setString(name);
 	text_widget->setOrigin(Anchor::CENTER_LEFT);
 	text_widget->setParentAnchor(Anchor::CENTER_LEFT);
-	text_widget->setParent(entry_rectangle_widget);
+	text_widget->setParent(rectangle_widget);
+	// children box
+	children_box_widget = outliner.widget_list.createWidget<fw::ContainerWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
+	children_box_widget->setName("children box");
+	children_box_widget->setVisible(false);
+	children_box_widget->setRenderable(false);
+	children_box_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+	children_box_widget->setParent(widget);
+	// spacing
+	children_spacing_widget = outliner.widget_list.createWidget<fw::EmptyWidget>();
+	children_spacing_widget->setName("spacing");
+	children_spacing_widget->setSize(OUTLINER_ENTRY_CHILDREN_OFFSET, 1.0f);
+	children_spacing_widget->setParent(children_box_widget);
 	// children
-	fw::ContainerWidget* entry_children_widget = widget_list.createWidget<fw::ContainerWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
-	entry_children_widget->setName("children");
-	entry_children_widget->setHorizontal(false);
-	entry_children_widget->setFillColor(sf::Color::Red);
-	entry_children_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
-	entry_children_widget->setParent(entry_container_widget);
-	return entry_container_widget;
-}
-
-Outliner::Entry::Entry(GameObject* object, fw::ContainerWidget* widget) {
-	this->object = object;
-	this->widget = widget;
-	this->rectangle_widget = dynamic_cast<fw::RectangleWidget*>(widget->find("rectangle"));
-	mAssert(this->rectangle_widget);
-	this->children_widget = dynamic_cast<fw::ContainerWidget*>(widget->find("children"));
-	mAssert(this->children_widget);
+	children_widget = outliner.widget_list.createWidget<fw::ContainerWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
+	children_widget->setName("children");
+	children_widget->setHorizontal(false);
+	//children_widget->setPaddingY(OUTLINER_CONTAINER_PADDING);
+	children_widget->setRenderable(false);
+	children_widget->setSizeXPolicy(fw::Widget::SizePolicy::EXPAND);
+	children_widget->setParent(children_box_widget);
 }
 
 Outliner::Entry::~Entry() {
@@ -154,6 +158,14 @@ fw::RectangleWidget* Outliner::Entry::getRectangleWidget() const {
 	return rectangle_widget;
 }
 
+fw::ContainerWidget* Outliner::Entry::getChildrenBoxWidget() const {
+	return children_box_widget;
+}
+
+fw::EmptyWidget* Outliner::Entry::getChildrenSpacingWidget() const {
+	return children_spacing_widget;
+}
+
 fw::ContainerWidget* Outliner::Entry::getChildrenWidget() const {
 	return children_widget;
 }
@@ -165,3 +177,4 @@ void Outliner::Entry::select() {
 void Outliner::Entry::deselect() {
 	rectangle_widget->setFillColor(OUTLINER_ENTRY_BACKGROUND_COLOR);
 }
+
