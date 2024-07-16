@@ -99,6 +99,7 @@ Outliner::Entry::Entry(Outliner& outliner, GameObject* object) : outliner(outlin
 	widget = outliner.widget_list.createWidget<fw::ContainerWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
 	widget->setName(name + " entry");
 	widget->setHorizontal(false);
+	widget->setInnerPaddingY(OUTLINER_CONTAINER_PADDING);
 	widget->setFillColor(sf::Color::Transparent);
 	widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
 	widget->setParent(outliner.container_widget);
@@ -140,7 +141,7 @@ Outliner::Entry::Entry(Outliner& outliner, GameObject* object) : outliner(outlin
 	children_widget = outliner.widget_list.createWidget<fw::ContainerWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
 	children_widget->setName("children");
 	children_widget->setHorizontal(false);
-	//children_widget->setPaddingY(OUTLINER_CONTAINER_PADDING);
+	children_widget->setInnerPaddingY(OUTLINER_CONTAINER_PADDING);
 	children_widget->setRenderable(false);
 	children_widget->setSizeXPolicy(fw::Widget::SizePolicy::EXPAND);
 	children_widget->setParent(children_box_widget);
