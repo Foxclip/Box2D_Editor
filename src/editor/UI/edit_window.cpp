@@ -154,7 +154,7 @@ void EditWindow::setSpacingWidgets() {
         fw::TextWidget* text_widget = dynamic_cast<fw::TextWidget*>(parameter->getWidget()->find("text"));
         EmptyWidget* spacing_widget = dynamic_cast<fw::EmptyWidget*>(parameter->getWidget()->find("spacing"));
         mAssert(spacing_widget);
-        float padding = container_widget->getPaddingX();
+        float padding = container_widget->getInnerPaddingX();
         spacing_widget->setWidth(max_text_width + padding - text_widget->getWidth());
     }
 }

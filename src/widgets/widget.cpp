@@ -1126,8 +1126,8 @@ namespace fw {
 		sf::Vector2f new_size = getSize();
 		if (size_policy_x == SizePolicy::PARENT) {
 			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(parent)) {
-				new_pos.x = container->getPaddingX();
-				new_size.x = container->getWidth() - container->getPaddingX() * 2;
+				new_pos.x = container->getInnerPaddingX();
+				new_size.x = container->getWidth() - container->getInnerPaddingX() * 2;
 			} else {
 				new_pos.x = 0.0f;
 				new_size.x = parent->getWidth();
@@ -1143,8 +1143,8 @@ namespace fw {
 		sf::Vector2f new_size = getSize();
 		if (size_policy_y == SizePolicy::PARENT) {
 			if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(parent)) {
-				new_pos.y = container->getPaddingY();
-				new_size.y = container->getHeight() - container->getPaddingY() * 2;
+				new_pos.y = container->getInnerPaddingY();
+				new_size.y = container->getHeight() - container->getInnerPaddingY() * 2;
 			} else {
 				new_pos.y = 0.0f;
 				new_size.y = parent->getHeight();

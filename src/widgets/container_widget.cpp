@@ -18,12 +18,28 @@ namespace fw {
 		return horizontal;
 	}
 
-	float ContainerWidget::getPaddingX() const {
-		return padding_x;
+	float ContainerWidget::getInnerPaddingX() const {
+		return inner_padding_x;
 	}
 
-	float ContainerWidget::getPaddingY() const {
-		return padding_y;
+	float ContainerWidget::getInnerPaddingY() const {
+		return inner_padding_y;
+	}
+
+	float ContainerWidget::getTopPadding() const {
+		return top_padding;
+	}
+
+	float ContainerWidget::getBottomPadding() const {
+		return bottom_padding;
+	}
+
+	float ContainerWidget::getLeftPadding() const {
+		return left_padding;
+	}
+
+	float ContainerWidget::getRightPadding() const {
+		return right_padding;
 	}
 
 	Widget::Alignment ContainerWidget::getAlignmentY() const {
@@ -39,16 +55,48 @@ namespace fw {
 	}
 
 	void ContainerWidget::setPadding(float padding) {
-		this->padding_x = padding;
-		this->padding_y = padding;
+		this->inner_padding_x = padding;
+		this->inner_padding_y = padding;
+		this->top_padding = padding;
+		this->bottom_padding = padding;
+		this->left_padding = padding;
+		this->right_padding = padding;
 	}
 
 	void ContainerWidget::setPaddingX(float padding) {
-		this->padding_x = padding;
+		this->inner_padding_x = padding;
+		this->left_padding = padding;
+		this->right_padding = padding;
 	}
 
 	void ContainerWidget::setPaddingY(float padding) {
-		this->padding_y = padding;
+		this->inner_padding_y = padding;
+		this->top_padding = padding;
+		this->bottom_padding = padding;
+	}
+
+	void ContainerWidget::setInnerPaddingX(float padding) {
+		this->inner_padding_x = padding;
+	}
+
+	void ContainerWidget::setInnerPaddingY(float padding) {
+		this->inner_padding_y = padding;
+	}
+
+	void ContainerWidget::setTopPadding(float padding) {
+		this->top_padding = padding;
+	}
+
+	void ContainerWidget::setBottomPadding(float padding) {
+		this->bottom_padding = padding;
+	}
+
+	void ContainerWidget::setLeftPadding(float padding) {
+		this->left_padding = padding;
+	}
+
+	void ContainerWidget::setRightPadding(float padding) {
+		this->right_padding = padding;
 	}
 
 	void ContainerWidget::setAlignmentX(Alignment alignment) {
@@ -63,7 +111,7 @@ namespace fw {
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
 		if (size_policy_x == SizePolicy::CHILDREN) {
-			new_size.x = children_bounds.width + padding_x;
+			new_size.x = children_bounds.width + right_padding;
 		} else {
 			Widget::updateSizeX();
 			return;
@@ -76,7 +124,7 @@ namespace fw {
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
 		if (size_policy_y == SizePolicy::CHILDREN) {
-			new_size.y = children_bounds.height + padding_y;
+			new_size.y = children_bounds.height + bottom_padding;
 		} else {
 			Widget::updateSizeY();
 			return;
@@ -148,8 +196,14 @@ namespace fw {
 		auto get_max_size = [&](const Widget* widget) {
 			return horizontal ? widget->getMaxSize().x : widget->getMaxSize().y;
 		};
-		auto get_padding = [&]() {
-			return horizontal ? padding_x : padding_y;
+		auto get_inner_padding = [&]() {
+			return horizontal ? inner_padding_x : inner_padding_y;
+		};
+		auto get_outer_padding_1 = [&]() {
+			return horizontal ? left_padding : top_padding;
+		};
+		auto get_outer_padding_2 = [&]() {
+			return horizontal ? right_padding : bottom_padding;
 		};
 		// calculating fixed size
 		float fixed_size = 0.0f;
@@ -181,9 +235,9 @@ namespace fw {
 				fixed_size += get_size(child);
 			}
 		}
-		float edge_padding = get_padding() * 2.0f;
-		float between_padding = get_padding() * (visible_count - 1);
-		float container_free_space = get_container_size() - edge_padding - between_padding;
+		float outer_padding = get_outer_padding_1() + get_outer_padding_2();
+		float inner_padding = get_inner_padding() * (visible_count - 1);
+		float container_free_space = get_container_size() - outer_padding - inner_padding;
 		float expanding_free_space = container_free_space - fixed_size;
 		// setting widgets to their minimum size
 		for (size_t i = 0; i < expanding_widgets.size(); i++) {
@@ -223,7 +277,7 @@ namespace fw {
 		}
 		// setting child positions
 		children_bounds = sf::FloatRect();
-		float next_pos = get_padding();
+		float next_pos = get_outer_padding_1();
 		for (size_t i = 0; i < children.size(); i++) {
 			Widget* child = children[i];
 			if (!child->isVisible()) {
@@ -234,7 +288,7 @@ namespace fw {
 				? sf::Vector2f(next_pos, child->getPosition().y)
 				: sf::Vector2f(child->getPosition().x, next_pos);
 			child->setPosition(child_pos);
-			next_pos += get_size(child) + get_padding();
+			next_pos += get_size(child) + get_inner_padding();
 			sf::FloatRect child_bounds = child->getParentLocalBounds();
 			extend_bounds(children_bounds, child_bounds);
 		}
@@ -242,31 +296,34 @@ namespace fw {
 
 	void ContainerWidget::updateSecondary() {
 		// helper functions
-		auto get_other_size = [&](const Widget* widget) {
+		auto get_secondary_size = [&](const Widget* widget) {
 			return horizontal ? widget->getHeight() : widget->getWidth();
 		};
-		auto get_other_padding = [&]() {
-			return horizontal ? padding_y : padding_x;
+		auto get_secondary_outer_padding_1 = [&]() {
+			return horizontal ? top_padding : left_padding;
+		};
+		auto get_secondary_outer_padding_2 = [&]() {
+			return horizontal ? bottom_padding : right_padding;
 		};
 		auto get_alignment = [&]() {
 			return horizontal ? alignment_y : alignment_x;
 		};
 		// calculating max widget size
-		float max_other_size = 0.0f;
+		float max_secondary_size = 0.0f;
 		for (size_t i = 0; i < children.size(); i++) {
-			if (get_other_size(children[i]) > max_other_size) {
-				max_other_size = get_other_size(children[i]);
+			if (get_secondary_size(children[i]) > max_secondary_size) {
+				max_secondary_size = get_secondary_size(children[i]);
 			}
 		}
 		// setting child positions
 		children_bounds = sf::FloatRect();
-		float other_pos = get_other_padding() + alignmentToOffset(get_alignment(), max_other_size);
+		float secondary_pos = get_secondary_outer_padding_1() + alignmentToOffset(get_alignment(), max_secondary_size);
 		for (size_t i = 0; i < children.size(); i++) {
 			Widget* child = children[i];
 			sf::Vector2f child_pos =
 				horizontal
-				? sf::Vector2f(child->getPosition().x, other_pos)
-				: sf::Vector2f(other_pos, child->getPosition().y);
+				? sf::Vector2f(child->getPosition().x, secondary_pos)
+				: sf::Vector2f(secondary_pos, child->getPosition().y);
 			child->setPosition(child_pos);
 			child->setOrigin(alignmentToAnchor(get_alignment()));
 			sf::FloatRect child_bounds = child->getParentLocalBounds();

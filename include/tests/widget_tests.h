@@ -157,6 +157,7 @@ private:
 	void checkboxWidgetToggleTest(test::Test& test);
 	void containerWidgetBasicTest(test::Test& test);
 	void containerWidgetChildrenTest(test::Test& test);
+	void containerWidgetPaddingTest(test::Test& test);
 	void sizePolicyTest(test::Test& test);
 	void sizePolicyPositionTest(test::Test& test);
 	void sizePolicyExpandTest(test::Test& test);

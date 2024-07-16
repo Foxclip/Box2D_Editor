@@ -123,6 +123,7 @@ void WidgetTests::createTestLists() {
     test::TestList* container_widget_list = createTestList("ContainerWidget", { widgets_basic_list });
     test::Test* container_widget_basic_test = container_widget_list->addTest("basic", [&](test::Test& test) { containerWidgetBasicTest(test); });
     test::Test* container_widget_children_test = container_widget_list->addTest("children", { container_widget_basic_test }, [&](test::Test& test) { containerWidgetChildrenTest(test); });
+    test::Test* container_widget_padding_test = container_widget_list->addTest("padding", { container_widget_children_test }, [&](test::Test& test) { containerWidgetPaddingTest(test); });
 
     test::TestList* size_policy_list = createTestList("SizePolicy", { widgets_basic_list });
     test::Test* size_policy_basic_test = size_policy_list->addTest("basic", [&](test::Test& test) { sizePolicyTest(test); });
@@ -1711,6 +1712,71 @@ void WidgetTests::containerWidgetChildrenTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(container_widget->getSize(), new_container_size);
     T_VEC2_APPROX_COMPARE(child_1_widget->getPosition(), sf::Vector2f(padding_x, padding_y));
     T_VEC2_APPROX_COMPARE(child_2_widget->getPosition(), sf::Vector2f(padding_x + child_1_widget->getWidth() + padding_x, padding_y));
+}
+
+void WidgetTests::containerWidgetPaddingTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    sf::Vector2f container_size(100.0f, 100.0f);
+    fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>(container_size);
+    sf::Vector2f position(100.0f, 100.0f);
+    float inner_padding_x = 5.0f;
+    float inner_padding_y = 11.0f;
+    float top_padding = 1.0f;
+    float bottom_padding = 7.0f;
+    float left_padding = 2.0f;
+    float right_padding = 3.0f;
+    container_widget->setPosition(position);
+    container_widget->setInnerPaddingX(inner_padding_x);
+    container_widget->setInnerPaddingY(inner_padding_y);
+    container_widget->setTopPadding(top_padding);
+    container_widget->setBottomPadding(bottom_padding);
+    container_widget->setLeftPadding(left_padding);
+    container_widget->setRightPadding(right_padding);
+    T_VEC2_APPROX_COMPARE(container_widget->getSize(), container_size);
+    application.advance();
+    T_VEC2_APPROX_COMPARE(container_widget->getSize(), sf::Vector2f(right_padding, bottom_padding));
+    sf::Vector2f child_1_size(35.0f, 28.0f);
+    sf::Vector2f child_2_size(46.0f, 54.0f);
+    sf::Vector2f child_3_size(27.0f, 14.0f);
+    fw::RectangleWidget* child_1_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_1_size);
+    fw::RectangleWidget* child_2_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_2_size);
+    fw::RectangleWidget* child_3_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_3_size);
+    child_1_widget->setParent(container_widget);
+    child_2_widget->setParent(container_widget);
+    child_3_widget->setParent(container_widget);
+    {
+        // horizontal
+        application.advance();
+        sf::Vector2f new_container_size = sf::Vector2f(
+            left_padding + child_1_widget->getWidth() + inner_padding_x + child_2_widget->getWidth() + inner_padding_x + child_3_widget->getWidth() + right_padding,
+            top_padding + std::max(child_1_widget->getHeight(), child_2_widget->getHeight()) + bottom_padding
+        );
+        float child_1_x = left_padding;
+        float child_2_x = child_1_x + child_1_widget->getWidth() + inner_padding_x;
+        float child_3_x = child_2_x + child_2_widget->getWidth() + inner_padding_x;
+        T_VEC2_APPROX_COMPARE(container_widget->getSize(), new_container_size);
+        T_VEC2_APPROX_COMPARE(child_1_widget->getPosition(), sf::Vector2f(child_1_x, top_padding));
+        T_VEC2_APPROX_COMPARE(child_2_widget->getPosition(), sf::Vector2f(child_2_x, top_padding));
+        T_VEC2_APPROX_COMPARE(child_3_widget->getPosition(), sf::Vector2f(child_3_x, top_padding));
+    }
+    {
+        // vertical
+        container_widget->setHorizontal(false);
+        application.advance();
+        sf::Vector2f new_container_size = sf::Vector2f(
+            left_padding + std::max(child_1_widget->getWidth(), child_2_widget->getWidth()) + right_padding,
+            top_padding + child_1_widget->getHeight() + inner_padding_y + child_2_widget->getHeight() + inner_padding_y + child_3_widget->getHeight() + bottom_padding
+        );
+        float child_1_y = top_padding;
+        float child_2_y = child_1_y + child_1_widget->getHeight() + inner_padding_y;
+        float child_3_y = child_2_y + child_2_widget->getHeight() + inner_padding_y;
+        T_VEC2_APPROX_COMPARE(container_widget->getSize(), new_container_size);
+        T_VEC2_APPROX_COMPARE(child_1_widget->getPosition(), sf::Vector2f(left_padding, child_1_y));
+        T_VEC2_APPROX_COMPARE(child_2_widget->getPosition(), sf::Vector2f(left_padding, child_2_y));
+        T_VEC2_APPROX_COMPARE(child_3_widget->getPosition(), sf::Vector2f(left_padding, child_3_y));
+    }
 }
 
 void WidgetTests::sizePolicyTest(test::Test& test) {
