@@ -16,6 +16,8 @@ const sf::Color OUTLINER_SCROLLBAR_COLOR = sf::Color(110, 110, 110);
 const sf::Color OUTLINER_ENTRY_BACKGROUND_COLOR = sf::Color(100, 100, 100);
 const sf::Color OUTLINER_ENTRY_TEXT_COLOR = sf::Color(255, 255, 255);
 const sf::Color OUTLINER_ENTRY_SELECTION_COLOR = sf::Color(200, 100, 0);
+const sf::Color OUTLINER_ENTRY_ARROW_AREA_COLOR = sf::Color(80, 80, 80);
+const sf::Color OUTLINER_ENTRY_ARROW_COLOR = sf::Color(255, 255, 255);
 const float OUTLINER_CONTAINER_PADDING = 2.0f;
 
 class Editor;
@@ -28,6 +30,7 @@ public:
 		~Entry();
 		fw::ContainerWidget* getWidget() const;
 		fw::RectangleWidget* getRectangleWidget() const;
+		fw::RectangleWidget* getArrowAreaWidget() const;
 		fw::PolygonWidget* getArrowWidget() const;
 		fw::ContainerWidget* getChildrenBoxWidget() const;
 		fw::EmptyWidget* getChildrenSpacingWidget() const;
@@ -39,6 +42,7 @@ public:
 		GameObject* object = nullptr;
 		fw::ContainerWidget* entry_widget = nullptr;
 		fw::RectangleWidget* rectangle_widget = nullptr;
+		fw::RectangleWidget* arrow_area_widget = nullptr;
 		fw::PolygonWidget* arrow_widget = nullptr;
 		fw::ContainerWidget* children_box_widget = nullptr;
 		fw::EmptyWidget* children_spacing_widget = nullptr;

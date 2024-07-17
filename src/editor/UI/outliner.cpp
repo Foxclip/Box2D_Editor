@@ -65,13 +65,13 @@ void Outliner::setParentToObject(GameObject* object, GameObject* parent) {
 	fw::ContainerWidget* object_widget = entry->getWidget();
 	Entry* parent_entry = object_entry[parent];
 	if (parent) {
-		parent_entry->getArrowWidget()->setVisible(true);
+		parent_entry->getArrowAreaWidget()->setVisible(true);
 		fw::ContainerWidget* children_widget = parent_entry->getChildrenWidget();
 		object_widget->setParent(children_widget);
 	} else {
 		object_widget->setParent(container_widget);
 		if (parent_entry->getChildrenWidget()->getChildrenCount() == 0) {
-			parent_entry->getArrowWidget()->setVisible(false);
+			parent_entry->getArrowAreaWidget()->setVisible(false);
 			parent_entry->getChildrenBoxWidget()->setVisible(false);
 		}
 	}
@@ -121,6 +121,22 @@ Outliner::Entry::Entry(Outliner& outliner, GameObject* object) : outliner(outlin
 		}
 	};
 	rectangle_widget->setParent(entry_widget);
+	// arrow area
+	arrow_area_widget = outliner.widget_list.createWidget<fw::RectangleWidget>(15.0f, 20.0f);
+	arrow_area_widget->setName("arrow area");
+	arrow_area_widget->setVisible(false);
+	arrow_area_widget->setSizeYPolicy(fw::Widget::SizePolicy::PARENT);
+	arrow_area_widget->setFillColor(OUTLINER_ENTRY_ARROW_AREA_COLOR);
+	arrow_area_widget->setClickThrough(false);
+	arrow_area_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
+		if (children_box_widget->isVisible()) {
+			arrow_widget->setRotation(0.0f);
+		} else {
+			arrow_widget->setRotation(90.0f);
+		}
+		children_box_widget->toggleVisible();
+	};
+	arrow_area_widget->setParent(rectangle_widget);
 	// arrow
 	std::vector<sf::Vector2f> vertices = {
 		sf::Vector2f(5.0, 0.0f),
@@ -129,19 +145,9 @@ Outliner::Entry::Entry(Outliner& outliner, GameObject* object) : outliner(outlin
 	};
 	arrow_widget = outliner.widget_list.createWidget<fw::PolygonWidget>(vertices);
 	arrow_widget->setName("arrow");
-	arrow_widget->setVisible(false);
-	arrow_widget->setClickThrough(false);
-	arrow_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
-		if (children_box_widget->isVisible()) {
-			arrow_widget->setRotation(0.0f);
-		} else {
-			arrow_widget->setRotation(90.0f);
-		}
-		children_box_widget->toggleVisible();
-	};
-	arrow_widget->setParentAnchor(fw::Widget::Anchor::CENTER_LEFT);
-	arrow_widget->setAnchorOffsetX(7.0f);
-	arrow_widget->setParent(rectangle_widget);
+	arrow_widget->setFillColor(OUTLINER_ENTRY_ARROW_COLOR);
+	arrow_widget->setParentAnchor(fw::Widget::Anchor::CENTER);
+	arrow_widget->setParent(arrow_area_widget);
 	// text
 	fw::TextWidget* text_widget = outliner.widget_list.createWidget<fw::TextWidget>();
 	text_widget->setCharacterSize(OUTLINER_ENTRY_FONT_SIZE);
@@ -149,7 +155,7 @@ Outliner::Entry::Entry(Outliner& outliner, GameObject* object) : outliner(outlin
 	text_widget->setString(name);
 	text_widget->setOrigin(Anchor::CENTER_LEFT);
 	text_widget->setParentAnchor(Anchor::CENTER_LEFT);
-	text_widget->setAnchorOffsetX(15.0f);
+	text_widget->setAnchorOffsetX(18.0f);
 	text_widget->setParent(rectangle_widget);
 	// children box
 	children_box_widget = outliner.widget_list.createWidget<fw::ContainerWidget>(20.0f, OUTLINER_ENTRY_HEIGHT);
@@ -183,6 +189,10 @@ fw::ContainerWidget* Outliner::Entry::getWidget() const {
 
 fw::RectangleWidget* Outliner::Entry::getRectangleWidget() const {
 	return rectangle_widget;
+}
+
+fw::RectangleWidget* Outliner::Entry::getArrowAreaWidget() const {
+	return arrow_area_widget;
 }
 
 fw::PolygonWidget* Outliner::Entry::getArrowWidget() const {
