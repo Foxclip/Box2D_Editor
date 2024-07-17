@@ -1,6 +1,7 @@
 #pragma once
 
 #include "widgets/rectangle_widget.h"
+#include <widgets/polygon_widget.h>
 #include "widgets/container_widget.h"
 #include "widgets/scroll_area_widget.h"
 #include "simulation/objectlist.h"
@@ -27,6 +28,7 @@ public:
 		~Entry();
 		fw::ContainerWidget* getWidget() const;
 		fw::RectangleWidget* getRectangleWidget() const;
+		fw::PolygonWidget* getArrowWidget() const;
 		fw::ContainerWidget* getChildrenBoxWidget() const;
 		fw::EmptyWidget* getChildrenSpacingWidget() const;
 		fw::ContainerWidget* getChildrenWidget() const;
@@ -35,8 +37,9 @@ public:
 	private:
 		Outliner& outliner;
 		GameObject* object = nullptr;
-		fw::ContainerWidget* widget = nullptr;
+		fw::ContainerWidget* entry_widget = nullptr;
 		fw::RectangleWidget* rectangle_widget = nullptr;
+		fw::PolygonWidget* arrow_widget = nullptr;
 		fw::ContainerWidget* children_box_widget = nullptr;
 		fw::EmptyWidget* children_spacing_widget = nullptr;
 		fw::ContainerWidget* children_widget = nullptr;
