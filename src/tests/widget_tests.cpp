@@ -3957,9 +3957,11 @@ void WidgetTests::scrollAreaWidgetScrollbarContainerTest(test::Test& test) {
     application.advance();
     T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
     T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
+    T_COMPARE(container_widget->getWidth(), scroll_area_size.x);
     application.advance();
     T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
     T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
+    T_COMPARE(container_widget->getWidth(), scroll_area_size.x);
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
