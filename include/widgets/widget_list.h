@@ -67,6 +67,7 @@ namespace fw {
 		void processAfterInput();
 		void updateRenderQueue();
 		void updateWidgets();
+		void printUpdateQueue();
 		void render(sf::RenderTarget& target);
 		void reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_pos);
 		void setFocusedWidget(Widget* widget);
@@ -83,6 +84,7 @@ namespace fw {
 		CompVectorUptr<Widget> widgets;
 		EmptyWidget* root_widget = nullptr;
 		Widget* focused_widget = nullptr;
+		bool print_update_queue = false;
 		std::vector<PendingMove> pending_moves;
 		WidgetUpdateQueue update_queue = WidgetUpdateQueue(*this);
 		WidgetRenderQueue render_queue = WidgetRenderQueue(*this);

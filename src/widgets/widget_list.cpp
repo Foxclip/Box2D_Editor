@@ -5,6 +5,10 @@
 
 namespace fw {
 
+	Logger& operator<<(Logger& logger, const WidgetUpdateTarget& target) {
+		return logger << target.toStr();
+	}
+
 	WidgetList::WidgetList(Application& application) : application(application) {
 		root_widget = createWidget<EmptyWidget>();
 		root_widget->setFillColor(sf::Color::Transparent);
@@ -259,12 +263,30 @@ namespace fw {
 		root_widget->preUpdate();
 		update_queue.update();
 		const std::vector<std::vector<WidgetUpdateTarget*>>& queue = update_queue.get();
-		for (const auto& layer : queue) {
-			for (WidgetUpdateTarget* target : layer) {
+		for (size_t layer_i = 0; layer_i < queue.size(); layer_i++) {
+			const std::vector<WidgetUpdateTarget*>& layer = queue[layer_i];
+			for (size_t target_i = 0; target_i < layer.size(); target_i++) {
+				WidgetUpdateTarget* target = layer[target_i];
 				target->execute();
 			}
 		}
+		if (print_update_queue) {
+			for (size_t layer_i = 0; layer_i < queue.size(); layer_i++) {
+				logger << "Layer " << layer_i << ":" << "\n";
+				LoggerIndent layer_indent;
+				const std::vector<WidgetUpdateTarget*>& layer = queue[layer_i];
+				for (size_t target_i = 0; target_i < layer.size(); target_i++) {
+					WidgetUpdateTarget* target = layer[target_i];
+					logger << target_i << ": " << *target << "\n";
+				}
+			}
+		}
+		print_update_queue = false;
 		root_widget->postUpdate();
+	}
+
+	void WidgetList::printUpdateQueue() {
+		print_update_queue = true;
 	}
 
 	void WidgetList::render(sf::RenderTarget& target) {
