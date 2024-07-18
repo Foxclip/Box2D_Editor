@@ -152,6 +152,8 @@ namespace fw {
 				area_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
 			}
 		);
+		area_widget->getSizeXTarget()->addTarget(area_size_x_link);
+		area_widget->getSizeYTarget()->addTarget(area_size_y_link);
 
 		updateScroll();
 	}
