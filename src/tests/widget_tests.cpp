@@ -3929,19 +3929,37 @@ void WidgetTests::scrollAreaWidgetScrollbarContainerTest(test::Test& test) {
     sf::Vector2f child_size(100.0f, 200.0f);
     fw::ScrollAreaWidget* scroll_area_widget = application.getWidgets().createWidget<fw::ScrollAreaWidget>(scroll_area_size);
     fw::ContainerWidget* container_widget = application.getWidgets().createWidget<fw::ContainerWidget>(container_size);
+    fw::ContainerWidget* inner_container_widget = application.getWidgets().createWidget<fw::ContainerWidget>(container_size);
     fw::RectangleWidget* red_widget = application.getWidgets().createWidget<fw::RectangleWidget>(child_size);
     scroll_area_widget->setScrolledWidget(container_widget);
     container_widget->setFillColor(sf::Color(100, 100, 100));
     container_widget->setHorizontal(false);
     container_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+    inner_container_widget->setName("inner container");
+    inner_container_widget->setFillColor(sf::Color(70, 70, 70));
+    inner_container_widget->setHorizontal(false);
+    inner_container_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+    inner_container_widget->setParent(container_widget);
+    red_widget->setName("red");
     red_widget->setFillColor(sf::Color::Red);
-    red_widget->setParent(container_widget);
+    red_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
+    red_widget->setParent(inner_container_widget);
     application.advance();
 
     red_widget->setHeight(red_widget->getHeight() + 50.0f);
     application.advance();
     T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
     T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
+    application.advance();
+    T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
+    T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
+    red_widget->setHeight(child_size.y);
+    application.advance();
+    T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
+    T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
+    application.advance();
+    T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
+    T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
