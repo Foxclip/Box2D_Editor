@@ -140,14 +140,14 @@ namespace fw {
 		);
 		WidgetLink* area_size_x_link = addLink(
 			"AREA_SIZE_X",
-			{ getSizeXTarget(), scrollbar_x_visiblility_link },
+			{ getSizeXTarget(), scrollbar_y_visiblility_link },
 			[&]() {
 				area_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
 			}
 		);
 		WidgetLink* area_size_y_link = addLink(
 			"AREA_SIZE_Y",
-			{ getSizeYTarget(), scrollbar_y_visiblility_link },
+			{ getSizeYTarget(), scrollbar_x_visiblility_link },
 			[&]() {
 				area_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());
 			}
