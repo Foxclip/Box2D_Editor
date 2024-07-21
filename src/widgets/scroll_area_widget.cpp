@@ -226,6 +226,11 @@ namespace fw {
 		this->delta_y = delta;
 	}
 
+	void ScrollAreaWidget::setScrollbarPolicy(ScrollbarPolicy policy) {
+		this->scrollbar_x_policy = policy;
+		this->scrollbar_y_policy = policy;
+	}
+
 	void ScrollAreaWidget::setScrollbarXPolicy(ScrollbarPolicy policy) {
 		this->scrollbar_x_policy = policy;
 	}

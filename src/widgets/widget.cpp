@@ -11,6 +11,10 @@ namespace fw {
 		return type;
 	}
 
+	bool Widget::isContainer() const {
+		return type == WidgetType::Container || type == WidgetType::TreeView;
+	}
+
 	bool Widget::isMouseOver() const {
 		return mouseIn;
 	}
@@ -1084,7 +1088,7 @@ namespace fw {
 		if (parent_anchor == Anchor::CUSTOM) {
 			return;
 		}
-		if (parent->getType() == WidgetType::Container) {
+		if (parent->isContainer()) {
 			return;
 		}
 		sf::Vector2f parent_size = parent->getLocalBounds().getSize();
@@ -1102,7 +1106,7 @@ namespace fw {
 		if (parent_anchor == Anchor::CUSTOM) {
 			return;
 		}
-		if (parent->getType() == WidgetType::Container) {
+		if (parent->isContainer()) {
 			return;
 		}
 		sf::Vector2f parent_size = parent->getLocalBounds().getSize();

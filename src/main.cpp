@@ -27,7 +27,10 @@ int main() {
 
     execute_app();
 
-    // TODO: object list window (outliner)
+    // TODO: TreeViewWidget
+    // TODO: reparent object in outliner
+    // TODO: rename object in outliner
+    // TODO: delete object in outliner
     // TODO: OnAfterObjectRemoved test
     // TODO: OnObjectRenamed event in GameObjectList
     // TODOL test invisible widgets in container

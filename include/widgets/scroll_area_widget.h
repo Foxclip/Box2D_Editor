@@ -40,6 +40,7 @@ namespace fw {
 		void setSliderColor(const sf::Color& color);
 		void setDeltaX(float delta);
 		void setDeltaY(float delta);
+		void setScrollbarPolicy(ScrollbarPolicy policy);
 		void setScrollbarXPolicy(ScrollbarPolicy policy);
 		void setScrollbarYPolicy(ScrollbarPolicy policy);
 

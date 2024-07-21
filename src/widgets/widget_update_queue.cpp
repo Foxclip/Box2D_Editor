@@ -17,7 +17,7 @@ namespace fw {
 			entries.push_back(&widget->pos_y_target);
 			entries.push_back(&widget->size_x_target);
 			entries.push_back(&widget->size_y_target);
-			if (widget->getType() == Widget::WidgetType::Container) {
+			if (widget->isContainer()) {
 				entries.push_back(&widget->children_x_target);
 				entries.push_back(&widget->children_y_target);
 			}
@@ -62,7 +62,7 @@ namespace fw {
 				// pos entry depends on parent's children x entry,
 				// and so all entries dependent on pos entry will be updated
 				// after parent's children x entry
-				if (socket->getWidget()->getParent() && socket->getWidget()->getParent()->getType() == Widget::WidgetType::Container) {
+				if (socket->getWidget()->getParent() && socket->getWidget()->getParent()->isContainer()) {
 					result.add(&socket->getWidget()->getParent()->children_x_target);
 				}
 				// some anchors need parent size
@@ -81,7 +81,7 @@ namespace fw {
 					result.add(size_x_entry);
 				}
 			} else if (socket->getType() == WidgetUpdateType::POS_Y) {
-				if (socket->getWidget()->getParent() && socket->getWidget()->getParent()->getType() == Widget::WidgetType::Container) {
+				if (socket->getWidget()->getParent() && socket->getWidget()->getParent()->isContainer()) {
 					result.add(&socket->getWidget()->getParent()->children_y_target);
 				}
 				WidgetUpdateTarget* size_y_entry = &socket->getWidget()->getParent()->size_y_target;

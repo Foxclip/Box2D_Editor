@@ -272,7 +272,7 @@ void Editor::initWidgets() {
     toolbox_widget = widgets.createWidget<Toolbox>(*this);
     edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(300.0f, 400.0f, *this);
     create_tool.create_panel_widget = widgets.createWidget<CreatePanel>(*this);
-    outliner_widget = widgets.createWidget<Outliner>(*this);
+    outliner_widget = widgets.createWidget<Outliner>(300.0f, 200.0f, *this);
 
     // step text
     step_widget = widgets.createWidget<fw::TextWidget>();

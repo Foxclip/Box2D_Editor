@@ -55,6 +55,7 @@ namespace fw {
 			ScrollArea,
 			Text,
 			Textbox,
+			TreeView,
 			Window,
 		};
 		enum class Anchor {
@@ -112,6 +113,7 @@ namespace fw {
 
 		Widget(WidgetList& list);
 		WidgetType getType() const;
+		bool isContainer() const;
 		bool isMouseOver() const;
 		void updateMouseState(const sf::Vector2f& mouse_pos);
 		virtual bool isVisualPositionQuantized() const;
