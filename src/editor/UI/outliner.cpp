@@ -63,7 +63,7 @@ void Outliner::setParentToObject(GameObject* object, GameObject* parent) {
 	logger << "SetParent: " << child_str << " -> " << parent_str << "\n";
 	fw::TreeViewWidget::Entry* entry = object_entry[object];
 	fw::TreeViewWidget::Entry* parent_entry = object_entry[parent];
-	treeview_widget->setParentToEntry(entry, parent_entry);
+	entry->setParent(parent_entry);
 }
 
 void Outliner::selectObject(GameObject* object) {

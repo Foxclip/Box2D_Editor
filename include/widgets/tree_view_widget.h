@@ -23,10 +23,13 @@ namespace fw {
 	public:
 		class Entry {
 		public:
-			Event<const sf::Vector2f&> OnLeftPress;
+			Event<Entry*> OnEntrySelected;
 
 			Entry(TreeViewWidget& treeview, const sf::String& name);
 			~Entry();
+			Entry* getParent() const;
+			CompVector<Entry*> getChildren() const;
+			size_t getChildrenCount() const;
 			fw::ContainerWidget* getWidget() const;
 			fw::RectangleWidget* getRectangleWidget() const;
 			fw::RectangleWidget* getArrowAreaWidget() const;
@@ -34,10 +37,15 @@ namespace fw {
 			fw::ContainerWidget* getChildrenBoxWidget() const;
 			fw::EmptyWidget* getChildrenSpacingWidget() const;
 			fw::ContainerWidget* getChildrenWidget() const;
-			void select();
-			void deselect();
+			void select(bool with_children = false);
+			void deselect(bool with_children = false);
+			void toggleSelect(bool with_children = false);
+			void setParent(Entry* new_parent);
 		private:
 			TreeViewWidget& treeview;
+			Entry* parent = nullptr;
+			CompVector<Entry*> children;
+			bool selected = false;
 			fw::ContainerWidget* entry_widget = nullptr;
 			fw::RectangleWidget* rectangle_widget = nullptr;
 			fw::RectangleWidget* arrow_area_widget = nullptr;
@@ -49,10 +57,10 @@ namespace fw {
 		};
 		TreeViewWidget(WidgetList& widget_list, float width, float height);
 		TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size);
+		void deselectAll();
 		Entry* getEntry(size_t index) const;
 		Entry* addEntry(const sf::String& name);
 		void removeEntry(Entry* entry);
-		void setParentToEntry(Entry* child_entry, Entry* parent_entry);
 		void clear();
 
 	protected:

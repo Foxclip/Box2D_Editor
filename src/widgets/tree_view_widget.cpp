@@ -18,6 +18,12 @@ namespace fw {
 	TreeViewWidget::TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size)
 		: TreeViewWidget(widget_list, size.x, size.y) { }
 
+	void TreeViewWidget::deselectAll() {
+		for (size_t i = 0; i < entries.size(); i++) {
+			entries[i]->deselect();
+		}
+	}
+
 	TreeViewWidget::Entry* TreeViewWidget::getEntry(size_t index) const {
 		return entries[index];
 	}
@@ -31,21 +37,6 @@ namespace fw {
 
 	void TreeViewWidget::removeEntry(Entry* entry) {
 		entries.remove(entry);
-	}
-
-	void TreeViewWidget::setParentToEntry(Entry* child_entry, Entry* parent_entry) {
-		fw::ContainerWidget* child_entry_widget = child_entry->getWidget();
-		if (parent) {
-			parent_entry->getArrowAreaWidget()->setVisible(true);
-			fw::ContainerWidget* parent_children_widget = parent_entry->getChildrenWidget();
-			child_entry_widget->setParent(parent_children_widget);
-		} else {
-			child_entry_widget->setParent(container_widget);
-			if (parent_entry->getChildrenWidget()->getChildrenCount() == 0) {
-				parent_entry->getArrowAreaWidget()->setVisible(false);
-				parent_entry->getChildrenBoxWidget()->setVisible(false);
-			}
-		}
 	}
 
 	void TreeViewWidget::clear() {
@@ -65,7 +56,15 @@ namespace fw {
 		rectangle_widget = treeview.widget_list.createWidget<fw::RectangleWidget>(20.0f, TREEVIEW_ENTRY_HEIGHT);
 		rectangle_widget->setFillColor(TREEVIEW_ENTRY_BACKGROUND_COLOR);
 		rectangle_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
-		rectangle_widget->OnLeftPress += this->OnLeftPress;
+		rectangle_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
+			bool with_children = treeview.widget_list.isLCtrlPressed();
+			if (treeview.widget_list.isLShiftPressed()) {
+				toggleSelect(with_children);
+			} else {
+				treeview.deselectAll();
+				select(with_children);
+			}
+		};
 		rectangle_widget->setParent(entry_widget);
 		// arrow area
 		arrow_area_widget = treeview.widget_list.createWidget<fw::RectangleWidget>(15.0f, 20.0f);
@@ -129,6 +128,18 @@ namespace fw {
 		entry_widget->remove();
 	}
 
+	TreeViewWidget::Entry* TreeViewWidget::Entry::getParent() const {
+		return parent;
+	}
+
+	CompVector<TreeViewWidget::Entry*> TreeViewWidget::Entry::getChildren() const {
+		return children;
+	}
+
+	size_t TreeViewWidget::Entry::getChildrenCount() const {
+		return children.size();
+	}
+
 	fw::ContainerWidget* TreeViewWidget::Entry::getWidget() const {
 		return entry_widget;
 	}
@@ -157,12 +168,54 @@ namespace fw {
 		return children_widget;
 	}
 
-	void TreeViewWidget::Entry::select() {
+	void TreeViewWidget::Entry::select(bool with_children) {
+		selected = true;
 		rectangle_widget->setFillColor(TREEVIEW_ENTRY_SELECTION_COLOR);
+		if (with_children) {
+			for (size_t i = 0; i < children.size(); i++) {
+				Entry* child = children[i];
+				child->select(true);
+			}
+		}
+		OnEntrySelected(this);
 	}
 
-	void TreeViewWidget::Entry::deselect() {
+	void TreeViewWidget::Entry::deselect(bool with_children) {
+		selected = false;
 		rectangle_widget->setFillColor(TREEVIEW_ENTRY_BACKGROUND_COLOR);
+		if (with_children) {
+			for (size_t i = 0; i < children.size(); i++) {
+				Entry* child = children[i];
+				child->deselect(true);
+			}
+		}
+	}
+
+	void TreeViewWidget::Entry::toggleSelect(bool with_children) {
+		if (selected) {
+			deselect(with_children);
+		} else {
+			select(with_children);
+		}
+	}
+
+	void TreeViewWidget::Entry::setParent(Entry* new_parent) {
+		Entry* old_parent = parent;
+		if (old_parent) {
+			old_parent->children.remove(this);
+			if (old_parent->getChildrenWidget()->getChildrenCount() == 0) {
+				old_parent->getArrowAreaWidget()->setVisible(false);
+				old_parent->getChildrenBoxWidget()->setVisible(false);
+			}
+		}
+		if (new_parent) {
+			new_parent->children.add(this);
+			new_parent->getArrowAreaWidget()->setVisible(true);
+			fw::ContainerWidget* parent_children_widget = new_parent->getChildrenWidget();
+			entry_widget->setParent(parent_children_widget);
+		} else {
+			entry_widget->setParent(treeview.container_widget);
+		}
 	}
 
 }
