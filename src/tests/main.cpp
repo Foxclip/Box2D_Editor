@@ -8,6 +8,7 @@ void run_tests() {
     test_manager.addModule<LoggerTests>();
     test_manager.addModule<CompVectorTests>();
     test_manager.addModule<SearchIndexTests>();
+    test_manager.addModule<EventTests>();
     test_manager.addModule<SimulationTests>();
     test_manager.addModule<WidgetTests>();
     test_manager.runAllModules();

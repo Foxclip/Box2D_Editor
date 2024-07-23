@@ -2,6 +2,7 @@ add_executable(tests)
 
 target_sources(tests PRIVATE
     "${INCLUDE_DIR}/tests/compvector_tests.h"
+    "${INCLUDE_DIR}/tests/event_tests.h"
     "${INCLUDE_DIR}/tests/logger_tests.h"
     "${INCLUDE_DIR}/tests/searchindex_tests.h"
     "${INCLUDE_DIR}/tests/simulation_tests.h"
@@ -11,6 +12,7 @@ target_sources(tests PRIVATE
 )
 target_sources(tests PRIVATE
     "compvector_tests.cpp"
+    "event_tests.cpp"
     "logger_tests.cpp"
     "main.cpp"
     "searchindex_tests.cpp"
