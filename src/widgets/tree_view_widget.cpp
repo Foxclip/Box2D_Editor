@@ -168,7 +168,7 @@ namespace fw {
 		return children_widget;
 	}
 
-	void TreeViewWidget::Entry::select(bool with_children) {
+	void TreeViewWidget::Entry::selectSilent(bool with_children) {
 		selected = true;
 		rectangle_widget->setFillColor(TREEVIEW_ENTRY_SELECTION_COLOR);
 		if (with_children) {
@@ -177,10 +177,9 @@ namespace fw {
 				child->select(true);
 			}
 		}
-		OnEntrySelected(this);
 	}
 
-	void TreeViewWidget::Entry::deselect(bool with_children) {
+	void TreeViewWidget::Entry::deselectSilent(bool with_children) {
 		selected = false;
 		rectangle_widget->setFillColor(TREEVIEW_ENTRY_BACKGROUND_COLOR);
 		if (with_children) {
@@ -189,6 +188,24 @@ namespace fw {
 				child->deselect(true);
 			}
 		}
+	}
+
+	void TreeViewWidget::Entry::toggleSelectSilent(bool with_children) {
+		if (selected) {
+			deselectSilent(with_children);
+		} else {
+			selectSilent(with_children);
+		}
+	}
+
+	void TreeViewWidget::Entry::select(bool with_children) {
+		selectSilent(with_children);
+		treeview.OnEntrySelected(this);
+	}
+
+	void TreeViewWidget::Entry::deselect(bool with_children) {
+		deselectSilent(with_children);
+		treeview.OnEntryDeselected(this);
 	}
 
 	void TreeViewWidget::Entry::toggleSelect(bool with_children) {

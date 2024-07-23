@@ -23,8 +23,6 @@ namespace fw {
 	public:
 		class Entry {
 		public:
-			Event<Entry*> OnEntrySelected;
-
 			Entry(TreeViewWidget& treeview, const sf::String& name);
 			~Entry();
 			Entry* getParent() const;
@@ -37,6 +35,9 @@ namespace fw {
 			fw::ContainerWidget* getChildrenBoxWidget() const;
 			fw::EmptyWidget* getChildrenSpacingWidget() const;
 			fw::ContainerWidget* getChildrenWidget() const;
+			void selectSilent(bool with_children = false);
+			void deselectSilent(bool with_children = false);
+			void toggleSelectSilent(bool with_children = false);
 			void select(bool with_children = false);
 			void deselect(bool with_children = false);
 			void toggleSelect(bool with_children = false);
@@ -55,6 +56,10 @@ namespace fw {
 			fw::ContainerWidget* children_widget = nullptr;
 
 		};
+
+		Event<Entry*> OnEntrySelected;
+		Event<Entry*> OnEntryDeselected;
+
 		TreeViewWidget(WidgetList& widget_list, float width, float height);
 		TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		void deselectAll();
