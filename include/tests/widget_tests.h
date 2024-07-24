@@ -199,6 +199,7 @@ private:
 	void scrollAreaWidgetScrollTest(test::Test& test);
 	void scrollAreaWidgetScrollbarVisibilityTest(test::Test& test);
 	void scrollAreaWidgetScrollbarContainerTest(test::Test& test);
+	void treeviewWidgetBasicTest(test::Test& test);
 
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);

@@ -10,6 +10,8 @@ namespace fw {
 		type = WidgetType::TreeView;
 		setName("treeview");
 		setFillColor(sf::Color::Transparent);
+		setClipChildren(true);
+		setClickThrough(false);
 		setHorizontal(false);
 		setPadding(TREEVIEW_CONTAINER_PADDING);
 		setSizeXPolicy(SizePolicy::NONE);

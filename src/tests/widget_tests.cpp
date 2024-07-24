@@ -181,6 +181,9 @@ void WidgetTests::createTestLists() {
     test::Test* scroll_area_widget_scrollbar_visibility_test = scroll_area_widget_list->addTest("scrollbar_visibility", { scroll_area_widget_basic_test }, [&](test::Test& test) { scrollAreaWidgetScrollbarVisibilityTest(test); });
     test::Test* scroll_area_widget_scrollbar_container_test = scroll_area_widget_list->addTest("scrollbar_container", { scroll_area_widget_scrollbar_visibility_test }, [&](test::Test& test) { scrollAreaWidgetScrollbarContainerTest(test); });
 
+    test::TestList* tree_view_widget_list = createTestList("TreeViewWidget", { widgets_basic_list });
+    test::Test* tree_view_widget_basic_test = tree_view_widget_list->addTest("basic", [&](test::Test& test) { treeviewWidgetBasicTest(test); });
+
 }
 
 void WidgetTests::beforeRunModule() {
@@ -3962,6 +3965,51 @@ void WidgetTests::scrollAreaWidgetScrollbarContainerTest(test::Test& test) {
     T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
     T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
     T_COMPARE(container_widget->getWidth(), scroll_area_size.x);
+}
+
+void WidgetTests::treeviewWidgetBasicTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::TreeViewWidget* tree_view_widget = application.getWidgets().createWidget<fw::TreeViewWidget>(size);
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(tree_view_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    tree_view_widget->setPosition(position);
+
+    GenericWidgetTest gwt(application, test);
+    gwt.widget = tree_view_widget;
+    gwt.total_widgets = 2;
+    gwt.type = fw::Widget::WidgetType::TreeView;
+    gwt.name = "treeview";
+    gwt.fullname = "root|treeview";
+    gwt.is_visual_position_quantized = false;
+    fw::WidgetVisibility visibility;
+    visibility.addedToRoot = true;
+    visibility.allParentsVisible = true;
+    visibility.hasUnclippedRegion = true;
+    visibility.nonZeroSize = true;
+    visibility.onScreen = true;
+    visibility.opaque = false;
+    visibility.renderableSetting = true;
+    visibility.visibleSetting = true;
+    gwt.visibility = visibility;
+    gwt.is_click_through = false;
+    gwt.is_mouse_over = false;
+    gwt.focusable_type = fw::Widget::FocusableType::NONE;
+    gwt.is_focused = false;
+    gwt.clip_children = true;
+    gwt.force_custom_cursor = false;
+    gwt.parent = root_widget;
+    gwt.local_bounds = sf::FloatRect(sf::Vector2f(), size);
+    gwt.global_bounds = sf::FloatRect(position, size);
+    gwt.parent_local_bounds = gwt.global_bounds;
+    gwt.visual_local_bounds = gwt.local_bounds;
+    gwt.visual_global_bounds = gwt.global_bounds;
+    gwt.visual_parent_local_bounds = gwt.global_bounds;
+    T_WRAP_CONTAINER(genericWidgetTest(gwt));
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
