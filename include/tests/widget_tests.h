@@ -200,6 +200,7 @@ private:
 	void scrollAreaWidgetScrollbarVisibilityTest(test::Test& test);
 	void scrollAreaWidgetScrollbarContainerTest(test::Test& test);
 	void treeviewWidgetBasicTest(test::Test& test);
+	void treeviewWidgetEntriesTest(test::Test& test);
 
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);
@@ -226,6 +227,8 @@ private:
 	void resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget);
 	sf::Vector2f getHeaderCenter(fw::WindowWidget* window);
 	void dragWindow(fw::Application& application, fw::WindowWidget* window, const sf::Vector2f& offset);
+	float calcTreeViewEntryHeight(fw::TreeViewWidget::Entry* entry);
+	float calcTreeViewHeight(fw::TreeViewWidget* treeview);
 	void genericWidgetTest(const GenericWidgetTest& gwt);
 	bool layer_contains(const std::vector<Node*>& layer, const std::string& name);
 

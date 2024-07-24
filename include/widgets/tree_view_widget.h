@@ -25,8 +25,10 @@ namespace fw {
 		public:
 			Entry(TreeViewWidget& treeview, const sf::String& name);
 			~Entry();
+			bool isExpanded() const;
 			Entry* getParent() const;
 			CompVector<Entry*> getChildren() const;
+			Entry* getChild(size_t index) const;
 			size_t getChildrenCount() const;
 			fw::ContainerWidget* getWidget() const;
 			fw::RectangleWidget* getRectangleWidget() const;
@@ -42,10 +44,14 @@ namespace fw {
 			void deselect(bool with_children = false);
 			void toggleSelect(bool with_children = false);
 			void setParent(Entry* new_parent);
+			void expand();
+			void collapse();
+			void toggle();
 		private:
 			TreeViewWidget& treeview;
 			Entry* parent = nullptr;
 			CompVector<Entry*> children;
+			bool expanded = false;
 			bool selected = false;
 			fw::ContainerWidget* entry_widget = nullptr;
 			fw::RectangleWidget* rectangle_widget = nullptr;
@@ -63,8 +69,12 @@ namespace fw {
 		TreeViewWidget(WidgetList& widget_list, float width, float height);
 		TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		void deselectAll();
+		const CompVector<Entry*>& getEntries() const;
+		size_t getEntryCount() const;
 		Entry* getEntry(size_t index) const;
 		Entry* addEntry(const sf::String& name);
+		void expandAll();
+		void collapseAll();
 		void removeEntry(Entry* entry);
 		void clear();
 

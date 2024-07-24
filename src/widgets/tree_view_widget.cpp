@@ -26,6 +26,14 @@ namespace fw {
 		}
 	}
 
+	const CompVector<TreeViewWidget::Entry*>& TreeViewWidget::getEntries() const {
+		return entries.getCompVector();
+	}
+
+	size_t TreeViewWidget::getEntryCount() const {
+		return entries.size();
+	}
+
 	TreeViewWidget::Entry* TreeViewWidget::getEntry(size_t index) const {
 		return entries[index];
 	}
@@ -35,6 +43,18 @@ namespace fw {
 		Entry* ptr = entry_uptr.get();
 		entries.add(std::move(entry_uptr));
 		return ptr;
+	}
+
+	void TreeViewWidget::expandAll() {
+		for (size_t i = 0; i < entries.size(); i++) {
+			entries[i]->expand();
+		}
+	}
+
+	void TreeViewWidget::collapseAll() {
+		for (size_t i = 0; i < entries.size(); i++) {
+			entries[i]->collapse();
+		}
 	}
 
 	void TreeViewWidget::removeEntry(Entry* entry) {
@@ -76,12 +96,7 @@ namespace fw {
 		arrow_area_widget->setFillColor(TREEVIEW_ENTRY_ARROW_AREA_COLOR);
 		arrow_area_widget->setClickThrough(false);
 		arrow_area_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
-			if (children_box_widget->isVisible()) {
-				arrow_widget->setRotation(0.0f);
-			} else {
-				arrow_widget->setRotation(90.0f);
-			}
-			children_box_widget->toggleVisible();
+			toggle();
 		};
 		arrow_area_widget->setParent(rectangle_widget);
 		// arrow
@@ -130,12 +145,20 @@ namespace fw {
 		entry_widget->remove();
 	}
 
+	bool TreeViewWidget::Entry::isExpanded() const {
+		return expanded;
+	}
+
 	TreeViewWidget::Entry* TreeViewWidget::Entry::getParent() const {
 		return parent;
 	}
 
 	CompVector<TreeViewWidget::Entry*> TreeViewWidget::Entry::getChildren() const {
 		return children;
+	}
+
+	TreeViewWidget::Entry* TreeViewWidget::Entry::getChild(size_t index) const {
+		return children[index];
 	}
 
 	size_t TreeViewWidget::Entry::getChildrenCount() const {
@@ -234,6 +257,26 @@ namespace fw {
 			entry_widget->setParent(parent_children_widget);
 		} else {
 			entry_widget->setParent(treeview.container_widget);
+		}
+	}
+
+	void TreeViewWidget::Entry::expand() {
+		expanded = true;
+		arrow_widget->setRotation(90.0f);
+		children_box_widget->setVisible(true);
+	}
+
+	void TreeViewWidget::Entry::collapse() {
+		expanded = false;
+		arrow_widget->setRotation(0.0f);
+		children_box_widget->setVisible(false);
+	}
+
+	void TreeViewWidget::Entry::toggle() {
+		if (expanded) {
+			collapse();
+		} else {
+			expand();
 		}
 	}
 

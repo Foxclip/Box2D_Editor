@@ -183,6 +183,7 @@ void WidgetTests::createTestLists() {
 
     test::TestList* tree_view_widget_list = createTestList("TreeViewWidget", { widgets_basic_list });
     test::Test* tree_view_widget_basic_test = tree_view_widget_list->addTest("basic", [&](test::Test& test) { treeviewWidgetBasicTest(test); });
+    test::Test* tree_view_widget_entries_test = tree_view_widget_list->addTest("entries", [&](test::Test& test) { treeviewWidgetEntriesTest(test); });
 
 }
 
@@ -4012,6 +4013,30 @@ void WidgetTests::treeviewWidgetBasicTest(test::Test& test) {
     T_WRAP_CONTAINER(genericWidgetTest(gwt));
 }
 
+void WidgetTests::treeviewWidgetEntriesTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.setDefaultFont(textbox_font);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::TreeViewWidget* tree_view_widget = application.getWidgets().createWidget<fw::TreeViewWidget>(size);
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(tree_view_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    tree_view_widget->setPosition(position);
+
+    tree_view_widget->addEntry("Entry 1");
+    tree_view_widget->addEntry("Entry 2");
+    tree_view_widget->addEntry("Entry 3");
+    application.advance();
+    auto rect_to_str = &WidgetTests::floatRectToStr;
+    auto rect_approx_cmp = &WidgetTests::rectApproxCmp;
+    float treeview_height = calcTreeViewHeight(tree_view_widget);
+    sf::FloatRect local_bounds(0.0f, 0.0f, size.x, treeview_height);
+    T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
+}
+
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
     return "(" + utils::vec_to_str(vec) + ")";
 }
@@ -4246,6 +4271,35 @@ void WidgetTests::dragWindow(fw::Application& application, fw::WindowWidget* win
     application.advance();
     application.mouseLeftRelease();
     application.advance();
+}
+
+float WidgetTests::calcTreeViewEntryHeight(fw::TreeViewWidget::Entry* entry) {
+    float result = 0.0f;
+    result += fw::TREEVIEW_ENTRY_HEIGHT;
+    if (entry->isExpanded()) {
+        for (size_t i = 0; i < entry->getChildrenCount(); i++) {
+            result += fw::TREEVIEW_CONTAINER_PADDING;
+            fw::TreeViewWidget::Entry* child = entry->getChild(i);
+            float child_height = calcTreeViewEntryHeight(child);
+            result += child_height;
+        }
+    }
+    return result;
+}
+
+float WidgetTests::calcTreeViewHeight(fw::TreeViewWidget* treeview) {
+    float result = 0.0f;
+    result += fw::TREEVIEW_CONTAINER_PADDING;
+    for (size_t i = 0; i < treeview->getEntryCount(); i++) {
+        fw::TreeViewWidget::Entry* entry = treeview->getEntry(i);
+        float entry_height = calcTreeViewEntryHeight(entry);
+        result += entry_height;
+        if (i < treeview->getEntryCount() - 1) {
+            result += fw::TREEVIEW_CONTAINER_PADDING;
+        }
+    }
+    result += fw::TREEVIEW_CONTAINER_PADDING;
+    return result;
 }
 
 void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
