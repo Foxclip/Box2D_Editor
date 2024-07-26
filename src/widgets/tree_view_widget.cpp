@@ -334,17 +334,13 @@ namespace fw {
 	}
 
 	void TreeViewWidget::Entry::expand() {
-		if (children.size() > 0) {
-			expanded = true;
-			arrow_widget->setRotation(90.0f);
-			children_box_widget->setVisible(true);
-		}
+		expanded = true;
+		updateWidgets();
 	}
 
 	void TreeViewWidget::Entry::collapse() {
 		expanded = false;
-		arrow_widget->setRotation(0.0f);
-		children_box_widget->setVisible(false);
+		updateWidgets();
 	}
 
 	void TreeViewWidget::Entry::toggle() {
@@ -365,7 +361,13 @@ namespace fw {
 			getChildrenBoxWidget()->setVisible(false);
 		} else {
 			getArrowAreaWidget()->setVisible(true);
-			getChildrenBoxWidget()->setVisible(expanded);
+			if (expanded) {
+				arrow_widget->setRotation(90.0f);
+				getChildrenBoxWidget()->setVisible(true);
+			} else {
+				arrow_widget->setRotation(0.0f);
+				getChildrenBoxWidget()->setVisible(false);
+			}
 		}
 	}
 

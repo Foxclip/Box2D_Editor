@@ -27,7 +27,7 @@ int main() {
 
     execute_app();
 
-    // TODO: TreeViewWidget test
+    // TODO: TreeViewWidget: entry order after remove
     // TODO: reparent object in outliner
     // TODO: rename object in outliner
     // TODO: delete object in outliner
