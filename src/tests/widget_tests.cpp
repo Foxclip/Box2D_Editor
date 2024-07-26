@@ -3996,7 +3996,7 @@ void WidgetTests::treeviewWidgetBasicTest(test::Test& test) {
     visibility.hasUnclippedRegion = true;
     visibility.nonZeroSize = true;
     visibility.onScreen = true;
-    visibility.opaque = false;
+    visibility.opaque = true;
     visibility.renderableSetting = true;
     visibility.visibleSetting = true;
     gwt.visibility = visibility;

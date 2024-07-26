@@ -9,7 +9,7 @@ namespace fw {
 		: ContainerWidget(widget_list, width, height) {
 		type = WidgetType::TreeView;
 		setName("treeview");
-		setFillColor(sf::Color::Transparent);
+		setFillColor(TREEVIEW_BACKGROUND_COLOR);
 		setClipChildren(true);
 		setClickThrough(false);
 		setHorizontal(false);

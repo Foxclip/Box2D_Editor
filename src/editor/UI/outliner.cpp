@@ -13,6 +13,7 @@ Outliner::Outliner(fw::WidgetList& widget_list, float width, float height, Edito
 	setScrollbarColor(OUTLINER_SCROLLBAR_COLOR);
 	// container
 	treeview_widget = widget_list.createWidget<fw::TreeViewWidget>(width, height);
+	treeview_widget->setFillColor(sf::Color::Transparent);
 	treeview_widget->setSizeXPolicy(SizePolicy::PARENT);
 	treeview_widget->OnEntrySelected += [&](fw::TreeViewWidget::Entry* entry) {
 		GameObject* object = entry_object[entry];
