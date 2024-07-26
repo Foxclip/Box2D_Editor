@@ -20,7 +20,16 @@ namespace fw {
 	TreeViewWidget::TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size)
 		: TreeViewWidget(widget_list, size.x, size.y) { }
 
-	void TreeViewWidget::deselectAll(Entry* except_subtree) {
+	void TreeViewWidget::deselectAllExceptEntry(Entry* except_entry) {
+		for (size_t i = 0; i < all_entries.size(); i++) {
+			Entry* entry = all_entries[i];
+			if (entry != except_entry) {
+				all_entries[i]->deselect();
+			}
+		}
+	}
+
+	void TreeViewWidget::deselectAllExceptSubtree(Entry* except_subtree) {
 		std::function<void(Entry*)> deselect_subtree = [&](Entry* entry) {
 			if (entry == except_subtree) {
 				return;
@@ -69,6 +78,18 @@ namespace fw {
 		return ptr;
 	}
 
+	void TreeViewWidget::selectAll() {
+		for (size_t i = 0; i < all_entries.size(); i++) {
+			all_entries[i]->select();
+		}
+	}
+
+	void TreeViewWidget::deselectAll() {
+		for (size_t i = 0; i < all_entries.size(); i++) {
+			all_entries[i]->deselect();
+		}
+	}
+
 	void TreeViewWidget::expandAll() {
 		for (size_t i = 0; i < all_entries.size(); i++) {
 			all_entries[i]->expand();
@@ -114,7 +135,11 @@ namespace fw {
 			if (treeview.widget_list.isLShiftPressed()) {
 				toggleSelect(with_children);
 			} else {
-				treeview.deselectAll(this);
+				if (with_children) {
+					treeview.deselectAllExceptSubtree(this);
+				} else {
+					treeview.deselectAllExceptEntry(this);
+				}
 				select(with_children);
 			}
 		};
@@ -255,15 +280,17 @@ namespace fw {
 	}
 
 	void TreeViewWidget::Entry::select(bool with_children) {
-		if (!selected) {
-			selectSilent(with_children);
+		bool was_selected = selected;
+		selectSilent(with_children);
+		if (!was_selected) {
 			treeview.OnEntrySelected(this);
 		}
 	}
 
 	void TreeViewWidget::Entry::deselect(bool with_children) {
-		if (selected) {
-			deselectSilent(with_children);
+		bool was_selected = selected;
+		deselectSilent(with_children);
+		if (was_selected) {
 			treeview.OnEntryDeselected(this);
 		}
 	}

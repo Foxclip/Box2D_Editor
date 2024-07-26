@@ -72,7 +72,6 @@ namespace fw {
 
 		TreeViewWidget(WidgetList& widget_list, float width, float height);
 		TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size);
-		void deselectAll(Entry* except_subtree = nullptr);
 		const CompVector<Entry*>& getAllEntries() const;
 		const CompVector<Entry*>& getTopEntries() const;
 		size_t getAllEntryCount() const;
@@ -80,6 +79,8 @@ namespace fw {
 		Entry* getFromAll(size_t index) const;
 		Entry* getFromTop(size_t index) const;
 		Entry* addEntry(const sf::String& name);
+		void selectAll();
+		void deselectAll();
 		void expandAll();
 		void collapseAll();
 		void removeEntry(Entry* entry);
@@ -87,12 +88,15 @@ namespace fw {
 
 	protected:
 
-
 	private:
 		friend class Entry;
 		fw::ContainerWidget* container_widget = nullptr;
 		CompVectorUptr<Entry> all_entries;
 		CompVector<Entry*> top_entries;
+
+		void deselectAllExceptEntry(Entry* except_entry = nullptr);
+		void deselectAllExceptSubtree(Entry* except_subtree = nullptr);
+
 
 	};
 
