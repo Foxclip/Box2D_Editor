@@ -203,6 +203,7 @@ private:
 	void treeviewWidgetEntriesTest(test::Test& test);
 	void treeviewWidgetParent1Test(test::Test& test);
 	void treeviewWidgetParent2Test(test::Test& test);
+	void treeviewWidgetSelectTest(test::Test& test);
 
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);

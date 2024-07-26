@@ -72,7 +72,7 @@ namespace fw {
 
 		TreeViewWidget(WidgetList& widget_list, float width, float height);
 		TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size);
-		void deselectAll();
+		void deselectAll(Entry* except_subtree = nullptr);
 		const CompVector<Entry*>& getAllEntries() const;
 		const CompVector<Entry*>& getTopEntries() const;
 		size_t getAllEntryCount() const;

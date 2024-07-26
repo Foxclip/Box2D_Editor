@@ -20,9 +20,20 @@ namespace fw {
 	TreeViewWidget::TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size)
 		: TreeViewWidget(widget_list, size.x, size.y) { }
 
-	void TreeViewWidget::deselectAll() {
-		for (size_t i = 0; i < all_entries.size(); i++) {
-			all_entries[i]->deselect();
+	void TreeViewWidget::deselectAll(Entry* except_subtree) {
+		std::function<void(Entry*)> deselect_subtree = [&](Entry* entry) {
+			if (entry == except_subtree) {
+				return;
+			}
+			for (size_t i = 0; i < entry->getChildrenCount(); i++) {
+				Entry* child = entry->getChild(i);
+				deselect_subtree(child);
+			}
+			entry->deselect();
+		};
+		for (size_t i = 0; i < top_entries.size(); i++) {
+			Entry* entry = top_entries[i];
+			deselect_subtree(entry);
 		}
 	}
 
@@ -96,13 +107,14 @@ namespace fw {
 		// rectangle
 		rectangle_widget = treeview.widget_list.createWidget<fw::RectangleWidget>(20.0f, TREEVIEW_ENTRY_HEIGHT);
 		rectangle_widget->setFillColor(TREEVIEW_ENTRY_BACKGROUND_COLOR);
+		rectangle_widget->setClipChildren(true);
 		rectangle_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
 		rectangle_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
 			bool with_children = treeview.widget_list.isLCtrlPressed();
 			if (treeview.widget_list.isLShiftPressed()) {
 				toggleSelect(with_children);
 			} else {
-				treeview.deselectAll();
+				treeview.deselectAll(this);
 				select(with_children);
 			}
 		};
@@ -243,13 +255,17 @@ namespace fw {
 	}
 
 	void TreeViewWidget::Entry::select(bool with_children) {
-		selectSilent(with_children);
-		treeview.OnEntrySelected(this);
+		if (!selected) {
+			selectSilent(with_children);
+			treeview.OnEntrySelected(this);
+		}
 	}
 
 	void TreeViewWidget::Entry::deselect(bool with_children) {
-		deselectSilent(with_children);
-		treeview.OnEntryDeselected(this);
+		if (selected) {
+			deselectSilent(with_children);
+			treeview.OnEntryDeselected(this);
+		}
 	}
 
 	void TreeViewWidget::Entry::toggleSelect(bool with_children) {

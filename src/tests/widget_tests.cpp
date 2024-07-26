@@ -186,6 +186,7 @@ void WidgetTests::createTestLists() {
     test::Test* tree_view_widget_entries_test = tree_view_widget_list->addTest("entries", { tree_view_widget_basic_test }, [&](test::Test& test) { treeviewWidgetEntriesTest(test); });
     test::Test* tree_view_widget_parent1_test = tree_view_widget_list->addTest("parent_1", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent1Test(test); });
     test::Test* tree_view_widget_parent2_test = tree_view_widget_list->addTest("parent_2", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent2Test(test); });
+    test::Test* tree_view_widget_select_test = tree_view_widget_list->addTest("select", { tree_view_widget_parent1_test }, [&](test::Test& test) { treeviewWidgetSelectTest(test); });
 
 }
 
@@ -4023,8 +4024,6 @@ void WidgetTests::treeviewWidgetEntriesTest(test::Test& test) {
     application.advance();
     sf::Vector2f size(100.0f, 100.0f);
     fw::TreeViewWidget* tree_view_widget = application.getWidgets().createWidget<fw::TreeViewWidget>(size);
-    fw::Widget* root_widget = application.getWidgets().getRootWidget();
-    T_ASSERT(T_CHECK(tree_view_widget));
     sf::Vector2f position(100.0f, 100.0f);
     tree_view_widget->setPosition(position);
 
@@ -4047,8 +4046,6 @@ void WidgetTests::treeviewWidgetParent1Test(test::Test& test) {
     application.advance();
     sf::Vector2f size(100.0f, 100.0f);
     fw::TreeViewWidget* tree_view_widget = application.getWidgets().createWidget<fw::TreeViewWidget>(size);
-    fw::Widget* root_widget = application.getWidgets().getRootWidget();
-    T_ASSERT(T_CHECK(tree_view_widget));
     sf::Vector2f position(100.0f, 100.0f);
     tree_view_widget->setPosition(position);
 
@@ -4078,8 +4075,6 @@ void WidgetTests::treeviewWidgetParent2Test(test::Test& test) {
     application.advance();
     sf::Vector2f size(100.0f, 100.0f);
     fw::TreeViewWidget* tree_view_widget = application.getWidgets().createWidget<fw::TreeViewWidget>(size);
-    fw::Widget* root_widget = application.getWidgets().getRootWidget();
-    T_ASSERT(T_CHECK(tree_view_widget));
     sf::Vector2f position(100.0f, 100.0f);
     tree_view_widget->setPosition(position);
 
@@ -4095,6 +4090,146 @@ void WidgetTests::treeviewWidgetParent2Test(test::Test& test) {
     float treeview_height = calcTreeViewHeight(tree_view_widget);
     sf::FloatRect local_bounds(0.0f, 0.0f, size.x, treeview_height);
     T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
+}
+
+void WidgetTests::treeviewWidgetSelectTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.setDefaultFont(textbox_font);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::TreeViewWidget* tree_view_widget = application.getWidgets().createWidget<fw::TreeViewWidget>(size);
+    sf::Vector2f position(100.0f, 100.0f);
+    tree_view_widget->setPosition(position);
+
+    auto click_entry = [&](fw::TreeViewWidget::Entry* entry, bool shift = false, bool ctrl = false) {
+        sf::Vector2f entry_pos = entry->getRectangleWidget()->getGlobalCenter();
+        application.mouseMove(entry_pos);
+        if (shift) {
+            application.keyPress(sf::Keyboard::LShift);
+        }
+        if (ctrl) {
+            application.keyPress(sf::Keyboard::LControl);
+        }
+        application.mouseLeftPress();
+        application.advance();
+        application.mouseLeftRelease();
+        if (ctrl) {
+            application.keyRelease(sf::Keyboard::LControl);
+        }
+        if (shift) {
+            application.keyRelease(sf::Keyboard::LShift);
+        }
+        application.advance();
+    };
+    auto click_arrow = [&](fw::TreeViewWidget::Entry* entry) {
+        sf::Vector2f arrow_pos = entry->getArrowAreaWidget()->getGlobalCenter();
+        application.mouseMove(arrow_pos);
+        application.mouseLeftPress();
+        application.advance();
+        application.mouseLeftRelease();
+        application.advance();
+    };
+    CompVector<fw::TreeViewWidget::Entry*> selected_entries;
+    CompVector<fw::TreeViewWidget::Entry*> deselected_entries;
+    tree_view_widget->OnEntrySelected += [&](fw::TreeViewWidget::Entry* entry) {
+        selected_entries.add(entry);
+    };
+    tree_view_widget->OnEntryDeselected += [&](fw::TreeViewWidget::Entry* entry) {
+        deselected_entries.add(entry);
+    };
+    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewWidget::Entry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewWidget::Entry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
+    fw::TreeViewWidget::Entry* entry_3 = tree_view_widget->addEntry("Entry 3");
+    fw::TreeViewWidget::Entry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
+    fw::TreeViewWidget::Entry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
+    entry_2_child_1->setParent(entry_2);
+    entry_3_child_1->setParent(entry_3);
+    entry_3_child_2->setParent(entry_3);
+    application.advance();
+
+    click_entry(entry_1);
+    T_ASSERT(T_CHECK(selected_entries.size() == 1));
+    T_CHECK(selected_entries.back() == entry_1);
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_entry(entry_2);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 1));
+    T_CHECK(deselected_entries.back() == entry_1);
+    T_ASSERT(T_CHECK(selected_entries.size() == 1));
+    T_CHECK(selected_entries.back() == entry_2);
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_arrow(entry_2);
+    click_entry(entry_2_child_1);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 1));
+    T_CHECK(deselected_entries.back() == entry_2);
+    T_ASSERT(T_CHECK(selected_entries.size() == 1));
+    T_CHECK(selected_entries.back() == entry_2_child_1);
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_arrow(entry_3);
+    click_entry(entry_3_child_1, true, false);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 0));
+    T_ASSERT(T_CHECK(selected_entries.size() == 1));
+    T_CHECK(selected_entries.back() == entry_3_child_1);
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_entry(entry_1, true, false);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 0));
+    T_ASSERT(T_CHECK(selected_entries.size() == 1));
+    T_CHECK(selected_entries.back() == entry_1);
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_entry(entry_2_child_1, true, false);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 1));
+    T_CHECK(deselected_entries.back() == entry_2_child_1);
+    T_ASSERT(T_CHECK(selected_entries.size() == 0));
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_entry(entry_2, true, true);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 0));
+    T_ASSERT(T_CHECK(selected_entries.size() == 2));
+    T_CHECK(selected_entries[0] == entry_2_child_1);
+    T_CHECK(selected_entries[1] == entry_2);
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_entry(entry_3, true, true);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 0));
+    T_ASSERT(T_CHECK(selected_entries.size() == 2));
+    T_CHECK(selected_entries[0] == entry_3_child_2);
+    T_CHECK(selected_entries[1] == entry_3);
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_entry(entry_3, true, true);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 3));
+    T_CHECK(deselected_entries[0] == entry_3_child_1);
+    T_CHECK(deselected_entries[1] == entry_3_child_2);
+    T_CHECK(deselected_entries[2] == entry_3);
+    T_ASSERT(T_CHECK(selected_entries.size() == 0));
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_entry(entry_2, false, true);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 1));
+    T_CHECK(deselected_entries[0] == entry_1);
+    T_ASSERT(T_CHECK(selected_entries.size() == 0));
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_entry(entry_2, false, true);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 0));
+    T_ASSERT(T_CHECK(selected_entries.size() == 0));
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
