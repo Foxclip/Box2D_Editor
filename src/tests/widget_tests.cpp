@@ -4230,6 +4230,33 @@ void WidgetTests::treeviewWidgetSelectTest(test::Test& test) {
     click_entry(entry_2, false, true);
     T_ASSERT(T_CHECK(deselected_entries.size() == 0));
     T_ASSERT(T_CHECK(selected_entries.size() == 0));
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    tree_view_widget->deselectAll();
+    T_ASSERT(T_CHECK(deselected_entries.size() == 2));
+    T_CHECK(deselected_entries[0] == entry_2_child_1);
+    T_CHECK(deselected_entries[1] == entry_2);
+    T_ASSERT(T_CHECK(selected_entries.size() == 0));
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_entry(entry_3_child_2);
+    click_entry(entry_3);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 1));
+    T_CHECK(deselected_entries[0] == entry_3_child_2);
+    T_ASSERT(T_CHECK(selected_entries.size() == 2));
+    T_CHECK(selected_entries[0] == entry_3_child_2);
+    T_CHECK(selected_entries[1] == entry_3);
+
+    selected_entries.clear();
+    deselected_entries.clear();
+    click_entry(entry_3, false, true);
+    T_ASSERT(T_CHECK(deselected_entries.size() == 0));
+    T_ASSERT(T_CHECK(selected_entries.size() == 2));
+    T_CHECK(selected_entries[0] == entry_3_child_1);
+    T_CHECK(selected_entries[1] == entry_3_child_2);
+
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {

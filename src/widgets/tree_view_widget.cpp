@@ -79,14 +79,14 @@ namespace fw {
 	}
 
 	void TreeViewWidget::selectAll() {
-		for (size_t i = 0; i < all_entries.size(); i++) {
-			all_entries[i]->select();
+		for (size_t i = 0; i < top_entries.size(); i++) {
+			top_entries[i]->select(true);
 		}
 	}
 
 	void TreeViewWidget::deselectAll() {
-		for (size_t i = 0; i < all_entries.size(); i++) {
-			all_entries[i]->deselect();
+		for (size_t i = 0; i < top_entries.size(); i++) {
+			top_entries[i]->deselect(true);
 		}
 	}
 
