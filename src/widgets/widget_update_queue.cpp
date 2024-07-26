@@ -138,11 +138,9 @@ namespace fw {
 				if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(socket->getWidget())) {
 					for (Widget* child : socket->getWidget()->getChildren()) {
 						// child's position and size update needs to be overwritten by container update
-						if (container->getHorizontal()) {
-							// avoiding a loop
-							if (child->getSizeXPolicy() != Widget::SizePolicy::EXPAND) {
-								result.add(&child->size_x_target);
-							}
+						// avoiding a loop
+						if (child->getSizeXPolicy() != Widget::SizePolicy::EXPAND) {
+							result.add(&child->size_x_target);
 						}
 					}
 				} else {
@@ -154,10 +152,8 @@ namespace fw {
 				}
 				if (ContainerWidget* container = dynamic_cast<ContainerWidget*>(socket->getWidget())) {
 					for (Widget* child : socket->getWidget()->getChildren()) {
-						if (!container->getHorizontal()) {
-							if (child->getSizeXPolicy() != Widget::SizePolicy::EXPAND) {
-								result.add(&child->size_y_target);
-							}
+						if (child->getSizeYPolicy() != Widget::SizePolicy::EXPAND) {
+							result.add(&child->size_y_target);
 						}
 					}
 				} else {

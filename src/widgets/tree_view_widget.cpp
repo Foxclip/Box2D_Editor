@@ -21,51 +21,70 @@ namespace fw {
 		: TreeViewWidget(widget_list, size.x, size.y) { }
 
 	void TreeViewWidget::deselectAll() {
-		for (size_t i = 0; i < entries.size(); i++) {
-			entries[i]->deselect();
+		for (size_t i = 0; i < all_entries.size(); i++) {
+			all_entries[i]->deselect();
 		}
 	}
 
-	const CompVector<TreeViewWidget::Entry*>& TreeViewWidget::getEntries() const {
-		return entries.getCompVector();
+	const CompVector<TreeViewWidget::Entry*>& TreeViewWidget::getAllEntries() const {
+		return all_entries.getCompVector();
 	}
 
-	size_t TreeViewWidget::getEntryCount() const {
-		return entries.size();
+	const CompVector<TreeViewWidget::Entry*>& TreeViewWidget::getTopEntries() const {
+		return top_entries;
 	}
 
-	TreeViewWidget::Entry* TreeViewWidget::getEntry(size_t index) const {
-		return entries[index];
+	size_t TreeViewWidget::getAllEntryCount() const {
+		return all_entries.size();
+	}
+
+	size_t TreeViewWidget::getTopEntryCount() const {
+		return top_entries.size();
+	}
+
+	TreeViewWidget::Entry* TreeViewWidget::getFromAll(size_t index) const {
+		return all_entries[index];
+	}
+
+	TreeViewWidget::Entry* TreeViewWidget::getFromTop(size_t index) const {
+		return top_entries[index];
 	}
 
 	TreeViewWidget::Entry* TreeViewWidget::addEntry(const sf::String& name) {
 		std::unique_ptr<Entry> entry_uptr = std::make_unique<Entry>(*this, name);
 		Entry* ptr = entry_uptr.get();
-		entries.add(std::move(entry_uptr));
+		top_entries.add(ptr);
+		all_entries.add(std::move(entry_uptr));
 		return ptr;
 	}
 
 	void TreeViewWidget::expandAll() {
-		for (size_t i = 0; i < entries.size(); i++) {
-			entries[i]->expand();
+		for (size_t i = 0; i < all_entries.size(); i++) {
+			all_entries[i]->expand();
 		}
 	}
 
 	void TreeViewWidget::collapseAll() {
-		for (size_t i = 0; i < entries.size(); i++) {
-			entries[i]->collapse();
+		for (size_t i = 0; i < all_entries.size(); i++) {
+			all_entries[i]->collapse();
 		}
 	}
 
 	void TreeViewWidget::removeEntry(Entry* entry) {
-		entries.remove(entry);
+		top_entries.remove(entry);
+		all_entries.remove(entry);
 	}
 
 	void TreeViewWidget::clear() {
-		entries.clear();
+		top_entries.clear();
+		all_entries.clear();
 	}
 
 	TreeViewWidget::Entry::Entry(TreeViewWidget& treeview, const sf::String& name) : treeview(treeview) {
+#ifndef NDEBUG
+		this->debug_name = name;
+#endif
+		this->name = name;
 		// container
 		entry_widget = treeview.widget_list.createWidget<fw::ContainerWidget>(20.0f, TREEVIEW_ENTRY_HEIGHT);
 		entry_widget->setName(name + " entry");
@@ -255,15 +274,20 @@ namespace fw {
 			new_parent->getArrowAreaWidget()->setVisible(true);
 			fw::ContainerWidget* parent_children_widget = new_parent->getChildrenWidget();
 			entry_widget->setParent(parent_children_widget);
+			treeview.top_entries.remove(this);
 		} else {
 			entry_widget->setParent(treeview.container_widget);
+			treeview.top_entries.add(this);
 		}
+		this->parent = new_parent;
 	}
 
 	void TreeViewWidget::Entry::expand() {
-		expanded = true;
-		arrow_widget->setRotation(90.0f);
-		children_box_widget->setVisible(true);
+		if (children.size() > 0) {
+			expanded = true;
+			arrow_widget->setRotation(90.0f);
+			children_box_widget->setVisible(true);
+		}
 	}
 
 	void TreeViewWidget::Entry::collapse() {

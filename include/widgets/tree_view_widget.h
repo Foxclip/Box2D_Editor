@@ -49,6 +49,10 @@ namespace fw {
 			void toggle();
 		private:
 			TreeViewWidget& treeview;
+#ifndef NDEBUG
+			std::string debug_name;
+#endif
+			sf::String name;
 			Entry* parent = nullptr;
 			CompVector<Entry*> children;
 			bool expanded = false;
@@ -69,9 +73,12 @@ namespace fw {
 		TreeViewWidget(WidgetList& widget_list, float width, float height);
 		TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		void deselectAll();
-		const CompVector<Entry*>& getEntries() const;
-		size_t getEntryCount() const;
-		Entry* getEntry(size_t index) const;
+		const CompVector<Entry*>& getAllEntries() const;
+		const CompVector<Entry*>& getTopEntries() const;
+		size_t getAllEntryCount() const;
+		size_t getTopEntryCount() const;
+		Entry* getFromAll(size_t index) const;
+		Entry* getFromTop(size_t index) const;
 		Entry* addEntry(const sf::String& name);
 		void expandAll();
 		void collapseAll();
@@ -84,7 +91,8 @@ namespace fw {
 	private:
 		friend class Entry;
 		fw::ContainerWidget* container_widget = nullptr;
-		CompVectorUptr<Entry> entries;
+		CompVectorUptr<Entry> all_entries;
+		CompVector<Entry*> top_entries;
 
 	};
 

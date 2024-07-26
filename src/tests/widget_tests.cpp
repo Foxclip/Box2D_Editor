@@ -183,7 +183,9 @@ void WidgetTests::createTestLists() {
 
     test::TestList* tree_view_widget_list = createTestList("TreeViewWidget", { widgets_basic_list });
     test::Test* tree_view_widget_basic_test = tree_view_widget_list->addTest("basic", [&](test::Test& test) { treeviewWidgetBasicTest(test); });
-    test::Test* tree_view_widget_entries_test = tree_view_widget_list->addTest("entries", [&](test::Test& test) { treeviewWidgetEntriesTest(test); });
+    test::Test* tree_view_widget_entries_test = tree_view_widget_list->addTest("entries", { tree_view_widget_basic_test }, [&](test::Test& test) { treeviewWidgetEntriesTest(test); });
+    test::Test* tree_view_widget_parent1_test = tree_view_widget_list->addTest("parent_1", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent1Test(test); });
+    test::Test* tree_view_widget_parent2_test = tree_view_widget_list->addTest("parent_2", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent2Test(test); });
 
 }
 
@@ -4037,6 +4039,64 @@ void WidgetTests::treeviewWidgetEntriesTest(test::Test& test) {
     T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
 }
 
+void WidgetTests::treeviewWidgetParent1Test(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.setDefaultFont(textbox_font);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::TreeViewWidget* tree_view_widget = application.getWidgets().createWidget<fw::TreeViewWidget>(size);
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(tree_view_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    tree_view_widget->setPosition(position);
+
+    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewWidget::Entry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewWidget::Entry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
+    fw::TreeViewWidget::Entry* entry_3 = tree_view_widget->addEntry("Entry 3");
+    fw::TreeViewWidget::Entry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
+    fw::TreeViewWidget::Entry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
+    entry_2_child_1->setParent(entry_2);
+    entry_3_child_1->setParent(entry_3);
+    entry_3_child_2->setParent(entry_3);
+    tree_view_widget->expandAll();
+    application.advance();
+    auto rect_to_str = &WidgetTests::floatRectToStr;
+    auto rect_approx_cmp = &WidgetTests::rectApproxCmp;
+    float treeview_height = calcTreeViewHeight(tree_view_widget);
+    sf::FloatRect local_bounds(0.0f, 0.0f, size.x, treeview_height);
+    T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
+}
+
+void WidgetTests::treeviewWidgetParent2Test(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.setDefaultFont(textbox_font);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::TreeViewWidget* tree_view_widget = application.getWidgets().createWidget<fw::TreeViewWidget>(size);
+    fw::Widget* root_widget = application.getWidgets().getRootWidget();
+    T_ASSERT(T_CHECK(tree_view_widget));
+    sf::Vector2f position(100.0f, 100.0f);
+    tree_view_widget->setPosition(position);
+
+    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewWidget::Entry* entry_1_child_1 = tree_view_widget->addEntry("Entry 1 Child 1");
+    fw::TreeViewWidget::Entry* entry_1_child_1_child_1 = tree_view_widget->addEntry("Entry 1 Child 1 Child 1");
+    entry_1_child_1->setParent(entry_1);
+    entry_1_child_1_child_1->setParent(entry_1_child_1);
+    tree_view_widget->expandAll();
+    application.advance();
+    auto rect_to_str = &WidgetTests::floatRectToStr;
+    auto rect_approx_cmp = &WidgetTests::rectApproxCmp;
+    float treeview_height = calcTreeViewHeight(tree_view_widget);
+    sf::FloatRect local_bounds(0.0f, 0.0f, size.x, treeview_height);
+    T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
+}
+
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
     return "(" + utils::vec_to_str(vec) + ")";
 }
@@ -4290,11 +4350,11 @@ float WidgetTests::calcTreeViewEntryHeight(fw::TreeViewWidget::Entry* entry) {
 float WidgetTests::calcTreeViewHeight(fw::TreeViewWidget* treeview) {
     float result = 0.0f;
     result += fw::TREEVIEW_CONTAINER_PADDING;
-    for (size_t i = 0; i < treeview->getEntryCount(); i++) {
-        fw::TreeViewWidget::Entry* entry = treeview->getEntry(i);
+    for (size_t i = 0; i < treeview->getTopEntryCount(); i++) {
+        fw::TreeViewWidget::Entry* entry = treeview->getFromTop(i);
         float entry_height = calcTreeViewEntryHeight(entry);
         result += entry_height;
-        if (i < treeview->getEntryCount() - 1) {
+        if (i < treeview->getTopEntryCount() - 1) {
             result += fw::TREEVIEW_CONTAINER_PADDING;
         }
     }
