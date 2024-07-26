@@ -58,7 +58,7 @@ void Outliner::removeObject(GameObject* object) {
 		auto it = object_entry.find(object);
 		if (it != object_entry.end()) {
 			fw::TreeViewWidget::Entry* entry = it->second;
-			treeview_widget->removeEntry(entry);
+			treeview_widget->removeEntry(entry, false);
 			object_entry.erase(object);
 			entry_object.erase(entry);
 		}

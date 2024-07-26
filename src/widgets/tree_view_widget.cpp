@@ -102,7 +102,20 @@ namespace fw {
 		}
 	}
 
-	void TreeViewWidget::removeEntry(Entry* entry) {
+	void TreeViewWidget::removeEntry(Entry* entry, bool with_children) {
+		Entry* parent = entry->getParent();
+		CompVector<Entry*> children_copy = entry->getChildren();
+		for (size_t i = 0; i < children_copy.size(); i++) {
+			Entry* child = children_copy[i];
+			if (with_children) {
+				child->remove(true);
+			} else {
+				child->setParent(parent);
+			}
+		}
+		if (parent) {
+			parent->removeChild(entry);
+		}
 		top_entries.remove(entry);
 		all_entries.remove(entry);
 	}
@@ -209,7 +222,7 @@ namespace fw {
 		return parent;
 	}
 
-	CompVector<TreeViewWidget::Entry*> TreeViewWidget::Entry::getChildren() const {
+	const CompVector<TreeViewWidget::Entry*>& TreeViewWidget::Entry::getChildren() const {
 		return children;
 	}
 
@@ -306,20 +319,15 @@ namespace fw {
 	void TreeViewWidget::Entry::setParent(Entry* new_parent) {
 		Entry* old_parent = parent;
 		if (old_parent) {
-			old_parent->children.remove(this);
-			if (old_parent->getChildrenWidget()->getChildrenCount() == 0) {
-				old_parent->getArrowAreaWidget()->setVisible(false);
-				old_parent->getChildrenBoxWidget()->setVisible(false);
-			}
+			old_parent->removeChild(this);
 		}
 		if (new_parent) {
-			new_parent->children.add(this);
-			new_parent->getArrowAreaWidget()->setVisible(true);
+			new_parent->addChild(this);
 			fw::ContainerWidget* parent_children_widget = new_parent->getChildrenWidget();
 			entry_widget->setParent(parent_children_widget);
 			treeview.top_entries.remove(this);
 		} else {
-			entry_widget->setParent(treeview.container_widget);
+			entry_widget->setParent(&treeview);
 			treeview.top_entries.add(this);
 		}
 		this->parent = new_parent;
@@ -345,6 +353,30 @@ namespace fw {
 		} else {
 			expand();
 		}
+	}
+
+	void TreeViewWidget::Entry::remove(bool with_children) {
+		treeview.removeEntry(this, with_children);
+	}
+
+	void TreeViewWidget::Entry::updateWidgets() {
+		if (getChildrenCount() == 0) {
+			getArrowAreaWidget()->setVisible(false);
+			getChildrenBoxWidget()->setVisible(false);
+		} else {
+			getArrowAreaWidget()->setVisible(true);
+			getChildrenBoxWidget()->setVisible(expanded);
+		}
+	}
+
+	void TreeViewWidget::Entry::addChild(Entry* entry) {
+		children.add(entry);
+		updateWidgets();
+	}
+
+	void TreeViewWidget::Entry::removeChild(Entry* entry) {
+		children.remove(entry);
+		updateWidgets();
 	}
 
 }

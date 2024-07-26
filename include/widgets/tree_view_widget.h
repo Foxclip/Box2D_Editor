@@ -27,7 +27,7 @@ namespace fw {
 			~Entry();
 			bool isExpanded() const;
 			Entry* getParent() const;
-			CompVector<Entry*> getChildren() const;
+			const CompVector<Entry*>& getChildren() const;
 			Entry* getChild(size_t index) const;
 			size_t getChildrenCount() const;
 			fw::ContainerWidget* getWidget() const;
@@ -47,7 +47,9 @@ namespace fw {
 			void expand();
 			void collapse();
 			void toggle();
+			void remove(bool with_children);
 		private:
+			friend TreeViewWidget;
 			TreeViewWidget& treeview;
 #ifndef NDEBUG
 			std::string debug_name;
@@ -64,6 +66,10 @@ namespace fw {
 			fw::ContainerWidget* children_box_widget = nullptr;
 			fw::EmptyWidget* children_spacing_widget = nullptr;
 			fw::ContainerWidget* children_widget = nullptr;
+
+			void updateWidgets();
+			void addChild(Entry* entry);
+			void removeChild(Entry* entry);
 
 		};
 
@@ -83,14 +89,13 @@ namespace fw {
 		void deselectAll();
 		void expandAll();
 		void collapseAll();
-		void removeEntry(Entry* entry);
+		void removeEntry(Entry* entry, bool with_children);
 		void clear();
 
 	protected:
 
 	private:
 		friend class Entry;
-		fw::ContainerWidget* container_widget = nullptr;
 		CompVectorUptr<Entry> all_entries;
 		CompVector<Entry*> top_entries;
 
