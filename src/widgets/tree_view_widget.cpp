@@ -46,6 +46,11 @@ namespace fw {
 		}
 	}
 
+	void TreeViewWidget::moveEntryToIndex(Entry* entry, size_t index) {
+		wAssert(top_entries.contains(entry));
+		top_entries.moveValueToIndex(entry, index);
+	}
+
 	const CompVector<TreeViewWidget::Entry*>& TreeViewWidget::getAllEntries() const {
 		return all_entries.getCompVector();
 	}
@@ -333,6 +338,15 @@ namespace fw {
 		this->parent = new_parent;
 	}
 
+	void TreeViewWidget::Entry::moveToIndex(size_t index) {
+		if (parent) {
+			parent->moveChildToIndex(this, index);
+		} else {
+			treeview.moveEntryToIndex(this, index);
+		}
+		entry_widget->moveToIndex(index);
+	}
+
 	void TreeViewWidget::Entry::expand() {
 		expanded = true;
 		updateWidgets();
@@ -374,6 +388,11 @@ namespace fw {
 	void TreeViewWidget::Entry::addChild(Entry* entry) {
 		children.add(entry);
 		updateWidgets();
+	}
+
+	void TreeViewWidget::Entry::moveChildToIndex(Entry* entry, size_t index) {
+		wAssert(children.contains(entry));
+		children.moveValueToIndex(entry, index);
 	}
 
 	void TreeViewWidget::Entry::removeChild(Entry* entry) {

@@ -204,6 +204,7 @@ private:
 	void treeviewWidgetParent1Test(test::Test& test);
 	void treeviewWidgetParent2Test(test::Test& test);
 	void treeviewWidgetSelectTest(test::Test& test);
+	void treeviewWidgetReorderTest(test::Test& test);
 	void treeviewWidgetRemoveTest(test::Test& test);
 
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);

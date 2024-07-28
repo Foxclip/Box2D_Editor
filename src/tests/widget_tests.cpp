@@ -187,7 +187,8 @@ void WidgetTests::createTestLists() {
     test::Test* tree_view_widget_parent1_test = tree_view_widget_list->addTest("parent_1", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent1Test(test); });
     test::Test* tree_view_widget_parent2_test = tree_view_widget_list->addTest("parent_2", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent2Test(test); });
     test::Test* tree_view_widget_select_test = tree_view_widget_list->addTest("select", { tree_view_widget_parent1_test }, [&](test::Test& test) { treeviewWidgetSelectTest(test); });
-    test::Test* tree_view_widget_remove_test = tree_view_widget_list->addTest("remove", { tree_view_widget_parent1_test }, [&](test::Test& test) { treeviewWidgetRemoveTest(test); });
+    test::Test* tree_view_widget_reorder_test = tree_view_widget_list->addTest("reorder", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetReorderTest(test); });
+    test::Test* tree_view_widget_remove_test = tree_view_widget_list->addTest("remove", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetRemoveTest(test); });
 
 }
 
@@ -4257,7 +4258,73 @@ void WidgetTests::treeviewWidgetSelectTest(test::Test& test) {
     T_ASSERT(T_CHECK(selected_entries.size() == 2));
     T_CHECK(selected_entries[0] == entry_3_child_1);
     T_CHECK(selected_entries[1] == entry_3_child_2);
+}
 
+void WidgetTests::treeviewWidgetReorderTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.setDefaultFont(textbox_font);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(200.0f, 100.0f);
+    fw::TreeViewWidget* tree_view_widget = application.getWidgets().createWidget<fw::TreeViewWidget>(size);
+    sf::Vector2f position(100.0f, 100.0f);
+    tree_view_widget->setPosition(position);
+
+    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewWidget::Entry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewWidget::Entry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
+    fw::TreeViewWidget::Entry* entry_3 = tree_view_widget->addEntry("Entry 3");
+    fw::TreeViewWidget::Entry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
+    fw::TreeViewWidget::Entry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
+    fw::TreeViewWidget::Entry* entry_4 = tree_view_widget->addEntry("Entry 4");
+    fw::TreeViewWidget::Entry* entry_4_child_1 = tree_view_widget->addEntry("Entry 4 Child 1");
+    fw::TreeViewWidget::Entry* entry_4_child_1_child_1 = tree_view_widget->addEntry("Entry 4 Child 1 Child 1");
+    fw::TreeViewWidget::Entry* entry_4_child_1_child_2 = tree_view_widget->addEntry("Entry 4 Child 1 Child 2");
+    entry_2_child_1->setParent(entry_2);
+    entry_3_child_1->setParent(entry_3);
+    entry_3_child_2->setParent(entry_3);
+    entry_4_child_1->setParent(entry_4);
+    entry_4_child_1_child_1->setParent(entry_4_child_1);
+    entry_4_child_1_child_2->setParent(entry_4_child_1);
+    tree_view_widget->expandAll();
+    application.advance();
+
+    const CompVector<fw::TreeViewWidget::Entry*>& top_entries = tree_view_widget->getTopEntries();
+    T_ASSERT(T_COMPARE(top_entries.size(), 4));
+    T_CHECK(top_entries[0] == entry_1);
+    T_CHECK(top_entries[1] == entry_2);
+    T_CHECK(top_entries[2] == entry_3);
+    T_CHECK(top_entries[3] == entry_4);
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    {
+        entry_1->moveToIndex(2);
+        application.advance();
+        T_ASSERT(T_COMPARE(top_entries.size(), 4));
+        T_CHECK(top_entries[0] == entry_2);
+        T_CHECK(top_entries[1] == entry_1);
+        T_CHECK(top_entries[2] == entry_3);
+        T_CHECK(top_entries[3] == entry_4);
+        T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    }
+    {
+        entry_3_child_2->moveToIndex(0);
+        application.advance();
+        const CompVector<fw::TreeViewWidget::Entry*>& children = entry_3->getChildren();
+        T_ASSERT(T_COMPARE(children.size(), 2));
+        T_CHECK(children[0] == entry_3_child_2);
+        T_CHECK(children[1] == entry_3_child_1);
+        T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    }
+    {
+        entry_4_child_1_child_1->moveToIndex(2);
+        application.advance();
+        const CompVector<fw::TreeViewWidget::Entry*>& children = entry_4_child_1->getChildren();
+        T_ASSERT(T_COMPARE(children.size(), 2));
+        T_CHECK(children[0] == entry_4_child_1_child_2);
+        T_CHECK(children[1] == entry_4_child_1_child_1);
+        T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    }
 }
 
 void WidgetTests::treeviewWidgetRemoveTest(test::Test& test) {

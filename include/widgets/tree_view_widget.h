@@ -44,6 +44,7 @@ namespace fw {
 			void deselect(bool with_children = false);
 			void toggleSelect(bool with_children = false);
 			void setParent(Entry* new_parent);
+			void moveToIndex(size_t index);
 			void expand();
 			void collapse();
 			void toggle();
@@ -69,6 +70,7 @@ namespace fw {
 
 			void updateWidgets();
 			void addChild(Entry* entry);
+			void moveChildToIndex(Entry* entry, size_t index);
 			void removeChild(Entry* entry);
 
 		};
@@ -101,6 +103,7 @@ namespace fw {
 
 		void deselectAllExceptEntry(Entry* except_entry = nullptr);
 		void deselectAllExceptSubtree(Entry* except_subtree = nullptr);
+		void moveEntryToIndex(Entry* entry, size_t index);
 
 
 	};
