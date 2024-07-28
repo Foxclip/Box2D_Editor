@@ -43,6 +43,11 @@ void Editor::setCameraPos(float x, float y) {
     viewCenterY = y;
 }
 
+void Editor::setCameraPos(const b2Vec2& pos) {
+    viewCenterX = pos.x;
+    viewCenterY = pos.y;
+}
+
 void Editor::setCameraZoom(float zoom) {
     zoomFactor = zoom;
 }
@@ -458,6 +463,8 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
             debug_break = true;
         } else if (event.key.code == sf::Keyboard::E) {
             simulation.advance(timeStep);
+        } else if (event.key.code == sf::Keyboard::Slash) {
+            viewObject(active_object);
         }
     }
     if (event.type == sf::Event::KeyReleased) {
@@ -1369,6 +1376,30 @@ void Editor::deleteObject(GameObject* object, bool remove_children) {
     }
     select_tool.deselectObject(object);
     simulation.remove(object, remove_children);
+}
+
+void Editor::viewObject(GameObject* object) {
+    if (!object) {
+        return;
+    }
+    b2AABB aabb = object->getAABB();
+    float sizeX = aabb.upperBound.x - aabb.lowerBound.x;
+    float sizeY = aabb.upperBound.y - aabb.lowerBound.y;
+    float zoomX = window.getSize().x / sizeX;
+    float zoomY = window.getSize().y / sizeY;
+    float zoom = 1.0f;
+    if (sizeX == 0.0f && sizeY > 0.0f) {
+        zoom = zoomY;
+    } else if (sizeX > 0.0f && sizeY == 0.0f) {
+        zoom = zoomX;
+    } else if (sizeX > 0.0f && sizeY > 0.0f) {
+        zoom = std::min(zoomX, zoomY);
+    } else {
+        mAssert(false, "Invalid size");
+    }
+    b2Vec2 aabb_center = aabb.GetCenter();
+    setCameraPos(aabb_center);
+    setCameraZoom(zoom);
 }
 
 void Editor::checkDebugbreak() {

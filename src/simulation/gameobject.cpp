@@ -137,6 +137,22 @@ Joint* GameObject::getJoint(size_t index) const {
 	return joints[index];
 }
 
+b2AABB GameObject::getAABB() const {
+	b2AABB result;
+	bool first = true;
+	result.lowerBound = b2Vec2_zero;
+	result.upperBound = b2Vec2_zero;
+	for (b2Fixture* f = rigid_body->GetFixtureList(); f; f = f->GetNext()) {
+		b2AABB aabb = f->GetAABB(0);
+		if (first) {
+			result = aabb;
+		} else {
+			result.Combine(aabb);
+		}
+	}
+	return result;
+}
+
 b2Vec2 GameObject::toGlobal(const b2Vec2& pos) {
 	b2Transform gt = getGlobalTransform();
 	return b2Mul(gt, pos);

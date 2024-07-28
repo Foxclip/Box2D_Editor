@@ -61,6 +61,7 @@ public:
 	void init();
 	void load(const std::string& filename);
 	void setCameraPos(float x, float y);
+	void setCameraPos(const b2Vec2& pos);
 	void setCameraZoom(float zoom);
 	fw::WidgetList& getWidgetList();
 	void selectSingleObject(GameObject* object, bool with_children = false);
@@ -228,6 +229,7 @@ private:
 	void endMove(bool confirm);
 	void endRotate(bool confirm);
 	void deleteObject(GameObject* object, bool remove_children);
+	void viewObject(GameObject* object);
 	void checkDebugbreak();
 	void canvasDraw(fw::CanvasWidget* canvas, const sf::Drawable& drawable, const sf::RenderStates& states = sf::RenderStates::Default);
 

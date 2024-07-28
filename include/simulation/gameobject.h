@@ -80,6 +80,7 @@ public:
 	GameObject* getChild(size_t index) const;
 	const CompVector<Joint*>& getJoints() const;
 	Joint* getJoint(size_t index) const;
+	b2AABB getAABB() const;
 	b2Vec2 toGlobal(const b2Vec2& pos);
 	b2Vec2 toLocal(const b2Vec2& pos);
 	float toGlobalAngle(float angle);
