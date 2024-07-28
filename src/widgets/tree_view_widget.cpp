@@ -134,8 +134,10 @@ namespace fw {
 	}
 
 	void TreeViewWidget::clear() {
-		top_entries.clear();
-		all_entries.clear();
+		for (ptrdiff_t i = top_entries.size() - 1; i >= 0; i--) {
+			Entry* entry = top_entries[i];
+			entry->remove(true);
+		}
 	}
 
 	TreeViewWidget::Entry::Entry(TreeViewWidget& treeview, const sf::String& name) : treeview(treeview) {

@@ -189,7 +189,7 @@ void WidgetTests::createTestLists() {
     test::Test* tree_view_widget_select_test = tree_view_widget_list->addTest("select", { tree_view_widget_parent1_test }, [&](test::Test& test) { treeviewWidgetSelectTest(test); });
     test::Test* tree_view_widget_reorder_test = tree_view_widget_list->addTest("reorder", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetReorderTest(test); });
     test::Test* tree_view_widget_remove_test = tree_view_widget_list->addTest("remove", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetRemoveTest(test); });
-
+    test::Test* tree_view_widget_clear_test = tree_view_widget_list->addTest("clear", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetClearTest(test); });
 }
 
 void WidgetTests::beforeRunModule() {
@@ -4507,6 +4507,55 @@ void WidgetTests::treeviewWidgetRemoveTest(test::Test& test) {
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 0);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 0);
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+}
+
+void WidgetTests::treeviewWidgetClearTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.setDefaultFont(textbox_font);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(200.0f, 100.0f);
+    fw::TreeViewWidget* tree_view_widget = application.getWidgets().createWidget<fw::TreeViewWidget>(size);
+    sf::Vector2f position(100.0f, 100.0f);
+    tree_view_widget->setPosition(position);
+
+    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewWidget::Entry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewWidget::Entry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
+    fw::TreeViewWidget::Entry* entry_3 = tree_view_widget->addEntry("Entry 3");
+    fw::TreeViewWidget::Entry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
+    fw::TreeViewWidget::Entry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
+    fw::TreeViewWidget::Entry* entry_4 = tree_view_widget->addEntry("Entry 4");
+    fw::TreeViewWidget::Entry* entry_4_child_1 = tree_view_widget->addEntry("Entry 4 Child 1");
+    fw::TreeViewWidget::Entry* entry_4_child_2 = tree_view_widget->addEntry("Entry 4 Child 2");
+    fw::TreeViewWidget::Entry* entry_4_child_3 = tree_view_widget->addEntry("Entry 4 Child 3");
+    fw::TreeViewWidget::Entry* entry_5 = tree_view_widget->addEntry("Entry 5");
+    fw::TreeViewWidget::Entry* entry_5_child_1 = tree_view_widget->addEntry("Entry 5 Child 1");
+    fw::TreeViewWidget::Entry* entry_5_child_1_child_1 = tree_view_widget->addEntry("Entry 5 Child 1 Child 1");
+    entry_1->setParent(entry_2_child_1); // simple cycle will not work with hierarchy like this
+    entry_2_child_1->setParent(entry_2);
+    entry_3_child_1->setParent(entry_3);
+    entry_3_child_2->setParent(entry_3);
+    entry_4_child_1->setParent(entry_4);
+    entry_4_child_2->setParent(entry_4);
+    entry_4_child_3->setParent(entry_4);
+    entry_5_child_1->setParent(entry_5);
+    entry_5_child_1_child_1->setParent(entry_5_child_1);
+    tree_view_widget->expandAll();
+    application.advance();
+
+    tree_view_widget->clear();
+    application.advance();
+    T_COMPARE(tree_view_widget->getTopEntryCount(), 0);
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 0);
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+
+    fw::TreeViewWidget::Entry* entry_6 = tree_view_widget->addEntry("Entry 6");
+    application.advance();
+    T_COMPARE(tree_view_widget->getTopEntryCount(), 1);
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 1);
     T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
 }
 
