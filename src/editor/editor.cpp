@@ -480,7 +480,7 @@ void Editor::beforeProcessMouseEvent(const sf::Event& event) {
 
 void Editor::onProcessLeftPress() {
     if (selected_tool == &create_tool) {
-        std::string id_string = std::to_string(simulation.getMaxId());
+        std::string id_string = std::to_string(simulation.getMaxId() + 1);
         switch (create_tool.type) {
             case CreateTool::BOX:
                 simulation.createBox(
