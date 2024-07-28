@@ -137,13 +137,32 @@ Joint* GameObject::getJoint(size_t index) const {
 	return joints[index];
 }
 
+b2AABB GameObject::getFixtureAABB(b2Fixture* fixture) {
+	b2AABB result;
+	bool first = true;
+	size_t child_shape_count = 1;
+	if (b2ChainShape* chain = dynamic_cast<b2ChainShape*>(fixture->GetShape())) {
+		child_shape_count = chain->m_count - 1;
+	}
+	for (size_t i = 0; i < child_shape_count; i++) {
+		b2AABB aabb = fixture->GetAABB(static_cast<int32>(i));
+		if (first) {
+			result = aabb;
+			first = false;
+		} else {
+			result.Combine(aabb);
+		}
+	}
+	return result;
+}
+
 b2AABB GameObject::getAABB() const {
 	b2AABB result;
 	bool first = true;
 	result.lowerBound = b2Vec2_zero;
 	result.upperBound = b2Vec2_zero;
 	for (b2Fixture* f = rigid_body->GetFixtureList(); f; f = f->GetNext()) {
-		b2AABB aabb = f->GetAABB(0);
+		b2AABB aabb = getFixtureAABB(f);
 		if (first) {
 			result = aabb;
 			first = false;
