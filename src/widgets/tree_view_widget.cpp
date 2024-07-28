@@ -21,6 +21,7 @@ namespace fw {
 		: TreeViewWidget(widget_list, size.x, size.y) { }
 
 	void TreeViewWidget::deselectAllExceptEntry(Entry* except_entry) {
+		wAssert(all_entries.contains(except_entry));
 		for (size_t i = 0; i < all_entries.size(); i++) {
 			Entry* entry = all_entries[i];
 			if (entry != except_entry) {
@@ -30,6 +31,7 @@ namespace fw {
 	}
 
 	void TreeViewWidget::deselectAllExceptSubtree(Entry* except_subtree) {
+		wAssert(all_entries.contains(except_subtree));
 		std::function<void(Entry*)> deselect_subtree = [&](Entry* entry) {
 			if (entry == except_subtree) {
 				return;
@@ -108,6 +110,7 @@ namespace fw {
 	}
 
 	void TreeViewWidget::removeEntry(Entry* entry, bool with_children) {
+		wAssert(all_entries.contains(entry));
 		Entry* parent = entry->getParent();
 		CompVector<Entry*> children_copy = entry->getChildren();
 		ptrdiff_t index = -1;
@@ -335,6 +338,9 @@ namespace fw {
 	}
 
 	void TreeViewWidget::Entry::setParent(Entry* new_parent) {
+		if (new_parent) {
+			wAssert(treeview.all_entries.contains(new_parent));
+		}
 		Entry* old_parent = parent;
 		if (old_parent) {
 			old_parent->removeChild(this);
@@ -399,6 +405,7 @@ namespace fw {
 	}
 
 	void TreeViewWidget::Entry::addChild(Entry* entry) {
+		wAssert(treeview.all_entries.contains(entry));
 		children.add(entry);
 		updateWidgets();
 	}
@@ -409,6 +416,7 @@ namespace fw {
 	}
 
 	void TreeViewWidget::Entry::removeChild(Entry* entry) {
+		wAssert(children.contains(entry));
 		children.remove(entry);
 		updateWidgets();
 	}
