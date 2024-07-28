@@ -76,6 +76,7 @@ namespace fw {
 
 		};
 
+		Event<Entry*> OnEntryClicked;
 		Event<Entry*> OnEntrySelected;
 		Event<Entry*> OnEntryDeselected;
 

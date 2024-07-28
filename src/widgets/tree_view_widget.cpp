@@ -157,6 +157,7 @@ namespace fw {
 		rectangle_widget->setClipChildren(true);
 		rectangle_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
 		rectangle_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
+			treeview.OnEntryClicked(this);
 			bool with_children = treeview.widget_list.isLCtrlPressed();
 			if (treeview.widget_list.isLShiftPressed()) {
 				toggleSelect(with_children);

@@ -4133,8 +4133,12 @@ void WidgetTests::treeviewWidgetSelectTest(test::Test& test) {
         application.mouseLeftRelease();
         application.advance();
     };
+    CompVector<fw::TreeViewWidget::Entry*> clicked_entries;
     CompVector<fw::TreeViewWidget::Entry*> selected_entries;
     CompVector<fw::TreeViewWidget::Entry*> deselected_entries;
+    tree_view_widget->OnEntryClicked += [&](fw::TreeViewWidget::Entry* entry) {
+        clicked_entries.add(entry);
+    };
     tree_view_widget->OnEntrySelected += [&](fw::TreeViewWidget::Entry* entry) {
         selected_entries.add(entry);
     };
@@ -4152,108 +4156,152 @@ void WidgetTests::treeviewWidgetSelectTest(test::Test& test) {
     entry_3_child_2->setParent(entry_3);
     application.advance();
 
+    clicked_entries.clear();
+    selected_entries.clear();
+    deselected_entries.clear();
     click_entry(entry_1);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_1);
     T_ASSERT(T_CHECK(selected_entries.size() == 1));
     T_CHECK(selected_entries.back() == entry_1);
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_entry(entry_2);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_2);
     T_ASSERT(T_CHECK(deselected_entries.size() == 1));
     T_CHECK(deselected_entries.back() == entry_1);
     T_ASSERT(T_CHECK(selected_entries.size() == 1));
     T_CHECK(selected_entries.back() == entry_2);
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_arrow(entry_2);
     click_entry(entry_2_child_1);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_2_child_1);
     T_ASSERT(T_CHECK(deselected_entries.size() == 1));
     T_CHECK(deselected_entries.back() == entry_2);
     T_ASSERT(T_CHECK(selected_entries.size() == 1));
     T_CHECK(selected_entries.back() == entry_2_child_1);
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_arrow(entry_3);
     click_entry(entry_3_child_1, true, false);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_3_child_1);
     T_ASSERT(T_CHECK(deselected_entries.size() == 0));
     T_ASSERT(T_CHECK(selected_entries.size() == 1));
     T_CHECK(selected_entries.back() == entry_3_child_1);
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_entry(entry_1, true, false);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_1);
     T_ASSERT(T_CHECK(deselected_entries.size() == 0));
     T_ASSERT(T_CHECK(selected_entries.size() == 1));
     T_CHECK(selected_entries.back() == entry_1);
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_entry(entry_2_child_1, true, false);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_2_child_1);
     T_ASSERT(T_CHECK(deselected_entries.size() == 1));
     T_CHECK(deselected_entries.back() == entry_2_child_1);
     T_ASSERT(T_CHECK(selected_entries.size() == 0));
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_entry(entry_2, true, true);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_2);
     T_ASSERT(T_CHECK(deselected_entries.size() == 0));
     T_ASSERT(T_CHECK(selected_entries.size() == 2));
     T_CHECK(selected_entries[0] == entry_2_child_1);
     T_CHECK(selected_entries[1] == entry_2);
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_entry(entry_3, true, true);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_3);
     T_ASSERT(T_CHECK(deselected_entries.size() == 0));
     T_ASSERT(T_CHECK(selected_entries.size() == 2));
     T_CHECK(selected_entries[0] == entry_3_child_2);
     T_CHECK(selected_entries[1] == entry_3);
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_entry(entry_3, true, true);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_3);
     T_ASSERT(T_CHECK(deselected_entries.size() == 3));
     T_CHECK(deselected_entries[0] == entry_3_child_1);
     T_CHECK(deselected_entries[1] == entry_3_child_2);
     T_CHECK(deselected_entries[2] == entry_3);
     T_ASSERT(T_CHECK(selected_entries.size() == 0));
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_entry(entry_2, false, true);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_2);
     T_ASSERT(T_CHECK(deselected_entries.size() == 1));
     T_CHECK(deselected_entries[0] == entry_1);
     T_ASSERT(T_CHECK(selected_entries.size() == 0));
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_entry(entry_2, false, true);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_2);
     T_ASSERT(T_CHECK(deselected_entries.size() == 0));
     T_ASSERT(T_CHECK(selected_entries.size() == 0));
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     tree_view_widget->deselectAll();
+    T_ASSERT(T_CHECK(clicked_entries.size() == 0));
     T_ASSERT(T_CHECK(deselected_entries.size() == 2));
     T_CHECK(deselected_entries[0] == entry_2_child_1);
     T_CHECK(deselected_entries[1] == entry_2);
     T_ASSERT(T_CHECK(selected_entries.size() == 0));
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_entry(entry_3_child_2);
     click_entry(entry_3);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 2));
+    T_CHECK(clicked_entries[0] == entry_3_child_2);
+    T_CHECK(clicked_entries[1] == entry_3);
     T_ASSERT(T_CHECK(deselected_entries.size() == 1));
     T_CHECK(deselected_entries[0] == entry_3_child_2);
     T_ASSERT(T_CHECK(selected_entries.size() == 2));
     T_CHECK(selected_entries[0] == entry_3_child_2);
     T_CHECK(selected_entries[1] == entry_3);
 
+    clicked_entries.clear();
     selected_entries.clear();
     deselected_entries.clear();
     click_entry(entry_3, false, true);
+    T_ASSERT(T_CHECK(clicked_entries.size() == 1));
+    T_CHECK(clicked_entries.back() == entry_3);
     T_ASSERT(T_CHECK(deselected_entries.size() == 0));
     T_ASSERT(T_CHECK(selected_entries.size() == 2));
     T_CHECK(selected_entries[0] == entry_3_child_1);
