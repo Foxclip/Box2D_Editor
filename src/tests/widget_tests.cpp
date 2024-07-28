@@ -4421,12 +4421,34 @@ void WidgetTests::treeviewWidgetRemoveTest(test::Test& test) {
 
     // add widgets
     fw::TreeViewWidget::Entry* entry_5_child_2 = tree_view_widget->addEntry("Entry 5 Child 2");
-    fw::TreeViewWidget::Entry* entry_5_child_2_child_1 = tree_view_widget->addEntry("Entry 5 Child 2 Child 1");
+    fw::TreeViewWidget::Entry* entry_5_child_3 = tree_view_widget->addEntry("Entry 5 Child 3");
+    fw::TreeViewWidget::Entry* entry_5_child_3_child_1 = tree_view_widget->addEntry("Entry 5 Child 3 Child 1");
+    fw::TreeViewWidget::Entry* entry_5_child_3_child_2 = tree_view_widget->addEntry("Entry 5 Child 3 Child 2");
+    fw::TreeViewWidget::Entry* entry_5_child_3_child_3 = tree_view_widget->addEntry("Entry 5 Child 3 Child 3");
+    fw::TreeViewWidget::Entry* entry_5_child_4 = tree_view_widget->addEntry("Entry 5 Child 4");
     entry_5_child_2->setParent(entry_5);
-    entry_5_child_2_child_1->setParent(entry_5_child_2);
+    entry_5_child_3->setParent(entry_5);
+    entry_5_child_3_child_1->setParent(entry_5_child_3);
+    entry_5_child_3_child_2->setParent(entry_5_child_3);
+    entry_5_child_3_child_3->setParent(entry_5_child_3);
+    entry_5_child_4->setParent(entry_5);
+    tree_view_widget->expandAll();
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 4);
-    T_COMPARE(tree_view_widget->getAllEntryCount(), 6);
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 10);
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+
+    // remove child without children
+    entry_5_child_3->remove(false);
+    application.advance();
+    if (T_COMPARE(entry_5->getChildrenCount(), 5)) {
+        T_CHECK(entry_5->getChild(0) == entry_5_child_2);
+        T_CHECK(entry_5->getChild(1) == entry_5_child_3_child_1);
+        T_CHECK(entry_5->getChild(2) == entry_5_child_3_child_2);
+        T_CHECK(entry_5->getChild(3) == entry_5_child_3_child_3);
+        T_CHECK(entry_5->getChild(4) == entry_5_child_4);
+    }
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 9);
     T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
 
     // remove all widgets
