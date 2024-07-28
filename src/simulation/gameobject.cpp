@@ -146,6 +146,7 @@ b2AABB GameObject::getAABB() const {
 		b2AABB aabb = f->GetAABB(0);
 		if (first) {
 			result = aabb;
+			first = false;
 		} else {
 			result.Combine(aabb);
 		}
