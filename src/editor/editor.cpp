@@ -942,8 +942,12 @@ std::string Editor::serialize() const {
 
 void Editor::deserialize(const std::string& str, bool set_camera) {
     ptrdiff_t active_object_id = -1;
+    ptrdiff_t follow_object_id = -1;
     if (active_object) {
         active_object_id = active_object->getId();
+    }
+    if (follow_object) {
+        follow_object_id = follow_object->getId();
     }
     initTools();
     TokenReader tr(str);
@@ -982,6 +986,10 @@ void Editor::deserialize(const std::string& str, bool set_camera) {
         if (active_object_id >= 0) {
             GameObject* object = simulation.getById(active_object_id);
             setActiveObject(object);
+        }
+        if (follow_object_id >= 0) {
+            GameObject* object = simulation.getById(follow_object_id);
+            follow_object = object;
         }
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": Line " + std::to_string(tr.getLine(-1)) + ": " + exc.what());
@@ -1401,6 +1409,9 @@ void Editor::deleteObject(GameObject* object, bool remove_children) {
     }
     if (object == active_object) {
         setActiveObject(nullptr);
+    }
+    if (object == follow_object) {
+        follow_object = nullptr;
     }
     select_tool.deselectObject(object);
     simulation.remove(object, remove_children);
