@@ -15,10 +15,12 @@ void CompVectorTests::createCompVectorList(test::TestList* list) {
 	test::Test* empty_vector_test = list->addTest("empty_vector", [&](test::Test& test) {
 		CompVector<int> vec;
 		T_COMPARE(vec.size(), 0);
+		T_CHECK(vec.empty());
 	});
 	test::Test* one_value_test = list->addTest("one_value", { empty_vector_test }, [&](test::Test& test) {
 		CompVector<int> vec = { 5 };
 		T_ASSERT(T_COMPARE(vec.size(), 1));
+		T_CHECK(!vec.empty());
 		T_COMPARE(vec[0], 5);
 		T_COMPARE(vec.front(), 5);
 		T_COMPARE(vec.back(), 5);
@@ -290,10 +292,12 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 	test::Test* empty_vector_test = list->addTest("empty_vector", [&](test::Test& test) {
 		CompVectorUptr<int> vec;
 		T_COMPARE(vec.size(), 0);
+		T_CHECK(vec.empty());
 	});
 	test::Test* one_value_test = list->addTest("one_value", [&](test::Test& test) {
 		CompVectorUptr<int> vec = { 5 };
 		T_ASSERT(T_COMPARE(vec.size(), 1));
+		T_CHECK(!vec.empty());
 		T_COMPARE(*vec[0], 5);
 		T_COMPARE(*vec.front(), 5);
 		T_COMPARE(*vec.back(), 5);

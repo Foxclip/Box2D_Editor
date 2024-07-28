@@ -214,6 +214,7 @@ private:
 	ptrdiff_t mouseGetChainEdge(const b2Fixture* fixture) const;
 	b2Fixture* getFixtureAt(const sf::Vector2f& screen_pos) const;
 	GameObject* getObjectAt(const sf::Vector2f& screen_pos) const;
+	b2AABB getObjectsAABB(const CompVector<GameObject*>& objects) const;
 	ptrdiff_t mouseGetObjectVertex() const;
 	ptrdiff_t mouseGetObjectEdge() const;
 	ptrdiff_t mouseGetEdgeVertex() const;
@@ -229,7 +230,7 @@ private:
 	void endMove(bool confirm);
 	void endRotate(bool confirm);
 	void deleteObject(GameObject* object, bool remove_children);
-	void viewObject(GameObject* object);
+	void viewSelectedObjects();
 	void checkDebugbreak();
 	void canvasDraw(fw::CanvasWidget* canvas, const sf::Drawable& drawable, const sf::RenderStates& states = sf::RenderStates::Default);
 

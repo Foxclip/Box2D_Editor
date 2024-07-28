@@ -32,6 +32,7 @@ public:
 	CompVector(const std::initializer_list<T>& list);
 	CompVector(const std::vector<T>& vec);
 	size_t size() const;
+	bool empty() const;
 	bool add(const T& value);
 	bool insert(const std::vector<T>::const_iterator& where, const T& value);
 	template<std::incrementable TIter>
@@ -89,6 +90,7 @@ public:
 	CompVectorUptr(const std::initializer_list<T*>& list);
 	CompVectorUptr(const std::vector<T*>& vec);
 	size_t size() const;
+	bool empty() const;
 	T* add(const T& value);
 	T* add(const T* ptr);
 	T* add(std::unique_ptr<T> value);
@@ -165,6 +167,11 @@ inline CompVector<T, TCmp>::CompVector(const std::vector<T>& vec) {
 template<typename T, typename TCmp>
 inline size_t CompVector<T, TCmp>::size() const {
 	return vector.size();
+}
+
+template<typename T, typename TCmp>
+inline bool CompVector<T, TCmp>::empty() const {
+	return size() == 0;
 }
 
 template<typename T, typename TCmp>
@@ -430,6 +437,11 @@ inline CompVectorUptr<T, TCmp>::CompVectorUptr(const std::vector<T*>& vec) {
 template<typename T, typename TCmp>
 inline size_t CompVectorUptr<T, TCmp>::size() const {
 	return comp.size();
+}
+
+template<typename T, typename TCmp>
+inline bool CompVectorUptr<T, TCmp>::empty() const {
+	return size() == 0;
 }
 
 template<typename T, typename TCmp>

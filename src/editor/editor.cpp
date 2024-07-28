@@ -475,7 +475,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
         } else if (event.key.code == sf::Keyboard::E) {
             simulation.advance(timeStep);
         } else if (event.key.code == sf::Keyboard::Slash) {
-            viewObject(active_object);
+            viewSelectedObjects();
         }
     }
     if (event.type == sf::Event::KeyReleased) {
@@ -1147,6 +1147,22 @@ GameObject* Editor::getObjectAt(const sf::Vector2f& screen_pos) const {
     return result;
 }
 
+b2AABB Editor::getObjectsAABB(const CompVector<GameObject*>& objects) const {
+    b2AABB result;
+    result.lowerBound = b2Vec2_zero;
+    result.upperBound = b2Vec2_zero;
+    if (objects.empty()) {
+        return result;
+    }
+    result = objects.front()->getAABB();
+    for (size_t i = 1; i < objects.size(); i++) {
+        GameObject* object = objects[i];
+        b2AABB aabb = object->getAABB();
+        result.Combine(aabb);
+    }
+    return result;
+}
+
 ptrdiff_t Editor::mouseGetObjectVertex() const {
     if (!active_object) {
         return -1;
@@ -1378,11 +1394,11 @@ void Editor::deleteObject(GameObject* object, bool remove_children) {
     simulation.remove(object, remove_children);
 }
 
-void Editor::viewObject(GameObject* object) {
-    if (!object) {
+void Editor::viewSelectedObjects() {
+    if (select_tool.selectedCount() == 0) {
         return;
     }
-    b2AABB aabb = object->getAABB();
+    b2AABB aabb = getObjectsAABB(select_tool.getSelectedObjects());
     float sizeX = aabb.upperBound.x - aabb.lowerBound.x;
     float sizeY = aabb.upperBound.y - aabb.lowerBound.y;
     float zoomX = window.getSize().x / sizeX;
@@ -1395,7 +1411,7 @@ void Editor::viewObject(GameObject* object) {
     } else if (sizeX > 0.0f && sizeY > 0.0f) {
         zoom = std::min(zoomX, zoomY);
     } else {
-        mAssert(false, "Invalid size");
+        zoom = zoomFactor;
     }
     b2Vec2 aabb_center = aabb.GetCenter();
     setCameraPos(aabb_center);
