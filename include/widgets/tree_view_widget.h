@@ -30,6 +30,7 @@ namespace fw {
 			const CompVector<Entry*>& getChildren() const;
 			Entry* getChild(size_t index) const;
 			size_t getChildrenCount() const;
+			size_t getIndex() const;
 			fw::ContainerWidget* getWidget() const;
 			fw::RectangleWidget* getRectangleWidget() const;
 			fw::RectangleWidget* getArrowAreaWidget() const;

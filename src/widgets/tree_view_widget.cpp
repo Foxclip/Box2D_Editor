@@ -110,12 +110,17 @@ namespace fw {
 	void TreeViewWidget::removeEntry(Entry* entry, bool with_children) {
 		Entry* parent = entry->getParent();
 		CompVector<Entry*> children_copy = entry->getChildren();
+		ptrdiff_t index = -1;
+		if (!with_children) {
+			index = entry->getIndex();
+		}
 		for (size_t i = 0; i < children_copy.size(); i++) {
 			Entry* child = children_copy[i];
 			if (with_children) {
 				child->remove(true);
 			} else {
 				child->setParent(parent);
+				child->moveToIndex(index + i);
 			}
 		}
 		if (parent) {
@@ -237,6 +242,14 @@ namespace fw {
 
 	size_t TreeViewWidget::Entry::getChildrenCount() const {
 		return children.size();
+	}
+
+	size_t TreeViewWidget::Entry::getIndex() const {
+		if (parent) {
+			return parent->children.getIndex(const_cast<Entry*>(this));
+		} else {
+			return treeview.top_entries.getIndex(const_cast<Entry*>(this));
+		}
 	}
 
 	fw::ContainerWidget* TreeViewWidget::Entry::getWidget() const {
