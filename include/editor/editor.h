@@ -66,6 +66,7 @@ public:
 	fw::WidgetList& getWidgetList();
 	void selectSingleObject(GameObject* object, bool with_children = false);
 	Simulation& getSimulation();
+	void setActiveObject(GameObject* object);
 	BoxObject* createBox(
 		const std::string& name,
 		const b2Vec2& pos,
@@ -199,7 +200,6 @@ private:
 	void loadFromFile(const std::string& filename);
 	void quicksave();
 	void quickload();
-	void setActiveObject(GameObject* object);
 	Tool* trySelectToolByIndex(size_t index);
 	Tool* trySelectTool(Tool* tool);
 	void selectCreateType(size_t type);

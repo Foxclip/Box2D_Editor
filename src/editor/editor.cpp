@@ -64,6 +64,17 @@ Simulation& Editor::getSimulation() {
     return simulation;
 }
 
+void Editor::setActiveObject(GameObject* object) {
+    active_object = object;
+    if (selected_tool == &edit_tool) {
+        if (object) {
+            edit_tool.edit_window_widget->updateParameters();
+        } else {
+            trySelectTool(&select_tool);
+        }
+    }
+}
+
 BoxObject* Editor::createBox(
     const std::string& name,
     const b2Vec2& pos,
@@ -1001,17 +1012,6 @@ void Editor::quickload() {
         logger << "Quickload\n";
     } else {
         logger << "Can't quickload\n";
-    }
-}
-
-void Editor::setActiveObject(GameObject* object) {
-    active_object = object;
-    if (selected_tool == &edit_tool) {
-        if (object) {
-            edit_tool.edit_window_widget->updateParameters();
-        } else {
-            trySelectTool(&select_tool);
-        }
     }
 }
 

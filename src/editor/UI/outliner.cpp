@@ -15,6 +15,10 @@ Outliner::Outliner(fw::WidgetList& widget_list, float width, float height, Edito
 	treeview_widget = widget_list.createWidget<fw::TreeViewWidget>(width, height);
 	treeview_widget->setFillColor(sf::Color::Transparent);
 	treeview_widget->setSizeXPolicy(SizePolicy::PARENT);
+	treeview_widget->OnEntryClicked += [&](fw::TreeViewWidget::Entry* entry) {
+		GameObject* object = entry_object[entry];
+		app.setActiveObject(object);
+	};
 	treeview_widget->OnEntrySelected += [&](fw::TreeViewWidget::Entry* entry) {
 		GameObject* object = entry_object[entry];
 		app.select_tool.selectObject(object);
