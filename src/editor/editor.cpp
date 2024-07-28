@@ -476,6 +476,12 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
             simulation.advance(timeStep);
         } else if (event.key.code == sf::Keyboard::Slash) {
             viewSelectedObjects();
+        } else if (event.key.code == sf::Keyboard::F) {
+            if (follow_object) {
+                follow_object = nullptr;
+            } else {
+                follow_object = active_object;
+            }
         }
     }
     if (event.type == sf::Event::KeyReleased) {
@@ -714,6 +720,9 @@ void Editor::onProcessMouse() {
         sf::Vector2i mouseDelta = mousePrevPos - getMousePos();
         viewCenterX += mouseDelta.x / zoomFactor;
         viewCenterY += -mouseDelta.y / zoomFactor;
+        if (mouseDelta.x != 0 || mouseDelta.y != 0) {
+            follow_object = nullptr;
+        }
     }
 }
 
@@ -744,6 +753,9 @@ void Editor::onProcessWorld() {
 }
 
 void Editor::onRender() {
+    if (follow_object) {
+        setCameraPos(follow_object->getGlobalPosition());
+    }
     renderWorld();
     renderUi();
 }

@@ -160,6 +160,7 @@ private:
 	bool render_object_info = true;
 	b2Vec2 b2MousePosWorld;
 	GameObject* active_object = nullptr;
+	GameObject* follow_object = nullptr;
 	Simulation simulation;
 
 	History<std::string> history;
