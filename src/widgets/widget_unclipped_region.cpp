@@ -36,8 +36,6 @@ namespace fw {
 	}
 
 	void WidgetUnclippedRegion::recalc() const {
-		CompVector<Widget*> parents = widget->getParentChain();
-		parents.reverse();
 		sf::FloatRect result = widget->getVisualGlobalBounds();
 		Widget* parent = widget->parent;
 		while (parent) {

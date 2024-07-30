@@ -20,6 +20,7 @@ target_sources(widgets_lib PRIVATE
     "${INCLUDE_DIR}/widgets/widget.h"
     "${INCLUDE_DIR}/widgets/widget_link.h"
     "${INCLUDE_DIR}/widgets/widget_list.h"
+    "${INCLUDE_DIR}/widgets/widget_parent_chain.h"
     "${INCLUDE_DIR}/widgets/widget_render_queue.h"
     "${INCLUDE_DIR}/widgets/widget_transform.h"
     "${INCLUDE_DIR}/widgets/widget_unclipped_region.h"
@@ -48,6 +49,7 @@ target_sources(widgets_lib PRIVATE
     widget.cpp
     widget_link.cpp
     widget_list.cpp
+    widget_parent_chain.cpp
     widget_render_queue.cpp
     widget_transform.cpp
     widget_unclipped_region.cpp

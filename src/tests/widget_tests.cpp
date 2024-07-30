@@ -865,7 +865,7 @@ void WidgetTests::rectangleWidgetTest(test::Test& test) {
     T_WRAP_CONTAINER(genericWidgetTest(gwt));
 
     T_CHECK(rectangle_widget->getParent() == root_widget);
-    CompVector<fw::Widget*> parent_chain = rectangle_widget->getParentChain();
+    const CompVector<fw::Widget*>& parent_chain = rectangle_widget->getParentChain();
     T_ASSERT(T_COMPARE(parent_chain.size(), 1));
     T_CHECK(parent_chain[0] == root_widget);
     T_COMPARE(rectangle_widget->getChildren().size(), 0);
@@ -944,7 +944,7 @@ void WidgetTests::setParentTest(test::Test& test) {
     sf::Vector2f child_global_pos_before = child_widget->getGlobalPosition();
     child_widget->setParent(parent_widget);
     T_CHECK(child_widget->getParent() == parent_widget);
-    CompVector<fw::Widget*> parent_chain = child_widget->getParentChain();
+    const CompVector<fw::Widget*>& parent_chain = child_widget->getParentChain();
     T_ASSERT(T_COMPARE(parent_chain.size(), 2));
     T_CHECK(parent_chain[0] == parent_widget);
     T_CHECK(parent_chain[1] == root_widget);

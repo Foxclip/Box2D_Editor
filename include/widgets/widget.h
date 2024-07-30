@@ -9,6 +9,7 @@
 #include "widget_update_queue.h"
 #include "widget_render_queue.h"
 #include "widget_unclipped_region.h"
+#include "widget_parent_chain.h"
 #include "common/compvector.h"
 #include "common/searchindex.h"
 #include "common/event.h"
@@ -143,7 +144,7 @@ namespace fw {
 		bool getQuantizeRenderedPosition() const;
 		sf::Shader* getShader() const;
 		Widget* getParent() const;
-		CompVector<Widget*> getParentChain() const;
+		const CompVector<Widget*>& getParentChain() const;
 		const CompVector<Widget*>& getChildren() const;
 		size_t getChildrenCount() const;
 		CompVector<Widget*> getAllChildren() const;
@@ -301,12 +302,14 @@ namespace fw {
 		friend class WidgetLink;
 		friend class WidgetUpdateSocket;
 		friend class WidgetUpdateQueue;
+		friend class WidgetParentChain;
 		WidgetType type = WidgetType::None;
 		std::string name = "<unnamed>";
 		std::string full_name;
 		WidgetList& widget_list;
 		WidgetTransform transforms = WidgetTransform(this);
 		Widget* parent = nullptr;
+		WidgetParentChain parent_chain = WidgetParentChain(*this);
 		CompVector<Widget*> children;
 		bool children_locked = false;
 		SearchIndexMultiple<std::string, Widget*> children_names;

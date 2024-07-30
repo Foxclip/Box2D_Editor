@@ -58,7 +58,7 @@ namespace fw {
 	WidgetVisibility Widget::checkVisibility() const {
 		WidgetVisibility v;
 		sf::FloatRect global_bounds = getGlobalBounds();
-		CompVector<Widget*> parents = getParentChain();
+		const CompVector<Widget*>& parents = getParentChain();
 		v.addedToRoot = this == widget_list.root_widget || parents.contains(widget_list.root_widget);
 		v.allParentsVisible = true;
 		for (size_t i = 0; i < parents.size(); i++) {
@@ -208,18 +208,8 @@ namespace fw {
 		return parent;
 	}
 
-	CompVector<Widget*> Widget::getParentChain() const {
-		const Widget* cur_obj = this;
-		CompVector<Widget*> result;
-		while (cur_obj) {
-			if (cur_obj->parent) {
-				result.add(cur_obj->parent);
-				cur_obj = cur_obj->parent;
-			} else {
-				break;
-			}
-		}
-		return result;
+	const CompVector<Widget*>& Widget::getParentChain() const {
+		return parent_chain.get();
 	}
 
 	const CompVector<Widget*>& Widget::getChildren() const {
@@ -814,7 +804,7 @@ namespace fw {
 			throw std::runtime_error("Cannot parent object to itself: " + full_name);
 		}
 		if (new_parent) {
-			CompVector<Widget*> parent_chain = new_parent->getParentChain();
+			const CompVector<Widget*>& parent_chain = new_parent->getParentChain();
 			if (parent_chain.contains(this)) {
 				std::string chain_str;
 				chain_str += name;
@@ -1028,6 +1018,7 @@ namespace fw {
 		children.add(child);
 		children_names.add(child->name, child);
 		child->parent = this;
+		child->parent_chain.invalidate();
 	}
 
 	void Widget::removeChild(Widget* child) {
@@ -1191,7 +1182,7 @@ namespace fw {
 	void Widget::internalOnAfterRender() { }
 
 	std::string Widget::calcFullName() const {
-		CompVector<Widget*> parents = getParentChain();
+		const CompVector<Widget*>& parents = getParentChain();
 		std::string result;
 		for (ptrdiff_t i = parents.size() - 1; i >= 0; i--) {
 			result += parents[i]->name;
