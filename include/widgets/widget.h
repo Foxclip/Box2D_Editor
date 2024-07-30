@@ -303,6 +303,8 @@ namespace fw {
 		friend class WidgetUpdateSocket;
 		friend class WidgetUpdateQueue;
 		friend class WidgetParentChain;
+		friend class PendingMove;
+		friend class PendingDelete;
 		WidgetType type = WidgetType::None;
 		std::string name = "<unnamed>";
 		std::string full_name;

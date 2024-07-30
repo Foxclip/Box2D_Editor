@@ -239,20 +239,15 @@ namespace fw {
 
 	void WidgetList::addPendingMove(Widget* widget, size_t index) {
 		wAssert(!isLocked());
-		PendingMove move;
-		move.widget = widget;
-		move.index = index;
-		pending_moves.push_back(move);
+		std::unique_ptr<PendingMove> uptr = std::make_unique<PendingMove>(*this, widget, index);
+		pending_operations.add(std::move(uptr));
 	}
 
 	void WidgetList::processAfterInput() {
-		for (const PendingMove& move : pending_moves) {
-			if (widgets.contains(move.widget) && widgets.contains(move.widget->getParent())) {
-				Widget* parent = move.widget->getParent();
-				parent->moveChildToIndex(move.widget, move.index);
-			}
+		for (PendingOperation* op : pending_operations) {
+			op->execute();
 		}
-		pending_moves = std::vector<PendingMove>();
+		pending_operations.clear();
 	}
 
 	void WidgetList::updateRenderQueue() {
@@ -375,6 +370,30 @@ namespace fw {
 		parent->removeChild(widget);
 		render_queue.remove(widget);
 		widgets.remove(widget);
+	}
+
+	PendingOperation::PendingOperation(WidgetList& widget_list) : widget_list(widget_list) { }
+
+	PendingMove::PendingMove(WidgetList& widget_list, Widget* widget, size_t index) : PendingOperation(widget_list) {
+		this->widget = widget;
+		this->index = index;
+	}
+
+	void PendingMove::execute() {
+		wAssert(widget_list.widgets.contains(widget));
+		wAssert(widget_list.widgets.contains(widget->getParent()));
+		Widget* parent = widget->getParent();
+		parent->moveChildToIndex(widget, index);
+	}
+
+	PendingDelete::PendingDelete(WidgetList& widget_list, Widget* widget, bool with_children) : PendingOperation(widget_list) {
+		this->widget = widget;
+		this->with_children = with_children;
+	}
+
+	void PendingDelete::execute() {
+		wAssert(widget_list.widgets.contains(widget));
+		widget_list.removeWidget(widget, with_children);
 	}
 
 }

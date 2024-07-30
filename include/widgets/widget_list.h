@@ -14,9 +14,33 @@ namespace fw {
 	const sf::Color DEBUG_RENDER_TRANSFORM_POSITION_COLOR = sf::Color(0, 0, 255);
 	const sf::Color DEBUG_RENDER_FOCUSED_WIDGET_BOUNDS_COLOR = sf::Color(0, 200, 255);
 
-	struct PendingMove {
+	class PendingOperation {
+	public:
+		PendingOperation(WidgetList& widget_list);
+		virtual void execute() = 0;
+
+	protected:
+		WidgetList& widget_list;
+	};
+
+	class PendingMove : public PendingOperation {
+	public:
 		Widget* widget = nullptr;
 		size_t index = 0;
+
+		PendingMove(WidgetList& widget_list, Widget* widget, size_t index);
+		void execute() override;
+
+	};
+
+	class PendingDelete : public PendingOperation {
+	public:
+		Widget* widget = nullptr;
+		bool with_children = false;
+
+		PendingDelete(WidgetList& widget_list, Widget* widget, bool with_children);
+		void execute() override;
+
 	};
 
 	class Application;
@@ -75,6 +99,8 @@ namespace fw {
 
 	private:
 		friend class Widget;
+		friend class PendingMove;
+		friend class PendingDelete;
 		Application& application;
 		bool locked = false;
 		bool click_blocked = false;
@@ -85,7 +111,7 @@ namespace fw {
 		EmptyWidget* root_widget = nullptr;
 		Widget* focused_widget = nullptr;
 		bool print_update_queue = false;
-		std::vector<PendingMove> pending_moves;
+		CompVectorUptr<PendingOperation> pending_operations;
 		WidgetUpdateQueue update_queue = WidgetUpdateQueue(*this);
 		WidgetRenderQueue render_queue = WidgetRenderQueue(*this);
 
