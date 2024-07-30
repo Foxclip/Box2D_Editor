@@ -214,14 +214,15 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
     mAssert(object);
     mAssert(all_objects.contains(object));
     OnBeforeObjectRemoved(object);
-    object->setParent(nullptr);
-    std::vector<Joint*> joints_copy = object->joints.getVector();
-    for (Joint* joint : joints_copy) {
-        removeJoint(joint);
-    }
+    GameObject* parent = object->getParent();
     ptrdiff_t index = -1;
     if (!remove_children) {
         index = object->getIndex();
+    }
+    object->setParent(nullptr); // has to be here to trigger OnSetParent event
+    std::vector<Joint*> joints_copy = object->joints.getVector();
+    for (Joint* joint : joints_copy) {
+        removeJoint(joint);
     }
     CompVector<GameObject*> children_copy = object->getChildren();
     for (size_t i = 0; i < children_copy.size(); i++) {
@@ -229,7 +230,7 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
         if (remove_children) {
             remove(child, true);
         } else {
-            child->setParent(nullptr);
+            child->setParent(parent);
             child->moveToIndex(index + i);
         }
     }
