@@ -48,11 +48,11 @@ Joint* GameObjectList::getJoint(size_t i) const {
     return joints[i];
 }
 
-const CompVector<GameObject*>& GameObjectList::getTopVector() const {
+const CompVector<GameObject*>& GameObjectList::getTopObjects() const {
     return top_objects;
 }
 
-const CompVector<GameObject*>& GameObjectList::getAllVector() const {
+const CompVector<GameObject*>& GameObjectList::getAllObjects() const {
     return all_objects.getCompVector();
 }
 
@@ -208,6 +208,7 @@ void GameObjectList::transformFromRigidbody() {
 void GameObjectList::moveObjectToIndex(GameObject* object, size_t index) {
     mAssert(top_objects.contains(object));
     top_objects.moveValueToIndex(object, index);
+    OnObjectMoved(object, index);
 }
 
 void GameObjectList::remove(GameObject* object, bool remove_children) {

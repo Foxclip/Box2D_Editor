@@ -585,13 +585,13 @@ void SimulationTests::objectsTest(test::Test& test) {
     T_CHECK(simulation.contains(box0));
     T_CHECK(simulation.contains(box1));
     T_CHECK(simulation.contains(box2));
-    T_ASSERT(T_COMPARE(simulation.getAllVector().size(), 3));
-    T_CHECK(simulation.getAllVector()[0] == box0);
-    T_CHECK(simulation.getAllVector()[1] == box1);
-    T_CHECK(simulation.getAllVector()[2] == box2);
-    T_ASSERT(T_COMPARE(simulation.getTopVector().size(), 2));
-    T_CHECK(simulation.getTopVector()[0] == box0);
-    T_CHECK(simulation.getTopVector()[1] == box2);
+    T_ASSERT(T_COMPARE(simulation.getAllObjects().size(), 3));
+    T_CHECK(simulation.getAllObjects()[0] == box0);
+    T_CHECK(simulation.getAllObjects()[1] == box1);
+    T_CHECK(simulation.getAllObjects()[2] == box2);
+    T_ASSERT(T_COMPARE(simulation.getTopObjects().size(), 2));
+    T_CHECK(simulation.getTopObjects()[0] == box0);
+    T_CHECK(simulation.getTopObjects()[1] == box2);
     T_COMPARE(simulation.getMaxId(), 2);
 }
 
@@ -847,8 +847,10 @@ void SimulationTests::eventTest(test::Test& test) {
     std::vector<GameObject*> removed_objects;
     std::vector<ptrdiff_t> removed_object_ids;
     bool on_clear = false;
-    GameObject* object = nullptr;
-    GameObject* parent = nullptr;
+    GameObject* set_parent_object = nullptr;
+    GameObject* set_parent_parent = nullptr;
+    GameObject* move_object = nullptr;
+    ptrdiff_t move_index = -1;
     simulation.OnObjectAdded += [&](GameObject* object) {
         added_objects.push_back(object);
     };
@@ -857,12 +859,17 @@ void SimulationTests::eventTest(test::Test& test) {
         removed_object_ids.push_back(object->getId());
     };
     simulation.OnSetParent += [&](GameObject* p_object, GameObject* p_parent) {
-        object = p_object;
-        parent = p_parent;
+        set_parent_object = p_object;
+        set_parent_parent = p_parent;
+    };
+    simulation.OnObjectMoved += [&](GameObject* p_object, size_t index) {
+        move_object = p_object;
+        move_index = index;
     };
     simulation.OnClear += [&]() {
         on_clear = true;
     };
+
     BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
     BoxObject* box1 = createBox(simulation, "box1", b2Vec2(1.1f, 1.1f));
     BoxObject* box2 = createBox(simulation, "box2", b2Vec2(1.75f, 1.75f));
@@ -871,15 +878,28 @@ void SimulationTests::eventTest(test::Test& test) {
     T_CHECK(added_objects[1] == box1);
     T_CHECK(added_objects[2] == box2);
     T_COMPARE(removed_objects.size(), 0);
-    T_CHECK(!object);
-    T_CHECK(!parent);
+    T_CHECK(!set_parent_object);
+    T_CHECK(!set_parent_parent);
     T_CHECK(!on_clear);
+
     box1->setParent(box0);
     T_ASSERT(T_COMPARE(added_objects.size(), 3));
     T_COMPARE(removed_objects.size(), 0);
-    T_CHECK(object == box1);
-    T_CHECK(parent == box0);
+    T_CHECK(set_parent_object == box1);
+    T_CHECK(set_parent_parent == box0);
     T_CHECK(!on_clear);
+
+    box2->moveToIndex(0);
+    T_ASSERT(T_COMPARE(added_objects.size(), 3));
+    T_COMPARE(removed_objects.size(), 0);
+    T_CHECK(move_object == box2);
+    T_CHECK(move_index == 0);
+    const CompVector<GameObject*> top_objects = simulation.getTopObjects();
+    T_ASSERT(T_COMPARE(top_objects.size(), 2));
+    T_CHECK(top_objects[0] == box2);
+    T_CHECK(top_objects[1] == box0);
+    T_CHECK(!on_clear);
+
     simulation.remove(box0, false);
     simulation.remove(box1, false);
     simulation.remove(box2, false);
@@ -892,7 +912,10 @@ void SimulationTests::eventTest(test::Test& test) {
     T_COMPARE(removed_object_ids[1], 1);
     T_COMPARE(removed_object_ids[2], 2);
     T_CHECK(!on_clear);
+
     simulation.clear();
+    T_COMPARE(simulation.getAllSize(), 0);
+    T_COMPARE(simulation.getTopSize(), 0);
     T_CHECK(on_clear);
 }
 

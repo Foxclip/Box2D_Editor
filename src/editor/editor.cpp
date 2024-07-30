@@ -417,11 +417,11 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
         } else if (event.key.code == sf::Keyboard::A) {
             if (selected_tool == &select_tool) {
                 if (isLAltPressed()) {
-                    for (GameObject* obj : simulation.getAllVector()) {
+                    for (GameObject* obj : simulation.getAllObjects()) {
                         select_tool.deselectObject(obj);
                     }
                 } else {
-                    for (GameObject* obj : simulation.getAllVector()) {
+                    for (GameObject* obj : simulation.getAllObjects()) {
                         select_tool.selectObject(obj);
                     }
                 }
@@ -797,7 +797,7 @@ void Editor::renderUi() {
 
     if (render_object_info) {
         // parent relation lines
-        for (GameObject* object : simulation.getAllVector()) {
+        for (GameObject* object : simulation.getAllObjects()) {
             for (GameObject* child : object->getChildren()) {
                 sf::Vector2f v1 = worldToScreen(object->getGlobalPosition());
                 sf::Vector2f v2 = worldToScreen(child->getGlobalPosition());

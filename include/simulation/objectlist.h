@@ -13,6 +13,7 @@ public:
 	Event<GameObject*> OnBeforeObjectRemoved;
 	Event<GameObject*> OnAfterObjectRemoved;
 	Event<GameObject*, GameObject*> OnSetParent;
+	Event<GameObject*, size_t> OnObjectMoved;
 	Event<> OnClear;
 
 	b2World* getWorld() const;
@@ -27,8 +28,8 @@ public:
 	ptrdiff_t getTopIndex(GameObject* object) const;
 	ptrdiff_t getAllIndex(GameObject* object) const;
 	Joint* getJoint(size_t i) const;
-	const CompVector<GameObject*>& getTopVector() const;
-	const CompVector<GameObject*>& getAllVector() const;
+	const CompVector<GameObject*>& getTopObjects() const;
+	const CompVector<GameObject*>& getAllObjects() const;
 	ptrdiff_t getMaxId() const;
 	GameObject* add(std::unique_ptr<GameObject> object, bool assign_new_id);
 	Joint* addJoint(std::unique_ptr<Joint> joint);
