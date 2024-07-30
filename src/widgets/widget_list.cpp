@@ -247,8 +247,10 @@ namespace fw {
 
 	void WidgetList::processAfterInput() {
 		for (const PendingMove& move : pending_moves) {
-			Widget* parent = move.widget->getParent();
-			parent->moveChildToIndex(move.widget, move.index);
+			if (widgets.contains(move.widget) && widgets.contains(move.widget->getParent())) {
+				Widget* parent = move.widget->getParent();
+				parent->moveChildToIndex(move.widget, move.index);
+			}
 		}
 		pending_moves = std::vector<PendingMove>();
 	}
