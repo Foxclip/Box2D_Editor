@@ -129,6 +129,14 @@ GameObject* GameObject::getChild(size_t index) const {
 	return children[index];
 }
 
+size_t GameObject::getIndex() const {
+	if (parent) {
+		return parent->children.getIndex(const_cast<GameObject*>(this));
+	} else {
+		return object_list->top_objects.getIndex(const_cast<GameObject*>(this));
+	}
+}
+
 const CompVector<Joint*>& GameObject::getJoints() const {
 	return joints;
 }
@@ -384,6 +392,19 @@ void GameObject::setRestitution(float restitution, bool include_children) {
 			children[i]->setRestitution(restitution, true);
 		}
 	}
+}
+
+void GameObject::moveToIndex(size_t index) {
+	if (parent) {
+		parent->moveChildToIndex(this, index);
+	} else {
+		object_list->moveObjectToIndex(this, index);
+	}
+}
+
+void GameObject::moveChildToIndex(GameObject* child, size_t index) {
+	mAssert(children.contains(child));
+	children.moveValueToIndex(child, index);
 }
 
 void GameObject::moveVertices(const std::vector<size_t>& index_list, const b2Vec2& offset) {

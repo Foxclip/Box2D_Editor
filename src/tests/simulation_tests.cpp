@@ -44,6 +44,7 @@ void SimulationTests::createTestLists() {
     test::Test* duplicate_with_children_test = objectlist_list->addTest("duplicate_with_children", { duplicate_test }, [&](test::Test& test) { duplicateWithChildrenTest(test); });
     test::Test* remove_joint_test = objectlist_list->addTest("remove_joint", { add_joint_test }, [&](test::Test& test) { removeJointTest(test); });
     test::Test* remove_test = objectlist_list->addTest("remove", { add_test, remove_joint_test }, [&](test::Test& test) { removeTest(test); });
+    test::Test* remove_without_children_test = objectlist_list->addTest("remove_without_children", { remove_test }, [&](test::Test& test) { removeWithoutChildrenTest(test); });
     test::Test* remove_with_children_test = objectlist_list->addTest("remove_with_children", { remove_test }, [&](test::Test& test) { removeWithChildrenTest(test); });
     test::Test* event_test = objectlist_list->addTest("event", { remove_test }, [&](test::Test& test) { eventTest(test); });
     test::Test* clear_test = objectlist_list->addTest("clear", { objects_test }, [&](test::Test& test) { clearTest(test); });
@@ -753,6 +754,33 @@ void SimulationTests::removeTest(test::Test& test) {
     T_CHECK(simulation.getFromAll(1) == box2);
     T_ASSERT(T_COMPARE(box2->getChildren().size(), 0));
     T_CHECK(box2->getParent() == nullptr);
+    T_ASSERT(T_COMPARE(simulation.getJointsSize(), 0));
+}
+
+void SimulationTests::removeWithoutChildrenTest(test::Test& test) {
+    Simulation simulation;
+    BoxObject* box0 = createBox(simulation, "box0", b2Vec2(0.5f, 0.5f));
+    BoxObject* box1 = createBox(simulation, "box1", b2Vec2(1.1f, 1.1f));
+    BoxObject* box1_child_1 = createBox(simulation, "box1_child_1", b2Vec2(1.75f, 1.75f));
+    BoxObject* box1_child_2 = createBox(simulation, "box1_child_2", b2Vec2(3.0f, 1.75f));
+    BoxObject* box1_child_3 = createBox(simulation, "box1_child_3", b2Vec2(3.0f, 3.0f));
+    BoxObject* box2 = createBox(simulation, "box2", b2Vec2(1.75f, 3.0f));
+    RevoluteJoint* joint0 = simulation.createRevoluteJoint(box1, box1_child_1, b2Vec2(0.0f, 0.0f));
+    RevoluteJoint* joint2 = simulation.createRevoluteJoint(box1, box1_child_3, b2Vec2(0.0f, 0.0f));
+    box1_child_1->setParent(box1);
+    box1_child_2->setParent(box1);
+    box1_child_3->setParent(box1);
+    T_ASSERT(T_COMPARE(simulation.getAllSize(), 6));
+    T_ASSERT(T_COMPARE(simulation.getTopSize(), 3));
+
+    simulation.remove(box1, false);
+    T_ASSERT(T_COMPARE(simulation.getAllSize(), 5));
+    T_ASSERT(T_COMPARE(simulation.getTopSize(), 5));
+    T_CHECK(simulation.getFromTop(0) == box0);
+    T_CHECK(simulation.getFromTop(1) == box1_child_1);
+    T_CHECK(simulation.getFromTop(2) == box1_child_2);
+    T_CHECK(simulation.getFromTop(3) == box1_child_3);
+    T_CHECK(simulation.getFromTop(4) == box2);
     T_ASSERT(T_COMPARE(simulation.getJointsSize(), 0));
 }
 

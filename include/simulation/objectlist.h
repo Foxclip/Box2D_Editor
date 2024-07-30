@@ -35,6 +35,7 @@ public:
 	GameObject* duplicate(const GameObject* object, bool with_children = false);
 	CompVector<GameObject*> duplicate(const CompVector<GameObject*>& old_objects);
 	void transformFromRigidbody();
+	void moveObjectToIndex(GameObject* object, size_t index);
 	void remove(GameObject* object, bool remove_children);
 	void removeJoint(Joint* joint);
 	void clear();

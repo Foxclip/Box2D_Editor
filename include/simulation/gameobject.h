@@ -78,6 +78,7 @@ public:
 	const CompVector<GameObject*>& getChildren() const;
 	CompVector<GameObject*> getAllChildren() const;
 	GameObject* getChild(size_t index) const;
+	size_t getIndex() const;
 	const CompVector<Joint*>& getJoints() const;
 	Joint* getJoint(size_t index) const;
 	static b2AABB getFixtureAABB(b2Fixture* fixture);
@@ -106,6 +107,8 @@ public:
 	void setDensity(float density, bool include_children);
 	void setFriction(float friction, bool include_children);
 	void setRestitution(float restitution, bool include_children);
+	void moveToIndex(size_t index);
+	void moveChildToIndex(GameObject* child, size_t index);
 	void moveVertices(const std::vector<size_t>& index_list, const b2Vec2& offset);
 	void offsetVertex(size_t index, const b2Vec2& offset, bool sync = true);
 	void offsetSelected(const b2Vec2& offset, bool sync = true);

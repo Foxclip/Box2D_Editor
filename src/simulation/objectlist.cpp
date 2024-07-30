@@ -205,6 +205,11 @@ void GameObjectList::transformFromRigidbody() {
     }
 }
 
+void GameObjectList::moveObjectToIndex(GameObject* object, size_t index) {
+    mAssert(top_objects.contains(object));
+    top_objects.moveValueToIndex(object, index);
+}
+
 void GameObjectList::remove(GameObject* object, bool remove_children) {
     mAssert(object);
     mAssert(all_objects.contains(object));
@@ -214,16 +219,18 @@ void GameObjectList::remove(GameObject* object, bool remove_children) {
     for (Joint* joint : joints_copy) {
         removeJoint(joint);
     }
+    ptrdiff_t index = -1;
+    if (!remove_children) {
+        index = object->getIndex();
+    }
     CompVector<GameObject*> children_copy = object->getChildren();
-    if (remove_children) {
-        for (size_t i = 0; i < children_copy.size(); i++) {
-            GameObject* child = children_copy[i];
+    for (size_t i = 0; i < children_copy.size(); i++) {
+        GameObject* child = children_copy[i];
+        if (remove_children) {
             remove(child, true);
-        }
-    } else {
-        for (size_t i = 0; i < children_copy.size(); i++) {
-            GameObject* child = children_copy[i];
+        } else {
             child->setParent(nullptr);
+            child->moveToIndex(index + i);
         }
     }
     top_objects.remove(object);

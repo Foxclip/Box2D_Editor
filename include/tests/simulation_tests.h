@@ -46,6 +46,7 @@ private:
 	void duplicateWithChildrenTest(test::Test& test);
 	void removeJointTest(test::Test& test);
 	void removeTest(test::Test& test);
+	void removeWithoutChildrenTest(test::Test& test);
 	void removeWithChildrenTest(test::Test& test);
 	void eventTest(test::Test& test);
 	void clearTest(test::Test& test);

@@ -27,21 +27,20 @@ int main() {
 
     execute_app();
 
-    // TODO: reparent object in outliner
-    // TODO: rename object in outliner
-    // TODO: delete object in outliner
-    // TODO: OnAfterObjectRemoved test
-    // TODO: OnObjectRenamed event in GameObjectList
-    // TODOL test invisible widgets in container
-    // TODO: render polygon indices
-    // TODO: make widgets a separate library
-    // TODO: delay editing polygons with many vertices
+    // TODO: Objectlist: don't move children to the end after removing parent
+    // TODO: Outliner: reparent object
+    // TODO: Outliner: rename object
+    // TODO: Outliner: delete object
+    // TODO: Objectlist: OnAfterObjectRemoved test
+    // TODO: Objectlist: OnObjectRenamed
+    // TODO: ContainerWidget: test invisible widgets
+    // TODO: Editor: render polygon indices
+    // TODO: Widgets: make widgets a separate library
+    // TODO: Editor: delay editing polygons with many vertices
+    // TODO: Editor: joint editor
     // TODO: evolving cars
     // TODO: rename project to EvolvingCars
-    // TODO: edit and simulate modes
-    // TODO: create tests with keyboard and mouse event recording
-    // TODO: rotated widgets, masking
-    // TODO: joint editor
+    // TODO: Editor: edit and simulate modes
 
     return 0;
 }
