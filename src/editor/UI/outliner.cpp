@@ -31,11 +31,17 @@ Outliner::Outliner(fw::WidgetList& widget_list, float width, float height, Edito
 	object_list.OnObjectAdded += [&](GameObject* object) {
 		addObject(object);
 	};
+	object_list.OnBeforeObjectRemoved += [&](GameObject* object) {
+		logger << "RemoveObject: " << object->getId() << " \"" << object->getName() << "\"" << "\n";
+	};
 	object_list.OnAfterObjectRemoved += [&](GameObject* object) {
 		removeObject(object);
 	};
 	object_list.OnSetParent += [&](GameObject* object, GameObject* parent) {
 		setParentToObject(object, parent);
+	};
+	object_list.OnObjectMoved += [&](GameObject* object, size_t index) {
+		moveObject(object, index);
 	};
 	object_list.OnClear += [&]() {
 		clear();
@@ -58,14 +64,20 @@ void Outliner::addObject(GameObject* object) {
 	entry_object[entry] = object;
 }
 
+void Outliner::moveObject(GameObject* object, size_t index) {
+	logger << "MoveObject: " << object->getId() << " \"" << object->getName() << "\": " << index << "\n";
+	fw::TreeViewWidget::Entry* entry = object_entry[object];
+	entry->moveToIndex(index);
+}
+
 void Outliner::removeObject(GameObject* object) {
-		auto it = object_entry.find(object);
-		if (it != object_entry.end()) {
-			fw::TreeViewWidget::Entry* entry = it->second;
-			treeview_widget->removeEntry(entry, false);
-			object_entry.erase(object);
-			entry_object.erase(entry);
-		}
+	auto it = object_entry.find(object);
+	if (it != object_entry.end()) {
+		fw::TreeViewWidget::Entry* entry = it->second;
+		treeview_widget->removeEntry(entry, false);
+		object_entry.erase(object);
+		entry_object.erase(entry);
+	}
 }
 
 void Outliner::setParentToObject(GameObject* object, GameObject* parent) {

@@ -24,6 +24,7 @@ private:
 	std::map<fw::TreeViewWidget::Entry*, GameObject*> entry_object;
 
 	void addObject(GameObject* object);
+	void moveObject(GameObject* object, size_t index);
 	void removeObject(GameObject* object);
 	void setParentToObject(GameObject* object, GameObject* parent);
 	void selectEntry(GameObject* object);
