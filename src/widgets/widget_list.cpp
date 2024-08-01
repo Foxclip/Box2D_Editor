@@ -240,14 +240,51 @@ namespace fw {
 	void WidgetList::addPendingMove(Widget* widget, size_t index) {
 		wAssert(!isLocked());
 		std::unique_ptr<PendingMove> uptr = std::make_unique<PendingMove>(*this, widget, index);
-		pending_operations.add(std::move(uptr));
+		pending_move.add(std::move(uptr));
+	}
+
+	void WidgetList::addPendingDelete(Widget* widget, bool with_children) {
+		wAssert(!isLocked());
+		std::unique_ptr<PendingDelete> uptr = std::make_unique<PendingDelete>(*this, widget, with_children);
+		pending_delete.add(std::move(uptr));
+	}
+
+	void WidgetList::removeWidget(Widget* widget, bool with_children) {
+		wAssert(!isLocked());
+		wAssert(widget);
+		wAssert(widget != root_widget);
+		wAssert(widgets.contains(widget));
+		Widget* parent = widget->getParent();
+		wAssert(parent);
+		CompVector<Widget*> children = widget->getChildren();
+		for (size_t i = 0; i < children.size(); i++) {
+			Widget* child = children[i];
+			if (with_children) {
+				removeWidget(child, true);
+			} else {
+				child->setParent(parent);
+			}
+		}
+		widget->removeSocket(widget->getPosXTarget());
+		widget->removeSocket(widget->getPosYTarget());
+		widget->removeSocket(widget->getSizeXTarget());
+		widget->removeSocket(widget->getSizeYTarget());
+		widget->removeSocket(widget->getChildrenXTarget());
+		widget->removeSocket(widget->getChildrenYTarget());
+		parent->removeChild(widget);
+		render_queue.remove(widget);
+		widgets.remove(widget);
 	}
 
 	void WidgetList::processAfterInput() {
-		for (PendingOperation* op : pending_operations) {
+		for (PendingMove* op : pending_move) {
 			op->execute();
 		}
-		pending_operations.clear();
+		for (PendingDelete* op : pending_delete) {
+			op->execute();
+		}
+		pending_move.clear();
+		pending_delete.clear();
 	}
 
 	void WidgetList::updateRenderQueue() {
@@ -343,33 +380,6 @@ namespace fw {
 			focused_widget->internalOnFocused();
 			focused_widget->OnFocused();
 		}
-	}
-
-	void WidgetList::removeWidget(Widget* widget, bool with_children) {
-		wAssert(!isLocked());
-		wAssert(widget);
-		wAssert(widget != root_widget);
-		wAssert(widgets.contains(widget));
-		Widget* parent = widget->getParent();
-		wAssert(parent);
-		CompVector<Widget*> children = widget->getChildren();
-		for (size_t i = 0; i < children.size(); i++) {
-			Widget* child = children[i];
-			if (with_children) {
-				removeWidget(child, true);
-			} else {
-				child->setParent(parent);
-			}
-		}
-		widget->removeSocket(widget->getPosXTarget());
-		widget->removeSocket(widget->getPosYTarget());
-		widget->removeSocket(widget->getSizeXTarget());
-		widget->removeSocket(widget->getSizeYTarget());
-		widget->removeSocket(widget->getChildrenXTarget());
-		widget->removeSocket(widget->getChildrenYTarget());
-		parent->removeChild(widget);
-		render_queue.remove(widget);
-		widgets.remove(widget);
 	}
 
 	PendingOperation::PendingOperation(WidgetList& widget_list) : widget_list(widget_list) { }

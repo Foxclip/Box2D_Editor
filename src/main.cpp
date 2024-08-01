@@ -27,7 +27,6 @@ int main() {
 
     execute_app();
 
-    // TODO: Objectlist: don't move children to the end after removing parent
     // TODO: Outliner: reparent object
     // TODO: Outliner: rename object
     // TODO: Outliner: delete object

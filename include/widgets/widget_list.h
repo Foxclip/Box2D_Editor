@@ -87,7 +87,6 @@ namespace fw {
 		void processMouse(const sf::Vector2f pos);
 		void processWindowEvent(const sf::Event& event);
 		void processKeyboardEvent(const sf::Event& event);
-		void addPendingMove(Widget* widget, size_t index);
 		void processAfterInput();
 		void updateRenderQueue();
 		void updateWidgets();
@@ -95,7 +94,6 @@ namespace fw {
 		void render(sf::RenderTarget& target);
 		void reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_pos);
 		void setFocusedWidget(Widget* widget);
-		void removeWidget(Widget* widget, bool with_children = true);
 
 	private:
 		friend class Widget;
@@ -111,9 +109,14 @@ namespace fw {
 		EmptyWidget* root_widget = nullptr;
 		Widget* focused_widget = nullptr;
 		bool print_update_queue = false;
-		CompVectorUptr<PendingOperation> pending_operations;
+		CompVectorUptr<PendingMove> pending_move;
+		CompVectorUptr<PendingDelete> pending_delete;
 		WidgetUpdateQueue update_queue = WidgetUpdateQueue(*this);
 		WidgetRenderQueue render_queue = WidgetRenderQueue(*this);
+
+		void addPendingMove(Widget* widget, size_t index);
+		void addPendingDelete(Widget* widget, bool with_children);
+		void removeWidget(Widget* widget, bool with_children);
 
 	};
 

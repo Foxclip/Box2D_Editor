@@ -1329,7 +1329,14 @@ namespace fw {
 
 	void Widget::remove(bool with_clildren) {
 		wAssert(!widget_list.isLocked());
-		widget_list.removeWidget(this, with_clildren);
+		Stage stage = widget_list.application.getStage();
+		if (stage == Stage::INPUT) {
+			widget_list.addPendingDelete(this, with_clildren);
+		} else if (stage == Stage::NONE || stage == Stage::AFTER_INPUT) {
+			widget_list.removeWidget(this, with_clildren);
+		} else {
+			wAssert(false, "Cannot remove children in this stage");
+		}
 	}
 
 	sf::Vector2f Widget::anchorToPos(Anchor p_anchor, const sf::Vector2f& size) {
