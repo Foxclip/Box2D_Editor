@@ -35,8 +35,8 @@ namespace fw {
 	void extend_bounds(sf::FloatRect& rect1, const sf::FloatRect& rect2);
 	bool parseLL(const std::string& str, long long& result);
 	bool parseFloat(const std::string& str, float& result);
-	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point, bool include_upper_bound = true);
-	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point);
+	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point, bool include_upper_bound = false);
+	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point, bool include_upper_bound = false);
 	void quantize_position(sf::Transform& transform);
 	enum QuantizeMode {
 		QUANTIZE_MODE_FLOOR,

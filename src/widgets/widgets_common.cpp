@@ -102,8 +102,8 @@ namespace fw {
 		);
 	}
 
-	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point) {
-		return contains_point(shape.getGlobalBounds(), point);
+	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point, bool include_upper_bound) {
+		return contains_point(shape.getGlobalBounds(), point, include_upper_bound);
 	}
 
 	void quantize_position(sf::Transform& transform) {
