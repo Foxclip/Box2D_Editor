@@ -95,7 +95,8 @@ namespace fw {
 		Event<const sf::Vector2f&> OnRightPress;
 		Event<const sf::Vector2f&> OnGlobalLeftRelease;
 		Event<const sf::Vector2f&> OnBlockableLeftRelease;
-		Event<const sf::Vector2f&> OnRightRelease;
+		Event<const sf::Vector2f&> OnGlobalRightRelease;
+		Event<const sf::Vector2f&> OnBlockableRightRelease;
 		Event<const sf::Vector2f&, float> OnScrollX;
 		Event<const sf::Vector2f&, float> OnScrollY;
 		Event<const sf::Vector2f&> OnMouseMoved;
@@ -130,7 +131,8 @@ namespace fw {
 		void processRightPress(const sf::Vector2f& pos);
 		void processGlobalLeftRelease(const sf::Vector2f& pos);
 		void processBlockableLeftRelease(const sf::Vector2f& pos);
-		void processRightRelease(const sf::Vector2f& pos);
+		void processGlobalRightRelease(const sf::Vector2f& pos);
+		void processBlockableRightRelease(const sf::Vector2f& pos);
 		void processMouseMove(const sf::Vector2f& pos);
 		void processScrollX(const sf::Vector2f pos, float delta);
 		void processScrollY(const sf::Vector2f pos, float delta);
@@ -376,7 +378,8 @@ namespace fw {
 		virtual void internalOnRightPress(const sf::Vector2f& pos);
 		virtual void internalOnGlobalLeftRelease(const sf::Vector2f& pos);
 		virtual void internalOnBlockableLeftRelease(const sf::Vector2f& pos);
-		virtual void internalOnRightRelease(const sf::Vector2f& pos);
+		virtual void internalOnGlobalRightRelease(const sf::Vector2f& pos);
+		virtual void internalOnBlockableRightRelease(const sf::Vector2f& pos);
 		virtual void internalOnScrollX(const sf::Vector2f& pos, float delta);
 		virtual void internalOnScrollY(const sf::Vector2f& pos, float delta);
 		virtual void internalProcessKeyboardEvent(const sf::Event& event);

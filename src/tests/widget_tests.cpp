@@ -981,8 +981,10 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     bool mouse_entered = false;
     bool mouse_left_pressed = false;
     bool mouse_right_pressed = false;
-    bool mouse_left_released = false;
-    bool mouse_right_released = false;
+    bool mouse_left_released_global = false;
+    bool mouse_left_released_blockable = false;
+    bool mouse_right_released_global = false;
+    bool mouse_right_released_blockable = false;
     bool mouse_moved = false;
     bool mouse_scroll_x = false;
     bool mouse_scroll_y = false;
@@ -998,10 +1000,16 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
         mouse_right_pressed = true;
     };
     rectangle_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
-        mouse_left_released = true;
+        mouse_left_released_global = true;
     };
-    rectangle_widget->OnRightRelease += [&](const sf::Vector2f& pos) {
-        mouse_right_released = true;
+    rectangle_widget->OnBlockableLeftRelease += [&](const sf::Vector2f& pos) {
+        mouse_left_released_blockable = true;
+    };
+    rectangle_widget->OnGlobalRightRelease += [&](const sf::Vector2f& pos) {
+        mouse_right_released_global = true;
+    };
+    rectangle_widget->OnBlockableRightRelease += [&](const sf::Vector2f& pos) {
+        mouse_right_released_blockable = true;
     };
     rectangle_widget->OnMouseMoved += [&](const sf::Vector2f& pos) {
         mouse_moved = true;
@@ -1025,9 +1033,11 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!rectangle_widget->isMouseOver());
     T_CHECK(!mouse_entered);
     T_CHECK(!mouse_left_pressed);
-    T_CHECK(!mouse_left_released);
+    T_CHECK(!mouse_left_released_global);
+    T_CHECK(!mouse_left_released_blockable);
     T_CHECK(!mouse_right_pressed);
-    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_right_released_global);
+    T_CHECK(!mouse_right_released_blockable);
     T_CHECK(!mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1038,9 +1048,11 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(rectangle_widget->isMouseOver());
     T_CHECK(mouse_entered);
     T_CHECK(!mouse_left_pressed);
-    T_CHECK(!mouse_left_released);
+    T_CHECK(!mouse_left_released_global);
+    T_CHECK(!mouse_left_released_blockable);
     T_CHECK(!mouse_right_pressed);
-    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_right_released_global);
+    T_CHECK(!mouse_right_released_blockable);
     T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1050,9 +1062,11 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     application.advance();
     T_CHECK(mouse_entered);
     T_CHECK(mouse_left_pressed);
-    T_CHECK(!mouse_left_released);
+    T_CHECK(!mouse_left_released_global);
+    T_CHECK(!mouse_left_released_blockable);
     T_CHECK(!mouse_right_pressed);
-    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_right_released_global);
+    T_CHECK(!mouse_right_released_blockable);
     T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1062,9 +1076,11 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     application.advance();
     T_CHECK(mouse_entered);
     T_CHECK(mouse_left_pressed);
-    T_CHECK(!mouse_left_released); // clickThrough is on, so release is not processed
+    T_CHECK(!mouse_left_released_global); // clickThrough is on, so release is not processed
+    T_CHECK(!mouse_left_released_blockable);
     T_CHECK(!mouse_right_pressed);
-    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_right_released_global);
+    T_CHECK(!mouse_right_released_blockable);
     T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1074,9 +1090,11 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     application.advance();
     T_CHECK(mouse_entered);
     T_CHECK(mouse_left_pressed);
-    T_CHECK(!mouse_left_released);
+    T_CHECK(!mouse_left_released_global);
+    T_CHECK(!mouse_left_released_blockable);
     T_CHECK(mouse_right_pressed);
-    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_right_released_global);
+    T_CHECK(!mouse_right_released_blockable);
     T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1086,9 +1104,11 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     application.advance();
     T_CHECK(mouse_entered);
     T_CHECK(mouse_left_pressed);
-    T_CHECK(!mouse_left_released);
+    T_CHECK(!mouse_left_released_global);
+    T_CHECK(!mouse_left_released_blockable);
     T_CHECK(mouse_right_pressed);
-    T_CHECK(!mouse_right_released); // clickThrough is on, so release is not processed
+    T_CHECK(!mouse_right_released_global); // clickThrough is on, so release is not processed
+    T_CHECK(!mouse_right_released_blockable);
     T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1098,9 +1118,11 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     application.advance();
     T_CHECK(mouse_entered);
     T_CHECK(mouse_left_pressed);
-    T_CHECK(!mouse_left_released);
+    T_CHECK(!mouse_left_released_global);
+    T_CHECK(!mouse_left_released_blockable);
     T_CHECK(mouse_right_pressed);
-    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_right_released_global);
+    T_CHECK(!mouse_right_released_blockable);
     T_CHECK(mouse_moved);
     T_CHECK(mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1110,9 +1132,11 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     application.advance();
     T_CHECK(mouse_entered);
     T_CHECK(mouse_left_pressed);
-    T_CHECK(!mouse_left_released);
+    T_CHECK(!mouse_left_released_global);
+    T_CHECK(!mouse_left_released_blockable);
     T_CHECK(mouse_right_pressed);
-    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_right_released_global);
+    T_CHECK(!mouse_right_released_blockable);
     T_CHECK(mouse_moved);
     T_CHECK(mouse_scroll_x);
     T_CHECK(mouse_scroll_y);
@@ -1123,9 +1147,11 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!rectangle_widget->isMouseOver());
     T_CHECK(mouse_entered);
     T_CHECK(mouse_left_pressed);
-    T_CHECK(!mouse_left_released);
+    T_CHECK(!mouse_left_released_global);
+    T_CHECK(!mouse_left_released_blockable);
     T_CHECK(mouse_right_pressed);
-    T_CHECK(!mouse_right_released);
+    T_CHECK(!mouse_right_released_global);
+    T_CHECK(!mouse_right_released_blockable);
     T_CHECK(mouse_moved);
     T_CHECK(mouse_scroll_x);
     T_CHECK(mouse_scroll_y);

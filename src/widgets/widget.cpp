@@ -120,15 +120,23 @@ namespace fw {
 		OnBlockableLeftRelease(pos);
 	}
 
-	void Widget::processRightRelease(const sf::Vector2f& pos) {
+	void Widget::processGlobalRightRelease(const sf::Vector2f& pos) {
 		if (!visible) {
 			return;
 		}
-		internalOnRightRelease(pos);
-		OnRightRelease(pos);
+		internalOnGlobalRightRelease(pos);
+		OnGlobalRightRelease(pos);
 		for (size_t i = 0; i < children.size(); i++) {
-			children[i]->processRightRelease(pos);
+			children[i]->processGlobalRightRelease(pos);
 		}
+	}
+
+	void Widget::processBlockableRightRelease(const sf::Vector2f& pos) {
+		if (!visible) {
+			return;
+		}
+		internalOnBlockableRightRelease(pos);
+		OnBlockableRightRelease(pos);
 	}
 
 	void Widget::processMouseMove(const sf::Vector2f& pos) {
@@ -1175,7 +1183,9 @@ namespace fw {
 
 	void Widget::internalOnBlockableLeftRelease(const sf::Vector2f& pos) { }
 
-	void Widget::internalOnRightRelease(const sf::Vector2f& pos) { }
+	void Widget::internalOnGlobalRightRelease(const sf::Vector2f& pos) { }
+
+	void Widget::internalOnBlockableRightRelease(const sf::Vector2f& pos) { }
 
 	void Widget::internalOnScrollX(const sf::Vector2f& pos, float delta) { }
 

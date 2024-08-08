@@ -192,7 +192,13 @@ namespace fw {
 
 	void WidgetList::processRightRelease(const sf::Vector2f pos) {
 		wAssert(!isLocked());
-		root_widget->processRightRelease(pos);
+		root_widget->processGlobalRightRelease(pos);
+		bool blocked_discard;
+		CompVector<Widget*> widgets = getWidgetsUnderCursor(true, blocked_discard);
+		for (size_t i = 0; i < widgets.size(); i++) {
+			Widget* widget = widgets[i];
+			widget->processBlockableRightRelease(pos);
+		}
 	}
 
 	void WidgetList::processMouseMove(const sf::Vector2f pos) {
