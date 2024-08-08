@@ -318,8 +318,16 @@ namespace fw {
 
     void Application::onClose() { }
 
-    void Application::startMoveGesture() {
-        startMoveGesture(MouseGesture::SCREEN);
+    void Application::startMoveGesture(Widget* source) {
+        LoggerTag tag_mouse_gesture("mouseGesture");
+        mouseGesture = MouseGesture(source, MouseGesture::MOVE, getMousePosf(), sf::Mouse::Left);
+        std::string source_str = source->getFullName();
+        std::string type_str = "move";
+        logger << "Start gesture: \n";
+        LoggerIndent indent;
+        logger << source_str << "\n";
+        logger << type_str << "\n";
+        logger << getMousePosf() << "\n";
     }
 
     void Application::endGesture() {
@@ -419,13 +427,10 @@ namespace fw {
         }
     }
 
-    void Application::startNormalGesture(
-        MouseGesture::MouseGestureSource source,
-        sf::Mouse::Button button
-    ) {
+    void Application::startNormalGesture(Widget* source, sf::Mouse::Button button) {
         LoggerTag tag_mouse_gesture("mouseGesture");
         mouseGesture = MouseGesture(source, MouseGesture::NORMAL, getMousePosf(), button);
-        std::string source_str = source == MouseGesture::WIDGETS ? "widgets" : "screen";
+        std::string source_str = source->getFullName();
         std::string type_str = "normal";
         std::string button_str;
         switch (button) {
@@ -442,59 +447,31 @@ namespace fw {
         logger << button_str << "\n";
     }
 
-    void Application::startMoveGesture(
-        MouseGesture::MouseGestureSource source
-    ) {
-        LoggerTag tag_mouse_gesture("mouseGesture");
-        mouseGesture = MouseGesture(source, MouseGesture::MOVE, getMousePosf(), sf::Mouse::Left);
-        std::string source_str = source == MouseGesture::WIDGETS ? "widgets" : "screen";
-        std::string type_str = "move";
-        logger << "Start gesture: \n";
-        LoggerIndent indent;
-        logger << source_str << "\n";
-        logger << type_str << "\n";
-        logger << getMousePosf() << "\n";
-    }
-
     void Application::processLeftPress() {
         if (mouseGesture.active) {
             if (mouseGesture.type == MouseGesture::MOVE) {
-                if (mouseGesture.source == MouseGesture::WIDGETS) {
-                    // skipping for now
-                } else if (mouseGesture.source == MouseGesture::SCREEN) {
-                    onProcessLeftPress();
-                }
+                onProcessLeftPress();
                 endGesture();
             }
         } else {
             widgets.processLeftPress(getMousePosf());
-            if (widgets.isClickBlocked()) {
-                startNormalGesture(MouseGesture::WIDGETS, sf::Mouse::Left);
-            } else {
-                startNormalGesture(MouseGesture::SCREEN, sf::Mouse::Left);
-                onProcessLeftPress();
-            }
+            onProcessLeftPress();
+            Widget* widget_under_cursor = widgets.getTopWidgetUnderCursor();
+            startNormalGesture(widget_under_cursor, sf::Mouse::Left);
         }
     }
 
     void Application::processRightPress() {
         if (mouseGesture.active) {
             if (mouseGesture.type == MouseGesture::MOVE) {
-                if (mouseGesture.source == MouseGesture::WIDGETS) {
-                    // skipping for now
-                } else if (mouseGesture.source == MouseGesture::SCREEN) {
-                    onProcessRightPress();
-                }
+                onProcessRightPress();
                 endGesture();
             }
         } else {
             widgets.processRightPress(getMousePosf());
-            if (widgets.isClickBlocked()) {
-                startNormalGesture(MouseGesture::WIDGETS, sf::Mouse::Right);
-            } else {
-                startNormalGesture(MouseGesture::SCREEN, sf::Mouse::Right);
-                onProcessRightPress();
-            }
+            onProcessRightPress();
+            Widget* widget_under_cursor = widgets.getTopWidgetUnderCursor();
+            startNormalGesture(widget_under_cursor, sf::Mouse::Right);
         }
     }
 
@@ -502,11 +479,8 @@ namespace fw {
         if (!mouseGesture.active) {
             return;
         }
-        if (mouseGesture.source == MouseGesture::WIDGETS) {
-            widgets.processLeftRelease(getMousePosf());
-        } else if (mouseGesture.source == MouseGesture::SCREEN) {
-            onProcessLeftRelease();
-        }
+        widgets.processLeftRelease(getMousePosf());
+        onProcessLeftRelease();
         endGesture();
     }
 
@@ -514,11 +488,8 @@ namespace fw {
         if (!mouseGesture.active) {
             return;
         }
-        if (mouseGesture.source == MouseGesture::WIDGETS) {
-            widgets.processRightRelease(getMousePosf());
-        } else if (mouseGesture.source == MouseGesture::SCREEN) {
-            onProcessRightRelease();
-        }
+        widgets.processRightRelease(getMousePosf());
+        onProcessRightRelease();
         endGesture();
     }
 
@@ -547,13 +518,10 @@ namespace fw {
 
     void Application::processMouse() {
         widgets.processMouse(getMousePosf());
+        onProcessMouse();
         sf::Cursor::Type cursor_type = sf::Cursor::Arrow;
         widgets.getCurrentCursorType(cursor_type);
         setCursorType(cursor_type);
-        bool non_screen_gesture = mouseGesture.active && mouseGesture.source != MouseGesture::SCREEN;
-        if (!non_screen_gesture) {
-            onProcessMouse();
-        }
         mousePrevPos = getMousePos();
         mousePrevPosf = getMousePosf();
     }
@@ -599,7 +567,7 @@ namespace fw {
     MouseGesture::MouseGesture() { }
 
     MouseGesture::MouseGesture(
-        MouseGestureSource source,
+        Widget* source,
         MouseGestureType type,
         sf::Vector2f startPos,
         sf::Mouse::Button button

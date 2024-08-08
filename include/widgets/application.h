@@ -11,18 +11,14 @@ namespace fw {
 			NORMAL,
 			MOVE,
 		};
-		enum MouseGestureSource {
-			WIDGETS,
-			SCREEN,
-		};
 		bool active = false;
-		MouseGestureSource source;
+		Widget* source = nullptr;
 		MouseGestureType type;
 		sf::Vector2f startPos;
 		sf::Mouse::Button button;
 		MouseGesture();
 		MouseGesture(
-			MouseGestureSource source,
+			Widget* source,
 			MouseGestureType type,
 			sf::Vector2f startPos,
 			sf::Mouse::Button button
@@ -136,7 +132,7 @@ namespace fw {
 		virtual void onProcessWorld();
 		virtual void onRender();
 		virtual void onClose();
-		void startMoveGesture();
+		void startMoveGesture(Widget* source);
 		void endGesture();
 
 	private:
@@ -153,13 +149,7 @@ namespace fw {
 		void processWindowEvent(const sf::Event& event);
 		void processKeyboardEvent(const sf::Event& event);
 		void processMouseEvent(const sf::Event& event);
-		void startNormalGesture(
-			MouseGesture::MouseGestureSource source,
-			sf::Mouse::Button button
-		);
-		void startMoveGesture(
-			MouseGesture::MouseGestureSource source
-		);
+		void startNormalGesture(Widget* source, sf::Mouse::Button button);
 		void processLeftPress();
 		void processRightPress();
 		void processLeftRelease();
