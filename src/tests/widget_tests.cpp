@@ -997,7 +997,7 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     rectangle_widget->OnRightPress += [&](const sf::Vector2f& pos) {
         mouse_right_pressed = true;
     };
-    rectangle_widget->OnLeftRelease += [&](const sf::Vector2f& pos) {
+    rectangle_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
         mouse_left_released = true;
     };
     rectangle_widget->OnRightRelease += [&](const sf::Vector2f& pos) {
@@ -1159,7 +1159,7 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     rectangle_widget_1->OnLeftPress += [&](const sf::Vector2f& pos) {
         mouse_pressed_1 = true;
     };
-    rectangle_widget_1->OnLeftRelease += [&](const sf::Vector2f& pos) {
+    rectangle_widget_1->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
         mouse_released_1 = true;
     };
     rectangle_widget_1->OnMouseExit += [&](const sf::Vector2f& pos) {
@@ -1174,7 +1174,7 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     rectangle_widget_2->OnLeftPress += [&](const sf::Vector2f& pos) {
         mouse_pressed_2 = true;
     };
-    rectangle_widget_2->OnLeftRelease += [&](const sf::Vector2f& pos) {
+    rectangle_widget_2->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
         mouse_released_2 = true;
     };
     rectangle_widget_2->OnMouseExit += [&](const sf::Vector2f& pos) {
@@ -4117,6 +4117,7 @@ void WidgetTests::treeviewWidgetSelectTest(test::Test& test) {
         application.mouseLeftPress();
         application.advance();
         application.mouseLeftRelease();
+        application.advance();
         if (ctrl) {
             application.keyRelease(sf::Keyboard::LControl);
         }

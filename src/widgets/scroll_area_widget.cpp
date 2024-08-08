@@ -56,7 +56,7 @@ namespace fw {
 				setSliderX(slider_grab_pos + x_offset);
 			}
 		};
-		slider_x_widget->OnLeftRelease += [&](const sf::Vector2f& pos) {
+		slider_x_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
 			slider_x_grabbed = false;
 			updateColors();
 		};
@@ -95,7 +95,7 @@ namespace fw {
 				setSliderY(slider_grab_pos + y_offset);
 			}
 		};
-		slider_y_widget->OnLeftRelease += [&](const sf::Vector2f& pos) {
+		slider_y_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
 			slider_y_grabbed = false;
 			updateColors();
 		};

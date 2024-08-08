@@ -359,7 +359,7 @@ namespace fw {
 		history.updateCurrent();
 	}
 
-	void TextBoxWidget::internalOnLeftRelease(const sf::Vector2f& pos) {
+	void TextBoxWidget::internalOnGlobalLeftRelease(const sf::Vector2f& pos) {
 		left_button_pressed = false;
 		dragging_begun = false;
 	}

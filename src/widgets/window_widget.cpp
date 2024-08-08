@@ -47,7 +47,7 @@ namespace fw {
 				setTransformPosition(new_pos);
 			}
 		};
-		header_widget->OnLeftRelease += [&](const sf::Vector2f& pos) {
+		header_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
 			is_grabbed = false;
 		};
 		header_widget->setParent(this);
@@ -179,7 +179,7 @@ namespace fw {
 				setSizeKeepPos(width_max, height_max + header_widget->getHeight());
 			}
 		};
-		resize_widget->OnLeftRelease += [&](const sf::Vector2f& pos) {
+		resize_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
 			active_resizing_type = Resizing::NONE;
 		};
 		resize_widget->setParent(this);

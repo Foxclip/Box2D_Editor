@@ -93,7 +93,8 @@ namespace fw {
 
 		Event<const sf::Vector2f&> OnLeftPress;
 		Event<const sf::Vector2f&> OnRightPress;
-		Event<const sf::Vector2f&> OnLeftRelease;
+		Event<const sf::Vector2f&> OnGlobalLeftRelease;
+		Event<const sf::Vector2f&> OnBlockableLeftRelease;
 		Event<const sf::Vector2f&> OnRightRelease;
 		Event<const sf::Vector2f&, float> OnScrollX;
 		Event<const sf::Vector2f&, float> OnScrollY;
@@ -123,9 +124,12 @@ namespace fw {
 		bool isClickThrough() const;
 		bool getChildrenLocked() const;
 		WidgetVisibility checkVisibility() const;
+		bool containsPoint(const sf::Vector2f& point, bool include_upper_bound = false) const;
+		bool unclippedRegionContainsPoint(const sf::Vector2f& point, bool include_upper_bound = false) const;
 		void processLeftPress(const sf::Vector2f& pos, bool became_focused);
 		void processRightPress(const sf::Vector2f& pos);
-		void processLeftRelease(const sf::Vector2f& pos);
+		void processGlobalLeftRelease(const sf::Vector2f& pos);
+		void processBlockableLeftRelease(const sf::Vector2f& pos);
 		void processRightRelease(const sf::Vector2f& pos);
 		void processMouseMove(const sf::Vector2f& pos);
 		void processScrollX(const sf::Vector2f pos, float delta);
@@ -370,7 +374,8 @@ namespace fw {
 		virtual void internalOnSetParent(Widget* parent);
 		virtual void internalOnLeftPress(const sf::Vector2f& pos, bool became_focused);
 		virtual void internalOnRightPress(const sf::Vector2f& pos);
-		virtual void internalOnLeftRelease(const sf::Vector2f& pos);
+		virtual void internalOnGlobalLeftRelease(const sf::Vector2f& pos);
+		virtual void internalOnBlockableLeftRelease(const sf::Vector2f& pos);
 		virtual void internalOnRightRelease(const sf::Vector2f& pos);
 		virtual void internalOnScrollX(const sf::Vector2f& pos, float delta);
 		virtual void internalOnScrollY(const sf::Vector2f& pos, float delta);

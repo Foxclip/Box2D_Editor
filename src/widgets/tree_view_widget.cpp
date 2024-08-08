@@ -159,18 +159,13 @@ namespace fw {
 		rectangle_widget->setClipChildren(true);
 		rectangle_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
 		rectangle_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
-			treeview.OnEntryClicked(this);
-			bool with_children = treeview.widget_list.isLCtrlPressed();
-			if (treeview.widget_list.isLShiftPressed()) {
-				toggleSelect(with_children);
-			} else {
-				if (with_children) {
-					treeview.deselectAllExceptSubtree(this);
-				} else {
-					treeview.deselectAllExceptEntry(this);
-				}
-				select(with_children);
-			}
+			pressed = true;
+		};
+		rectangle_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
+			pressed = false;
+		};
+		rectangle_widget->OnBlockableLeftRelease += [&](const sf::Vector2f& pos) {
+			click();
 		};
 		rectangle_widget->setParent(entry_widget);
 		// arrow area
@@ -313,6 +308,21 @@ namespace fw {
 			deselectSilent(with_children);
 		} else {
 			selectSilent(with_children);
+		}
+	}
+
+	void TreeViewWidget::Entry::click() {
+		treeview.OnEntryClicked(this);
+		bool with_children = treeview.widget_list.isLCtrlPressed();
+		if (treeview.widget_list.isLShiftPressed()) {
+			toggleSelect(with_children);
+		} else {
+			if (with_children) {
+				treeview.deselectAllExceptSubtree(this);
+			} else {
+				treeview.deselectAllExceptEntry(this);
+			}
+			select(with_children);
 		}
 	}
 

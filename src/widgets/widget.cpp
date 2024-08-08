@@ -77,6 +77,14 @@ namespace fw {
 		return v;
 	}
 
+	bool Widget::containsPoint(const sf::Vector2f& point, bool include_upper_bound) const {
+		return contains_point(getGlobalBounds(), point, include_upper_bound);
+	}
+
+	bool Widget::unclippedRegionContainsPoint(const sf::Vector2f& point, bool include_upper_bound) const {
+		return contains_point(getUnclippedRegion(), point, include_upper_bound);
+	}
+
 	void Widget::processLeftPress(const sf::Vector2f& pos, bool became_focused) {
 		if (!visible) {
 			return;
@@ -93,15 +101,23 @@ namespace fw {
 		OnRightPress(pos);
 	}
 
-	void Widget::processLeftRelease(const sf::Vector2f& pos) {
+	void Widget::processGlobalLeftRelease(const sf::Vector2f& pos) {
 		if (!visible) {
 			return;
 		}
-		internalOnLeftRelease(pos);
-		OnLeftRelease(pos);
+		internalOnGlobalLeftRelease(pos);
+		OnGlobalLeftRelease(pos);
 		for (size_t i = 0; i < children.size(); i++) {
-			children[i]->processLeftRelease(pos);
+			children[i]->processGlobalLeftRelease(pos);
 		}
+	}
+
+	void Widget::processBlockableLeftRelease(const sf::Vector2f& pos) {
+		if (!visible) {
+			return;
+		}
+		internalOnBlockableLeftRelease(pos);
+		OnBlockableLeftRelease(pos);
 	}
 
 	void Widget::processRightRelease(const sf::Vector2f& pos) {
@@ -1155,7 +1171,9 @@ namespace fw {
 
 	void Widget::internalOnRightPress(const sf::Vector2f& pos) { }
 
-	void Widget::internalOnLeftRelease(const sf::Vector2f& pos) { }
+	void Widget::internalOnGlobalLeftRelease(const sf::Vector2f& pos) { }
+
+	void Widget::internalOnBlockableLeftRelease(const sf::Vector2f& pos) { }
 
 	void Widget::internalOnRightRelease(const sf::Vector2f& pos) { }
 

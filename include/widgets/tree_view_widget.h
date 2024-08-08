@@ -41,6 +41,7 @@ namespace fw {
 			void selectSilent(bool with_children = false);
 			void deselectSilent(bool with_children = false);
 			void toggleSelectSilent(bool with_children = false);
+			void click();
 			void select(bool with_children = false);
 			void deselect(bool with_children = false);
 			void toggleSelect(bool with_children = false);
@@ -59,6 +60,7 @@ namespace fw {
 			sf::String name;
 			Entry* parent = nullptr;
 			CompVector<Entry*> children;
+			bool pressed = false;
 			bool expanded = false;
 			bool selected = false;
 			fw::ContainerWidget* entry_widget = nullptr;
