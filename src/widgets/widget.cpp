@@ -810,6 +810,9 @@ namespace fw {
 
 	void Widget::setClickThrough(bool value) {
 		wAssert(!widget_list.isLocked());
+		if (this == widget_list.getRootWidget() && value) {
+			wAssert(false, "Cannot enable clickThrough on root widget");
+		}
 		this->click_through = value;
 	}
 

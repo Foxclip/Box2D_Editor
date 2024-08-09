@@ -12,6 +12,7 @@ namespace fw {
 	WidgetList::WidgetList(Application& application) : application(application) {
 		root_widget = createWidget<EmptyWidget>();
 		root_widget->setFillColor(sf::Color::Transparent);
+		root_widget->setClickThrough(false);
 		root_widget->setClipChildren(true);
 		root_widget->setName("root");
 	}
@@ -48,6 +49,17 @@ namespace fw {
 		for (RenderQueueLayer layer : render_queue.get() | std::views::reverse) {
 			for (Widget* widget : layer.widgets | std::views::reverse) {
 				if (widget->isMouseOver()) {
+					return widget;
+				}
+			}
+		}
+		return nullptr;
+	}
+
+	Widget* WidgetList::getBlockingWidget() const {
+		for (RenderQueueLayer layer : render_queue.get() | std::views::reverse) {
+			for (Widget* widget : layer.widgets | std::views::reverse) {
+				if (widget->isMouseOver() && !widget->isClickThrough()) {
 					return widget;
 				}
 			}

@@ -249,6 +249,7 @@ void Editor::initWidgets() {
     );
     world_widget->setName("world_canvas");
     world_widget->setShader(&desat_shader);
+    world_widget->setClickThrough(false);
     world_widget->OnBeforeRender += [&](sf::RenderTarget& target) {
         desat_shader.setUniform("texture", sf::Shader::CurrentTexture);
         desat_shader.setUniform("saturation", WORLD_SATURATION);
@@ -267,6 +268,9 @@ void Editor::initWidgets() {
     };
     world_widget->OnBlockableLeftRelease += [&](const sf::Vector2f& pos) {
         processBlockableLeftRelease(pos);
+    };
+    world_widget->OnProcessDragGesture += [&](const sf::Vector2f& pos) {
+        processDragGesture(pos);
     };
     world_widget->OnScrollY += [&](const sf::Vector2f& pos, float delta) {
         processMouseScrollY(delta);
@@ -654,7 +658,7 @@ void Editor::processMouseScrollY(float delta) {
     zoomFactor *= pow(MOUSE_SCROLL_ZOOM, delta);
 }
 
-void Editor::onProcessMouse() {
+void Editor::processDragGesture(const sf::Vector2f& pos) {
     if (selected_tool == &select_tool) {
         {
             GameObject* old_hover = select_tool.hover_object;

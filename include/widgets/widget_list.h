@@ -61,6 +61,7 @@ namespace fw {
 		Widget* getRootWidget() const;
 		Widget* getFocusedWidget() const;
 		Widget* getTopWidgetUnderCursor() const;
+		Widget* getBlockingWidget() const;
 		CompVector<Widget*> getWidgetsUnderCursor(bool can_block, bool& blocked) const;
 		bool getCurrentCursorType(sf::Cursor::Type& result) const;
 		Widget* getGestureSource() const;

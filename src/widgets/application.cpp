@@ -464,8 +464,8 @@ namespace fw {
         } else {
             widgets.processLeftPress(getMousePosf());
             onProcessLeftPress();
-            Widget* widget_under_cursor = widgets.getTopWidgetUnderCursor();
-            startNormalGesture(widget_under_cursor, sf::Mouse::Left);
+            Widget* blocking_widget = widgets.getBlockingWidget();
+            startNormalGesture(blocking_widget, sf::Mouse::Left);
         }
     }
 
@@ -478,8 +478,8 @@ namespace fw {
         } else {
             widgets.processRightPress(getMousePosf());
             onProcessRightPress();
-            Widget* widget_under_cursor = widgets.getTopWidgetUnderCursor();
-            startNormalGesture(widget_under_cursor, sf::Mouse::Right);
+            Widget* blocking_widget = widgets.getBlockingWidget();
+            startNormalGesture(blocking_widget, sf::Mouse::Right);
         }
     }
 
