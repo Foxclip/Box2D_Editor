@@ -27,7 +27,9 @@ int main() {
 
     execute_app();
 
-    // TODO: Widget: OnBlockableLeftRelease test
+    // TODO: Editor: fix selecting object and clicking on outliner (make OnClick event)
+    // TODO: Editor: fix dragging mouse from select tool button
+    // TODO: Editor: fix selecting object and dragging mouse
     // TODO: Outliner: reparent object
     // TODO: Outliner: rename object
     // TODO: Outliner: delete object

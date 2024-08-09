@@ -259,6 +259,18 @@ void Editor::initWidgets() {
         world_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
         world_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };
+    world_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
+        processLeftPress(pos);
+    };
+    world_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
+        processGlobalLeftRelease(pos);
+    };
+    world_widget->OnBlockableLeftRelease += [&](const sf::Vector2f& pos) {
+        processBlockableLeftRelease(pos);
+    };
+    world_widget->OnScrollY += [&](const sf::Vector2f& pos, float delta) {
+        processMouseScrollY(delta);
+    };
 
     selection_mask_widget = widgets.createWidget<fw::CanvasWidget>(
         (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
@@ -444,14 +456,14 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                 Tool* s_tool = selected_tool;
                 trySelectTool(&move_tool);
                 grabSelected(s_tool);
-                startMoveGesture();
+                startMoveGesture(world_widget);
             }
         } else if (event.key.code == sf::Keyboard::R) {
             if (select_tool.selectedCount() > 0) {
                 Tool* s_tool = selected_tool;
                 trySelectTool(&rotate_tool);
                 rotateSelected(s_tool);
-                startMoveGesture();
+                startMoveGesture(world_widget);
             }
         } else if (event.key.code == sf::Keyboard::D) {
             if (isLShiftPressed()) {
@@ -463,7 +475,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                     trySelectTool(&move_tool);
                     grabSelected(s_tool);
                     commit_action = true;
-                    startMoveGesture();
+                    startMoveGesture(world_widget);
                 }
             } else {
                 widgets.debug_render = !widgets.debug_render;
@@ -502,7 +514,7 @@ void Editor::beforeProcessMouseEvent(const sf::Event& event) {
     b2MousePosWorld = tob2(sfMousePosWorld);
 }
 
-void Editor::onProcessLeftPress() {
+void Editor::processLeftPress(const sf::Vector2f& pos) {
     if (selected_tool == &create_tool) {
         std::string id_string = std::to_string(simulation.getMaxId() + 1);
         switch (create_tool.type) {
@@ -594,19 +606,8 @@ void Editor::onProcessLeftPress() {
     }
 }
 
-void Editor::onProcessLeftRelease() {
-    if (selected_tool == &select_tool) {
-        if (utils::length(getMousePosf() - getMousePressPosf()) < MOUSE_DRAG_THRESHOLD) {
-            GameObject* object = getObjectAt(getMousePosf());
-            setActiveObject(object);
-            bool with_children = isLCtrlPressed();
-            if (isLShiftPressed()) {
-                select_tool.toggleSelect(object, with_children);
-            } else {
-                select_tool.selectSingleObject(object, with_children);
-            }
-        }
-    } else if (selected_tool == &move_tool) {
+void Editor::processGlobalLeftRelease(const sf::Vector2f& pos) {
+    if (selected_tool == &move_tool) {
         endMove(true);
     } else if (selected_tool == &rotate_tool) {
         endRotate(true);
@@ -634,7 +635,22 @@ void Editor::onProcessLeftRelease() {
     }
 }
 
-void Editor::onProcessMouseScrollY(float delta) {
+void Editor::processBlockableLeftRelease(const sf::Vector2f& pos) {
+    if (selected_tool == &select_tool) {
+        if (utils::length(getMousePosf() - getMousePressPosf()) < MOUSE_DRAG_THRESHOLD) {
+            GameObject* object = getObjectAt(getMousePosf());
+            setActiveObject(object);
+            bool with_children = isLCtrlPressed();
+            if (isLShiftPressed()) {
+                select_tool.toggleSelect(object, with_children);
+            } else {
+                select_tool.selectSingleObject(object, with_children);
+            }
+        }
+    }
+}
+
+void Editor::processMouseScrollY(float delta) {
     zoomFactor *= pow(MOUSE_SCROLL_ZOOM, delta);
 }
 

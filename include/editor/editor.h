@@ -182,9 +182,10 @@ private:
 	void onProcessWindowEvent(const sf::Event& event) override;
 	void onProcessKeyboardEvent(const sf::Event& event) override;
 	void beforeProcessMouseEvent(const sf::Event& event) override;
-	void onProcessLeftPress() override;
-	void onProcessLeftRelease() override;
-	void onProcessMouseScrollY(float delta) override;
+	void processLeftPress(const sf::Vector2f& pos);
+	void processGlobalLeftRelease(const sf::Vector2f& pos);
+	void processBlockableLeftRelease(const sf::Vector2f& pos);
+	void processMouseScrollY(float delta);
 	void onProcessMouse() override;
 	void afterProcessInput() override;
 	void onProcessWorld() override;
