@@ -458,6 +458,7 @@ namespace fw {
     void Application::processLeftPress() {
         if (mouseGesture.active) {
             if (mouseGesture.type == MouseGesture::MOVE) {
+                widgets.processLeftPress(getMousePosf());
                 onProcessLeftPress();
                 endGesture();
             }
@@ -472,6 +473,7 @@ namespace fw {
     void Application::processRightPress() {
         if (mouseGesture.active) {
             if (mouseGesture.type == MouseGesture::MOVE) {
+                widgets.processRightPress(getMousePosf());
                 onProcessRightPress();
                 endGesture();
             }

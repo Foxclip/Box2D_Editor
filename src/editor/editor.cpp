@@ -269,6 +269,9 @@ void Editor::initWidgets() {
     world_widget->OnBlockableLeftRelease += [&](const sf::Vector2f& pos) {
         processBlockableLeftRelease(pos);
     };
+    world_widget->OnProcessMouse += [&](const sf::Vector2f& pos) {
+        processMouse(pos);
+    };
     world_widget->OnProcessDragGesture += [&](const sf::Vector2f& pos) {
         processDragGesture(pos);
     };
@@ -658,7 +661,7 @@ void Editor::processMouseScrollY(float delta) {
     zoomFactor *= pow(MOUSE_SCROLL_ZOOM, delta);
 }
 
-void Editor::processDragGesture(const sf::Vector2f& pos) {
+void Editor::processMouse(const sf::Vector2f& pos) {
     if (selected_tool == &select_tool) {
         {
             GameObject* old_hover = select_tool.hover_object;
@@ -704,6 +707,9 @@ void Editor::processDragGesture(const sf::Vector2f& pos) {
             obj->setGlobalAngle(obj->orig_angle + offset);
         }
     }
+}
+
+void Editor::processDragGesture(const sf::Vector2f& pos) {
     if (leftButtonPressed) {
         if (selected_tool == &select_tool) {
             if (select_tool.rectangle_select.active) {
