@@ -52,6 +52,7 @@ namespace fw {
 		sf::Vector2u getWindowSize() const;
 		const fw::Font& getDefaultFont() const;
 		Stage getStage() const;
+		Widget* getGestureSource() const;
 		void setWindowSize(unsigned int width, unsigned int height);
 		void setWindowSize(const sf::Vector2u& size);
 		void addExternalEvent(const sf::Event& event);

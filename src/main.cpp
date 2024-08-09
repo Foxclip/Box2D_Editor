@@ -27,6 +27,7 @@ int main() {
 
     execute_app();
 
+    // TODO: Tests: set window title to the name of the test
     // TODO: Editor: fix selecting object and clicking on outliner (make OnClick event)
     // TODO: Editor: fix dragging mouse from select tool button
     // TODO: Editor: fix selecting object and dragging mouse

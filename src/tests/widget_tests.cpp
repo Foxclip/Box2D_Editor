@@ -105,6 +105,7 @@ void WidgetTests::createTestLists() {
     test::Test* set_parent_test = widgets_basic_list->addTest("set_parent", { root_widget_test }, [&](test::Test& test) { setParentTest(test); });
     test::Test* widget_mouse_events_1_test = widgets_basic_list->addTest("mouse_events_1", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents1(test); });
     test::Test* widget_mouse_events_2_test = widgets_basic_list->addTest("mouse_events_2", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents2(test); });
+    test::Test* drag_gesture_event_test = widgets_basic_list->addTest("drag_gesture_event", { root_widget_test }, [&](test::Test& test) { dragGestureEventTest(test); });
     test::Test* events_test = widgets_basic_list->addTest("events", { root_widget_test }, [&](test::Test& test) { eventsTest(test); });
     test::Test* coordinates_test = widgets_basic_list->addTest("coordinates", { set_parent_test }, [&](test::Test& test) { coordinatesTest(test); });
     test::Test* find_test = widgets_basic_list->addTest("find", { set_parent_test }, [&](test::Test& test) { findTest(test); });
@@ -1332,6 +1333,55 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(mouse_released_blockable_2);
     T_CHECK(mouse_exited_2);
     T_CHECK(mouse_processed_2);
+}
+
+void WidgetTests::dragGestureEventTest(test::Test& test) {
+    fw::Application application(window);
+    application.init("Test window", 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::RectangleWidget* rectangle_widget_1 = application.getWidgets().createWidget<fw::RectangleWidget>(size);
+    fw::RectangleWidget* rectangle_widget_2 = application.getWidgets().createWidget<fw::RectangleWidget>(size);
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2i mouse_pos_1(150, 150);
+    sf::Vector2i mouse_pos_2(300, 300);
+    rectangle_widget_1->setPosition(position);
+    rectangle_widget_2->setPosition(position);
+    sf::Vector2f drag_pos;
+    bool dragged_1 = false;
+    bool dragged_2 = false;
+    rectangle_widget_1->OnProcessDragGesture += [&](const sf::Vector2f& pos) {
+        dragged_1 = true;
+    };
+    rectangle_widget_2->OnProcessDragGesture += [&](const sf::Vector2f& pos) {
+        dragged_2 = true;
+        drag_pos = pos;
+    };
+    application.advance();
+    T_CHECK(!dragged_1);
+    T_CHECK(!dragged_2);
+
+    application.mouseMove(mouse_pos_1);
+    application.advance();
+    T_CHECK(!dragged_1);
+    T_CHECK(!dragged_2);
+    application.mouseLeftPress();
+    application.advance();
+    T_CHECK(!dragged_1);
+    T_CHECK(dragged_2);
+    T_VEC2_APPROX_COMPARE(drag_pos, fw::to2f(mouse_pos_1));
+    application.mouseMove(mouse_pos_2);
+    application.advance();
+    T_CHECK(!dragged_1);
+    T_CHECK(dragged_2);
+    T_VEC2_APPROX_COMPARE(drag_pos, fw::to2f(mouse_pos_2));
+    application.mouseLeftRelease();
+    application.advance();
+    T_CHECK(!dragged_1);
+    T_CHECK(dragged_2);
+    T_VEC2_APPROX_COMPARE(drag_pos, fw::to2f( mouse_pos_2));
 }
 
 void WidgetTests::eventsTest(test::Test& test) {

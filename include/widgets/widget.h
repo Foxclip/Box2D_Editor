@@ -103,6 +103,7 @@ namespace fw {
 		Event<const sf::Vector2f&> OnMouseEnter;
 		Event<const sf::Vector2f&> OnMouseExit;
 		Event<const sf::Vector2f&> OnProcessMouse;
+		Event<const sf::Vector2f&> OnProcessDragGesture;
 		Event<> OnFocused;
 		Event<> OnFocusLost;
 		Event<> OnPreUpdate;

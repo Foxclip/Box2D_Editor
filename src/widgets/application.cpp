@@ -77,6 +77,14 @@ namespace fw {
         return stage;
     }
 
+    Widget* Application::getGestureSource() const {
+        if (mouseGesture.active) {
+            return mouseGesture.source;
+        } else {
+            return nullptr;
+        }
+    }
+
     void Application::setWindowSize(unsigned int width, unsigned int height) {
         window.setSize(sf::Vector2u(width, height));
         if (external_control) {
@@ -517,8 +525,13 @@ namespace fw {
     }
 
     void Application::processMouse() {
-        widgets.processMouse(getMousePosf());
+        sf::Vector2f mousePosf = getMousePosf();
+        widgets.processMouse(mousePosf);
+        Widget* gesture_source = getGestureSource();
         onProcessMouse();
+        if (mouseGesture.active && mouseGesture.type == MouseGesture::NORMAL && gesture_source) {
+            gesture_source->OnProcessDragGesture(mousePosf);
+        }
         sf::Cursor::Type cursor_type = sf::Cursor::Arrow;
         widgets.getCurrentCursorType(cursor_type);
         setCursorType(cursor_type);
