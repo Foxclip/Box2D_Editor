@@ -77,9 +77,17 @@ namespace fw {
         return stage;
     }
 
-    Widget* Application::getGestureSource() const {
-        if (mouseGesture.active) {
-            return mouseGesture.source;
+    Widget* Application::getLeftGestureSource() const {
+        if (mouse_gesture_left.active) {
+            return mouse_gesture_left.source;
+        } else {
+            return nullptr;
+        }
+    }
+
+    Widget* Application::getRightGestureSource() const {
+        if (mouse_gesture_right.active) {
+            return mouse_gesture_right.source;
         } else {
             return nullptr;
         }
@@ -328,7 +336,7 @@ namespace fw {
 
     void Application::startMoveGesture(Widget* source) {
         LoggerTag tag_mouse_gesture("mouseGesture");
-        mouseGesture = MouseGesture(source, MouseGesture::MOVE, getMousePosf(), sf::Mouse::Left);
+        mouse_gesture_left = MouseGesture(source, MouseGesture::MOVE, getMousePosf(), sf::Mouse::Left);
         std::string source_str = source->getFullName();
         std::string type_str = "move";
         logger << "Start gesture: \n";
@@ -338,9 +346,15 @@ namespace fw {
         logger << getMousePosf() << "\n";
     }
 
-    void Application::endGesture() {
+    void Application::endGestureLeft() {
         LoggerTag tag_mouse_gesture("mouseGesture");
-        mouseGesture.active = false;
+        mouse_gesture_left.active = false;
+        logger << "End gesture\n";
+    }
+
+    void Application::endGestureRight() {
+        LoggerTag tag_mouse_gesture("mouseGesture");
+        mouse_gesture_right.active = false;
         logger << "End gesture\n";
     }
 
@@ -437,7 +451,11 @@ namespace fw {
 
     void Application::startNormalGesture(Widget* source, sf::Mouse::Button button) {
         LoggerTag tag_mouse_gesture("mouseGesture");
-        mouseGesture = MouseGesture(source, MouseGesture::NORMAL, getMousePosf(), button);
+        if (button == sf::Mouse::Left) {
+            mouse_gesture_left = MouseGesture(source, MouseGesture::NORMAL, getMousePosf(), button);
+        } else if (button == sf::Mouse::Right) {
+            mouse_gesture_right = MouseGesture(source, MouseGesture::NORMAL, getMousePosf(), button);
+        }
         std::string source_str = source->getFullName();
         std::string type_str = "normal";
         std::string button_str;
@@ -456,11 +474,11 @@ namespace fw {
     }
 
     void Application::processLeftPress() {
-        if (mouseGesture.active) {
-            if (mouseGesture.type == MouseGesture::MOVE) {
-                mouseGesture.source->processLeftPress(getMousePosf(), false);
+        if (mouse_gesture_left.active) {
+            if (mouse_gesture_left.type == MouseGesture::MOVE) {
+                mouse_gesture_left.source->processLeftPress(getMousePosf(), false);
                 onProcessLeftPress();
-                endGesture();
+                endGestureLeft();
             }
         } else {
             widgets.processLeftPress(getMousePosf());
@@ -471,12 +489,8 @@ namespace fw {
     }
 
     void Application::processRightPress() {
-        if (mouseGesture.active) {
-            if (mouseGesture.type == MouseGesture::MOVE) {
-                mouseGesture.source->processRightPress(getMousePosf());
-                onProcessRightPress();
-                endGesture();
-            }
+        if (mouse_gesture_right.active) {
+            endGestureRight();
         } else {
             widgets.processRightPress(getMousePosf());
             onProcessRightPress();
@@ -486,21 +500,21 @@ namespace fw {
     }
 
     void Application::processLeftRelease() {
-        if (!mouseGesture.active) {
+        if (!mouse_gesture_left.active) {
             return;
         }
         widgets.processLeftRelease(getMousePosf());
         onProcessLeftRelease();
-        endGesture();
+        endGestureLeft();
     }
 
     void Application::processRightRelease() {
-        if (!mouseGesture.active) {
+        if (!mouse_gesture_right.active) {
             return;
         }
         widgets.processRightRelease(getMousePosf());
         onProcessRightRelease();
-        endGesture();
+        endGestureRight();
     }
 
     void Application::processMouseMove() {
@@ -529,10 +543,14 @@ namespace fw {
     void Application::processMouse() {
         sf::Vector2f mousePosf = getMousePosf();
         widgets.processMouse(mousePosf);
-        Widget* gesture_source = getGestureSource();
+        Widget* gesture_source_left = getLeftGestureSource();
+        Widget* gesture_source_right = getRightGestureSource();
         onProcessMouse();
-        if (mouseGesture.active && mouseGesture.type == MouseGesture::NORMAL && gesture_source) {
-            gesture_source->OnProcessDragGesture(mousePosf);
+        if (mouse_gesture_left.active && mouse_gesture_left.type == MouseGesture::NORMAL && gesture_source_left) {
+            gesture_source_left->OnProcessDragGesture(sf::Mouse::Left, mousePosf);
+        }
+        if (mouse_gesture_right.active && mouse_gesture_right.type == MouseGesture::NORMAL && gesture_source_right) {
+            gesture_source_right->OnProcessDragGesture(sf::Mouse::Right, mousePosf);
         }
         sf::Cursor::Type cursor_type = sf::Cursor::Arrow;
         widgets.getCurrentCursorType(cursor_type);

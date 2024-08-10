@@ -64,7 +64,8 @@ namespace fw {
 		Widget* getBlockingWidget() const;
 		CompVector<Widget*> getWidgetsUnderCursor(bool can_block, bool& blocked) const;
 		bool getCurrentCursorType(sf::Cursor::Type& result) const;
-		Widget* getGestureSource() const;
+		Widget* getLeftGestureSource() const;
+		Widget* getRightGestureSource() const;
 		sf::Vector2f getMousePosf() const;
 		sf::Vector2u getWindowSize() const;
 		bool isLCtrlPressed() const;

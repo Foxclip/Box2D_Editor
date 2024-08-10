@@ -100,8 +100,12 @@ namespace fw {
 		return false;
 	}
 
-	Widget* WidgetList::getGestureSource() const {
-		return application.getGestureSource();
+	Widget* WidgetList::getLeftGestureSource() const {
+		return application.getLeftGestureSource();
+	}
+
+	Widget* WidgetList::getRightGestureSource() const {
+		return application.getRightGestureSource();
 	}
 
 	sf::Vector2f WidgetList::getMousePosf() const {

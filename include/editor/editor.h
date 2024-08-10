@@ -187,7 +187,8 @@ private:
 	void processBlockableLeftRelease(const sf::Vector2f& pos);
 	void processMouseScrollY(float delta);
 	void processMouse(const sf::Vector2f& pos);
-	void processDragGesture(const sf::Vector2f& pos);
+	void processDragGestureLeft(const sf::Vector2f& pos);
+	void processDragGestureRight(const sf::Vector2f& pos);
 	void afterProcessInput() override;
 	void onProcessWorld() override;
 	void onRender() override;

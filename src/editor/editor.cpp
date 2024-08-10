@@ -272,8 +272,12 @@ void Editor::initWidgets() {
     world_widget->OnProcessMouse += [&](const sf::Vector2f& pos) {
         processMouse(pos);
     };
-    world_widget->OnProcessDragGesture += [&](const sf::Vector2f& pos) {
-        processDragGesture(pos);
+    world_widget->OnProcessDragGesture += [&](sf::Mouse::Button button, const sf::Vector2f& pos) {
+        if (button == sf::Mouse::Left) {
+            processDragGestureLeft(pos);
+        } else if (button == sf::Mouse::Right) {
+            processDragGestureRight(pos);
+        }
     };
     world_widget->OnScrollY += [&](const sf::Vector2f& pos, float delta) {
         processMouseScrollY(delta);
@@ -373,11 +377,11 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
             if (selected_tool == &move_tool) {
                 endMove(false);
                 trySelectTool(move_tool.selected_tool);
-                endGesture();
+                endGestureLeft();
             } else if (selected_tool == &rotate_tool) {
                 endRotate(false);
                 trySelectTool(rotate_tool.selected_tool);
-                endGesture();
+                endGestureLeft();
             }
         } else if (event.key.code == sf::Keyboard::Space) {
             togglePause();
@@ -709,46 +713,45 @@ void Editor::processMouse(const sf::Vector2f& pos) {
     }
 }
 
-void Editor::processDragGesture(const sf::Vector2f& pos) {
-    if (leftButtonPressed) {
-        if (selected_tool == &select_tool) {
-            if (select_tool.rectangle_select.active) {
-                selectObjectsInRect(select_tool.rectangle_select);
-            } else if (utils::length(getMousePosf() - getMousePressPosf()) >= MOUSE_DRAG_THRESHOLD) {
-                select_tool.rectangle_select.active = true;
-                select_tool.rectangle_select.select_origin = screenToWorld(getMousePressPosf());
-                if (!isLShiftPressed()) {
-                    select_tool.clearSelected();
-                }
+void Editor::processDragGestureLeft(const sf::Vector2f& pos) {
+    if (selected_tool == &select_tool) {
+        if (select_tool.rectangle_select.active) {
+            selectObjectsInRect(select_tool.rectangle_select);
+        } else if (utils::length(getMousePosf() - getMousePressPosf()) >= MOUSE_DRAG_THRESHOLD) {
+            select_tool.rectangle_select.active = true;
+            select_tool.rectangle_select.select_origin = screenToWorld(getMousePressPosf());
+            if (!isLShiftPressed()) {
+                select_tool.clearSelected();
             }
-        } else if (selected_tool == &drag_tool) {
-            if (drag_tool.mouse_joint) {
-                drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
+        }
+    } else if (selected_tool == &drag_tool) {
+        if (drag_tool.mouse_joint) {
+            drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
+        }
+    } else if (selected_tool == &edit_tool) {
+        if (edit_tool.mode == EditTool::SELECT) {
+            if (edit_tool.rectangle_select.active) {
+                selectVerticesInRect(edit_tool.rectangle_select);
             }
-        } else if (selected_tool == &edit_tool) {
-            if (edit_tool.mode == EditTool::SELECT) {
-                if (edit_tool.rectangle_select.active) {
-                    selectVerticesInRect(edit_tool.rectangle_select);
-                }
-            } else if (edit_tool.mode == EditTool::MOVE) {
-                if (edit_tool.grabbed_vertex != -1) {
-                    ptrdiff_t index = edit_tool.grabbed_vertex;
-                    const EditableVertex& vertex = active_object->getVertex(index);
-                    b2Vec2 offset = active_object->toLocal(b2MousePosWorld) + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
-                    active_object->offsetVertex(index, offset, false);
-                    active_object->offsetSelected(offset, false);
-                    active_object->syncVertices();
-                }
+        } else if (edit_tool.mode == EditTool::MOVE) {
+            if (edit_tool.grabbed_vertex != -1) {
+                ptrdiff_t index = edit_tool.grabbed_vertex;
+                const EditableVertex& vertex = active_object->getVertex(index);
+                b2Vec2 offset = active_object->toLocal(b2MousePosWorld) + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
+                active_object->offsetVertex(index, offset, false);
+                active_object->offsetSelected(offset, false);
+                active_object->syncVertices();
             }
         }
     }
-    if (rightButtonPressed) {
-        sf::Vector2i mouseDelta = mousePrevPos - getMousePos();
-        viewCenterX += mouseDelta.x / zoomFactor;
-        viewCenterY += -mouseDelta.y / zoomFactor;
-        if (mouseDelta.x != 0 || mouseDelta.y != 0) {
-            follow_object = nullptr;
-        }
+}
+
+void Editor::processDragGestureRight(const sf::Vector2f& pos) {
+    sf::Vector2i mouseDelta = mousePrevPos - getMousePos();
+    viewCenterX += mouseDelta.x / zoomFactor;
+    viewCenterY += -mouseDelta.y / zoomFactor;
+    if (mouseDelta.x != 0 || mouseDelta.y != 0) {
+        follow_object = nullptr;
     }
 }
 

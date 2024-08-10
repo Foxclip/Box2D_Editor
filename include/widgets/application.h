@@ -52,7 +52,8 @@ namespace fw {
 		sf::Vector2u getWindowSize() const;
 		const fw::Font& getDefaultFont() const;
 		Stage getStage() const;
-		Widget* getGestureSource() const;
+		Widget* getLeftGestureSource() const;
+		Widget* getRightGestureSource() const;
 		void setWindowSize(unsigned int width, unsigned int height);
 		void setWindowSize(const sf::Vector2u& size);
 		void addExternalEvent(const sf::Event& event);
@@ -92,7 +93,8 @@ namespace fw {
 		sf::Vector2f mousePressPosf;
 		bool leftButtonPressed = false;
 		bool rightButtonPressed = false;
-		MouseGesture mouseGesture;
+		MouseGesture mouse_gesture_left;
+		MouseGesture mouse_gesture_right;
 		sf::Cursor arrow_cursor;
 		sf::Cursor text_cursor;
 		sf::Cursor size_top_left_cursor;
@@ -134,7 +136,8 @@ namespace fw {
 		virtual void onRender();
 		virtual void onClose();
 		void startMoveGesture(Widget* source);
-		void endGesture();
+		void endGestureLeft();
+		void endGestureRight();
 
 	private:
 		friend class Widget;
