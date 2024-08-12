@@ -81,14 +81,16 @@ public:
 	size_t getIndex() const;
 	const CompVector<Joint*>& getJoints() const;
 	Joint* getJoint(size_t index) const;
-	static b2AABB getFixtureAABB(b2Fixture* fixture);
-	b2AABB getAABB() const;
-	b2Vec2 toGlobal(const b2Vec2& pos);
-	b2Vec2 toLocal(const b2Vec2& pos);
-	float toGlobalAngle(float angle);
-	float toLocalAngle(float angle);
-	b2Vec2 toParentLocal(const b2Vec2& pos);
-	float toParentLocalAngle(float angle);
+	b2AABB getApproxFixtureAABB(b2Fixture* fixture) const;
+	b2AABB getExactFixtureAABB(b2Fixture* fixture) const;
+	b2AABB getApproxAABB() const;
+	b2AABB getExactAABB() const;
+	b2Vec2 toGlobal(const b2Vec2& pos) const;
+	b2Vec2 toLocal(const b2Vec2& pos) const;
+	float toGlobalAngle(float angle) const;
+	float toLocalAngle(float angle) const;
+	b2Vec2 toParentLocal(const b2Vec2& pos) const;
+	float toParentLocalAngle(float angle) const;
 	ptrdiff_t getChildIndex(const GameObject* object) const;
 	void updateVisual();
 	void renderMask(const std::function<void(const sf::Drawable& drawable)>& draw_func);
@@ -165,6 +167,8 @@ private:
 	ptrdiff_t new_id = -1;
 	CompVector<GameObject*> children;
 	GameObjectTransform transform = GameObjectTransform(this);
+
+	b2AABB getAABB(bool exact) const;
 
 };
 

@@ -23,7 +23,7 @@ int main() {
     LoggerDisableTag disable_serialize_tag("serialize");
     LoggerDisableTag disable_recut_tag("recut");
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
-    //LoggerDisableTag disable_mouse_gesture("mouseGesture");
+    LoggerDisableTag disable_mouse_gesture("mouseGesture");
 
     execute_app();
 

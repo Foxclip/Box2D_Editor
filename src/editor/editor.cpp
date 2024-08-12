@@ -1203,10 +1203,10 @@ b2AABB Editor::getObjectsAABB(const CompVector<GameObject*>& objects) const {
     if (objects.empty()) {
         return result;
     }
-    result = objects.front()->getAABB();
+    result = objects.front()->getExactAABB();
     for (size_t i = 1; i < objects.size(); i++) {
         GameObject* object = objects[i];
-        b2AABB aabb = object->getAABB();
+        b2AABB aabb = object->getExactAABB();
         result.Combine(aabb);
     }
     return result;

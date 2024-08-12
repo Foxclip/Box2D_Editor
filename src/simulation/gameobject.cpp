@@ -145,7 +145,7 @@ Joint* GameObject::getJoint(size_t index) const {
 	return joints[index];
 }
 
-b2AABB GameObject::getFixtureAABB(b2Fixture* fixture) {
+b2AABB GameObject::getApproxFixtureAABB(b2Fixture* fixture) const {
 	b2AABB result;
 	bool first = true;
 	size_t child_shape_count = 1;
@@ -164,49 +164,79 @@ b2AABB GameObject::getFixtureAABB(b2Fixture* fixture) {
 	return result;
 }
 
-b2AABB GameObject::getAABB() const {
+b2AABB GameObject::getExactFixtureAABB(b2Fixture* fixture) const {
 	b2AABB result;
 	bool first = true;
-	result.lowerBound = b2Vec2_zero;
-	result.upperBound = b2Vec2_zero;
-	for (b2Fixture* f = rigid_body->GetFixtureList(); f; f = f->GetNext()) {
-		b2AABB aabb = getFixtureAABB(f);
-		if (first) {
-			result = aabb;
-			first = false;
-		} else {
-			result.Combine(aabb);
+	b2Shape* shape = fixture->GetShape();
+	auto init_aabb = [&](const b2Vec2& vertex) {
+		result.lowerBound.x = vertex.x;
+		result.lowerBound.y = vertex.y;
+		result.upperBound.x = vertex.x;
+		result.upperBound.y = vertex.y;
+	};
+	auto extend_aabb = [&](const b2Vec2& vertex) {
+		result.lowerBound.x = std::min(result.lowerBound.x, vertex.x);
+		result.lowerBound.y = std::min(result.lowerBound.y, vertex.y);
+		result.upperBound.x = std::max(result.upperBound.x, vertex.x);
+		result.upperBound.y = std::max(result.upperBound.y, vertex.y);
+	};
+	if (b2PolygonShape* polygon = dynamic_cast<b2PolygonShape*>(shape)) {
+		init_aabb(toGlobal(polygon->m_vertices[0]));
+		for (size_t i = 1; i < polygon->m_count; i++) {
+			extend_aabb(toGlobal(polygon->m_vertices[i]));
+		}
+	} else if (b2CircleShape* circle = dynamic_cast<b2CircleShape*>(shape)) {
+		b2Vec2 global_center = toGlobal(circle->m_p);
+		result.lowerBound.x = global_center.x - circle->m_radius;
+		result.lowerBound.y = global_center.y - circle->m_radius;
+		result.upperBound.x = global_center.x + circle->m_radius;
+		result.upperBound.y = global_center.y + circle->m_radius;
+	} else if (b2EdgeShape* edge = dynamic_cast<b2EdgeShape*>(shape)) {
+		init_aabb(toGlobal(edge->m_vertex1));
+		extend_aabb(toGlobal(edge->m_vertex2));
+	} else if (b2ChainShape* chain = dynamic_cast<b2ChainShape*>(shape)) {
+		init_aabb(toGlobal(chain->m_vertices[0]));
+		for (size_t i = 1; i < chain->m_count; i++) {
+			extend_aabb(toGlobal(chain->m_vertices[i]));
 		}
 	}
 	return result;
 }
 
-b2Vec2 GameObject::toGlobal(const b2Vec2& pos) {
+b2AABB GameObject::getApproxAABB() const {
+	return getAABB(false);
+}
+
+b2AABB GameObject::getExactAABB() const {
+	return getAABB(true);
+}
+
+b2Vec2 GameObject::toGlobal(const b2Vec2& pos) const {
 	b2Transform gt = getGlobalTransform();
 	return b2Mul(gt, pos);
 }
 
-b2Vec2 GameObject::toLocal(const b2Vec2& pos) {
+b2Vec2 GameObject::toLocal(const b2Vec2& pos) const {
 	b2Transform gt = getGlobalTransform();
 	return b2MulT(gt, pos);
 }
 
-float GameObject::toGlobalAngle(float angle) {
+float GameObject::toGlobalAngle(float angle) const {
 	b2Transform gt = getGlobalTransform();
 	return gt.q.GetAngle() + angle;
 }
 
-float GameObject::toLocalAngle(float angle) {
+float GameObject::toLocalAngle(float angle) const {
 	b2Transform gt = getGlobalTransform();
 	return angle - gt.q.GetAngle();
 }
 
-b2Vec2 GameObject::toParentLocal(const b2Vec2& pos) {
+b2Vec2 GameObject::toParentLocal(const b2Vec2& pos) const {
 	b2Transform pgt = getParentGlobalTransform();
 	return b2MulT(pgt, pos);
 }
 
-float GameObject::toParentLocalAngle(float angle) {
+float GameObject::toParentLocalAngle(float angle) const {
 	b2Transform pgt = getParentGlobalTransform();
 	return angle - pgt.q.GetAngle();
 }
@@ -569,6 +599,28 @@ void GameObject::destroyFixtures() {
 	for (size_t i = 0; i < fixtures.size(); i++) {
 		rigid_body->DestroyFixture(fixtures[i]);
 	}
+}
+
+b2AABB GameObject::getAABB(bool exact) const {
+	b2AABB result;
+	bool first = true;
+	result.lowerBound = b2Vec2_zero;
+	result.upperBound = b2Vec2_zero;
+	for (b2Fixture* f = rigid_body->GetFixtureList(); f; f = f->GetNext()) {
+		b2AABB aabb;
+		if (exact) {
+			aabb = getExactFixtureAABB(f);
+		} else {
+			aabb = getApproxFixtureAABB(f);
+		}
+		if (first) {
+			result = aabb;
+			first = false;
+		} else {
+			result.Combine(aabb);
+		}
+	}
+	return result;
 }
 
 TokenWriter& GameObject::serializeBody(TokenWriter& tw, b2Body* body) {
