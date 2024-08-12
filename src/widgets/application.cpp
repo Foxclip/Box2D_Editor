@@ -524,16 +524,12 @@ namespace fw {
 
     void Application::processScrollX(float delta) {
         widgets.processScrollX(getMousePosf(), delta);
-        if (!widgets.isClickBlocked()) {
-            onProcessMouseScrollX(delta);
-        }
+        onProcessMouseScrollX(delta);
     }
 
     void Application::processScrollY(float delta) {
         widgets.processScrollY(getMousePosf(), delta);
-        if (!widgets.isClickBlocked()) {
-            onProcessMouseScrollY(delta);
-        }
+        onProcessMouseScrollY(delta);
     }
 
     void Application::processKeyboard() {

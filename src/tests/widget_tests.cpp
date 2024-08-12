@@ -748,7 +748,7 @@ void WidgetTests::rootWidgetTest(test::Test& test) {
     visibility.renderableSetting = false;
     visibility.visibleSetting = true;
     gwt.visibility = visibility;
-    gwt.is_click_through = true;
+    gwt.is_click_through = false;
     gwt.is_mouse_over = true;
     gwt.focusable_type = fw::Widget::FocusableType::NONE;
     gwt.is_focused = false;
@@ -1349,15 +1349,16 @@ void WidgetTests::dragGestureEventTest(test::Test& test) {
     sf::Vector2i mouse_pos_2(300, 300);
     rectangle_widget_1->setPosition(position);
     rectangle_widget_2->setPosition(position);
+    rectangle_widget_1->setClickThrough(false);
     sf::Vector2f drag_pos;
     bool dragged_1 = false;
     bool dragged_2 = false;
-    rectangle_widget_1->OnProcessDragGesture += [&](const sf::Vector2f& pos) {
+    rectangle_widget_1->OnProcessDragGesture += [&](sf::Mouse::Button button, const sf::Vector2f& pos) {
         dragged_1 = true;
-    };
-    rectangle_widget_2->OnProcessDragGesture += [&](const sf::Vector2f& pos) {
-        dragged_2 = true;
         drag_pos = pos;
+    };
+    rectangle_widget_2->OnProcessDragGesture += [&](sf::Mouse::Button button, const sf::Vector2f& pos) {
+        dragged_2 = true;
     };
     application.advance();
     T_CHECK(!dragged_1);
@@ -1369,18 +1370,18 @@ void WidgetTests::dragGestureEventTest(test::Test& test) {
     T_CHECK(!dragged_2);
     application.mouseLeftPress();
     application.advance();
-    T_CHECK(!dragged_1);
-    T_CHECK(dragged_2);
+    T_CHECK(dragged_1);
+    T_CHECK(!dragged_2);
     T_VEC2_APPROX_COMPARE(drag_pos, fw::to2f(mouse_pos_1));
     application.mouseMove(mouse_pos_2);
     application.advance();
-    T_CHECK(!dragged_1);
-    T_CHECK(dragged_2);
+    T_CHECK(dragged_1);
+    T_CHECK(!dragged_2);
     T_VEC2_APPROX_COMPARE(drag_pos, fw::to2f(mouse_pos_2));
     application.mouseLeftRelease();
     application.advance();
-    T_CHECK(!dragged_1);
-    T_CHECK(dragged_2);
+    T_CHECK(dragged_1);
+    T_CHECK(!dragged_2);
     T_VEC2_APPROX_COMPARE(drag_pos, fw::to2f( mouse_pos_2));
 }
 
