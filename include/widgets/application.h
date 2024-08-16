@@ -28,6 +28,7 @@ namespace fw {
 	enum class Stage {
 		NONE,
 		PROCESS,
+		BEFORE_INPUT,
 		INPUT,
 		AFTER_INPUT,
 		WORLD,
@@ -88,6 +89,7 @@ namespace fw {
 		bool running = true;
 		sf::View window_view;
 		WidgetList widgets = WidgetList(*this);
+		sf::Vector2i internal_mouse_pos;
 		sf::Vector2i mousePrevPos;
 		sf::Vector2f mousePrevPosf;
 		sf::Vector2f mousePressPosf;
@@ -121,7 +123,6 @@ namespace fw {
 		virtual void onProcessWidgets();
 		virtual void onProcessWindowEvent(const sf::Event& event);
 		virtual void onProcessKeyboardEvent(const sf::Event& event);
-		virtual void beforeProcessMouseEvent(const sf::Event& event);
 		virtual void onProcessLeftPress();
 		virtual void onProcessRightPress();
 		virtual void onProcessLeftRelease();
@@ -131,7 +132,8 @@ namespace fw {
 		virtual void onProcessMouseScrollY(float delta);
 		virtual void onProcessKeyboard();
 		virtual void onProcessMouse();
-		virtual void afterProcessInput();
+		virtual void onBeforeProcessInput();
+		virtual void onAfterProcessInput();
 		virtual void onProcessWorld();
 		virtual void onRender();
 		virtual void onClose();
@@ -147,6 +149,7 @@ namespace fw {
 
 		void mainLoop();
 		void processWidgets();
+		void processBeforeInput();
 		void processInput();
 		void processAfterInput();
 		void processEvent(const sf::Event& event);

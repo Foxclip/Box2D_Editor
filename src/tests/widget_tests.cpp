@@ -615,7 +615,6 @@ void WidgetTests::advanceTest(test::Test& test) {
     T_CHECK(application.process_widgets);
     T_CHECK(!application.process_window_event);
     T_CHECK(!application.process_keyboard_event);
-    T_CHECK(!application.before_process_mouse_event);
     T_CHECK(!application.process_left_press);
     T_CHECK(!application.process_left_release);
     T_CHECK(!application.process_mouse_move);
@@ -5047,10 +5046,6 @@ void TestApplication::onProcessKeyboardEvent(const sf::Event& event) {
     }
 }
 
-void TestApplication::beforeProcessMouseEvent(const sf::Event& event) {
-    before_process_mouse_event = true;
-}
-
 void TestApplication::onProcessLeftPress() {
     process_left_press = true;
     left_click_pos = getMousePos();
@@ -5093,7 +5088,7 @@ void TestApplication::onProcessMouse() {
     process_mouse = true;
 }
 
-void TestApplication::afterProcessInput() {
+void TestApplication::onAfterProcessInput() {
     after_process_input = true;
 }
 

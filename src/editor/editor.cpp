@@ -520,24 +520,19 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
     }
 }
 
-void Editor::beforeProcessMouseEvent(const sf::Event& event) {
-    sfMousePosWorld = pixelToWorld(getMousePos());
-    b2MousePosWorld = tob2(sfMousePosWorld);
-}
-
 void Editor::processLeftPress(const sf::Vector2f& pos) {
     if (selected_tool == &create_tool) {
         std::string id_string = std::to_string(simulation.getMaxId() + 1);
         switch (create_tool.type) {
             case CreateTool::BOX:
                 simulation.createBox(
-                    "box" + id_string, b2MousePosWorld, 0.0f, NEW_BOX_SIZE, NEW_BOX_COLOR
+                    "box" + id_string, getMouseWorldPosb2(), 0.0f, NEW_BOX_SIZE, NEW_BOX_COLOR
                 );
                 commit_action = true;
                 break;
             case CreateTool::BALL:
                 simulation.createBall(
-                    "ball" + id_string, b2MousePosWorld, NEW_BALL_RADIUS, NEW_BALL_COLOR, NEW_BALL_NOTCH_COLOR
+                    "ball" + id_string, getMouseWorldPosb2(), NEW_BALL_RADIUS, NEW_BALL_COLOR, NEW_BALL_NOTCH_COLOR
                 );
                 commit_action = true;
                 break;
@@ -560,7 +555,7 @@ void Editor::processLeftPress(const sf::Vector2f& pos) {
             mouse_joint_def.damping = 1.0f;
             mouse_joint_def.maxForce = 5000.0f * grabbed_body->GetMass();
             mouse_joint_def.stiffness = 50.0f;
-            mouse_joint_def.target = b2MousePosWorld;
+            mouse_joint_def.target = getMouseWorldPosb2();
             b2MouseJoint* mouse_joint = (b2MouseJoint*)simulation.getWorld()->CreateJoint(&mouse_joint_def);
             drag_tool.mouse_joint = std::unique_ptr<b2MouseJoint, std::function<void(b2MouseJoint*)>>(
                 mouse_joint,
@@ -588,7 +583,7 @@ void Editor::processLeftPress(const sf::Vector2f& pos) {
                 edit_tool.mode = EditTool::MOVE;
                 edit_tool.grabbed_vertex = edit_tool.highlighted_vertex;
                 const EditableVertex& vertex = active_object->getVertex(edit_tool.grabbed_vertex);
-                edit_tool.grabbed_vertex_offset = vertex.pos - active_object->toLocal(b2MousePosWorld);
+                edit_tool.grabbed_vertex_offset = vertex.pos - active_object->toLocal(getMouseWorldPosb2());
                 bool shift = isLShiftPressed();
                 if (!vertex.selected && !shift) {
                     active_object->deselectAllVertices();
@@ -598,16 +593,16 @@ void Editor::processLeftPress(const sf::Vector2f& pos) {
             } else {
                 edit_tool.mode = EditTool::SELECT;
                 edit_tool.rectangle_select.active = true;
-                edit_tool.rectangle_select.select_origin = sfMousePosWorld;
+                edit_tool.rectangle_select.select_origin = getMouseWorldPos();
                 if (!isLShiftPressed()) {
                     active_object->deselectAllVertices();
                 }
             }
         } else if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             if (edit_tool.edge_vertex == 0) {
-                active_object->addVertexGlobal(0, b2MousePosWorld);
+                active_object->addVertexGlobal(0, getMouseWorldPosb2());
             } else if (edit_tool.edge_vertex > 0) {
-                active_object->addVertexGlobal(edit_tool.edge_vertex + 1, b2MousePosWorld);
+                active_object->addVertexGlobal(edit_tool.edge_vertex + 1, getMouseWorldPosb2());
             }
             commit_action = true;
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
@@ -688,17 +683,18 @@ void Editor::processMouse(const sf::Vector2f& pos) {
             if (edit_tool.highlighted_edge != -1) {
                 b2Vec2 v1 = active_object->getGlobalVertexPos(edit_tool.highlighted_edge);
                 b2Vec2 v2 = active_object->getGlobalVertexPos(active_object->indexLoop(edit_tool.highlighted_edge + 1));
-                edit_tool.insertVertexPos = utils::line_project(b2MousePosWorld, v1, v2);
+                edit_tool.insertVertexPos = utils::line_project(getMouseWorldPosb2(), v1, v2);
             }
         }
     } else if (selected_tool == &move_tool) {
         for (GameObject* obj : move_tool.moving_objects) {
-            obj->setGlobalPosition(b2MousePosWorld + obj->cursor_offset);
+            b2Vec2 new_pos = getMouseWorldPosb2() + obj->cursor_offset;
+            obj->setGlobalPosition(new_pos);
         }
     } else if (selected_tool == &rotate_tool) {
         for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
             GameObject* obj = rotate_tool.rotating_objects[i];
-            b2Vec2 mouse_vector = b2MousePosWorld - rotate_tool.pivot_pos;
+            b2Vec2 mouse_vector = getMouseWorldPosb2() - rotate_tool.pivot_pos;
             float current_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
             float offset = current_mouse_angle - rotate_tool.orig_mouse_angle;
             if (isLCtrlPressed()) {
@@ -726,7 +722,7 @@ void Editor::processDragGestureLeft(const sf::Vector2f& pos) {
         }
     } else if (selected_tool == &drag_tool) {
         if (drag_tool.mouse_joint) {
-            drag_tool.mouse_joint->SetTarget(b2MousePosWorld);
+            drag_tool.mouse_joint->SetTarget(getMouseWorldPosb2());
         }
     } else if (selected_tool == &edit_tool) {
         if (edit_tool.mode == EditTool::SELECT) {
@@ -737,7 +733,7 @@ void Editor::processDragGestureLeft(const sf::Vector2f& pos) {
             if (edit_tool.grabbed_vertex != -1) {
                 ptrdiff_t index = edit_tool.grabbed_vertex;
                 const EditableVertex& vertex = active_object->getVertex(index);
-                b2Vec2 offset = active_object->toLocal(b2MousePosWorld) + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
+                b2Vec2 offset = active_object->toLocal(getMouseWorldPosb2()) + edit_tool.grabbed_vertex_offset - vertex.orig_pos;
                 active_object->offsetVertex(index, offset, false);
                 active_object->offsetSelected(offset, false);
                 active_object->syncVertices();
@@ -753,9 +749,10 @@ void Editor::processDragGestureRight(const sf::Vector2f& pos) {
     if (mouseDelta.x != 0 || mouseDelta.y != 0) {
         follow_object = nullptr;
     }
+    
 }
 
-void Editor::afterProcessInput() {
+void Editor::onAfterProcessInput() {
     if (commit_action) {
         history.save("Normal");
         commit_action = false;
@@ -1136,6 +1133,14 @@ sf::Vector2f Editor::worldDirToScreenf(const b2Vec2& world_dir) const {
     return sf::Vector2f(world_dir.x, -world_dir.y);
 }
 
+sf::Vector2f Editor::getMouseWorldPos() const {
+    return pixelToWorld(getMousePos());
+}
+
+b2Vec2 Editor::getMouseWorldPosb2() const {
+    return tob2(getMouseWorldPos());
+}
+
 ptrdiff_t Editor::mouseGetChainEdge(const b2Fixture* fixture) const {
     const b2ChainShape* shape = dynamic_cast<const b2ChainShape*>(fixture->GetShape());
     const b2Body* body = fixture->GetBody();
@@ -1148,8 +1153,8 @@ ptrdiff_t Editor::mouseGetChainEdge(const b2Fixture* fixture) const {
         b2Vec2 side1_p = p1 + side1_dir;
         b2Vec2 side2_p = p2 + side2_dir;
         bool inside =
-            utils::left_side(b2MousePosWorld, p1, side1_p)
-            && utils::left_side(b2MousePosWorld, p2, side2_p);
+            utils::left_side(getMouseWorldPosb2(), p1, side1_p)
+            && utils::left_side(getMouseWorldPosb2(), p2, side2_p);
         if (!inside) {
             continue;
         }
@@ -1247,8 +1252,8 @@ ptrdiff_t Editor::mouseGetObjectEdge() const {
         b2Vec2 side1_p = p1 + side1_dir;
         b2Vec2 side2_p = p2 + side2_dir;
         bool inside = 
-            utils::left_side(b2MousePosWorld, p1, side1_p)
-            && utils::left_side(b2MousePosWorld, p2, side2_p);
+            utils::left_side(getMouseWorldPosb2(), p1, side1_p)
+            && utils::left_side(getMouseWorldPosb2(), p2, side2_p);
         if (!inside) {
             continue;
         }
@@ -1284,7 +1289,7 @@ ptrdiff_t Editor::mouseGetEdgeVertex() const {
 }
 
 void Editor::selectVerticesInRect(const RectangleSelect& rectangle_select) {
-    sf::Vector2f mpos = sfMousePosWorld;
+    sf::Vector2f mpos = getMouseWorldPos();
     sf::Vector2f origin = rectangle_select.select_origin;
     float left = std::min(mpos.x, origin.x);
     float top = std::min(mpos.y, origin.y);
@@ -1303,10 +1308,10 @@ void Editor::selectVerticesInRect(const RectangleSelect& rectangle_select) {
 void Editor::selectObjectsInRect(const RectangleSelect& rectangle_select) {
     select_tool.clearRectSelected();
     b2AABB aabb;
-    float lower_x = std::min(rectangle_select.select_origin.x, sfMousePosWorld.x);
-    float lower_y = std::min(rectangle_select.select_origin.y, sfMousePosWorld.y);
-    float upper_x = std::max(rectangle_select.select_origin.x, sfMousePosWorld.x);
-    float upper_y = std::max(rectangle_select.select_origin.y, sfMousePosWorld.y);
+    float lower_x = std::min(rectangle_select.select_origin.x, getMouseWorldPos().x);
+    float lower_y = std::min(rectangle_select.select_origin.y, getMouseWorldPos().y);
+    float upper_x = std::max(rectangle_select.select_origin.x, getMouseWorldPos().x);
+    float upper_y = std::max(rectangle_select.select_origin.y, getMouseWorldPos().y);
     aabb.lowerBound = b2Vec2(lower_x, lower_y);
     aabb.upperBound = b2Vec2(upper_x, upper_y);
     QueryCallback callback;
@@ -1363,7 +1368,7 @@ bool Editor::isParentSelected(const GameObject* object) const {
 }
 
 void Editor::grabSelected(Tool* selected_tool) {
-    move_tool.orig_cursor_pos = b2MousePosWorld;
+    move_tool.orig_cursor_pos = getMouseWorldPosb2();
     move_tool.moving_objects = CompVector<GameObject*>();
     move_tool.selected_tool = selected_tool;
     for (GameObject* obj : select_tool.getSelectedObjects()) {
@@ -1372,7 +1377,7 @@ void Editor::grabSelected(Tool* selected_tool) {
         }
         move_tool.moving_objects.add(obj);
         obj->orig_pos = obj->getGlobalPosition();
-        obj->cursor_offset = obj->getGlobalPosition() - b2MousePosWorld;
+        obj->cursor_offset = obj->getGlobalPosition() - getMouseWorldPosb2();
         obj->was_enabled = obj->getRigidBody()->IsEnabled();
         obj->setEnabled(false, true);
         obj->setLinearVelocity(b2Vec2(0.0f, 0.0f), true);
@@ -1381,7 +1386,7 @@ void Editor::grabSelected(Tool* selected_tool) {
 }
 
 void Editor::rotateSelected(Tool* selected_tool) {
-    rotate_tool.orig_cursor_pos = b2MousePosWorld;
+    rotate_tool.orig_cursor_pos = getMouseWorldPosb2();
     rotate_tool.rotating_objects = CompVector<GameObject*>();
     rotate_tool.selected_tool = selected_tool;
     for (GameObject* obj : select_tool.getSelectedObjects()) {
@@ -1401,7 +1406,7 @@ void Editor::rotateSelected(Tool* selected_tool) {
     }
     b2Vec2 avg = 1.0f / rotate_tool.rotating_objects.size() * sum;
     rotate_tool.pivot_pos = avg;
-    b2Vec2 mouse_vector = b2MousePosWorld - avg;
+    b2Vec2 mouse_vector = getMouseWorldPosb2() - avg;
     rotate_tool.orig_mouse_angle = atan2(mouse_vector.y, mouse_vector.x);
 }
 

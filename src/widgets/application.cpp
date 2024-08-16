@@ -46,6 +46,8 @@ namespace fw {
         onFrameBegin();
         stage = Stage::PROCESS;
         processWidgets();
+        stage = Stage::BEFORE_INPUT;
+        processBeforeInput();
         stage = Stage::INPUT;
         processInput();
         stage = Stage::AFTER_INPUT;
@@ -263,7 +265,7 @@ namespace fw {
         if (external_control) {
             return external_mouse_pos;
         } else {
-            return sf::Mouse::getPosition(window);
+            return internal_mouse_pos;
         }
     }
 
@@ -306,8 +308,6 @@ namespace fw {
 
     void Application::onProcessKeyboardEvent(const sf::Event& event) { }
 
-    void Application::beforeProcessMouseEvent(const sf::Event& event) { }
-
     void Application::onProcessLeftPress() { }
 
     void Application::onProcessRightPress() { }
@@ -326,7 +326,9 @@ namespace fw {
 
     void Application::onProcessMouse() { }
 
-    void Application::afterProcessInput() { }
+    void Application::onBeforeProcessInput() { }
+
+    void Application::onAfterProcessInput() { }
 
     void Application::onProcessWorld() { }
 
@@ -371,6 +373,10 @@ namespace fw {
         onProcessWidgets();
     }
 
+    void Application::processBeforeInput() {
+        internal_mouse_pos = sf::Mouse::getPosition(window);
+    }
+
     void Application::processInput() {
         if (external_control) {
             while (!external_event_queue.empty()) {
@@ -386,7 +392,7 @@ namespace fw {
         }
         processKeyboard();
         processMouse();
-        afterProcessInput();
+        onAfterProcessInput();
     }
 
     void Application::processAfterInput() {
@@ -413,7 +419,6 @@ namespace fw {
     }
 
     void Application::processMouseEvent(const sf::Event& event) {
-        beforeProcessMouseEvent(event);
         if (event.type == sf::Event::MouseButtonPressed) {
             switch (event.mouseButton.button) {
                 case sf::Mouse::Left:

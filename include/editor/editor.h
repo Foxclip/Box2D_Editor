@@ -117,7 +117,6 @@ private:
 	fw::CanvasWidget* selection_mask_widget = nullptr;
 	sf::Shader desat_shader;
 	sf::Shader selection_shader;
-	sf::Vector2f sfMousePosWorld;
 	float zoomFactor = 30.0f;
 	float viewCenterX = 0.0f, viewCenterY = 5.0f;
 	SelectTool select_tool;
@@ -158,11 +157,11 @@ private:
 	float timeStep = 1.0f / FPS;
 	bool paused = true;
 	bool render_object_info = true;
-	b2Vec2 b2MousePosWorld;
 	GameObject* active_object = nullptr;
 	GameObject* follow_object = nullptr;
 	Simulation simulation;
 
+	sf::Vector2f mouse_world_pos;
 	History<std::string> history;
 	bool commit_action = false;
 	struct LoadRequest {
@@ -181,7 +180,6 @@ private:
 	void onProcessWidgets() override;
 	void onProcessWindowEvent(const sf::Event& event) override;
 	void onProcessKeyboardEvent(const sf::Event& event) override;
-	void beforeProcessMouseEvent(const sf::Event& event) override;
 	void processLeftPress(const sf::Vector2f& pos);
 	void processGlobalLeftRelease(const sf::Vector2f& pos);
 	void processBlockableLeftRelease(const sf::Vector2f& pos);
@@ -189,7 +187,7 @@ private:
 	void processMouse(const sf::Vector2f& pos);
 	void processDragGestureLeft(const sf::Vector2f& pos);
 	void processDragGestureRight(const sf::Vector2f& pos);
-	void afterProcessInput() override;
+	void onAfterProcessInput() override;
 	void onProcessWorld() override;
 	void onRender() override;
 	void initTools();
@@ -215,6 +213,8 @@ private:
 	sf::Vector2i worldToPixel(const sf::Vector2f& world_pos) const;
 	sf::Vector2i worldToPixel(const b2Vec2& world_pos) const;
 	sf::Vector2f worldDirToScreenf(const b2Vec2& world_dir) const;
+	sf::Vector2f getMouseWorldPos() const;
+	b2Vec2 getMouseWorldPosb2() const;
 	ptrdiff_t mouseGetChainEdge(const b2Fixture* fixture) const;
 	b2Fixture* getFixtureAt(const sf::Vector2f& screen_pos) const;
 	GameObject* getObjectAt(const sf::Vector2f& screen_pos) const;

@@ -31,7 +31,6 @@ public:
 	bool process_widgets = false;
 	bool process_window_event = false;
 	bool process_keyboard_event = false;
-	bool before_process_mouse_event = false;
 	bool process_left_press = false;
 	bool process_right_press = false;
 	bool process_left_release = false;
@@ -60,7 +59,6 @@ public:
 	void onProcessWidgets() override;
 	void onProcessWindowEvent(const sf::Event& event) override;
 	void onProcessKeyboardEvent(const sf::Event& event) override;
-	void beforeProcessMouseEvent(const sf::Event& event) override;
 	void onProcessLeftPress() override;
 	void onProcessRightPress() override;
 	void onProcessLeftRelease() override;
@@ -70,7 +68,7 @@ public:
 	void onProcessMouseScrollY(float delta) override;
 	void onProcessKeyboard() override;
 	void onProcessMouse() override;
-	void afterProcessInput() override;
+	void onAfterProcessInput() override;
 	void onProcessWorld() override;
 	void onRender() override;
 	void onClose() override;
