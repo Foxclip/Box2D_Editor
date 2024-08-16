@@ -5,7 +5,7 @@
 
 class SimulationTests : public test::TestModule {
 public:
-	SimulationTests(test::TestManager& manager);
+	SimulationTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
 	void createTestLists() override;
 
 private:

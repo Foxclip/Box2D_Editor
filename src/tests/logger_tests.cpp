@@ -1,6 +1,7 @@
 #include "tests/logger_tests.h"
 
-LoggerTests::LoggerTests(test::TestManager& manager) : TestModule("Logger", manager) { }
+LoggerTests::LoggerTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules)
+	: TestModule("Logger", manager, required_modules) { }
 
 void LoggerTests::createTestLists() {
 	test::TestList* logger_list = createTestList("Logger");

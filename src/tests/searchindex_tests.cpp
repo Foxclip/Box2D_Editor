@@ -1,6 +1,8 @@
 #include "tests/searchindex_tests.h"
 
-SearchIndexTests::SearchIndexTests(test::TestManager& manager) : TestModule("SearchIndex", manager) { }
+SearchIndexTests::SearchIndexTests(
+	test::TestManager& manager, const std::vector<TestModule*>& required_modules
+) : TestModule("SearchIndex", manager, required_modules) { }
 
 class MyClass { };
 

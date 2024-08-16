@@ -5,7 +5,7 @@
 
 class CompVectorTests : public test::TestModule {
 public:
-	CompVectorTests(test::TestManager& manager);
+	CompVectorTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
 	void createTestLists() override;
 
 protected:

@@ -126,14 +126,17 @@ namespace test {
 	class TestModule {
 	public:
 		std::string name;
+		std::vector<TestModule*> required_modules;
 		std::vector<std::unique_ptr<TestList>> test_lists;
 		std::vector<std::string> passed_list;
 		std::vector<std::string> cancelled_list;
 		std::vector<std::string> failed_list;
+		bool is_run = false;
 
-		TestModule(const std::string& name, TestManager& manager);
+		TestModule(const std::string& name, TestManager& manager, const std::vector<TestModule*>& required_modules = { });
 		virtual void createTestLists() = 0;
 		TestList* createTestList(const std::string& name, const std::vector<TestList*>& required_lists = { });
+		std::vector<Test*> getTestList() const;
 		void runTests();
 		static void printSummary(
 			const std::vector<std::string>& passed_list,
@@ -176,7 +179,7 @@ namespace test {
 
 		template<typename T>
 		requires std::derived_from<T, TestModule>
-		void addModule();
+		TestModule* addModule(const std::vector<TestModule*>& required_modules = { });
 		void runAllModules();
 
 	private:
@@ -255,9 +258,11 @@ namespace test {
 
 	template<typename T>
 	requires std::derived_from<T, TestModule>
-	inline void TestManager::addModule() {
-		std::unique_ptr<T> uptr = std::make_unique<T>(*this);
+	inline TestModule* TestManager::addModule(const std::vector<TestModule*>& required_modules) {
+		std::unique_ptr<T> uptr = std::make_unique<T>(*this, required_modules);
+		T* ptr = uptr.get();
 		modules.push_back(std::move(uptr));
+		return ptr;
 	}
 
 }

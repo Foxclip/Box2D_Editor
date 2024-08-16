@@ -5,7 +5,7 @@
 
 class LoggerTests : public test::TestModule {
 public:
-	LoggerTests(test::TestManager& manager);
+	LoggerTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
 	void createTestLists() override;
 
 protected:

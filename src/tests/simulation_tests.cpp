@@ -1,6 +1,6 @@
 #include "tests/simulation_tests.h"
 
-SimulationTests::SimulationTests(test::TestManager& manager) : TestModule("Simulation", manager) { }
+SimulationTests::SimulationTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules) : TestModule("Simulation", manager, required_modules) { }
 
 void SimulationTests::createTestLists() {
     test::TestList* simulation_list = createTestList("Simulation");

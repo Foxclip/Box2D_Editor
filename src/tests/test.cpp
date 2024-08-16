@@ -188,8 +188,13 @@ namespace test {
 		is_run = true;
 	}
 
-	TestModule::TestModule(const std::string& name, TestManager& manager) : manager(manager) {
+	TestModule::TestModule(
+		const std::string& name,
+		TestManager& manager,
+		const std::vector<TestModule*>& required_modules
+	) : manager(manager) {
 		this->name = name;
+		this->required_modules = required_modules;
 	}
 
 	TestList* TestModule::createTestList(const std::string& name, const std::vector<TestList*>& required_lists) {
@@ -199,9 +204,17 @@ namespace test {
 		return ptr;
 	}
 
+	std::vector<Test*> TestModule::getTestList() const {
+		std::vector<Test*> result;
+		for (size_t i = 0; i < test_lists.size(); i++) {
+			TestList* list = test_lists[i].get();
+			std::vector<Test*> list_tests = list->getTestList();
+			result.insert(result.end(), list_tests.begin(), list_tests.end());
+		}
+		return result;
+	}
+
 	void TestModule::runTests() {
-		logger << "Module: " << name << "\n";
-		LoggerIndent test_module_indent;
 		beforeRunModule();
 		for (auto& test_list : test_lists) {
 			logger << "List: " << test_list->name << "\n";
@@ -244,6 +257,7 @@ namespace test {
 		if (manager.print_module_summary) {
 			printSummary(passed_list, cancelled_list, failed_list);
 		}
+		is_run = true;
 	}
 
 	void TestModule::printSummary(
@@ -313,7 +327,25 @@ namespace test {
 		std::vector<std::string> failed_list;
 		for (size_t i = 0; i < modules.size(); i++) {
 			TestModule* module = modules[i].get();
-			module->runTests();
+			logger << "Module: " << module->name << "\n";
+			LoggerIndent test_module_indent;
+			bool cancelled = false;
+			for (TestModule* req_list : module->required_modules) {
+				if (!req_list->is_run || req_list->failed_list.size() > 0) {
+					cancelled = true;
+					break;
+				}
+			}
+			if (cancelled) {
+				std::vector<Test*> tests = module->getTestList();
+				for (Test* test : tests) {
+					test->cancelled = true;
+					module->cancelled_list.push_back(test->name);
+				}
+				logger << "Cancelled " << tests.size() << " tests\n";
+			} else {
+				module->runTests();
+			}
 			for (const std::string& name : module->passed_list) {
 				passed_list.push_back(module->name + "/" + name);
 			}

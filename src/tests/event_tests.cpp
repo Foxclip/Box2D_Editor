@@ -1,7 +1,9 @@
 #include "tests/event_tests.h"
 #include "common/event.h"
 
-EventTests::EventTests(test::TestManager& manager) : TestModule("Event", manager) { }
+EventTests::EventTests(
+	test::TestManager& manager, const std::vector<TestModule*>& required_modules
+) : TestModule("Event", manager, required_modules) { }
 
 void EventTests::createTestLists() {
 	test::TestList* event_list = createTestList("Event");

@@ -70,7 +70,7 @@
 #define CHECK_SELECTION(active, text, cursor_pos, left, right) \
     T_WRAP_CONTAINER(_CHECK_SELECTION(active, text, cursor_pos, left, right))
 
-WidgetTests::WidgetTests(test::TestManager& manager) : TestModule("Widgets", manager) { }
+WidgetTests::WidgetTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules) : TestModule("Widgets", manager, required_modules) { }
 
 void WidgetTests::createTestLists() {
     test::TestList* toposort_list = createTestList("Toposort");

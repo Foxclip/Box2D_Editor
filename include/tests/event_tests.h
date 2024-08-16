@@ -4,7 +4,7 @@
 
 class EventTests : public test::TestModule {
 public:
-	EventTests(test::TestManager& manager);
+	EventTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
 	void createTestLists() override;
 
 private:

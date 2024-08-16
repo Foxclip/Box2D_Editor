@@ -5,7 +5,7 @@
 
 class SearchIndexTests : public test::TestModule {
 public:
-	SearchIndexTests(test::TestManager& manager);
+	SearchIndexTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
 	void createTestLists() override;
 
 protected:

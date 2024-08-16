@@ -102,7 +102,7 @@ struct GenericWidgetTest {
 
 class WidgetTests : public test::TestModule {
 public:
-	WidgetTests(test::TestManager& manager);
+	WidgetTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
 	void createTestLists() override;
 
 protected:
