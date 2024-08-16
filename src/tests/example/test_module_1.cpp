@@ -6,14 +6,14 @@ ExampleTestModule1::ExampleTestModule1(
 
 void ExampleTestModule1::createTestLists() {
 	test::TestList* list_1 = createTestList("List1");
-	test::Test* test_1_1 = list_1->addTest("first_test", [&](test::Test& test) { test1_1(test); });
-	test::Test* test_1_2 = list_1->addTest("second_test", { test_1_1 }, [&](test::Test& test) { test1_2(test); });
-	test::Test* test_1_3 = list_1->addTest("third_test", { test_1_2 }, [&](test::Test& test) { test1_3(test); });
+	test::Test* test_1_1 = list_1->addTest("first", [&](test::Test& test) { test1_1(test); });
+	test::Test* test_1_2 = list_1->addTest("second", { test_1_1 }, [&](test::Test& test) { test1_2(test); });
+	test::Test* test_1_3 = list_1->addTest("third", { test_1_2 }, [&](test::Test& test) { test1_3(test); });
 
 	test::TestList* list_2 = createTestList("List2");
-	test::Test* test_2_1 = list_2->addTest("first_test", [&](test::Test& test) { test2_1(test); });
-	test::Test* test_2_2 = list_2->addTest("second_test", [&](test::Test& test) { test2_2(test); });
-	test::Test* test_2_3 = list_2->addTest("third_test", { test_2_1, test_2_2 }, [&](test::Test& test) { test2_3(test); });
+	test::Test* test_2_1 = list_2->addTest("first", [&](test::Test& test) { test2_1(test); });
+	test::Test* test_2_2 = list_2->addTest("second", [&](test::Test& test) { test2_2(test); });
+	test::Test* test_2_3 = list_2->addTest("third", { test_2_1, test_2_2 }, [&](test::Test& test) { test2_3(test); });
 }
 
 void ExampleTestModule1::test1_1(test::Test& test) {

@@ -6,3 +6,4 @@
 #include "event_tests.h"
 #include "simulation_tests.h"
 #include "widget_tests.h"
+#include "editor_tests.h"

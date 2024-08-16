@@ -11,6 +11,7 @@ void run_tests() {
     test::TestModule* event_module = test_manager.addModule<EventTests>({ logger_module });
     test::TestModule* simulation_module = test_manager.addModule<SimulationTests>({ logger_module, compvector_module });
     test::TestModule* widget_module = test_manager.addModule<WidgetTests>({ logger_module, event_module, compvector_module, searchindex_module });
+    test::TestModule* editor_module = test_manager.addModule<EditorTests>({ simulation_module, widget_module });
     test_manager.runAllModules();
 }
 

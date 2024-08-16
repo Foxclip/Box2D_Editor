@@ -4,6 +4,7 @@ set(TESTS_HEADER_FILES
     "${INCLUDE_DIR}/tests/example/test_module_1.h"
     "${INCLUDE_DIR}/tests/example/test_module_2.h"
     "${INCLUDE_DIR}/tests/compvector_tests.h"
+    "${INCLUDE_DIR}/tests/editor_tests.h"
     "${INCLUDE_DIR}/tests/event_tests.h"
     "${INCLUDE_DIR}/tests/logger_tests.h"
     "${INCLUDE_DIR}/tests/searchindex_tests.h"
@@ -17,6 +18,7 @@ set(TESTS_SOURCE_FILES
     "example/test_module_2.cpp"
     "example/main.cpp"
     "compvector_tests.cpp"
+    "editor_tests.cpp"
     "event_tests.cpp"
     "logger_tests.cpp"
     "main.cpp"
@@ -36,4 +38,5 @@ target_include_directories(tests PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
 target_link_libraries(tests PUBLIC common_lib)
 target_link_libraries(tests PUBLIC widgets_lib)
 target_link_libraries(tests PUBLIC simulation_lib)
+target_link_libraries(tests PUBLIC editor)
 set_property(TARGET tests PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
