@@ -27,7 +27,7 @@ public:
 	Logger& operator<<(float value);
 	Logger& operator<<(double value);
 	Logger& operator<<(bool value);
-	Logger& operator<<(const LoggerFlush& flush);
+	Logger& operator<<(const LoggerFlush& value);
 	void lock();
 	void unlock();
 	void manualActivate();
@@ -38,6 +38,8 @@ public:
 	void setAutoFlush(bool value);
 	bool getActiveSwitch() const;
 	void setActiveSwitch(bool value);
+	static void disableStdWrite();
+	static void enableStdWrite();
 	std::vector<std::string>& getTags();
 	const std::vector<std::string>& getTags() const;
 	std::set<std::string>& getEnabledTags();
@@ -56,6 +58,7 @@ private:
 	ptrdiff_t indent_level = 0;
 	std::string indent_str;
 	bool autoflush = true;
+	inline static bool std_write = true;
 	bool active_switch = true;
 	bool manual_switch_active = true;
 	bool is_active = true;

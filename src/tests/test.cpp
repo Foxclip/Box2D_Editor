@@ -164,11 +164,13 @@ namespace test {
 				spacing_str += "-";
 			}
 			logger << test->name << spacing_str << "|" << LoggerFlush();
+			Logger::disableStdWrite();
 			logger.manualDeactivate();
 			OnBeforeRunTest();
 			bool result = test->run();
 			OnAfterRunTest();
 			logger.manualActivate();
+			Logger::enableStdWrite();
 			if (result) {
 				logger << "passed" << "\n";
 				passed_list.push_back(test->name);

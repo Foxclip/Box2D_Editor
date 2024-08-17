@@ -32,70 +32,59 @@ Logger::Logger(bool test) {
 	}
 }
 
-Logger& Logger::operator<<(const char* value) {
-	if (!is_active || !manual_switch_active) {
-		return *this;
+#define LOGGER_CHECKS() \
+	loggerAssert(!locked); \
+	if (!is_active || !manual_switch_active) { \
+		return *this; \
 	}
+
+Logger& Logger::operator<<(const char* value) {
+	LOGGER_CHECKS();
 	return writeString(std::string(value));
 }
 
 Logger& Logger::operator<<(std::string value) {
-	if (!is_active || !manual_switch_active) {
-		return *this;
-	}
+	LOGGER_CHECKS();
 	return writeString(value);
 }
 
 Logger& Logger::operator<<(int value) {
-	if (!is_active || !manual_switch_active) {
-		return *this;
-	}
+	LOGGER_CHECKS();
 	return writeInt(value);
 }
 
 Logger& Logger::operator<<(unsigned int value) {
-	if (!is_active || !manual_switch_active) {
-		return *this;
-	}
+	LOGGER_CHECKS();
 	return writeUnsignedInt(value);
 }
 
 Logger& Logger::operator<<(std::size_t value) {
-	if (!is_active || !manual_switch_active) {
-		return *this;
-	}
+	LOGGER_CHECKS();
 	return writeSizet(value);
 }
 
 Logger& Logger::operator<<(ptrdiff_t value) {
-	if (!is_active || !manual_switch_active) {
-		return *this;
-	}
+	LOGGER_CHECKS();
 	return writePtrdifft(value);
 }
 
 Logger& Logger::operator<<(float value) {
-	if (!is_active || !manual_switch_active) {
-		return *this;
-	}
+	LOGGER_CHECKS();
 	return writeFloat(value);
 }
 
 Logger& Logger::operator<<(double value) {
-	if (!is_active || !manual_switch_active) {
-		return *this;
-	}
+	LOGGER_CHECKS();
 	return writeDouble(value);
 }
 
 Logger& Logger::operator<<(bool value) {
-	if (!is_active || !manual_switch_active) {
-		return *this;
-	}
+	LOGGER_CHECKS();
 	return writeBool(value);
 }
 
-Logger& Logger::operator<<(const LoggerFlush& flush) {
+Logger& Logger::operator<<(const LoggerFlush& value) {
+	LOGGER_CHECKS();
 	flushLineBuffer();
 	return *this;
 }
@@ -147,6 +136,14 @@ bool Logger::getActiveSwitch() const {
 void Logger::setActiveSwitch(bool value) {
 	loggerAssert(!locked);
 	this->active_switch = value;
+}
+
+void Logger::disableStdWrite() {
+	std_write = false;
+}
+
+void Logger::enableStdWrite() {
+	std_write = true;
 }
 
 std::vector<std::string>& Logger::getTags() {
@@ -321,8 +318,10 @@ void Logger::updateIndentStr() {
 }
 
 void Logger::internalFlush() {
-	if (!test_mode) {
+	if (std_write) {
 		std::cout << total_buffer;
+	}
+	if (!test_mode) {
 		total_buffer = "";
 	}
 }
