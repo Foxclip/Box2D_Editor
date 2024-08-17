@@ -17,12 +17,12 @@ void EditorTests::basicTest(test::Test& test) {
 
 void EditorTests::initTest(test::Test& test) {
 	Editor editor;
-	editor.init();
+	editor.init(test.name);
 }
 
 void EditorTests::advanceTest(test::Test& test) {
 	Editor editor;
-	editor.init();
+	editor.init(test.name);
 	editor.start(true);
 	editor.advance();
 }

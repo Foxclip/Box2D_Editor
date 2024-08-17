@@ -215,7 +215,7 @@ private:
 	static std::string colorToStr(const sf::Color& color);
 	static std::string anchorToStr(fw::Widget::Anchor anchor);
 	static bool rectApproxCmp(const sf::FloatRect& left, const sf::FloatRect& right);
-	fw::TextBoxWidget* initTextBox(fw::Application& application, float width, float height) const;
+	fw::TextBoxWidget* initTextBox(fw::Application& application, const std::string& test_name, float width, float height) const;
 	void mouseDragGesture(fw::Application& application, const sf::Vector2f& begin_pos, const sf::Vector2f& offset);
 	enum class ResizePoint {
 		TOP_LEFT,

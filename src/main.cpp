@@ -8,7 +8,7 @@ void execute_app() {
     logger << "Starting app\n";
     Editor app(true);
     try {
-        app.init();
+        app.init("Box2D Editor");
         app.load("levels/level.txt");
         app.start();
     } catch (std::string msg) {

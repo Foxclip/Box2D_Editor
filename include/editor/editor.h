@@ -59,7 +59,7 @@ class Outliner;
 class Editor : public fw::Application {
 public:
 	Editor(bool maximized = false);
-	void init();
+	void init(const std::string& title);
 	void load(const std::string& filename);
 	void setCameraPos(float x, float y);
 	void setCameraPos(const b2Vec2& pos);
