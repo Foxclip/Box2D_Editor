@@ -136,7 +136,7 @@ void Editor::onInit() {
     }
     initTools();
     initUi();
-    logger.OnLineWrite = [&](std::string line) { // should be after initUi and preferably before any logging
+    editor_logger.OnLineWrite = [&](std::string line) { // should be after initUi and preferably before any logging
         logger_text_widget->setString(line);
     };
     trySelectToolByIndex(0); // should be after initTools and initUi
@@ -951,7 +951,7 @@ void Editor::renderUi() {
 
 std::string Editor::serialize() const {
     LoggerTag tag_serialize("serialize");
-    logger << __FUNCTION__"\n";
+    editor_logger << __FUNCTION__"\n";
     LoggerIndent serialize_indent;
     TokenWriter tw;
     tw << "camera\n";
@@ -1026,7 +1026,7 @@ void Editor::saveToFile(const std::string& filename) const {
     LoggerTag tag_saveload("saveload");
     std::string str = serialize();
     utils::str_to_file(str, filename);
-    logger << "Saved to " << filename << "\n";
+    editor_logger << "Saved to " << filename << "\n";
 }
 
 void Editor::loadAction(const std::string& filename) {
@@ -1039,7 +1039,7 @@ void Editor::loadFromFile(const std::string& filename) {
     try {
         std::string str = utils::file_to_str(filename);
         deserialize(str, true);
-        logger << "Editor loaded from " << filename << "\n";
+        editor_logger << "Editor loaded from " << filename << "\n";
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": " + filename + ": " + std::string(exc.what()));
     }
@@ -1048,16 +1048,16 @@ void Editor::loadFromFile(const std::string& filename) {
 void Editor::quicksave() {
     LoggerTag tag_saveload("saveload");
     quicksave_str = serialize();
-    logger << "Quicksave\n";
+    editor_logger << "Quicksave\n";
 }
 
 void Editor::quickload() {
     LoggerTag tag_saveload("saveload");
     if (quicksave_str.size() > 0) {
         deserialize(quicksave_str, true);
-        logger << "Quickload\n";
+        editor_logger << "Quickload\n";
     } else {
-        logger << "Can't quickload\n";
+        editor_logger << "Can't quickload\n";
     }
 }
 

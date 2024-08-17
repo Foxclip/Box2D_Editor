@@ -172,6 +172,7 @@ private:
 	std::string quicksave_str;
 	bool quickload_requested = false;
 	bool debug_break = false;
+	mutable Logger editor_logger;
 
 	void onInit() override;
 	void onStart() override;
