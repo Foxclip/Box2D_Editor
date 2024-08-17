@@ -58,6 +58,7 @@ class Outliner;
 
 class Editor : public fw::Application {
 public:
+	Editor(bool maximized = false);
 	void init();
 	void load(const std::string& filename);
 	void setCameraPos(float x, float y);
@@ -173,6 +174,7 @@ private:
 	bool quickload_requested = false;
 	bool debug_break = false;
 	mutable Logger editor_logger;
+	bool maximize_window = false;
 
 	void onInit() override;
 	void onStart() override;

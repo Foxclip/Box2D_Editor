@@ -6,7 +6,7 @@
 
 void execute_app() {
     logger << "Starting app\n";
-    Editor app;
+    Editor app(true);
     try {
         app.init();
         app.load("levels/level.txt");

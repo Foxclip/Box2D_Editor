@@ -30,6 +30,10 @@ bool QueryCallback::ReportFixture(b2Fixture* fixture) {
     return true;
 }
 
+Editor::Editor(bool maximized) {
+    this->maximize_window = maximized;
+}
+
 void Editor::init() {
     fw::Application::init(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, ANTIALIASING, true);
 }
@@ -141,7 +145,9 @@ void Editor::onInit() {
     };
     trySelectToolByIndex(0); // should be after initTools and initUi
     selectCreateType(0);
-    maximizeWindow();
+    if (maximize_window) {
+        maximizeWindow();
+    }
     auto getter = [&]() { return serialize(); };
     auto setter = [&](std::string str) { deserialize(str, false); };
     history = History<std::string>("Editor", getter, setter);
