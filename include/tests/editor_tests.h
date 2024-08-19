@@ -19,4 +19,6 @@ private:
 	void panTest(test::Test& test);
 	void selectTest(test::Test& test);
 
+	void clickObject(Editor& editor, GameObject* object);
+
 };

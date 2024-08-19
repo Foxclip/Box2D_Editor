@@ -79,12 +79,19 @@ void EditorTests::selectTest(test::Test& test) {
 	editor.advance();
 
 	BoxObject* box0 = editor.getSimulation().createBox(
-		"box0", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+		"box0", b2Vec2(-2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+	);
+	BoxObject* box1 = editor.getSimulation().createBox(
+		"box1", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+	);
+	BoxObject* box2 = editor.getSimulation().createBox(
+		"box2", b2Vec2(2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
 	);
 	const CompVector<GameObject*>& selected_objects = editor.getSelectTool().getSelectedObjects();
 	T_ASSERT(T_COMPARE(selected_objects.size(), 0));
-	sf::Vector2f box_pos = editor.getObjectScreenPos(box0);
-	editor.mouseMove(box_pos);
+
+	sf::Vector2f box_0_pos = editor.getObjectScreenPos(box0);
+	editor.mouseMove(box_0_pos);
 	editor.mouseLeftPress();
 	editor.advance();
 	T_COMPARE(selected_objects.size(), 0);
@@ -94,7 +101,17 @@ void EditorTests::selectTest(test::Test& test) {
 		T_CHECK(selected_objects[0] == box0);
 	}
 
-	sf::Vector2f click_pos = editor.worldToScreen(box0->getGlobalPosition() + box0->size);
+	clickObject(editor, box1);
+	if (T_COMPARE(selected_objects.size(), 1)) {
+		T_CHECK(selected_objects[0] == box1);
+	}
+
+	clickObject(editor, box2);
+	if (T_COMPARE(selected_objects.size(), 1)) {
+		T_CHECK(selected_objects[0] == box2);
+	}
+
+	sf::Vector2f click_pos = editor.worldToScreen(box2->getGlobalPosition() + box2->size);
 	editor.mouseMove(click_pos);
 	editor.mouseLeftPress();
 	editor.advance();
@@ -102,4 +119,13 @@ void EditorTests::selectTest(test::Test& test) {
 	editor.mouseLeftRelease();
 	editor.advance();
 	T_COMPARE(selected_objects.size(), 0);
+}
+
+void EditorTests::clickObject(Editor& editor, GameObject* object) {
+	sf::Vector2f pos = editor.getObjectScreenPos(object);
+	editor.mouseMove(pos);
+	editor.mouseLeftPress();
+	editor.advance();
+	editor.mouseLeftRelease();
+	editor.advance();
 }
