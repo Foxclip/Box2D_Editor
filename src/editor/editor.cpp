@@ -702,7 +702,9 @@ void Editor::processMouse(const sf::Vector2f& pos) {
         }
     } else if (selected_tool == &move_tool) {
         for (GameObject* obj : move_tool.moving_objects) {
-            b2Vec2 new_pos = getMouseWorldPosb2() + obj->cursor_offset;
+            b2Vec2 mouse_pos = getMouseWorldPosb2();
+            b2Vec2 cursor_offset = obj->cursor_offset;
+            b2Vec2 new_pos = mouse_pos + cursor_offset;
             obj->setGlobalPosition(new_pos);
         }
     } else if (selected_tool == &rotate_tool) {

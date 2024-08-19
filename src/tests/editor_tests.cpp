@@ -14,6 +14,7 @@ void EditorTests::createTestLists() {
 	test::Test* select_test = list->addTest("select", { advance_test }, [&](test::Test& test) { selectTest(test); });
 	test::Test* multi_select_test = list->addTest("multi_select", { select_test }, [&](test::Test& test) { multiSelectTest(test); });
 	test::Test* move_test = list->addTest("move", { select_test }, [&](test::Test& test) { moveTest(test); });
+	test::Test* pan_move_test = list->addTest("pan_move", { pan_test, move_test }, [&](test::Test& test) { panMoveTest(test); });
 }
 
 void EditorTests::beforeRunModule() {
@@ -200,6 +201,47 @@ void EditorTests::moveTest(test::Test& test) {
 	{
 		sf::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
 		T_VEC2_APPROX_COMPARE(box_pos_2_actual, box_pos_2);
+	}
+}
+
+void EditorTests::panMoveTest(test::Test& test) {
+	Editor editor(window);
+	editor.init(test.name, false);
+	editor.start(true);
+	editor.outliner_widget->setSize(150.0f, 100.0f);
+	editor.advance();
+
+	sf::Vector2f box_offset = sf::Vector2f(100.0f, 100.0f);
+	BoxObject* box0 = editor.getSimulation().createBox(
+		"box0", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+	);
+	clickObject(editor, box0);
+	b2Vec2 box_world_pos = box0->getGlobalPosition();
+	sf::Vector2f box_pos_1 = editor.getObjectScreenPos(box0);
+	sf::Vector2f box_pos_2 = box_pos_1 - box_offset;
+	editor.mouseMove(box_pos_1);
+	tapKey(editor, sf::Keyboard::G);
+	editor.mouseRightPress();
+	editor.advance();
+	editor.mouseMove(box_pos_2);
+	editor.advance();
+	{
+		sf::Vector2f box_screen_pos_actual = editor.getObjectScreenPos(box0);
+		T_VEC2_APPROX_COMPARE(box_screen_pos_actual, box_pos_2);
+		b2Vec2 box_world_pos_actual = box0->getGlobalPosition();
+		T_VEC2_APPROX_COMPARE(box_world_pos_actual, box_world_pos);
+	}
+	editor.mouseRightRelease();
+	editor.advance();
+	editor.mouseLeftPress();
+	editor.advance();
+	editor.mouseLeftRelease();
+	editor.advance();
+	{
+		sf::Vector2f box_screen_pos_actual = editor.getObjectScreenPos(box0);
+		T_VEC2_APPROX_COMPARE(box_screen_pos_actual, box_pos_2);
+		b2Vec2 box_world_pos_actual = box0->getGlobalPosition();
+		T_VEC2_APPROX_COMPARE(box_world_pos_actual, box_world_pos);
 	}
 }
 
