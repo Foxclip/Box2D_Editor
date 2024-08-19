@@ -10,6 +10,7 @@ void EditorTests::createTestLists() {
 	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) { basicTest(test); });
 	test::Test* init_test = list->addTest("init", { basic_test }, [&](test::Test& test) { initTest(test); });
 	test::Test* advance_test = list->addTest("advance", { init_test }, [&](test::Test& test) { advanceTest(test); });
+	test::Test* pan_test = list->addTest("pan", { advance_test }, [&](test::Test& test) { panTest(test); });
 	test::Test* select_test = list->addTest("select", { advance_test }, [&](test::Test& test) { selectTest(test); });
 }
 
@@ -39,12 +40,43 @@ void EditorTests::advanceTest(test::Test& test) {
 	editor.advance();
 }
 
+void EditorTests::panTest(test::Test& test) {
+	Editor editor(window);
+	editor.init(test.name);
+	editor.start(true);
+	editor.outliner_widget->setSize(150.0f, 100.0f);
+	editor.advance();
+
+	sf::Vector2f box_offset = sf::Vector2f(100.0f, 50.0f);
+	BoxObject* box0 = editor.getSimulation().createBox(
+		"box0", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+	);
+	sf::Vector2f box_pos_1 = editor.getObjectScreenPos(box0);
+	sf::Vector2f box_pos_2 = box_pos_1 - box_offset;
+	editor.mouseMove(box_pos_1);
+	editor.mouseRightPress();
+	editor.advance();
+	editor.mouseMove(box_pos_2);
+	editor.advance();
+	{
+		sf::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
+		T_VEC2_APPROX_COMPARE(box_pos_2_actual, box_pos_2);
+	}
+	editor.mouseRightRelease();
+	editor.advance();
+	{
+		sf::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
+		T_VEC2_APPROX_COMPARE(box_pos_2_actual, box_pos_2);
+	}
+}
+
+
 void EditorTests::selectTest(test::Test& test) {
 	Editor editor(window);
 	editor.init(test.name);
 	editor.start(true);
-	editor.advance();
 	editor.outliner_widget->setSize(150.0f, 100.0f);
+	editor.advance();
 
 	BoxObject* box0 = editor.getSimulation().createBox(
 		"box0", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green

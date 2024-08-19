@@ -16,6 +16,7 @@ private:
 	void basicTest(test::Test& test);
 	void initTest(test::Test& test);
 	void advanceTest(test::Test& test);
+	void panTest(test::Test& test);
 	void selectTest(test::Test& test);
 
 };
