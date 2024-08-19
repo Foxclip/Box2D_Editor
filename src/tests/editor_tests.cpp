@@ -11,17 +11,27 @@ void EditorTests::createTestLists() {
 	test::Test* advance_test = list->addTest("advance", { init_test }, [&](test::Test& test) { advanceTest(test); });
 }
 
+void EditorTests::beforeRunModule() {
+	sf::ContextSettings cs_window;
+	window.create(sf::VideoMode(800, 600), "Editor tests", sf::Style::Default, cs_window);
+	font = fw::Font("fonts/verdana.ttf");
+}
+
+void EditorTests::afterRunModule() {
+	window.close();
+}
+
 void EditorTests::basicTest(test::Test& test) {
-	Editor editor;
+	Editor editor(window);
 }
 
 void EditorTests::initTest(test::Test& test) {
-	Editor editor;
+	Editor editor(window);
 	editor.init(test.name);
 }
 
 void EditorTests::advanceTest(test::Test& test) {
-	Editor editor;
+	Editor editor(window);
 	editor.init(test.name);
 	editor.start(true);
 	editor.advance();

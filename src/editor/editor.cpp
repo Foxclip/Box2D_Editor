@@ -34,6 +34,10 @@ Editor::Editor(bool maximized) {
     this->maximize_window = maximized;
 }
 
+Editor::Editor(sf::RenderWindow& window, bool maximized) : Application(window) {
+    this->maximize_window = maximized;
+}
+
 void Editor::init(const std::string& title) {
     fw::Application::init(title, WINDOW_WIDTH, WINDOW_HEIGHT, ANTIALIASING, true);
 }

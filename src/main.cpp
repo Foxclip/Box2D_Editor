@@ -27,7 +27,8 @@ int main() {
 
     execute_app();
 
-    // TODO: Tests: set window title to the name of the test
+    // TODO: Editor: select test
+    // TODO: Editor: move test
     // TODO: Outliner: fix selection after subtree collapse
     // TODO: Outliner: reparent object
     // TODO: Outliner: rename object

@@ -195,7 +195,7 @@ void WidgetTests::createTestLists() {
 
 void WidgetTests::beforeRunModule() {
     sf::ContextSettings cs_window;
-    window.create(sf::VideoMode(800, 600), "Test window", sf::Style::Default, cs_window);
+    window.create(sf::VideoMode(800, 600), "Widget tests", sf::Style::Default, cs_window);
     textbox_font = fw::Font("fonts/verdana.ttf");
 }
 
