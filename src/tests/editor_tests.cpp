@@ -13,6 +13,7 @@ void EditorTests::createTestLists() {
 	test::Test* pan_test = list->addTest("pan", { advance_test }, [&](test::Test& test) { panTest(test); });
 	test::Test* select_test = list->addTest("select", { advance_test }, [&](test::Test& test) { selectTest(test); });
 	test::Test* multi_select_test = list->addTest("multi_select", { select_test }, [&](test::Test& test) { multiSelectTest(test); });
+	test::Test* move_test = list->addTest("move", { select_test }, [&](test::Test& test) { moveTest(test); });
 }
 
 void EditorTests::beforeRunModule() {
@@ -170,6 +171,38 @@ void EditorTests::multiSelectTest(test::Test& test) {
 	T_COMPARE(selected_objects.size(), 0);
 }
 
+void EditorTests::moveTest(test::Test& test) {
+	Editor editor(window);
+	editor.init(test.name, false);
+	editor.start(true);
+	editor.outliner_widget->setSize(150.0f, 100.0f);
+	editor.advance();
+
+	sf::Vector2f box_offset = sf::Vector2f(100.0f, 50.0f);
+	BoxObject* box0 = editor.getSimulation().createBox(
+		"box0", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+	);
+	clickObject(editor, box0);
+	sf::Vector2f box_pos_1 = editor.getObjectScreenPos(box0);
+	sf::Vector2f box_pos_2 = box_pos_1 - box_offset;
+	editor.mouseMove(box_pos_1);
+	tapKey(editor, sf::Keyboard::G);
+	editor.mouseMove(box_pos_2);
+	editor.advance();
+	editor.mouseLeftPress();
+	editor.advance();
+	{
+		sf::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
+		T_VEC2_APPROX_COMPARE(box_pos_2_actual, box_pos_2);
+	}
+	editor.mouseLeftRelease();
+	editor.advance();
+	{
+		sf::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
+		T_VEC2_APPROX_COMPARE(box_pos_2_actual, box_pos_2);
+	}
+}
+
 void EditorTests::clickMouse(Editor& editor, const sf::Vector2f& pos) {
 	editor.mouseMove(pos);
 	editor.mouseLeftPress();
@@ -197,5 +230,12 @@ void EditorTests::clickObject(Editor& editor, GameObject* object, bool shift, bo
 	if (shift) {
 		editor.keyRelease(sf::Keyboard::LShift);
 	}
+	editor.advance();
+}
+
+void EditorTests::tapKey(Editor& editor, sf::Keyboard::Key key) {
+	editor.keyPress(key);
+	editor.advance();
+	editor.keyRelease(key);
 	editor.advance();
 }
