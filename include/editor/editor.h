@@ -70,6 +70,7 @@ public:
 	fw::WidgetList& getWidgetList();
 	void selectSingleObject(GameObject* object, bool with_children = false);
 	Simulation& getSimulation();
+	SelectTool& getSelectTool();
 	void setActiveObject(GameObject* object);
 	BoxObject* createBox(
 		const std::string& name,
@@ -116,13 +117,14 @@ private:
 	friend class Toolbox;
 	friend class CreatePanel;
 	friend class Outliner;
+	friend class EditorTests;
 	fw::CanvasWidget* world_widget = nullptr;
 	fw::CanvasWidget* ui_widget = nullptr;
 	fw::CanvasWidget* selection_mask_widget = nullptr;
 	sf::Shader desat_shader;
 	sf::Shader selection_shader;
 	float zoomFactor = 30.0f;
-	float viewCenterX = 0.0f, viewCenterY = 5.0f;
+	float viewCenterX = 0.0f, viewCenterY = 0.0f;
 	SelectTool select_tool;
 	CreateTool create_tool;
 	DragTool drag_tool;
@@ -224,6 +226,7 @@ private:
 	ptrdiff_t mouseGetChainEdge(const b2Fixture* fixture) const;
 	b2Fixture* getFixtureAt(const sf::Vector2f& screen_pos) const;
 	GameObject* getObjectAt(const sf::Vector2f& screen_pos) const;
+	sf::Vector2f getObjectScreenPos(GameObject* object) const;
 	b2AABB getObjectsAABB(const CompVector<GameObject*>& objects) const;
 	ptrdiff_t mouseGetObjectVertex() const;
 	ptrdiff_t mouseGetObjectEdge() const;

@@ -177,6 +177,30 @@ namespace fw {
         addExternalEvent(event);
     }
 
+    void Application::mouseLeftClick() {
+        mouseLeftPress();
+        advance();
+        mouseLeftRelease();
+        advance();
+    }
+
+    void Application::mouseRightClick() {
+        mouseRightPress();
+        advance();
+        mouseRightRelease();
+        advance();
+    }
+
+    void Application::mouseLeftClick(const sf::Vector2f& pos) {
+        mouseMove(pos);
+        mouseLeftClick();
+    }
+
+    void Application::mouseRightClick(const sf::Vector2f& pos) {
+        mouseMove(pos);
+        mouseRightClick();
+    }
+
     void Application::mouseScrollX(float delta) {
         wAssert(external_control);
         sf::Event event;

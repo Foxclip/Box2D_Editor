@@ -72,6 +72,10 @@ Simulation& Editor::getSimulation() {
     return simulation;
 }
 
+SelectTool& Editor::getSelectTool() {
+    return select_tool;
+}
+
 void Editor::setActiveObject(GameObject* object) {
     active_object = object;
     if (selected_tool == &edit_tool) {
@@ -1209,6 +1213,10 @@ GameObject* Editor::getObjectAt(const sf::Vector2f& screen_pos) const {
         result = GameObject::getGameobject(body);
     }
     return result;
+}
+
+sf::Vector2f Editor::getObjectScreenPos(GameObject* object) const {
+    return worldToScreen(object->getGlobalPosition());
 }
 
 b2AABB Editor::getObjectsAABB(const CompVector<GameObject*>& objects) const {

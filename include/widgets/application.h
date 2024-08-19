@@ -66,6 +66,10 @@ namespace fw {
 		void mouseRightPress();
 		void mouseLeftRelease();
 		void mouseRightRelease();
+		void mouseLeftClick();
+		void mouseRightClick();
+		void mouseLeftClick(const sf::Vector2f& pos);
+		void mouseRightClick(const sf::Vector2f& pos);
 		void mouseScrollX(float delta);
 		void mouseScrollY(float delta);
 		void keyPress(sf::Keyboard::Key key);
