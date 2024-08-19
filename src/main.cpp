@@ -27,8 +27,8 @@ int main() {
 
     execute_app();
 
-    // TODO: Editor: select test
-    // TODO: Editor: move test
+    // TODOL Editor: Camera class
+    // TODO: Editor: fix redundant serialize logger message
     // TODO: Outliner: fix selection after subtree collapse
     // TODO: Outliner: reparent object
     // TODO: Outliner: rename object

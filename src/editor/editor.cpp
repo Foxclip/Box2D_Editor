@@ -47,17 +47,15 @@ void Editor::load(const std::string& filename) {
 }
 
 void Editor::setCameraPos(float x, float y) {
-    viewCenterX = x;
-    viewCenterY = y;
+    camera.setPosition(x, y);
 }
 
 void Editor::setCameraPos(const b2Vec2& pos) {
-    viewCenterX = pos.x;
-    viewCenterY = pos.y;
+    camera.setPosition(pos);
 }
 
 void Editor::setCameraZoom(float zoom) {
-    zoomFactor = zoom;
+    camera.setZoom(zoom);
 }
 
 fw::WidgetList& Editor::getWidgetList() {
@@ -671,7 +669,7 @@ void Editor::processBlockableLeftRelease(const sf::Vector2f& pos) {
 }
 
 void Editor::processMouseScrollY(float delta) {
-    zoomFactor *= pow(MOUSE_SCROLL_ZOOM, delta);
+    camera.setZoom(camera.getZoom() * pow(MOUSE_SCROLL_ZOOM, delta));
 }
 
 void Editor::processMouse(const sf::Vector2f& pos) {
@@ -699,13 +697,6 @@ void Editor::processMouse(const sf::Vector2f& pos) {
                 b2Vec2 v2 = active_object->getGlobalVertexPos(active_object->indexLoop(edit_tool.highlighted_edge + 1));
                 edit_tool.insertVertexPos = utils::line_project(getMouseWorldPosb2(), v1, v2);
             }
-        }
-    } else if (selected_tool == &move_tool) {
-        for (GameObject* obj : move_tool.moving_objects) {
-            b2Vec2 mouse_pos = getMouseWorldPosb2();
-            b2Vec2 cursor_offset = obj->cursor_offset;
-            b2Vec2 new_pos = mouse_pos + cursor_offset;
-            obj->setGlobalPosition(new_pos);
         }
     } else if (selected_tool == &rotate_tool) {
         for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
@@ -760,8 +751,9 @@ void Editor::processDragGestureLeft(const sf::Vector2f& pos) {
 
 void Editor::processDragGestureRight(const sf::Vector2f& pos) {
     sf::Vector2i mouseDelta = mousePrevPos - getMousePos();
-    viewCenterX += mouseDelta.x / zoomFactor;
-    viewCenterY += -mouseDelta.y / zoomFactor;
+    float x_offset = mouseDelta.x / camera.getZoom();
+    float y_offset = -mouseDelta.y / camera.getZoom();
+    camera.move(x_offset, y_offset);
     if (mouseDelta.x != 0 || mouseDelta.y != 0) {
         follow_object = nullptr;
     }
@@ -769,6 +761,16 @@ void Editor::processDragGestureRight(const sf::Vector2f& pos) {
 }
 
 void Editor::onAfterProcessInput() {
+    // must be here to avoid a bug in situaltion when
+    // the user is using move tool and moving camera at the same time
+    if (selected_tool == &move_tool) {
+        for (GameObject* obj : move_tool.moving_objects) {
+            b2Vec2 mouse_pos = getMouseWorldPosb2();
+            b2Vec2 cursor_offset = obj->cursor_offset;
+            b2Vec2 new_pos = mouse_pos + cursor_offset;
+            obj->setGlobalPosition(new_pos);
+        }
+    }
     if (commit_action) {
         history.save("Normal");
         commit_action = false;
@@ -804,8 +806,8 @@ void Editor::onRender() {
 
 void Editor::renderWorld() {
     world_widget->clear(sf::Color::Transparent);
-    world_widget->setViewCenter(viewCenterX, viewCenterY);
-    world_widget->setViewSize(world_widget->getSize().x / zoomFactor, -1.0f * world_widget->getSize().y / zoomFactor);
+    world_widget->setViewCenter(tosf(camera.getPosition()));
+    world_widget->setViewSize(world_widget->getSize().x / camera.getZoom(), -1.0f * world_widget->getSize().y / camera.getZoom());
     for (size_t i = 0; i < simulation.getTopSize(); i++) {
         GameObject* gameobject = simulation.getFromTop(i);
         gameobject->setDrawVarray(selected_tool == &edit_tool && gameobject == active_object);
@@ -973,8 +975,8 @@ std::string Editor::serialize() const {
     tw << "camera\n";
     {
         TokenWriterIndent camera_indent(tw);
-        tw << "center" << viewCenterX << viewCenterY << "\n";
-        tw << "zoom" << zoomFactor << "\n";
+        tw << "center" << camera.getPosition() << "\n";
+        tw << "zoom" << camera.getZoom() << "\n";
     }
     tw << "/camera";
     tw << "\n\n";
@@ -1015,9 +1017,8 @@ void Editor::deserialize(const std::string& str, bool set_camera) {
                     }
                 }
                 if (set_camera) {
-                    viewCenterX = params.x;
-                    viewCenterY = params.y;
-                    zoomFactor = params.zoom;
+                    camera.setPosition(params.x, params.y);
+                    camera.setZoom(params.zoom);
                 }
             } else if (entity == "simulation") {
                 simulation.deserialize(tr);
@@ -1488,7 +1489,7 @@ void Editor::viewSelectedObjects() {
     } else if (sizeX > 0.0f && sizeY > 0.0f) {
         zoom = std::min(zoomX, zoomY);
     } else {
-        zoom = zoomFactor;
+        zoom = camera.getZoom();
     }
     b2Vec2 aabb_center = aabb.GetCenter();
     setCameraPos(aabb_center);
@@ -1542,4 +1543,40 @@ int FpsCounter::frameEnd() {
 
 int FpsCounter::getFps() const {
     return fps;
+}
+
+Editor::Camera::Camera(Editor& editor) : editor(editor) { }
+
+const b2Vec2& Editor::Camera::getPosition() const {
+    return pos;
+}
+
+float Editor::Camera::getZoom() const {
+    return zoom;
+}
+
+void Editor::Camera::setPosition(float x, float y) {
+    pos.x = x;
+    pos.y = y;
+    editor.world_widget->setViewCenter(x, y);
+}
+
+void Editor::Camera::setPosition(const b2Vec2& p_pos) {
+    setPosition(p_pos.x, p_pos.y);;
+}
+
+void Editor::Camera::move(float x, float y) {
+    setPosition(pos.x + x, pos.y + y);
+}
+
+void Editor::Camera::move(const b2Vec2& offset) {
+    move(offset.x, offset.y);
+}
+
+void Editor::Camera::setZoom(float zoom) {
+    this->zoom = zoom;
+    editor.world_widget->setViewSize(
+        editor.world_widget->getSize().x / zoom,
+        -1.0f * editor.world_widget->getSize().y / zoom
+    );
 }

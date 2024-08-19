@@ -123,8 +123,22 @@ private:
 	fw::CanvasWidget* selection_mask_widget = nullptr;
 	sf::Shader desat_shader;
 	sf::Shader selection_shader;
-	float zoomFactor = 30.0f;
-	float viewCenterX = 0.0f, viewCenterY = 0.0f;
+	class Camera {
+	public:
+		Camera(Editor& editor);
+		const b2Vec2& getPosition() const;
+		float getZoom() const;
+		void setPosition(float x, float y);
+		void setPosition(const b2Vec2& p_pos);
+		void move(float x, float y);
+		void move(const b2Vec2& offset);
+		void setZoom(float zoom);
+	private:
+		Editor& editor;
+		b2Vec2 pos = b2Vec2_zero;
+		float zoom = 30.0f;
+	};
+	Camera camera = Camera(*this);
 	SelectTool select_tool;
 	CreateTool create_tool;
 	DragTool drag_tool;
