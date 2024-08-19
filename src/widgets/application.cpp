@@ -313,6 +313,10 @@ namespace fw {
         widgets.setDefaultFont(font);
     }
 
+    void Application::setVerticalSyncEnabled(bool value) {
+        window.setVerticalSyncEnabled(value);
+    }
+
     void Application::close() {
         running = false;
         onClose();

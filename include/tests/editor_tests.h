@@ -18,7 +18,9 @@ private:
 	void advanceTest(test::Test& test);
 	void panTest(test::Test& test);
 	void selectTest(test::Test& test);
+	void multiSelectTest(test::Test& test);
 
-	void clickObject(Editor& editor, GameObject* object);
+	void clickMouse(Editor& editor, const sf::Vector2f& pos);
+	void clickObject(Editor& editor, GameObject* object, bool shift = false, bool ctrl = false);
 
 };

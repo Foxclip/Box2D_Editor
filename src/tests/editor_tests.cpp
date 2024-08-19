@@ -12,6 +12,7 @@ void EditorTests::createTestLists() {
 	test::Test* advance_test = list->addTest("advance", { init_test }, [&](test::Test& test) { advanceTest(test); });
 	test::Test* pan_test = list->addTest("pan", { advance_test }, [&](test::Test& test) { panTest(test); });
 	test::Test* select_test = list->addTest("select", { advance_test }, [&](test::Test& test) { selectTest(test); });
+	test::Test* multi_select_test = list->addTest("multi_select", { select_test }, [&](test::Test& test) { multiSelectTest(test); });
 }
 
 void EditorTests::beforeRunModule() {
@@ -30,19 +31,19 @@ void EditorTests::basicTest(test::Test& test) {
 
 void EditorTests::initTest(test::Test& test) {
 	Editor editor(window);
-	editor.init(test.name);
+	editor.init(test.name, false);
 }
 
 void EditorTests::advanceTest(test::Test& test) {
 	Editor editor(window);
-	editor.init(test.name);
+	editor.init(test.name, false);
 	editor.start(true);
 	editor.advance();
 }
 
 void EditorTests::panTest(test::Test& test) {
 	Editor editor(window);
-	editor.init(test.name);
+	editor.init(test.name, false);
 	editor.start(true);
 	editor.outliner_widget->setSize(150.0f, 100.0f);
 	editor.advance();
@@ -73,7 +74,7 @@ void EditorTests::panTest(test::Test& test) {
 
 void EditorTests::selectTest(test::Test& test) {
 	Editor editor(window);
-	editor.init(test.name);
+	editor.init(test.name, false);
 	editor.start(true);
 	editor.outliner_widget->setSize(150.0f, 100.0f);
 	editor.advance();
@@ -121,11 +122,80 @@ void EditorTests::selectTest(test::Test& test) {
 	T_COMPARE(selected_objects.size(), 0);
 }
 
-void EditorTests::clickObject(Editor& editor, GameObject* object) {
-	sf::Vector2f pos = editor.getObjectScreenPos(object);
+void EditorTests::multiSelectTest(test::Test& test) {
+	Editor editor(window);
+	editor.init(test.name, false);
+	editor.start(true);
+	editor.outliner_widget->setSize(150.0f, 100.0f);
+	editor.advance();
+
+	BoxObject* box0 = editor.getSimulation().createBox(
+		"box0", b2Vec2(-2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+	);
+	BoxObject* box1 = editor.getSimulation().createBox(
+		"box1", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+	);
+	BoxObject* box2 = editor.getSimulation().createBox(
+		"box2", b2Vec2(2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+	);
+	const CompVector<GameObject*>& selected_objects = editor.getSelectTool().getSelectedObjects();
+	T_ASSERT(T_COMPARE(selected_objects.size(), 0));
+
+	clickObject(editor, box0);
+	if (T_COMPARE(selected_objects.size(), 1)) {
+		T_CHECK(selected_objects[0] == box0);
+	}
+	clickObject(editor, box1, true);
+	if (T_COMPARE(selected_objects.size(), 2)) {
+		T_CHECK(selected_objects[0] == box0);
+		T_CHECK(selected_objects[1] == box1);
+	}
+	clickObject(editor, box2, true);
+	if (T_COMPARE(selected_objects.size(), 3)) {
+		T_CHECK(selected_objects[0] == box0);
+		T_CHECK(selected_objects[1] == box1);
+		T_CHECK(selected_objects[2] == box2);
+	}
+	clickObject(editor, box1, true);
+	if (T_COMPARE(selected_objects.size(), 2)) {
+		T_CHECK(selected_objects[0] == box0);
+		T_CHECK(selected_objects[1] == box2);
+	}
+	clickObject(editor, box2, false);
+	if (T_COMPARE(selected_objects.size(), 1)) {
+		T_CHECK(selected_objects[0] == box2);
+	}
+	sf::Vector2f click_pos = editor.worldToScreen(box2->getGlobalPosition() + box2->size);
+	clickMouse(editor, click_pos);
+	T_COMPARE(selected_objects.size(), 0);
+}
+
+void EditorTests::clickMouse(Editor& editor, const sf::Vector2f& pos) {
 	editor.mouseMove(pos);
 	editor.mouseLeftPress();
 	editor.advance();
 	editor.mouseLeftRelease();
+	editor.advance();
+}
+
+void EditorTests::clickObject(Editor& editor, GameObject* object, bool shift, bool ctrl) {
+	sf::Vector2f pos = editor.getObjectScreenPos(object);
+	editor.mouseMove(pos);
+	if (shift) {
+		editor.keyPress(sf::Keyboard::LShift);
+	}
+	if (ctrl) {
+		editor.keyPress(sf::Keyboard::LControl);
+	}
+	editor.mouseLeftPress();
+	editor.advance();
+	editor.mouseLeftRelease();
+	editor.advance();
+	if (ctrl) {
+		editor.keyRelease(sf::Keyboard::LControl);
+	}
+	if (shift) {
+		editor.keyRelease(sf::Keyboard::LShift);
+	}
 	editor.advance();
 }

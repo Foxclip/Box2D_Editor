@@ -84,6 +84,7 @@ namespace fw {
 		WidgetList& getWidgets();
 		void setBackgroundColor(const sf::Color& color);
 		void setDefaultFont(const fw::Font& font);
+		void setVerticalSyncEnabled(bool value);
 		void close();
 
 	protected:
