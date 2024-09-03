@@ -6,7 +6,6 @@
 
 const float TOOL_RECT_WIDTH = 60.0f;
 const float TOOL_RECT_HEIGHT = 40.0f;
-const int TOOLBOX_PADDING = 10;
 const int TOOL_TEXT_SIZE = 16;
 const float CREATE_RECT_WIDTH = 40.0f;
 const float CREATE_RECT_HEIGHT = 40.0f;

@@ -2,6 +2,8 @@
 
 #include "widgets/container_widget.h"
 
+const int TOOLBOX_PADDING = 10;
+
 class Editor;
 
 class Toolbox : public fw::ContainerWidget {

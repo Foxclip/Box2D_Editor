@@ -5,6 +5,7 @@
 #include "editor/UI/create_panel.h"
 #include "editor/UI/edit_window.h"
 #include "editor/UI/outliner.h"
+#include "editor/UI/menu.h"
 #include "common/utils.h"
 #include <numbers>
 #include <iostream>
@@ -324,6 +325,8 @@ void Editor::initWidgets() {
     edit_tool.edit_window_widget = widgets.createWidget<EditWindow>(300.0f, 400.0f, *this);
     create_tool.create_panel_widget = widgets.createWidget<CreatePanel>(*this);
     outliner_widget = widgets.createWidget<Outliner>(300.0f, 200.0f, *this);
+    menu_widget = widgets.createWidget<Menu>(*this);
+    menu_widget->setAnchorOffsetX(200.0f);
 
     // step text
     step_widget = widgets.createWidget<fw::TextWidget>();
@@ -1039,10 +1042,19 @@ void Editor::deserialize(const std::string& str, bool set_camera) {
     }
 }
 
-void Editor::saveToFile(const std::string& filename) const {
+void Editor::save() {
+    if (save_file_location.empty()) {
+        showSaveFileMenu();
+    } else {
+        saveToFile(save_file_location);
+    }
+}
+
+void Editor::saveToFile(const std::string& filename) {
     LoggerTag tag_saveload("saveload");
     std::string str = serialize();
     utils::str_to_file(str, filename);
+    save_file_location = filename;
     editor_logger << "Saved to " << filename << "\n";
 }
 
@@ -1076,6 +1088,14 @@ void Editor::quickload() {
     } else {
         editor_logger << "Can't quickload\n";
     }
+}
+
+void Editor::showOpenFileMenu() const {
+    editor_logger << "showOpenFileMenu\n";
+}
+
+void Editor::showSaveFileMenu() const {
+    editor_logger << "showSaveFileMenu\n";
 }
 
 Tool* Editor::trySelectToolByIndex(size_t index) {

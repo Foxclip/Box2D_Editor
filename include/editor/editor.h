@@ -117,6 +117,7 @@ private:
 	friend class Toolbox;
 	friend class CreatePanel;
 	friend class Outliner;
+	friend class Menu;
 	friend class EditorTests;
 	fw::CanvasWidget* world_widget = nullptr;
 	fw::CanvasWidget* ui_widget = nullptr;
@@ -172,6 +173,7 @@ private:
 	sf::Text object_info_text;
 	sf::Text id_text;
 	Outliner* outliner_widget = nullptr;
+	Menu* menu_widget = nullptr;
 
 	const float MOUSE_FORCE_SCALE = 50.0f;
 	float timeStep = 1.0f / FPS;
@@ -191,6 +193,7 @@ private:
 	LoadRequest load_request;
 	std::string quicksave_str;
 	bool quickload_requested = false;
+	std::string save_file_location;
 	bool debug_break = false;
 	mutable Logger editor_logger;
 	bool maximize_window = false;
@@ -219,11 +222,14 @@ private:
 	void renderUi();
 	std::string serialize() const;
 	void deserialize(const std::string& str, bool set_camera);
-	void saveToFile(const std::string& filename) const;
+	void save();
+	void saveToFile(const std::string& filename);
 	void loadAction(const std::string& filename);
 	void loadFromFile(const std::string& filename);
 	void quicksave();
 	void quickload();
+	void showOpenFileMenu() const;
+	void showSaveFileMenu() const;
 	Tool* trySelectToolByIndex(size_t index);
 	Tool* trySelectTool(Tool* tool);
 	void selectCreateType(size_t type);

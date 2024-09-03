@@ -6,6 +6,7 @@ set(EDITOR_HEADER_FILES
     "${EDITOR_INCLUDE_DIR}/tools.h"
     "${EDITOR_INCLUDE_DIR}/UI/create_panel.h"
     "${EDITOR_INCLUDE_DIR}/UI/edit_window.h"
+    "${EDITOR_INCLUDE_DIR}/UI/menu.h"
     "${EDITOR_INCLUDE_DIR}/UI/outliner.h"
     "${EDITOR_INCLUDE_DIR}/UI/toolbox.h"
 )
@@ -14,6 +15,7 @@ set(EDITOR_SOURCE_FILES
     "tools.cpp"
     "UI/create_panel.cpp"
     "UI/edit_window.cpp"
+    "UI/menu.cpp"
     "UI/outliner.cpp"
     "UI/toolbox.cpp"
 )
