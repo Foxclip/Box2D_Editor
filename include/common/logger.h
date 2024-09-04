@@ -6,6 +6,7 @@
 #include <functional>
 #include <stack>
 #include <set>
+#include <filesystem>
 
 // if a method can modify logger object
 // in a way unrelated to logging,
@@ -27,6 +28,7 @@ public:
 	Logger& operator<<(float value);
 	Logger& operator<<(double value);
 	Logger& operator<<(bool value);
+	Logger& operator<<(const std::filesystem::path& value);
 	Logger& operator<<(const LoggerFlush& value);
 	void lock();
 	void unlock();
@@ -83,6 +85,7 @@ private:
 	Logger& writeFloat(float value);
 	Logger& writeDouble(double value);
 	Logger& writeBool(bool value);
+	Logger& writePath(const std::filesystem::path& value);
 	void updateIndentStr();
 	void internalFlush();
 	void flushLineBuffer(bool newline = false);

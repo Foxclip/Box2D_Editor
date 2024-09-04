@@ -57,6 +57,7 @@ namespace fw {
 
 class Outliner;
 class Toolbox;
+class Menu;
 
 class Editor : public fw::Application {
 public:
@@ -188,12 +189,12 @@ private:
 	bool commit_action = false;
 	struct LoadRequest {
 		bool requested = false;
-		std::string filename;
+		std::filesystem::path path;
 	};
 	LoadRequest load_request;
 	std::string quicksave_str;
 	bool quickload_requested = false;
-	std::string save_file_location;
+	std::filesystem::path save_file_location;
 	bool debug_break = false;
 	mutable Logger editor_logger;
 	bool maximize_window = false;
@@ -223,13 +224,13 @@ private:
 	std::string serialize() const;
 	void deserialize(const std::string& str, bool set_camera);
 	void save();
-	void saveToFile(const std::string& filename);
-	void loadAction(const std::string& filename);
-	void loadFromFile(const std::string& filename);
+	void saveToFile(const std::filesystem::path& path);
+	void loadAction(const std::filesystem::path& path);
+	void loadFromFile(const std::filesystem::path& path);
 	void quicksave();
 	void quickload();
-	void showOpenFileMenu() const;
-	void showSaveFileMenu() const;
+	void showOpenFileMenu();
+	void showSaveFileMenu();
 	Tool* trySelectToolByIndex(size_t index);
 	Tool* trySelectTool(Tool* tool);
 	void selectCreateType(size_t type);

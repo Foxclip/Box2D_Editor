@@ -7,6 +7,7 @@
 #include "editor/UI/outliner.h"
 #include "editor/UI/menu.h"
 #include "common/utils.h"
+#include "common/filedialog.h"
 #include <numbers>
 #include <iostream>
 #include <ranges>
@@ -786,7 +787,7 @@ void Editor::onAfterProcessInput() {
         quickload_requested = false;
     }
     if (load_request.requested) {
-        loadFromFile(load_request.filename);
+        loadFromFile(load_request.path);
         history.save("Load");
         load_request.requested = false;
     }
@@ -1050,27 +1051,27 @@ void Editor::save() {
     }
 }
 
-void Editor::saveToFile(const std::string& filename) {
+void Editor::saveToFile(const std::filesystem::path& path) {
     LoggerTag tag_saveload("saveload");
     std::string str = serialize();
-    utils::str_to_file(str, filename);
-    save_file_location = filename;
-    editor_logger << "Saved to " << filename << "\n";
+    utils::str_to_file(str, path);
+    save_file_location = path;
+    editor_logger << "Saved to " << path << "\n";
 }
 
-void Editor::loadAction(const std::string& filename) {
+void Editor::loadAction(const std::filesystem::path& path) {
     load_request.requested = true;
-    load_request.filename = filename;
+    load_request.path = path;
 }
 
-void Editor::loadFromFile(const std::string& filename) {
+void Editor::loadFromFile(const std::filesystem::path& path) {
     LoggerTag tag_saveload("saveload");
     try {
-        std::string str = utils::file_to_str(filename);
+        std::string str = utils::file_to_str(path);
         deserialize(str, true);
-        editor_logger << "Editor loaded from " << filename << "\n";
+        editor_logger << "Editor loaded from " << path << "\n";
     } catch (std::exception exc) {
-        throw std::runtime_error(__FUNCTION__": " + filename + ": " + std::string(exc.what()));
+        throw std::runtime_error(__FUNCTION__": " + path.string() + ": " + std::string(exc.what()));
     }
 }
 
@@ -1090,12 +1091,22 @@ void Editor::quickload() {
     }
 }
 
-void Editor::showOpenFileMenu() const {
-    editor_logger << "showOpenFileMenu\n";
+void Editor::showOpenFileMenu() {
+    std::wstring filename = open_file_dialog("levels/");
+    endGestureLeft(); // dialog prevents mouse button release
+    if (filename.empty()) {
+        return;
+    }
+    loadFromFile(filename);
 }
 
-void Editor::showSaveFileMenu() const {
-    editor_logger << "showSaveFileMenu\n";
+void Editor::showSaveFileMenu() {
+    std::wstring filename = save_file_dialog("levels/");
+    endGestureLeft();
+    if (filename.empty()) {
+        return;
+    }
+    saveToFile(filename);
 }
 
 Tool* Editor::trySelectToolByIndex(size_t index) {

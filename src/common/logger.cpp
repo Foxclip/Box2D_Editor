@@ -83,6 +83,11 @@ Logger& Logger::operator<<(bool value) {
 	return writeBool(value);
 }
 
+Logger& Logger::operator<<(const std::filesystem::path& value) {
+	LOGGER_CHECKS();
+	return writePath(value);
+}
+
 Logger& Logger::operator<<(const LoggerFlush& value) {
 	LOGGER_CHECKS();
 	flushLineBuffer();
@@ -308,6 +313,10 @@ Logger& Logger::writeDouble(double value) {
 
 Logger& Logger::writeBool(bool value) {
 	return writeString(boolToStr(value));
+}
+
+Logger& Logger::writePath(const std::filesystem::path& value) {
+	return writeString(value.string());
 }
 
 void Logger::updateIndentStr() {

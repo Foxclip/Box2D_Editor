@@ -1,0 +1,29 @@
+camera
+    center 0 0
+    zoom 50
+/camera
+
+simulation
+
+    object polygon
+        id 0
+        name "polygon0"
+        vertices 5 0 -2.18556949e-07 5 -5 -4.37113897e-07 5.9624405e-08 -5
+        color 255 0 0 255
+        body
+            type dynamic
+            position 0 0
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+/simulation

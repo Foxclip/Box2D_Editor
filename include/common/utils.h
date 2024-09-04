@@ -36,8 +36,8 @@ namespace utils {
 	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point);
 	std::string body_type_to_str(b2BodyType type);
 	b2BodyType str_to_body_type(std::string str);
-	void str_to_file(std::string str, std::string path);
-	std::string file_to_str(std::filesystem::path path);
+	void str_to_file(std::string& str, const std::filesystem::path& path);
+	std::string file_to_str(const std::filesystem::path& path);
 	std::string color_to_str(sf::Color color);
 	std::string farr_to_str(std::vector<float>& vec);
 	std::string bool_to_str(bool value);

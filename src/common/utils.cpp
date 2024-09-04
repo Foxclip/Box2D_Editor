@@ -93,18 +93,18 @@ namespace utils {
 		}
 	}
 
-	void str_to_file(std::string str, std::string path) {
+	void str_to_file(std::string& str, const std::filesystem::path& path) {
 		std::ofstream ofstream(path);
 		if (ofstream.is_open()) {
 			ofstream << str;
 		} else {
-			std::string p(path);
+			std::string p = path.string();
 			p.resize(FILENAME_MAX);
 			throw std::runtime_error("File write error: " + p);
 		}
 	}
 
-	std::string file_to_str(std::filesystem::path path) {
+	std::string file_to_str(const std::filesystem::path& path) {
 		if (!std::filesystem::exists(path)) {
 			throw std::format("File not found: {}", path.string());
 		}
