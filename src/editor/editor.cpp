@@ -1069,6 +1069,7 @@ void Editor::loadFromFile(const std::filesystem::path& path) {
     try {
         std::string str = utils::file_to_str(path);
         deserialize(str, true);
+        save_file_location = path;
         editor_logger << "Editor loaded from " << path << "\n";
     } catch (std::exception exc) {
         throw std::runtime_error(__FUNCTION__": " + path.string() + ": " + std::string(exc.what()));

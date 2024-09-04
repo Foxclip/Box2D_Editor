@@ -85,8 +85,7 @@ std::wstring save_file_dialog(const std::filesystem::path& default_folder) {
                 hr = pFileSave->SetDefaultExtension(L"txt");
                 if (SUCCEEDED(hr)) {
                     IShellItem* pCurFolder = nullptr;
-                    std::filesystem::path currentFolder = std::filesystem::current_path();
-                    std::string absolutePath = std::filesystem::absolute(currentFolder).string();
+                    std::string absolutePath = std::filesystem::absolute(default_folder).string();
                     std::wstring stemp = std::wstring(absolutePath.begin(), absolutePath.end());
                     PCWSTR sw = stemp.c_str();
                     hr = SHCreateItemFromParsingName(sw, NULL, IID_PPV_ARGS(&pCurFolder));
