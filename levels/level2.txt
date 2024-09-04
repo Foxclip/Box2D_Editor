@@ -1,0 +1,893 @@
+camera
+    center 3.74500442 11.0644302
+    zoom 25.0000153
+/camera
+
+simulation
+
+    object chain
+        id 0
+        name "ground"
+        vertices 25 8 15 2 5 0 -5 0 -15 2 -25 8
+        color 255 255 255 255
+        body
+            type static
+            position 0 0
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 1
+        name "box0"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position 7.45820379 1.0200969
+            angle 0.19103241
+            linear_velocity -3.85342691e-09 -7.44564099e-09
+            angular_velocity 1.37671208e-09
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 2
+        name "box1"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position 8.45600986 1.21775436
+            angle -1.37605715
+            linear_velocity -1.96147587e-09 1.12103118e-08
+            angular_velocity -1.55696451e-08
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 3
+        name "box2"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position 9.45352459 1.41664076
+            angle -1.37379026
+            linear_velocity 1.80423909e-09 1.06028228e-10
+            angular_velocity -2.87721247e-09
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object ball
+        id 4
+        name "ball0"
+        radius 0.5
+        color 0 255 0 255
+        notch_color 0 64 0 255
+        body
+            type dynamic
+            position 10.4413261 1.60326612
+            angle 5.39395857
+            linear_velocity 1.74075643e-10 -8.72144912e-10
+            angular_velocity -1.84891658e-10
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object polygon
+        id 5
+        name "car bottom"
+        vertices 5 0 0.49999997 0.866025448 -2.50000024 4.33012676 -1 -8.74227766e-08 -2.49999952 -4.33012724 0.499999911 -0.866025448
+        color 255 0 0 255
+        body
+            type dynamic
+            position 9.64582634 4.50601625
+            angle -0.326743305
+            linear_velocity -1.00136353e-08 4.0072381e-09
+            angular_velocity 2.4881941e-09
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object ball
+        id 6
+        parent_id 5
+        name "car bottom wheel right"
+        radius 1
+        color 255 255 0 255
+        notch_color 64 64 0 255
+        body
+            type dynamic
+            position 14.3812895 2.90121484
+            angle -1224.74512
+            linear_velocity -6.02057781e-09 1.57899898e-08
+            angular_velocity -10
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object ball
+        id 7
+        parent_id 5
+        name "car bottom wheel top"
+        radius 1
+        color 255 255 0 255
+        notch_color 64 64 0 255
+        body
+            type dynamic
+            position 8.66789341 9.40944862
+            angle -1233.49097
+            linear_velocity -2.21513847e-08 1.58035129e-09
+            angular_velocity -10
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object ball
+        id 8
+        parent_id 5
+        name "car bottom wheel left"
+        radius 1
+        color 255 255 0 255
+        notch_color 64 64 0 255
+        body
+            type dynamic
+            position 5.88829613 1.20738518
+            angle -18.3855381
+            linear_velocity -1.98783479e-09 -5.19706322e-09
+            angular_velocity -2.36659892e-09
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object polygon
+        id 9
+        name "car left"
+        vertices 5 0 0.49999997 0.866025448 -2.50000024 4.33012676 -1 -8.74227766e-08 -2.49999952 -4.33012724 0.499999911 -0.866025448
+        color 255 0 0 255
+        body
+            type dynamic
+            position -7.32843542 12.8457108
+            angle 0.418831408
+            linear_velocity -0.761032343 -1.05698633
+            angular_velocity -0.260491103
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object ball
+        id 11
+        parent_id 9
+        name "car left wheel left"
+        radius 1
+        color 255 255 0 255
+        notch_color 64 64 0 255
+        body
+            type static
+            position -11.3733807 15.7848291
+            angle -59.1701202
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object ball
+        id 12
+        parent_id 9
+        name "car left wheel right"
+        radius 1
+        color 255 255 0 255
+        notch_color 64 64 0 255
+        body
+            type dynamic
+            position -7.85122728 7.87307882
+            angle -1214.9657
+            linear_velocity -2.05687094 -0.92642647
+            angular_velocity -10.2604933
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object polygon
+        id 13
+        name "car right"
+        vertices 5 0 0.49999997 0.866025448 -2.50000024 4.33012676 -1 -8.74227766e-08 -2.49999952 -4.33012724 0.499999911 -0.866025448
+        color 255 0 0 255
+        body
+            type dynamic
+            position 9.68337059 19.0235291
+            angle 0.446045071
+            linear_velocity 0.0112363743 0.0163812935
+            angular_velocity 0.00397292245
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object ball
+        id 14
+        parent_id 13
+        name "car right wheel left"
+        radius 1
+        color 255 255 0 255
+        notch_color 64 64 0 255
+        body
+            type static
+            position 5.55994892 21.8514957
+            angle -2.62145257
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object ball
+        id 15
+        parent_id 13
+        name "car right wheel right"
+        radius 1
+        color 255 255 0 255
+        notch_color 64 64 0 255
+        body
+            type dynamic
+            position 9.2959938 14.038558
+            angle -1061.05042
+            linear_velocity 0.0310360398 0.0148427309
+            angular_velocity -9.99602699
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 16
+        name "box16"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -3.58540154 0.565407753
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 17
+        name "box17"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -2.47622013 0.597557068
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 18
+        name "box18"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -1.3348875 0.613633156
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 19
+        name "box19"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -0.0971059799 0.597558022
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 20
+        name "box20"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position 1.14067745 0.613633156
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 21
+        name "box20"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position 1.15675259 1.80319023
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 22
+        name "box19"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -0.0810308456 1.7871151
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 23
+        name "box18"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -1.31881237 1.80319023
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 24
+        name "box17"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -2.460145 1.78711414
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 25
+        name "box16"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -3.5693264 1.75496483
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 26
+        name "box20"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position 1.12460232 2.99274731
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 27
+        name "box19"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -0.113181114 2.97667217
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 28
+        name "box18"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -1.35096264 2.99274731
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 29
+        name "box17"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -2.49229527 2.97667122
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 30
+        name "box16"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -3.60147667 2.9445219
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 31
+        name "box20"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position 1.14067745 4.29483032
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 32
+        name "box19"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -0.0971059799 4.27875519
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 33
+        name "box18"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -1.3348875 4.29483032
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 34
+        name "box17"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -2.47622013 4.27875423
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object box
+        id 35
+        name "box16"
+        size 1 1
+        color 0 255 0 255
+        body
+            type dynamic
+            position -3.58540154 4.24660492
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    joint revolute
+        body_a 5
+        body_b 6
+        anchor_a 5 0
+        anchor_b 0 0
+        collide_connected false
+        reference_angle 0
+        angle_lower_limit 0
+        angle_upper_limit 0
+        angle_limit_enabled false
+        motor_max_torque 30
+        motor_speed -10
+        motor_enabled true
+    /joint
+
+    joint revolute
+        body_a 5
+        body_b 7
+        anchor_a -2.50000024 4.33012676
+        anchor_b 0 0
+        collide_connected false
+        reference_angle 0
+        angle_lower_limit 0
+        angle_upper_limit 0
+        angle_limit_enabled false
+        motor_max_torque 30
+        motor_speed -10
+        motor_enabled true
+    /joint
+
+    joint revolute
+        body_a 5
+        body_b 8
+        anchor_a -2.49999952 -4.33012724
+        anchor_b 0 0
+        collide_connected false
+        reference_angle 0
+        angle_lower_limit 0
+        angle_upper_limit 0
+        angle_limit_enabled false
+        motor_max_torque 30
+        motor_speed -10
+        motor_enabled true
+    /joint
+
+    joint revolute
+        body_a 9
+        body_b 11
+        anchor_a -2.50000024 4.33012676
+        anchor_b 0 0
+        collide_connected false
+        reference_angle 0
+        angle_lower_limit 0
+        angle_upper_limit 0
+        angle_limit_enabled false
+        motor_max_torque 30
+        motor_speed -10
+        motor_enabled true
+    /joint
+
+    joint revolute
+        body_a 9
+        body_b 12
+        anchor_a -2.49999952 -4.33012724
+        anchor_b 0 0
+        collide_connected false
+        reference_angle 0
+        angle_lower_limit 0
+        angle_upper_limit 0
+        angle_limit_enabled false
+        motor_max_torque 30
+        motor_speed -10
+        motor_enabled true
+    /joint
+
+    joint revolute
+        body_a 13
+        body_b 14
+        anchor_a -2.50000024 4.33012676
+        anchor_b 0 0
+        collide_connected false
+        reference_angle 0
+        angle_lower_limit 0
+        angle_upper_limit 0
+        angle_limit_enabled false
+        motor_max_torque 30
+        motor_speed -10
+        motor_enabled true
+    /joint
+
+    joint revolute
+        body_a 13
+        body_b 15
+        anchor_a -2.49999952 -4.33012724
+        anchor_b 0 0
+        collide_connected false
+        reference_angle 0
+        angle_lower_limit 0
+        angle_upper_limit 0
+        angle_limit_enabled false
+        motor_max_torque 30
+        motor_speed -10
+        motor_enabled true
+    /joint
+
+/simulation

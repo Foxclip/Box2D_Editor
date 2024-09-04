@@ -1,0 +1,174 @@
+camera
+    center 15.2510481 8.8475647
+    zoom 20.8333607
+/camera
+
+simulation
+
+    object chain
+        id 0
+        name "ground"
+        vertices 348.883148 -3.32850647 348.44519 -28.8287983 272.149994 -28.8026352 251.64624 -36.5661888 217.606018 -44.7278786 188.841049 -49.4059258 158.682602 -45.4246063 141.762024 -30.0965576 133.898895 -16.7591629 125.586639 5.96666908 105.026642 1.76666832 86.3866501 -0.873329163 71.6666565 0.526668549 62.4266624 7.68666267 49.0186653 9.77466965 35.6506653 9.57466888 25 8 15 2 5 0 -5 0 -15 2 -25 8
+        color 255 255 255 255
+        body
+            type static
+            position 0 0
+            angle 0
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.200000003
+                    restitution 0
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object polygon
+        id 5
+        name "car"
+        vertices 5 0 0.49999997 0.866025448 -2.50000024 4.33012676 -1 -8.74227766e-08 -2.49999952 -4.33012724 0.499999911 -0.866025448
+        color 255 0 0 255
+        body
+            type dynamic
+            position -15.1255236 10.0490599
+            angle -0.37470606
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object ball
+        id 6
+        parent_id 5
+        name "car wheel right"
+        radius 1
+        color 255 255 0 255
+        notch_color 64 64 0 255
+        body
+            type dynamic
+            position -10.4724464 8.21906471
+            angle -0.44473809
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object ball
+        id 7
+        parent_id 5
+        name "car wheel top"
+        radius 1
+        color 255 255 0 255
+        notch_color 64 64 0 255
+        body
+            type dynamic
+            position -15.8673143 14.9937429
+            angle -2.90747523
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    object ball
+        id 8
+        parent_id 5
+        name "car wheel left"
+        radius 1
+        color 255 255 0 255
+        notch_color 64 64 0 255
+        body
+            type dynamic
+            position -19.036972 6.93460464
+            angle 2.78931212
+            linear_velocity 0 0
+            angular_velocity 0
+            fixtures
+                fixture
+                    density 1
+                    friction 0.300000012
+                    restitution 0.5
+                /fixture
+            /fixtures
+        /body
+    /object
+
+    joint revolute
+        body_a 5
+        body_b 6
+        anchor_a 5 0
+        anchor_b 0 0
+        collide_connected false
+        reference_angle 0
+        angle_lower_limit 0
+        angle_upper_limit 0
+        angle_limit_enabled false
+        motor_max_torque 30
+        motor_speed -10
+        motor_enabled true
+    /joint
+
+    joint revolute
+        body_a 5
+        body_b 7
+        anchor_a -2.50000024 4.33012676
+        anchor_b 0 0
+        collide_connected false
+        reference_angle 0
+        angle_lower_limit 0
+        angle_upper_limit 0
+        angle_limit_enabled false
+        motor_max_torque 30
+        motor_speed -10
+        motor_enabled true
+    /joint
+
+    joint revolute
+        body_a 5
+        body_b 8
+        anchor_a -2.49999952 -4.33012724
+        anchor_b 0 0
+        collide_connected false
+        reference_angle 0
+        angle_lower_limit 0
+        angle_upper_limit 0
+        angle_limit_enabled false
+        motor_max_torque 30
+        motor_speed -10
+        motor_enabled true
+    /joint
+
+/simulation
