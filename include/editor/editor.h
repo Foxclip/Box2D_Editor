@@ -175,6 +175,7 @@ private:
 	sf::Text id_text;
 	Outliner* outliner_widget = nullptr;
 	Menu* menu_widget = nullptr;
+	fw::TextWidget* debug_release_widget = nullptr;
 
 	const float MOUSE_FORCE_SCALE = 50.0f;
 	float timeStep = 1.0f / FPS;

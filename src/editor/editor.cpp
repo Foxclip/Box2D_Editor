@@ -384,6 +384,20 @@ void Editor::initWidgets() {
     logger_text_widget->setString("Logger message");
     logger_text_widget->setParent(logger_widget);
 
+    // debug/release text
+    debug_release_widget = widgets.createWidget<fw::TextWidget>();
+    debug_release_widget->setFont(ui_font);
+#ifndef NDEBUG
+    debug_release_widget->setString("DEBUG");
+#else
+    debug_release_widget->setString("RELEASE");
+#endif // !NDEBUG
+    debug_release_widget->setCharacterSize(10);
+    debug_release_widget->setFillColor(sf::Color::White);
+    debug_release_widget->setOrigin(fw::Widget::Anchor::BOTTOM_RIGHT);
+    debug_release_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_RIGHT);
+    debug_release_widget->setName("debug_release text");
+
     edit_tool.edit_window_widget->moveToTop();
 }
 
