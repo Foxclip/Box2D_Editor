@@ -1,0 +1,32 @@
+Shortcuts
+    Space                        pause/unpause simulation
+    Right Mouse Hold             move camera
+    Mouse Wheel                  zoom camera
+    Left Mouse Click             select single object
+    Shift + Left Mouse Click     add object to selection
+    Left Mouse Hold              rectangle select
+    A                            select all objects
+    Alt + A                      deselect all objects
+    Ctrl + Left Mouse Click      select object with children
+    G                            move selected objects
+    R                            rotate selected objects
+    Escape                       cancel move/rotate
+    Shift + D                    duplicate selected objects
+    Tab                          open edit mode (if there is an active object)
+    X                            delete selected objects
+    Ctrl + Z                     undo
+    Ctrl + Shift + Z             redo
+    Ctrl + S                     save
+    D                            toggle widgets debug render
+    I                            toggle additional info
+    E                            advance one frame
+    /                            center camera on selected objects
+    F                            toggle follow object (if there is an active object)
+
+Edit mode
+    Ctrl + Left Mouse Click      add vertex to end
+    Alt + Left Mouse Click       insert vertex
+    X                            delete vertex (when hovering mouse on a vertex)
+    A                            select all vertices
+    Alt + A                      deselect all vertices
+    Tab                          open select mode

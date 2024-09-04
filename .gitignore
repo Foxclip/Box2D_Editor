@@ -401,3 +401,4 @@ build/
 box2d/
 sfml/
 tests/tmp/
+install/
