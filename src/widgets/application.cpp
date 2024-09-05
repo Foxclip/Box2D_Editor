@@ -420,10 +420,10 @@ namespace fw {
         }
         processKeyboard();
         processMouse();
-        onAfterProcessInput();
     }
 
     void Application::processAfterInput() {
+        onAfterProcessInput();
         widgets.processAfterInput();
     }
 

@@ -1080,6 +1080,10 @@ void Editor::requestLoad(const std::filesystem::path& path) {
 
 void Editor::loadFromFile(const std::filesystem::path& path) {
     LoggerTag tag_saveload("saveload");
+    fw::Stage stage = getStage();
+    if (stage != fw::Stage::AFTER_INPUT && stage != fw::Stage::NONE) {
+        mAssert(false, "Cannot load file in this stage");
+    }
     try {
         std::string str = utils::file_to_str(path);
         deserialize(str, true);
