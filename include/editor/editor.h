@@ -226,7 +226,7 @@ private:
 	void deserialize(const std::string& str, bool set_camera);
 	void save();
 	void saveToFile(const std::filesystem::path& path);
-	void loadAction(const std::filesystem::path& path);
+	void requestLoad(const std::filesystem::path& path);
 	void loadFromFile(const std::filesystem::path& path);
 	void quicksave();
 	void quickload();

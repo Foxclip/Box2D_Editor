@@ -1073,7 +1073,7 @@ void Editor::saveToFile(const std::filesystem::path& path) {
     editor_logger << "Saved to " << path << "\n";
 }
 
-void Editor::loadAction(const std::filesystem::path& path) {
+void Editor::requestLoad(const std::filesystem::path& path) {
     load_request.requested = true;
     load_request.path = path;
 }
@@ -1112,7 +1112,7 @@ void Editor::showOpenFileMenu() {
     if (filename.empty()) {
         return;
     }
-    loadFromFile(filename);
+    requestLoad(filename);
 }
 
 void Editor::showSaveFileMenu() {
