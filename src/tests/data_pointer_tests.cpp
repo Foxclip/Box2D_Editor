@@ -7,6 +7,7 @@ struct MyStruct {
 		this->val = val;
 	}
 	int val = 0;
+	int hidden = 0;
 };
 
 template<typename T>
@@ -42,16 +43,39 @@ void DataPointerTests::createTestLists() {
 
 void DataPointerTests::nullTest(test::Test& test) {
 	DataPointer<int> dp(nullptr);
+
+	T_COMPARE(data_blocks.size(), 0);
 }
 
 void DataPointerTests::basicTest(test::Test& test) {
 	int* x = new int(5);
 	DataPointer<int> dp(x);
+
+	if (T_COMPARE(data_blocks.size(), 1)) {
+		auto it = data_blocks.find(x);
+		if (T_CHECK(it != data_blocks.end())) {
+			void* ptr = it->second.ptr;
+			size_t size = it->second.size;
+			T_COMPARE(ptr, x, &pointer_to_str);
+			T_COMPARE(size, sizeof(int));
+		}
+	}
 }
 
 void DataPointerTests::structTest(test::Test& test) {
 	MyStruct* m = new MyStruct(11);
 	DataPointer<MyStruct> dp(m);
+	static_assert(sizeof(MyStruct) != sizeof(int));
+
+	if (T_COMPARE(data_blocks.size(), 1)) {
+		auto it = data_blocks.find(m);
+		if (T_CHECK(it != data_blocks.end())) {
+			void* ptr = it->second.ptr;
+			size_t size = it->second.size;
+			T_COMPARE(ptr, m, &pointer_to_str);
+			T_COMPARE(size, sizeof(MyStruct));
+		}
+	}
 }
 
 void DataPointerTests::customDeleterTest(test::Test& test) {
@@ -65,6 +89,8 @@ void DataPointerTests::customDeleterTest(test::Test& test) {
 		DataPointer<MyStruct, CustomDeleter<MyStruct>> dp(m, cd);
 	}
 	T_CHECK(flag);
+
+	T_COMPARE(data_blocks.size(), 0);
 }
 
 void DataPointerTests::getTest(test::Test& test) {
@@ -81,6 +107,8 @@ void DataPointerTests::releaseTest(test::Test& test) {
 	T_COMPARE(m2, m, &pointer_to_str);
 	MyStruct* m3 = dp.get();
 	T_COMPARE(m3, nullptr, &pointer_to_str);
+
+	T_COMPARE(data_blocks.size(), 0);
 }
 
 void DataPointerTests::resetTest(test::Test& test) {
@@ -92,6 +120,16 @@ void DataPointerTests::resetTest(test::Test& test) {
 	dp.reset(m2);
 	MyStruct* mt2 = dp.get();
 	T_COMPARE(mt2, m2, &pointer_to_str);
+
+	if (T_COMPARE(data_blocks.size(), 1)) {
+		auto it = data_blocks.find(m2);
+		if (T_CHECK(it != data_blocks.end())) {
+			void* ptr = it->second.ptr;
+			size_t size = it->second.size;
+			T_COMPARE(ptr, m2, &pointer_to_str);
+			T_COMPARE(size, sizeof(MyStruct));
+		}
+	}
 }
 
 void DataPointerTests::dereferenceTest(test::Test& test) {
@@ -116,4 +154,14 @@ void DataPointerTests::moveTest(test::Test& test) {
 		vec.push_back(std::move(dp));
 	}
 	T_COMPARE(vec[0]->val, 99);
+
+	if (T_COMPARE(data_blocks.size(), 1)) {
+		auto it = data_blocks.find(m);
+		if (T_CHECK(it != data_blocks.end())) {
+			void* ptr = it->second.ptr;
+			size_t size = it->second.size;
+			T_COMPARE(ptr, m, &pointer_to_str);
+			T_COMPARE(size, sizeof(MyStruct));
+		}
+	}
 }

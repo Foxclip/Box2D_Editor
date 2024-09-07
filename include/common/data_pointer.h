@@ -2,8 +2,18 @@
 
 #include <format>
 #include <iostream>
+#include <map>
 
 std::string pointer_to_str(void* ptr);
+
+struct DataBlock {
+	DataBlock();
+	DataBlock(void* ptr, size_t size);
+	void* ptr = nullptr;
+	size_t size = 0;
+};
+
+extern std::map<void*, DataBlock> data_blocks;
 
 template<typename T>
 class DataPointerDefaultDelete {
@@ -46,12 +56,18 @@ template<typename T, typename D>
 inline DataPointer<T, D>::DataPointer(T* ptr) {
 	//std::cout << "Creating DataPointer: " << pointer_to_str(reinterpret_cast<void*>(ptr)) << "\n";
 	this->ptr = ptr;
+	if (ptr) {
+		data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
+	}
 	this->deleter = DataPointerDefaultDelete<T>();
 }
 
 template<typename T, typename D>
 inline DataPointer<T, D>::DataPointer(T* ptr, const D& deleter) {
 	this->ptr = ptr;
+	if (ptr) {
+		data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
+	}
 	this->deleter = deleter;
 }
 
@@ -63,6 +79,9 @@ inline DataPointer<T, D>::DataPointer(DataPointer&& dp) noexcept {
 
 template<typename T, typename D>
 inline DataPointer<T, D>::~DataPointer() {
+	if (ptr) {
+		data_blocks.erase(reinterpret_cast<void*>(ptr));
+	}
 	deleter(ptr);
 }
 
@@ -74,12 +93,25 @@ inline T* DataPointer<T, D>::get() const {
 template<typename T, typename D>
 inline T* DataPointer<T, D>::release() {
 	T* result = ptr;
+	if (ptr) {
+		data_blocks.erase(reinterpret_cast<void*>(ptr));
+	}
 	ptr = nullptr;
 	return result;
 }
 
 template<typename T, typename D>
 inline void DataPointer<T, D>::reset(T* new_ptr) {
+	T* old_ptr = ptr;
+	if (old_ptr == new_ptr) {
+		return;
+	}
+	if (old_ptr) {
+		data_blocks.erase(reinterpret_cast<void*>(old_ptr));
+	}
+	if (new_ptr) {
+		data_blocks.insert({ reinterpret_cast<void*>(new_ptr), DataBlock(new_ptr, sizeof(T)) });
+	}
 	ptr = new_ptr;
 }
 
