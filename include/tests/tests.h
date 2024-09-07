@@ -7,3 +7,4 @@
 #include "simulation_tests.h"
 #include "widget_tests.h"
 #include "editor_tests.h"
+#include "data_pointer_tests.h"

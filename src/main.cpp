@@ -27,7 +27,9 @@ int main() {
 
     execute_app();
 
-    // TODOL Editor: Camera class
+    // TODO: replace all std smart pointers with custom smart pointers
+    // TODO: do memory debugging of loadFromFile again with custom smart pointers
+    // TODO: Editor: Camera class
     // TODO: Editor: fix redundant serialize logger message
     // TODO: Outliner: fix selection after subtree collapse
     // TODO: Outliner: reparent object
