@@ -188,7 +188,7 @@ void SimulationTests::boxSerializeTest(test::Test& test) {
         "box0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), b2Vec2(1.1f, 2.0f), sf::Color::Green
     );
     std::string str = boxA->serialize();
-    std::unique_ptr<BoxObject> uptr = BoxObject::deserialize(str, &simulation);
+    DataPointer<BoxObject> uptr = BoxObject::deserialize(str, &simulation);
     BoxObject* boxB = uptr.get();
     boxCmp(test, boxA, boxB);
 }
@@ -199,7 +199,7 @@ void SimulationTests::ballSerializeTest(test::Test& test) {
         "ball0", b2Vec2(1.5f, -3.5f), 2.2f, sf::Color::Green, sf::Color::Green
     );
     std::string str = ballA->serialize();
-    std::unique_ptr<BallObject> uptr = BallObject::deserialize(str, &simulation);
+    DataPointer<BallObject> uptr = BallObject::deserialize(str, &simulation);
     BallObject* ballB = uptr.get();
     ballCmp(test, ballA, ballB);
 }
@@ -215,7 +215,7 @@ void SimulationTests::polygonSerializeTest(test::Test& test) {
         "polygon0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), vertices, sf::Color::Green
     );
     std::string str = polygonA->serialize();
-    std::unique_ptr<PolygonObject> uptr = PolygonObject::deserialize(str, &simulation);
+    DataPointer<PolygonObject> uptr = PolygonObject::deserialize(str, &simulation);
     PolygonObject* polygonB = uptr.get();
     polygonCmp(test, polygonA, polygonB);
 }
@@ -234,7 +234,7 @@ void SimulationTests::chainSerializeTest(test::Test& test) {
         "chain0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), vertices, sf::Color::Green
     );
     std::string str = chainA->serialize();
-    std::unique_ptr<ChainObject> uptr = ChainObject::deserialize(str, &simulation);
+    DataPointer<ChainObject> uptr = ChainObject::deserialize(str, &simulation);
     ChainObject* chainB = uptr.get();
     chainCmp(test, chainA, chainB);
 }
@@ -259,7 +259,7 @@ void SimulationTests::revoluteJointSerializeTest(test::Test& test) {
     joint_def.upperAngle = utils::to_radians(55.0f);
     RevoluteJoint* jointA = simulation.createRevoluteJoint(joint_def, box0, box1);
     std::string str = jointA->serialize();
-    std::unique_ptr<RevoluteJoint> uptr = RevoluteJoint::deserialize(str, &simulation);
+    DataPointer<RevoluteJoint> uptr = RevoluteJoint::deserialize(str, &simulation);
     RevoluteJoint* jointB = uptr.get();
     T_ASSERT(T_COMPARE(simulation.getJointsSize(), 1));
     T_CHECK(simulation.getJoint(0) == jointA);
@@ -618,13 +618,13 @@ void SimulationTests::addTest(test::Test& test) {
     Simulation simulationA;
     BoxObject* box0 = createBox(simulationA, "box0", b2Vec2(1.5f, -3.5f));
     std::string str0 = box0->serialize();
-    std::unique_ptr<BoxObject> uptr1 = BoxObject::deserialize(str0, &simulationA);
+    DataPointer<BoxObject> uptr1 = BoxObject::deserialize(str0, &simulationA);
     BoxObject* box1 = dynamic_cast<BoxObject*>(simulationA.add(std::move(uptr1), true));
     T_ASSERT(T_COMPARE(simulationA.getAllSize(), 2));
     T_COMPARE(box1->getId(), 1);
     Simulation simulationB;
     std::string str1 = box1->serialize();
-    std::unique_ptr<BoxObject> uptr2 = BoxObject::deserialize(str1, &simulationB);
+    DataPointer<BoxObject> uptr2 = BoxObject::deserialize(str1, &simulationB);
     BoxObject* box2 = dynamic_cast<BoxObject*>(simulationB.add(std::move(uptr2), false));
     T_ASSERT(T_COMPARE(simulationB.getAllSize(), 1));
     boxCmp(test, box1, box2);
@@ -639,7 +639,7 @@ void SimulationTests::addJointTest(test::Test& test) {
     Simulation simulationB;
     BoxObject* box0B = createBox(simulationB, "box0", b2Vec2(1.5f, -3.5f));
     BoxObject* box1B = createBox(simulationB, "box1", b2Vec2(1.0f, 0.5f));
-    std::unique_ptr<RevoluteJoint> uptr = RevoluteJoint::deserialize(str, &simulationB);
+    DataPointer<RevoluteJoint> uptr = RevoluteJoint::deserialize(str, &simulationB);
     RevoluteJoint* joint1 = dynamic_cast<RevoluteJoint*>(simulationB.addJoint(std::move(uptr)));
     T_ASSERT(T_COMPARE(simulationB.getJointsSize(), 1));
     T_CHECK(simulationB.getJoint(0) == joint1);

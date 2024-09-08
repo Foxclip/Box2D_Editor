@@ -31,8 +31,8 @@ public:
 	const CompVector<GameObject*>& getTopObjects() const;
 	const CompVector<GameObject*>& getAllObjects() const;
 	ptrdiff_t getMaxId() const;
-	GameObject* add(std::unique_ptr<GameObject> object, bool assign_new_id);
-	Joint* addJoint(std::unique_ptr<Joint> joint);
+	GameObject* add(DataPointer<GameObject> object, bool assign_new_id);
+	Joint* addJoint(DataPointer<Joint> joint);
 	GameObject* duplicate(const GameObject* object, bool with_children = false);
 	CompVector<GameObject*> duplicate(const CompVector<GameObject*>& old_objects);
 	void transformFromRigidbody();

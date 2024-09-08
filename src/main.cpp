@@ -27,7 +27,8 @@ int main() {
 
     execute_app();
 
-    // TODO: DataPointer: replace all std smart pointers with DataPointer
+    // TODO: DataPointer: move assignment test
+    // TODO: DataPointer: resetSilent and releaseSilent test
     // TODO: do memory debugging of loadFromFile again with custom smart pointers
     // TODO: Editor: Camera class
     // TODO: Editor: fix redundant serialize logger message

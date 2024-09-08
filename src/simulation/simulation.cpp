@@ -117,7 +117,7 @@ void Simulation::deserialize(TokenReader& tr) {
         while (tr.validRange()) {
             std::string entity = tr.readString();
             if (entity == "object") {
-                std::unique_ptr<GameObject> gameobject;
+                DataPointer<GameObject> gameobject;
                 std::string type = tr.readString();
                 if (type == "box") {
                     gameobject = BoxObject::deserialize(tr, this);
@@ -134,7 +134,7 @@ void Simulation::deserialize(TokenReader& tr) {
             } else if (entity == "joint") {
                 std::string type = tr.readString();
                 if (type == "revolute") {
-                    std::unique_ptr<RevoluteJoint> uptr = RevoluteJoint::deserialize(tr, this);
+                    DataPointer<RevoluteJoint> uptr = RevoluteJoint::deserialize(tr, this);
                     addJoint(std::move(uptr));
                 } else {
                     throw std::runtime_error("Unknown joint type: " + type);
@@ -161,7 +161,7 @@ BoxObject* Simulation::createBox(
     def.type = b2_dynamicBody;
     def.position = pos;
     def.angle = angle;
-    std::unique_ptr<BoxObject> uptr = std::make_unique<BoxObject>(
+    DataPointer<BoxObject> uptr = make_data_pointer<BoxObject>(
         this, def, size, color
     );
     BoxObject* ptr = uptr.get();
@@ -180,7 +180,7 @@ BallObject* Simulation::createBall(
     b2BodyDef def;
     def.type = b2_dynamicBody;
     def.position = pos;
-    std::unique_ptr<BallObject> uptr = std::make_unique<BallObject>(
+    DataPointer<BallObject> uptr = make_data_pointer<BallObject>(
         this, def, radius, color, notch_color
     );
     BallObject* ptr = uptr.get();
@@ -200,7 +200,7 @@ PolygonObject* Simulation::createPolygon(
     def.type = b2_dynamicBody;
     def.position = pos;
     def.angle = angle;
-    std::unique_ptr<PolygonObject> uptr = std::make_unique<PolygonObject>(
+    DataPointer<PolygonObject> uptr = make_data_pointer<PolygonObject>(
         this, def, vertices, color
     );
     PolygonObject* ptr = uptr.get();
@@ -281,7 +281,7 @@ ChainObject* Simulation::createChain(
     b2BodyDef def;
     def.position = pos;
     def.angle = angle;
-    std::unique_ptr<ChainObject> uptr = std::make_unique<ChainObject>(
+    DataPointer<ChainObject> uptr = make_data_pointer<ChainObject>(
         this, def, vertices, color
     );
     ChainObject* ptr = uptr.get();
@@ -295,7 +295,7 @@ RevoluteJoint* Simulation::createRevoluteJoint(
     GameObject* obj1,
     GameObject* obj2
 ) {
-    std::unique_ptr<RevoluteJoint> uptr = std::make_unique<RevoluteJoint>(
+    DataPointer<RevoluteJoint> uptr = make_data_pointer<RevoluteJoint>(
         def, world.get(), obj1, obj2
     );
     RevoluteJoint* ptr = uptr.get();

@@ -184,8 +184,8 @@ public:
 	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static std::unique_ptr<BoxObject> deserialize(const std::string& str, GameObjectList* object_list);
-	static std::unique_ptr<BoxObject> deserialize(TokenReader& tr, GameObjectList* object_list);
+	static DataPointer<BoxObject> deserialize(const std::string& str, GameObjectList* object_list);
+	static DataPointer<BoxObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
 	bool isEqual(const GameObject* other) const;
 
@@ -211,8 +211,8 @@ public:
 	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static std::unique_ptr<BallObject> deserialize(const std::string& str, GameObjectList* object_list);
-	static std::unique_ptr<BallObject> deserialize(TokenReader& tr, GameObjectList* object_list);
+	static DataPointer<BallObject> deserialize(const std::string& str, GameObjectList* object_list);
+	static DataPointer<BallObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
 	bool isEqual(const GameObject* other) const;
 
@@ -239,8 +239,8 @@ public:
 	void setDrawVarray(bool value) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static std::unique_ptr<PolygonObject> deserialize(const std::string& str, GameObjectList* object_list);
-	static std::unique_ptr<PolygonObject> deserialize(TokenReader& tr, GameObjectList* object_list);
+	static DataPointer<PolygonObject> deserialize(const std::string& str, GameObjectList* object_list);
+	static DataPointer<PolygonObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
 	bool isEqual(const GameObject* other) const;
 
@@ -258,8 +258,8 @@ public:
 	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static std::unique_ptr<ChainObject> deserialize(const std::string& str, GameObjectList* object_list);
-	static std::unique_ptr<ChainObject> deserialize(TokenReader& tr, GameObjectList* object_list);
+	static DataPointer<ChainObject> deserialize(const std::string& str, GameObjectList* object_list);
+	static DataPointer<ChainObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
 	bool isEqual(const GameObject* other) const;
 

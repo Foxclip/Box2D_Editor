@@ -127,7 +127,7 @@ namespace fw {
 	requires std::derived_from<T, Widget>
 	inline T* WidgetList::createWidget(Args&&... args) {
 		wAssert(!isLocked());
-		std::unique_ptr<T> uptr = std::make_unique<T>(*this, args...);
+		DataPointer<T> uptr = make_data_pointer<T>(*this, args...);
 		T* ptr = uptr.get();
 		if (root_widget) {
 			ptr->setParentSilent(root_widget);

@@ -908,7 +908,7 @@ namespace fw {
 		const ExecuteFuncType& func
 	) {
 		wAssert(!widget_list.isLocked());
-		std::unique_ptr<WidgetLink> uptr = std::make_unique<WidgetLink>(name, targets, this, func);
+		DataPointer<WidgetLink> uptr = make_data_pointer<WidgetLink>(name, targets, this, func);
 		WidgetLink* ptr = uptr.get();
 		for (size_t i = 0; i < targets.size(); i++) {
 			WidgetUpdateTarget* target = targets[i];
@@ -934,7 +934,7 @@ namespace fw {
 		const ExecuteFuncType& func
 	) {
 		wAssert(!widget_list.isLocked());
-		std::unique_ptr<WidgetLink> uptr = std::make_unique<WidgetLink>(name, targets_func, this, func);
+		DataPointer<WidgetLink> uptr = make_data_pointer<WidgetLink>(name, targets_func, this, func);
 		WidgetLink* ptr = uptr.get();
 		links.add(std::move(uptr));
 		return ptr;

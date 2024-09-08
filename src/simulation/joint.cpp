@@ -157,26 +157,26 @@ TokenWriter& RevoluteJoint::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(const std::string& str, GameObjectList* object_list) {
+DataPointer<RevoluteJoint> RevoluteJoint::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	std::unique_ptr<RevoluteJoint> uptr = deserialize(tr, object_list);
+	DataPointer<RevoluteJoint> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(
+DataPointer<RevoluteJoint> RevoluteJoint::deserialize(
 	const std::string& str, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
 ) {
 	TokenReader tr(str);
-	std::unique_ptr<RevoluteJoint> uptr = deserialize(tr, object_list, new_object_a, new_object_b);
+	DataPointer<RevoluteJoint> uptr = deserialize(tr, object_list, new_object_a, new_object_b);
 	return uptr;
 }
 
-std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(TokenReader& tr, GameObjectList* object_list) {
-	std::unique_ptr<RevoluteJoint> uptr = deserialize(tr, object_list, nullptr, nullptr);
+DataPointer<RevoluteJoint> RevoluteJoint::deserialize(TokenReader& tr, GameObjectList* object_list) {
+	DataPointer<RevoluteJoint> uptr = deserialize(tr, object_list, nullptr, nullptr);
 	return uptr;
 }
 
-std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(
+DataPointer<RevoluteJoint> RevoluteJoint::deserialize(
 	TokenReader& tr, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
 ) {
 	try {
@@ -228,7 +228,7 @@ std::unique_ptr<RevoluteJoint> RevoluteJoint::deserialize(
 		if (new_object_b) {
 			object2 = new_object_b;
 		}
-		std::unique_ptr<RevoluteJoint> uptr = std::make_unique<RevoluteJoint>(def, object_list->getWorld(), object1, object2);
+		DataPointer<RevoluteJoint> uptr = make_data_pointer<RevoluteJoint>(def, object_list->getWorld(), object1, object2);
 		return uptr;
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));

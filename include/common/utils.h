@@ -54,6 +54,7 @@ namespace utils {
 	bool parseLL(const std::string& str, long long& result);
 	bool parseFloat(const std::string& str, float& result);
 	std::string floatToStr(float value, size_t precision = 9);
+	std::string pointer_to_str(void* ptr);
 
 	template <typename TVec2>
 	TVec2 get_circle_vertex(ptrdiff_t index, size_t point_count, float radius, float offset = 0.0f) {

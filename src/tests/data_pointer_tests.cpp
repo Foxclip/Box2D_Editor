@@ -1,6 +1,7 @@
 #include "tests/data_pointer_tests.h"
 #include "common/data_pointer.h"
 #include <functional>
+#include "common/utils.h"
 
 struct MyStruct {
 	MyStruct(int val) {
@@ -88,16 +89,16 @@ void DataPointerTests::getTest(test::Test& test) {
 	MyStruct* m = new MyStruct(33);
 	DataPointer<MyStruct> dp(m);
 	MyStruct* m2 = dp.get();
-	T_COMPARE(m2, m, &pointer_to_str);
+	T_COMPARE(m2, m, &utils::pointer_to_str);
 }
 
 void DataPointerTests::releaseTest(test::Test& test) {
 	MyStruct* m = new MyStruct(44);
 	DataPointer<MyStruct> dp(m);
 	MyStruct* m2 = dp.release();
-	T_COMPARE(m2, m, &pointer_to_str);
+	T_COMPARE(m2, m, &utils::pointer_to_str);
 	MyStruct* m3 = dp.get();
-	T_COMPARE(m3, nullptr, &pointer_to_str);
+	T_COMPARE(m3, nullptr, &utils::pointer_to_str);
 
 	T_COMPARE(data_blocks.size(), 0);
 }
@@ -107,10 +108,10 @@ void DataPointerTests::resetTest(test::Test& test) {
 	MyStruct* m2 = new MyStruct(66);
 	DataPointer<MyStruct> dp(m);
 	MyStruct* mt1 = dp.get();
-	T_COMPARE(mt1, m, &pointer_to_str);
+	T_COMPARE(mt1, m, &utils::pointer_to_str);
 	dp.reset(m2);
 	MyStruct* mt2 = dp.get();
-	T_COMPARE(mt2, m2, &pointer_to_str);
+	T_COMPARE(mt2, m2, &utils::pointer_to_str);
 
 	T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
 }
@@ -171,7 +172,7 @@ void DataPointerTests::checkDataBlock(test::Test& test, void* p_block, size_t p_
 		if (T_CHECK(it != data_blocks.end())) {
 			void* ptr = it->second.ptr;
 			size_t size = it->second.size;
-			T_COMPARE(ptr, p_block, &pointer_to_str);
+			T_COMPARE(ptr, p_block, &utils::pointer_to_str);
 			T_COMPARE(size, p_size);
 		}
 	}

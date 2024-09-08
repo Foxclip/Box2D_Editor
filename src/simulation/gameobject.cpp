@@ -828,13 +828,13 @@ TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-std::unique_ptr<BoxObject> BoxObject::deserialize(const std::string& str, GameObjectList* object_list) {
+DataPointer<BoxObject> BoxObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	std::unique_ptr<BoxObject> uptr = deserialize(tr, object_list);
+	DataPointer<BoxObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+DataPointer<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -867,7 +867,7 @@ std::unique_ptr<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectLis
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<BoxObject> box = std::make_unique<BoxObject>(object_list, bdef, size, color);
+		DataPointer<BoxObject> box = make_data_pointer<BoxObject>(object_list, bdef, size, color);
 		box->id = id;
 		box->parent_id = parent_id;
 		box->name = name;
@@ -961,13 +961,13 @@ TokenWriter& BallObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-std::unique_ptr<BallObject> BallObject::deserialize(const std::string& str, GameObjectList* object_list) {
+DataPointer<BallObject> BallObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	std::unique_ptr<BallObject> uptr = deserialize(tr, object_list);
+	DataPointer<BallObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+DataPointer<BallObject> BallObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -1008,7 +1008,7 @@ std::unique_ptr<BallObject> BallObject::deserialize(TokenReader& tr, GameObjectL
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<BallObject> ball = std::make_unique<BallObject>(object_list, bdef, radius, color, notch_color);
+		DataPointer<BallObject> ball = make_data_pointer<BallObject>(object_list, bdef, radius, color, notch_color);
 		ball->id = id;
 		ball->parent_id = parent_id;
 		ball->name = name;
@@ -1118,13 +1118,13 @@ TokenWriter& PolygonObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-std::unique_ptr<PolygonObject> PolygonObject::deserialize(const std::string& str, GameObjectList* object_list) {
+DataPointer<PolygonObject> PolygonObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	std::unique_ptr<PolygonObject> uptr = deserialize(tr, object_list);
+	DataPointer<PolygonObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+DataPointer<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -1132,7 +1132,6 @@ std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameO
 		sf::Color color = sf::Color::White;
 		std::vector<b2Vec2> vertices;
 		BodyDef body_def;
-		std::vector<std::unique_ptr<BallObject>> wheels;
 		if (tr.tryEat("object")) {
 			tr.eat("polygon");
 		}
@@ -1158,7 +1157,7 @@ std::unique_ptr<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameO
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<PolygonObject> car = std::make_unique<PolygonObject>(object_list, bdef, vertices, color);
+		DataPointer<PolygonObject> car = make_data_pointer<PolygonObject>(object_list, bdef, vertices, color);
 		car->id = id;
 		car->parent_id = parent_id;
 		car->name = name;
@@ -1262,13 +1261,13 @@ TokenWriter& ChainObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-std::unique_ptr<ChainObject> ChainObject::deserialize(const std::string& str, GameObjectList* object_list) {
+DataPointer<ChainObject> ChainObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	std::unique_ptr<ChainObject> uptr = deserialize(tr, object_list);
+	DataPointer<ChainObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+DataPointer<ChainObject> ChainObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -1301,7 +1300,7 @@ std::unique_ptr<ChainObject> ChainObject::deserialize(TokenReader& tr, GameObjec
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		std::unique_ptr<ChainObject> chain = std::make_unique<ChainObject>(object_list, bdef, vertices, color);
+		DataPointer<ChainObject> chain = make_data_pointer<ChainObject>(object_list, bdef, vertices, color);
 		chain->id = id;
 		chain->parent_id = parent_id;
 		chain->name = name;

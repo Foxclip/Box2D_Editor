@@ -4,8 +4,6 @@
 #include <iostream>
 #include <map>
 
-std::string pointer_to_str(void* ptr);
-
 struct DataBlock {
 	DataBlock();
 	DataBlock(void* ptr, size_t size);
@@ -25,6 +23,7 @@ public:
 template<typename T, typename D = DataPointerDefaultDelete<T>>
 class DataPointer {
 public:
+	DataPointer();
 	DataPointer(T* ptr);
 	DataPointer(T* ptr, const D& deleter);
 	DataPointer(DataPointer&& dp) noexcept;
@@ -38,6 +37,7 @@ public:
 	void reset(T* new_ptr);
 	T& operator*() const;
 	T* operator->() const;
+	DataPointer& operator=(DataPointer&& right);
 
 	DataPointer(const DataPointer&) = delete;
 	DataPointer& operator=(const DataPointer&) = delete;
@@ -53,15 +53,19 @@ DataPointer<T> make_data_pointer(Args&&... args);
 
 template<typename T>
 inline void DataPointerDefaultDelete<T>::operator()(T* ptr) {
-	//std::cout << "Deleting DataPointer (default): " << pointer_to_str(reinterpret_cast<void*>(ptr)) << "\n";
 	if (ptr) {
 		delete ptr;
 	}
 }
 
 template<typename T, typename D>
+inline DataPointer<T, D>::DataPointer() {
+	this->ptr = nullptr;
+	this->deleter = DataPointerDefaultDelete<T>();
+}
+
+template<typename T, typename D>
 inline DataPointer<T, D>::DataPointer(T* ptr) {
-	//std::cout << "Creating DataPointer: " << pointer_to_str(reinterpret_cast<void*>(ptr)) << "\n";
 	this->ptr = ptr;
 	if (ptr) {
 		data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
@@ -147,6 +151,12 @@ inline T& DataPointer<T, D>::operator*() const {
 template<typename T, typename D>
 inline T* DataPointer<T, D>::operator->() const {
 	return ptr;
+}
+
+template<typename T, typename D>
+inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer&& right) {
+	this->ptr = right.releaseSilent();
+	return *this;
 }
 
 template<typename T, typename... Args>

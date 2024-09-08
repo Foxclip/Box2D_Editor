@@ -4,6 +4,7 @@
 #include <set>
 #include <memory>
 #include <cassert>
+#include "data_pointer.h"
 
 template<typename T, typename U>
 concept NotSameAs = !std::same_as<T, U>;
@@ -93,9 +94,9 @@ public:
 	bool empty() const;
 	T* add(const T& value);
 	T* add(const T* ptr);
-	T* add(std::unique_ptr<T> value);
+	T* add(DataPointer<T> value);
 	bool insert(const std::vector<T*>::const_iterator& where, T* ptr);
-	bool insert(const std::vector<T*>::const_iterator& where, std::unique_ptr<T> value);
+	bool insert(const std::vector<T*>::const_iterator& where, DataPointer<T> value);
 	template<std::incrementable TIter>
 	size_t insert(const std::vector<T*>::const_iterator& where, const TIter& first, const TIter& last);
 	ptrdiff_t remove(T* value);
@@ -129,7 +130,7 @@ public:
 	bool operator==(const TCont& other) const;
 
 private:
-	std::vector<std::unique_ptr<T>> uptrs;
+	std::vector<DataPointer<T>> uptrs;
 	CompVector<T*, TCmp> comp;
 
 };
@@ -414,7 +415,7 @@ inline CompVectorUptr<T, TCmp>::CompVectorUptr() { }
 template<typename T, typename TCmp>
 inline CompVectorUptr<T, TCmp>::CompVectorUptr(const std::initializer_list<T>& list) {
 	for (const T& value : list) {
-		std::unique_ptr<T> uptr = std::make_unique<T>(value);
+		DataPointer<T> uptr = make_data_pointer<T>(value);
 		add(std::move(uptr));
 	}
 }
@@ -429,7 +430,7 @@ inline CompVectorUptr<T, TCmp>::CompVectorUptr(const std::initializer_list<T*>& 
 template<typename T, typename TCmp>
 inline CompVectorUptr<T, TCmp>::CompVectorUptr(const std::vector<T*>& vec) {
 	for (const T* value : vec) {
-		std::unique_ptr<T> uptr = std::unique_ptr<T>(const_cast<T*>(value));
+		DataPointer<T> uptr = DataPointer<T>(const_cast<T*>(value));
 		add(std::move(uptr));
 	}
 }
@@ -446,7 +447,7 @@ inline bool CompVectorUptr<T, TCmp>::empty() const {
 
 template<typename T, typename TCmp>
 inline T* CompVectorUptr<T, TCmp>::add(const T& value) {
-	std::unique_ptr<T> uptr = std::make_unique<T>(value);
+	DataPointer<T> uptr = make_data_pointer<T>(value);
 	T* ptr = uptr.get();
 	comp.add(ptr);
 	uptrs.push_back(std::move(uptr));
@@ -458,7 +459,7 @@ inline T* CompVectorUptr<T, TCmp>::add(const T* ptr) {
 	T* nptr = const_cast<T*>(ptr);
 	bool added = comp.add(nptr);
 	if (added) {
-		std::unique_ptr<T> uptr = std::unique_ptr<T>(nptr);
+		DataPointer<T> uptr = DataPointer<T>(nptr);
 		uptrs.push_back(std::move(uptr));
 		return nptr;
 	}
@@ -466,7 +467,7 @@ inline T* CompVectorUptr<T, TCmp>::add(const T* ptr) {
 }
 
 template<typename T, typename TCmp>
-inline T* CompVectorUptr<T, TCmp>::add(std::unique_ptr<T> value) {
+inline T* CompVectorUptr<T, TCmp>::add(DataPointer<T> value) {
 	T* ptr = value.get();
 	bool added = comp.add(ptr);
 	if (added) {
@@ -478,12 +479,12 @@ inline T* CompVectorUptr<T, TCmp>::add(std::unique_ptr<T> value) {
 
 template<typename T, typename TCmp>
 inline bool CompVectorUptr<T, TCmp>::insert(const std::vector<T*>::const_iterator& where, T* ptr) {
-	std::unique_ptr<T> uptr(ptr);
+	DataPointer<T> uptr(ptr);
 	return insert(where, std::move(uptr));
 }
 
 template<typename T, typename TCmp>
-inline bool CompVectorUptr<T, TCmp>::insert(const std::vector<T*>::const_iterator& where, std::unique_ptr<T> value) {
+inline bool CompVectorUptr<T, TCmp>::insert(const std::vector<T*>::const_iterator& where, DataPointer<T> value) {
 	size_t offset = where - comp.begin();
 	bool inserted = comp.insert(where, value.get());
 	if (inserted) {
@@ -501,7 +502,7 @@ inline size_t CompVectorUptr<T, TCmp>::insert(const std::vector<T*>::const_itera
 	TIter iter_other(first);
 	size_t inserted_count = 0;
 	while (iter_other != last) {
-		if (insert(comp.begin() + offset, std::move(const_cast<std::unique_ptr<T>&>(*iter_other)))) {
+		if (insert(comp.begin() + offset, std::move(const_cast<DataPointer<T>&>(*iter_other)))) {
 			inserted_count++;
 			offset++;
 		}
@@ -655,7 +656,7 @@ inline bool CompVectorUptr<T, TCmp>::contains(const T* value) const {
 
 template<typename T, typename TCmp>
 inline void CompVectorUptr<T, TCmp>::clear() {
-	uptrs = std::vector<std::unique_ptr<T>>();
+	uptrs = std::vector<DataPointer<T>>();
 	comp.clear();
 }
 
