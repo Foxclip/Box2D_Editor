@@ -44,6 +44,9 @@ private:
 
 };
 
+template<typename T, typename... Args>
+DataPointer<T> make_data_pointer(Args&&... args);
+
 template<typename T>
 inline void DataPointerDefaultDelete<T>::operator()(T* ptr) {
 	//std::cout << "Deleting DataPointer (default): " << pointer_to_str(reinterpret_cast<void*>(ptr)) << "\n";
@@ -123,4 +126,11 @@ inline T& DataPointer<T, D>::operator*() const {
 template<typename T, typename D>
 inline T* DataPointer<T, D>::operator->() const {
 	return ptr;
+}
+
+template<typename T, typename... Args>
+inline DataPointer<T> make_data_pointer(Args&&... args) {
+	T* ptr = new T(std::forward<Args>(args)...);
+	DataPointer<T> result(ptr);
+	return result;
 }

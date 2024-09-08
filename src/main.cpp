@@ -27,7 +27,7 @@ int main() {
 
     execute_app();
 
-    // TODO: replace all std smart pointers with custom smart pointers
+    // TODO: DataPointer: replace all std smart pointers with DataPointer
     // TODO: do memory debugging of loadFromFile again with custom smart pointers
     // TODO: Editor: Camera class
     // TODO: Editor: fix redundant serialize logger message

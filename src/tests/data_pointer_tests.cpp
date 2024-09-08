@@ -39,6 +39,7 @@ void DataPointerTests::createTestLists() {
 	test::Test* dereference_test = list->addTest("dereference", { struct_test }, [&](test::Test& test) { dereferenceTest(test); });
 	test::Test* pointer_access_test = list->addTest("pointer_access", { struct_test }, [&](test::Test& test) { pointerAccessTest(test); });
 	test::Test* move_test = list->addTest("move", { struct_test }, [&](test::Test& test) { moveTest(test); });
+	test::Test* make_data_pointer_test = list->addTest("make_data_pointer", { struct_test }, [&](test::Test& test) { makeDataPointerTest(test); });
 }
 
 void DataPointerTests::nullTest(test::Test& test) {
@@ -51,15 +52,7 @@ void DataPointerTests::basicTest(test::Test& test) {
 	int* x = new int(5);
 	DataPointer<int> dp(x);
 
-	if (T_COMPARE(data_blocks.size(), 1)) {
-		auto it = data_blocks.find(x);
-		if (T_CHECK(it != data_blocks.end())) {
-			void* ptr = it->second.ptr;
-			size_t size = it->second.size;
-			T_COMPARE(ptr, x, &pointer_to_str);
-			T_COMPARE(size, sizeof(int));
-		}
-	}
+	T_WRAP_CONTAINER(checkDataBlock(test, x, sizeof(int)));
 }
 
 void DataPointerTests::structTest(test::Test& test) {
@@ -67,15 +60,7 @@ void DataPointerTests::structTest(test::Test& test) {
 	DataPointer<MyStruct> dp(m);
 	static_assert(sizeof(MyStruct) != sizeof(int));
 
-	if (T_COMPARE(data_blocks.size(), 1)) {
-		auto it = data_blocks.find(m);
-		if (T_CHECK(it != data_blocks.end())) {
-			void* ptr = it->second.ptr;
-			size_t size = it->second.size;
-			T_COMPARE(ptr, m, &pointer_to_str);
-			T_COMPARE(size, sizeof(MyStruct));
-		}
-	}
+	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
 }
 
 void DataPointerTests::customDeleterTest(test::Test& test) {
@@ -121,15 +106,7 @@ void DataPointerTests::resetTest(test::Test& test) {
 	MyStruct* mt2 = dp.get();
 	T_COMPARE(mt2, m2, &pointer_to_str);
 
-	if (T_COMPARE(data_blocks.size(), 1)) {
-		auto it = data_blocks.find(m2);
-		if (T_CHECK(it != data_blocks.end())) {
-			void* ptr = it->second.ptr;
-			size_t size = it->second.size;
-			T_COMPARE(ptr, m2, &pointer_to_str);
-			T_COMPARE(size, sizeof(MyStruct));
-		}
-	}
+	T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
 }
 
 void DataPointerTests::dereferenceTest(test::Test& test) {
@@ -155,13 +132,29 @@ void DataPointerTests::moveTest(test::Test& test) {
 	}
 	T_COMPARE(vec[0]->val, 99);
 
+	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
+}
+
+void DataPointerTests::makeDataPointerTest(test::Test& test) {
+	{
+		DataPointer<MyStruct> dp = make_data_pointer<MyStruct>(111);
+		T_COMPARE(dp->val, 111);
+
+		MyStruct* m = dp.get();
+		T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
+	}
+
+	T_COMPARE(data_blocks.size(), 0);
+}
+
+void DataPointerTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {
 	if (T_COMPARE(data_blocks.size(), 1)) {
-		auto it = data_blocks.find(m);
+		auto it = data_blocks.find(p_block);
 		if (T_CHECK(it != data_blocks.end())) {
 			void* ptr = it->second.ptr;
 			size_t size = it->second.size;
-			T_COMPARE(ptr, m, &pointer_to_str);
-			T_COMPARE(size, sizeof(MyStruct));
+			T_COMPARE(ptr, p_block, &pointer_to_str);
+			T_COMPARE(size, p_size);
 		}
 	}
 }
