@@ -28,9 +28,13 @@ public:
 	DataPointer(T* ptr);
 	DataPointer(T* ptr, const D& deleter);
 	DataPointer(DataPointer&& dp) noexcept;
+	template<typename T2, typename D2>
+	DataPointer(DataPointer<T2, D2>&& dp) noexcept;
 	~DataPointer();
 	T* get() const;
+	T* releaseSilent();
 	T* release();
+	void resetSilent(T* new_ptr);
 	void reset(T* new_ptr);
 	T& operator*() const;
 	T* operator->() const;
@@ -76,8 +80,13 @@ inline DataPointer<T, D>::DataPointer(T* ptr, const D& deleter) {
 
 template<typename T, typename D>
 inline DataPointer<T, D>::DataPointer(DataPointer&& dp) noexcept {
-	this->ptr = dp.ptr;
-	dp.ptr = nullptr;
+	this->ptr = dp.releaseSilent();
+}
+
+template<typename T, typename D>
+template<typename T2, typename D2>
+inline DataPointer<T, D>::DataPointer(DataPointer<T2, D2>&& dp) noexcept {
+	this->ptr = dp.releaseSilent();
 }
 
 template<typename T, typename D>
@@ -94,6 +103,13 @@ inline T* DataPointer<T, D>::get() const {
 }
 
 template<typename T, typename D>
+inline T* DataPointer<T, D>::releaseSilent() {
+	T* result = ptr;
+	ptr = nullptr;
+	return result;
+}
+
+template<typename T, typename D>
 inline T* DataPointer<T, D>::release() {
 	T* result = ptr;
 	if (ptr) {
@@ -101,6 +117,11 @@ inline T* DataPointer<T, D>::release() {
 	}
 	ptr = nullptr;
 	return result;
+}
+
+template<typename T, typename D>
+inline void DataPointer<T, D>::resetSilent(T* new_ptr) {
+	ptr = new_ptr;
 }
 
 template<typename T, typename D>

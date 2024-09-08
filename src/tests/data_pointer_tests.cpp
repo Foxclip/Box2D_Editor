@@ -10,6 +10,11 @@ struct MyStruct {
 	int hidden = 0;
 };
 
+struct ChildStruct : public MyStruct {
+	ChildStruct(int val) : MyStruct(val) { }
+	int child_hidden = 0;
+};
+
 template<typename T>
 struct CustomDeleter {
 	CustomDeleter() { }
@@ -40,6 +45,7 @@ void DataPointerTests::createTestLists() {
 	test::Test* pointer_access_test = list->addTest("pointer_access", { struct_test }, [&](test::Test& test) { pointerAccessTest(test); });
 	test::Test* move_test = list->addTest("move", { struct_test }, [&](test::Test& test) { moveTest(test); });
 	test::Test* make_data_pointer_test = list->addTest("make_data_pointer", { struct_test }, [&](test::Test& test) { makeDataPointerTest(test); });
+	test::Test* make_data_pointer_derived_test = list->addTest("make_data_pointer_derived", { make_data_pointer_test }, [&](test::Test& test) { makeDataPointerDerivedTest(test); });
 }
 
 void DataPointerTests::nullTest(test::Test& test) {
@@ -142,6 +148,18 @@ void DataPointerTests::makeDataPointerTest(test::Test& test) {
 
 		MyStruct* m = dp.get();
 		T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
+	}
+
+	T_COMPARE(data_blocks.size(), 0);
+}
+
+void DataPointerTests::makeDataPointerDerivedTest(test::Test& test) {
+	{
+		DataPointer<MyStruct> dp = make_data_pointer<ChildStruct>(222);
+		T_COMPARE(dp->val, 222);
+
+		MyStruct* m = dp.get();
+		T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(ChildStruct)));
 	}
 
 	T_COMPARE(data_blocks.size(), 0);

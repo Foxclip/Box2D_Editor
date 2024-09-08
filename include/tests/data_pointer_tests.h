@@ -17,6 +17,7 @@ private:
 	void pointerAccessTest(test::Test& test);
 	void moveTest(test::Test& test);
 	void makeDataPointerTest(test::Test& test);
+	void makeDataPointerDerivedTest(test::Test& test);
 	
 	void checkDataBlock(test::Test& test, void* p_block, size_t p_size);
 
