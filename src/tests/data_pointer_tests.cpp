@@ -47,6 +47,8 @@ void DataPointerTests::createTestLists() {
 	test::Test* reset_test = list->addTest("reset", { get_test }, [&](test::Test& test) { resetTest(test); });
 	test::Test* release_silent_test = list->addTest("release_silent", { release_test }, [&](test::Test& test) { releaseSilentTest(test); });
 	test::Test* reset_silent_test = list->addTest("reset_silent", { reset_test }, [&](test::Test& test) { resetSilentTest(test); });
+	test::Test* move_constructor_test = list->addTest("move_contructor", { release_silent_test }, [&](test::Test& test) { moveConstructorTest(test); });
+	test::Test* move_constructor_derived_test = list->addTest("move_contructor_derived", { move_constructor_test }, [&](test::Test& test) { moveConstructorDerivedTest(test); });
 	test::Test* dereference_test = list->addTest("dereference", { struct_test }, [&](test::Test& test) { dereferenceTest(test); });
 	test::Test* pointer_access_test = list->addTest("pointer_access", { struct_test }, [&](test::Test& test) { pointerAccessTest(test); });
 	test::Test* move_test = list->addTest("move", { struct_test }, [&](test::Test& test) { moveTest(test); });
@@ -143,6 +145,28 @@ void DataPointerTests::resetSilentTest(test::Test& test) {
 	T_COMPARE(mt2, m2, &utils::pointer_to_str);
 
 	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
+}
+
+void DataPointerTests::moveConstructorTest(test::Test& test) {
+	MyStruct* m = new MyStruct(11);
+	DataPointer<MyStruct> dp(m);
+	DataPointer<MyStruct> dp2(std::move(dp));
+	MyStruct* m2 = dp.get();
+	MyStruct* m3 = dp2.get();
+	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+
+	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+}
+
+void DataPointerTests::moveConstructorDerivedTest(test::Test& test) {
+	ChildStruct* m = new ChildStruct(11);
+	DataPointer<ChildStruct> dp(m);
+	DataPointer<MyStruct> dp2(std::move(dp));
+	MyStruct* m2 = dp.get();
+	MyStruct* m3 = dp2.get();
+	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+
+	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
 }
 
 void DataPointerTests::dereferenceTest(test::Test& test) {
