@@ -49,6 +49,8 @@ void DataPointerTests::createTestLists() {
 	test::Test* reset_silent_test = list->addTest("reset_silent", { reset_test }, [&](test::Test& test) { resetSilentTest(test); });
 	test::Test* move_constructor_test = list->addTest("move_contructor", { release_silent_test }, [&](test::Test& test) { moveConstructorTest(test); });
 	test::Test* move_constructor_derived_test = list->addTest("move_contructor_derived", { move_constructor_test }, [&](test::Test& test) { moveConstructorDerivedTest(test); });
+	test::Test* move_assignment_test = list->addTest("move_assignment", { release_silent_test }, [&](test::Test& test) { moveAssignmentTest(test); });
+	test::Test* move_assignment_derived_test = list->addTest("move_assignment_derived", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDerivedTest(test); });
 	test::Test* dereference_test = list->addTest("dereference", { struct_test }, [&](test::Test& test) { dereferenceTest(test); });
 	test::Test* pointer_access_test = list->addTest("pointer_access", { struct_test }, [&](test::Test& test) { pointerAccessTest(test); });
 	test::Test* move_test = list->addTest("move", { struct_test }, [&](test::Test& test) { moveTest(test); });
@@ -166,6 +168,32 @@ void DataPointerTests::moveConstructorDerivedTest(test::Test& test) {
 	MyStruct* m3 = dp2.get();
 	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
 
+	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+}
+
+void DataPointerTests::moveAssignmentTest(test::Test& test) {
+	MyStruct* m1 = new MyStruct(11);
+	DataPointer<MyStruct> dp1(m1);
+	DataPointer<MyStruct> dp2;
+	dp2 = std::move(dp1);
+	MyStruct* m2 = dp1.get();
+	MyStruct* m3 = dp2.get();
+	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+
+	T_COMPARE(data_blocks.size(), 1);
+	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+}
+
+void DataPointerTests::moveAssignmentDerivedTest(test::Test& test) {
+	ChildStruct* m1 = new ChildStruct(11);
+	DataPointer<ChildStruct> dp1(m1);
+	DataPointer<MyStruct> dp2;
+	dp2 = std::move(dp1);
+	ChildStruct* m2 = dp1.get();
+	MyStruct* m3 = dp2.get();
+	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+
+	T_COMPARE(data_blocks.size(), 1);
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
 }
 
