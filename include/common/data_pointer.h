@@ -62,27 +62,24 @@ inline void DataPointerDefaultDelete<T>::operator()(T* ptr) {
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::DataPointer() {
+inline DataPointer<T, D>::DataPointer() : deleter(DataPointerDefaultDelete<T>()) {
 	this->ptr = nullptr;
-	this->deleter = DataPointerDefaultDelete<T>();
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::DataPointer(T* ptr) {
+inline DataPointer<T, D>::DataPointer(T* ptr) : deleter(DataPointerDefaultDelete<T>()) {
 	this->ptr = ptr;
 	if (ptr) {
 		data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
 	}
-	this->deleter = DataPointerDefaultDelete<T>();
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::DataPointer(T* ptr, const D& deleter) {
+inline DataPointer<T, D>::DataPointer(T* ptr, const D& deleter) : deleter(deleter) {
 	this->ptr = ptr;
 	if (ptr) {
 		data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
 	}
-	this->deleter = deleter;
 }
 
 template<typename T, typename D>

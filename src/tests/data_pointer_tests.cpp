@@ -42,6 +42,7 @@ void DataPointerTests::createTestLists() {
 	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) { basicTest(test); });
 	test::Test* struct_test = list->addTest("struct", { basic_test }, [&](test::Test& test) { structTest(test); });
 	test::Test* custom_deleter_test = list->addTest("custom_deleter", { struct_test }, [&](test::Test& test) { customDeleterTest(test); });
+	test::Test* lambda_deleter_test = list->addTest("lambda_deleter", { struct_test }, [&](test::Test& test) { lambdaDeleterTest(test); });
 	test::Test* get_test = list->addTest("get", { struct_test }, [&](test::Test& test) { getTest(test); });
 	test::Test* release_test = list->addTest("release", { get_test }, [&](test::Test& test) { releaseTest(test); });
 	test::Test* reset_test = list->addTest("reset", { get_test }, [&](test::Test& test) { resetTest(test); });
@@ -89,6 +90,21 @@ void DataPointerTests::customDeleterTest(test::Test& test) {
 	CustomDeleter<MyStruct> cd(func);
 	{
 		DataPointer<MyStruct, CustomDeleter<MyStruct>> dp(m, cd);
+	}
+	T_CHECK(flag);
+
+	T_COMPARE(data_blocks.size(), 0);
+}
+
+void DataPointerTests::lambdaDeleterTest(test::Test& test) {
+	MyStruct* m = new MyStruct(22);
+	bool flag = false;
+	auto func = [&](MyStruct* ptr) {
+		flag = true;
+		delete ptr;
+	};
+	{
+		DataPointer<MyStruct, decltype(func)> dp(m, func);
 	}
 	T_CHECK(flag);
 
