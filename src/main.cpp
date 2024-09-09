@@ -28,7 +28,8 @@ int main() {
     execute_app();
 
     // TODO: DataPointer: move assignment test
-    // TODO: DataPointer: resetSilent and releaseSilent test
+    // TODO: DataPointer: make swap method
+    // TODO: replace other unique_ptr's with DataPointer
     // TODO: do memory debugging of loadFromFile again with custom smart pointers
     // TODO: Editor: Camera class
     // TODO: Editor: fix redundant serialize logger message

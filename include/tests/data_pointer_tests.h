@@ -13,6 +13,8 @@ private:
 	void getTest(test::Test& test);
 	void releaseTest(test::Test& test);
 	void resetTest(test::Test& test);
+	void releaseSilentTest(test::Test& test);
+	void resetSilentTest(test::Test& test);
 	void dereferenceTest(test::Test& test);
 	void pointerAccessTest(test::Test& test);
 	void moveTest(test::Test& test);
