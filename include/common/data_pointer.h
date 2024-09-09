@@ -35,6 +35,7 @@ public:
 	T* release();
 	void resetSilent(T* new_ptr);
 	void reset(T* new_ptr);
+	void swap(DataPointer& dp);
 	T& operator*() const;
 	T* operator->() const;
 	DataPointer& operator=(DataPointer&& right);
@@ -143,6 +144,12 @@ inline void DataPointer<T, D>::reset(T* new_ptr) {
 		data_blocks.insert({ reinterpret_cast<void*>(new_ptr), DataBlock(new_ptr, sizeof(T)) });
 	}
 	ptr = new_ptr;
+}
+
+template<typename T, typename D>
+inline void DataPointer<T, D>::swap(DataPointer& dp) {
+	std::swap(this->ptr, dp.ptr);
+	std::swap(this->deleter, dp.deleter);
 }
 
 template<typename T, typename D>

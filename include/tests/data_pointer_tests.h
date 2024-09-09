@@ -19,6 +19,7 @@ private:
 	void moveConstructorDerivedTest(test::Test& test);
 	void moveAssignmentTest(test::Test& test);
 	void moveAssignmentDerivedTest(test::Test& test);
+	void swapTest(test::Test& test);
 	void dereferenceTest(test::Test& test);
 	void pointerAccessTest(test::Test& test);
 	void moveTest(test::Test& test);

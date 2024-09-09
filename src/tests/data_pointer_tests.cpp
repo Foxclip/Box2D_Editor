@@ -51,6 +51,7 @@ void DataPointerTests::createTestLists() {
 	test::Test* move_constructor_derived_test = list->addTest("move_contructor_derived", { move_constructor_test }, [&](test::Test& test) { moveConstructorDerivedTest(test); });
 	test::Test* move_assignment_test = list->addTest("move_assignment", { release_silent_test }, [&](test::Test& test) { moveAssignmentTest(test); });
 	test::Test* move_assignment_derived_test = list->addTest("move_assignment_derived", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDerivedTest(test); });
+	test::Test* swap_test = list->addTest("swap", { get_test }, [&](test::Test& test) { swapTest(test); });
 	test::Test* dereference_test = list->addTest("dereference", { struct_test }, [&](test::Test& test) { dereferenceTest(test); });
 	test::Test* pointer_access_test = list->addTest("pointer_access", { struct_test }, [&](test::Test& test) { pointerAccessTest(test); });
 	test::Test* move_test = list->addTest("move", { struct_test }, [&](test::Test& test) { moveTest(test); });
@@ -195,6 +196,16 @@ void DataPointerTests::moveAssignmentDerivedTest(test::Test& test) {
 
 	T_COMPARE(data_blocks.size(), 1);
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+}
+
+void DataPointerTests::swapTest(test::Test& test) {
+	MyStruct* m1 = new MyStruct(123);
+	MyStruct* m2 = new MyStruct(567);
+	DataPointer<MyStruct> dp1(m1);
+	DataPointer<MyStruct> dp2(m2);
+	dp1.swap(dp2);
+	T_COMPARE(dp1.get(), m2, &utils::pointer_to_str);
+	T_COMPARE(dp2.get(), m1, &utils::pointer_to_str);
 }
 
 void DataPointerTests::dereferenceTest(test::Test& test) {
