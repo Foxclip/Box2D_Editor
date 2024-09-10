@@ -29,6 +29,23 @@ struct CustomDeleter {
 	std::function<void(void)> func;
 };
 
+template<typename T>
+struct AnotherDeleter {
+	AnotherDeleter() { }
+	template<typename T2>
+	AnotherDeleter(const CustomDeleter<T2>& cd) {
+		this->func = cd.func;
+	}
+	AnotherDeleter(const std::function<void(void)>& func) {
+		this->func = func;
+	}
+	void operator()(T* ptr) {
+		func();
+		delete ptr;
+	}
+	std::function<void(void)> func;
+};
+
 DataPointerTests::DataPointerTests(
 	test::TestManager& manager, const std::vector<TestModule*>& required_modules
 ) : TestModule("DataPointer", manager, required_modules) { }
@@ -49,7 +66,9 @@ void DataPointerTests::createTestLists() {
 	test::Test* release_silent_test = list->addTest("release_silent", { release_test }, [&](test::Test& test) { releaseSilentTest(test); });
 	test::Test* reset_silent_test = list->addTest("reset_silent", { reset_test }, [&](test::Test& test) { resetSilentTest(test); });
 	test::Test* move_constructor_test = list->addTest("move_contructor", { release_silent_test }, [&](test::Test& test) { moveConstructorTest(test); });
+	test::Test* move_constructor_deleter_test = list->addTest("move_contructor_deleter", { move_constructor_test }, [&](test::Test& test) { moveConstructorDeleterTest(test); });
 	test::Test* move_constructor_derived_test = list->addTest("move_contructor_derived", { move_constructor_test }, [&](test::Test& test) { moveConstructorDerivedTest(test); });
+	test::Test* move_constructor_derived_deleter_test = list->addTest("move_contructor_derived_deleter", { move_constructor_derived_test }, [&](test::Test& test) { moveConstructorDerivedDeleterTest(test); });
 	test::Test* move_assignment_test = list->addTest("move_assignment", { release_silent_test }, [&](test::Test& test) { moveAssignmentTest(test); });
 	test::Test* move_assignment_derived_test = list->addTest("move_assignment_derived", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDerivedTest(test); });
 	test::Test* swap_test = list->addTest("swap", { get_test }, [&](test::Test& test) { swapTest(test); });
@@ -177,6 +196,25 @@ void DataPointerTests::moveConstructorTest(test::Test& test) {
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
 }
 
+void DataPointerTests::moveConstructorDeleterTest(test::Test& test) {
+	bool flag = false;
+	auto func = [&]() {
+		flag = true;
+	};
+	CustomDeleter<MyStruct> cd(func);
+	{
+		MyStruct* m = new MyStruct(11);
+		DataPointer<MyStruct, CustomDeleter<MyStruct>> dp(m, cd);
+		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp2(std::move(dp));
+		MyStruct* m2 = dp.get();
+		MyStruct* m3 = dp2.get();
+		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+
+		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+	}
+	T_CHECK(flag);
+}
+
 void DataPointerTests::moveConstructorDerivedTest(test::Test& test) {
 	ChildStruct* m = new ChildStruct(11);
 	DataPointer<ChildStruct> dp(m);
@@ -186,6 +224,25 @@ void DataPointerTests::moveConstructorDerivedTest(test::Test& test) {
 	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
 
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+}
+
+void DataPointerTests::moveConstructorDerivedDeleterTest(test::Test& test) {
+	bool flag = false;
+	auto func = [&]() {
+		flag = true;
+	};
+	CustomDeleter<ChildStruct> cd(func);
+	{
+		ChildStruct* m = new ChildStruct(11);
+		DataPointer<ChildStruct, CustomDeleter<ChildStruct>> dp(m, cd);
+		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp2(std::move(dp));
+		ChildStruct* m2 = dp.get();
+		MyStruct* m3 = dp2.get();
+		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+
+		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+	}
+	T_CHECK(flag);
 }
 
 void DataPointerTests::moveAssignmentTest(test::Test& test) {

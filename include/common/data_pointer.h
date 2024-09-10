@@ -16,6 +16,9 @@ extern std::map<void*, DataBlock> data_blocks;
 template<typename T>
 class DataPointerDefaultDelete {
 public:
+	DataPointerDefaultDelete() = default;
+	template<typename T2>
+	DataPointerDefaultDelete(const DataPointerDefaultDelete<T2>& other);
 	void operator()(T* ptr);
 
 };
@@ -36,6 +39,8 @@ public:
 	void resetSilent(T* new_ptr);
 	void reset(T* new_ptr);
 	void swap(DataPointer& dp);
+	D& getDeleter();
+	const D& getDeleter() const;
 	T& operator*() const;
 	T* operator->() const;
 	DataPointer& operator=(DataPointer&& right);
@@ -53,6 +58,10 @@ private:
 
 template<typename T, typename... Args>
 DataPointer<T> make_data_pointer(Args&&... args);
+
+template<typename T>
+template<typename T2>
+inline DataPointerDefaultDelete<T>::DataPointerDefaultDelete(const DataPointerDefaultDelete<T2>& other) { }
 
 template<typename T>
 inline void DataPointerDefaultDelete<T>::operator()(T* ptr) {
@@ -85,20 +94,22 @@ inline DataPointer<T, D>::DataPointer(T* ptr, const D& deleter) : deleter(delete
 template<typename T, typename D>
 inline DataPointer<T, D>::DataPointer(DataPointer&& dp) noexcept {
 	this->ptr = dp.releaseSilent();
+	this->deleter = dp.getDeleter();
 }
 
 template<typename T, typename D>
 template<typename T2, typename D2>
 inline DataPointer<T, D>::DataPointer(DataPointer<T2, D2>&& dp) noexcept {
 	this->ptr = dp.releaseSilent();
+	this->deleter = dp.getDeleter();
 }
 
 template<typename T, typename D>
 inline DataPointer<T, D>::~DataPointer() {
 	if (ptr) {
 		data_blocks.erase(reinterpret_cast<void*>(ptr));
+		deleter(ptr);
 	}
-	deleter(ptr);
 }
 
 template<typename T, typename D>
@@ -147,6 +158,16 @@ template<typename T, typename D>
 inline void DataPointer<T, D>::swap(DataPointer& dp) {
 	std::swap(this->ptr, dp.ptr);
 	std::swap(this->deleter, dp.deleter);
+}
+
+template<typename T, typename D>
+inline D& DataPointer<T, D>::getDeleter() {
+	return deleter;
+}
+
+template<typename T, typename D>
+inline const D& DataPointer<T, D>::getDeleter() const {
+	return deleter;
 }
 
 template<typename T, typename D>

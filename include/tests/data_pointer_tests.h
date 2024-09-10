@@ -17,7 +17,9 @@ private:
 	void releaseSilentTest(test::Test& test);
 	void resetSilentTest(test::Test& test);
 	void moveConstructorTest(test::Test& test);
+	void moveConstructorDeleterTest(test::Test& test);
 	void moveConstructorDerivedTest(test::Test& test);
+	void moveConstructorDerivedDeleterTest(test::Test& test);
 	void moveAssignmentTest(test::Test& test);
 	void moveAssignmentDerivedTest(test::Test& test);
 	void swapTest(test::Test& test);
