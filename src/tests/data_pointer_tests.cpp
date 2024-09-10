@@ -64,6 +64,7 @@ void DataPointerTests::createTestLists() {
 	test::Test* struct_test = list->addTest("struct", { basic_test }, [&](test::Test& test) { structTest(test); });
 	test::Test* destructor_test = list->addTest("destructor", { struct_test }, [&](test::Test& test) { destructorTest(test); });
 	test::Test* derived_destructor_test = list->addTest("derived_destructor", { destructor_test }, [&](test::Test& test) { derivedDestructorTest(test); });
+	test::Test* vector_destructor_test = list->addTest("vector_destructor", { destructor_test }, [&](test::Test& test) { vectorDestructorTest(test); });
 	test::Test* custom_deleter_test = list->addTest("custom_deleter", { struct_test }, [&](test::Test& test) { customDeleterTest(test); });
 	test::Test* lambda_deleter_test = list->addTest("lambda_deleter", { struct_test }, [&](test::Test& test) { lambdaDeleterTest(test); });
 	test::Test* get_test = list->addTest("get", { struct_test }, [&](test::Test& test) { getTest(test); });
@@ -131,6 +132,21 @@ void DataPointerTests::derivedDestructorTest(test::Test& test) {
 			flag = true;
 		};
 	}
+	T_CHECK(flag);
+
+	T_COMPARE(data_blocks.size(), 0);
+}
+
+void DataPointerTests::vectorDestructorTest(test::Test& test) {
+	bool flag = false;
+	MyStruct* m = new MyStruct(11);
+	m->destructor_func = [&]() {
+		flag = true;
+	};
+	std::vector<DataPointer<MyStruct>> vec;
+	DataPointer<MyStruct> dp(m);
+	vec.push_back(std::move(dp));
+	vec.erase(vec.begin());
 	T_CHECK(flag);
 
 	T_COMPARE(data_blocks.size(), 0);
