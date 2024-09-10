@@ -190,7 +190,7 @@ public:
 	bool isEqual(const GameObject* other) const;
 
 private:
-	std::unique_ptr<sf::RectangleShape> rect_shape;
+	DataPointer<sf::RectangleShape> rect_shape;
 };
 
 class BallObject : public GameObject {
@@ -217,7 +217,7 @@ public:
 	bool isEqual(const GameObject* other) const;
 
 private:
-	std::unique_ptr<CircleNotchShape> circle_notch_shape;
+	DataPointer<CircleNotchShape> circle_notch_shape;
 	sf::Color notch_color;
 
 };
@@ -245,7 +245,7 @@ public:
 	bool isEqual(const GameObject* other) const;
 
 private:
-	std::unique_ptr<SplittablePolygon> polygon;
+	DataPointer<SplittablePolygon> polygon;
 };
 
 class ChainObject : public GameObject {
@@ -264,7 +264,7 @@ public:
 	bool isEqual(const GameObject* other) const;
 
 private:
-	std::unique_ptr<LineStripShape> line_strip_shape;
+	DataPointer<LineStripShape> line_strip_shape;
 
 	b2ChainShape* getShape() const;
 

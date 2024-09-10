@@ -39,7 +39,7 @@ void Simulation::save(const std::string& filename) const {
 void Simulation::reset() {
     clear();
     b2Vec2 gravity(0.0f, -9.8f);
-    world = std::make_unique<b2World>(gravity);
+    world = make_data_pointer<b2World>(gravity);
 }
 
 std::string Simulation::serialize() const {

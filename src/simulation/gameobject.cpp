@@ -889,7 +889,7 @@ void BoxObject::internalSyncVertices() {
 	b2PolygonShape box_shape;
 	box_shape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
 	b2Fixture* fixture = rigid_body->CreateFixture(&box_shape, 1.0f);
-	rect_shape = std::make_unique<sf::RectangleShape>(tosf(size));
+	rect_shape = make_data_pointer<sf::RectangleShape>(tosf(size));
 	rect_shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
 	rect_shape->setFillColor(color);
 }
@@ -1030,7 +1030,7 @@ void BallObject::internalSyncVertices() {
 	b2CircleShape circle_shape;
 	circle_shape.m_radius = radius;
 	b2Fixture* fixture = rigid_body->CreateFixture(&circle_shape, 1.0f);
-	circle_notch_shape = std::make_unique<CircleNotchShape>(radius, 30, 4);
+	circle_notch_shape = make_data_pointer<CircleNotchShape>(radius, 30, 4);
 	circle_notch_shape->setCircleColor(color);
 	circle_notch_shape->setNotchColor(notch_color);
 }
@@ -1058,7 +1058,7 @@ PolygonObject::PolygonObject(
 	for (size_t i = 0; i < vertices.size(); i++) {
 		this->vertices.push_back(EditableVertex(vertices[i]));
 	}
-	polygon = std::make_unique<SplittablePolygon>();
+	polygon = make_data_pointer<SplittablePolygon>();
 	syncVertices(true);
 	transformFromRigidbody();
 	polygon->setFillColor(color);
@@ -1212,7 +1212,7 @@ ChainObject::ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector
 		EditableVertex ev(p_vertices[i]);
 		vertices.push_back(ev);
 	}
-	line_strip_shape = std::make_unique<LineStripShape>(drawable_vertices);
+	line_strip_shape = make_data_pointer<LineStripShape>(drawable_vertices);
 	syncVertices(true);
 	transformFromRigidbody();
 	line_strip_shape->setLineColor(color);

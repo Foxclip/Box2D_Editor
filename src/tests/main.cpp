@@ -10,7 +10,7 @@ void run_tests() {
     test::TestModule* compvector_module = test_manager.addModule<CompVectorTests>({ data_pointer_module });
     test::TestModule* searchindex_module = test_manager.addModule<SearchIndexTests>({ data_pointer_module });
     test::TestModule* event_module = test_manager.addModule<EventTests>({ data_pointer_module });
-    //test::TestModule* simulation_module = test_manager.addModule<SimulationTests>({ logger_module, compvector_module });
+    test::TestModule* simulation_module = test_manager.addModule<SimulationTests>({ data_pointer_module, compvector_module });
     //test::TestModule* widget_module = test_manager.addModule<WidgetTests>({ logger_module, event_module, compvector_module, searchindex_module });
     //test::TestModule* editor_module = test_manager.addModule<EditorTests>({ simulation_module, widget_module });
 
