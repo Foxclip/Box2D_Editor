@@ -71,12 +71,12 @@ inline void DataPointerDefaultDelete<T>::operator()(T* ptr) {
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::DataPointer() : deleter(DataPointerDefaultDelete<T>()) {
+inline DataPointer<T, D>::DataPointer() : deleter(D()) {
 	this->ptr = nullptr;
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::DataPointer(T* ptr) : deleter(DataPointerDefaultDelete<T>()) {
+inline DataPointer<T, D>::DataPointer(T* ptr) : deleter(D()) {
 	this->ptr = ptr;
 	if (ptr) {
 		data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
@@ -183,6 +183,7 @@ inline T* DataPointer<T, D>::operator->() const {
 template<typename T, typename D>
 inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer&& right) {
 	this->ptr = right.releaseSilent();
+	this->deleter = right.getDeleter();
 	return *this;
 }
 
@@ -190,6 +191,7 @@ template<typename T, typename D>
 template<typename T2, typename D2>
 inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer<T2, D2>&& right) {
 	this->ptr = right.releaseSilent();
+	this->deleter = right.getDeleter();
 	return *this;
 }
 

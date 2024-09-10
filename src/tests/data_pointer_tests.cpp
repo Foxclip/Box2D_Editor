@@ -70,7 +70,9 @@ void DataPointerTests::createTestLists() {
 	test::Test* move_constructor_derived_test = list->addTest("move_contructor_derived", { move_constructor_test }, [&](test::Test& test) { moveConstructorDerivedTest(test); });
 	test::Test* move_constructor_derived_deleter_test = list->addTest("move_contructor_derived_deleter", { move_constructor_derived_test }, [&](test::Test& test) { moveConstructorDerivedDeleterTest(test); });
 	test::Test* move_assignment_test = list->addTest("move_assignment", { release_silent_test }, [&](test::Test& test) { moveAssignmentTest(test); });
+	test::Test* move_assignment_deleter_test = list->addTest("move_assignment_deleter", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDeleterTest(test); });
 	test::Test* move_assignment_derived_test = list->addTest("move_assignment_derived", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDerivedTest(test); });
+	test::Test* move_assignment_derived_deleter_test = list->addTest("move_assignment_derived_deleter", { move_assignment_derived_test }, [&](test::Test& test) { moveAssignmentDerivedDeleterTest(test); });
 	test::Test* swap_test = list->addTest("swap", { get_test }, [&](test::Test& test) { swapTest(test); });
 	test::Test* dereference_test = list->addTest("dereference", { struct_test }, [&](test::Test& test) { dereferenceTest(test); });
 	test::Test* pointer_access_test = list->addTest("pointer_access", { struct_test }, [&](test::Test& test) { pointerAccessTest(test); });
@@ -258,6 +260,26 @@ void DataPointerTests::moveAssignmentTest(test::Test& test) {
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
 }
 
+void DataPointerTests::moveAssignmentDeleterTest(test::Test& test) {
+	bool flag = false;
+	auto func = [&]() {
+		flag = true;
+	};
+	CustomDeleter<MyStruct> cd(func);
+	{
+		MyStruct* m = new MyStruct(11);
+		DataPointer<MyStruct, CustomDeleter<MyStruct>> dp(m, cd);
+		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp2;
+		dp2 = std::move(dp);
+		MyStruct* m2 = dp.get();
+		MyStruct* m3 = dp2.get();
+		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+
+		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+	}
+	T_CHECK(flag);
+}
+
 void DataPointerTests::moveAssignmentDerivedTest(test::Test& test) {
 	ChildStruct* m1 = new ChildStruct(11);
 	DataPointer<ChildStruct> dp1(m1);
@@ -269,6 +291,26 @@ void DataPointerTests::moveAssignmentDerivedTest(test::Test& test) {
 
 	T_COMPARE(data_blocks.size(), 1);
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+}
+
+void DataPointerTests::moveAssignmentDerivedDeleterTest(test::Test& test) {
+	bool flag = false;
+	auto func = [&]() {
+		flag = true;
+	};
+	CustomDeleter<ChildStruct> cd(func);
+	{
+		ChildStruct* m = new ChildStruct(11);
+		DataPointer<ChildStruct, CustomDeleter<ChildStruct>> dp(m, cd);
+		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp2;
+		dp2 = std::move(dp);
+		ChildStruct* m2 = dp.get();
+		MyStruct* m3 = dp2.get();
+		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+
+		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+	}
+	T_CHECK(flag);
 }
 
 void DataPointerTests::swapTest(test::Test& test) {
