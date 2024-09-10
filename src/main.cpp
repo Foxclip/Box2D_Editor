@@ -27,7 +27,6 @@ int main() {
 
     execute_app();
 
-    // TODO: DataPointer: move custom deleters in move contructor and move assignment and swap method
     // TODO: replace other unique_ptr's with DataPointer
     // TODO: do memory debugging of loadFromFile again with custom smart pointers
     // TODO: Editor: Camera class
