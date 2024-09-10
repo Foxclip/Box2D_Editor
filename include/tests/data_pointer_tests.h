@@ -9,6 +9,8 @@ private:
 	void nullTest(test::Test& test);
 	void basicTest(test::Test& test);
 	void structTest(test::Test& test);
+	void destructorTest(test::Test& test);
+	void derivedDestructorTest(test::Test& test);
 	void customDeleterTest(test::Test& test);
 	void lambdaDeleterTest(test::Test& test);
 	void getTest(test::Test& test);

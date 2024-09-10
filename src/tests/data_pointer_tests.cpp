@@ -9,6 +9,10 @@ struct MyStruct {
 	}
 	int val = 0;
 	int hidden = 0;
+	std::function<void(void)> destructor_func = []() { };
+	~MyStruct() {
+		destructor_func();
+	}
 };
 
 struct ChildStruct : public MyStruct {
@@ -58,6 +62,8 @@ void DataPointerTests::createTestLists() {
 	test::Test* null_test = list->addTest("null", [&](test::Test& test) { nullTest(test); });
 	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) { basicTest(test); });
 	test::Test* struct_test = list->addTest("struct", { basic_test }, [&](test::Test& test) { structTest(test); });
+	test::Test* destructor_test = list->addTest("destructor", { struct_test }, [&](test::Test& test) { destructorTest(test); });
+	test::Test* derived_destructor_test = list->addTest("derived_destructor", { destructor_test }, [&](test::Test& test) { derivedDestructorTest(test); });
 	test::Test* custom_deleter_test = list->addTest("custom_deleter", { struct_test }, [&](test::Test& test) { customDeleterTest(test); });
 	test::Test* lambda_deleter_test = list->addTest("lambda_deleter", { struct_test }, [&](test::Test& test) { lambdaDeleterTest(test); });
 	test::Test* get_test = list->addTest("get", { struct_test }, [&](test::Test& test) { getTest(test); });
@@ -101,6 +107,33 @@ void DataPointerTests::structTest(test::Test& test) {
 	static_assert(sizeof(MyStruct) != sizeof(int));
 
 	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
+}
+
+void DataPointerTests::destructorTest(test::Test& test) {
+	bool flag = false;
+	MyStruct* m = new MyStruct(11);
+	m->destructor_func = [&]() {
+		flag = true;
+	};
+	{
+		DataPointer<MyStruct> dp(m);
+	}
+	T_CHECK(flag);
+
+	T_COMPARE(data_blocks.size(), 0);
+}
+
+void DataPointerTests::derivedDestructorTest(test::Test& test) {
+	bool flag = false;
+	{
+		DataPointer<MyStruct> dp = make_data_pointer<ChildStruct>(11);
+		dp->destructor_func = [&]() {
+			flag = true;
+		};
+	}
+	T_CHECK(flag);
+
+	T_COMPARE(data_blocks.size(), 0);
 }
 
 void DataPointerTests::customDeleterTest(test::Test& test) {
