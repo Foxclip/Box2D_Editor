@@ -147,6 +147,7 @@ inline void DataPointer<T, D>::reset(T* new_ptr) {
 	}
 	if (old_ptr) {
 		data_blocks.erase(reinterpret_cast<void*>(old_ptr));
+		deleter(ptr);
 	}
 	if (new_ptr) {
 		data_blocks.insert({ reinterpret_cast<void*>(new_ptr), DataBlock(new_ptr, sizeof(T)) });

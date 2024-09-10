@@ -63,6 +63,7 @@ void DataPointerTests::createTestLists() {
 	test::Test* get_test = list->addTest("get", { struct_test }, [&](test::Test& test) { getTest(test); });
 	test::Test* release_test = list->addTest("release", { get_test }, [&](test::Test& test) { releaseTest(test); });
 	test::Test* reset_test = list->addTest("reset", { get_test }, [&](test::Test& test) { resetTest(test); });
+	test::Test* reset_deleter_test = list->addTest("reset_deleter", { reset_test }, [&](test::Test& test) { resetDeleterTest(test); });
 	test::Test* release_silent_test = list->addTest("release_silent", { release_test }, [&](test::Test& test) { releaseSilentTest(test); });
 	test::Test* reset_silent_test = list->addTest("reset_silent", { reset_test }, [&](test::Test& test) { resetSilentTest(test); });
 	test::Test* move_constructor_test = list->addTest("move_contructor", { release_silent_test }, [&](test::Test& test) { moveConstructorTest(test); });
@@ -159,6 +160,28 @@ void DataPointerTests::resetTest(test::Test& test) {
 	dp.reset(m2);
 	MyStruct* mt2 = dp.get();
 	T_COMPARE(mt2, m2, &utils::pointer_to_str);
+
+	T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
+}
+
+void DataPointerTests::resetDeleterTest(test::Test& test) {
+	bool flag = false;
+	MyStruct* del_ptr = nullptr;
+	auto deleter = [&](MyStruct* ptr) {
+		flag = true;
+		del_ptr = ptr;
+		delete ptr;
+	};
+	MyStruct* m = new MyStruct(55);
+	MyStruct* m2 = new MyStruct(66);
+	DataPointer<MyStruct, decltype(deleter)> dp(m, deleter);
+	MyStruct* m3 = dp.get();
+	T_COMPARE(m3, m, &utils::pointer_to_str);
+	dp.reset(m2);
+	MyStruct* m4 = dp.get();
+	T_COMPARE(m4, m2, &utils::pointer_to_str);
+	T_CHECK(flag);
+	T_COMPARE(del_ptr, m, &utils::pointer_to_str);
 
 	T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
 }
