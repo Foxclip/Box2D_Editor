@@ -136,6 +136,9 @@ inline T* DataPointer<T, D>::release() {
 
 template<typename T, typename D>
 inline void DataPointer<T, D>::resetSilent(T* new_ptr) {
+	if (ptr) {
+		deleter(ptr);
+	}
 	ptr = new_ptr;
 }
 

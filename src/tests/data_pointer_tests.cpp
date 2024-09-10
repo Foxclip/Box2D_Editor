@@ -145,7 +145,9 @@ void DataPointerTests::vectorDestructorTest(test::Test& test) {
 	};
 	std::vector<DataPointer<MyStruct>> vec;
 	DataPointer<MyStruct> dp(m);
+	DataPointer<MyStruct> dp2;
 	vec.push_back(std::move(dp));
+	vec.push_back(std::move(dp2));
 	vec.erase(vec.begin());
 	T_CHECK(flag);
 
@@ -247,16 +249,26 @@ void DataPointerTests::releaseSilentTest(test::Test& test) {
 }
 
 void DataPointerTests::resetSilentTest(test::Test& test) {
+	bool flag = false;
+	MyStruct* del_ptr = nullptr;
+	auto deleter = [&](MyStruct* ptr) {
+		flag = true;
+		del_ptr = ptr;
+		delete ptr;
+	};
 	MyStruct* m = new MyStruct(77);
 	MyStruct* m2 = new MyStruct(88);
-	DataPointer<MyStruct> dp(m);
+	DataPointer<MyStruct, decltype(deleter)> dp(m, deleter);
 	MyStruct* mt1 = dp.get();
 	T_COMPARE(mt1, m, &utils::pointer_to_str);
 	dp.resetSilent(m2);
 	MyStruct* mt2 = dp.get();
 	T_COMPARE(mt2, m2, &utils::pointer_to_str);
+	T_CHECK(flag);
+	T_COMPARE(del_ptr, m, &utils::pointer_to_str);
 
 	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
+	T_WRAP_CONTAINER(checkNoDataBlock(test, m2));
 }
 
 void DataPointerTests::moveConstructorTest(test::Test& test) {
@@ -446,7 +458,7 @@ void DataPointerTests::makeDataPointerDerivedTest(test::Test& test) {
 }
 
 void DataPointerTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {
-	if (T_COMPARE(data_blocks.size(), 1)) {
+	if (T_CHECK(data_blocks.size() > 0)) {
 		auto it = data_blocks.find(p_block);
 		if (T_CHECK(it != data_blocks.end())) {
 			void* ptr = it->second.ptr;
@@ -455,4 +467,9 @@ void DataPointerTests::checkDataBlock(test::Test& test, void* p_block, size_t p_
 			T_COMPARE(size, p_size);
 		}
 	}
+}
+
+void DataPointerTests::checkNoDataBlock(test::Test& test, void* p_block) {
+	auto it = data_blocks.find(p_block);
+	T_CHECK(it == data_blocks.end());
 }
