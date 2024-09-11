@@ -7,6 +7,8 @@ namespace fw {
 
 	Widget::Widget(WidgetList& widget_list) : widget_list(widget_list) { }
 
+	Widget::~Widget() { }
+
 	Widget::WidgetType Widget::getType() const {
 		return type;
 	}

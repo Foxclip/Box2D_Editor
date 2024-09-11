@@ -16,6 +16,7 @@ public:
 	GameObject* object1 = nullptr;
 	GameObject* object2 = nullptr;
 
+	virtual ~Joint();
 	b2JointType getType() const;
 	b2Body* getBodyA();
 	b2Body* getBodyB();
@@ -24,7 +25,6 @@ public:
 	bool getCollideConnected() const;
 	std::string serialize() const;
 	virtual TokenWriter& serialize(TokenWriter& tw) const = 0;
-	~Joint();
 	bool operator==(const Joint& other) const;
 
 protected:

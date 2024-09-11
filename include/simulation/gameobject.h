@@ -53,7 +53,7 @@ public:
 	bool was_enabled = true;
 
 	GameObject();
-	~GameObject();
+	virtual ~GameObject();
 	virtual GameObjectType getType() const = 0;
 	virtual bool isClosed() const = 0;
 	ptrdiff_t getId() const;
