@@ -93,14 +93,14 @@ inline DataPointer<T, D>::DataPointer(T* ptr, const D& deleter) : deleter(delete
 
 template<typename T, typename D>
 inline DataPointer<T, D>::DataPointer(DataPointer&& dp) noexcept {
-	this->ptr = dp.releaseSilent();
+	resetSilent(dp.releaseSilent());
 	this->deleter = dp.getDeleter();
 }
 
 template<typename T, typename D>
 template<typename T2, typename D2>
 inline DataPointer<T, D>::DataPointer(DataPointer<T2, D2>&& dp) noexcept {
-	this->ptr = dp.releaseSilent();
+	resetSilent(dp.releaseSilent());
 	this->deleter = dp.getDeleter();
 }
 
@@ -186,7 +186,7 @@ inline T* DataPointer<T, D>::operator->() const {
 
 template<typename T, typename D>
 inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer&& right) {
-	this->ptr = right.releaseSilent();
+	reset(right.releaseSilent());
 	this->deleter = right.getDeleter();
 	return *this;
 }
@@ -194,7 +194,7 @@ inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer&& right) {
 template<typename T, typename D>
 template<typename T2, typename D2>
 inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer<T2, D2>&& right) {
-	this->ptr = right.releaseSilent();
+	reset(right.releaseSilent());
 	this->deleter = right.getDeleter();
 	return *this;
 }

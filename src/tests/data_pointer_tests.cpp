@@ -30,7 +30,7 @@ struct CustomDeleter {
 		func();
 		delete ptr;
 	}
-	std::function<void(void)> func;
+	std::function<void(void)> func = []() { };
 };
 
 template<typename T>
@@ -332,69 +332,93 @@ void DataPointerTests::moveConstructorDerivedDeleterTest(test::Test& test) {
 }
 
 void DataPointerTests::moveAssignmentTest(test::Test& test) {
+	bool flag = false;
 	MyStruct* m1 = new MyStruct(11);
+	m1->destructor_func = [&]() {
+		flag = true;
+	};
+	MyStruct* m2 = new MyStruct(22);
 	DataPointer<MyStruct> dp1(m1);
-	DataPointer<MyStruct> dp2;
-	dp2 = std::move(dp1);
-	MyStruct* m2 = dp1.get();
-	MyStruct* m3 = dp2.get();
-	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+	DataPointer<MyStruct> dp2(m2);
+	dp1 = std::move(dp2);
+	MyStruct* m3 = dp1.get();
+	MyStruct* m4 = dp2.get();
+	T_COMPARE(m4, nullptr, &utils::pointer_to_str);
+	T_CHECK(flag);
 
 	T_COMPARE(data_blocks.size(), 1);
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
 }
 
 void DataPointerTests::moveAssignmentDeleterTest(test::Test& test) {
-	bool flag = false;
+	bool flag1 = false;
 	auto func = [&]() {
-		flag = true;
+		flag1 = true;
 	};
 	CustomDeleter<MyStruct> cd(func);
 	{
-		MyStruct* m = new MyStruct(11);
-		DataPointer<MyStruct, CustomDeleter<MyStruct>> dp(m, cd);
-		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp2;
-		dp2 = std::move(dp);
-		MyStruct* m2 = dp.get();
-		MyStruct* m3 = dp2.get();
-		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+		bool flag2 = false;
+		MyStruct* m1 = new MyStruct(11);
+		m1->destructor_func = [&]() {
+			flag2 = true;
+		};
+		MyStruct* m2 = new MyStruct(22);
+		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp1(m1, cd);
+		DataPointer<MyStruct, CustomDeleter<MyStruct>> dp2(m2);
+		dp1 = std::move(dp2);
+		MyStruct* m3 = dp1.get();
+		MyStruct* m4 = dp2.get();
+		T_COMPARE(m4, nullptr, &utils::pointer_to_str);
+		T_CHECK(flag2);
 
 		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
 	}
-	T_CHECK(flag);
+	T_CHECK(flag1);
 }
 
 void DataPointerTests::moveAssignmentDerivedTest(test::Test& test) {
-	ChildStruct* m1 = new ChildStruct(11);
-	DataPointer<ChildStruct> dp1(m1);
-	DataPointer<MyStruct> dp2;
-	dp2 = std::move(dp1);
-	ChildStruct* m2 = dp1.get();
-	MyStruct* m3 = dp2.get();
-	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+	bool flag = false;
+	MyStruct* m1 = new MyStruct(11);
+	m1->destructor_func = [&]() {
+		flag = true;
+	};
+	ChildStruct* m2 = new ChildStruct(22);
+	DataPointer<MyStruct> dp1(m1);
+	DataPointer<ChildStruct> dp2(m2);
+	dp1 = std::move(dp2);
+	MyStruct* m3 = dp1.get();
+	ChildStruct* m4 = dp2.get();
+	T_COMPARE(m4, nullptr, &utils::pointer_to_str);
+	T_CHECK(flag);
 
 	T_COMPARE(data_blocks.size(), 1);
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
 }
 
 void DataPointerTests::moveAssignmentDerivedDeleterTest(test::Test& test) {
-	bool flag = false;
+	bool flag1 = false;
 	auto func = [&]() {
-		flag = true;
+		flag1 = true;
 	};
 	CustomDeleter<ChildStruct> cd(func);
 	{
-		ChildStruct* m = new ChildStruct(11);
-		DataPointer<ChildStruct, CustomDeleter<ChildStruct>> dp(m, cd);
-		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp2;
-		dp2 = std::move(dp);
-		ChildStruct* m2 = dp.get();
-		MyStruct* m3 = dp2.get();
-		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+		bool flag2 = false;
+		MyStruct* m1 = new MyStruct(11);
+		m1->destructor_func = [&]() {
+			flag2 = true;
+		};
+		ChildStruct* m2 = new ChildStruct(22);
+		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp1(m1, cd);
+		DataPointer<ChildStruct, CustomDeleter<ChildStruct>> dp2(m2);
+		dp1 = std::move(dp2);
+		MyStruct* m3 = dp1.get();
+		ChildStruct* m4 = dp2.get();
+		T_COMPARE(m4, nullptr, &utils::pointer_to_str);
+		T_CHECK(flag2);
 
 		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
 	}
-	T_CHECK(flag);
+	T_CHECK(flag1);
 }
 
 void DataPointerTests::swapTest(test::Test& test) {
