@@ -37,7 +37,7 @@ public:
 	T* releaseSilent();
 	T* release();
 	void resetSilent(T* new_ptr);
-	void reset(T* new_ptr);
+	void reset(T* new_ptr = nullptr);
 	void swap(DataPointer& dp);
 	D& getDeleter();
 	const D& getDeleter() const;
@@ -46,6 +46,7 @@ public:
 	DataPointer& operator=(DataPointer&& right);
 	template<typename T2, typename D2>
 	DataPointer& operator=(DataPointer<T2, D2>&& right);
+	operator bool();
 
 	DataPointer(const DataPointer&) = delete;
 	DataPointer& operator=(const DataPointer&) = delete;
@@ -189,6 +190,11 @@ inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer&& right) {
 	reset(right.releaseSilent());
 	this->deleter = right.getDeleter();
 	return *this;
+}
+
+template<typename T, typename D>
+inline DataPointer<T, D>::operator bool() {
+	return static_cast<bool>(ptr);
 }
 
 template<typename T, typename D>
