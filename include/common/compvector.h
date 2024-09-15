@@ -4,6 +4,7 @@
 #include <set>
 #include <memory>
 #include <cassert>
+#include <string>
 #include "data_pointer.h"
 
 template<typename T, typename U>
@@ -415,7 +416,7 @@ inline CompVectorUptr<T, TCmp>::CompVectorUptr() { }
 template<typename T, typename TCmp>
 inline CompVectorUptr<T, TCmp>::CompVectorUptr(const std::initializer_list<T>& list) {
 	for (const T& value : list) {
-		DataPointer<T> uptr = make_data_pointer<T>(value);
+		DataPointer<T> uptr = make_data_pointer<T>("CompVectorUptr entry", value);
 		add(std::move(uptr));
 	}
 }
@@ -447,7 +448,7 @@ inline bool CompVectorUptr<T, TCmp>::empty() const {
 
 template<typename T, typename TCmp>
 inline T* CompVectorUptr<T, TCmp>::add(const T& value) {
-	DataPointer<T> uptr = make_data_pointer<T>(value);
+	DataPointer<T> uptr = make_data_pointer<T>("CompVectorUptr entry " + std::to_string(size()), value);
 	T* ptr = uptr.get();
 	comp.add(ptr);
 	uptrs.push_back(std::move(uptr));
@@ -459,7 +460,7 @@ inline T* CompVectorUptr<T, TCmp>::add(const T* ptr) {
 	T* nptr = const_cast<T*>(ptr);
 	bool added = comp.add(nptr);
 	if (added) {
-		DataPointer<T> uptr = DataPointer<T>(nptr);
+		DataPointer<T> uptr = DataPointer<T>("CompVectorUptr entry", nptr);
 		uptrs.push_back(std::move(uptr));
 		return nptr;
 	}
@@ -479,7 +480,7 @@ inline T* CompVectorUptr<T, TCmp>::add(DataPointer<T> value) {
 
 template<typename T, typename TCmp>
 inline bool CompVectorUptr<T, TCmp>::insert(const std::vector<T*>::const_iterator& where, T* ptr) {
-	DataPointer<T> uptr(ptr);
+	DataPointer<T> uptr("CompVectorUptr entry", ptr);
 	return insert(where, std::move(uptr));
 }
 

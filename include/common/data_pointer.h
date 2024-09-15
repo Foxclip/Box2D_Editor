@@ -27,8 +27,8 @@ template<typename T, typename D = DataPointerDefaultDelete<T>>
 class DataPointer {
 public:
 	DataPointer();
-	DataPointer(T* ptr);
-	DataPointer(T* ptr, const D& deleter);
+	DataPointer(const std::string& name, T* ptr);
+	DataPointer(const std::string& name, T* ptr, const D& deleter);
 	DataPointer(DataPointer&& dp) noexcept;
 	template<typename T2, typename D2>
 	DataPointer(DataPointer<T2, D2>&& dp) noexcept;
@@ -41,6 +41,7 @@ public:
 	void swap(DataPointer& dp);
 	D& getDeleter();
 	const D& getDeleter() const;
+	const std::string& getName() const;
 	T& operator*() const;
 	T* operator->() const;
 	DataPointer& operator=(DataPointer&& right);
@@ -52,13 +53,18 @@ public:
 	DataPointer& operator=(const DataPointer&) = delete;
 
 private:
+	std::string name = "<unnamed>";
 	T* ptr = nullptr;
 	D deleter;
 
 };
 
 template<typename T, typename... Args>
-DataPointer<T> make_data_pointer(Args&&... args);
+inline DataPointer<T> make_data_pointer(const std::string& name, Args&&... args) {
+	T* ptr = new T(std::forward<Args>(args)...);
+	DataPointer<T> result(name, ptr);
+	return result;
+}
 
 template<typename T>
 template<typename T2>
@@ -77,7 +83,8 @@ inline DataPointer<T, D>::DataPointer() : deleter(D()) {
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::DataPointer(T* ptr) : deleter(D()) {
+inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr) : deleter(D()) {
+	this->name = name;
 	this->ptr = ptr;
 	if (ptr) {
 		data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
@@ -85,7 +92,8 @@ inline DataPointer<T, D>::DataPointer(T* ptr) : deleter(D()) {
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::DataPointer(T* ptr, const D& deleter) : deleter(deleter) {
+inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr, const D& deleter) : deleter(deleter) {
+	this->name = name;
 	this->ptr = ptr;
 	if (ptr) {
 		data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
@@ -94,6 +102,7 @@ inline DataPointer<T, D>::DataPointer(T* ptr, const D& deleter) : deleter(delete
 
 template<typename T, typename D>
 inline DataPointer<T, D>::DataPointer(DataPointer&& dp) noexcept {
+	this->name = dp.getName();
 	resetSilent(dp.releaseSilent());
 	this->deleter = dp.getDeleter();
 }
@@ -101,6 +110,7 @@ inline DataPointer<T, D>::DataPointer(DataPointer&& dp) noexcept {
 template<typename T, typename D>
 template<typename T2, typename D2>
 inline DataPointer<T, D>::DataPointer(DataPointer<T2, D2>&& dp) noexcept {
+	this->name = dp.getName();
 	resetSilent(dp.releaseSilent());
 	this->deleter = dp.getDeleter();
 }
@@ -161,6 +171,7 @@ inline void DataPointer<T, D>::reset(T* new_ptr) {
 
 template<typename T, typename D>
 inline void DataPointer<T, D>::swap(DataPointer& dp) {
+	std::swap(this->name, dp.name);
 	std::swap(this->ptr, dp.ptr);
 	std::swap(this->deleter, dp.deleter);
 }
@@ -176,6 +187,11 @@ inline const D& DataPointer<T, D>::getDeleter() const {
 }
 
 template<typename T, typename D>
+inline const std::string& DataPointer<T, D>::getName() const {
+	return name;
+}
+
+template<typename T, typename D>
 inline T& DataPointer<T, D>::operator*() const {
 	return *ptr;
 }
@@ -187,6 +203,7 @@ inline T* DataPointer<T, D>::operator->() const {
 
 template<typename T, typename D>
 inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer&& right) {
+	this->name = right.getName();
 	reset(right.releaseSilent());
 	this->deleter = right.getDeleter();
 	return *this;
@@ -200,14 +217,8 @@ inline DataPointer<T, D>::operator bool() {
 template<typename T, typename D>
 template<typename T2, typename D2>
 inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer<T2, D2>&& right) {
+	this->name = right.getName();
 	reset(right.releaseSilent());
 	this->deleter = right.getDeleter();
 	return *this;
-}
-
-template<typename T, typename... Args>
-inline DataPointer<T> make_data_pointer(Args&&... args) {
-	T* ptr = new T(std::forward<Args>(args)...);
-	DataPointer<T> result(ptr);
-	return result;
 }

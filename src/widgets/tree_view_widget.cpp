@@ -78,7 +78,7 @@ namespace fw {
 	}
 
 	TreeViewWidget::Entry* TreeViewWidget::addEntry(const sf::String& name) {
-		DataPointer<Entry> entry_uptr = make_data_pointer<Entry>(*this, name);
+		DataPointer<Entry> entry_uptr = make_data_pointer<Entry>("TreeViewWidget Entry " + name, *this, name);
 		Entry* ptr = entry_uptr.get();
 		top_entries.add(ptr);
 		all_entries.add(std::move(entry_uptr));

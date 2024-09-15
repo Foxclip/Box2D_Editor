@@ -573,6 +573,7 @@ void Editor::processLeftPress(const sf::Vector2f& pos) {
             b2BodyDef mouse_body_def;
             b2Body* mouse_body = simulation.getWorld()->CreateBody(&mouse_body_def);
             drag_tool.mouse_body = DataPointer<b2Body, std::function<void(b2Body*)>>(
+                "MouseBody",
                 mouse_body,
                 [&](b2Body* ptr) {
                     simulation.getWorld()->DestroyBody(ptr);
@@ -588,6 +589,7 @@ void Editor::processLeftPress(const sf::Vector2f& pos) {
             mouse_joint_def.target = getMouseWorldPosb2();
             b2MouseJoint* mouse_joint = (b2MouseJoint*)simulation.getWorld()->CreateJoint(&mouse_joint_def);
             drag_tool.mouse_joint = DataPointer<b2MouseJoint, std::function<void(b2MouseJoint*)>>(
+                "MouseJoint",
                 mouse_joint,
                 [&](b2MouseJoint* ptr) {
                     simulation.getWorld()->DestroyJoint(ptr);

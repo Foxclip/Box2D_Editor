@@ -271,13 +271,17 @@ namespace fw {
 
 	void WidgetList::addPendingMove(Widget* widget, size_t index) {
 		wAssert(!isLocked());
-		DataPointer<PendingMove> uptr = make_data_pointer<PendingMove>(*this, widget, index);
+		DataPointer<PendingMove> uptr = make_data_pointer<PendingMove>(
+			"PendingMove " + widget->getFullName() + " " + std::to_string(index), *this, widget, index
+		);
 		pending_move.add(std::move(uptr));
 	}
 
 	void WidgetList::addPendingDelete(Widget* widget, bool with_children) {
 		wAssert(!isLocked());
-		DataPointer<PendingDelete> uptr = make_data_pointer<PendingDelete>(*this, widget, with_children);
+		DataPointer<PendingDelete> uptr = make_data_pointer<PendingDelete>(
+			"PendingDelete " + widget->getFullName() + " " + std::to_string(with_children), *this, widget, with_children
+		);
 		pending_delete.add(std::move(uptr));
 	}
 

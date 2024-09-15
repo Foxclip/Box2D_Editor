@@ -59,19 +59,19 @@ private:
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator+=(const std::function<void(TArgs...)>& func) {
-	DataPointer<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerFunc<TArgs...>>(func);
+	DataPointer<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerFunc<TArgs...>>("EventHandler func", func);
 	targets.push_back(std::move(uptr));
 }
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator+=(const Event<TArgs...>& event) {
-	DataPointer<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerEvent<TArgs...>>(event);
+	DataPointer<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerEvent<TArgs...>>("EventHandler event", event);
 	targets.push_back(std::move(uptr));
 }
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator+=(const EventHandlerFunc<TArgs...>& handler) {
-	DataPointer<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerFunc<TArgs...>>(handler);
+	DataPointer<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerFunc<TArgs...>>("EventHandler EventHandlerFunc", handler);
 	targets.push_back(std::move(uptr));
 }
 

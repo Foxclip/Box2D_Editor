@@ -5122,7 +5122,7 @@ const std::vector<Node*>& Node::getParents(Node* node) {
 }
 
 Node* NodeList::createNode(const std::string& name) {
-    DataPointer<Node> uptr = make_data_pointer<Node>(name);
+    DataPointer<Node> uptr = make_data_pointer<Node>("Node " + name, name);
     Node* ptr = uptr.get();
     nodes.add(std::move(uptr));
     return ptr;

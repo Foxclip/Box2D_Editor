@@ -228,7 +228,13 @@ DataPointer<RevoluteJoint> RevoluteJoint::deserialize(
 		if (new_object_b) {
 			object2 = new_object_b;
 		}
-		DataPointer<RevoluteJoint> uptr = make_data_pointer<RevoluteJoint>(def, object_list->getWorld(), object1, object2);
+		DataPointer<RevoluteJoint> uptr = make_data_pointer<RevoluteJoint>(
+			"RevoluteJoint A: " + object1->getName() + " B: " + object2->getName(),
+			def,
+			object_list->getWorld(),
+			object1,
+			object2
+		);
 		return uptr;
 	} catch (std::exception exc) {
 		throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));

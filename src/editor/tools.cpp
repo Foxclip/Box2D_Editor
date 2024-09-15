@@ -21,8 +21,8 @@ DragTool::DragTool() : Tool() {
 }
 
 void DragTool::reset() {
-    mouse_body = nullptr;
-    mouse_joint = nullptr;
+    mouse_body.reset();
+    mouse_joint.reset();
 }
 
 MoveTool::MoveTool() : Tool() {

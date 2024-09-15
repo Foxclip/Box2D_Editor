@@ -39,7 +39,7 @@ void Simulation::save(const std::string& filename) const {
 void Simulation::reset() {
     clear();
     b2Vec2 gravity(0.0f, -9.8f);
-    world = make_data_pointer<b2World>(gravity);
+    world = make_data_pointer<b2World>("Simulation World", gravity);
 }
 
 std::string Simulation::serialize() const {
@@ -162,7 +162,7 @@ BoxObject* Simulation::createBox(
     def.position = pos;
     def.angle = angle;
     DataPointer<BoxObject> uptr = make_data_pointer<BoxObject>(
-        this, def, size, color
+        "BoxObject " + name, this, def, size, color
     );
     BoxObject* ptr = uptr.get();
     ptr->setName(name);
@@ -181,7 +181,7 @@ BallObject* Simulation::createBall(
     def.type = b2_dynamicBody;
     def.position = pos;
     DataPointer<BallObject> uptr = make_data_pointer<BallObject>(
-        this, def, radius, color, notch_color
+        "BallObject " + name, this, def, radius, color, notch_color
     );
     BallObject* ptr = uptr.get();
     ptr->setName(name);
@@ -201,7 +201,7 @@ PolygonObject* Simulation::createPolygon(
     def.position = pos;
     def.angle = angle;
     DataPointer<PolygonObject> uptr = make_data_pointer<PolygonObject>(
-        this, def, vertices, color
+        "PolygonObject " + name, this, def, vertices, color
     );
     PolygonObject* ptr = uptr.get();
     ptr->setName(name);
@@ -282,7 +282,7 @@ ChainObject* Simulation::createChain(
     def.position = pos;
     def.angle = angle;
     DataPointer<ChainObject> uptr = make_data_pointer<ChainObject>(
-        this, def, vertices, color
+        "ChainObject " + name, this, def, vertices, color
     );
     ChainObject* ptr = uptr.get();
     ptr->setName(name);
@@ -296,7 +296,7 @@ RevoluteJoint* Simulation::createRevoluteJoint(
     GameObject* obj2
 ) {
     DataPointer<RevoluteJoint> uptr = make_data_pointer<RevoluteJoint>(
-        def, world.get(), obj1, obj2
+        "RevoluteJoint A: " + obj1->getName() + " B: " + obj2->getName(), def, world.get(), obj1, obj2
     );
     RevoluteJoint* ptr = uptr.get();
     addJoint(std::move(uptr));
