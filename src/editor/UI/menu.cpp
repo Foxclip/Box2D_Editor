@@ -26,7 +26,7 @@ Menu::Menu(fw::WidgetList& widget_list, Editor& p_app)
 }
 
 fw::RectangleWidget* Menu::createButton(const std::string& name, const std::string& display_name) {
-    RectangleWidget* button_widget = app.widgets.createWidget<RectangleWidget>(
+    RectangleWidget* button_widget = app.widgets.createRectangleWidget(
         MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT
     );
     button_widget->setFillColor(sf::Color(128, 128, 128));
@@ -39,7 +39,7 @@ fw::RectangleWidget* Menu::createButton(const std::string& name, const std::stri
     };
     button_widget->setParent(this);
     button_widget->setName(name);
-    fw::TextWidget* text_widget = app.widgets.createWidget<fw::TextWidget>();
+    fw::TextWidget* text_widget = app.widgets.createTextWidget();
     text_widget->setFont(app.ui_font);
     text_widget->setCharacterSize(MENU_BUTTON_TEXT_SIZE);
     text_widget->setString(display_name);

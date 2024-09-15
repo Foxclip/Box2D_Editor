@@ -22,7 +22,7 @@ namespace fw {
 			return sf::Cursor::Text;
 		};
 		// text
-		text_widget = widget_list.createWidget<TextWidget>();
+		text_widget = widget_list.createTextWidget();
 		text_widget->setFillColor(text_color);
 		text_widget->setParentAnchor(Anchor::CENTER_LEFT);
 		text_widget->setAnchorOffset(TEXTBOX_TEXT_VIEW_ZERO_POS);
@@ -30,7 +30,7 @@ namespace fw {
 		text_widget->setLocalRenderLayer(static_cast<size_t>(TextBoxTextRenderLayers::TEXTBOX_TEXT));
 		text_widget->setParent(this);
 		// cursor
-		cursor_widget = widget_list.createWidget<RectangleWidget>(1.0f, 10.0f);
+		cursor_widget = widget_list.createRectangleWidget(1.0f, 10.0f);
 		cursor_widget->setVisible(false);
 		cursor_widget->setFillColor(editor_text_color);
 		updateCursorSize();
@@ -38,7 +38,7 @@ namespace fw {
 		cursor_widget->setParentLocalRenderLayer(static_cast<size_t>(TextBoxTextRenderLayers::TEXTBOX_CURSOR));
 		cursor_widget->setName("cursor");
 		// selection
-		selection_widget = widget_list.createWidget<RectangleWidget>(0.0f, 0.0f);
+		selection_widget = widget_list.createRectangleWidget(0.0f, 0.0f);
 		selection_widget->setVisible(false);
 		selection_widget->setFillColor(selection_color);
 		selection_widget->setParent(text_widget);

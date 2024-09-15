@@ -44,6 +44,18 @@ namespace fw {
 	};
 
 	class Application;
+	class RectangleWidget;
+	class TextWidget;
+	class PolygonWidget;
+	class ContainerWidget;
+	class EmptyWidget;
+	class TextBoxWidget;
+	class CheckboxWidget;
+	class DropdownWidget;
+	class CanvasWidget;
+	class WindowWidget;
+	class ScrollAreaWidget;
+	class TreeViewWidget;
 
 	// Adding methods:
 	// If method changes widgets, check this:
@@ -77,6 +89,26 @@ namespace fw {
 		template<typename T, typename... Args>
 		requires std::derived_from<T, Widget>
 		T* createWidget(Args&&... args);
+		RectangleWidget* createRectangleWidget(float width, float height);
+		RectangleWidget* createRectangleWidget(const sf::Vector2f& size);
+		TextWidget* createTextWidget();
+		PolygonWidget* createPolygonWidget(const std::vector<sf::Vector2f>& vertices);
+		ContainerWidget* createContainerWidget(float width, float height);
+		ContainerWidget* createContainerWidget(const sf::Vector2f& size);
+		EmptyWidget* createEmptyWidget();
+		TextBoxWidget* createTextBoxWidget();
+		TextBoxWidget* createTextBoxWidget(float width, float height);
+		TextBoxWidget* createTextBoxWidget(const sf::Vector2f& size);
+		CheckboxWidget* createCheckboxWidget();
+		DropdownWidget* createDropdownWidget();
+		CanvasWidget* createCanvasWidget(float width, float height, unsigned int texture_width, unsigned int texture_height);
+		CanvasWidget* createCanvasWidget(const sf::Vector2f& size, const sf::Vector2u& texture_size);
+		WindowWidget* createWindowWidget(float width, float height);
+		WindowWidget* createWindowWidget(const sf::Vector2f& size);
+		ScrollAreaWidget* createScrollAreaWidget(float width, float height);
+		ScrollAreaWidget* createScrollAreaWidget(const sf::Vector2f& size);
+		TreeViewWidget* createTreeViewWidget(float width, float height);
+		TreeViewWidget* createTreeViewWidget(const sf::Vector2f& size);
 		bool isLocked() const;
 		void lock();
 		void unlock();

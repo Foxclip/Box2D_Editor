@@ -17,7 +17,7 @@ namespace fw {
 		setName("window");
 		setSizeInternal(width, height + WINDOW_HEADER_HEIGHT);
 		// header
-		header_widget = widget_list.createWidget<RectangleWidget>(width, WINDOW_HEADER_HEIGHT);
+		header_widget = widget_list.createRectangleWidget(width, WINDOW_HEADER_HEIGHT);
 		header_widget->setOrigin(Anchor::TOP_LEFT);
 		header_widget->setClipChildren(true);
 		header_widget->setClickThrough(false);
@@ -53,7 +53,7 @@ namespace fw {
 		header_widget->setParent(this);
 		header_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::HEADER));
 		// header text
-		header_text_widget = widget_list.createWidget<TextWidget>();
+		header_text_widget = widget_list.createTextWidget();
 		header_text_widget->setOrigin(Anchor::TOP_LEFT);
 		header_text_widget->setParentAnchor(Anchor::TOP_LEFT);
 		header_text_widget->setAnchorOffset(WINDOW_HEADER_TEXT_PADDING, 0.0f);
@@ -64,7 +64,7 @@ namespace fw {
 		setHeaderTextColor(WINDOW_HEADER_TEXT_DEFAULT_COLOR);
 		setHeaderTextCharacterSize(WINDOW_HEADER_TEXT_DEFAULT_CHARACTER_SIZE);
 		// main widget
-		main_widget = widget_list.createWidget<RectangleWidget>(width, height);
+		main_widget = widget_list.createRectangleWidget(width, height);
 		main_widget->setName("main");
 		main_widget->setParentAnchor(Anchor::TOP_LEFT);
 		main_widget->setAnchorOffset(0.0f, WINDOW_HEADER_HEIGHT);
@@ -76,7 +76,7 @@ namespace fw {
 		main_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::WINDOW));
 		// resize widget
 		sf::Vector2f resize_size(width + WINDOW_RESIZE_MARGIN * 2, WINDOW_HEADER_HEIGHT + height + WINDOW_RESIZE_MARGIN * 2);
-		resize_widget = widget_list.createWidget<EmptyWidget>();
+		resize_widget = widget_list.createEmptyWidget();
 		resize_widget->setName("resize");
 		resize_widget->setSize(resize_size);
 		resize_widget->setParentAnchor(Anchor::TOP_LEFT);
@@ -185,7 +185,7 @@ namespace fw {
 		resize_widget->setParent(this);
 		resize_widget->setParentLocalRenderLayer(static_cast<size_t>(WindowRenderLayers::RESIZE));
 		// outline
-		outline_widget = widget_list.createWidget<RectangleWidget>(width, height + WINDOW_HEADER_HEIGHT);
+		outline_widget = widget_list.createRectangleWidget(width, height + WINDOW_HEADER_HEIGHT);
 		outline_widget->setName("outline");
 		outline_widget->setSize(width, WINDOW_HEADER_HEIGHT + height);
 		outline_widget->setFillColor(sf::Color::Transparent);

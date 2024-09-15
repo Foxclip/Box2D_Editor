@@ -258,7 +258,7 @@ void Editor::initUi() {
 
 void Editor::initWidgets() {
     // canvas widgets
-    world_widget = widgets.createWidget<fw::CanvasWidget>(
+    world_widget = widgets.createCanvasWidget(
         (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
     );
     world_widget->setName("world_canvas");
@@ -297,7 +297,7 @@ void Editor::initWidgets() {
         processMouseScrollY(delta);
     };
 
-    selection_mask_widget = widgets.createWidget<fw::CanvasWidget>(
+    selection_mask_widget = widgets.createCanvasWidget(
         (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
     );
     selection_mask_widget->setName("selection_mask_canvas");
@@ -312,7 +312,7 @@ void Editor::initWidgets() {
         selection_mask_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };
 
-    ui_widget = widgets.createWidget<fw::CanvasWidget>(
+    ui_widget = widgets.createCanvasWidget(
         (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
     );
     ui_widget->setName("ui_canvas");
@@ -330,7 +330,7 @@ void Editor::initWidgets() {
     menu_widget->setAnchorOffsetX(200.0f);
 
     // step text
-    step_widget = widgets.createWidget<fw::TextWidget>();
+    step_widget = widgets.createTextWidget();
     step_widget->setFont(ui_font);
     step_widget->setString(std::to_string(simulation.getStep()));
     step_widget->setCharacterSize(10);
@@ -340,12 +340,12 @@ void Editor::initWidgets() {
     step_widget->setName("step text");
 
     // pause widget
-    paused_rect_widget = widgets.createWidget<fw::ContainerWidget>(20.0f, 20.0f);
+    paused_rect_widget = widgets.createContainerWidget(20.0f, 20.0f);
     paused_rect_widget->setFillColor(sf::Color(0, 0, 0, 128));
     paused_rect_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     paused_rect_widget->setPadding(10.0f);
     paused_rect_widget->setName("paused rect");
-    fw::TextWidget* paused_text_widget = widgets.createWidget<fw::TextWidget>();
+    fw::TextWidget* paused_text_widget = widgets.createTextWidget();
     paused_text_widget->setFont(ui_font);
     paused_text_widget->setString("PAUSED");
     paused_text_widget->setCharacterSize(24);
@@ -354,13 +354,13 @@ void Editor::initWidgets() {
     paused_text_widget->setParent(paused_rect_widget);
 
     // fps
-    fps_widget = widgets.createWidget<fw::ContainerWidget>(20.0f, 20.0f);
+    fps_widget = widgets.createContainerWidget(20.0f, 20.0f);
     fps_widget->setFillColor(sf::Color::Yellow);
     fps_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     fps_widget->setPosition(120.0f, 0.0f);
     fps_widget->setPadding(0.0f);
     fps_widget->setName("fps");
-    fps_text_widget = widgets.createWidget<fw::TextWidget>();
+    fps_text_widget = widgets.createTextWidget();
     fps_text_widget->setFont(fps_font);
     fps_text_widget->setCharacterSize(32);
     fps_text_widget->setFillColor(sf::Color::Black);
@@ -369,13 +369,13 @@ void Editor::initWidgets() {
     fps_text_widget->setParent(fps_widget);
 
     // logger
-    logger_widget = widgets.createWidget<fw::RectangleWidget>(500.0f, 20.0f);
+    logger_widget = widgets.createRectangleWidget(500.0f, 20.0f);
     logger_widget->setFillColor(sf::Color(0, 0, 0));
     logger_widget->setOrigin(fw::Widget::Anchor::BOTTOM_LEFT);
     logger_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_LEFT);
     logger_widget->setClipChildren(true);
     logger_widget->setName("logger");
-    logger_text_widget = widgets.createWidget<fw::TextWidget>();
+    logger_text_widget = widgets.createTextWidget();
     logger_text_widget->setFont(console_font);
     logger_text_widget->setCharacterSize(15);
     logger_text_widget->setFillColor(sf::Color::White);
@@ -385,7 +385,7 @@ void Editor::initWidgets() {
     logger_text_widget->setParent(logger_widget);
 
     // debug/release text
-    debug_release_widget = widgets.createWidget<fw::TextWidget>();
+    debug_release_widget = widgets.createTextWidget();
     debug_release_widget->setFont(ui_font);
 #ifndef NDEBUG
     debug_release_widget->setString("DEBUG");

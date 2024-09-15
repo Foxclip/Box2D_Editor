@@ -13,7 +13,7 @@ CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
     setClickThrough(false);
     setName("create panel");
     for (size_t i = 0; i < CreateTool::mode_count; i++) {
-        RectangleWidget* button_widget = widget_list.createWidget<RectangleWidget>(
+        RectangleWidget* button_widget = widget_list.createRectangleWidget(
             CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT
         );
         button_widget->setFillColor(sf::Color(128, 128, 128));
@@ -28,7 +28,7 @@ CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
             button_widget->setOutlineThickness(0.0f);
         };
         button_widget->setName("button " + std::to_string(i));
-        fw::TextWidget* text_widget = widget_list.createWidget<fw::TextWidget>();
+        fw::TextWidget* text_widget = widget_list.createTextWidget();
         text_widget->setFont(app.ui_font);
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
         text_widget->setString(CreateTool::create_type_name(static_cast<CreateTool::ObjectType>(i)));

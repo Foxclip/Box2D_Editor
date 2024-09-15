@@ -12,7 +12,7 @@ Toolbox::Toolbox(fw::WidgetList& widget_list, Editor& p_app)
     setName("toolbox");
     for (size_t i = 0; i < app.tools.size(); i++) {
         Tool* tool = app.tools[i];
-        RectangleWidget* tool_widget = app.widgets.createWidget<RectangleWidget>(
+        RectangleWidget* tool_widget = app.widgets.createRectangleWidget(
             TOOL_RECT_WIDTH, TOOL_RECT_HEIGHT
         );
         tool_widget->setFillColor(sf::Color(128, 128, 128));
@@ -32,7 +32,7 @@ Toolbox::Toolbox(fw::WidgetList& widget_list, Editor& p_app)
         };
         tool_widget->setParent(this);
         tool_widget->setName("tool " + tool->name);
-        fw::TextWidget* text_widget = app.widgets.createWidget<fw::TextWidget>();
+        fw::TextWidget* text_widget = app.widgets.createTextWidget();
         text_widget->setFont(app.ui_font);
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
         text_widget->setString(app.tools[i]->name);

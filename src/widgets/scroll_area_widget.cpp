@@ -18,7 +18,7 @@ namespace fw {
 		float default_width = SCROLL_AREA_SCROLLBAR_DEFAULT_WIDTH;
 		float area_width = width - default_width;
 		float area_height = height - default_width;
-		area_widget = widget_list.createWidget<RectangleWidget>(area_width, area_height);
+		area_widget = widget_list.createRectangleWidget(area_width, area_height);
 		area_widget->setName("area");
 		area_widget->setFillColor(SCROLL_AREA_DEFAULT_BACKGROUND_COLOR);
 		area_widget->setParentAnchor(Anchor::TOP_LEFT);
@@ -26,7 +26,7 @@ namespace fw {
 		area_widget->setClickThrough(false);
 		area_widget->setParent(this);
 		// slider x bg
-		scrollbar_x_widget = widget_list.createWidget<RectangleWidget>(area_width, default_width);
+		scrollbar_x_widget = widget_list.createRectangleWidget(area_width, default_width);
 		scrollbar_x_widget->setName("slider bg x");
 		scrollbar_x_widget->setFillColor(SCROLL_AREA_DEFAULT_SCROLL_BACKGROUND_COLOR);
 		scrollbar_x_widget->setParentAnchor(Anchor::BOTTOM_LEFT);
@@ -34,7 +34,7 @@ namespace fw {
 		scrollbar_x_widget->setClickThrough(false);
 		scrollbar_x_widget->setParent(this);
 		// slider x
-		slider_x_widget = widget_list.createWidget<RectangleWidget>(area_width / 2.0f, default_width);
+		slider_x_widget = widget_list.createRectangleWidget(area_width / 2.0f, default_width);
 		slider_x_widget->setName("slider x");
 		slider_x_widget->setFillColor(SCROLL_AREA_DEFAULT_SLIDER_COLOR);
 		slider_x_widget->setClickThrough(false);
@@ -65,7 +65,7 @@ namespace fw {
 			updateColors();
 		};
 		// slider y bg
-		scrollbar_y_widget = widget_list.createWidget<RectangleWidget>(default_width, area_height);
+		scrollbar_y_widget = widget_list.createRectangleWidget(default_width, area_height);
 		scrollbar_y_widget->setName("slider bg y");
 		scrollbar_y_widget->setFillColor(SCROLL_AREA_DEFAULT_SCROLL_BACKGROUND_COLOR);
 		scrollbar_y_widget->setParentAnchor(Anchor::TOP_RIGHT);
@@ -73,7 +73,7 @@ namespace fw {
 		scrollbar_y_widget->setClickThrough(false);
 		scrollbar_y_widget->setParent(this);
 		// slider y
-		slider_y_widget = widget_list.createWidget<RectangleWidget>(default_width, area_height / 2.0f);
+		slider_y_widget = widget_list.createRectangleWidget(default_width, area_height / 2.0f);
 		slider_y_widget->setName("slider y");
 		slider_y_widget->setFillColor(SCROLL_AREA_DEFAULT_SLIDER_COLOR);
 		slider_y_widget->setClickThrough(false);
@@ -104,7 +104,7 @@ namespace fw {
 			updateColors();
 		};
 		// corner
-		corner_widget = widget_list.createWidget<RectangleWidget>(default_width, default_width);
+		corner_widget = widget_list.createRectangleWidget(default_width, default_width);
 		corner_widget->setName("corner");
 		corner_widget->setFillColor(SCROLL_AREA_DEFAULT_CORNER_COLOR);
 		corner_widget->setParentAnchor(Anchor::BOTTOM_RIGHT);

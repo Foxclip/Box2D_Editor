@@ -25,19 +25,19 @@ namespace fw {
 			}
 		};
 		// main
-		main_widget = widget_list.createWidget<RectangleWidget>(DROPDOWN_DEFAULT_SIZE);
+		main_widget = widget_list.createRectangleWidget(DROPDOWN_DEFAULT_SIZE);
 		main_widget->setName("main");
 		main_widget->setClipChildren(true);
 		main_widget->setFillColor(DROPDOWN_DEFAULT_MAIN_COLOR);
 		main_widget->setSizePolicy(Widget::SizePolicy::PARENT);
 		main_widget->setParent(this);
 		// main text
-		text_widget = widget_list.createWidget<TextWidget>();
+		text_widget = widget_list.createTextWidget();
 		text_widget->setString("Dropdown");
 		text_widget->setFillColor(DROPDOWN_DEFAULT_MAIN_TEXT_COLOR);
 		text_widget->setParent(main_widget);
 		// main square
-		square_widget = widget_list.createWidget<RectangleWidget>(main_widget->getHeight(), main_widget->getHeight());
+		square_widget = widget_list.createRectangleWidget(main_widget->getHeight(), main_widget->getHeight());
 		square_widget->setName("square");
 		square_widget->setFillColor(DROPDOWN_DEFAULT_SQUARE_COLOR);
 		square_widget->setParentAnchor(Anchor::TOP_RIGHT);
@@ -46,13 +46,13 @@ namespace fw {
 		square_widget->setParent(main_widget);
 		// main triangle
 		std::vector<sf::Vector2f> vertices = get_regular_polygon<sf::Vector2f>(3, 5.0f, to_radians(90.0f));
-		triangle_widget = widget_list.createWidget<PolygonWidget>(vertices);
+		triangle_widget = widget_list.createPolygonWidget(vertices);
 		triangle_widget->setName("triangle");
 		triangle_widget->setFillColor(DROPDOWN_DEFAULT_TRIANGLE_COLOR);
 		triangle_widget->setParentAnchor(Anchor::CENTER);
 		triangle_widget->setParent(square_widget);
 		// options panel
-		panel_widget = widget_list.createWidget<RectangleWidget>(100.0f, 100.0f);
+		panel_widget = widget_list.createRectangleWidget(100.0f, 100.0f);
 		panel_widget->setName("panel");
 		panel_widget->setVisible(false);
 		panel_widget->setClickThrough(false);
@@ -132,7 +132,7 @@ namespace fw {
 		if (index < 0) {
 			index = option_widgets.size();
 		}
-		RectangleWidget* option_widget = widget_list.createWidget<RectangleWidget>(100.0f, 20.0f);
+		RectangleWidget* option_widget = widget_list.createRectangleWidget(100.0f, 20.0f);
 		option_widget->setParent(panel_widget);
 		option_widget->moveToIndex(index);
 		option_widget->setFillColor(sf::Color::Transparent);
@@ -145,7 +145,7 @@ namespace fw {
 		};
 		option_widget->setGlobalRenderLayer(GlobalRenderLayer::DROPDOWN_PANEL);
 		option_widgets.insert(option_widgets.begin() + index, option_widget);
-		TextWidget* option_text_widget = widget_list.createWidget<TextWidget>();
+		TextWidget* option_text_widget = widget_list.createTextWidget();
 		if (text_widget->getFont().isLoaded()) {
 			option_text_widget->setFont(text_widget->getFont());
 		}

@@ -1,6 +1,17 @@
 #include "widgets/application.h"
 #include "widgets/widget_list.h"
 #include "widgets/rectangle_widget.h"
+#include "widgets/text_widget.h"
+#include "widgets/polygon_widget.h"
+#include "widgets/container_widget.h"
+#include "widgets/empty_widget.h"
+#include "widgets/textbox_widget.h"
+#include "widgets/checkbox_widget.h"
+#include "widgets/dropdown_widget.h"
+#include "widgets/canvas_widget.h"
+#include "widgets/window_widget.h"
+#include "widgets/scroll_area_widget.h"
+#include "widgets/tree_view_widget.h"
 #include <ranges>
 
 namespace fw {
@@ -10,7 +21,7 @@ namespace fw {
 	}
 
 	WidgetList::WidgetList(Application& application) : application(application) {
-		root_widget = createWidget<EmptyWidget>();
+		root_widget = createEmptyWidget();
 		root_widget->setFillColor(sf::Color::Transparent);
 		root_widget->setClickThrough(false);
 		root_widget->setClipChildren(true);
@@ -141,6 +152,106 @@ namespace fw {
 
 	void WidgetList::setDefaultFont(const fw::Font& font) {
 		default_font = font;
+	}
+
+	RectangleWidget* WidgetList::createRectangleWidget(float width, float height) {
+		RectangleWidget* rectangle_widget = createWidget<RectangleWidget>(width, height);
+		return rectangle_widget;
+	}
+
+	RectangleWidget* WidgetList::createRectangleWidget(const sf::Vector2f& size) {
+		RectangleWidget* rectangle_widget = createRectangleWidget(size.x, size.y);
+		return rectangle_widget;
+	}
+
+	TextWidget* WidgetList::createTextWidget() {
+		TextWidget* text_widget = createWidget<TextWidget>();
+		return text_widget;
+	}
+
+	PolygonWidget* WidgetList::createPolygonWidget(const std::vector<sf::Vector2f>& vertices) {
+		PolygonWidget* polygon_widget = createWidget<PolygonWidget>(vertices);
+		return polygon_widget;
+	}
+
+	ContainerWidget* WidgetList::createContainerWidget(float width, float height) {
+		ContainerWidget* container_widget = createWidget<ContainerWidget>(width, height);
+		return container_widget;
+	}
+
+	ContainerWidget* WidgetList::createContainerWidget(const sf::Vector2f& size) {
+		ContainerWidget* container_widget = createContainerWidget(size.x, size.y);
+		return container_widget;
+	}
+
+	EmptyWidget* WidgetList::createEmptyWidget() {
+		EmptyWidget* empty_widget = createWidget<EmptyWidget>();
+		return empty_widget;
+	}
+
+	TextBoxWidget* WidgetList::createTextBoxWidget() {
+		TextBoxWidget* textbox_widget = createWidget<TextBoxWidget>();
+		return textbox_widget;
+	}
+
+	TextBoxWidget* WidgetList::createTextBoxWidget(float width, float height) {
+		TextBoxWidget* textbox_widget = createWidget<TextBoxWidget>(width, height);
+		return textbox_widget;
+	}
+
+	TextBoxWidget* WidgetList::createTextBoxWidget(const sf::Vector2f& size) {
+		TextBoxWidget* textbox_widget = createTextBoxWidget(size.x, size.y);
+		return textbox_widget;
+	}
+
+	CheckboxWidget* WidgetList::createCheckboxWidget() {
+		CheckboxWidget* checkbox_widget = createWidget<CheckboxWidget>();
+		return checkbox_widget;
+	}
+
+	DropdownWidget* WidgetList::createDropdownWidget() {
+		DropdownWidget* dropdown_widget = createWidget<DropdownWidget>();
+		return dropdown_widget;
+	}
+
+	CanvasWidget* WidgetList::createCanvasWidget(float width, float height, unsigned int texture_width, unsigned int texture_height) {
+		CanvasWidget* canvas_widget = createWidget<CanvasWidget>(width, height, texture_width, texture_height);
+		return canvas_widget;
+	}
+
+	CanvasWidget* WidgetList::createCanvasWidget(const sf::Vector2f& size, const sf::Vector2u& texture_size) {
+		CanvasWidget* canvas_widget = createCanvasWidget(size.x, size.y, texture_size.x, texture_size.y);
+		return canvas_widget;
+	}
+
+	WindowWidget* WidgetList::createWindowWidget(float width, float height) {
+		WindowWidget* window_widget = createWidget<WindowWidget>(width, height);
+		return window_widget;
+	}
+
+	WindowWidget* WidgetList::createWindowWidget(const sf::Vector2f& size) {
+		WindowWidget* window_widget = createWindowWidget(size.x, size.y);
+		return window_widget;
+	}
+
+	ScrollAreaWidget* WidgetList::createScrollAreaWidget(float width, float height) {
+		ScrollAreaWidget* scroll_area_widget = createWidget<ScrollAreaWidget>(width, height);
+		return scroll_area_widget;
+	}
+
+	ScrollAreaWidget* WidgetList::createScrollAreaWidget(const sf::Vector2f& size) {
+		ScrollAreaWidget* scroll_area_widget = createScrollAreaWidget(size.x, size.y);
+		return scroll_area_widget;
+	}
+
+	TreeViewWidget* WidgetList::createTreeViewWidget(float width, float height) {
+		TreeViewWidget* tree_view_widget = createWidget<TreeViewWidget>(width, height);
+		return tree_view_widget;
+	}
+
+	TreeViewWidget* WidgetList::createTreeViewWidget(const sf::Vector2f& size) {
+		TreeViewWidget* tree_view_widget = createTreeViewWidget(size.x, size.y);
+		return tree_view_widget;
 	}
 
 	bool WidgetList::isLocked() const {

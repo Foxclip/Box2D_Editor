@@ -146,7 +146,7 @@ namespace fw {
 #endif
 		this->name = name;
 		// container
-		entry_widget = treeview.widget_list.createWidget<fw::ContainerWidget>(20.0f, TREEVIEW_ENTRY_HEIGHT);
+		entry_widget = treeview.widget_list.createContainerWidget(20.0f, TREEVIEW_ENTRY_HEIGHT);
 		entry_widget->setName(name + " entry");
 		entry_widget->setHorizontal(false);
 		entry_widget->setInnerPaddingY(TREEVIEW_CONTAINER_PADDING);
@@ -154,7 +154,7 @@ namespace fw {
 		entry_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
 		entry_widget->setParent(&treeview);
 		// rectangle
-		rectangle_widget = treeview.widget_list.createWidget<fw::RectangleWidget>(20.0f, TREEVIEW_ENTRY_HEIGHT);
+		rectangle_widget = treeview.widget_list.createRectangleWidget(20.0f, TREEVIEW_ENTRY_HEIGHT);
 		rectangle_widget->setFillColor(TREEVIEW_ENTRY_BACKGROUND_COLOR);
 		rectangle_widget->setClipChildren(true);
 		rectangle_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
@@ -169,7 +169,7 @@ namespace fw {
 		};
 		rectangle_widget->setParent(entry_widget);
 		// arrow area
-		arrow_area_widget = treeview.widget_list.createWidget<fw::RectangleWidget>(15.0f, 20.0f);
+		arrow_area_widget = treeview.widget_list.createRectangleWidget(15.0f, 20.0f);
 		arrow_area_widget->setName("arrow area");
 		arrow_area_widget->setVisible(false);
 		arrow_area_widget->setSizeYPolicy(fw::Widget::SizePolicy::PARENT);
@@ -185,13 +185,13 @@ namespace fw {
 			sf::Vector2f(-3.0, 5.0f),
 			sf::Vector2f(-3.0, -5.0f),
 		};
-		arrow_widget = treeview.widget_list.createWidget<fw::PolygonWidget>(vertices);
+		arrow_widget = treeview.widget_list.createPolygonWidget(vertices);
 		arrow_widget->setName("arrow");
 		arrow_widget->setFillColor(TREEVIEW_ENTRY_ARROW_COLOR);
 		arrow_widget->setParentAnchor(fw::Widget::Anchor::CENTER);
 		arrow_widget->setParent(arrow_area_widget);
 		// text
-		fw::TextWidget* text_widget = treeview.widget_list.createWidget<fw::TextWidget>();
+		fw::TextWidget* text_widget = treeview.widget_list.createTextWidget();
 		text_widget->setCharacterSize(TREEVIEW_ENTRY_FONT_SIZE);
 		text_widget->setFillColor(TREEVIEW_ENTRY_TEXT_COLOR);
 		text_widget->setString(name);
@@ -200,19 +200,19 @@ namespace fw {
 		text_widget->setAnchorOffsetX(18.0f);
 		text_widget->setParent(rectangle_widget);
 		// children box
-		children_box_widget = treeview.widget_list.createWidget<fw::ContainerWidget>(20.0f, TREEVIEW_ENTRY_HEIGHT);
+		children_box_widget = treeview.widget_list.createContainerWidget(20.0f, TREEVIEW_ENTRY_HEIGHT);
 		children_box_widget->setName("children box");
 		children_box_widget->setVisible(false);
 		children_box_widget->setRenderable(false);
 		children_box_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
 		children_box_widget->setParent(entry_widget);
 		// spacing
-		children_spacing_widget = treeview.widget_list.createWidget<fw::EmptyWidget>();
+		children_spacing_widget = treeview.widget_list.createEmptyWidget();
 		children_spacing_widget->setName("spacing");
 		children_spacing_widget->setSize(TREEVIEW_ENTRY_CHILDREN_OFFSET, 1.0f);
 		children_spacing_widget->setParent(children_box_widget);
 		// children
-		children_widget = treeview.widget_list.createWidget<fw::ContainerWidget>(20.0f, TREEVIEW_ENTRY_HEIGHT);
+		children_widget = treeview.widget_list.createContainerWidget(20.0f, TREEVIEW_ENTRY_HEIGHT);
 		children_widget->setName("children");
 		children_widget->setHorizontal(false);
 		children_widget->setInnerPaddingY(TREEVIEW_CONTAINER_PADDING);

@@ -8,7 +8,7 @@ namespace fw {
 		setClickThrough(false);
 		RectangleWidget::setFillColor(background_fill_color);
 		setName("checkbox");
-		check_widget = widget_list.createWidget<RectangleWidget>(rect.getSize() * check_size);
+		check_widget = widget_list.createRectangleWidget(rect.getSize() * check_size);
 		check_widget->setVisible(checked);
 		check_widget->setFillColor(check_fill_color);
 		check_widget->setOrigin(Anchor::CENTER);
