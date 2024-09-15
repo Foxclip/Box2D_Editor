@@ -130,8 +130,8 @@ public:
 	bool operator==(const TCont& other) const;
 
 private:
-	std::vector<DataPointer<T>> uptrs;
 	CompVector<T*, TCmp> comp;
+	std::vector<DataPointer<T>> uptrs;
 
 };
 
