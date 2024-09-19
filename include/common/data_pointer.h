@@ -87,7 +87,10 @@ inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr) : deleter
 	this->name = name;
 	this->ptr = ptr;
 	if (ptr) {
-		data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
+		auto inserted = data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
+		if (!inserted.second) {
+			assert(false); // pointer already in data_blocks
+		}
 	}
 }
 
@@ -96,7 +99,10 @@ inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr, const D& 
 	this->name = name;
 	this->ptr = ptr;
 	if (ptr) {
-		data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
+		auto inserted = data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
+		if (!inserted.second) {
+			assert(false); // pointer already in data_blocks
+		}
 	}
 }
 
@@ -120,6 +126,7 @@ inline DataPointer<T, D>::~DataPointer() {
 	if (ptr) {
 		data_blocks.erase(reinterpret_cast<void*>(ptr));
 		deleter(ptr);
+		assert(data_blocks.contains(ptr));
 	}
 }
 
