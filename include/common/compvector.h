@@ -117,6 +117,7 @@ public:
 	T* back() const;
 	T* at(size_t index);
 	T* at(size_t index) const;
+	DataPointer<T>& getUptr(size_t index);
 	ptrdiff_t getIndex(const T* value) const;
 	const CompVector<T*>& getCompVector() const;
 	const std::vector<T*>& getVector() const;
@@ -612,6 +613,11 @@ inline T* CompVectorUptr<T, TCmp>::at(size_t index) {
 template<typename T, typename TCmp>
 inline T* CompVectorUptr<T, TCmp>::at(size_t index) const {
 	return comp.at(index);
+}
+
+template<typename T, typename TCmp>
+inline DataPointer<T>& CompVectorUptr<T, TCmp>::getUptr(size_t index) {
+	return uptrs[index];
 }
 
 template<typename T, typename TCmp>
