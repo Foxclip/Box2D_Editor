@@ -222,7 +222,9 @@ namespace fw {
 	}
 
 	TreeViewWidget::Entry::~Entry() {
-		entry_widget->remove();
+		if (!treeview.widget_list.isBeingDestroyed()) {
+			entry_widget->remove();
+		}
 	}
 
 	bool TreeViewWidget::Entry::isExpanded() const {

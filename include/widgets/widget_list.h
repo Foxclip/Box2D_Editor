@@ -65,11 +65,13 @@ namespace fw {
 		bool debug_render = false;
 
 		WidgetList(Application& application);
+		virtual ~WidgetList();
 		Application& getApplication() const;
 		size_t getSize() const;
 		bool contains(const Widget* widget);
 		bool isClickBlocked() const;
 		bool isReleaseBlocked() const;
+		bool isBeingDestroyed() const;
 		Widget* getRootWidget() const;
 		Widget* getFocusedWidget() const;
 		Widget* getTopWidgetUnderCursor() const;
@@ -144,6 +146,7 @@ namespace fw {
 		EmptyWidget* root_widget = nullptr;
 		Widget* focused_widget = nullptr;
 		bool print_update_queue = false;
+		bool is_being_destroyed = false;
 		CompVectorUptr<PendingMove> pending_move;
 		CompVectorUptr<PendingDelete> pending_delete;
 		WidgetUpdateQueue update_queue = WidgetUpdateQueue(*this);

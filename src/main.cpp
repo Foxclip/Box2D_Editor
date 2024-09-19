@@ -28,6 +28,8 @@ int main() {
     execute_app();
 
     // TODO: replace other unique_ptr's with DataPointer
+    // TODO: WidgetList: change case of variables in WidgetList (?)
+    // TODO: Compvector: getUptr test
     // TODO: do memory debugging of loadFromFile again with custom smart pointers
     // TODO: Editor: Camera class
     // TODO: Editor: fix redundant serialize logger message

@@ -24,7 +24,7 @@ namespace fw {
 		class Entry {
 		public:
 			Entry(TreeViewWidget& treeview, const sf::String& name);
-			~Entry();
+			virtual ~Entry();
 			bool isExpanded() const;
 			Entry* getParent() const;
 			const CompVector<Entry*>& getChildren() const;

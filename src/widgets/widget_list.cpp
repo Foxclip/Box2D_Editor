@@ -28,6 +28,10 @@ namespace fw {
 		root_widget->setName("root");
 	}
 
+	WidgetList::~WidgetList() {
+		is_being_destroyed = true;
+	}
+
 	Application& WidgetList::getApplication() const {
 		return application;
 	}
@@ -48,6 +52,9 @@ namespace fw {
 		return release_blocked;
 	}
 
+	bool WidgetList::isBeingDestroyed() const {
+		return is_being_destroyed;
+	}
 	Widget* WidgetList::getRootWidget() const {
 		return root_widget;
 	}
