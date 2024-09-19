@@ -380,13 +380,9 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 		int* ptr3 = new int(3);
 		int* ptr5 = new int(5);
 		CompVectorUptr<int> vec = { ptr1, ptr2, ptr3 };
-		DataPointer<int> uptr5_another("ptr5", ptr5);
 		DataPointer<int> uptr5("ptr5", ptr5);
 		vec.insert(vec.begin() + 2, std::move(uptr5));
 		T_CHECK(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr3 }));
-		vec.insert(vec.begin() + 2, std::move(uptr5_another));
-		T_CHECK(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr3 }));
-		uptr5_another.release();
 	});
 	test::Test* insert_range_test = list->addTest("insert_range", { insert_value_test }, [&](test::Test& test) {
 		int* ptr1 = new int(1);
@@ -402,34 +398,22 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 		DataPointer<int> uptr5("ptr5", ptr5);
 		DataPointer<int> uptr6("ptr6", ptr6);
 		DataPointer<int> uptr7("ptr7", ptr7);
-		DataPointer<int> uptr5_another("Another ptr5", ptr5);
-		DataPointer<int> uptr6_another("Another ptr6", ptr6);
-		DataPointer<int> uptr7_another("Another ptr7", ptr7);
 		std::vector<DataPointer<int>> vec1;
 		std::vector<DataPointer<int>> vec1_another;
 		vec1.push_back(std::move(uptr5));
 		vec1.push_back(std::move(uptr6));
 		vec1.push_back(std::move(uptr7));
-		vec1_another.push_back(std::move(uptr5_another));
-		vec1_another.push_back(std::move(uptr6_another));
-		vec1_another.push_back(std::move(uptr7_another));
 		vec.insert(vec.begin() + 2, vec1.begin(), vec1.end());
 		T_CHECK(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr6, ptr7, ptr3 }));
 		vec.insert(vec.begin() + 2, vec1_another.begin(), vec1_another.end());
 		T_CHECK(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr6, ptr7, ptr3 }));
-		DataPointer<int> uptr7_2("ptr7_2", ptr7);
 		DataPointer<int> uptr8("ptr8", ptr8);
 		DataPointer<int> uptr9("ptr9", ptr9);
 		std::vector<DataPointer<int>> vec2;
-		vec2.push_back(std::move(uptr7_2));
 		vec2.push_back(std::move(uptr8));
 		vec2.push_back(std::move(uptr9));
 		vec.insert(vec.begin(), vec2.begin(), vec2.end());
 		T_CHECK(vec == std::vector<int*>({ ptr8, ptr9, ptr1, ptr2, ptr5, ptr6, ptr7, ptr3 }));
-		uptr5_another.release();
-		uptr6_another.release();
-		uptr7_another.release();
-		uptr7_2.release();
 	});
 	test::Test* remove_test = list->addTest("remove", { basic_tests }, [&](test::Test& test) {
 		int* ptr1 = new int(1);

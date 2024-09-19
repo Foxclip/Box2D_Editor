@@ -269,6 +269,9 @@ void DataPointerTests::resetSilentTest(test::Test& test) {
 
 	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
 	T_WRAP_CONTAINER(checkNoDataBlock(test, m2));
+
+	add_to_data_blocks(m2, sizeof(MyStruct)); // to avoid triggering assert in ~DataPointer
+	remove_from_data_blocks(m);
 }
 
 void DataPointerTests::moveConstructorTest(test::Test& test) {

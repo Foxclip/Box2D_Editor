@@ -3,6 +3,7 @@
 #include <format>
 #include <iostream>
 #include <map>
+#include <cassert>
 
 struct DataBlock {
 	DataBlock();
@@ -66,6 +67,10 @@ inline DataPointer<T> make_data_pointer(const std::string& name, Args&&... args)
 	return result;
 }
 
+void add_to_data_blocks(const DataBlock& block);
+void add_to_data_blocks(void* ptr, size_t size);
+void remove_from_data_blocks(void* ptr);
+
 template<typename T>
 template<typename T2>
 inline DataPointerDefaultDelete<T>::DataPointerDefaultDelete(const DataPointerDefaultDelete<T2>& other) { }
@@ -87,10 +92,7 @@ inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr) : deleter
 	this->name = name;
 	this->ptr = ptr;
 	if (ptr) {
-		auto inserted = data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
-		if (!inserted.second) {
-			assert(false); // pointer already in data_blocks
-		}
+		add_to_data_blocks(reinterpret_cast<void*>(ptr), sizeof(T));
 	}
 }
 
@@ -99,10 +101,7 @@ inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr, const D& 
 	this->name = name;
 	this->ptr = ptr;
 	if (ptr) {
-		auto inserted = data_blocks.insert({ reinterpret_cast<void*>(ptr), DataBlock(ptr, sizeof(T)) });
-		if (!inserted.second) {
-			assert(false); // pointer already in data_blocks
-		}
+		add_to_data_blocks(reinterpret_cast<void*>(ptr), sizeof(T));
 	}
 }
 
@@ -124,9 +123,8 @@ inline DataPointer<T, D>::DataPointer(DataPointer<T2, D2>&& dp) noexcept {
 template<typename T, typename D>
 inline DataPointer<T, D>::~DataPointer() {
 	if (ptr) {
-		data_blocks.erase(reinterpret_cast<void*>(ptr));
+		remove_from_data_blocks(reinterpret_cast<void*>(ptr));
 		deleter(ptr);
-		assert(data_blocks.contains(ptr));
 	}
 }
 
@@ -146,7 +144,7 @@ template<typename T, typename D>
 inline T* DataPointer<T, D>::release() {
 	T* result = ptr;
 	if (ptr) {
-		data_blocks.erase(reinterpret_cast<void*>(ptr));
+		remove_from_data_blocks(reinterpret_cast<void*>(ptr));
 	}
 	ptr = nullptr;
 	return result;
@@ -167,11 +165,11 @@ inline void DataPointer<T, D>::reset(T* new_ptr) {
 		return;
 	}
 	if (old_ptr) {
-		data_blocks.erase(reinterpret_cast<void*>(old_ptr));
+		remove_from_data_blocks(reinterpret_cast<void*>(old_ptr));
 		deleter(ptr);
 	}
 	if (new_ptr) {
-		data_blocks.insert({ reinterpret_cast<void*>(new_ptr), DataBlock(new_ptr, sizeof(T)) });
+		add_to_data_blocks(reinterpret_cast<void*>(new_ptr), sizeof(T));
 	}
 	ptr = new_ptr;
 }
@@ -211,7 +209,8 @@ inline T* DataPointer<T, D>::operator->() const {
 template<typename T, typename D>
 inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer&& right) {
 	this->name = right.getName();
-	reset(right.releaseSilent());
+	reset();
+	resetSilent(right.releaseSilent());
 	this->deleter = right.getDeleter();
 	return *this;
 }
@@ -225,7 +224,8 @@ template<typename T, typename D>
 template<typename T2, typename D2>
 inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer<T2, D2>&& right) {
 	this->name = right.getName();
-	reset(right.releaseSilent());
+	reset();
+	resetSilent(right.releaseSilent());
 	this->deleter = right.getDeleter();
 	return *this;
 }

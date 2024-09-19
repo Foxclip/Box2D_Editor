@@ -480,8 +480,12 @@ inline T* CompVectorUptr<T, TCmp>::add(DataPointer<T> value) {
 
 template<typename T, typename TCmp>
 inline bool CompVectorUptr<T, TCmp>::insert(const std::vector<T*>::const_iterator& where, T* ptr) {
-	DataPointer<T> uptr("CompVectorUptr entry", ptr);
-	return insert(where, std::move(uptr));
+	if (contains(ptr)) {
+		return false;
+	} else {
+		DataPointer<T> uptr("CompVectorUptr entry", ptr);
+		return insert(where, std::move(uptr));
+	}
 }
 
 template<typename T, typename TCmp>
