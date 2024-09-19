@@ -43,6 +43,7 @@ public:
 	D& getDeleter();
 	const D& getDeleter() const;
 	const std::string& getName() const;
+	void setName(const std::string& name);
 	T& operator*() const;
 	T* operator->() const;
 	DataPointer& operator=(DataPointer&& right);
@@ -194,6 +195,11 @@ inline const D& DataPointer<T, D>::getDeleter() const {
 template<typename T, typename D>
 inline const std::string& DataPointer<T, D>::getName() const {
 	return name;
+}
+
+template<typename T, typename D>
+inline void DataPointer<T, D>::setName(const std::string& name) {
+	this->name = name;
 }
 
 template<typename T, typename D>

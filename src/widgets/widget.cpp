@@ -1231,6 +1231,10 @@ namespace fw {
 		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->updateFullName();
 		}
+		ptrdiff_t index = widget_list.getAllWidgets().getIndex(this);
+		if (index >= 0) {
+			widget_list.getWidgetUptrs().getUptr(index).setName("Widget " + full_name);
+		}
 	}
 
 	void Widget::updateVisibility() {

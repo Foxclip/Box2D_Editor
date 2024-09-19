@@ -72,6 +72,8 @@ namespace fw {
 		bool isClickBlocked() const;
 		bool isReleaseBlocked() const;
 		bool isBeingDestroyed() const;
+		const CompVector<Widget*>& getAllWidgets() const;
+		CompVectorUptr<Widget>& getWidgetUptrs();
 		Widget* getRootWidget() const;
 		Widget* getFocusedWidget() const;
 		Widget* getTopWidgetUnderCursor() const;
@@ -131,6 +133,7 @@ namespace fw {
 		void render(sf::RenderTarget& target);
 		void reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_pos);
 		void setFocusedWidget(Widget* widget);
+		Widget* operator[](size_t index) const;
 
 	private:
 		friend class Widget;
@@ -163,6 +166,8 @@ namespace fw {
 	inline T* WidgetList::createWidget(Args&&... args) {
 		wAssert(!isLocked());
 		DataPointer<T> uptr = make_data_pointer<T>("Widget", *this, args...);
+		Widget* widget = uptr.get();
+		uptr.setName("Widget " + widget->full_name);
 		T* ptr = uptr.get();
 		if (root_widget) {
 			ptr->setParentSilent(root_widget);

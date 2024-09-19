@@ -55,6 +55,15 @@ namespace fw {
 	bool WidgetList::isBeingDestroyed() const {
 		return is_being_destroyed;
 	}
+
+	const CompVector<Widget*>& WidgetList::getAllWidgets() const {
+		return widgets.getCompVector();
+	}
+
+	CompVectorUptr<Widget>& WidgetList::getWidgetUptrs() {
+		return widgets;
+	}
+
 	Widget* WidgetList::getRootWidget() const {
 		return root_widget;
 	}
@@ -534,6 +543,10 @@ namespace fw {
 			focused_widget->internalOnFocused();
 			focused_widget->OnFocused();
 		}
+	}
+
+	Widget* WidgetList::operator[](size_t index) const {
+		return widgets[index];
 	}
 
 	PendingOperation::PendingOperation(WidgetList& widget_list) : widget_list(widget_list) { }
