@@ -87,6 +87,7 @@ void DataPointerTests::createTestLists() {
 	test::Test* move_test = list->addTest("move", { struct_test }, [&](test::Test& test) { moveTest(test); });
 	test::Test* make_data_pointer_test = list->addTest("make_data_pointer", { struct_test }, [&](test::Test& test) { makeDataPointerTest(test); });
 	test::Test* make_data_pointer_derived_test = list->addTest("make_data_pointer_derived", { make_data_pointer_test }, [&](test::Test& test) { makeDataPointerDerivedTest(test); });
+	test::Test* block_name_test = list->addTest("block_name", { make_data_pointer_test }, [&](test::Test& test) { blockNameTest(test); });
 }
 
 void DataPointerTests::nullTest(test::Test& test) {
@@ -482,6 +483,73 @@ void DataPointerTests::makeDataPointerDerivedTest(test::Test& test) {
 	}
 
 	T_COMPARE(data_blocks.size(), 0);
+}
+
+void DataPointerTests::blockNameTest(test::Test& test) {
+
+	{
+		MyStruct* m1 = new MyStruct(11);
+		CustomDeleter<MyStruct> cd([]() { });
+		DataPointer<MyStruct, CustomDeleter<MyStruct>> dp1("m1", m1, cd);
+		DataPointer<MyStruct> dp2 = make_data_pointer<MyStruct>("m2", 22);
+		MyStruct* m2 = dp2.get();
+		{
+			auto it1 = data_blocks.find(m1);
+			auto it2 = data_blocks.find(m2);
+			T_COMPARE(it1->second.name, "m1");
+			T_COMPARE(it2->second.name, "m2");
+		}
+
+		dp1.setName("dp1");
+		{
+			auto it = data_blocks.find(m1);
+			T_COMPARE(it->second.name, "dp1");
+		}
+
+		MyStruct* m3 = new MyStruct(33);
+		dp1.reset("m3", m3);
+		{
+			auto it = data_blocks.find(m3);
+			T_COMPARE(it->second.name, "m3");
+		}
+	}
+
+	{
+		MyStruct* m4 = new MyStruct(44);
+		MyStruct* m5 = new MyStruct(55);
+		DataPointer<MyStruct> dp4("m4", m4);
+		DataPointer<MyStruct> dp5("m5", m5);
+		dp4 = std::move(dp5);
+		{
+			auto it = data_blocks.find(m5);
+			T_COMPARE(it->second.name, "m5");
+		}
+	}
+
+	{
+		MyStruct* m6 = new MyStruct(66);
+		DataPointer<MyStruct> dp6("m6", m6);
+		DataPointer<MyStruct> dp7(std::move(dp6));
+		{
+			auto it = data_blocks.find(m6);
+			T_COMPARE(it->second.name, "m6");
+		}
+	}
+
+	{
+		MyStruct* m8 = new MyStruct(88);
+		MyStruct* m9 = new MyStruct(99);
+		DataPointer<MyStruct> dp8("m8", m8);
+		DataPointer<MyStruct> dp9("m9", m9);
+		dp8.swap(dp9);
+		{
+			auto it1 = data_blocks.find(m8);
+			auto it2 = data_blocks.find(m9);
+			T_COMPARE(it1->second.name, "m8");
+			T_COMPARE(it2->second.name, "m9");
+		}
+	}
+
 }
 
 void DataPointerTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {

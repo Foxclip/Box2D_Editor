@@ -3,6 +3,7 @@
 std::map<void*, DataBlock> data_blocks;
 
 DataBlock::DataBlock(const std::string& name, void* ptr, size_t size) {
+	this->name = name;
 	this->ptr = ptr;
 	this->size = size;
 }
