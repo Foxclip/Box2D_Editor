@@ -208,7 +208,7 @@ void DataPointerTests::resetTest(test::Test& test) {
 	DataPointer<MyStruct> dp("MyStruct", m);
 	MyStruct* mt1 = dp.get();
 	T_COMPARE(mt1, m, &utils::pointer_to_str);
-	dp.reset(m2);
+	dp.reset("m2", m2);
 	MyStruct* mt2 = dp.get();
 	T_COMPARE(mt2, m2, &utils::pointer_to_str);
 
@@ -228,7 +228,7 @@ void DataPointerTests::resetDeleterTest(test::Test& test) {
 	DataPointer<MyStruct, decltype(deleter)> dp("MyStruct", m, deleter);
 	MyStruct* m3 = dp.get();
 	T_COMPARE(m3, m, &utils::pointer_to_str);
-	dp.reset(m2);
+	dp.reset("m2", m2);
 	MyStruct* m4 = dp.get();
 	T_COMPARE(m4, m2, &utils::pointer_to_str);
 	T_CHECK(flag);
@@ -270,7 +270,7 @@ void DataPointerTests::resetSilentTest(test::Test& test) {
 	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
 	T_WRAP_CONTAINER(checkNoDataBlock(test, m2));
 
-	add_to_data_blocks(m2, sizeof(MyStruct)); // to avoid triggering assert in ~DataPointer
+	add_to_data_blocks("m2", m2, sizeof(MyStruct)); // to avoid triggering assert in ~DataPointer
 	remove_from_data_blocks(m);
 }
 

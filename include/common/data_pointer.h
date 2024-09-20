@@ -6,8 +6,8 @@
 #include <cassert>
 
 struct DataBlock {
-	DataBlock();
-	DataBlock(void* ptr, size_t size);
+	DataBlock(const std::string& name, void* ptr, size_t size);
+	std::string name = "<unnamed>";
 	void* ptr = nullptr;
 	size_t size = 0;
 };
@@ -38,7 +38,7 @@ public:
 	T* releaseSilent();
 	T* release();
 	void resetSilent(T* new_ptr);
-	void reset(T* new_ptr = nullptr);
+	void reset(const std::string& name = "", T* new_ptr = nullptr);
 	void swap(DataPointer& dp);
 	D& getDeleter();
 	const D& getDeleter() const;
@@ -69,8 +69,10 @@ inline DataPointer<T> make_data_pointer(const std::string& name, Args&&... args)
 }
 
 void add_to_data_blocks(const DataBlock& block);
-void add_to_data_blocks(void* ptr, size_t size);
+void add_to_data_blocks(const std::string& name, void* ptr, size_t size);
 void remove_from_data_blocks(void* ptr);
+std::string pointer_to_str(void* ptr);
+void print_data_blocks();
 
 template<typename T>
 template<typename T2>
@@ -93,7 +95,7 @@ inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr) : deleter
 	this->name = name;
 	this->ptr = ptr;
 	if (ptr) {
-		add_to_data_blocks(reinterpret_cast<void*>(ptr), sizeof(T));
+		add_to_data_blocks(name, reinterpret_cast<void*>(ptr), sizeof(T));
 	}
 }
 
@@ -102,7 +104,7 @@ inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr, const D& 
 	this->name = name;
 	this->ptr = ptr;
 	if (ptr) {
-		add_to_data_blocks(reinterpret_cast<void*>(ptr), sizeof(T));
+		add_to_data_blocks(name, reinterpret_cast<void*>(ptr), sizeof(T));
 	}
 }
 
@@ -160,7 +162,7 @@ inline void DataPointer<T, D>::resetSilent(T* new_ptr) {
 }
 
 template<typename T, typename D>
-inline void DataPointer<T, D>::reset(T* new_ptr) {
+inline void DataPointer<T, D>::reset(const std::string& new_name, T* new_ptr) {
 	T* old_ptr = ptr;
 	if (old_ptr == new_ptr) {
 		return;
@@ -170,7 +172,7 @@ inline void DataPointer<T, D>::reset(T* new_ptr) {
 		deleter(ptr);
 	}
 	if (new_ptr) {
-		add_to_data_blocks(reinterpret_cast<void*>(new_ptr), sizeof(T));
+		add_to_data_blocks(new_name, reinterpret_cast<void*>(new_ptr), sizeof(T));
 	}
 	ptr = new_ptr;
 }
@@ -200,6 +202,8 @@ inline const std::string& DataPointer<T, D>::getName() const {
 template<typename T, typename D>
 inline void DataPointer<T, D>::setName(const std::string& name) {
 	this->name = name;
+	auto it = data_blocks.find(ptr);
+	it->second.name = name;
 }
 
 template<typename T, typename D>
