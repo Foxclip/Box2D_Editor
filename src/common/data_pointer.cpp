@@ -35,5 +35,6 @@ void print_data_blocks() {
 	for (size_t i = 0; i < data_blocks.size(); i++) {
 		DataBlock& block = it->second;
 		std::cout << i << ": ptr: " << pointer_to_str(block.ptr) << ": name: " << block.name << " size: " << block.size << "\n";
+		it++;
 	}
 }
