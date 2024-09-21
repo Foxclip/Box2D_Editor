@@ -30,11 +30,30 @@ std::string pointer_to_str(void* ptr) {
 	return str;
 }
 
+std::string data_block_to_str(const DataBlock& block) {
+	std::string result = "Name: " + block.name + " ptr: " + pointer_to_str(block.ptr) + " size: " + std::to_string(block.size);
+	return result;
+}
+
+bool check_data_block(void* ptr) {
+	return data_blocks.contains(ptr);
+}
+
+std::string data_block_to_str(void* ptr) {
+	std::string result = "<NOT FOUND>";
+	auto it = data_blocks.find(ptr);
+	if (it != data_blocks.end()) {
+		DataBlock& block = it->second;
+		result = data_block_to_str(block);
+	}
+	return result;
+}
+
 void print_data_blocks() {
 	auto it = data_blocks.begin();
 	for (size_t i = 0; i < data_blocks.size(); i++) {
 		DataBlock& block = it->second;
-		std::cout << i << ": ptr: " << pointer_to_str(block.ptr) << ": name: " << block.name << " size: " << block.size << "\n";
+		std::cout << i << ": " << data_block_to_str(block) << "\n";
 		it++;
 	}
 }
