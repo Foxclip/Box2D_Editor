@@ -32,6 +32,7 @@ Outliner::Outliner(fw::WidgetList& widget_list, float width, float height, Edito
 		addObject(object);
 	};
 	object_list.OnBeforeObjectRemoved += [&](GameObject* object) {
+		LoggerTag outlinerTag("outliner");
 		logger << "RemoveObject: " << object->getId() << " \"" << object->getName() << "\"" << "\n";
 	};
 	object_list.OnAfterObjectRemoved += [&](GameObject* object) {
@@ -58,6 +59,7 @@ Outliner::Outliner(fw::WidgetList& widget_list, const sf::Vector2f& size, Editor
 	: Outliner(widget_list, size.x, size.y, p_app) { }
 
 void Outliner::addObject(GameObject* object) {
+	LoggerTag outlinerTag("outliner");
 	logger << "AddObject: " << object->getId() << " \"" << object->getName() << "\"" << "\n";
 	fw::TreeViewWidget::Entry* entry = treeview_widget->addEntry(object->getName());
 	object_entry[object] = entry;
@@ -65,6 +67,7 @@ void Outliner::addObject(GameObject* object) {
 }
 
 void Outliner::moveObject(GameObject* object, size_t index) {
+	LoggerTag outlinerTag("outliner");
 	logger << "MoveObject: " << object->getId() << " \"" << object->getName() << "\": " << index << "\n";
 	fw::TreeViewWidget::Entry* entry = object_entry[object];
 	entry->moveToIndex(index);
@@ -81,6 +84,7 @@ void Outliner::removeObject(GameObject* object) {
 }
 
 void Outliner::setParentToObject(GameObject* object, GameObject* parent) {
+	LoggerTag outlinerTag("outliner");
 	std::string child_str = std::to_string(object->getId()) + " \"" + object->getName() + "\"";
 	std::string parent_str = "null";
 	if (parent) {

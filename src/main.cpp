@@ -24,10 +24,11 @@ int main() {
     LoggerDisableTag disable_recut_tag("recut");
     LoggerDisableTag disable_set_focused_widget("setFocusedWidget");
     LoggerDisableTag disable_mouse_gesture("mouseGesture");
+    LoggerDisableTag disable_outliner("outliner");
+    LoggerDisableTag disable_history("history");
 
     execute_app();
 
-    // TODO: Editor: fix redundant serialize logger message
     // TODO: Outliner: fix selection after subtree collapse
     // TODO: Outliner: reparent object
     // TODO: Outliner: rename object
