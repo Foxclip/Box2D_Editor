@@ -24,6 +24,9 @@ namespace test {
 #define T_APPROX_COMPARE(actual, expected, ...) \
 	testApproxCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__)
 
+#define T_VEC2_COMPARE(actual, expected, ...) \
+	testVec2Compare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__)
+
 #define T_VEC2_APPROX_COMPARE(actual, expected, ...) \
 	testVec2ApproxCompare(test, __FILE__, __LINE__, #actual, actual, expected, __VA_ARGS__)
 
@@ -162,6 +165,8 @@ namespace test {
 		template<typename T>
 		static bool testApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, T epsilon = 0.0001f);
 		template<typename T>
+		static bool testVec2Compare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected);
+		template<typename T>
 		static bool testVec2ApproxCompare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected, double epsilon = 0.0001);
 		template<typename T, typename TEps>
 		static bool equals(T left, T right, TEps epsilon = 0.0001f);
@@ -224,6 +229,18 @@ namespace test {
 		if (!equals(actual, expected, epsilon)) {
 			auto func = [](const T& val) { return std::to_string(val); };
 			compareFail(test, file, line, name, actual, expected, func);
+			return false;
+		}
+		return true;
+	}
+
+	template<typename T>
+	inline bool TestModule::testVec2Compare(Test& test, const std::string& file, size_t line, const std::string& name, T actual, T expected) {
+		if (actual.x != expected.x || actual.y != expected.y) {
+			auto to_str = [](const T& vec) {
+				return "(" + std::to_string(vec.x) + " " + std::to_string(vec.y) + ")";
+			};
+			compareFail(test, file, line, name, actual, expected, to_str);
 			return false;
 		}
 		return true;

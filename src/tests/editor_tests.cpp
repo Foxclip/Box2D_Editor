@@ -264,7 +264,7 @@ void EditorTests::serializeEmptyTest(test::Test& test) {
 	editor.deserialize(str, true);
 	auto objects = editor.getAllObjects();
 	T_COMPARE(objects.size(), 0);
-	T_VEC2_APPROX_COMPARE(camera.getPosition(), prev_pos);
+	T_VEC2_COMPARE(camera.getPosition(), prev_pos);
 	T_COMPARE(camera.getZoom(), prev_zoom);
 }
 
