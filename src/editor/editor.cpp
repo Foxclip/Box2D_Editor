@@ -992,13 +992,7 @@ std::string Editor::serialize() const {
     editor_logger << __FUNCTION__"\n";
     LoggerIndent serialize_indent;
     TokenWriter tw;
-    tw << "camera\n";
-    {
-        TokenWriterIndent camera_indent(tw);
-        tw << "center" << camera.getPosition() << "\n";
-        tw << "zoom" << camera.getZoom() << "\n";
-    }
-    tw << "/camera";
+    camera.serialize(tw);
     tw << "\n\n";
     simulation.serialize(tw);
     return tw.toStr();
@@ -1019,26 +1013,10 @@ void Editor::deserialize(const std::string& str, bool set_camera) {
         while (tr.validRange()) {
             std::string entity = tr.readString();
             if (entity == "camera") {
-                struct CameraParams {
-                    float x = 0.0f, y = 0.0f, zoom = 30.0f;
-                };
-                CameraParams params;
-                while (tr.validRange()) {
-                    std::string pname = tr.readString();
-                    if (pname == "center") {
-                        params.x = tr.readFloat();
-                        params.y = tr.readFloat();
-                    } else if (pname == "zoom") {
-                        params.zoom = tr.readFloat();
-                    } else if (pname == "/camera") {
-                        break;
-                    } else {
-                        throw std::runtime_error("Unknown camera parameter: " + pname);
-                    }
-                }
+                Camera loaded_camera(*this);
+                loaded_camera.deserialize(tr);
                 if (set_camera) {
-                    camera.setPosition(params.x, params.y);
-                    camera.setZoom(params.zoom);
+                    camera = loaded_camera;
                 }
             } else if (entity == "simulation") {
                 simulation.deserialize(tr);
@@ -1597,38 +1575,87 @@ int FpsCounter::getFps() const {
     return fps;
 }
 
-Editor::Camera::Camera(Editor& editor) : editor(editor) { }
+Camera::Camera(Editor& editor) : editor(editor) { }
 
-const b2Vec2& Editor::Camera::getPosition() const {
+const b2Vec2& Camera::getPosition() const {
     return pos;
 }
 
-float Editor::Camera::getZoom() const {
+float Camera::getZoom() const {
     return zoom;
 }
 
-void Editor::Camera::setPosition(float x, float y) {
+void Camera::setPosition(float x, float y) {
     pos.x = x;
     pos.y = y;
     editor.world_widget->setViewCenter(x, y);
 }
 
-void Editor::Camera::setPosition(const b2Vec2& p_pos) {
+void Camera::setPosition(const b2Vec2& p_pos) {
     setPosition(p_pos.x, p_pos.y);;
 }
 
-void Editor::Camera::move(float x, float y) {
+void Camera::move(float x, float y) {
     setPosition(pos.x + x, pos.y + y);
 }
 
-void Editor::Camera::move(const b2Vec2& offset) {
+void Camera::move(const b2Vec2& offset) {
     move(offset.x, offset.y);
 }
 
-void Editor::Camera::setZoom(float zoom) {
+void Camera::setZoom(float zoom) {
     this->zoom = zoom;
     editor.world_widget->setViewSize(
         editor.world_widget->getSize().x / zoom,
         -1.0f * editor.world_widget->getSize().y / zoom
     );
+}
+
+std::string Camera::serialize() const {
+    TokenWriter tw;
+    serialize(tw);
+    return tw.toStr();
+}
+
+TokenWriter& Camera::serialize(TokenWriter& tw) const {
+    tw << "camera\n";
+    {
+        TokenWriterIndent camera_indent(tw);
+        tw << "center" << getPosition() << "\n";
+        tw << "zoom" << getZoom() << "\n";
+    }
+    tw << "/camera";
+    return tw;
+}
+
+void Camera::deserialize(const std::string& str) {
+    TokenReader tr(str);
+    deserialize(tr);
+}
+
+void Camera::deserialize(TokenReader& tr) {
+    try {
+        tr.tryEat("camera");
+        while (tr.validRange()) {
+            std::string pname = tr.readString();
+            if (pname == "center") {
+                pos.x = tr.readFloat();
+                pos.y = tr.readFloat();
+            } else if (pname == "zoom") {
+                zoom = tr.readFloat();
+            } else if (pname == "/camera") {
+                break;
+            } else {
+                throw std::runtime_error("Unknown camera parameter: " + pname);
+            }
+        }
+    } catch (std::exception exc) {
+        throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+    }
+}
+
+Camera& Camera::operator=(const Camera& right) {
+    this->pos = right.pos;
+    this->zoom = right.zoom;
+    return *this;
 }

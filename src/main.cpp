@@ -27,8 +27,8 @@ int main() {
 
     execute_app();
 
-    // TODO: do memory debugging of loadFromFile again with custom smart pointers
     // TODO: Editor: Camera class
+    // TODO: Simulation: make serialize method use TokenWriter instead of returning string
     // TODO: Editor: fix redundant serialize logger message
     // TODO: Outliner: fix selection after subtree collapse
     // TODO: Outliner: reparent object

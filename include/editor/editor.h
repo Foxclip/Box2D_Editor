@@ -46,6 +46,29 @@ private:
 	int fps = 0;
 };
 
+class Editor;
+
+class Camera {
+public:
+	Camera(Editor& editor);
+	const b2Vec2& getPosition() const;
+	float getZoom() const;
+	void setPosition(float x, float y);
+	void setPosition(const b2Vec2& p_pos);
+	void move(float x, float y);
+	void move(const b2Vec2& offset);
+	void setZoom(float zoom);
+	std::string serialize() const;
+	TokenWriter& serialize(TokenWriter& tw) const;
+	void deserialize(const std::string& str);
+	void deserialize(TokenReader& tr);
+	Camera& operator=(const Camera& right);
+private:
+	Editor& editor;
+	b2Vec2 pos = b2Vec2_zero;
+	float zoom = 30.0f;
+};
+
 sf::Vector2f to2f(sf::Vector2i vec);
 sf::Vector2f to2f(sf::Vector2u vec);
 
@@ -120,26 +143,12 @@ private:
 	friend class Outliner;
 	friend class Menu;
 	friend class EditorTests;
+	friend class Camera;
 	fw::CanvasWidget* world_widget = nullptr;
 	fw::CanvasWidget* ui_widget = nullptr;
 	fw::CanvasWidget* selection_mask_widget = nullptr;
 	sf::Shader desat_shader;
 	sf::Shader selection_shader;
-	class Camera {
-	public:
-		Camera(Editor& editor);
-		const b2Vec2& getPosition() const;
-		float getZoom() const;
-		void setPosition(float x, float y);
-		void setPosition(const b2Vec2& p_pos);
-		void move(float x, float y);
-		void move(const b2Vec2& offset);
-		void setZoom(float zoom);
-	private:
-		Editor& editor;
-		b2Vec2 pos = b2Vec2_zero;
-		float zoom = 30.0f;
-	};
 	Camera camera = Camera(*this);
 	SelectTool select_tool;
 	CreateTool create_tool;
