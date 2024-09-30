@@ -97,6 +97,8 @@ namespace fw {
 		Event<const sf::Vector2f&> OnBlockableLeftRelease;
 		Event<const sf::Vector2f&> OnGlobalRightRelease;
 		Event<const sf::Vector2f&> OnBlockableRightRelease;
+		Event<const sf::Vector2f&> OnLeftClick;
+		Event<const sf::Vector2f&> OnRightClick;
 		Event<const sf::Vector2f&, float> OnScrollX;
 		Event<const sf::Vector2f&, float> OnScrollY;
 		Event<const sf::Vector2f&> OnMouseMoved;
@@ -348,6 +350,8 @@ namespace fw {
 		bool click_through = true;
 		bool clip_children = false;
 		bool mouseIn = false;
+		bool is_left_pressed = false;
+		bool is_right_pressed = false;
 		bool force_custom_cursor = false;
 
 		sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& size);
@@ -382,6 +386,8 @@ namespace fw {
 		virtual void internalOnBlockableLeftRelease(const sf::Vector2f& pos);
 		virtual void internalOnGlobalRightRelease(const sf::Vector2f& pos);
 		virtual void internalOnBlockableRightRelease(const sf::Vector2f& pos);
+		virtual void internalOnLeftClick(const sf::Vector2f& pos);
+		virtual void internalOnRightClick(const sf::Vector2f& pos);
 		virtual void internalOnScrollX(const sf::Vector2f& pos, float delta);
 		virtual void internalOnScrollY(const sf::Vector2f& pos, float delta);
 		virtual void internalProcessKeyboardEvent(const sf::Event& event);

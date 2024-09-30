@@ -328,24 +328,24 @@ namespace fw {
 
 	void WidgetList::processLeftRelease(const sf::Vector2f pos) {
 		wAssert(!isLocked());
-		root_widget->processGlobalLeftRelease(pos);
 		bool blocked_discard;
 		CompVector<Widget*> widgets = getWidgetsUnderCursor(true, blocked_discard);
 		for (size_t i = 0; i < widgets.size(); i++) {
 			Widget* widget = widgets[i];
 			widget->processBlockableLeftRelease(pos);
 		}
+		root_widget->processGlobalLeftRelease(pos);
 	}
 
 	void WidgetList::processRightRelease(const sf::Vector2f pos) {
 		wAssert(!isLocked());
-		root_widget->processGlobalRightRelease(pos);
 		bool blocked_discard;
 		CompVector<Widget*> widgets = getWidgetsUnderCursor(true, blocked_discard);
 		for (size_t i = 0; i < widgets.size(); i++) {
 			Widget* widget = widgets[i];
 			widget->processBlockableRightRelease(pos);
 		}
+		root_widget->processGlobalRightRelease(pos);
 	}
 
 	void WidgetList::processMouseMove(const sf::Vector2f pos) {

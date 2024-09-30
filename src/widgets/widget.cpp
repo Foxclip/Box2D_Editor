@@ -91,6 +91,7 @@ namespace fw {
 		if (!visible) {
 			return;
 		}
+		is_left_pressed = true;
 		internalOnLeftPress(pos, became_focused);
 		OnLeftPress(pos);
 	}
@@ -99,6 +100,7 @@ namespace fw {
 		if (!visible) {
 			return;
 		}
+		is_right_pressed = true;
 		internalOnRightPress(pos);
 		OnRightPress(pos);
 	}
@@ -112,6 +114,7 @@ namespace fw {
 		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->processGlobalLeftRelease(pos);
 		}
+		is_left_pressed = false;
 	}
 
 	void Widget::processBlockableLeftRelease(const sf::Vector2f& pos) {
@@ -120,6 +123,10 @@ namespace fw {
 		}
 		internalOnBlockableLeftRelease(pos);
 		OnBlockableLeftRelease(pos);
+		if (is_left_pressed) {
+			internalOnLeftClick(pos);
+			OnLeftClick(pos);
+		}
 	}
 
 	void Widget::processGlobalRightRelease(const sf::Vector2f& pos) {
@@ -131,6 +138,7 @@ namespace fw {
 		for (size_t i = 0; i < children.size(); i++) {
 			children[i]->processGlobalRightRelease(pos);
 		}
+		is_right_pressed = false;
 	}
 
 	void Widget::processBlockableRightRelease(const sf::Vector2f& pos) {
@@ -139,6 +147,10 @@ namespace fw {
 		}
 		internalOnBlockableRightRelease(pos);
 		OnBlockableRightRelease(pos);
+		if (is_right_pressed) {
+			internalOnRightClick(pos);
+			OnRightClick(pos);
+		}
 	}
 
 	void Widget::processMouseMove(const sf::Vector2f& pos) {
@@ -1191,6 +1203,10 @@ namespace fw {
 	void Widget::internalOnGlobalRightRelease(const sf::Vector2f& pos) { }
 
 	void Widget::internalOnBlockableRightRelease(const sf::Vector2f& pos) { }
+
+	void Widget::internalOnLeftClick(const sf::Vector2f& pos) { }
+
+	void Widget::internalOnRightClick(const sf::Vector2f& pos) { }
 
 	void Widget::internalOnScrollX(const sf::Vector2f& pos, float delta) { }
 

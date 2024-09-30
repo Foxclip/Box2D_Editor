@@ -985,6 +985,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     bool mouse_left_released_blockable = false;
     bool mouse_right_released_global = false;
     bool mouse_right_released_blockable = false;
+    bool mouse_left_clicked = false;
+    bool mouse_right_clicked = false;
     bool mouse_moved = false;
     bool mouse_scroll_x = false;
     bool mouse_scroll_y = false;
@@ -1010,6 +1012,12 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     };
     rectangle_widget->OnBlockableRightRelease += [&](const sf::Vector2f& pos) {
         mouse_right_released_blockable = true;
+    };
+    rectangle_widget->OnLeftClick += [&](const sf::Vector2f& pos) {
+        mouse_left_clicked = true;
+    };
+    rectangle_widget->OnRightClick += [&](const sf::Vector2f& pos) {
+        mouse_right_clicked = true;
     };
     rectangle_widget->OnMouseMoved += [&](const sf::Vector2f& pos) {
         mouse_moved = true;
@@ -1038,6 +1046,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released_global);
     T_CHECK(!mouse_right_released_blockable);
+    T_CHECK(!mouse_left_clicked);
+    T_CHECK(!mouse_right_clicked);
     T_CHECK(!mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1053,6 +1063,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released_global);
     T_CHECK(!mouse_right_released_blockable);
+    T_CHECK(!mouse_left_clicked);
+    T_CHECK(!mouse_right_clicked);
     T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1067,6 +1079,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released_global);
     T_CHECK(!mouse_right_released_blockable);
+    T_CHECK(!mouse_left_clicked);
+    T_CHECK(!mouse_right_clicked);
     T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1081,6 +1095,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(!mouse_right_pressed);
     T_CHECK(!mouse_right_released_global);
     T_CHECK(!mouse_right_released_blockable);
+    T_CHECK(mouse_left_clicked);
+    T_CHECK(!mouse_right_clicked);
     T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1095,6 +1111,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(mouse_right_pressed);
     T_CHECK(!mouse_right_released_global);
     T_CHECK(!mouse_right_released_blockable);
+    T_CHECK(mouse_left_clicked);
+    T_CHECK(!mouse_right_clicked);
     T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1109,6 +1127,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(mouse_right_pressed);
     T_CHECK(mouse_right_released_global);
     T_CHECK(mouse_right_released_blockable);
+    T_CHECK(mouse_left_clicked);
+    T_CHECK(mouse_right_clicked);
     T_CHECK(mouse_moved);
     T_CHECK(!mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1123,6 +1143,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(mouse_right_pressed);
     T_CHECK(mouse_right_released_global);
     T_CHECK(mouse_right_released_blockable);
+    T_CHECK(mouse_left_clicked);
+    T_CHECK(mouse_right_clicked);
     T_CHECK(mouse_moved);
     T_CHECK(mouse_scroll_x);
     T_CHECK(!mouse_scroll_y);
@@ -1137,6 +1159,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(mouse_right_pressed);
     T_CHECK(mouse_right_released_global);
     T_CHECK(mouse_right_released_blockable);
+    T_CHECK(mouse_left_clicked);
+    T_CHECK(mouse_right_clicked);
     T_CHECK(mouse_moved);
     T_CHECK(mouse_scroll_x);
     T_CHECK(mouse_scroll_y);
@@ -1152,6 +1176,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(mouse_right_pressed);
     T_CHECK(mouse_right_released_global);
     T_CHECK(mouse_right_released_blockable);
+    T_CHECK(mouse_left_clicked);
+    T_CHECK(mouse_right_clicked);
     T_CHECK(mouse_moved);
     T_CHECK(mouse_scroll_x);
     T_CHECK(mouse_scroll_y);
@@ -1173,12 +1199,14 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     bool mouse_pressed_1 = false;
     bool mouse_released_global_1 = false;
     bool mouse_released_blockable_1 = false;
+    bool mouse_clicked_1 = false;
     bool mouse_exited_1 = false;
     bool mouse_processed_1 = false;
     bool mouse_entered_2 = false;
     bool mouse_pressed_2 = false;
     bool mouse_released_global_2 = false;
     bool mouse_released_blockable_2 = false;
+    bool mouse_clicked_2 = false;
     bool mouse_exited_2 = false;
     bool mouse_processed_2 = false;
     rectangle_widget_1->OnMouseEnter += [&](const sf::Vector2f& pos) {
@@ -1192,6 +1220,9 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     };
     rectangle_widget_1->OnBlockableLeftRelease += [&](const sf::Vector2f& pos) {
         mouse_released_blockable_1 = true;
+    };
+    rectangle_widget_1->OnLeftClick += [&](const sf::Vector2f& pos) {
+        mouse_clicked_1 = true;
     };
     rectangle_widget_1->OnMouseExit += [&](const sf::Vector2f& pos) {
         mouse_exited_1 = true;
@@ -1211,6 +1242,9 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     rectangle_widget_2->OnBlockableLeftRelease += [&](const sf::Vector2f& pos) {
         mouse_released_blockable_2 = true;
     };
+    rectangle_widget_2->OnLeftClick += [&](const sf::Vector2f& pos) {
+        mouse_clicked_2 = true;
+    };
     rectangle_widget_2->OnMouseExit += [&](const sf::Vector2f& pos) {
         mouse_exited_2 = true;
     };
@@ -1227,6 +1261,7 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(!mouse_pressed_1);
     T_CHECK(!mouse_released_global_1);
     T_CHECK(!mouse_released_blockable_1);
+    T_CHECK(!mouse_clicked_1);
     T_CHECK(!mouse_exited_1);
     T_CHECK(!mouse_processed_1);
     T_CHECK(!rectangle_widget_2->isMouseOver());
@@ -1234,6 +1269,7 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(!mouse_pressed_2);
     T_CHECK(!mouse_released_global_2);
     T_CHECK(!mouse_released_blockable_2);
+    T_CHECK(!mouse_clicked_2);
     T_CHECK(!mouse_exited_2);
     T_CHECK(!mouse_processed_2);
     application.mouseMove(mouse_pos_1);
@@ -1243,6 +1279,7 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(!mouse_pressed_1);
     T_CHECK(!mouse_released_global_1);
     T_CHECK(!mouse_released_blockable_1);
+    T_CHECK(!mouse_clicked_1);
     T_CHECK(!mouse_exited_1);
     T_CHECK(mouse_processed_1);
     T_CHECK(rectangle_widget_2->isMouseOver());
@@ -1250,6 +1287,7 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(!mouse_pressed_2);
     T_CHECK(!mouse_released_global_2);
     T_CHECK(!mouse_released_blockable_2);
+    T_CHECK(!mouse_clicked_2);
     T_CHECK(!mouse_exited_2);
     T_CHECK(mouse_processed_2);
     rectangle_widget_2->setClickThrough(true);
@@ -1259,12 +1297,14 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(mouse_pressed_1);
     T_CHECK(!mouse_released_global_1);
     T_CHECK(!mouse_released_blockable_1);
+    T_CHECK(!mouse_clicked_1);
     T_CHECK(!mouse_exited_1);
     T_CHECK(mouse_processed_1);
     T_CHECK(mouse_entered_2);
     T_CHECK(mouse_pressed_2);
     T_CHECK(!mouse_released_global_2);
     T_CHECK(!mouse_released_blockable_2);
+    T_CHECK(!mouse_clicked_2);
     T_CHECK(!mouse_exited_2);
     T_CHECK(mouse_processed_2);
     application.mouseLeftRelease();
@@ -1273,20 +1313,24 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(mouse_pressed_1);
     T_CHECK(mouse_released_global_1);
     T_CHECK(mouse_released_blockable_1);
+    T_CHECK(mouse_clicked_1);
     T_CHECK(!mouse_exited_1);
     T_CHECK(mouse_processed_1);
     T_CHECK(mouse_entered_2);
     T_CHECK(mouse_pressed_2);
     T_CHECK(mouse_released_global_2);
     T_CHECK(mouse_released_blockable_2);
+    T_CHECK(mouse_clicked_2);
     T_CHECK(!mouse_exited_2);
     T_CHECK(mouse_processed_2);
     mouse_pressed_1 = false;
     mouse_pressed_2 = false;
     mouse_released_global_1 = false;
     mouse_released_blockable_1 = false;
+    mouse_clicked_1 = false;
     mouse_released_global_2 = false;
     mouse_released_blockable_2 = false;
+    mouse_clicked_2 = false;
     rectangle_widget_2->setClickThrough(false);
     application.mouseLeftPress();
     application.advance();
@@ -1294,12 +1338,14 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(!mouse_pressed_1);
     T_CHECK(!mouse_released_global_1);
     T_CHECK(!mouse_released_blockable_1);
+    T_CHECK(!mouse_clicked_1);
     T_CHECK(!mouse_exited_1);
     T_CHECK(mouse_processed_1);
     T_CHECK(mouse_entered_2);
     T_CHECK(mouse_pressed_2);
     T_CHECK(!mouse_released_global_2);
     T_CHECK(!mouse_released_blockable_2);
+    T_CHECK(!mouse_clicked_2);
     T_CHECK(!mouse_exited_2);
     T_CHECK(mouse_processed_2);
     application.mouseLeftRelease();
@@ -1308,12 +1354,14 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(!mouse_pressed_1);
     T_CHECK(mouse_released_global_1);
     T_CHECK(!mouse_released_blockable_1);
+    T_CHECK(!mouse_clicked_1);
     T_CHECK(!mouse_exited_1);
     T_CHECK(mouse_processed_1);
     T_CHECK(mouse_entered_2);
     T_CHECK(mouse_pressed_2);
     T_CHECK(mouse_released_global_2);
     T_CHECK(mouse_released_blockable_2);
+    T_CHECK(mouse_clicked_2);
     T_CHECK(!mouse_exited_2);
     T_CHECK(mouse_processed_2);
     application.mouseMove(mouse_pos_2);
@@ -1323,6 +1371,7 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(!mouse_pressed_1);
     T_CHECK(mouse_released_global_1);
     T_CHECK(!mouse_released_blockable_1);
+    T_CHECK(!mouse_clicked_1);
     T_CHECK(mouse_exited_1);
     T_CHECK(mouse_processed_1);
     T_CHECK(!rectangle_widget_2->isMouseOver());
@@ -1330,6 +1379,7 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(mouse_pressed_2);
     T_CHECK(mouse_released_global_2);
     T_CHECK(mouse_released_blockable_2);
+    T_CHECK(mouse_clicked_2);
     T_CHECK(mouse_exited_2);
     T_CHECK(mouse_processed_2);
 }
