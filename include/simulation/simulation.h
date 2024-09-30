@@ -12,7 +12,7 @@ public:
 	void save(const std::string& filename) const;
 	void reset();
 	std::string serialize() const;
-	std::string serialize(TokenWriter& tw) const;
+	TokenWriter& serialize(TokenWriter& tw) const;
 	void deserialize(const std::string& str);
 	void deserialize(TokenReader& tr);
 	BoxObject* createBox(

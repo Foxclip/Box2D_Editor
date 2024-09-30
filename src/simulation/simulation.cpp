@@ -44,11 +44,11 @@ void Simulation::reset() {
 
 std::string Simulation::serialize() const {
     TokenWriter tw;
-    std::string str = serialize(tw);
-    return str;
+    serialize(tw);
+    return tw.toStr();
 }
 
-std::string Simulation::serialize(TokenWriter& tw) const {
+TokenWriter& Simulation::serialize(TokenWriter& tw) const {
     LoggerTag tag_serialize("serialize");
     logger << __FUNCTION__"\n";
     LoggerIndent serialize_indent;
@@ -102,7 +102,7 @@ std::string Simulation::serialize(TokenWriter& tw) const {
     }
     tw << "\n\n";
     tw << "/simulation";
-    return tw.toStr();
+    return tw;
 }
 
 void Simulation::deserialize(const std::string& str) {
