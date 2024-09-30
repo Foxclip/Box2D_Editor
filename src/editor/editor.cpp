@@ -1001,7 +1001,6 @@ void Editor::renderUi() {
 
 std::string Editor::serialize() const {
     LoggerTag tag_serialize("serialize");
-    editor_logger << __FUNCTION__"\n";
     LoggerIndent serialize_indent;
     TokenWriter tw;
     camera.serialize(tw);
