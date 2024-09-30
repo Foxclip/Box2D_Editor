@@ -68,8 +68,9 @@ TokenWriter& Simulation::serialize(TokenWriter& tw) const {
             serialize_tree(obj->getChild(i));
         }
     };
-    tw << "simulation" << "\n\n";
-    {
+    tw << "simulation";
+    if (getAllObjects().size() > 0) {
+        tw << "\n\n";
         TokenWriterIndent simulation_indent(tw);
         {
             logger << "Objects\n";
@@ -99,8 +100,10 @@ TokenWriter& Simulation::serialize(TokenWriter& tw) const {
                 getJoint(i)->serialize(tw);
             }
         }
+        tw << "\n\n";
+    } else {
+        tw << "\n";
     }
-    tw << "\n\n";
     tw << "/simulation";
     return tw;
 }
