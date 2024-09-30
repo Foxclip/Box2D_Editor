@@ -164,7 +164,7 @@ namespace fw {
 		rectangle_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
 			pressed = false;
 		};
-		rectangle_widget->OnBlockableLeftRelease += [&](const sf::Vector2f& pos) {
+		rectangle_widget->OnLeftClick += [&](const sf::Vector2f& pos) {
 			click();
 		};
 		rectangle_widget->setParent(entry_widget);
