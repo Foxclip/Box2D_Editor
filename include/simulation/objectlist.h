@@ -40,6 +40,7 @@ public:
 	void remove(GameObject* object, bool remove_children);
 	void removeJoint(Joint* joint);
 	void clear();
+	GameObject* operator[](size_t index) const;
 
 private:
 	friend class GameObject;

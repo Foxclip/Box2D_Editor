@@ -257,3 +257,7 @@ void GameObjectList::clear() {
     names.clear();
     OnClear();
 }
+
+GameObject* GameObjectList::operator[](size_t index) const {
+    return getFromAll(index);
+}

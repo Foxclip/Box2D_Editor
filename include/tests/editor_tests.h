@@ -21,6 +21,7 @@ private:
 	void multiSelectTest(test::Test& test);
 	void moveTest(test::Test& test);
 	void panMoveTest(test::Test& test);
+	void serializeEmptyTest(test::Test& test);
 
 	void clickMouse(Editor& editor, const sf::Vector2f& pos);
 	void clickObject(Editor& editor, GameObject* object, bool shift = false, bool ctrl = false);

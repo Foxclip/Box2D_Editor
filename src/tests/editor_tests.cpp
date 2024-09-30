@@ -15,6 +15,7 @@ void EditorTests::createTestLists() {
 	test::Test* multi_select_test = list->addTest("multi_select", { select_test }, [&](test::Test& test) { multiSelectTest(test); });
 	test::Test* move_test = list->addTest("move", { select_test }, [&](test::Test& test) { moveTest(test); });
 	test::Test* pan_move_test = list->addTest("pan_move", { pan_test, move_test }, [&](test::Test& test) { panMoveTest(test); });
+	test::Test* serialize_empty_test = list->addTest("serialize_empty", { advance_test }, [&](test::Test& test) { serializeEmptyTest(test); });
 }
 
 void EditorTests::beforeRunModule() {
@@ -243,6 +244,28 @@ void EditorTests::panMoveTest(test::Test& test) {
 		b2Vec2 box_world_pos_actual = box0->getGlobalPosition();
 		T_VEC2_APPROX_COMPARE(box_world_pos_actual, box_world_pos);
 	}
+}
+
+void EditorTests::serializeEmptyTest(test::Test& test) {
+	Editor editor(window);
+	editor.init(test.name, false);
+	editor.start(true);
+	editor.advance();
+
+	Camera& camera = editor.getCamera();
+	camera.setPosition(1.0f, 2.0f);
+	camera.setZoom(4.4f);
+	std::string str = editor.serialize();
+	editor.createBox("added box", b2Vec2(10.0f, 15.0f), 45.0f, b2Vec2(1.0f, 1.0f), sf::Color::Red);
+	b2Vec2 prev_pos = camera.getPosition();
+	float prev_zoom = camera.getZoom();
+	camera.setPosition(2.0f, 3.0f);
+	camera.setZoom(5.5f);
+	editor.deserialize(str, true);
+	auto objects = editor.getAllObjects();
+	T_COMPARE(objects.size(), 0);
+	T_VEC2_APPROX_COMPARE(camera.getPosition(), prev_pos);
+	T_COMPARE(camera.getZoom(), prev_zoom);
 }
 
 void EditorTests::clickMouse(Editor& editor, const sf::Vector2f& pos) {

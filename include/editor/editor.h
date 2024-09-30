@@ -91,9 +91,12 @@ public:
 	void setCameraPos(float x, float y);
 	void setCameraPos(const b2Vec2& pos);
 	void setCameraZoom(float zoom);
+	Camera& getCamera();
 	fw::WidgetList& getWidgetList();
 	void selectSingleObject(GameObject* object, bool with_children = false);
 	Simulation& getSimulation();
+	const CompVector<GameObject*>& getTopObjects() const;
+	const CompVector<GameObject*>& getAllObjects() const;
 	SelectTool& getSelectTool();
 	void setActiveObject(GameObject* object);
 	BoxObject* createBox(

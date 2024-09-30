@@ -60,6 +60,10 @@ void Editor::setCameraZoom(float zoom) {
     camera.setZoom(zoom);
 }
 
+Camera& Editor::getCamera() {
+    return camera;
+}
+
 fw::WidgetList& Editor::getWidgetList() {
     return widgets;
 }
@@ -70,6 +74,14 @@ void Editor::selectSingleObject(GameObject* object, bool with_children) {
 
 Simulation& Editor::getSimulation() {
     return simulation;
+}
+
+const CompVector<GameObject*>& Editor::getTopObjects() const {
+    return simulation.getTopObjects();
+}
+
+const CompVector<GameObject*>& Editor::getAllObjects() const {
+    return simulation.getAllObjects();
 }
 
 SelectTool& Editor::getSelectTool() {
