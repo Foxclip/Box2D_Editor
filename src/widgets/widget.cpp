@@ -837,6 +837,11 @@ namespace fw {
 
 	void Widget::setParentSilent(Widget* new_parent) {
 		wAssert(!widget_list.isLocked());
+		Stage stage = widget_list.application.getStage();
+		wAssert(
+			stage == Stage::NONE || stage == Stage::AFTER_INPUT,
+			"Cannot set parent in this stage"
+		);
 		if (!new_parent) {
 			return setParentSilent(widget_list.root_widget);
 		}

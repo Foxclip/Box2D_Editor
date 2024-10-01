@@ -29,8 +29,10 @@ int main() {
 
     execute_app();
 
-    // TODO: Outliner: fix selection after subtree collapse
     // TODO: Outliner: reparent object
+    // TODO: Editor: put Camera in separate file
+    // TODO: TreeViewWidget: put Entry in separate file
+    // TODO: WidgetList: use addPending methods explicitly
     // TODO: Outliner: rename object
     // TODO: Outliner: delete object
     // TODO: Objectlist: OnAfterObjectRemoved test

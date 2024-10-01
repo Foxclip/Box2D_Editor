@@ -396,22 +396,6 @@ namespace fw {
 		}
 	}
 
-	void WidgetList::addPendingMove(Widget* widget, size_t index) {
-		wAssert(!isLocked());
-		DataPointer<PendingMove> uptr = make_data_pointer<PendingMove>(
-			"PendingMove " + widget->getFullName() + " " + std::to_string(index), *this, widget, index
-		);
-		pending_move.add(std::move(uptr));
-	}
-
-	void WidgetList::addPendingDelete(Widget* widget, bool with_children) {
-		wAssert(!isLocked());
-		DataPointer<PendingDelete> uptr = make_data_pointer<PendingDelete>(
-			"PendingDelete " + widget->getFullName() + " " + std::to_string(with_children), *this, widget, with_children
-		);
-		pending_delete.add(std::move(uptr));
-	}
-
 	void WidgetList::removeWidget(Widget* widget, bool with_children) {
 		wAssert(!isLocked());
 		wAssert(widget);
@@ -441,6 +425,9 @@ namespace fw {
 
 	void WidgetList::processAfterInput() {
 		for (PendingMove* op : pending_move) {
+			op->execute();
+		}
+		for (PendingSetParent* op : pending_setparent) {
 			op->execute();
 		}
 		for (PendingDelete* op : pending_delete) {
@@ -545,6 +532,30 @@ namespace fw {
 		}
 	}
 
+	void WidgetList::addPendingMove(Widget* widget, size_t index) {
+		wAssert(!isLocked());
+		DataPointer<PendingMove> uptr = make_data_pointer<PendingMove>(
+			"PendingMove " + widget->getFullName() + " " + std::to_string(index), *this, widget, index
+		);
+		pending_move.add(std::move(uptr));
+	}
+
+	void WidgetList::addPendingDelete(Widget* widget, bool with_children) {
+		wAssert(!isLocked());
+		DataPointer<PendingDelete> uptr = make_data_pointer<PendingDelete>(
+			"PendingDelete " + widget->getFullName() + " " + std::to_string(with_children), *this, widget, with_children
+		);
+		pending_delete.add(std::move(uptr));
+	}
+
+	void WidgetList::addPendingSetParent(Widget* widget, Widget* new_parent) {
+		wAssert(!isLocked());
+		DataPointer<PendingSetParent> uptr = make_data_pointer<PendingSetParent>(
+			"PendingSetParent " + widget->getFullName() + " " + new_parent->getFullName(), *this, widget, new_parent
+		);
+		pending_setparent.add(std::move(uptr));
+	}
+
 	Widget* WidgetList::operator[](size_t index) const {
 		return widgets[index];
 	}
@@ -571,6 +582,17 @@ namespace fw {
 	void PendingDelete::execute() {
 		wAssert(widget_list.widgets.contains(widget));
 		widget_list.removeWidget(widget, with_children);
+	}
+
+	PendingSetParent::PendingSetParent(WidgetList& widget_list, Widget* widget, Widget* new_parent) : PendingOperation(widget_list) {
+		this->widget = widget;
+		this->new_parent = new_parent;
+	}
+
+	void PendingSetParent::execute() {
+		wAssert(widget_list.widgets.contains(widget));
+		wAssert(new_parent == nullptr || widget_list.widgets.contains(new_parent));
+		widget->setParent(new_parent);
 	}
 
 }

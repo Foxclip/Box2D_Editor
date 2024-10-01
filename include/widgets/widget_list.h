@@ -43,6 +43,16 @@ namespace fw {
 
 	};
 
+	class PendingSetParent : public PendingOperation {
+	public:
+		Widget* widget = nullptr;
+		Widget* new_parent = nullptr;
+
+		PendingSetParent(WidgetList& widget_list, Widget* widget, Widget* new_parent);
+		void execute() override;
+
+	};
+
 	class Application;
 	class RectangleWidget;
 	class TextWidget;
@@ -133,12 +143,16 @@ namespace fw {
 		void render(sf::RenderTarget& target);
 		void reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_pos);
 		void setFocusedWidget(Widget* widget);
+		void addPendingMove(Widget* widget, size_t index);
+		void addPendingDelete(Widget* widget, bool with_children);
+		void addPendingSetParent(Widget* widget, Widget* new_parent);
 		Widget* operator[](size_t index) const;
 
 	private:
 		friend class Widget;
 		friend class PendingMove;
 		friend class PendingDelete;
+		friend class PendingSetParent;
 		Application& application;
 		bool locked = false;
 		bool click_blocked = false;
@@ -152,13 +166,11 @@ namespace fw {
 		bool is_being_destroyed = false;
 		CompVectorUptr<PendingMove> pending_move;
 		CompVectorUptr<PendingDelete> pending_delete;
+		CompVectorUptr<PendingSetParent> pending_setparent;
 		WidgetUpdateQueue update_queue = WidgetUpdateQueue(*this);
 		WidgetRenderQueue render_queue = WidgetRenderQueue(*this);
 
-		void addPendingMove(Widget* widget, size_t index);
-		void addPendingDelete(Widget* widget, bool with_children);
 		void removeWidget(Widget* widget, bool with_children);
-
 	};
 
 	template<typename T, typename... Args>
