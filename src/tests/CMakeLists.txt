@@ -28,6 +28,20 @@ set(TESTS_SOURCE_FILES
     "simulation_tests.cpp"
     "test.cpp"
     "widget_tests.cpp"
+    "widget_tests_application.cpp"
+    "widget_tests_basic.cpp"
+    "widget_tests_canvas.cpp"
+    "widget_tests_checkbox.cpp"
+    "widget_tests_container.cpp"
+    "widget_tests_dropdown.cpp"
+    "widget_tests_scroll_area.cpp"
+    "widget_tests_size_policy.cpp"
+    "widget_tests_text.cpp"
+    "widget_tests_textbox.cpp"
+    "widget_tests_toposort.cpp"
+    "widget_tests_tree_view.cpp"
+    "widget_tests_widget_link.cpp"
+    "widget_tests_window.cpp"
 )
 add_executable(tests ${TESTS_HEADER_FILES} ${TESTS_SOURCE_FILES})
 source_group(TREE ${TESTS_INCLUDE_DIR} PREFIX "Header Files" FILES ${TESTS_HEADER_FILES})
