@@ -64,10 +64,6 @@ Camera& Editor::getCamera() {
     return camera;
 }
 
-fw::WidgetList& Editor::getWidgetList() {
-    return widgets;
-}
-
 void Editor::selectSingleObject(GameObject* object, bool with_children) {
     select_tool.selectSingleObject(object, with_children);
 }
