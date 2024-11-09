@@ -435,6 +435,7 @@ namespace fw {
 		}
 		pending_move.clear();
 		pending_delete.clear();
+		pending_setparent.clear();
 	}
 
 	void WidgetList::updateRenderQueue() {
