@@ -4547,24 +4547,30 @@ void WidgetTests::treeviewWidgetDragTest(test::Test& test) {
     fw::Widget* entry_2_widget = entry_2->getWidget();
     fw::Widget* target_highlight_widget = tree_view_widget->getTargetHighlightWidget();
     sf::Vector2f entry_1_center = entry_1_widget->getGlobalCenter();
-    sf::Vector2f drag_offset = sf::Vector2f(fw::TREEVIEW_ENTRY_DRAG_DISTANCE + 5.0f, 0.0f);
+    sf::Vector2f drag_offset_1 = sf::Vector2f(fw::TREEVIEW_ENTRY_DRAG_DISTANCE + 5.0f, 0.0f);
     sf::Vector2f drag_start = entry_1_center + center_offset;
-    sf::Vector2f drag_end = drag_start + drag_offset;
+    sf::Vector2f drag_pos_1 = drag_start + drag_offset_1;
     application.mouseMove(drag_start);
     application.advance();
     application.mouseLeftPress();
     application.advance();
     T_CHECK(!entry_1->isGrabbed());
     T_CHECK(!target_highlight_widget->isVisible());
-    application.mouseMove(drag_end);
+    application.mouseMove(drag_pos_1);
     application.advance();
     T_CHECK(entry_1->isGrabbed());
     T_CHECK(!target_highlight_widget->isVisible());
     target_highlight_widget->setDebugRender(true);
     application.advance();
+    target_highlight_widget->setDebugRender(false);
     T_CHECK(entry_1->isGrabbed());
     T_CHECK(target_highlight_widget->isVisible());
     T_VEC2_COMPARE(target_highlight_widget->getGlobalOriginPosition(), entry_2_widget->getGlobalPosition());
+
+    sf::Vector2f drag_pos_2 = drag_pos_1 + sf::Vector2f(0.0f, 50.0f);
+    application.mouseMove(drag_pos_2);
+    application.advance();
+    T_VEC2_COMPARE(target_highlight_widget->getGlobalPosition(), entry_2_widget->getGlobalBottomLeft());
 }
 
 void WidgetTests::treeviewWidgetRemoveTest(test::Test& test) {

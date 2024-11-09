@@ -19,6 +19,8 @@ namespace fw {
 		float getRightPadding() const;
 		Alignment getAlignmentY() const;
 		Alignment getAlignmentX() const;
+		float getContentWidth() const;
+		float getContentHeight() const;
 		void setHorizontal(bool value);
 		void setPadding(float padding);
 		void setPaddingX(float padding);

@@ -157,13 +157,17 @@ namespace fw {
 			sf::Vector2f entry_pos = entry->getWidget()->getGlobalPosition();
 			target_highlight_widget->setGlobalPosition(entry_pos);
 			target_highlight_widget->setOrigin(Anchor::BOTTOM_LEFT);
-			widget_list.addPendingSetParent(target_highlight_widget, getParent(), true);
-			target_highlight_widget->setSizeXPolicy(SizePolicy::NONE);
 			target_highlight_widget->setWidth(entry->getWidget()->getWidth());
 		} else {
 			target_highlight_widget->setOrigin(Anchor::TOP_LEFT);
-			widget_list.addPendingSetParent(target_highlight_widget, this);
-			target_highlight_widget->setSizeXPolicy(SizePolicy::PARENT);
+			target_highlight_widget->setWidth(getContentWidth());
+			if (children.empty()) {
+				target_highlight_widget->setGlobalPosition(getGlobalPosition());
+			} else {
+				Widget* last_entry_widget = children.back();
+				sf::Vector2f last_entry_widget_pos = last_entry_widget->getGlobalBottomLeft();
+				target_highlight_widget->setGlobalPosition(last_entry_widget_pos);
+			}
 		}
 	}
 
@@ -499,6 +503,7 @@ namespace fw {
 		grabbed = true;
 		grab_begin = true;
 		treeview.grabbed_widget = entry_widget;
+		treeview.widget_list.addPendingSetParent(treeview.target_highlight_widget, treeview.getParent());
 	}
 
 	void TreeViewEntry::remove(bool with_children) {

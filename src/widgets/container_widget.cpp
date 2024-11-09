@@ -50,6 +50,14 @@ namespace fw {
 		return alignment_x;
 	}
 
+	float ContainerWidget::getContentWidth() const {
+		return getWidth() - left_padding - right_padding;
+	}
+
+	float ContainerWidget::getContentHeight() const {
+		return getHeight() - top_padding - bottom_padding;
+	}
+
 	void ContainerWidget::setHorizontal(bool value) {
 		this->horizontal = value;
 	}
