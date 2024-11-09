@@ -4202,12 +4202,12 @@ void WidgetTests::treeviewWidgetParent1Test(test::Test& test) {
     sf::Vector2f position(100.0f, 100.0f);
     tree_view_widget->setPosition(position);
 
-    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
-    fw::TreeViewWidget::Entry* entry_2 = tree_view_widget->addEntry("Entry 2");
-    fw::TreeViewWidget::Entry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
-    fw::TreeViewWidget::Entry* entry_3 = tree_view_widget->addEntry("Entry 3");
-    fw::TreeViewWidget::Entry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
-    fw::TreeViewWidget::Entry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
+    fw::TreeViewEntry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewEntry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewEntry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
+    fw::TreeViewEntry* entry_3 = tree_view_widget->addEntry("Entry 3");
+    fw::TreeViewEntry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
+    fw::TreeViewEntry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
     entry_2_child_1->setParent(entry_2);
     entry_3_child_1->setParent(entry_3);
     entry_3_child_2->setParent(entry_3);
@@ -4231,9 +4231,9 @@ void WidgetTests::treeviewWidgetParent2Test(test::Test& test) {
     sf::Vector2f position(100.0f, 100.0f);
     tree_view_widget->setPosition(position);
 
-    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
-    fw::TreeViewWidget::Entry* entry_1_child_1 = tree_view_widget->addEntry("Entry 1 Child 1");
-    fw::TreeViewWidget::Entry* entry_1_child_1_child_1 = tree_view_widget->addEntry("Entry 1 Child 1 Child 1");
+    fw::TreeViewEntry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewEntry* entry_1_child_1 = tree_view_widget->addEntry("Entry 1 Child 1");
+    fw::TreeViewEntry* entry_1_child_1_child_1 = tree_view_widget->addEntry("Entry 1 Child 1 Child 1");
     entry_1_child_1->setParent(entry_1);
     entry_1_child_1_child_1->setParent(entry_1_child_1);
     tree_view_widget->expandAll();
@@ -4256,7 +4256,7 @@ void WidgetTests::treeviewWidgetSelectTest(test::Test& test) {
     sf::Vector2f position(100.0f, 100.0f);
     tree_view_widget->setPosition(position);
 
-    auto click_entry = [&](fw::TreeViewWidget::Entry* entry, bool shift = false, bool ctrl = false) {
+    auto click_entry = [&](fw::TreeViewEntry* entry, bool shift = false, bool ctrl = false) {
         sf::Vector2f entry_pos = entry->getRectangleWidget()->getGlobalCenter();
         application.mouseMove(entry_pos);
         if (shift) {
@@ -4277,7 +4277,7 @@ void WidgetTests::treeviewWidgetSelectTest(test::Test& test) {
         }
         application.advance();
     };
-    auto click_arrow = [&](fw::TreeViewWidget::Entry* entry) {
+    auto click_arrow = [&](fw::TreeViewEntry* entry) {
         sf::Vector2f arrow_pos = entry->getArrowAreaWidget()->getGlobalCenter();
         application.mouseMove(arrow_pos);
         application.mouseLeftPress();
@@ -4285,24 +4285,24 @@ void WidgetTests::treeviewWidgetSelectTest(test::Test& test) {
         application.mouseLeftRelease();
         application.advance();
     };
-    CompVector<fw::TreeViewWidget::Entry*> clicked_entries;
-    CompVector<fw::TreeViewWidget::Entry*> selected_entries;
-    CompVector<fw::TreeViewWidget::Entry*> deselected_entries;
-    tree_view_widget->OnEntryClicked += [&](fw::TreeViewWidget::Entry* entry) {
+    CompVector<fw::TreeViewEntry*> clicked_entries;
+    CompVector<fw::TreeViewEntry*> selected_entries;
+    CompVector<fw::TreeViewEntry*> deselected_entries;
+    tree_view_widget->OnEntryClicked += [&](fw::TreeViewEntry* entry) {
         clicked_entries.add(entry);
     };
-    tree_view_widget->OnEntrySelected += [&](fw::TreeViewWidget::Entry* entry) {
+    tree_view_widget->OnEntrySelected += [&](fw::TreeViewEntry* entry) {
         selected_entries.add(entry);
     };
-    tree_view_widget->OnEntryDeselected += [&](fw::TreeViewWidget::Entry* entry) {
+    tree_view_widget->OnEntryDeselected += [&](fw::TreeViewEntry* entry) {
         deselected_entries.add(entry);
     };
-    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
-    fw::TreeViewWidget::Entry* entry_2 = tree_view_widget->addEntry("Entry 2");
-    fw::TreeViewWidget::Entry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
-    fw::TreeViewWidget::Entry* entry_3 = tree_view_widget->addEntry("Entry 3");
-    fw::TreeViewWidget::Entry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
-    fw::TreeViewWidget::Entry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
+    fw::TreeViewEntry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewEntry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewEntry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
+    fw::TreeViewEntry* entry_3 = tree_view_widget->addEntry("Entry 3");
+    fw::TreeViewEntry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
+    fw::TreeViewEntry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
     entry_2_child_1->setParent(entry_2);
     entry_3_child_1->setParent(entry_3);
     entry_3_child_2->setParent(entry_3);
@@ -4471,16 +4471,16 @@ void WidgetTests::treeviewWidgetReorderTest(test::Test& test) {
     sf::Vector2f position(100.0f, 100.0f);
     tree_view_widget->setPosition(position);
 
-    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
-    fw::TreeViewWidget::Entry* entry_2 = tree_view_widget->addEntry("Entry 2");
-    fw::TreeViewWidget::Entry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
-    fw::TreeViewWidget::Entry* entry_3 = tree_view_widget->addEntry("Entry 3");
-    fw::TreeViewWidget::Entry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
-    fw::TreeViewWidget::Entry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
-    fw::TreeViewWidget::Entry* entry_4 = tree_view_widget->addEntry("Entry 4");
-    fw::TreeViewWidget::Entry* entry_4_child_1 = tree_view_widget->addEntry("Entry 4 Child 1");
-    fw::TreeViewWidget::Entry* entry_4_child_1_child_1 = tree_view_widget->addEntry("Entry 4 Child 1 Child 1");
-    fw::TreeViewWidget::Entry* entry_4_child_1_child_2 = tree_view_widget->addEntry("Entry 4 Child 1 Child 2");
+    fw::TreeViewEntry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewEntry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewEntry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
+    fw::TreeViewEntry* entry_3 = tree_view_widget->addEntry("Entry 3");
+    fw::TreeViewEntry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
+    fw::TreeViewEntry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
+    fw::TreeViewEntry* entry_4 = tree_view_widget->addEntry("Entry 4");
+    fw::TreeViewEntry* entry_4_child_1 = tree_view_widget->addEntry("Entry 4 Child 1");
+    fw::TreeViewEntry* entry_4_child_1_child_1 = tree_view_widget->addEntry("Entry 4 Child 1 Child 1");
+    fw::TreeViewEntry* entry_4_child_1_child_2 = tree_view_widget->addEntry("Entry 4 Child 1 Child 2");
     entry_2_child_1->setParent(entry_2);
     entry_3_child_1->setParent(entry_3);
     entry_3_child_2->setParent(entry_3);
@@ -4490,7 +4490,7 @@ void WidgetTests::treeviewWidgetReorderTest(test::Test& test) {
     tree_view_widget->expandAll();
     application.advance();
 
-    const CompVector<fw::TreeViewWidget::Entry*>& top_entries = tree_view_widget->getTopEntries();
+    const CompVector<fw::TreeViewEntry*>& top_entries = tree_view_widget->getTopEntries();
     T_ASSERT(T_COMPARE(top_entries.size(), 4));
     T_CHECK(top_entries[0] == entry_1);
     T_CHECK(top_entries[1] == entry_2);
@@ -4510,7 +4510,7 @@ void WidgetTests::treeviewWidgetReorderTest(test::Test& test) {
     {
         entry_3_child_2->moveToIndex(0);
         application.advance();
-        const CompVector<fw::TreeViewWidget::Entry*>& children = entry_3->getChildren();
+        const CompVector<fw::TreeViewEntry*>& children = entry_3->getChildren();
         T_ASSERT(T_COMPARE(children.size(), 2));
         T_CHECK(children[0] == entry_3_child_2);
         T_CHECK(children[1] == entry_3_child_1);
@@ -4519,7 +4519,7 @@ void WidgetTests::treeviewWidgetReorderTest(test::Test& test) {
     {
         entry_4_child_1_child_1->moveToIndex(2);
         application.advance();
-        const CompVector<fw::TreeViewWidget::Entry*>& children = entry_4_child_1->getChildren();
+        const CompVector<fw::TreeViewEntry*>& children = entry_4_child_1->getChildren();
         T_ASSERT(T_COMPARE(children.size(), 2));
         T_CHECK(children[0] == entry_4_child_1_child_2);
         T_CHECK(children[1] == entry_4_child_1_child_1);
@@ -4538,8 +4538,8 @@ void WidgetTests::treeviewWidgetDragTest(test::Test& test) {
     sf::Vector2f position(100.0f, 100.0f);
     tree_view_widget->setPosition(position);
 
-    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
-    fw::TreeViewWidget::Entry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewEntry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewEntry* entry_2 = tree_view_widget->addEntry("Entry 2");
     application.advance();
 
     sf::Vector2f center_offset = sf::Vector2f(0.0f, -2.0f);
@@ -4578,19 +4578,19 @@ void WidgetTests::treeviewWidgetRemoveTest(test::Test& test) {
     sf::Vector2f position(100.0f, 100.0f);
     tree_view_widget->setPosition(position);
 
-    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
-    fw::TreeViewWidget::Entry* entry_2 = tree_view_widget->addEntry("Entry 2");
-    fw::TreeViewWidget::Entry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
-    fw::TreeViewWidget::Entry* entry_3 = tree_view_widget->addEntry("Entry 3");
-    fw::TreeViewWidget::Entry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
-    fw::TreeViewWidget::Entry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
-    fw::TreeViewWidget::Entry* entry_4 = tree_view_widget->addEntry("Entry 4");
-    fw::TreeViewWidget::Entry* entry_4_child_1 = tree_view_widget->addEntry("Entry 4 Child 1");
-    fw::TreeViewWidget::Entry* entry_4_child_2 = tree_view_widget->addEntry("Entry 4 Child 2");
-    fw::TreeViewWidget::Entry* entry_4_child_3 = tree_view_widget->addEntry("Entry 4 Child 3");
-    fw::TreeViewWidget::Entry* entry_5 = tree_view_widget->addEntry("Entry 5");
-    fw::TreeViewWidget::Entry* entry_5_child_1 = tree_view_widget->addEntry("Entry 5 Child 1");
-    fw::TreeViewWidget::Entry* entry_5_child_1_child_1 = tree_view_widget->addEntry("Entry 5 Child 1 Child 1");
+    fw::TreeViewEntry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewEntry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewEntry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
+    fw::TreeViewEntry* entry_3 = tree_view_widget->addEntry("Entry 3");
+    fw::TreeViewEntry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
+    fw::TreeViewEntry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
+    fw::TreeViewEntry* entry_4 = tree_view_widget->addEntry("Entry 4");
+    fw::TreeViewEntry* entry_4_child_1 = tree_view_widget->addEntry("Entry 4 Child 1");
+    fw::TreeViewEntry* entry_4_child_2 = tree_view_widget->addEntry("Entry 4 Child 2");
+    fw::TreeViewEntry* entry_4_child_3 = tree_view_widget->addEntry("Entry 4 Child 3");
+    fw::TreeViewEntry* entry_5 = tree_view_widget->addEntry("Entry 5");
+    fw::TreeViewEntry* entry_5_child_1 = tree_view_widget->addEntry("Entry 5 Child 1");
+    fw::TreeViewEntry* entry_5_child_1_child_1 = tree_view_widget->addEntry("Entry 5 Child 1 Child 1");
     entry_2_child_1->setParent(entry_2);
     entry_3_child_1->setParent(entry_3);
     entry_3_child_2->setParent(entry_3);
@@ -4602,7 +4602,7 @@ void WidgetTests::treeviewWidgetRemoveTest(test::Test& test) {
     tree_view_widget->expandAll();
     application.advance();
 
-    const CompVector<fw::TreeViewWidget::Entry*>& top_entries = tree_view_widget->getTopEntries();
+    const CompVector<fw::TreeViewEntry*>& top_entries = tree_view_widget->getTopEntries();
     auto check_treeview_height = [&]() {
         float treeview_height = calcTreeViewHeight(tree_view_widget);
         return tree_view_widget->getHeight() == treeview_height;
@@ -4660,12 +4660,12 @@ void WidgetTests::treeviewWidgetRemoveTest(test::Test& test) {
     T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
 
     // add widgets
-    fw::TreeViewWidget::Entry* entry_5_child_2 = tree_view_widget->addEntry("Entry 5 Child 2");
-    fw::TreeViewWidget::Entry* entry_5_child_3 = tree_view_widget->addEntry("Entry 5 Child 3");
-    fw::TreeViewWidget::Entry* entry_5_child_3_child_1 = tree_view_widget->addEntry("Entry 5 Child 3 Child 1");
-    fw::TreeViewWidget::Entry* entry_5_child_3_child_2 = tree_view_widget->addEntry("Entry 5 Child 3 Child 2");
-    fw::TreeViewWidget::Entry* entry_5_child_3_child_3 = tree_view_widget->addEntry("Entry 5 Child 3 Child 3");
-    fw::TreeViewWidget::Entry* entry_5_child_4 = tree_view_widget->addEntry("Entry 5 Child 4");
+    fw::TreeViewEntry* entry_5_child_2 = tree_view_widget->addEntry("Entry 5 Child 2");
+    fw::TreeViewEntry* entry_5_child_3 = tree_view_widget->addEntry("Entry 5 Child 3");
+    fw::TreeViewEntry* entry_5_child_3_child_1 = tree_view_widget->addEntry("Entry 5 Child 3 Child 1");
+    fw::TreeViewEntry* entry_5_child_3_child_2 = tree_view_widget->addEntry("Entry 5 Child 3 Child 2");
+    fw::TreeViewEntry* entry_5_child_3_child_3 = tree_view_widget->addEntry("Entry 5 Child 3 Child 3");
+    fw::TreeViewEntry* entry_5_child_4 = tree_view_widget->addEntry("Entry 5 Child 4");
     entry_5_child_2->setParent(entry_5);
     entry_5_child_3->setParent(entry_5);
     entry_5_child_3_child_1->setParent(entry_5_child_3);
@@ -4713,19 +4713,19 @@ void WidgetTests::treeviewWidgetClearTest(test::Test& test) {
     sf::Vector2f position(100.0f, 100.0f);
     tree_view_widget->setPosition(position);
 
-    fw::TreeViewWidget::Entry* entry_1 = tree_view_widget->addEntry("Entry 1");
-    fw::TreeViewWidget::Entry* entry_2 = tree_view_widget->addEntry("Entry 2");
-    fw::TreeViewWidget::Entry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
-    fw::TreeViewWidget::Entry* entry_3 = tree_view_widget->addEntry("Entry 3");
-    fw::TreeViewWidget::Entry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
-    fw::TreeViewWidget::Entry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
-    fw::TreeViewWidget::Entry* entry_4 = tree_view_widget->addEntry("Entry 4");
-    fw::TreeViewWidget::Entry* entry_4_child_1 = tree_view_widget->addEntry("Entry 4 Child 1");
-    fw::TreeViewWidget::Entry* entry_4_child_2 = tree_view_widget->addEntry("Entry 4 Child 2");
-    fw::TreeViewWidget::Entry* entry_4_child_3 = tree_view_widget->addEntry("Entry 4 Child 3");
-    fw::TreeViewWidget::Entry* entry_5 = tree_view_widget->addEntry("Entry 5");
-    fw::TreeViewWidget::Entry* entry_5_child_1 = tree_view_widget->addEntry("Entry 5 Child 1");
-    fw::TreeViewWidget::Entry* entry_5_child_1_child_1 = tree_view_widget->addEntry("Entry 5 Child 1 Child 1");
+    fw::TreeViewEntry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewEntry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewEntry* entry_2_child_1 = tree_view_widget->addEntry("Entry 2 Child 1");
+    fw::TreeViewEntry* entry_3 = tree_view_widget->addEntry("Entry 3");
+    fw::TreeViewEntry* entry_3_child_1 = tree_view_widget->addEntry("Entry 3 Child 1");
+    fw::TreeViewEntry* entry_3_child_2 = tree_view_widget->addEntry("Entry 3 Child 2");
+    fw::TreeViewEntry* entry_4 = tree_view_widget->addEntry("Entry 4");
+    fw::TreeViewEntry* entry_4_child_1 = tree_view_widget->addEntry("Entry 4 Child 1");
+    fw::TreeViewEntry* entry_4_child_2 = tree_view_widget->addEntry("Entry 4 Child 2");
+    fw::TreeViewEntry* entry_4_child_3 = tree_view_widget->addEntry("Entry 4 Child 3");
+    fw::TreeViewEntry* entry_5 = tree_view_widget->addEntry("Entry 5");
+    fw::TreeViewEntry* entry_5_child_1 = tree_view_widget->addEntry("Entry 5 Child 1");
+    fw::TreeViewEntry* entry_5_child_1_child_1 = tree_view_widget->addEntry("Entry 5 Child 1 Child 1");
     entry_1->setParent(entry_2_child_1); // simple cycle will not work with hierarchy like this
     entry_2_child_1->setParent(entry_2);
     entry_3_child_1->setParent(entry_3);
@@ -4744,7 +4744,7 @@ void WidgetTests::treeviewWidgetClearTest(test::Test& test) {
     T_COMPARE(tree_view_widget->getAllEntryCount(), 0);
     T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
 
-    fw::TreeViewWidget::Entry* entry_6 = tree_view_widget->addEntry("Entry 6");
+    fw::TreeViewEntry* entry_6 = tree_view_widget->addEntry("Entry 6");
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 1);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 1);
@@ -4987,13 +4987,13 @@ void WidgetTests::dragWindow(fw::Application& application, fw::WindowWidget* win
     application.advance();
 }
 
-float WidgetTests::calcTreeViewEntryHeight(fw::TreeViewWidget::Entry* entry) {
+float WidgetTests::calcTreeViewEntryHeight(fw::TreeViewEntry* entry) {
     float result = 0.0f;
     result += fw::TREEVIEW_ENTRY_HEIGHT;
     if (entry->isExpanded()) {
         for (size_t i = 0; i < entry->getChildrenCount(); i++) {
             result += fw::TREEVIEW_CONTAINER_PADDING;
-            fw::TreeViewWidget::Entry* child = entry->getChild(i);
+            fw::TreeViewEntry* child = entry->getChild(i);
             float child_height = calcTreeViewEntryHeight(child);
             result += child_height;
         }
@@ -5008,7 +5008,7 @@ float WidgetTests::calcTreeViewHeight(fw::TreeViewWidget* treeview) {
     }
     result += fw::TREEVIEW_CONTAINER_PADDING;
     for (size_t i = 0; i < treeview->getTopEntryCount(); i++) {
-        fw::TreeViewWidget::Entry* entry = treeview->getFromTop(i);
+        fw::TreeViewEntry* entry = treeview->getFromTop(i);
         float entry_height = calcTreeViewEntryHeight(entry);
         result += entry_height;
         if (i < treeview->getTopEntryCount() - 1) {

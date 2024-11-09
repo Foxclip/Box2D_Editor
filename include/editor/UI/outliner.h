@@ -20,8 +20,8 @@ private:
 	Editor& app;
 	GameObjectList& object_list;
 	fw::TreeViewWidget* treeview_widget = nullptr;
-	std::map<GameObject*, fw::TreeViewWidget::Entry*> object_entry;
-	std::map<fw::TreeViewWidget::Entry*, GameObject*> entry_object;
+	std::map<GameObject*, fw::TreeViewEntry*> object_entry;
+	std::map<fw::TreeViewEntry*, GameObject*> entry_object;
 
 	void addObject(GameObject* object);
 	void moveObject(GameObject* object, size_t index);
