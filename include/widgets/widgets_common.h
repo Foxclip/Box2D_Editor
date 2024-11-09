@@ -144,4 +144,9 @@ namespace fw {
 		return vertices;
 	}
 
+	template <typename T>
+	float length(const T& vec) {
+		return sqrt(vec.x * vec.x + vec.y * vec.y);
+	}
+
 }

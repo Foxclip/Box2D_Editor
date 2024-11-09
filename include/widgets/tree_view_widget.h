@@ -14,10 +14,13 @@ namespace fw {
 	const sf::Color TREEVIEW_ENTRY_ARROW_AREA_COLOR = sf::Color(80, 80, 80);
 	const sf::Color TREEVIEW_ENTRY_ARROW_COLOR = sf::Color(255, 255, 255);
 	const float TREEVIEW_CONTAINER_PADDING = 2.0f;
+	const float TREEVIEW_ENTRY_DRAG_DISTANCE = 20.0f;
+	const sf::Color TREEVIEW_TARGET_HIGHLIGHT_COLOR = sf::Color(255, 255, 0);
 
 	class WidgetList;
 	class PolygonWidget;
 	class EmptyWidget;
+	class TextWidget;
 
 	class TreeViewWidget : public ContainerWidget {
 	public:
@@ -26,6 +29,7 @@ namespace fw {
 			Entry(TreeViewWidget& treeview, const sf::String& name);
 			virtual ~Entry();
 			bool isExpanded() const;
+			bool isGrabbed() const;
 			Entry* getParent() const;
 			const CompVector<Entry*>& getChildren() const;
 			Entry* getChild(size_t index) const;
@@ -33,6 +37,7 @@ namespace fw {
 			size_t getIndex() const;
 			fw::ContainerWidget* getWidget() const;
 			fw::RectangleWidget* getRectangleWidget() const;
+			fw::TextWidget* getTextWidget() const;
 			fw::RectangleWidget* getArrowAreaWidget() const;
 			fw::PolygonWidget* getArrowWidget() const;
 			fw::ContainerWidget* getChildrenBoxWidget() const;
@@ -50,6 +55,7 @@ namespace fw {
 			void expand();
 			void collapse();
 			void toggle();
+			void take();
 			void remove(bool with_children);
 		private:
 			friend TreeViewWidget;
@@ -63,8 +69,12 @@ namespace fw {
 			bool pressed = false;
 			bool expanded = false;
 			bool selected = false;
+			bool grabbed = false;
+			bool grab_begin = true;
+			sf::Vector2f grab_offset;
 			fw::ContainerWidget* entry_widget = nullptr;
 			fw::RectangleWidget* rectangle_widget = nullptr;
+			fw::TextWidget* text_widget = nullptr;
 			fw::RectangleWidget* arrow_area_widget = nullptr;
 			fw::PolygonWidget* arrow_widget = nullptr;
 			fw::ContainerWidget* children_box_widget = nullptr;
@@ -86,6 +96,7 @@ namespace fw {
 		TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		const CompVector<Entry*>& getAllEntries() const;
 		const CompVector<Entry*>& getTopEntries() const;
+		CompVector<Entry*> getAllEntriesInOrder() const;
 		size_t getAllEntryCount() const;
 		size_t getTopEntryCount() const;
 		Entry* getFromAll(size_t index) const;
@@ -95,6 +106,9 @@ namespace fw {
 		void deselectAll();
 		void expandAll();
 		void collapseAll();
+		RectangleWidget* getTargetHighlightWidget() const;
+		Entry* getTargetHighlightEntry(const sf::Vector2f& global_pos) const;
+		void putTargetHighlight();
 		void removeEntry(Entry* entry, bool with_children);
 		void clear();
 
@@ -104,6 +118,8 @@ namespace fw {
 		friend class Entry;
 		CompVectorUptr<Entry> all_entries;
 		CompVector<Entry*> top_entries;
+		Widget* grabbed_widget = nullptr;
+		fw::RectangleWidget* target_highlight_widget = nullptr;
 
 		void deselectAllExceptEntry(Entry* except_entry = nullptr);
 		void deselectAllExceptSubtree(Entry* except_subtree = nullptr);

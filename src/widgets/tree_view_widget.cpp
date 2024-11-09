@@ -15,6 +15,13 @@ namespace fw {
 		setHorizontal(false);
 		setPadding(TREEVIEW_CONTAINER_PADDING);
 		setSizeXPolicy(SizePolicy::NONE);
+
+		// target highlight
+		target_highlight_widget = widget_list.createRectangleWidget(100.0f, TREEVIEW_CONTAINER_PADDING);
+		target_highlight_widget->setName("target highlight");
+		target_highlight_widget->setVisible(false);
+		target_highlight_widget->setFillColor(TREEVIEW_TARGET_HIGHLIGHT_COLOR);
+		target_highlight_widget->setParent(this);
 	}
 
 	TreeViewWidget::TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size)
@@ -59,6 +66,20 @@ namespace fw {
 
 	const CompVector<TreeViewWidget::Entry*>& TreeViewWidget::getTopEntries() const {
 		return top_entries;
+	}
+
+	CompVector<TreeViewWidget::Entry*> TreeViewWidget::getAllEntriesInOrder() const {
+		CompVector<Entry*> entries;
+		std::function<void(Entry*)> add_to_list = [&](Entry* entry) {
+			entries.add(entry);
+			for (Entry* child : entry->getChildren()) {
+				add_to_list(child);
+			}
+		};
+		for (Entry* entry : top_entries) {
+			add_to_list(entry);
+		}
+		return entries;
 	}
 
 	size_t TreeViewWidget::getAllEntryCount() const {
@@ -109,6 +130,43 @@ namespace fw {
 		}
 	}
 
+	RectangleWidget* TreeViewWidget::getTargetHighlightWidget() const {
+		return target_highlight_widget;
+	}
+
+	TreeViewWidget::Entry* TreeViewWidget::getTargetHighlightEntry(const sf::Vector2f& global_pos) const {
+		CompVector<Entry*> entries = getAllEntriesInOrder();
+		Entry* result = nullptr;
+		for (Entry* entry : entries) {
+			if (entry->getWidget()->isVisible() && !entry->grabbed) {
+				sf::Vector2f center = entry->getWidget()->getGlobalCenter();
+				if (global_pos.y < center.y) {
+					result = entry;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+
+	void TreeViewWidget::putTargetHighlight() {
+		target_highlight_widget->setVisible(true);
+		sf::Vector2f mouse_pos = widget_list.getMousePosf();
+		Entry* entry = getTargetHighlightEntry(mouse_pos);
+		if (entry) {
+			sf::Vector2f entry_pos = entry->getWidget()->getGlobalPosition();
+			target_highlight_widget->setGlobalPosition(entry_pos);
+			target_highlight_widget->setOrigin(Anchor::BOTTOM_LEFT);
+			widget_list.addPendingSetParent(target_highlight_widget, getParent(), true);
+			target_highlight_widget->setSizeXPolicy(SizePolicy::NONE);
+			target_highlight_widget->setWidth(entry->getWidget()->getWidth());
+		} else {
+			target_highlight_widget->setOrigin(Anchor::TOP_LEFT);
+			widget_list.addPendingSetParent(target_highlight_widget, this);
+			target_highlight_widget->setSizeXPolicy(SizePolicy::PARENT);
+		}
+	}
+
 	void TreeViewWidget::removeEntry(Entry* entry, bool with_children) {
 		wAssert(all_entries.contains(entry));
 		Entry* parent = entry->getParent();
@@ -153,6 +211,24 @@ namespace fw {
 		entry_widget->setFillColor(sf::Color::Transparent);
 		entry_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
 		entry_widget->setParent(&treeview);
+		entry_widget->OnMouseMoved += [&](const sf::Vector2f& pos) {
+			if (pressed && !grabbed) {
+				sf::Vector2f rel_pos = entry_widget->getRelativeMousePos() - grab_offset;
+				if (length(rel_pos) >= TREEVIEW_ENTRY_DRAG_DISTANCE) {
+					take();
+				}
+			}
+		};
+		entry_widget->OnProcessMouse += [&](const sf::Vector2f& pos) {
+			if (grabbed) {
+				sf::Vector2f new_pos = pos - grab_offset;
+				entry_widget->setGlobalPosition(new_pos);
+				if (!grab_begin) {
+					treeview.putTargetHighlight();
+				}
+			}
+			grab_begin = false;
+		};
 		// rectangle
 		rectangle_widget = treeview.widget_list.createRectangleWidget(20.0f, TREEVIEW_ENTRY_HEIGHT);
 		rectangle_widget->setFillColor(TREEVIEW_ENTRY_BACKGROUND_COLOR);
@@ -160,12 +236,15 @@ namespace fw {
 		rectangle_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
 		rectangle_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
 			pressed = true;
+			grab_offset = entry_widget->getRelativeMousePos();
 		};
 		rectangle_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
 			pressed = false;
 		};
 		rectangle_widget->OnLeftClick += [&](const sf::Vector2f& pos) {
-			click();
+			if (!grabbed) {
+				click();
+			}
 		};
 		rectangle_widget->setParent(entry_widget);
 		// arrow area
@@ -191,7 +270,7 @@ namespace fw {
 		arrow_widget->setParentAnchor(fw::Widget::Anchor::CENTER);
 		arrow_widget->setParent(arrow_area_widget);
 		// text
-		fw::TextWidget* text_widget = treeview.widget_list.createTextWidget();
+		text_widget = treeview.widget_list.createTextWidget();
 		text_widget->setCharacterSize(TREEVIEW_ENTRY_FONT_SIZE);
 		text_widget->setFillColor(TREEVIEW_ENTRY_TEXT_COLOR);
 		text_widget->setString(name);
@@ -231,6 +310,10 @@ namespace fw {
 		return expanded;
 	}
 
+	bool TreeViewWidget::Entry::isGrabbed() const {
+		return grabbed;
+	}
+
 	TreeViewWidget::Entry* TreeViewWidget::Entry::getParent() const {
 		return parent;
 	}
@@ -261,6 +344,10 @@ namespace fw {
 
 	fw::RectangleWidget* TreeViewWidget::Entry::getRectangleWidget() const {
 		return rectangle_widget;
+	}
+
+	fw::TextWidget* TreeViewWidget::Entry::getTextWidget() const {
+		return text_widget;
 	}
 
 	fw::RectangleWidget* TreeViewWidget::Entry::getArrowAreaWidget() const {
@@ -397,6 +484,21 @@ namespace fw {
 		} else {
 			expand();
 		}
+	}
+
+	void TreeViewWidget::Entry::take() {
+		treeview.widget_list.addPendingSetParent(entry_widget, treeview.getParent(), true);
+		entry_widget->setParentAnchor(Anchor::CUSTOM);
+		entry_widget->setSizeXPolicy(SizePolicy::NONE);
+		sf::Color rect_color = rectangle_widget->getFillColor();
+		rect_color.a /= 2;
+		rectangle_widget->setFillColor(rect_color);
+		sf::Color text_color = text_widget->getFillColor();
+		text_color.a /= 2;
+		text_widget->setFillColor(text_color);
+		grabbed = true;
+		grab_begin = true;
+		treeview.grabbed_widget = entry_widget;
 	}
 
 	void TreeViewWidget::Entry::remove(bool with_children) {
