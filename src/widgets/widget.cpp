@@ -37,6 +37,13 @@ namespace fw {
 		}
 	}
 
+	sf::Vector2f Widget::getRelativeMousePos() const {
+		sf::Vector2f mouse_pos = widget_list.application.getMousePosf();
+		sf::Vector2f global_pos = getGlobalPosition();
+		sf::Vector2f relative_pos = mouse_pos - global_pos;
+		return relative_pos;
+	}
+
 	bool Widget::isVisualPositionQuantized() const {
 		return false;
 	}

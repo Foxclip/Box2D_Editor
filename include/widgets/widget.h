@@ -123,6 +123,7 @@ namespace fw {
 		bool isContainer() const;
 		bool isMouseOver() const;
 		void updateMouseState(const sf::Vector2f& mouse_pos);
+		sf::Vector2f getRelativeMousePos() const;
 		virtual bool isVisualPositionQuantized() const;
 		bool isRenderable() const;
 		bool isVisible() const;
