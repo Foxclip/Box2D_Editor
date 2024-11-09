@@ -271,6 +271,8 @@ namespace fw {
 		void setFocusableType(FocusableType value);
 		void setParentSilent(Widget* new_parent);
 		void setParent(Widget* new_parent);
+		void setParentKeepPosSilent(Widget* new_parent);
+		void setParentKeepPos(Widget* new_parent);
 		void moveToIndex(size_t index);
 		void moveToTop();
 		void lockChildren();

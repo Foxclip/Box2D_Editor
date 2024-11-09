@@ -47,8 +47,9 @@ namespace fw {
 	public:
 		Widget* widget = nullptr;
 		Widget* new_parent = nullptr;
+		bool keep_pos = false;
 
-		PendingSetParent(WidgetList& widget_list, Widget* widget, Widget* new_parent);
+		PendingSetParent(WidgetList& widget_list, Widget* widget, Widget* new_parent, bool keep_pos);
 		void execute() override;
 
 	};
@@ -145,7 +146,7 @@ namespace fw {
 		void setFocusedWidget(Widget* widget);
 		void addPendingMove(Widget* widget, size_t index);
 		void addPendingDelete(Widget* widget, bool with_children);
-		void addPendingSetParent(Widget* widget, Widget* new_parent);
+		void addPendingSetParent(Widget* widget, Widget* new_parent, bool keep_pos = false);
 		Widget* operator[](size_t index) const;
 
 	private:

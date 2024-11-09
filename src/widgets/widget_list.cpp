@@ -549,10 +549,10 @@ namespace fw {
 		pending_delete.add(std::move(uptr));
 	}
 
-	void WidgetList::addPendingSetParent(Widget* widget, Widget* new_parent) {
+	void WidgetList::addPendingSetParent(Widget* widget, Widget* new_parent, bool keep_pos) {
 		wAssert(!isLocked());
 		DataPointer<PendingSetParent> uptr = make_data_pointer<PendingSetParent>(
-			"PendingSetParent " + widget->getFullName() + " " + new_parent->getFullName(), *this, widget, new_parent
+			"PendingSetParent " + widget->getFullName() + " " + new_parent->getFullName(), *this, widget, new_parent, keep_pos
 		);
 		pending_setparent.add(std::move(uptr));
 	}
@@ -585,15 +585,20 @@ namespace fw {
 		widget_list.removeWidget(widget, with_children);
 	}
 
-	PendingSetParent::PendingSetParent(WidgetList& widget_list, Widget* widget, Widget* new_parent) : PendingOperation(widget_list) {
+	PendingSetParent::PendingSetParent(WidgetList& widget_list, Widget* widget, Widget* new_parent, bool keep_pos) : PendingOperation(widget_list) {
 		this->widget = widget;
 		this->new_parent = new_parent;
+		this->keep_pos = keep_pos;
 	}
 
 	void PendingSetParent::execute() {
 		wAssert(widget_list.widgets.contains(widget));
 		wAssert(new_parent == nullptr || widget_list.widgets.contains(new_parent));
-		widget->setParent(new_parent);
+		if (keep_pos) {
+			widget->setParentKeepPos(new_parent);
+		} else {
+			widget->setParent(new_parent);
+		}
 	}
 
 }

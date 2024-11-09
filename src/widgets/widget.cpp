@@ -886,6 +886,20 @@ namespace fw {
 		internalOnSetParent(new_parent);
 	}
 
+	void Widget::setParentKeepPosSilent(Widget* new_parent) {
+		wAssert(!widget_list.isLocked());
+		sf::Vector2f old_global_pos = getGlobalOriginPosition();
+		setParentSilent(new_parent);
+		setGlobalPosition(old_global_pos);
+	}
+
+	void Widget::setParentKeepPos(Widget* new_parent) {
+		wAssert(!widget_list.isLocked());
+		sf::Vector2f old_global_pos = getGlobalOriginPosition();
+		setParent(new_parent);
+		setGlobalPosition(old_global_pos);
+	}
+
 	void Widget::moveChildToIndex(Widget* child, size_t index) {
 		wAssert(!widget_list.isLocked());
 		wAssert(!children_locked);
