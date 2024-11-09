@@ -305,7 +305,8 @@ namespace fw {
 		void processKeyboardEvent(const sf::Event& event);
 		void render(sf::RenderTarget& target);
 		void renderBounds(sf::RenderTarget& target, const sf::Color& color, bool include_children, bool transformed);
-		void renderOrigin(sf::RenderTarget& target);
+		void renderOrigin(sf::RenderTarget& target, bool include_children);
+		void setDebugRender(bool value);
 		void remove(bool with_clildren = true);
 
 	protected:
@@ -356,6 +357,7 @@ namespace fw {
 		bool is_left_pressed = false;
 		bool is_right_pressed = false;
 		bool force_custom_cursor = false;
+		bool debug_render = false;
 
 		sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& size);
 		virtual sf::Drawable* getDrawable() = 0;

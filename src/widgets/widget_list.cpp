@@ -492,7 +492,19 @@ namespace fw {
 		if (debug_render) {
 			root_widget->renderBounds(target, DEBUG_RENDER_BOUNDS_COLOR, true, false);
 			root_widget->renderBounds(target, DEBUG_RENDER_TRANSFORMED_BOUNDS_COLOR, true, true);
-			root_widget->renderOrigin(target);
+			root_widget->renderOrigin(target, true);
+		} else {
+			std::function<void(Widget*)> debug_render = [&](Widget* widget) {
+				if (widget->debug_render) {
+					widget->renderBounds(target, DEBUG_RENDER_BOUNDS_COLOR, false, false);
+					widget->renderBounds(target, DEBUG_RENDER_TRANSFORMED_BOUNDS_COLOR, false, true);
+					widget->renderOrigin(target, false);
+				}
+				for (Widget* child : widget->getChildren()) {
+					debug_render(child);
+				}
+			};
+			debug_render(root_widget);
 		}
 		if (focused_widget) {
 			focused_widget->renderBounds(target, DEBUG_RENDER_FOCUSED_WIDGET_BOUNDS_COLOR, false, true);

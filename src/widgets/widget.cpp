@@ -1388,7 +1388,7 @@ namespace fw {
 		}
 	}
 
-	void Widget::renderOrigin(sf::RenderTarget& target) {
+	void Widget::renderOrigin(sf::RenderTarget& target, bool include_children) {
 		if (!visible) {
 			return;
 		}
@@ -1401,9 +1401,15 @@ namespace fw {
 		sf::Vector2f pos = getGlobalPosition();
 		draw_line(target, pos - hoffset, pos + hoffset, DEBUG_RENDER_POSITION_COLOR);
 		draw_line(target, pos - voffset, pos + voffset, DEBUG_RENDER_POSITION_COLOR);
-		for (size_t i = 0; i < children.size(); i++) {
-			children[i]->renderOrigin(target);
+		if (include_children) {
+			for (size_t i = 0; i < children.size(); i++) {
+				children[i]->renderOrigin(target, true);
+			}
 		}
+	}
+
+	void Widget::setDebugRender(bool value) {
+		debug_render = value;
 	}
 
 	void Widget::remove(bool with_clildren) {
