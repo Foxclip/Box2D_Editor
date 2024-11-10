@@ -392,7 +392,7 @@ float WidgetTests::calcTreeViewHeight(fw::TreeViewWidget* treeview) {
     }
     result += fw::TREEVIEW_CONTAINER_PADDING;
     for (size_t i = 0; i < treeview->getTopEntryCount(); i++) {
-        fw::TreeViewEntry* entry = treeview->getFromTop(i);
+        fw::TreeViewEntry* entry = treeview->getTopEntry(i);
         float entry_height = calcTreeViewEntryHeight(entry);
         result += entry_height;
         if (i < treeview->getTopEntryCount() - 1) {

@@ -37,13 +37,12 @@ int main() {
 
     execute_app();
 
-    // TODO: TreeViewWidget: drag entries
-    // TODO: Outliner: reparent object
+    // TODO: TreeViewWidget: reorder entries
+    // TODO: TreeViewWidget: reparent entries
+    // TODO: Simulation: rename getFromAll to getObject and getFromTop to getTopObject
     // TODO: Editor: put Camera in separate file
-    // TODO: Tests: split widget_tests.cpp into several files
-    // TODO: TreeViewWidget: put Entry in separate file
-    // TODO: WidgetList: use addPending methods explicitly
-    // TODOL Widget: make test for setParent with keep_pos = true
+    // TODO: WidgetList: use addPending methods explicitly instead of sneakily calling them from other methods like moveToTop
+    // TODO: Widget: make test for setParent with keep_pos = true
     // TODO: Outliner: rename object
     // TODO: Outliner: delete object
     // TODO: Objectlist: OnAfterObjectRemoved test

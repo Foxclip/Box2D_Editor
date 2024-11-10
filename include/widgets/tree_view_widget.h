@@ -56,6 +56,7 @@ namespace fw {
 		void collapse();
 		void toggle();
 		void take();
+		void drop();
 		void remove(bool with_children);
 	private:
 		friend TreeViewWidget;
@@ -101,15 +102,15 @@ namespace fw {
 		CompVector<TreeViewEntry*> getAllEntriesInOrder() const;
 		size_t getAllEntryCount() const;
 		size_t getTopEntryCount() const;
-		TreeViewEntry* getFromAll(size_t index) const;
-		TreeViewEntry* getFromTop(size_t index) const;
+		TreeViewEntry* getEntry(size_t index) const;
+		TreeViewEntry* getTopEntry(size_t index) const;
 		TreeViewEntry* addEntry(const sf::String& name);
 		void selectAll();
 		void deselectAll();
 		void expandAll();
 		void collapseAll();
 		RectangleWidget* getTargetHighlightWidget() const;
-		TreeViewEntry* getTargetHighlightEntry(const sf::Vector2f& global_pos) const;
+		TreeViewEntry* getTargetHighlightEntry(const sf::Vector2f& global_pos, ptrdiff_t& index) const;
 		void putTargetHighlight();
 		void removeEntry(TreeViewEntry* entry, bool with_children);
 		void clear();
@@ -122,6 +123,8 @@ namespace fw {
 		CompVector<TreeViewEntry*> top_entries;
 		Widget* grabbed_widget = nullptr;
 		fw::RectangleWidget* target_highlight_widget = nullptr;
+		TreeViewEntry* highlighted_entry = nullptr;
+		ptrdiff_t highlighted_entry_index = -1;
 
 		void deselectAllExceptEntry(TreeViewEntry* except_entry = nullptr);
 		void deselectAllExceptSubtree(TreeViewEntry* except_subtree = nullptr);
