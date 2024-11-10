@@ -587,7 +587,7 @@ void WidgetTests::treeviewWidgetClearTest(test::Test& test) {
     T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
 }
 
-void WidgetTests::treeviewWidgetDragTest(test::Test& test) {
+void WidgetTests::treeviewWidgetDrag1Test(test::Test& test) {
     fw::Application application(window);
     application.init(test.name, 800, 600, 0, false);
     application.setDefaultFont(textbox_font);
@@ -645,9 +645,10 @@ void WidgetTests::treeviewWidgetDragTest(test::Test& test) {
     application.mouseLeftRelease();
     application.advance();
     T_CHECK(!target_highlight_widget->isVisible());
-    if (T_COMPARE(tree_view_widget->getAllEntryCount(), 2)) {
-        T_CHECK(tree_view_widget->getEntry(0) == entry_1);
-        T_CHECK(tree_view_widget->getEntry(1) == entry_2);
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 2);
+    if (T_COMPARE(tree_view_widget->getTopEntryCount(), 2)) {
+        T_CHECK(tree_view_widget->getTopEntry(0) == entry_1);
+        T_CHECK(tree_view_widget->getTopEntry(1) == entry_2);
     }
     if (T_COMPARE(tree_view_widget->getChildrenCount(), 3)) {
         T_CHECK(tree_view_widget->getChild(0) == entry_1_widget);
@@ -677,4 +678,57 @@ void WidgetTests::treeviewWidgetDragTest(test::Test& test) {
         T_CHECK(tree_view_widget->getChild(0) == entry_2_widget);
         T_CHECK(tree_view_widget->getChild(1) == entry_1_widget);
     }
+}
+
+void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
+    fw::Application application(window);
+    application.init(test.name, 800, 600, 0, false);
+    application.setDefaultFont(textbox_font);
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(200.0f, 100.0f);
+    fw::TreeViewWidget* tree_view_widget = application.getWidgets().createTreeViewWidget(size);
+    sf::Vector2f position(100.0f, 100.0f);
+    tree_view_widget->setPosition(position);
+
+    fw::TreeViewEntry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewEntry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewEntry* entry_3 = tree_view_widget->addEntry("Entry 3");
+    entry_3->setParent(entry_2);
+    fw::Widget* entry_1_widget = entry_1->getWidget();
+    fw::Widget* entry_2_widget = entry_2->getWidget();
+    fw::Widget* entry_3_widget = entry_2->getWidget();
+    fw::Widget* target_highlight_widget = tree_view_widget->getTargetHighlightWidget();
+    application.advance();
+
+    sf::Vector2f drag_top = tree_view_widget->getTop() + sf::Vector2f(0.0f, -50.0f);
+    sf::Vector2f drag_bottom = tree_view_widget->getBottom() + sf::Vector2f(0.0f, 50.0f);
+    auto drag_widget = [&](fw::Widget* widget, const sf::Vector2f& pos) {
+        application.mouseMove(widget->getGlobalCenter());
+        application.mouseLeftPress();
+        application.advance();
+        application.mouseMove(pos);
+        application.advance();
+    };
+    drag_widget(entry_1_widget, drag_top);
+    application.advance();
+    T_VEC2_COMPARE(target_highlight_widget->getGlobalOriginPosition(), entry_2_widget->getGlobalPosition());
+    application.mouseLeftRelease();
+    application.advance();
+    T_CHECK(!target_highlight_widget->isVisible());
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
+    if (T_COMPARE(tree_view_widget->getTopEntryCount(), 2)) {
+        T_CHECK(tree_view_widget->getTopEntry(0) == entry_1);
+        T_CHECK(tree_view_widget->getTopEntry(1) == entry_2);
+    }
+    if (T_COMPARE(tree_view_widget->getChildrenCount(), 3)) {
+        T_CHECK(tree_view_widget->getChild(0) == entry_1_widget);
+        T_CHECK(tree_view_widget->getChild(1) == entry_2_widget);
+    }
+
+    drag_widget(entry_1_widget, drag_bottom);
+    application.advance();
+    T_VEC2_COMPARE(target_highlight_widget->getGlobalPosition(), entry_2_widget->getGlobalBottomLeft());
+    application.mouseLeftRelease();
+    application.advance();
 }

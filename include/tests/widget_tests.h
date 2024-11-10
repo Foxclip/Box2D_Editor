@@ -217,7 +217,8 @@ private:
 	void treeviewWidgetReorderTest(test::Test& test);
 	void treeviewWidgetRemoveTest(test::Test& test);
 	void treeviewWidgetClearTest(test::Test& test);
-	void treeviewWidgetDragTest(test::Test& test);
+	void treeviewWidgetDrag1Test(test::Test& test);
+	void treeviewWidgetDrag2Test(test::Test& test);
 
 	static std::string sfVec2fToStr(const sf::Vector2f& vec);
 	static std::string sfVec2iToStr(const sf::Vector2i& vec);

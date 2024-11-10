@@ -452,7 +452,7 @@ namespace fw {
 		}
 	}
 
-	void TreeViewEntry::setParent(TreeViewEntry* new_parent) {
+	void TreeViewEntry::setParent(TreeViewEntry* new_parent, bool reparent_widget) {
 		if (new_parent) {
 			wAssert(treeview.all_entries.contains(new_parent));
 		}
@@ -462,11 +462,15 @@ namespace fw {
 		}
 		if (new_parent) {
 			new_parent->addChild(this);
-			fw::ContainerWidget* parent_children_widget = new_parent->getChildrenWidget();
-			entry_widget->setParent(parent_children_widget);
+			if (reparent_widget) {
+				fw::ContainerWidget* parent_children_widget = new_parent->getChildrenWidget();
+				entry_widget->setParent(parent_children_widget);
+			}
 			treeview.top_entries.remove(this);
 		} else {
-			entry_widget->setParent(&treeview);
+			if (reparent_widget) {
+				entry_widget->setParent(&treeview);
+			}
 			treeview.top_entries.add(this);
 		}
 		this->parent = new_parent;
@@ -517,9 +521,11 @@ namespace fw {
 
 	void TreeViewEntry::drop() {
 		if (treeview.highlighted_entry_index >= 0) {
+			setParent(treeview.highlighted_entry->getParent(), false);
 			moveToIndex(treeview.highlighted_entry_index);
 		} else {
-			moveToIndex(treeview.getAllEntryCount());
+			setParent(nullptr, false);
+			moveToIndex(treeview.getTopEntryCount());
 		}
 		treeview.widget_list.addPendingSetParent(entry_widget, &treeview, false, treeview.highlighted_entry_index);
 		entry_widget->setParentAnchor(Widget::Anchor::TOP_LEFT);

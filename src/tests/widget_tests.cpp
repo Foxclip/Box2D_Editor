@@ -122,7 +122,8 @@ void WidgetTests::createTestLists() {
     test::Test* tree_view_widget_reorder_test = tree_view_widget_list->addTest("reorder", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetReorderTest(test); });
     test::Test* tree_view_widget_remove_test = tree_view_widget_list->addTest("remove", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetRemoveTest(test); });
     test::Test* tree_view_widget_clear_test = tree_view_widget_list->addTest("clear", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetClearTest(test); });
-    test::Test* tree_view_widget_drag_test = tree_view_widget_list->addTest("drag", { tree_view_widget_reorder_test }, [&](test::Test& test) { treeviewWidgetDragTest(test); });
+    test::Test* tree_view_widget_drag_1_test = tree_view_widget_list->addTest("drag_1", { tree_view_widget_reorder_test }, [&](test::Test& test) { treeviewWidgetDrag1Test(test); });
+    test::Test* tree_view_widget_drag_2_test = tree_view_widget_list->addTest("drag_2", { tree_view_widget_drag_1_test }, [&](test::Test& test) { treeviewWidgetDrag2Test(test); });
 }
 
 void WidgetTests::beforeRunModule() {

@@ -50,7 +50,7 @@ namespace fw {
 		void select(bool with_children = false);
 		void deselect(bool with_children = false);
 		void toggleSelect(bool with_children = false);
-		void setParent(TreeViewEntry* new_parent);
+		void setParent(TreeViewEntry* new_parent, bool reparent_widget = true);
 		void moveToIndex(size_t index);
 		void expand();
 		void collapse();

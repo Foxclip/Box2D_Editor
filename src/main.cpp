@@ -14,8 +14,10 @@ void execute_app() {
         fw::TreeViewWidget* treeview = app.getWidgets().createTreeViewWidget(300.0f, 300.0f);
         treeview->setParentAnchor(fw::Widget::Anchor::CENTER);
         treeview->setSizeYPolicy(fw::Widget::SizePolicy::NONE);
-        treeview->addEntry("Entry 1");
-        treeview->addEntry("Entry 2");
+        fw::TreeViewEntry* entry_1 = treeview->addEntry("Entry 1");
+        fw::TreeViewEntry* entry_2 = treeview->addEntry("Entry 2");
+        fw::TreeViewEntry* entry_3 = treeview->addEntry("Entry 3");
+        entry_3->setParent(entry_2);
 
         app.load("levels/level.txt");
         app.start();
