@@ -34,7 +34,7 @@ namespace fw {
 		const CompVector<TreeViewEntry*>& getChildren() const;
 		TreeViewEntry* getChild(size_t index) const;
 		size_t getChildrenCount() const;
-		size_t getIndex() const;
+		size_t getIndex(TreeViewEntry* skip = nullptr) const;
 		fw::ContainerWidget* getWidget() const;
 		fw::RectangleWidget* getRectangleWidget() const;
 		fw::TextWidget* getTextWidget() const;
@@ -51,6 +51,7 @@ namespace fw {
 		void deselect(bool with_children = false);
 		void toggleSelect(bool with_children = false);
 		void setParent(TreeViewEntry* new_parent, bool reparent_widget = true);
+		void setWidgetParent(TreeViewEntry* new_parent);
 		void moveToIndex(size_t index);
 		void expand();
 		void collapse();
@@ -110,7 +111,7 @@ namespace fw {
 		void expandAll();
 		void collapseAll();
 		RectangleWidget* getTargetHighlightWidget() const;
-		TreeViewEntry* getTargetHighlightEntry(const sf::Vector2f& global_pos, ptrdiff_t& index) const;
+		TreeViewEntry* getTargetHighlightEntry(const sf::Vector2f& global_pos) const;
 		void putTargetHighlight();
 		void removeEntry(TreeViewEntry* entry, bool with_children);
 		void clear();
@@ -124,7 +125,6 @@ namespace fw {
 		Widget* grabbed_widget = nullptr;
 		fw::RectangleWidget* target_highlight_widget = nullptr;
 		TreeViewEntry* highlighted_entry = nullptr;
-		ptrdiff_t highlighted_entry_index = -1;
 
 		void deselectAllExceptEntry(TreeViewEntry* except_entry = nullptr);
 		void deselectAllExceptSubtree(TreeViewEntry* except_subtree = nullptr);

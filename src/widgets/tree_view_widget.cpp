@@ -134,17 +134,15 @@ namespace fw {
 		return target_highlight_widget;
 	}
 
-	TreeViewEntry* TreeViewWidget::getTargetHighlightEntry(const sf::Vector2f& global_pos, ptrdiff_t& index) const {
+	TreeViewEntry* TreeViewWidget::getTargetHighlightEntry(const sf::Vector2f& global_pos) const {
 		CompVector<TreeViewEntry*> entries = getAllEntriesInOrder();
 		TreeViewEntry* result = nullptr;
-		index = -1;
 		size_t current_index = 0;
 		for (TreeViewEntry* entry : entries) {
 			if (entry->getWidget()->isVisible() && !entry->grabbed) {
 				sf::Vector2f center = entry->getWidget()->getGlobalCenter();
 				if (global_pos.y < center.y) {
 					result = entry;
-					index = current_index;
 					break;
 				}
 				current_index++;
@@ -156,7 +154,7 @@ namespace fw {
 	void TreeViewWidget::putTargetHighlight() {
 		target_highlight_widget->setVisible(true);
 		sf::Vector2f mouse_pos = widget_list.getMousePosf();
-		highlighted_entry = getTargetHighlightEntry(mouse_pos, highlighted_entry_index);
+		highlighted_entry = getTargetHighlightEntry(mouse_pos);
 		if (highlighted_entry) {
 			sf::Vector2f entry_pos = highlighted_entry->getWidget()->getGlobalPosition();
 			target_highlight_widget->setGlobalPosition(entry_pos);
@@ -343,11 +341,24 @@ namespace fw {
 		return children.size();
 	}
 
-	size_t TreeViewEntry::getIndex() const {
+	size_t TreeViewEntry::getIndex(TreeViewEntry* skip) const {
+		CompVector<fw::TreeViewEntry*>* parent_list = &treeview.top_entries;
 		if (parent) {
-			return parent->children.getIndex(const_cast<TreeViewEntry*>(this));
+			parent_list = &parent->children;
+		}
+		if (skip) {
+			size_t index = 0;
+			for (size_t i = 0; i < parent_list->size(); i++) {
+				if ((*parent_list)[i] == this) {
+					break;
+				}
+				if ((*parent_list)[i] != skip) {
+					index++;
+				}
+			}
+			return index;
 		} else {
-			return treeview.top_entries.getIndex(const_cast<TreeViewEntry*>(this));
+			return (*parent_list).getIndex(const_cast<TreeViewEntry*>(this));
 		}
 	}
 
@@ -462,18 +473,23 @@ namespace fw {
 		}
 		if (new_parent) {
 			new_parent->addChild(this);
-			if (reparent_widget) {
-				fw::ContainerWidget* parent_children_widget = new_parent->getChildrenWidget();
-				entry_widget->setParent(parent_children_widget);
-			}
 			treeview.top_entries.remove(this);
 		} else {
-			if (reparent_widget) {
-				entry_widget->setParent(&treeview);
-			}
 			treeview.top_entries.add(this);
 		}
+		if (reparent_widget) {
+			setWidgetParent(new_parent);
+		}
 		this->parent = new_parent;
+	}
+
+	void TreeViewEntry::setWidgetParent(TreeViewEntry* new_parent) {
+		if (new_parent) {
+			fw::ContainerWidget* parent_children_widget = new_parent->getChildrenWidget();
+			entry_widget->setParent(parent_children_widget);
+		} else {
+			entry_widget->setParent(&treeview);
+		}
 	}
 
 	void TreeViewEntry::moveToIndex(size_t index) {
@@ -520,14 +536,21 @@ namespace fw {
 	}
 
 	void TreeViewEntry::drop() {
-		if (treeview.highlighted_entry_index >= 0) {
-			setParent(treeview.highlighted_entry->getParent(), false);
-			moveToIndex(treeview.highlighted_entry_index);
+		Widget* parent_widget = &treeview;
+		ptrdiff_t highlighted_entry_index = -1;
+		if (treeview.highlighted_entry) {
+			highlighted_entry_index = treeview.highlighted_entry->getIndex(this);
+			TreeViewEntry* highlighted_entry_parent = treeview.highlighted_entry->getParent();
+			setParent(highlighted_entry_parent, false);
+			moveToIndex(highlighted_entry_index);
+			if (highlighted_entry_parent) {
+				parent_widget = highlighted_entry_parent->getChildrenWidget();
+			}
 		} else {
 			setParent(nullptr, false);
 			moveToIndex(treeview.getTopEntryCount());
 		}
-		treeview.widget_list.addPendingSetParent(entry_widget, &treeview, false, treeview.highlighted_entry_index);
+		treeview.widget_list.addPendingSetParent(entry_widget, parent_widget, false, highlighted_entry_index);
 		entry_widget->setParentAnchor(Widget::Anchor::TOP_LEFT);
 		entry_widget->setSizeXPolicy(Widget::SizePolicy::PARENT);
 		sf::Color rect_color = rectangle_widget->getFillColor();
