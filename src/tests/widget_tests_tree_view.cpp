@@ -697,6 +697,7 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
     entry_3->setParent(entry_2);
     fw::Widget* entry_1_widget = entry_1->getWidget();
     fw::Widget* entry_2_widget = entry_2->getWidget();
+    fw::Widget* entry_2_children_widget = entry_2->getChildrenWidget();
     fw::Widget* entry_3_widget = entry_3->getWidget();
     fw::Widget* target_highlight_widget = tree_view_widget->getTargetHighlightWidget();
     auto drag_widget = [&](fw::Widget* widget, const sf::Vector2f& pos) {
@@ -708,7 +709,7 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
     };
     application.advance();
 
-    // drag to the top
+    // drop to the top
     sf::Vector2f drag_top = tree_view_widget->getTop() + sf::Vector2f(0.0f, -50.0f);
     drag_widget(entry_1_widget, drag_top);
     application.advance();
@@ -726,7 +727,8 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
         T_CHECK(tree_view_widget->getChild(1) == entry_2_widget);
     }
 
-    // drag to the bottom
+    // drop to the bottom
+    T_ASSERT_NO_ERRORS();
     sf::Vector2f drag_bottom = tree_view_widget->getBottom() + sf::Vector2f(0.0f, 50.0f);
     drag_widget(entry_1_widget, drag_bottom);
     application.advance();
@@ -734,7 +736,8 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
     application.mouseLeftRelease();
     application.advance();
 
-    // drag inside
+    // drop inside
+    T_ASSERT_NO_ERRORS();
     entry_2->expand();
     application.advance();
     sf::Vector2f drag_inside = entry_3_widget->getGlobalTop();
@@ -754,9 +757,69 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
     if (T_COMPARE(tree_view_widget->getChildrenCount(), 2)) {
         T_CHECK(tree_view_widget->getChild(0) == entry_2_widget);
     }
-    fw::ContainerWidget* entry_2_children_widget = entry_2->getChildrenWidget();
     if (T_COMPARE(entry_2_children_widget->getChildrenCount(), 2)) {
         T_CHECK(entry_2_children_widget->getChild(0) == entry_1_widget);
         T_CHECK(entry_2_children_widget->getChild(1) == entry_3_widget);
+    }
+
+    // drop to the same place inside
+    T_ASSERT_NO_ERRORS();
+    application.mouseMove(entry_1_widget->getGlobalCenter());
+    application.mouseLeftPress();
+    application.advance();
+    application.mouseMove(drag_top);
+    application.advance();
+    application.mouseMove(drag_inside);
+    application.advance();
+    application.mouseLeftRelease();
+    application.advance();
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
+    if (T_COMPARE(tree_view_widget->getTopEntryCount(), 1)) {
+        T_CHECK(tree_view_widget->getTopEntry(0) == entry_2);
+    }
+    if (T_COMPARE(entry_2->getChildrenCount(), 2)) {
+        T_CHECK(entry_2->getChild(0) == entry_1);
+        T_CHECK(entry_2->getChild(1) == entry_3);
+    }
+    if (T_COMPARE(tree_view_widget->getChildrenCount(), 2)) {
+        T_CHECK(tree_view_widget->getChild(0) == entry_2_widget);
+    }
+    if (T_COMPARE(entry_2_children_widget->getChildrenCount(), 2)) {
+        T_CHECK(entry_2_children_widget->getChild(0) == entry_1_widget);
+        T_CHECK(entry_2_children_widget->getChild(1) == entry_3_widget);
+    }
+
+    // drop outside
+    T_ASSERT_NO_ERRORS();
+    drag_widget(entry_1_widget, drag_top);
+    application.advance();
+    application.mouseLeftRelease();
+    application.advance();
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
+    if (T_COMPARE(tree_view_widget->getTopEntryCount(), 2)) {
+        T_CHECK(tree_view_widget->getTopEntry(0) == entry_1);
+        T_CHECK(tree_view_widget->getTopEntry(1) == entry_2);
+    }
+    if (T_COMPARE(tree_view_widget->getChildrenCount(), 3)) {
+        T_CHECK(tree_view_widget->getChild(0) == entry_1_widget);
+        T_CHECK(tree_view_widget->getChild(1) == entry_2_widget);
+    }
+
+    // drop outside the only child
+    T_ASSERT_NO_ERRORS();
+    drag_widget(entry_3_widget, drag_bottom);
+    application.advance();
+    application.mouseLeftRelease();
+    application.advance();
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
+    if (T_COMPARE(tree_view_widget->getTopEntryCount(), 3)) {
+        T_CHECK(tree_view_widget->getTopEntry(0) == entry_1);
+        T_CHECK(tree_view_widget->getTopEntry(1) == entry_2);
+        T_CHECK(tree_view_widget->getTopEntry(2) == entry_3);
+    }
+    if (T_COMPARE(tree_view_widget->getChildrenCount(), 4)) {
+        T_CHECK(tree_view_widget->getChild(0) == entry_1_widget);
+        T_CHECK(tree_view_widget->getChild(1) == entry_2_widget);
+        T_CHECK(tree_view_widget->getChild(2) == entry_3_widget);
     }
 }
