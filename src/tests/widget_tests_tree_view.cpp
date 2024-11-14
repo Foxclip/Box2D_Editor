@@ -710,34 +710,21 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
     application.advance();
     auto check_top_entries = [&](const std::initializer_list<fw::TreeViewEntry*>& entries) {
         std::vector<fw::TreeViewEntry*> entries_vec = std::vector<fw::TreeViewEntry*>(entries);
-        if (T_COMPARE(tree_view_widget->getTopEntryCount(), entries_vec.size())) {
+        if (T_COMPARE(tree_view_widget->getTopEntryCount(), entries.size()) && T_COMPARE(tree_view_widget->getChildrenCount(), entries.size() + 1)) {
             for (size_t i = 0; i < entries_vec.size(); i++) {
-                T_CHECK(tree_view_widget->getTopEntry(i) == entries_vec[i]);
-            }
-        }
-    };
-    auto check_top_widgets = [&](const std::initializer_list<fw::Widget*> widgets) {
-        std::vector<fw::Widget*> widgets_vec = std::vector<fw::Widget*>(widgets);
-        if (T_COMPARE(tree_view_widget->getChildrenCount(), widgets_vec.size() + 1)) { // + 1 because of target highlight widget
-            for (size_t i = 0; i < widgets_vec.size(); i++) {
-                T_CHECK(tree_view_widget->getChild(i) == widgets_vec[i]);
+                fw::TreeViewEntry* entry = tree_view_widget->getTopEntry(i);
+                T_CHECK(entry == entries_vec[i]);
+                T_CHECK(entry->getWidget() == entries_vec[i]->getWidget());
             }
         }
     };
     auto check_entries = [&](fw::TreeViewEntry* entry, const std::initializer_list<fw::TreeViewEntry*> entries) {
         std::vector<fw::TreeViewEntry*> entries_vec = std::vector<fw::TreeViewEntry*>(entries);
-        if (T_COMPARE(entry->getChildrenCount(), entries_vec.size())) {
+        fw::Widget* children_widget = entry->getChildrenWidget();
+        if (T_COMPARE(entry->getChildrenCount(), entries_vec.size()) && T_COMPARE(children_widget->getChildrenCount(), entries.size())) {
             for (size_t i = 0; i < entries_vec.size(); i++) {
                 T_CHECK(entry->getChild(i) == entries_vec[i]);
-            }
-        }
-    };
-    auto check_widgets = [&](fw::TreeViewEntry* entry, const std::initializer_list<fw::Widget*> widgets) {
-        std::vector<fw::Widget*> widgets_vec = std::vector<fw::Widget*>(widgets);
-        fw::Widget* children_widget = entry->getChildrenWidget();
-        if (T_COMPARE(children_widget->getChildrenCount(), widgets_vec.size())) {
-            for (size_t i = 0; i < widgets_vec.size(); i++) {
-                T_CHECK(children_widget->getChild(i) == widgets_vec[i]);
+                T_CHECK(children_widget->getChild(i) == entries_vec[i]->getWidget());
             }
         }
     };
@@ -752,7 +739,6 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
     T_CHECK(!target_highlight_widget->isVisible());
     T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
     T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2 }));
-    T_WRAP_CONTAINER(check_top_widgets({ entry_1_widget, entry_2_widget }));
 
     // drop to the bottom
     T_ASSERT_NO_ERRORS();
@@ -776,8 +762,6 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
     T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
     T_WRAP_CONTAINER(check_top_entries({ entry_2 }));
     T_WRAP_CONTAINER(check_entries(entry_2, { entry_1, entry_3 }));
-    T_WRAP_CONTAINER(check_top_widgets({ entry_2_widget }));
-    T_WRAP_CONTAINER(check_widgets(entry_2, { entry_1_widget, entry_3_widget }));
 
     // drop to the same place inside
     T_ASSERT_NO_ERRORS();
@@ -793,8 +777,6 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
     T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
     T_WRAP_CONTAINER(check_top_entries({ entry_2 }));
     T_WRAP_CONTAINER(check_entries(entry_2, { entry_1, entry_3 }));
-    T_WRAP_CONTAINER(check_top_widgets({ entry_2_widget }));
-    T_WRAP_CONTAINER(check_widgets(entry_2, { entry_1_widget, entry_3_widget }));
 
     // drop outside
     T_ASSERT_NO_ERRORS();
@@ -804,7 +786,6 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
     application.advance();
     T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
     T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2 }));
-    T_WRAP_CONTAINER(check_top_widgets({ entry_1_widget, entry_2_widget }));
 
     // drop outside the only child
     T_ASSERT_NO_ERRORS();
@@ -814,5 +795,4 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
     application.advance();
     T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
     T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3 }));
-    T_WRAP_CONTAINER(check_top_widgets({ entry_1_widget, entry_2_widget, entry_3_widget }));
 }
