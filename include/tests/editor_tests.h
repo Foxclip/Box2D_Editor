@@ -1,4 +1,4 @@
-#include "tests/test.h"
+#include "test_lib/test.h"
 #include "editor/editor.h"
 
 class EditorTests : public test::TestModule {

@@ -1,4 +1,4 @@
-#include "test.h"
+#include "test_lib/test.h"
 
 class DataPointerTests : public test::TestModule {
 public:

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "widgets/widgets.h"
-#include "test.h"
+#include "test_lib/test.h"
 #include <random>
 
 struct Node {

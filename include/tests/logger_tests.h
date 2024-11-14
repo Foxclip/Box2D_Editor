@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/logger.h"
-#include "test.h"
+#include "test_lib/test.h"
 
 class LoggerTests : public test::TestModule {
 public:

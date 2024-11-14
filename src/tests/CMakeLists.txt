@@ -1,9 +1,6 @@
 set(TESTS_INCLUDE_DIR "${INCLUDE_DIR}/tests/")
 
 set(TESTS_HEADER_FILES
-    "${INCLUDE_DIR}/tests/example/test_list_3.h"
-    "${INCLUDE_DIR}/tests/example/test_module_1.h"
-    "${INCLUDE_DIR}/tests/example/test_module_2.h"
     "${INCLUDE_DIR}/tests/compvector_tests.h"
     "${INCLUDE_DIR}/tests/data_pointer_tests.h"
     "${INCLUDE_DIR}/tests/editor_tests.h"
@@ -11,15 +8,10 @@ set(TESTS_HEADER_FILES
     "${INCLUDE_DIR}/tests/logger_tests.h"
     "${INCLUDE_DIR}/tests/searchindex_tests.h"
     "${INCLUDE_DIR}/tests/simulation_tests.h"
-    "${INCLUDE_DIR}/tests/widget_tests.h"
-    "${INCLUDE_DIR}/tests/test.h"
     "${INCLUDE_DIR}/tests/tests.h"
+    "${INCLUDE_DIR}/tests/widget_tests.h"
 )
 set(TESTS_SOURCE_FILES
-    "example/test_list_3.cpp"
-    "example/test_module_1.cpp"
-    "example/test_module_2.cpp"
-    "example/main.cpp"
     "compvector_tests.cpp"
     "data_pointer_tests.cpp"
     "editor_tests.cpp"
@@ -28,7 +20,6 @@ set(TESTS_SOURCE_FILES
     "main.cpp"
     "searchindex_tests.cpp"
     "simulation_tests.cpp"
-    "test.cpp"
     "widget_tests.cpp"
     "widget_tests_application.cpp"
     "widget_tests_basic.cpp"
@@ -53,6 +44,7 @@ target_include_directories(tests PRIVATE "${INCLUDE_DIR}")
 target_include_directories(tests PUBLIC "${CMAKE_SOURCE_DIR}")
 target_include_directories(tests PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(tests PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
+target_link_libraries(tests PUBLIC test_lib)
 target_link_libraries(tests PUBLIC common_lib)
 target_link_libraries(tests PUBLIC widgets_lib)
 target_link_libraries(tests PUBLIC simulation_lib)
