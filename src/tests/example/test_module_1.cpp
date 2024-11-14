@@ -1,4 +1,5 @@
 #include "tests/example/test_module_1.h"
+#include "tests/example/test_list_3.h"
 
 ExampleTestModule1::ExampleTestModule1(
 	test::TestManager& manager, const std::vector<TestModule*>& required_modules
@@ -14,6 +15,8 @@ void ExampleTestModule1::createTestLists() {
 	test::Test* test_2_1 = list_2->addTest("first", [&](test::Test& test) { test2_1(test); });
 	test::Test* test_2_2 = list_2->addTest("second", [&](test::Test& test) { test2_2(test); });
 	test::Test* test_2_3 = list_2->addTest("third", { test_2_1, test_2_2 }, [&](test::Test& test) { test2_3(test); });
+
+	test::TestList* list_3 = createTestList<TestList3>("List3");
 }
 
 void ExampleTestModule1::test1_1(test::Test& test) {
@@ -22,17 +25,12 @@ void ExampleTestModule1::test1_1(test::Test& test) {
 	T_COMPARE(four, 4);
 }
 
-void ExampleTestModule1::test1_2(test::Test& test) {
-}
+void ExampleTestModule1::test1_2(test::Test& test) { }
 
-void ExampleTestModule1::test1_3(test::Test& test) {
-}
+void ExampleTestModule1::test1_3(test::Test& test) { }
 
-void ExampleTestModule1::test2_1(test::Test& test) {
-}
+void ExampleTestModule1::test2_1(test::Test& test) { }
 
-void ExampleTestModule1::test2_2(test::Test& test) {
-}
+void ExampleTestModule1::test2_2(test::Test& test) { }
 
-void ExampleTestModule1::test2_3(test::Test& test) {
-}
+void ExampleTestModule1::test2_3(test::Test& test) { }

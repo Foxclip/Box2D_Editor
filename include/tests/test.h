@@ -139,6 +139,9 @@ namespace test {
 		TestModule(const std::string& name, TestManager& manager, const std::vector<TestModule*>& required_modules = { });
 		virtual void createTestLists() = 0;
 		TestList* createTestList(const std::string& name, const std::vector<TestList*>& required_lists = { });
+		template<typename T>
+		requires std::derived_from<T, TestList>
+		TestList* createTestList(const std::string& name, const std::vector<TestList*>& required_lists = { });
 		std::vector<Test*> getTestList() const;
 		void runTests();
 		static void printSummary(
@@ -194,6 +197,15 @@ namespace test {
 		size_t max_test_name = 0;
 
 	};
+
+	template<typename T>
+	requires std::derived_from<T, TestList>
+	inline TestList* TestModule::createTestList(const std::string& name, const std::vector<TestList*>& required_lists) {
+		std::unique_ptr<TestList> test_list = std::make_unique<T>(name, *this, required_lists);
+		TestList* ptr = test_list.get();
+		test_lists.push_back(std::move(test_list));
+		return ptr;
+	}
 
 	template<typename T1, typename T2>
 	inline bool TestModule::testCompare(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected) {

@@ -1,6 +1,7 @@
 set(TESTS_INCLUDE_DIR "${INCLUDE_DIR}/tests/")
 
 set(TESTS_HEADER_FILES
+    "${INCLUDE_DIR}/tests/example/test_list_3.h"
     "${INCLUDE_DIR}/tests/example/test_module_1.h"
     "${INCLUDE_DIR}/tests/example/test_module_2.h"
     "${INCLUDE_DIR}/tests/compvector_tests.h"
@@ -15,6 +16,7 @@ set(TESTS_HEADER_FILES
     "${INCLUDE_DIR}/tests/tests.h"
 )
 set(TESTS_SOURCE_FILES
+    "example/test_list_3.cpp"
     "example/test_module_1.cpp"
     "example/test_module_2.cpp"
     "example/main.cpp"
