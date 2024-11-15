@@ -41,11 +41,12 @@ set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 add_subdirectory(clip)
 target_compile_options(clip PRIVATE -w)
 
+add_subdirectory(test_lib)
+
 set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 add_subdirectory(src/common)
 add_subdirectory(src/editor)
 add_subdirectory(src/simulation)
-add_subdirectory(src/test_lib)
 add_subdirectory(src/tests)
 add_subdirectory(src/widgets)
 add_executable(Box2D_Editor src/main.cpp)

@@ -1,6 +1,6 @@
 #include "common/logger.h"
-#include "test_lib/example/test_module_1.h"
-#include "test_lib/example/test_module_2.h"
+#include "example/test_module_1.h"
+#include "example/test_module_2.h"
 
 void run_tests() {
     logger << "Running tests\n";

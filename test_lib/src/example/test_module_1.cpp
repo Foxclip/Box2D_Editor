@@ -1,5 +1,5 @@
-#include "test_lib/example/test_module_1.h"
-#include "test_lib/example/test_list_3.h"
+#include "example/test_module_1.h"
+#include "example/test_list_3.h"
 
 ExampleTestModule1::ExampleTestModule1(
 	test::TestManager& manager, const std::vector<TestModule*>& required_modules

@@ -1,4 +1,4 @@
-#include "test_lib/test.h"
+#include "test.h"
 #include "common/logger.h"
 #include <cassert>
 #include <algorithm>

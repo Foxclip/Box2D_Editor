@@ -1,4 +1,4 @@
-#include "test_lib/example/test_list_3.h"
+#include "example/test_list_3.h"
 
 TestList3::TestList3(
 	const std::string& name,

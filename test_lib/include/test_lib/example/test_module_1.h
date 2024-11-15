@@ -1,4 +1,4 @@
-#include "test_lib/test.h"
+#include "test.h"
 
 class ExampleTestModule1 : public test::TestModule {
 public:

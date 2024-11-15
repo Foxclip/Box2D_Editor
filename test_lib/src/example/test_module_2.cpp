@@ -1,4 +1,4 @@
-#include "test_lib/example/test_module_2.h"
+#include "example/test_module_2.h"
 
 ExampleTestModule2::ExampleTestModule2(
 	test::TestManager& manager, const std::vector<TestModule*>& required_modules
