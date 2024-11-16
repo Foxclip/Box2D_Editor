@@ -200,7 +200,9 @@ namespace test {
 					max_test_name = test->name.size();
 				}
 			}
+			logger << name << "\n";
 		}
+		LoggerIndent test_list_indent(1, isRoot());
 		beforeRunModule();
 		OnBeforeRun();
 		for (auto& node : children) {
