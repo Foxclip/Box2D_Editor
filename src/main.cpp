@@ -39,7 +39,7 @@ int main() {
 
     execute_app();
 
-    // TODO: Tests: make test_lib executable with main.cpp
+    // TODO: Tests: split 'tests' project into several projects
     // TODO: Tests: make lists in widget tests separate clases derived from TestList
     // TODO: TreeViewWidget: tests: make check_top_entries and check_entries separate methods
     // TODO: TreeViewWidget: tests: use check_top_entries and check_entries in other drag tests
