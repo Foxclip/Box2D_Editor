@@ -1,11 +1,9 @@
 #include "example/test_module_2.h"
 
 ExampleTestModule2::ExampleTestModule2(
-	test::TestManager& manager, const std::vector<TestModule*>& required_modules
-) : TestModule("ExampleModule2", manager, required_modules) { }
-
-void ExampleTestModule2::createTestLists() {
-	test::TestList* list_1 = createTestList("List1");
+	const std::string& name, test::TestModule* parent, const std::vector<test::TestNode*>& required_nodes
+) : TestModule("ExampleModule2", parent, required_nodes) {
+	test::TestModule* list_1 = addModule("List1");
 	test::Test* test_1_1 = list_1->addTest("first", [&](test::Test& test) { test1_1(test); });
 }
 

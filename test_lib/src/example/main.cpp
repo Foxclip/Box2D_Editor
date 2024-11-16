@@ -5,10 +5,10 @@
 void run_tests() {
     logger << "Running tests\n";
     LoggerIndent test_modules_indent;
-    test::TestManager test_manager;
-    test::TestModule* first_module = test_manager.addModule<ExampleTestModule1>();
-    test::TestModule* second_module = test_manager.addModule<ExampleTestModule2>({ first_module });
-    test_manager.runAllModules();
+    test::TestModule root_module("Example tests", nullptr);
+    test::TestModule* first_module = root_module.addModule<ExampleTestModule1>("ExampleModule1");
+    test::TestModule* second_module = root_module.addModule<ExampleTestModule2>("ExampleModule2", { first_module });
+    root_module.run();
 }
 
 int main() {
