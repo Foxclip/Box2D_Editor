@@ -233,7 +233,7 @@ namespace test {
 					}
 				}
 			} else if (TestModule* module = dynamic_cast<TestModule*>(node.get())) {
-				logger << "Module: " << module->name << "\n";
+				logger << module->name << "\n";
 				LoggerIndent test_list_indent;
 				bool cancelled = false;
 				for (TestNode* req_node : module->required) {
