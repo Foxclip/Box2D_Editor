@@ -1,19 +1,17 @@
 #include "tests/searchindex_tests.h"
 
-SearchIndexTests::SearchIndexTests(
-	test::TestManager& manager, const std::vector<TestModule*>& required_modules
-) : TestModule("SearchIndex", manager, required_modules) { }
-
 class MyClass { };
 
-void SearchIndexTests::createTestLists() {
-	test::TestList* test_list_unique = createTestList("SearchIndexUnique");
-	test::TestList* test_list_multiple = createTestList("SearchIndexMultiple");
+SearchIndexTests::SearchIndexTests(
+	const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes
+) : TestModule(name, parent, required_nodes) {
+	test::TestModule* test_list_unique = addModule("SearchIndexUnique");
+	test::TestModule* test_list_multiple = addModule("SearchIndexMultiple");
 	createTestListUnique(test_list_unique);
 	createTestListMultiple(test_list_multiple);
 }
 
-void SearchIndexTests::createTestListUnique(test::TestList* list) {
+void SearchIndexTests::createTestListUnique(test::TestModule* list) {
 	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
 		SearchIndexUnique<int, MyClass*> sindex;
 	});
@@ -112,7 +110,7 @@ void SearchIndexTests::createTestListUnique(test::TestList* list) {
 	});
 }
 
-void SearchIndexTests::createTestListMultiple(test::TestList* list) {
+void SearchIndexTests::createTestListMultiple(test::TestModule* list) {
 	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
 		SearchIndexMultiple<int, MyClass*> sindex;
 	});

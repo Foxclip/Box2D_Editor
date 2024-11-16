@@ -178,6 +178,26 @@ namespace test {
 		return result;
 	}
 
+	std::vector<Test*> TestModule::getChildTests() const {
+		std::vector<Test*> result;
+		for (size_t i = 0; i < children.size(); i++) {
+			if (Test* test = dynamic_cast<Test*>(children[i].get())) {
+				result.push_back(test);
+			}
+		}
+		return result;
+	}
+
+	std::vector<TestModule*> TestModule::getChildModules() const {
+		std::vector<TestModule*> result;
+		for (size_t i = 0; i < children.size(); i++) {
+			if (TestModule* module = dynamic_cast<TestModule*>(children[i].get())) {
+				result.push_back(module);
+			}
+		}
+		return result;
+	}
+
 	std::vector<Test*> TestModule::getAllTests() const {
 		std::vector<Test*> result;
 		for (size_t i = 0; i < children.size(); i++) {
@@ -253,13 +273,6 @@ namespace test {
 					logger << "Cancelled " << tests.size() << " tests\n";
 				} else {
 					module->run();
-					if (module->print_summary_enabled) {
-						printSummary(
-							module->passed_list,
-							module->cancelled_list,
-							module->failed_list
-						);
-					}
 				}
 				for (const std::string& name : module->passed_list) {
 					passed_list.push_back(module->name + "/" + name);

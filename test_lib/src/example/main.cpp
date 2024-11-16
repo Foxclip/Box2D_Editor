@@ -9,6 +9,9 @@ void run_tests() {
     test::TestModule* module_1 = root_module.addModule<ExampleTestModule1>("ExampleModule1");
     test::TestModule* module_2 = root_module.addModule<ExampleTestModule2>("ExampleModule2", { module_1 });
     test::TestModule* module_3 = root_module.addModule<ExampleTestModule3>("ExampleModule3");
+    for (test::TestModule* module : root_module.getChildModules()) {
+        module->print_summary_enabled = true;
+    }
     root_module.run();
 }
 

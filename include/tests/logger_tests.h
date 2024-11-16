@@ -5,11 +5,10 @@
 
 class LoggerTests : public test::TestModule {
 public:
-	LoggerTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
-	void createTestLists() override;
+	LoggerTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 
 protected:
-	void createLoggerList(test::TestList* list);
-	void createTagsList(test::TestList* list);
+	void createLoggerList(test::TestModule* list);
+	void createTagsList(test::TestModule* list);
 
 };

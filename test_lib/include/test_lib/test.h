@@ -129,6 +129,8 @@ namespace test {
 		TestModule* addModule(const std::string& name, const std::vector<TestNode*>& required = { });
 		TestModule* getRoot();
 		std::vector<TestNode*> getChildren() const;
+		std::vector<Test*> getChildTests() const;
+		std::vector<TestModule*> getChildModules() const;
 		std::vector<Test*> getAllTests() const;
 		bool run() override;
 		static void printSummary(

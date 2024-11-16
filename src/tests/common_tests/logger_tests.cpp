@@ -1,18 +1,16 @@
 #include "tests/logger_tests.h"
 
-LoggerTests::LoggerTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules)
-	: TestModule("Logger", manager, required_modules) { }
-
-void LoggerTests::createTestLists() {
-	test::TestList* logger_list = createTestList("Logger");
+LoggerTests::LoggerTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes)
+	: TestModule(name, parent, required_nodes) {
+	test::TestModule* logger_list = addModule("Logger");
 	logger_list->OnBeforeRunTest = []() { logger.lock(); };
 	logger_list->OnAfterRunTest = []() { logger.unlock(); };
-	test::TestList* tags_list = createTestList("Tags", { logger_list });
+	test::TestModule* tags_list = addModule("Tags", { logger_list });
 	createLoggerList(logger_list);
 	createTagsList(tags_list);
 }
 
-void LoggerTests::createLoggerList(test::TestList* list) {
+void LoggerTests::createLoggerList(test::TestModule* list) {
 	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) {
 		Logger logger(true);
 		logger << "Test\n";
@@ -87,7 +85,7 @@ void LoggerTests::createLoggerList(test::TestList* list) {
 	});
 }
 
-void LoggerTests::createTagsList(test::TestList* list) {
+void LoggerTests::createTagsList(test::TestModule* list) {
 	test::Test* tag_test = list->addTest("tag", [&](test::Test& test) {
 		Logger logger(true);
 		LoggerTag tag1(logger, "tag1");
@@ -133,7 +131,7 @@ void LoggerTests::createTagsList(test::TestList* list) {
 		T_COMPARE(logger.getTotalBuffer(), "tag1\n");
 	});
 
-	std::vector<test::Test*> tag_tests = list->getTestList();
+	std::vector<test::TestNode*> tag_tests = list->getChildren();
 
 	test::Test* return_disabled_test = list->addTest("return_disabled", { tag_tests }, [&](test::Test& test) {
 		Logger logger(true);
