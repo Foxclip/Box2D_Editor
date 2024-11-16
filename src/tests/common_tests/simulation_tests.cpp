@@ -1,9 +1,7 @@
 #include "tests/simulation_tests.h"
 
-SimulationTests::SimulationTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules) : TestModule("Simulation", manager, required_modules) { }
-
-void SimulationTests::createTestLists() {
-    test::TestList* simulation_list = createTestList("Simulation");
+SimulationTests::SimulationTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::TestModule* simulation_list = addModule("Simulation");
     test::Test* basic_test = simulation_list->addTest("basic", [&](test::Test& test) { basicTest(test); });
     test::Test* box_test = simulation_list->addTest("box", { basic_test }, [&](test::Test& test) { boxTest(test); });
     test::Test* ball_test = simulation_list->addTest("ball", { basic_test }, [&](test::Test& test) { ballTest(test); });
@@ -17,14 +15,14 @@ void SimulationTests::createTestLists() {
     test::Test* polygon_serialize_test = simulation_list->addTest("polygon_serialize", { polygon_test }, [&](test::Test& test) { polygonSerializeTest(test); });
     test::Test* chain_serialize_test = simulation_list->addTest("chain_serialize", { chain_test }, [&](test::Test& test) { chainSerializeTest(test); });
     test::Test* revolute_joint_serialize_test = simulation_list->addTest("revolute_joint_serialize", { revolute_joint_test }, [&](test::Test& test) { revoluteJointSerializeTest(test); });
-    std::vector<test::Test*> serialize_tests = { car_test, ball_serialize_test, polygon_serialize_test, revolute_joint_serialize_test };
+    std::vector<test::TestNode*> serialize_tests = { car_test, ball_serialize_test, polygon_serialize_test, revolute_joint_serialize_test };
     test::Test* car_serialize_test = simulation_list->addTest("car_serialize", serialize_tests, [&](test::Test& test) { carSerializeTest(test); });
     test::Test* advance_test = simulation_list->addTest("advance", { box_test }, [&](test::Test& test) { advanceTest(test); });
     test::Test* saveload_test = simulation_list->addTest("saveload", { box_test, box_serialize_test }, [&](test::Test& test) { saveloadTest(test); });
     test::Test* box_stack_test = simulation_list->addTest("box_stack", { advance_test, saveload_test }, [&](test::Test& test) { boxStackTest(test); });
     test::Test* moving_car_test = simulation_list->addTest("moving_car", { advance_test, saveload_test, car_serialize_test }, [&](test::Test& test) { movingCarTest(test); });
 
-    test::TestList* gameobject_list = createTestList("GameObject", { simulation_list });
+    test::TestModule* gameobject_list = addModule("GameObject", { simulation_list });
     test::Test* set_parent_two_test = gameobject_list->addTest("set_parent_two", [&](test::Test& test) { setParentTwoTest(test); });
     test::Test* set_parent_three_test = gameobject_list->addTest("set_parent_three", { set_parent_two_test }, [&](test::Test& test) { setParentThreeTest(test); });
     test::Test* parent_loop_test = gameobject_list->addTest("parent_loop", { set_parent_three_test }, [&](test::Test& test) { parentLoopTest(test); });
@@ -35,7 +33,7 @@ void SimulationTests::createTestLists() {
     test::Test* add_vertex_test = gameobject_list->addTest("add_vertex", { set_vertex_pos_test }, [&](test::Test& test) { addVertexTest(test); });
     test::Test* delete_vertex_test = gameobject_list->addTest("delete_vertex", { set_vertex_pos_test }, [&](test::Test& test) { deleteVertexTest(test); });
 
-    test::TestList* objectlist_list = createTestList("ObjectList");
+    test::TestModule* objectlist_list = addModule("ObjectList");
     test::Test* objects_test = objectlist_list->addTest("objects", [&](test::Test& test) { objectsTest(test); });
     test::Test* joints_test = objectlist_list->addTest("joints", [&](test::Test& test) { jointsTest(test); });
     test::Test* add_test = objectlist_list->addTest("add", { objects_test }, [&](test::Test& test) { addTest(test); });

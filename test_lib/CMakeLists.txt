@@ -20,11 +20,13 @@ set(TEST_LIB_EXAMPLE_HEADER_FILES
     "${TEST_LIB_INCLUDE_DIR}/example/test_list_3.h"
     "${TEST_LIB_INCLUDE_DIR}/example/test_module_1.h"
     "${TEST_LIB_INCLUDE_DIR}/example/test_module_2.h"
+    "${TEST_LIB_INCLUDE_DIR}/example/test_module_3.h"
 )
 set(TEST_LIB_EXAMPLE_SOURCE_FILES
     "${TEST_LIB_SOURCE_DIR}/example/test_list_3.cpp"
     "${TEST_LIB_SOURCE_DIR}/example/test_module_1.cpp"
     "${TEST_LIB_SOURCE_DIR}/example/test_module_2.cpp"
+    "${TEST_LIB_SOURCE_DIR}/example/test_module_3.cpp"
     "${TEST_LIB_SOURCE_DIR}/example/main.cpp"
 )
 add_executable(test_lib_example ${TEST_LIB_EXAMPLE_HEADER_FILES} ${TEST_LIB_EXAMPLE_SOURCE_FILES})

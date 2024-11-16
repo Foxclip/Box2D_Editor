@@ -2,11 +2,9 @@
 #include "common/event.h"
 
 EventTests::EventTests(
-	test::TestManager& manager, const std::vector<TestModule*>& required_modules
-) : TestModule("Event", manager, required_modules) { }
-
-void EventTests::createTestLists() {
-	test::TestList* event_list = createTestList("Event");
+	const std::string& name, test::TestModule* manager, const std::vector<TestNode*>& required_nodes
+) : TestModule(name, manager, required_nodes) {
+	test::TestModule* event_list = addModule("Event");
 	test::Test* basic_test = event_list->addTest("basic", [&](test::Test& test) { basicTest(test); });
 	test::Test* invoke_test = event_list->addTest("invoke", { basic_test }, [&](test::Test& test) { invokeTest(test); });
 	test::Test* invoke_arg1_test = event_list->addTest("invoke_arg1", { invoke_test }, [&](test::Test& test) { invokeArg1Test(test); });

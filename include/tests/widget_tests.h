@@ -102,8 +102,7 @@ struct GenericWidgetTest {
 
 class WidgetTests : public test::TestModule {
 public:
-	WidgetTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
-	void createTestLists() override;
+	WidgetTests(const std::string& name, test::TestModule* manager, const std::vector<TestNode*>& required_nodes = { });
 
 protected:
 	void beforeRunModule() override;

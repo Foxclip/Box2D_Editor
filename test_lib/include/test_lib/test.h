@@ -49,39 +49,50 @@ namespace test {
 		expr; \
 	}
 
-	class Test {
+	class TestModule;
+
+	class TestNode {
 	public:
-		struct Error {
-			enum class Type {
-				Root,
-				Container,
-				Normal,
-			};
-			Type type;
-			std::string str;
-			std::vector<std::unique_ptr<Error>> subentries;
-			explicit Error(const std::string& str, Type type);
-			Error* add(const std::string& message, Type type = Type::Normal);
-			void log() const;
-		};
 		std::string name = "<unnamed>";
-		std::vector<Test*> required;
+		TestModule* parent = nullptr;
+		std::vector<TestNode*> required;
+		bool is_run = false;
 		bool result = false;
 		bool cancelled = false;
-		std::unique_ptr<Error> root_error;
+		bool isRoot() const;
+		virtual bool run() = 0;
+	private:
+	};
+
+	struct TestError {
+		enum class Type {
+			Root,
+			Container,
+			Normal,
+		};
+		Type type;
+		std::string str;
+		std::vector<std::unique_ptr<TestError>> subentries;
+		explicit TestError(const std::string& str, Type type);
+		TestError* add(const std::string& message, Type type = Type::Normal);
+		void log() const;
+	};
+
+	class Test : public TestNode {
+	public:
+		std::unique_ptr<TestError> root_error;
 
 		Test(std::string name, TestFuncType func);
-		Test(std::string name, std::vector<Test*> required, TestFuncType func);
-		bool run();
-		Error* getCurrentError() const;
+		Test(std::string name, std::vector<TestNode*> required, TestFuncType func);
+		bool run() override;
+		TestError* getCurrentError() const;
+		static std::string char_to_str(char c);
+		static std::string char_to_esc(std::string str, bool convert_quotes = true);
 
 	private:
 		friend class ErrorContainer;
 		TestFuncType func;
-		std::stack<Error*> error_stack;
-
-		static std::string char_to_str(char c);
-		static std::string char_to_esc(std::string str, bool convert_quotes = true);
+		std::stack<TestError*> error_stack;
 	};
 
 	class ErrorContainer {
@@ -95,55 +106,33 @@ namespace test {
 		void close();
 	};
 
-	class TestModule;
-
-	class TestList {
+	class TestModule : public TestNode {
 	public:
-		std::string name;
-		std::vector<TestList*> required_lists;
+
+		std::vector<std::unique_ptr<TestNode>> children;
 		std::vector<std::string> passed_list;
 		std::vector<std::string> cancelled_list;
 		std::vector<std::string> failed_list;
-		bool is_run = false;
-		std::function<void(void)> OnBeforeRunAllTests = []() { };
-		std::function<void(void)> OnAfterRunAllTests = []() { };
+		size_t max_test_name = 0;
+		bool print_summary_enabled = false;
+		std::function<void(void)> OnBeforeRun = []() { };
+		std::function<void(void)> OnAfterRun = []() { };
 		std::function<void(void)> OnBeforeRunTest = []() { };
 		std::function<void(void)> OnAfterRunTest = []() { };
 
-		TestList(const std::string& name, TestModule& module, const std::vector<TestList*>& required_lists = { });
-		Test* addTest(std::string name, TestFuncType func);
-		Test* addTest(std::string name, std::vector<Test*> required, TestFuncType func);
-		std::vector<Test*> getTestList() const;
-		void runTests();
-
-	protected:
-		TestModule& module;
-		std::vector<std::unique_ptr<Test>> test_list;
-
-	private:
-
-	};
-
-	class TestManager;
-
-	class TestModule {
-	public:
-		std::string name;
-		std::vector<TestModule*> required_modules;
-		std::vector<std::unique_ptr<TestList>> test_lists;
-		std::vector<std::string> passed_list;
-		std::vector<std::string> cancelled_list;
-		std::vector<std::string> failed_list;
-		bool is_run = false;
-
-		TestModule(const std::string& name, TestManager& manager, const std::vector<TestModule*>& required_modules = { });
-		virtual void createTestLists() = 0;
-		TestList* createTestList(const std::string& name, const std::vector<TestList*>& required_lists = { });
+		TestModule(const std::string& name, TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
+		Test* addTest(const std::string& name, TestFuncType func);
+		Test* addTest(const std::string& name, const std::vector<TestNode*>& required, TestFuncType func);
+		TestModule* addModule(const std::string& name, const std::vector<TestNode*>& required = { });
 		template<typename T>
-		requires std::derived_from<T, TestList>
-		TestList* createTestList(const std::string& name, const std::vector<TestList*>& required_lists = { });
-		std::vector<Test*> getTestList() const;
-		void runTests();
+		requires std::derived_from<T, TestModule>
+		TestModule* addModule(const std::string& name, const std::vector<TestNode*>& required = { });
+		TestModule* getRoot();
+		std::vector<TestNode*> getChildren() const;
+		std::vector<Test*> getChildTests() const;
+		std::vector<TestModule*> getChildModules() const;
+		std::vector<Test*> getAllTests() const;
+		bool run() override;
 		static void printSummary(
 			const std::vector<std::string>& passed_list,
 			const std::vector<std::string>& cancelled_list,
@@ -151,8 +140,6 @@ namespace test {
 		);
 
 	protected:
-		friend class TestList;
-		TestManager& manager;
 
 		virtual void beforeRunModule();
 		virtual void afterRunModule();
@@ -180,30 +167,12 @@ namespace test {
 
 	};
 
-	class TestManager {
-	public:
-		bool print_module_summary = false;
-		bool print_list_summary = false;
-
-		template<typename T>
-		requires std::derived_from<T, TestModule>
-		TestModule* addModule(const std::vector<TestModule*>& required_modules = { });
-		void runAllModules();
-
-	private:
-		friend class TestList;
-		friend class Test;
-		std::vector<std::unique_ptr<TestModule>> modules;
-		size_t max_test_name = 0;
-
-	};
-
 	template<typename T>
-	requires std::derived_from<T, TestList>
-	inline TestList* TestModule::createTestList(const std::string& name, const std::vector<TestList*>& required_lists) {
-		std::unique_ptr<TestList> test_list = std::make_unique<T>(name, *this, required_lists);
-		TestList* ptr = test_list.get();
-		test_lists.push_back(std::move(test_list));
+	requires std::derived_from<T, TestModule>
+	inline TestModule* TestModule::addModule(const std::string& name, const std::vector<TestNode*>& required) {
+		std::unique_ptr<TestModule> uptr = std::make_unique<T>(name, this, required);
+		TestModule* ptr = uptr.get();
+		children.push_back(std::move(uptr));
 		return ptr;
 	}
 
@@ -279,19 +248,10 @@ namespace test {
 	inline void TestModule::compareFail(Test& test, const std::string& file, size_t line, const std::string& name, T1 actual, T2 expected, TStr to_str) {
 		std::string filename = std::filesystem::path(file).filename().string();
 		std::string location_str = "[" + filename + ":" + std::to_string(line) + "]";
-		Test::Error* error = test.getCurrentError()->add(name + " " + location_str);
+		TestError* error = test.getCurrentError()->add(name + " " + location_str);
 		error->add("Expected value: " + to_str(expected));
 		error->add("Actual value:   " + to_str(actual));
 		test.result = false;
-	}
-
-	template<typename T>
-	requires std::derived_from<T, TestModule>
-	inline TestModule* TestManager::addModule(const std::vector<TestModule*>& required_modules) {
-		std::unique_ptr<T> uptr = std::make_unique<T>(*this, required_modules);
-		T* ptr = uptr.get();
-		modules.push_back(std::move(uptr));
-		return ptr;
 	}
 
 }

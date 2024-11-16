@@ -2,11 +2,9 @@
 #include "editor/UI/outliner.h"
 
 EditorTests::EditorTests(
-	test::TestManager& manager, const std::vector<TestModule*>& required_modules
-) : TestModule("Editor", manager, required_modules) { }
-
-void EditorTests::createTestLists() {
-	test::TestList* list = createTestList("Editor");
+	const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes
+) : TestModule(name, parent, required_nodes) {
+	test::TestModule* list = addModule("Editor");
 	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) { basicTest(test); });
 	test::Test* init_test = list->addTest("init", { basic_test }, [&](test::Test& test) { initTest(test); });
 	test::Test* advance_test = list->addTest("advance", { init_test }, [&](test::Test& test) { advanceTest(test); });

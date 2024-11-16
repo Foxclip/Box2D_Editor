@@ -5,11 +5,10 @@
 
 class SearchIndexTests : public test::TestModule {
 public:
-	SearchIndexTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
-	void createTestLists() override;
+	SearchIndexTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 
 protected:
-	void createTestListUnique(test::TestList* list);
-	void createTestListMultiple(test::TestList* list);
+	void createTestListUnique(test::TestModule* list);
+	void createTestListMultiple(test::TestModule* list);
 
 };

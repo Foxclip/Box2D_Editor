@@ -3,17 +3,15 @@
 #include <ranges>
 
 CompVectorTests::CompVectorTests(
-	test::TestManager& manager, const std::vector<TestModule*>& required_modules
-) : TestModule("CompVector", manager, required_modules) { }
-
-void CompVectorTests::createTestLists() {
-	test::TestList* compvector_test_list = createTestList("CompVector");
-	test::TestList* compvector_uptr_test_list = createTestList("CompVectorUptr");
+	const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes
+) : TestModule(name, parent, required_nodes) {
+	test::TestModule* compvector_test_list = addModule("CompVector");
+	test::TestModule* compvector_uptr_test_list = addModule("CompVectorUptr");
 	createCompVectorList(compvector_test_list);
 	createCompVectorUptrList(compvector_uptr_test_list);
 }
 
-void CompVectorTests::createCompVectorList(test::TestList* list) {
+void CompVectorTests::createCompVectorList(test::TestModule* list) {
 	test::Test* empty_vector_test = list->addTest("empty_vector", [&](test::Test& test) {
 		CompVector<int> vec;
 		T_COMPARE(vec.size(), 0);
@@ -37,7 +35,7 @@ void CompVectorTests::createCompVectorList(test::TestList* list) {
 		T_COMPARE(vec.back(), 3);
 	});
 
-	std::vector<test::Test*> values_tests = { empty_vector_test, one_value_test, multiple_values_test };
+	std::vector<test::TestNode*> values_tests = { empty_vector_test, one_value_test, multiple_values_test };
 
 	test::Test* convert_to_vector_test = list->addTest("convert_to_vector", { values_tests }, [&](test::Test& test) {
 		CompVector<int> cvec = { 1, 2, 3 };
@@ -67,7 +65,7 @@ void CompVectorTests::createCompVectorList(test::TestList* list) {
 		T_CHECK(set_vec == std::vector<int>({ 3, 2, 1 }));
 	});
 
-	std::vector<test::Test*> basic_tests = list->getTestList();
+	std::vector<test::TestNode*> basic_tests = list->getChildren();
 
 	test::Test* add_test = list->addTest("add", { basic_tests }, [&](test::Test& test) {
 		CompVector<int> vec;
@@ -290,7 +288,7 @@ void CompVectorTests::createCompVectorList(test::TestList* list) {
 	});
 }
 
-void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
+void CompVectorTests::createCompVectorUptrList(test::TestModule* list) {
 	test::Test* empty_vector_test = list->addTest("empty_vector", [&](test::Test& test) {
 		CompVectorUptr<int> vec;
 		T_COMPARE(vec.size(), 0);
@@ -314,7 +312,7 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 		T_COMPARE(*vec.back(), 3);
 	});
 
-	std::vector<test::Test*> values_tests = { empty_vector_test, one_value_test, multiple_values_test };
+	std::vector<test::TestNode*> values_tests = { empty_vector_test, one_value_test, multiple_values_test };
 
 	test::Test* convert_to_vector_test = list->addTest("convert_to_vector", { values_tests }, [&](test::Test& test) {
 		int* ptr1 = new int(1);
@@ -346,7 +344,7 @@ void CompVectorTests::createCompVectorUptrList(test::TestList* list) {
 		T_CHECK(set_values == std::vector<int>({ 3, 2, 1 }));
 	});
 
-	std::vector<test::Test*> basic_tests = list->getTestList();
+	std::vector<test::TestNode*> basic_tests = list->getChildren();
 
 	test::Test* add_test = list->addTest("add", { basic_tests }, [&](test::Test& test) {
 		CompVectorUptr<int> vec;

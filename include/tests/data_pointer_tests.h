@@ -2,8 +2,7 @@
 
 class DataPointerTests : public test::TestModule {
 public:
-	DataPointerTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
-	void createTestLists() override;
+	DataPointerTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 
 private:
 	void nullTest(test::Test& test);

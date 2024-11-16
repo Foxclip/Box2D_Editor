@@ -3,8 +3,7 @@
 
 class EditorTests : public test::TestModule {
 public:
-	EditorTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
-	void createTestLists() override;
+	EditorTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 
 private:
 	sf::RenderWindow window;

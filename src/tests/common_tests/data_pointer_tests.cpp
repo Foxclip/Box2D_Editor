@@ -51,11 +51,9 @@ struct AnotherDeleter {
 };
 
 DataPointerTests::DataPointerTests(
-	test::TestManager& manager, const std::vector<TestModule*>& required_modules
-) : TestModule("DataPointer", manager, required_modules) { }
-
-void DataPointerTests::createTestLists() {
-	test::TestList* list = createTestList("DataPointer");
+	const std::string& name, test::TestModule* manager, const std::vector<TestNode*>& required_nodes
+) : TestModule(name, manager, required_nodes) {
+	test::TestModule* list = addModule("DataPointer");
 	list->OnAfterRunTest = [&]() {
 		data_blocks.clear();
 	};

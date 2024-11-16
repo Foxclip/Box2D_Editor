@@ -1,10 +1,8 @@
 #include "tests/widget_tests.h"
 #include <common/utils.h>
 
-WidgetTests::WidgetTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules) : TestModule("Widgets", manager, required_modules) { }
-
-void WidgetTests::createTestLists() {
-    test::TestList* toposort_list = createTestList("Toposort");
+WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::TestModule* toposort_list = addModule("Toposort");
     test::Test* empty_test = toposort_list->addTest("empty", [&](test::Test& test) { toposortEmptyTest(test); });
     test::Test* one_node_test = toposort_list->addTest("one_node", { empty_test }, [&](test::Test& test) { toposort1NodeTest(test); });
     test::Test* three_nodes_test = toposort_list->addTest("three_nodes", { one_node_test }, [&](test::Test& test) { toposort3NodesTest(test); });
@@ -19,7 +17,7 @@ void WidgetTests::createTestLists() {
     test::Test* forking_loop_test = toposort_list->addTest("forking_loop", { loop_event_test }, [&](test::Test& test) { toposortForkingLoopTest(test); });
     test::Test* triangles_loop_test = toposort_list->addTest("triangles_loop", { forking_loop_test }, [&](test::Test& test) { toposortTrianglesLoopTest(test); });
 
-    test::TestList* application_list = createTestList("Application", { toposort_list });
+    test::TestModule* application_list = addModule("Application", { toposort_list });
     test::Test* basic_test = application_list->addTest("basic", [&](test::Test& test) { basicTest(test); });
     test::Test* init_test = application_list->addTest("init", { basic_test }, [&](test::Test& test) { initTest(test); });
     test::Test* start_test = application_list->addTest("start", { init_test }, [&](test::Test& test) { startTest(test); });
@@ -28,7 +26,7 @@ void WidgetTests::createTestLists() {
     test::Test* mouse_events_test = application_list->addTest("mouse_events", { advance_test }, [&](test::Test& test) { mouseEventsTest(test); });
     test::Test* keyboard_events_test = application_list->addTest("keyboard_events", { advance_test }, [&](test::Test& test) { keyboardEventsTest(test); });
 
-    test::TestList* widgets_basic_list = createTestList("WidgetsBasic", { application_list });
+    test::TestModule* widgets_basic_list = addModule("WidgetsBasic", { application_list });
     test::Test* root_widget_test = widgets_basic_list->addTest("root_widget", [&](test::Test& test) { rootWidgetTest(test); });
     test::Test* empty_widget_test = widgets_basic_list->addTest("empty_widget", { root_widget_test }, [&](test::Test& test) { emptyWidgetTest(test); });
     test::Test* rectangle_widget_test = widgets_basic_list->addTest("rectangle_widget", { root_widget_test }, [&](test::Test& test) { rectangleWidgetTest(test); });
@@ -44,34 +42,34 @@ void WidgetTests::createTestLists() {
     test::Test* remove_1_test = widgets_basic_list->addTest("remove_1", { set_parent_test }, [&](test::Test& test) { remove1Test(test); });
     test::Test* remove_2_test = widgets_basic_list->addTest("remove_2", { set_parent_test }, [&](test::Test& test) { remove2Test(test); }); 
 
-    test::TestList* text_widget_list = createTestList("TextWidget", { application_list });
+    test::TestModule* text_widget_list = addModule("TextWidget", { application_list });
     test::Test* text_widget_basic_test = text_widget_list->addTest("basic", [&](test::Test& test) { textWidgetTest(test); });
     test::Test* text_widget_default_font_test = text_widget_list->addTest("default_font", { text_widget_basic_test }, [&](test::Test& test) { textWidgetDefaultFontTest(test); });
 
-    test::TestList* checkbox_widget_list = createTestList("CheckboxWidget", { widgets_basic_list });
+    test::TestModule* checkbox_widget_list = addModule("CheckboxWidget", { widgets_basic_list });
     test::Test* checkbox_widget_basic_test = checkbox_widget_list->addTest("basic", [&](test::Test& test) { checkboxWidgetBasicTest(test); });
     test::Test* checkbox_widget_toggle_test = checkbox_widget_list->addTest("toggle", { checkbox_widget_basic_test }, [&](test::Test& test) { checkboxWidgetToggleTest(test); });
 
-    test::TestList* container_widget_list = createTestList("ContainerWidget", { widgets_basic_list });
+    test::TestModule* container_widget_list = addModule("ContainerWidget", { widgets_basic_list });
     test::Test* container_widget_basic_test = container_widget_list->addTest("basic", [&](test::Test& test) { containerWidgetBasicTest(test); });
     test::Test* container_widget_children_test = container_widget_list->addTest("children", { container_widget_basic_test }, [&](test::Test& test) { containerWidgetChildrenTest(test); });
     test::Test* container_widget_padding_test = container_widget_list->addTest("padding", { container_widget_children_test }, [&](test::Test& test) { containerWidgetPaddingTest(test); });
 
-    test::TestList* size_policy_list = createTestList("SizePolicy", { widgets_basic_list });
+    test::TestModule* size_policy_list = addModule("SizePolicy", { widgets_basic_list });
     test::Test* size_policy_basic_test = size_policy_list->addTest("basic", [&](test::Test& test) { sizePolicyTest(test); });
     test::Test* size_policy_position_test = size_policy_list->addTest("position", [&](test::Test& test) { sizePolicyPositionTest(test); });
     test::Test* size_policy_expand_test = size_policy_list->addTest("expand", [&](test::Test& test) { sizePolicyExpandTest(test); });
     test::Test* size_policy_limits_test = size_policy_list->addTest("limits", { size_policy_expand_test }, [&](test::Test& test) { sizePolicyLimitsTest(test); });
-    std::vector<test::Test*> size_policy_tests = { size_policy_basic_test, size_policy_position_test, size_policy_expand_test, size_policy_limits_test };
+    std::vector<test::TestNode*> size_policy_tests = { size_policy_basic_test, size_policy_position_test, size_policy_expand_test, size_policy_limits_test };
     test::Test* size_policy_combined_test = size_policy_list->addTest("combined", size_policy_tests, [&](test::Test& test) { sizePolicyCombinedTest(test); });
 
-    test::TestList* widget_link_list = createTestList("WidgetLink", { widgets_basic_list, size_policy_list });
+    test::TestModule* widget_link_list = addModule("WidgetLink", { widgets_basic_list, size_policy_list });
     test::Test* widget_link_basic_test = widget_link_list->addTest("basic", [&](test::Test& test) { widgetLinkBasicTest(test); });
     test::Test* widget_link_targets_func_test = widget_link_list->addTest("target_func", [&](test::Test& test) { widgetLinkTargetsFuncTest(test); });
     test::Test* widget_link_container_test = widget_link_list->addTest("container", { widget_link_basic_test }, [&](test::Test& test) { widgetLinkContainerTest(test); });
     test::Test* widget_link_remove_test = widget_link_list->addTest("remove", { widget_link_basic_test }, [&](test::Test& test) { widgetLinkRemoveTest(test); });
 
-    test::TestList* textbox_widget_list = createTestList("TextBoxWidget", { widgets_basic_list, text_widget_list });
+    test::TestModule* textbox_widget_list = addModule("TextBoxWidget", { widgets_basic_list, text_widget_list });
     test::Test* textbox_widget_basic_test = textbox_widget_list->addTest("basic", [&](test::Test& test) { textboxWidgetBasicTest(test); });
     test::Test* textbox_widget_input_test = textbox_widget_list->addTest("input", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetInputTest(test); });
     test::Test* textbox_widget_events_test = textbox_widget_list->addTest("events", { textbox_widget_input_test }, [&](test::Test& test) { textboxWidgetEventsTest(test); });
@@ -86,12 +84,12 @@ void WidgetTests::createTestLists() {
     test::Test* textbox_widget_integer_test = textbox_widget_list->addTest("integer", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetIntegerTest(test); });
     test::Test* textbox_widget_float_test = textbox_widget_list->addTest("float", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetFloatTest(test); });
 
-    test::TestList* canvas_widget_list = createTestList("CanvasWidget", { widgets_basic_list });
+    test::TestModule* canvas_widget_list = addModule("CanvasWidget", { widgets_basic_list });
     test::Test* canvas_widget_basic_test = canvas_widget_list->addTest("basic", [&](test::Test& test) { canvasWidgetBasicTest(test); });
     test::Test* canvas_widget_draw_test = canvas_widget_list->addTest("draw", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetDrawTest(test); });
     test::Test* canvas_widget_alpha_test = canvas_widget_list->addTest("alpha", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetAlphaTest(test); });
 
-    test::TestList* window_widget_list = createTestList("WindowWidget", { widgets_basic_list, text_widget_list });
+    test::TestModule* window_widget_list = addModule("WindowWidget", { widgets_basic_list, text_widget_list });
     test::Test* window_widget_basic_test = window_widget_list->addTest("basic", [&](test::Test& test) { windowWidgetBasicTest(test); });
     test::Test* window_widget_drag_test = window_widget_list->addTest("drag", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetDragTest(test); });
     test::Test* window_widget_children_test = window_widget_list->addTest("children", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetChildrenTest(test); });
@@ -102,18 +100,18 @@ void WidgetTests::createTestLists() {
     test::Test* window_widget_move_to_top_drag_test = window_widget_list->addTest("move_to_top_drag", { window_widget_drag_test }, [&](test::Test& test) { windowWidgetMoveToTopDragTest(test); });
     test::Test* window_widget_move_to_top_resize_test = window_widget_list->addTest("move_to_top_resize", { window_widget_drag_test, window_widget_resize_test }, [&](test::Test& test) { windowWidgetMoveToTopResizeTest(test); });
 
-    test::TestList* dropdown_widget_list = createTestList("DropdownWidget", { widgets_basic_list, text_widget_list });
+    test::TestModule* dropdown_widget_list = addModule("DropdownWidget", { widgets_basic_list, text_widget_list });
     test::Test* dropdown_widget_basic_test = dropdown_widget_list->addTest("basic", [&](test::Test& test) { dropdownWidgetBasicTest(test); });
     test::Test* dropdown_widget_options_1_test = dropdown_widget_list->addTest("options_1", { dropdown_widget_basic_test }, [&](test::Test& test) { dropdownWidgetOptions1Test(test); });
     test::Test* dropdown_widget_options_2_test = dropdown_widget_list->addTest("options_2", { dropdown_widget_options_1_test }, [&](test::Test& test) { dropdownWidgetOptions2Test(test); });
 
-    test::TestList* scroll_area_widget_list = createTestList("ScrollAreaWidget", { widgets_basic_list });
+    test::TestModule* scroll_area_widget_list = addModule("ScrollAreaWidget", { widgets_basic_list });
     test::Test* scroll_area_widget_basic_test = scroll_area_widget_list->addTest("basic", [&](test::Test& test) { scrollAreaWidgetBasicTest(test); });
     test::Test* scroll_area_widget_scroll_test = scroll_area_widget_list->addTest("scroll", { scroll_area_widget_basic_test }, [&](test::Test& test) { scrollAreaWidgetScrollTest(test); });
     test::Test* scroll_area_widget_scrollbar_visibility_test = scroll_area_widget_list->addTest("scrollbar_visibility", { scroll_area_widget_basic_test }, [&](test::Test& test) { scrollAreaWidgetScrollbarVisibilityTest(test); });
     test::Test* scroll_area_widget_scrollbar_container_test = scroll_area_widget_list->addTest("scrollbar_container", { scroll_area_widget_scrollbar_visibility_test }, [&](test::Test& test) { scrollAreaWidgetScrollbarContainerTest(test); });
 
-    test::TestList* tree_view_widget_list = createTestList("TreeViewWidget", { widgets_basic_list });
+    test::TestModule* tree_view_widget_list = addModule("TreeViewWidget", { widgets_basic_list });
     test::Test* tree_view_widget_basic_test = tree_view_widget_list->addTest("basic", [&](test::Test& test) { treeviewWidgetBasicTest(test); });
     test::Test* tree_view_widget_entries_test = tree_view_widget_list->addTest("entries", { tree_view_widget_basic_test }, [&](test::Test& test) { treeviewWidgetEntriesTest(test); });
     test::Test* tree_view_widget_parent1_test = tree_view_widget_list->addTest("parent_1", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent1Test(test); });

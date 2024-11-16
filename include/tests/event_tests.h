@@ -4,8 +4,7 @@
 
 class EventTests : public test::TestModule {
 public:
-	EventTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
-	void createTestLists() override;
+	EventTests(const std::string& name, test::TestModule* manager, const std::vector<TestNode*>& required_nodes = { });
 
 private:
 	void basicTest(test::Test& test);

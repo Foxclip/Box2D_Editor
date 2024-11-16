@@ -5,10 +5,9 @@
 
 class CompVectorTests : public test::TestModule {
 public:
-	CompVectorTests(test::TestManager& manager, const std::vector<TestModule*>& required_modules = { });
-	void createTestLists() override;
+	CompVectorTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { }); 
 
 protected:
-	void createCompVectorList(test::TestList* list);
-	void createCompVectorUptrList(test::TestList* list);
+	void createCompVectorList(test::TestModule* list);
+	void createCompVectorUptrList(test::TestModule* list);
 };
