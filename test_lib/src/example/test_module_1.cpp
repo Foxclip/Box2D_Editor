@@ -3,7 +3,7 @@
 
 ExampleTestModule1::ExampleTestModule1(
 	const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes
-) : TestModule("ExampleModule1", parent, required_nodes) {
+) : TestModule(name, parent, required_nodes) {
 	test::TestModule* list_1 = addModule("List1");
 	test::Test* test_1_1 = list_1->addTest("first", [&](test::Test& test) { test1_1(test); });
 	test::Test* test_1_2 = list_1->addTest("second", { test_1_1 }, [&](test::Test& test) { test1_2(test); });
