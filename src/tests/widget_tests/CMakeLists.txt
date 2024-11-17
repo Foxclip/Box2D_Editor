@@ -3,6 +3,7 @@ set(WIDGET_TESTS_INCLUDE_DIR "${TESTS_INCLUDE_DIR}/widget_tests/")
 set(WIDGET_TESTS_HEADER_FILES
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_application.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_basic.h"
+    "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_text.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_toposort.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests.h"
 )

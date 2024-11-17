@@ -50,9 +50,6 @@ protected:
 	void afterRunModule() override;
 
 private:
-	void textWidgetTest(test::Test& test);
-	void textWidgetDefaultFontTest(test::Test& test);
-
 	void checkboxWidgetBasicTest(test::Test& test);
 	void checkboxWidgetToggleTest(test::Test& test);
 

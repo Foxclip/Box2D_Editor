@@ -1,6 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_application.h"
 #include "tests/widget_tests/widget_tests_basic.h"
+#include "tests/widget_tests/widget_tests_text.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
 #include "common/utils.h"
 
@@ -8,10 +9,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     test::TestModule* toposort_list = addModule<WidgetTestsToposort>("Toposort");
     test::TestModule* application_list = addModule<WidgetTestsApplication>("Application", { toposort_list });
     test::TestModule* widgets_basic_list = addModule<WidgetTestsBasic>("WidgetsBasic", { application_list });
-
-    test::TestModule* text_widget_list = addModule("TextWidget", { application_list });
-    test::Test* text_widget_basic_test = text_widget_list->addTest("basic", [&](test::Test& test) { textWidgetTest(test); });
-    test::Test* text_widget_default_font_test = text_widget_list->addTest("default_font", { text_widget_basic_test }, [&](test::Test& test) { textWidgetDefaultFontTest(test); });
+    test::TestModule* text_widget_list = addModule<WidgetTestsText>("TextWidget", { application_list });
 
     test::TestModule* checkbox_widget_list = addModule("CheckboxWidget", { widgets_basic_list });
     test::Test* checkbox_widget_basic_test = checkbox_widget_list->addTest("basic", [&](test::Test& test) { checkboxWidgetBasicTest(test); });
