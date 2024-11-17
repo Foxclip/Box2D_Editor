@@ -126,7 +126,7 @@ namespace test {
 		TestModule* addModule(const std::string& name, const std::vector<TestNode*>& required = { });
 		template<typename T>
 		requires std::derived_from<T, TestModule>
-		TestModule* addModule(const std::string& name, const std::vector<TestNode*>& required = { });
+		T* addModule(const std::string& name, const std::vector<TestNode*>& required = { });
 		TestModule* getRoot();
 		std::vector<TestNode*> getChildren() const;
 		std::vector<Test*> getChildTests() const;
@@ -169,9 +169,9 @@ namespace test {
 
 	template<typename T>
 	requires std::derived_from<T, TestModule>
-	inline TestModule* TestModule::addModule(const std::string& name, const std::vector<TestNode*>& required) {
-		std::unique_ptr<TestModule> uptr = std::make_unique<T>(name, this, required);
-		TestModule* ptr = uptr.get();
+	inline T* TestModule::addModule(const std::string& name, const std::vector<TestNode*>& required) {
+		std::unique_ptr<T> uptr = std::make_unique<T>(name, this, required);
+		T* ptr = uptr.get();
 		children.push_back(std::move(uptr));
 		return ptr;
 	}

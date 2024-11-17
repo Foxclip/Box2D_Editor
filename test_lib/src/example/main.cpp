@@ -6,9 +6,9 @@
 void run_tests() {
     test::TestModule root_module("Example tests", nullptr);
     root_module.print_summary_enabled = true;
-    test::TestModule* module_1 = root_module.addModule<ExampleTestModule1>("ExampleModule1");
-    test::TestModule* module_2 = root_module.addModule<ExampleTestModule2>("ExampleModule2", { module_1 });
-    test::TestModule* module_3 = root_module.addModule<ExampleTestModule3>("ExampleModule3");
+    ExampleTestModule1* module_1 = root_module.addModule<ExampleTestModule1>("ExampleModule1");
+    ExampleTestModule2* module_2 = root_module.addModule<ExampleTestModule2>("ExampleModule2", { module_1 });
+    ExampleTestModule3* module_3 = root_module.addModule<ExampleTestModule3>("ExampleModule3");
     for (test::TestModule* module : root_module.getChildModules()) {
         module->print_summary_enabled = true;
     }

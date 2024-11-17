@@ -16,20 +16,20 @@
 #include "common/utils.h"
 
 WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
-    test::TestModule* toposort_list = addModule<WidgetTestsToposort>("Toposort");
-    test::TestModule* application_list = addModule<WidgetTestsApplication>("Application", { toposort_list });
-    test::TestModule* widgets_basic_list = addModule<WidgetTestsBasic>("WidgetsBasic", { application_list });
-    test::TestModule* text_widget_list = addModule<WidgetTestsText>("TextWidget", { application_list });
-    test::TestModule* checkbox_widget_list = addModule<WidgetTestsCheckbox>("CheckboxWidget", { widgets_basic_list });
-    test::TestModule* container_widget_list = addModule<WidgetTestsContainer>("ContainerWidget", { widgets_basic_list });
-    test::TestModule* size_policy_list = addModule<WidgetTestsSizePolicy>("SizePolicy", { widgets_basic_list });
-    test::TestModule* widget_link_list = addModule<WidgetTestsWidgetLink>("WidgetLink", { widgets_basic_list, size_policy_list });
-    test::TestModule* textbox_widget_list = addModule<WidgetTestsTextbox>("TextBoxWidget", { widgets_basic_list, text_widget_list });
-    test::TestModule* canvas_widget_list = addModule<WidgetTestsCanvas>("CanvasWidget", { widgets_basic_list });
-    test::TestModule* window_widget_list = addModule<WidgetTestsWindow>("WindowWidget", { widgets_basic_list, text_widget_list });
-    test::TestModule* dropdown_widget_list = addModule<WidgetTestsDropdown>("DropdownWidget", { widgets_basic_list, text_widget_list });
-    test::TestModule* scroll_area_widget_list = addModule<WidgetTestsScrollArea>("ScrollAreaWidget", { widgets_basic_list });
-    test::TestModule* tree_view_widget_list = addModule<WidgetTestsTreeView>("TreeViewWidget", { widgets_basic_list });
+    WidgetTestsToposort* toposort_list = addModule<WidgetTestsToposort>("Toposort");
+    WidgetTestsApplication* application_list = addModule<WidgetTestsApplication>("Application", { toposort_list });
+    WidgetTestsBasic* widgets_basic_list = addModule<WidgetTestsBasic>("WidgetsBasic", { application_list });
+    WidgetTestsText* text_widget_list = addModule<WidgetTestsText>("TextWidget", { application_list });
+    WidgetTestsCheckbox* checkbox_widget_list = addModule<WidgetTestsCheckbox>("CheckboxWidget", { widgets_basic_list });
+    WidgetTestsContainer* container_widget_list = addModule<WidgetTestsContainer>("ContainerWidget", { widgets_basic_list });
+    WidgetTestsSizePolicy* size_policy_list = addModule<WidgetTestsSizePolicy>("SizePolicy", { widgets_basic_list });
+    WidgetTestsWidgetLink* widget_link_list = addModule<WidgetTestsWidgetLink>("WidgetLink", { widgets_basic_list, size_policy_list });
+    WidgetTestsTextbox* textbox_widget_list = addModule<WidgetTestsTextbox>("TextBoxWidget", { widgets_basic_list, text_widget_list });
+    WidgetTestsCanvas* canvas_widget_list = addModule<WidgetTestsCanvas>("CanvasWidget", { widgets_basic_list });
+    WidgetTestsWindow* window_widget_list = addModule<WidgetTestsWindow>("WindowWidget", { widgets_basic_list, text_widget_list });
+    WidgetTestsDropdown* dropdown_widget_list = addModule<WidgetTestsDropdown>("DropdownWidget", { widgets_basic_list, text_widget_list });
+    WidgetTestsScrollArea* scroll_area_widget_list = addModule<WidgetTestsScrollArea>("ScrollAreaWidget", { widgets_basic_list });
+    WidgetTestsTreeView* tree_view_widget_list = addModule<WidgetTestsTreeView>("TreeViewWidget", { widgets_basic_list });
 }
 
 void WidgetTests::beforeRunModule() {

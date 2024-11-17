@@ -14,7 +14,7 @@ ExampleTestModule1::ExampleTestModule1(
 	test::Test* test_2_2 = list_2->addTest("second", [&](test::Test& test) { test2_2(test); });
 	test::Test* test_2_3 = list_2->addTest("third", { test_2_1, test_2_2 }, [&](test::Test& test) { test2_3(test); });
 
-	test::TestModule* list_3 = addModule<TestList3>("List3", { list_2 });
+	TestList3* list_3 = addModule<TestList3>("List3", { list_2 });
 }
 
 void ExampleTestModule1::test1_1(test::Test& test) {
