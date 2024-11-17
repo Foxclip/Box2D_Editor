@@ -1,7 +1,13 @@
 #include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_checkbox.h"
 
-void WidgetTests::checkboxWidgetBasicTest(test::Test& test) {
-    fw::Application application(window);
+WidgetTestsCheckbox::WidgetTestsCheckbox(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::Test* checkbox_widget_basic_test = addTest("basic", [&](test::Test& test) { checkboxWidgetBasicTest(test); });
+    test::Test* checkbox_widget_toggle_test = addTest("toggle", { checkbox_widget_basic_test }, [&](test::Test& test) { checkboxWidgetToggleTest(test); });
+}
+
+void WidgetTestsCheckbox::checkboxWidgetBasicTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -44,7 +50,7 @@ void WidgetTests::checkboxWidgetBasicTest(test::Test& test) {
     gwt.visual_local_bounds = gwt.local_bounds;
     gwt.visual_global_bounds = gwt.global_bounds;
     gwt.visual_parent_local_bounds = gwt.global_bounds;
-    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    T_WRAP_CONTAINER(WidgetTests::genericWidgetTest(gwt));
 
     if (T_COMPARE(checkbox_widget->getChildren().size(), 1)) {
         fw::RectangleWidget* check_widget = dynamic_cast<fw::RectangleWidget*>(checkbox_widget->getChild(0));
@@ -55,8 +61,8 @@ void WidgetTests::checkboxWidgetBasicTest(test::Test& test) {
     T_COMPARE(checkbox_widget->getFillColor(), sf::Color(50, 50, 50), &WidgetTests::colorToStr);
 }
 
-void WidgetTests::checkboxWidgetToggleTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsCheckbox::checkboxWidgetToggleTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     fw::CheckboxWidget* checkbox_widget = application.getWidgets().createCheckboxWidget();
@@ -69,4 +75,12 @@ void WidgetTests::checkboxWidgetToggleTest(test::Test& test) {
     application.mouseLeftRelease();
     application.advance();
     T_CHECK(checkbox_widget->getValue());
+}
+
+sf::RenderWindow& WidgetTestsCheckbox::getWindow() {
+    return dynamic_cast<WidgetTests*>(parent)->window;
+}
+
+fw::Font& WidgetTestsCheckbox::getFont() {
+    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

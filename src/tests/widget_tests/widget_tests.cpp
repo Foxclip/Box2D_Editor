@@ -1,6 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_application.h"
 #include "tests/widget_tests/widget_tests_basic.h"
+#include "tests/widget_tests/widget_tests_checkbox.h"
 #include "tests/widget_tests/widget_tests_text.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
 #include "common/utils.h"
@@ -10,10 +11,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     test::TestModule* application_list = addModule<WidgetTestsApplication>("Application", { toposort_list });
     test::TestModule* widgets_basic_list = addModule<WidgetTestsBasic>("WidgetsBasic", { application_list });
     test::TestModule* text_widget_list = addModule<WidgetTestsText>("TextWidget", { application_list });
-
-    test::TestModule* checkbox_widget_list = addModule("CheckboxWidget", { widgets_basic_list });
-    test::Test* checkbox_widget_basic_test = checkbox_widget_list->addTest("basic", [&](test::Test& test) { checkboxWidgetBasicTest(test); });
-    test::Test* checkbox_widget_toggle_test = checkbox_widget_list->addTest("toggle", { checkbox_widget_basic_test }, [&](test::Test& test) { checkboxWidgetToggleTest(test); });
+    test::TestModule* checkbox_widget_list = addModule<WidgetTestsCheckbox>("CheckboxWidget", { widgets_basic_list });
 
     test::TestModule* container_widget_list = addModule("ContainerWidget", { widgets_basic_list });
     test::Test* container_widget_basic_test = container_widget_list->addTest("basic", [&](test::Test& test) { containerWidgetBasicTest(test); });

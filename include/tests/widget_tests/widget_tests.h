@@ -50,9 +50,6 @@ protected:
 	void afterRunModule() override;
 
 private:
-	void checkboxWidgetBasicTest(test::Test& test);
-	void checkboxWidgetToggleTest(test::Test& test);
-
 	void containerWidgetBasicTest(test::Test& test);
 	void containerWidgetChildrenTest(test::Test& test);
 	void containerWidgetPaddingTest(test::Test& test);
