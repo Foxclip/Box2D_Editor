@@ -1,6 +1,22 @@
-#include "tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_toposort.h"
 
-void WidgetTests::toposortEmptyTest(test::Test& test) {
+WidgetTestsToposort::WidgetTestsToposort(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::Test* empty_test = addTest("empty", [&](test::Test& test) { toposortEmptyTest(test); });
+    test::Test* one_node_test = addTest("one_node", { empty_test }, [&](test::Test& test) { toposort1NodeTest(test); });
+    test::Test* three_nodes_test = addTest("three_nodes", { one_node_test }, [&](test::Test& test) { toposort3NodesTest(test); });
+    test::Test* four_nodes_diamond_test = addTest("four_nodes_diamond", { three_nodes_test }, [&](test::Test& test) { toposort4NodesDiamondTest(test); });
+    test::Test* five_nodes_x_test = addTest("five_nodes_x", { three_nodes_test }, [&](test::Test& test) { toposort5NodesXTest(test); });
+    test::Test* five_nodes_random_test = addTest("five_nodes_random", { three_nodes_test }, [&](test::Test& test) { toposort5NodesRandomTest(test); });
+    test::Test* hair_test = addTest("hair", { three_nodes_test }, [&](test::Test& test) { toposortHairTest(test); });
+    test::Test* inverse_hair_test = addTest("inverse_hair", { three_nodes_test }, [&](test::Test& test) { toposortInverseHairTest(test); });
+    test::Test* loop_exception_test = addTest("loop_exception", { three_nodes_test }, [&](test::Test& test) { toposortLoopExceptionTest(test); });
+    test::Test* loop_event_test = addTest("loop_event", { three_nodes_test }, [&](test::Test& test) { toposortLoopEventTest(test); });
+    test::Test* two_loops_test = addTest("two_loops", { loop_event_test }, [&](test::Test& test) { toposortTwoLoopsTest(test); });
+    test::Test* forking_loop_test = addTest("forking_loop", { loop_event_test }, [&](test::Test& test) { toposortForkingLoopTest(test); });
+    test::Test* triangles_loop_test = addTest("triangles_loop", { forking_loop_test }, [&](test::Test& test) { toposortTrianglesLoopTest(test); });
+}
+
+void WidgetTestsToposort::toposortEmptyTest(test::Test& test) {
     NodeList list;
     std::vector<std::vector<Node*>> sorted = fw::toposort(
         list.getNodes(), &Node::getParents
@@ -8,7 +24,7 @@ void WidgetTests::toposortEmptyTest(test::Test& test) {
     T_CHECK(sorted.size() == 0);
 }
 
-void WidgetTests::toposort1NodeTest(test::Test& test) {
+void WidgetTestsToposort::toposort1NodeTest(test::Test& test) {
     NodeList list;
     Node* node = list.createNode("A");
     std::vector<std::vector<Node*>> sorted = fw::toposort(
@@ -21,7 +37,7 @@ void WidgetTests::toposort1NodeTest(test::Test& test) {
     }
 }
 
-void WidgetTests::toposort3NodesTest(test::Test& test) {
+void WidgetTestsToposort::toposort3NodesTest(test::Test& test) {
     NodeList list;
     Node* nodeA = list.createNode("A");
     Node* nodeB = list.createNode("B");
@@ -44,7 +60,7 @@ void WidgetTests::toposort3NodesTest(test::Test& test) {
     }
 }
 
-void WidgetTests::toposort4NodesDiamondTest(test::Test& test) {
+void WidgetTestsToposort::toposort4NodesDiamondTest(test::Test& test) {
     NodeList list;
     Node* nodeA = list.createNode("A");
     Node* nodeB = list.createNode("B");
@@ -71,7 +87,7 @@ void WidgetTests::toposort4NodesDiamondTest(test::Test& test) {
     }
 }
 
-void WidgetTests::toposort5NodesXTest(test::Test& test) {
+void WidgetTestsToposort::toposort5NodesXTest(test::Test& test) {
     NodeList list;
     Node* nodeA = list.createNode("A");
     Node* nodeB = list.createNode("B");
@@ -100,7 +116,7 @@ void WidgetTests::toposort5NodesXTest(test::Test& test) {
     }
 }
 
-void WidgetTests::toposort5NodesRandomTest(test::Test& test) {
+void WidgetTestsToposort::toposort5NodesRandomTest(test::Test& test) {
     NodeList list;
     Node* node0 = list.createNode("N0");
     Node* node1 = list.createNode("N1");
@@ -135,7 +151,7 @@ void WidgetTests::toposort5NodesRandomTest(test::Test& test) {
     }
 }
 
-void WidgetTests::toposortHairTest(test::Test& test) {
+void WidgetTestsToposort::toposortHairTest(test::Test& test) {
     NodeList list;
     Node* center = list.createNode("center");
     Node* short0 = list.createNode("short0");
@@ -172,7 +188,7 @@ void WidgetTests::toposortHairTest(test::Test& test) {
     }
 }
 
-void WidgetTests::toposortInverseHairTest(test::Test& test) {
+void WidgetTestsToposort::toposortInverseHairTest(test::Test& test) {
     NodeList list;
     Node* center = list.createNode("center");
     Node* short0 = list.createNode("short0");
@@ -209,7 +225,7 @@ void WidgetTests::toposortInverseHairTest(test::Test& test) {
     }
 }
 
-void WidgetTests::toposortLoopExceptionTest(test::Test& test) {
+void WidgetTestsToposort::toposortLoopExceptionTest(test::Test& test) {
     NodeList list;
     Node* nodeA = list.createNode("A");
     Node* nodeB = list.createNode("B");
@@ -228,7 +244,7 @@ void WidgetTests::toposortLoopExceptionTest(test::Test& test) {
     T_CHECK(exception);
 }
 
-void WidgetTests::toposortLoopEventTest(test::Test& test) {
+void WidgetTestsToposort::toposortLoopEventTest(test::Test& test) {
     NodeList list;
     Node* nodeA = list.createNode("A");
     Node* nodeB = list.createNode("B");
@@ -251,7 +267,7 @@ void WidgetTests::toposortLoopEventTest(test::Test& test) {
     }
 }
 
-void WidgetTests::toposortTwoLoopsTest(test::Test& test) {
+void WidgetTestsToposort::toposortTwoLoopsTest(test::Test& test) {
     NodeList list;
     Node* nodeA = list.createNode("A");
     Node* nodeB = list.createNode("B");
@@ -287,7 +303,7 @@ void WidgetTests::toposortTwoLoopsTest(test::Test& test) {
     }
 }
 
-void WidgetTests::toposortForkingLoopTest(test::Test& test) {
+void WidgetTestsToposort::toposortForkingLoopTest(test::Test& test) {
     NodeList list;
     Node* nodeA = list.createNode("A");
     Node* nodeB = list.createNode("B");
@@ -325,7 +341,7 @@ void WidgetTests::toposortForkingLoopTest(test::Test& test) {
     }
 }
 
-void WidgetTests::toposortTrianglesLoopTest(test::Test& test) {
+void WidgetTestsToposort::toposortTrianglesLoopTest(test::Test& test) {
     NodeList list;
     Node* nodeA = list.createNode("A");
     Node* nodeB = list.createNode("B");
@@ -380,6 +396,15 @@ void WidgetTests::toposortTrianglesLoopTest(test::Test& test) {
             T_CHECK(loops[4][2] == nodeF);
         }
     }
+}
+
+bool WidgetTestsToposort::layer_contains(const std::vector<Node*>& layer, const std::string& name) {
+    for (Node* node : layer) {
+        if (node->str == name) {
+            return true;
+        }
+    }
+    return false;
 }
 
 Node::Node(const std::string& str) {

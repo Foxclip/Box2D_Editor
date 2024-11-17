@@ -1,4 +1,4 @@
-#include "tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests.h"
 
 void WidgetTests::checkboxWidgetBasicTest(test::Test& test) {
     fw::Application application(window);

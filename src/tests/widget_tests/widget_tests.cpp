@@ -1,21 +1,9 @@
-#include "tests/widget_tests.h"
-#include <common/utils.h>
+#include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_toposort.h"
+#include "common/utils.h"
 
 WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
-    test::TestModule* toposort_list = addModule("Toposort");
-    test::Test* empty_test = toposort_list->addTest("empty", [&](test::Test& test) { toposortEmptyTest(test); });
-    test::Test* one_node_test = toposort_list->addTest("one_node", { empty_test }, [&](test::Test& test) { toposort1NodeTest(test); });
-    test::Test* three_nodes_test = toposort_list->addTest("three_nodes", { one_node_test }, [&](test::Test& test) { toposort3NodesTest(test); });
-    test::Test* four_nodes_diamond_test = toposort_list->addTest("four_nodes_diamond", { three_nodes_test }, [&](test::Test& test) { toposort4NodesDiamondTest(test); });
-    test::Test* five_nodes_x_test = toposort_list->addTest("five_nodes_x", { three_nodes_test }, [&](test::Test& test) { toposort5NodesXTest(test); });
-    test::Test* five_nodes_random_test = toposort_list->addTest("five_nodes_random", { three_nodes_test }, [&](test::Test& test) { toposort5NodesRandomTest(test); });
-    test::Test* hair_test = toposort_list->addTest("hair", { three_nodes_test }, [&](test::Test& test) { toposortHairTest(test); });
-    test::Test* inverse_hair_test = toposort_list->addTest("inverse_hair", { three_nodes_test }, [&](test::Test& test) { toposortInverseHairTest(test); });
-    test::Test* loop_exception_test = toposort_list->addTest("loop_exception", { three_nodes_test }, [&](test::Test& test) { toposortLoopExceptionTest(test); });
-    test::Test* loop_event_test = toposort_list->addTest("loop_event", { three_nodes_test }, [&](test::Test& test) { toposortLoopEventTest(test); });
-    test::Test* two_loops_test = toposort_list->addTest("two_loops", { loop_event_test }, [&](test::Test& test) { toposortTwoLoopsTest(test); });
-    test::Test* forking_loop_test = toposort_list->addTest("forking_loop", { loop_event_test }, [&](test::Test& test) { toposortForkingLoopTest(test); });
-    test::Test* triangles_loop_test = toposort_list->addTest("triangles_loop", { forking_loop_test }, [&](test::Test& test) { toposortTrianglesLoopTest(test); });
+    test::TestModule* toposort_list = addModule<WidgetTestsToposort>("Toposort");
 
     test::TestModule* application_list = addModule("Application", { toposort_list });
     test::Test* basic_test = application_list->addTest("basic", [&](test::Test& test) { basicTest(test); });
@@ -470,15 +458,6 @@ void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
     T_VEC2_APPROX_COMPARE(widget->getVisualGlobalTopRight(), visual_global_corners[1]);
     T_VEC2_APPROX_COMPARE(widget->getVisualGlobalBottomLeft(), visual_global_corners[2]);
     T_VEC2_APPROX_COMPARE(widget->getVisualGlobalBottomRight(), visual_global_corners[3]);
-}
-
-bool WidgetTests::layer_contains(const std::vector<Node*>& layer, const std::string& name) {
-    for (Node* node : layer) {
-        if (node->str == name) {
-            return true;
-        }
-    }
-    return false;
 }
 
 GenericWidgetTest::GenericWidgetTest(
