@@ -12,6 +12,7 @@ set(WIDGET_TESTS_HEADER_FILES
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_size_policy.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_text.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_textbox.h"
+    "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_tree_view.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_toposort.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_widget_link.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_window.h"

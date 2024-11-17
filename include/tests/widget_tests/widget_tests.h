@@ -3,31 +3,7 @@
 #include "widgets/widgets.h"
 #include "test_lib/test.h"
 
-struct GenericWidgetTest {
-	GenericWidgetTest(fw::Application& application, test::Test& test);
-	fw::Application& application;
-	test::Test& test;
-	fw::Widget* widget = nullptr;
-    size_t total_widgets = 0;
-	fw::Widget::WidgetType type = fw::Widget::WidgetType::None;
-    std::string name;
-    std::string fullname;
-    bool is_visual_position_quantized = false;
-    fw::WidgetVisibility visibility;
-	bool is_click_through = false;
-	bool is_mouse_over = false;
-	fw::Widget::FocusableType focusable_type = fw::Widget::FocusableType::NONE;
-	bool is_focused = false;
-	bool clip_children = false;
-	bool force_custom_cursor = false;
-	fw::Widget* parent = nullptr;
-	sf::FloatRect local_bounds;
-	sf::FloatRect global_bounds;
-	sf::FloatRect parent_local_bounds;
-	sf::FloatRect visual_local_bounds;
-	sf::FloatRect visual_global_bounds;
-	sf::FloatRect visual_parent_local_bounds;
-};
+struct GenericWidgetTest;
 
 class WidgetTests : public test::TestModule {
 public:
@@ -64,20 +40,33 @@ protected:
 	void afterRunModule() override;
 
 private:
-	void treeviewWidgetBasicTest(test::Test& test);
-	void treeviewWidgetEntriesTest(test::Test& test);
-	void treeviewWidgetParent1Test(test::Test& test);
-	void treeviewWidgetParent2Test(test::Test& test);
-	void treeviewWidgetSelectTest(test::Test& test);
-	void treeviewWidgetReorderTest(test::Test& test);
-	void treeviewWidgetRemoveTest(test::Test& test);
-	void treeviewWidgetClearTest(test::Test& test);
-	void treeviewWidgetDrag1Test(test::Test& test);
-	void treeviewWidgetDrag2Test(test::Test& test);
 
-	float calcTreeViewEntryHeight(fw::TreeViewEntry* entry);
-	float calcTreeViewHeight(fw::TreeViewWidget* treeview);
+};
 
+struct GenericWidgetTest {
+	GenericWidgetTest(fw::Application& application, test::Test& test);
+	fw::Application& application;
+	test::Test& test;
+	fw::Widget* widget = nullptr;
+	size_t total_widgets = 0;
+	fw::Widget::WidgetType type = fw::Widget::WidgetType::None;
+	std::string name;
+	std::string fullname;
+	bool is_visual_position_quantized = false;
+	fw::WidgetVisibility visibility;
+	bool is_click_through = false;
+	bool is_mouse_over = false;
+	fw::Widget::FocusableType focusable_type = fw::Widget::FocusableType::NONE;
+	bool is_focused = false;
+	bool clip_children = false;
+	bool force_custom_cursor = false;
+	fw::Widget* parent = nullptr;
+	sf::FloatRect local_bounds;
+	sf::FloatRect global_bounds;
+	sf::FloatRect parent_local_bounds;
+	sf::FloatRect visual_local_bounds;
+	sf::FloatRect visual_global_bounds;
+	sf::FloatRect visual_parent_local_bounds;
 };
 
 #define PRESS_MOUSE_LEFT(pos) \

@@ -1,7 +1,21 @@
 #include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_tree_view.h"
 
-void WidgetTests::treeviewWidgetBasicTest(test::Test& test) {
-    fw::Application application(window);
+WidgetTestsTreeView::WidgetTestsTreeView(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::Test* tree_view_widget_basic_test = addTest("basic", [&](test::Test& test) { treeviewWidgetBasicTest(test); });
+    test::Test* tree_view_widget_entries_test = addTest("entries", { tree_view_widget_basic_test }, [&](test::Test& test) { treeviewWidgetEntriesTest(test); });
+    test::Test* tree_view_widget_parent1_test = addTest("parent_1", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent1Test(test); });
+    test::Test* tree_view_widget_parent2_test = addTest("parent_2", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent2Test(test); });
+    test::Test* tree_view_widget_select_test = addTest("select", { tree_view_widget_parent1_test }, [&](test::Test& test) { treeviewWidgetSelectTest(test); });
+    test::Test* tree_view_widget_reorder_test = addTest("reorder", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetReorderTest(test); });
+    test::Test* tree_view_widget_remove_test = addTest("remove", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetRemoveTest(test); });
+    test::Test* tree_view_widget_clear_test = addTest("clear", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetClearTest(test); });
+    test::Test* tree_view_widget_drag_1_test = addTest("drag_1", { tree_view_widget_reorder_test }, [&](test::Test& test) { treeviewWidgetDrag1Test(test); });
+    test::Test* tree_view_widget_drag_2_test = addTest("drag_2", { tree_view_widget_drag_1_test }, [&](test::Test& test) { treeviewWidgetDrag2Test(test); });
+}
+
+void WidgetTestsTreeView::treeviewWidgetBasicTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -42,13 +56,13 @@ void WidgetTests::treeviewWidgetBasicTest(test::Test& test) {
     gwt.visual_local_bounds = gwt.local_bounds;
     gwt.visual_global_bounds = gwt.global_bounds;
     gwt.visual_parent_local_bounds = gwt.global_bounds;
-    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    T_WRAP_CONTAINER(WidgetTests::genericWidgetTest(gwt));
 }
 
-void WidgetTests::treeviewWidgetEntriesTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTreeView::treeviewWidgetEntriesTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     application.start(true);
     application.advance();
     sf::Vector2f size(100.0f, 100.0f);
@@ -67,10 +81,10 @@ void WidgetTests::treeviewWidgetEntriesTest(test::Test& test) {
     T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
 }
 
-void WidgetTests::treeviewWidgetParent1Test(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTreeView::treeviewWidgetParent1Test(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     application.start(true);
     application.advance();
     sf::Vector2f size(100.0f, 100.0f);
@@ -96,10 +110,10 @@ void WidgetTests::treeviewWidgetParent1Test(test::Test& test) {
     T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
 }
 
-void WidgetTests::treeviewWidgetParent2Test(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTreeView::treeviewWidgetParent2Test(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     application.start(true);
     application.advance();
     sf::Vector2f size(100.0f, 100.0f);
@@ -121,10 +135,10 @@ void WidgetTests::treeviewWidgetParent2Test(test::Test& test) {
     T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
 }
 
-void WidgetTests::treeviewWidgetSelectTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTreeView::treeviewWidgetSelectTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     application.start(true);
     application.advance();
     sf::Vector2f size(100.0f, 100.0f);
@@ -336,10 +350,10 @@ void WidgetTests::treeviewWidgetSelectTest(test::Test& test) {
     T_CHECK(selected_entries[1] == entry_3_child_2);
 }
 
-void WidgetTests::treeviewWidgetReorderTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTreeView::treeviewWidgetReorderTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     application.start(true);
     application.advance();
     sf::Vector2f size(200.0f, 100.0f);
@@ -403,10 +417,10 @@ void WidgetTests::treeviewWidgetReorderTest(test::Test& test) {
     }
 }
 
-void WidgetTests::treeviewWidgetRemoveTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTreeView::treeviewWidgetRemoveTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     application.start(true);
     application.advance();
     sf::Vector2f size(200.0f, 100.0f);
@@ -538,10 +552,10 @@ void WidgetTests::treeviewWidgetRemoveTest(test::Test& test) {
     T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
 }
 
-void WidgetTests::treeviewWidgetClearTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTreeView::treeviewWidgetClearTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     application.start(true);
     application.advance();
     sf::Vector2f size(200.0f, 100.0f);
@@ -587,10 +601,10 @@ void WidgetTests::treeviewWidgetClearTest(test::Test& test) {
     T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
 }
 
-void WidgetTests::treeviewWidgetDrag1Test(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     application.start(true);
     application.advance();
     sf::Vector2f size(200.0f, 100.0f);
@@ -680,10 +694,10 @@ void WidgetTests::treeviewWidgetDrag1Test(test::Test& test) {
     }
 }
 
-void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     application.start(true);
     application.advance();
     sf::Vector2f size(200.0f, 100.0f);
@@ -795,4 +809,44 @@ void WidgetTests::treeviewWidgetDrag2Test(test::Test& test) {
     application.advance();
     T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
     T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3 }));
+}
+
+sf::RenderWindow& WidgetTestsTreeView::getWindow() {
+    return dynamic_cast<WidgetTests*>(parent)->window;
+}
+
+fw::Font& WidgetTestsTreeView::getFont() {
+    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
+}
+
+float WidgetTestsTreeView::calcTreeViewEntryHeight(fw::TreeViewEntry* entry) {
+    float result = 0.0f;
+    result += fw::TREEVIEW_ENTRY_HEIGHT;
+    if (entry->isExpanded()) {
+        for (size_t i = 0; i < entry->getChildrenCount(); i++) {
+            result += fw::TREEVIEW_CONTAINER_PADDING;
+            fw::TreeViewEntry* child = entry->getChild(i);
+            float child_height = calcTreeViewEntryHeight(child);
+            result += child_height;
+        }
+    }
+    return result;
+}
+
+float WidgetTestsTreeView::calcTreeViewHeight(fw::TreeViewWidget* treeview) {
+    float result = 0.0f;
+    if (treeview->getChildrenCount() == 0) {
+        return fw::TREEVIEW_CONTAINER_PADDING;
+    }
+    result += fw::TREEVIEW_CONTAINER_PADDING;
+    for (size_t i = 0; i < treeview->getTopEntryCount(); i++) {
+        fw::TreeViewEntry* entry = treeview->getTopEntry(i);
+        float entry_height = calcTreeViewEntryHeight(entry);
+        result += entry_height;
+        if (i < treeview->getTopEntryCount() - 1) {
+            result += fw::TREEVIEW_CONTAINER_PADDING;
+        }
+    }
+    result += fw::TREEVIEW_CONTAINER_PADDING;
+    return result;
 }

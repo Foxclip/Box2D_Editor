@@ -9,6 +9,7 @@
 #include "tests/widget_tests/widget_tests_size_policy.h"
 #include "tests/widget_tests/widget_tests_text.h"
 #include "tests/widget_tests/widget_tests_textbox.h"
+#include "tests/widget_tests/widget_tests_tree_view.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
 #include "tests/widget_tests/widget_tests_widget_link.h"
 #include "tests/widget_tests/widget_tests_window.h"
@@ -28,18 +29,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     test::TestModule* window_widget_list = addModule<WidgetTestsWindow>("WindowWidget", { widgets_basic_list, text_widget_list });
     test::TestModule* dropdown_widget_list = addModule<WidgetTestsDropdown>("DropdownWidget", { widgets_basic_list, text_widget_list });
     test::TestModule* scroll_area_widget_list = addModule<WidgetTestsScrollArea>("ScrollAreaWidget", { widgets_basic_list });
-
-    test::TestModule* tree_view_widget_list = addModule("TreeViewWidget", { widgets_basic_list });
-    test::Test* tree_view_widget_basic_test = tree_view_widget_list->addTest("basic", [&](test::Test& test) { treeviewWidgetBasicTest(test); });
-    test::Test* tree_view_widget_entries_test = tree_view_widget_list->addTest("entries", { tree_view_widget_basic_test }, [&](test::Test& test) { treeviewWidgetEntriesTest(test); });
-    test::Test* tree_view_widget_parent1_test = tree_view_widget_list->addTest("parent_1", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent1Test(test); });
-    test::Test* tree_view_widget_parent2_test = tree_view_widget_list->addTest("parent_2", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent2Test(test); });
-    test::Test* tree_view_widget_select_test = tree_view_widget_list->addTest("select", { tree_view_widget_parent1_test }, [&](test::Test& test) { treeviewWidgetSelectTest(test); });
-    test::Test* tree_view_widget_reorder_test = tree_view_widget_list->addTest("reorder", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetReorderTest(test); });
-    test::Test* tree_view_widget_remove_test = tree_view_widget_list->addTest("remove", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetRemoveTest(test); });
-    test::Test* tree_view_widget_clear_test = tree_view_widget_list->addTest("clear", { tree_view_widget_parent2_test }, [&](test::Test& test) { treeviewWidgetClearTest(test); });
-    test::Test* tree_view_widget_drag_1_test = tree_view_widget_list->addTest("drag_1", { tree_view_widget_reorder_test }, [&](test::Test& test) { treeviewWidgetDrag1Test(test); });
-    test::Test* tree_view_widget_drag_2_test = tree_view_widget_list->addTest("drag_2", { tree_view_widget_drag_1_test }, [&](test::Test& test) { treeviewWidgetDrag2Test(test); });
+    test::TestModule* tree_view_widget_list = addModule<WidgetTestsTreeView>("TreeViewWidget", { widgets_basic_list });
 }
 
 void WidgetTests::beforeRunModule() {
@@ -187,38 +177,6 @@ void WidgetTests::dragWindow(fw::Application& application, fw::WindowWidget* win
     application.advance();
     application.mouseLeftRelease();
     application.advance();
-}
-
-float WidgetTests::calcTreeViewEntryHeight(fw::TreeViewEntry* entry) {
-    float result = 0.0f;
-    result += fw::TREEVIEW_ENTRY_HEIGHT;
-    if (entry->isExpanded()) {
-        for (size_t i = 0; i < entry->getChildrenCount(); i++) {
-            result += fw::TREEVIEW_CONTAINER_PADDING;
-            fw::TreeViewEntry* child = entry->getChild(i);
-            float child_height = calcTreeViewEntryHeight(child);
-            result += child_height;
-        }
-    }
-    return result;
-}
-
-float WidgetTests::calcTreeViewHeight(fw::TreeViewWidget* treeview) {
-    float result = 0.0f;
-    if (treeview->getChildrenCount() == 0) {
-        return fw::TREEVIEW_CONTAINER_PADDING;
-    }
-    result += fw::TREEVIEW_CONTAINER_PADDING;
-    for (size_t i = 0; i < treeview->getTopEntryCount(); i++) {
-        fw::TreeViewEntry* entry = treeview->getTopEntry(i);
-        float entry_height = calcTreeViewEntryHeight(entry);
-        result += entry_height;
-        if (i < treeview->getTopEntryCount() - 1) {
-            result += fw::TREEVIEW_CONTAINER_PADDING;
-        }
-    }
-    result += fw::TREEVIEW_CONTAINER_PADDING;
-    return result;
 }
 
 void WidgetTests::genericWidgetTest(const GenericWidgetTest& gwt) {
