@@ -50,20 +50,6 @@ protected:
 	void afterRunModule() override;
 
 private:
-	void textboxWidgetBasicTest(test::Test& test);
-	void textboxWidgetInputTest(test::Test& test);
-	void textboxWidgetEventsTest(test::Test& test);
-	void textboxWidgetCursorTest(test::Test& test);
-	void textboxWidgetScrollTest(test::Test& test);
-	void textboxWidgetResizingTest(test::Test& test);
-	void textboxWidgetSelectionTest(test::Test& test);
-	void textboxWidgetMouseClickTest(test::Test& test);
-	void textboxWidgetMouseDragTest(test::Test& test);
-	void textboxWidgetCopyPasteTest(test::Test& test);
-	void textboxWidgetHistoryTest(test::Test& test);
-	void textboxWidgetIntegerTest(test::Test& test);
-	void textboxWidgetFloatTest(test::Test& test);
-
 	void canvasWidgetBasicTest(test::Test& test);
 	void canvasWidgetDrawTest(test::Test& test);
 	void canvasWidgetAlphaTest(test::Test& test);
@@ -98,7 +84,6 @@ private:
 	void treeviewWidgetDrag1Test(test::Test& test);
 	void treeviewWidgetDrag2Test(test::Test& test);
 
-	fw::TextBoxWidget* initTextBox(fw::Application& application, const std::string& test_name, float width, float height) const;
 	void mouseDragGesture(fw::Application& application, const sf::Vector2f& begin_pos, const sf::Vector2f& offset);
 	enum class ResizePoint {
 		TOP_LEFT,

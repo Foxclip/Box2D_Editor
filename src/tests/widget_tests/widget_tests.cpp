@@ -5,6 +5,7 @@
 #include "tests/widget_tests/widget_tests_container.h"
 #include "tests/widget_tests/widget_tests_size_policy.h"
 #include "tests/widget_tests/widget_tests_text.h"
+#include "tests/widget_tests/widget_tests_textbox.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
 #include "tests/widget_tests/widget_tests_widget_link.h"
 #include "common/utils.h"
@@ -18,21 +19,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     test::TestModule* container_widget_list = addModule<WidgetTestsContainer>("ContainerWidget", { widgets_basic_list });
     test::TestModule* size_policy_list = addModule<WidgetTestsSizePolicy>("SizePolicy", { widgets_basic_list });
     test::TestModule* widget_link_list = addModule<WidgetTestsWidgetLink>("WidgetLink", { widgets_basic_list, size_policy_list });
-
-    test::TestModule* textbox_widget_list = addModule("TextBoxWidget", { widgets_basic_list, text_widget_list });
-    test::Test* textbox_widget_basic_test = textbox_widget_list->addTest("basic", [&](test::Test& test) { textboxWidgetBasicTest(test); });
-    test::Test* textbox_widget_input_test = textbox_widget_list->addTest("input", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetInputTest(test); });
-    test::Test* textbox_widget_events_test = textbox_widget_list->addTest("events", { textbox_widget_input_test }, [&](test::Test& test) { textboxWidgetEventsTest(test); });
-    test::Test* textbox_widget_cursor_test = textbox_widget_list->addTest("cursor", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetCursorTest(test); });
-    test::Test* textbox_widget_scroll_test = textbox_widget_list->addTest("scroll", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetScrollTest(test); });
-    test::Test* textbox_widget_resizing_test = textbox_widget_list->addTest("resizing", { textbox_widget_scroll_test }, [&](test::Test& test) { textboxWidgetResizingTest(test); });
-    test::Test* textbox_widget_selection_test = textbox_widget_list->addTest("selection", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetSelectionTest(test); });
-    test::Test* textbox_widget_mouse_click_test = textbox_widget_list->addTest("mouse_click", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetMouseClickTest(test); });
-    test::Test* textbox_widget_mouse_drag_test = textbox_widget_list->addTest("mouse_drag", { textbox_widget_mouse_click_test }, [&](test::Test& test) { textboxWidgetMouseDragTest(test); });
-    test::Test* textbox_widget_copypaste_test = textbox_widget_list->addTest("copypaste", { textbox_widget_selection_test }, [&](test::Test& test) { textboxWidgetCopyPasteTest(test); });
-    test::Test* textbox_widget_history_test = textbox_widget_list->addTest("history", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetHistoryTest(test); });
-    test::Test* textbox_widget_integer_test = textbox_widget_list->addTest("integer", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetIntegerTest(test); });
-    test::Test* textbox_widget_float_test = textbox_widget_list->addTest("float", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetFloatTest(test); });
+    test::TestModule* textbox_widget_list = addModule<WidgetTestsTextbox>("TextBoxWidget", { widgets_basic_list, text_widget_list });
 
     test::TestModule* canvas_widget_list = addModule("CanvasWidget", { widgets_basic_list });
     test::Test* canvas_widget_basic_test = canvas_widget_list->addTest("basic", [&](test::Test& test) { canvasWidgetBasicTest(test); });
@@ -162,24 +149,6 @@ bool WidgetTests::rectApproxCmp(const sf::FloatRect& left, const sf::FloatRect& 
         return false;
     }
     return true;
-}
-
-fw::TextBoxWidget* WidgetTests::initTextBox(fw::Application& application, const std::string& test_name, float width, float height) const {
-    application.init(test_name, 800, 600, 0, false);
-    application.start(true);
-    application.mouseMove(400, 300);
-    application.advance();
-    fw::TextBoxWidget* textbox_widget = application.getWidgets().createTextBoxWidget();
-    textbox_widget->setCharacterSize(20);
-    textbox_widget->setFont(textbox_font);
-    sf::Vector2f position(100.0f, 100.0f);
-    sf::Vector2f size(width, height);
-    std::string value = "Text";
-    textbox_widget->setPosition(position);
-    textbox_widget->setSize(size);
-    textbox_widget->setValue(value);
-    application.advance();
-    return textbox_widget;
 }
 
 void WidgetTests::mouseDragGesture(

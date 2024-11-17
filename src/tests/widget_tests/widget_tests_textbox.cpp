@@ -1,7 +1,24 @@
 #include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_textbox.h"
 
-void WidgetTests::textboxWidgetBasicTest(test::Test& test) {
-    fw::Application application(window);
+WidgetTestsTextbox::WidgetTestsTextbox(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::Test* textbox_widget_basic_test = addTest("basic", [&](test::Test& test) { textboxWidgetBasicTest(test); });
+    test::Test* textbox_widget_input_test = addTest("input", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetInputTest(test); });
+    test::Test* textbox_widget_events_test = addTest("events", { textbox_widget_input_test }, [&](test::Test& test) { textboxWidgetEventsTest(test); });
+    test::Test* textbox_widget_cursor_test = addTest("cursor", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetCursorTest(test); });
+    test::Test* textbox_widget_scroll_test = addTest("scroll", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetScrollTest(test); });
+    test::Test* textbox_widget_resizing_test = addTest("resizing", { textbox_widget_scroll_test }, [&](test::Test& test) { textboxWidgetResizingTest(test); });
+    test::Test* textbox_widget_selection_test = addTest("selection", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetSelectionTest(test); });
+    test::Test* textbox_widget_mouse_click_test = addTest("mouse_click", { textbox_widget_cursor_test }, [&](test::Test& test) { textboxWidgetMouseClickTest(test); });
+    test::Test* textbox_widget_mouse_drag_test = addTest("mouse_drag", { textbox_widget_mouse_click_test }, [&](test::Test& test) { textboxWidgetMouseDragTest(test); });
+    test::Test* textbox_widget_copypaste_test = addTest("copypaste", { textbox_widget_selection_test }, [&](test::Test& test) { textboxWidgetCopyPasteTest(test); });
+    test::Test* textbox_widget_history_test = addTest("history", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetHistoryTest(test); });
+    test::Test* textbox_widget_integer_test = addTest("integer", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetIntegerTest(test); });
+    test::Test* textbox_widget_float_test = addTest("float", { textbox_widget_copypaste_test }, [&](test::Test& test) { textboxWidgetFloatTest(test); });
+}
+
+void WidgetTestsTextbox::textboxWidgetBasicTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -44,13 +61,13 @@ void WidgetTests::textboxWidgetBasicTest(test::Test& test) {
     gwt.visual_local_bounds = gwt.local_bounds;
     gwt.visual_global_bounds = gwt.global_bounds;
     gwt.visual_parent_local_bounds = gwt.global_bounds;
-    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    T_WRAP_CONTAINER(WidgetTests::genericWidgetTest(gwt));
 
     T_COMPARE(textbox_widget->getFillColor(), sf::Color(50, 50, 50), &WidgetTests::colorToStr);
 }
 
-void WidgetTests::textboxWidgetInputTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetInputTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 80.0f, 20.0f);
     CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
@@ -79,8 +96,8 @@ void WidgetTests::textboxWidgetInputTest(test::Test& test) {
     T_CHECK(application.getWidgets().getFocusedWidget() == textbox_widget);
 }
 
-void WidgetTests::textboxWidgetEventsTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetEventsTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 80.0f, 20.0f);
     bool edit_mode = false;
     sf::String value;
@@ -120,8 +137,8 @@ void WidgetTests::textboxWidgetEventsTest(test::Test& test) {
     T_CHECK(cancelled);
 }
 
-void WidgetTests::textboxWidgetCursorTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetCursorTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 80.0f, 20.0f);
     CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
@@ -164,8 +181,8 @@ void WidgetTests::textboxWidgetCursorTest(test::Test& test) {
     T_WRAP_CONTAINER(move_cursor(sf::Keyboard::End, 4));
 }
 
-void WidgetTests::textboxWidgetScrollTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetScrollTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 20.0f, 20.0f);
     CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
@@ -208,8 +225,8 @@ void WidgetTests::textboxWidgetScrollTest(test::Test& test) {
     T_COMPARE(textbox_widget->getLocalCharPos(0).x, zero_pos);
 }
 
-void WidgetTests::textboxWidgetResizingTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetResizingTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 150.0f, 20.0f);
     textbox_widget->setValue("ABCDEFGH");
     const fw::TextWidget* text_widget = textbox_widget->getTextWidget();
@@ -229,8 +246,8 @@ void WidgetTests::textboxWidgetResizingTest(test::Test& test) {
     T_COMPARE(text_widget->getPosition().x, zero_pos);
 }
 
-void WidgetTests::textboxWidgetSelectionTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetSelectionTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 80.0f, 20.0f);
     CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
@@ -297,8 +314,8 @@ void WidgetTests::textboxWidgetSelectionTest(test::Test& test) {
     CHECK_SELECTION(true, "Text", 4, 0, 4);
 }
 
-void WidgetTests::textboxWidgetMouseClickTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetMouseClickTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 80.0f, 20.0f);
     CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
@@ -322,8 +339,8 @@ void WidgetTests::textboxWidgetMouseClickTest(test::Test& test) {
     T_CHECK(!textbox_widget->isFocused());
 }
 
-void WidgetTests::textboxWidgetMouseDragTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetMouseDragTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 80.0f, 20.0f);
 
     auto get_char_pos = [&](size_t index) {
@@ -370,8 +387,8 @@ void WidgetTests::textboxWidgetMouseDragTest(test::Test& test) {
     CHECK_SELECTION(true, "Text", 0, 0, 4);
 }
 
-void WidgetTests::textboxWidgetCopyPasteTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetCopyPasteTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 80.0f, 20.0f);
     CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
@@ -436,8 +453,8 @@ void WidgetTests::textboxWidgetCopyPasteTest(test::Test& test) {
     T_COMPARE(textbox_widget->getValue(), "eTeTeTeteTeTeTet");
 }
 
-void WidgetTests::textboxWidgetHistoryTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetHistoryTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 80.0f, 20.0f);
     CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
@@ -529,8 +546,8 @@ void WidgetTests::textboxWidgetHistoryTest(test::Test& test) {
     CHECK_SELECTION(false, "", 3, -1, -1);
 }
 
-void WidgetTests::textboxWidgetIntegerTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetIntegerTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 80.0f, 20.0f);
     CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
@@ -601,8 +618,8 @@ void WidgetTests::textboxWidgetIntegerTest(test::Test& test) {
     T_CHECK(textbox_widget->isValidValue());
 }
 
-void WidgetTests::textboxWidgetFloatTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsTextbox::textboxWidgetFloatTest(test::Test& test) {
+    fw::Application application(getWindow());
     fw::TextBoxWidget* textbox_widget = initTextBox(application, test.name, 80.0f, 20.0f);
     CLICK_MOUSE(textbox_widget->getGlobalCenter());
 
@@ -713,4 +730,30 @@ void WidgetTests::textboxWidgetFloatTest(test::Test& test) {
     T_CHECK(!textbox_widget->isValidValue());
 
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
+}
+
+sf::RenderWindow& WidgetTestsTextbox::getWindow() {
+    return dynamic_cast<WidgetTests*>(parent)->window;
+}
+
+fw::Font& WidgetTestsTextbox::getFont() {
+    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
+}
+
+fw::TextBoxWidget* WidgetTestsTextbox::initTextBox(fw::Application& application, const std::string& test_name, float width, float height) {
+    application.init(test_name, 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+    fw::TextBoxWidget* textbox_widget = application.getWidgets().createTextBoxWidget();
+    textbox_widget->setCharacterSize(20);
+    textbox_widget->setFont(getFont());
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(width, height);
+    std::string value = "Text";
+    textbox_widget->setPosition(position);
+    textbox_widget->setSize(size);
+    textbox_widget->setValue(value);
+    application.advance();
+    return textbox_widget;
 }
