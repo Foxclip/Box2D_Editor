@@ -2,6 +2,7 @@
 #include "tests/widget_tests/widget_tests_application.h"
 #include "tests/widget_tests/widget_tests_basic.h"
 #include "tests/widget_tests/widget_tests_checkbox.h"
+#include "tests/widget_tests/widget_tests_container.h"
 #include "tests/widget_tests/widget_tests_text.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
 #include "common/utils.h"
@@ -12,11 +13,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     test::TestModule* widgets_basic_list = addModule<WidgetTestsBasic>("WidgetsBasic", { application_list });
     test::TestModule* text_widget_list = addModule<WidgetTestsText>("TextWidget", { application_list });
     test::TestModule* checkbox_widget_list = addModule<WidgetTestsCheckbox>("CheckboxWidget", { widgets_basic_list });
-
-    test::TestModule* container_widget_list = addModule("ContainerWidget", { widgets_basic_list });
-    test::Test* container_widget_basic_test = container_widget_list->addTest("basic", [&](test::Test& test) { containerWidgetBasicTest(test); });
-    test::Test* container_widget_children_test = container_widget_list->addTest("children", { container_widget_basic_test }, [&](test::Test& test) { containerWidgetChildrenTest(test); });
-    test::Test* container_widget_padding_test = container_widget_list->addTest("padding", { container_widget_children_test }, [&](test::Test& test) { containerWidgetPaddingTest(test); });
+    test::TestModule* container_widget_list = addModule<WidgetTestsContainer>("ContainerWidget", { widgets_basic_list });
 
     test::TestModule* size_policy_list = addModule("SizePolicy", { widgets_basic_list });
     test::Test* size_policy_basic_test = size_policy_list->addTest("basic", [&](test::Test& test) { sizePolicyTest(test); });
