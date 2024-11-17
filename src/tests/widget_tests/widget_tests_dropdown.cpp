@@ -1,7 +1,14 @@
 #include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_dropdown.h"
 
-void WidgetTests::dropdownWidgetBasicTest(test::Test& test) {
-    fw::Application application(window);
+WidgetTestsDropdown::WidgetTestsDropdown(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::Test* dropdown_widget_basic_test = addTest("basic", [&](test::Test& test) { dropdownWidgetBasicTest(test); });
+    test::Test* dropdown_widget_options_1_test = addTest("options_1", { dropdown_widget_basic_test }, [&](test::Test& test) { dropdownWidgetOptions1Test(test); });
+    test::Test* dropdown_widget_options_2_test = addTest("options_2", { dropdown_widget_options_1_test }, [&](test::Test& test) { dropdownWidgetOptions2Test(test); });
+}
+
+void WidgetTestsDropdown::dropdownWidgetBasicTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -43,11 +50,11 @@ void WidgetTests::dropdownWidgetBasicTest(test::Test& test) {
     gwt.visual_local_bounds = gwt.local_bounds;
     gwt.visual_global_bounds = gwt.global_bounds;
     gwt.visual_parent_local_bounds = gwt.global_bounds;
-    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    T_WRAP_CONTAINER(WidgetTests::genericWidgetTest(gwt));
 }
 
-void WidgetTests::dropdownWidgetOptions1Test(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsDropdown::dropdownWidgetOptions1Test(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -56,7 +63,7 @@ void WidgetTests::dropdownWidgetOptions1Test(test::Test& test) {
     sf::Vector2f size(40.0f, 20.0f);
     dropdown_widget->setPosition(position);
     dropdown_widget->setSize(size);
-    dropdown_widget->setFont(textbox_font);
+    dropdown_widget->setFont(getFont());
     dropdown_widget->setCharacterSize(15);
     sf::Vector2f dropdown_center = dropdown_widget->getGlobalCenter();
     fw::RectangleWidget* panel_widget = dropdown_widget->getPanelWidget();
@@ -92,8 +99,8 @@ void WidgetTests::dropdownWidgetOptions1Test(test::Test& test) {
     T_CHECK(!panel_widget->isVisible());
 }
 
-void WidgetTests::dropdownWidgetOptions2Test(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsDropdown::dropdownWidgetOptions2Test(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -102,7 +109,7 @@ void WidgetTests::dropdownWidgetOptions2Test(test::Test& test) {
     sf::Vector2f size(40.0f, 20.0f);
     dropdown_widget->setPosition(position);
     dropdown_widget->setSize(size);
-    dropdown_widget->setFont(textbox_font);
+    dropdown_widget->setFont(getFont());
     dropdown_widget->setCharacterSize(15);
     sf::Vector2f dropdown_center = dropdown_widget->getGlobalCenter();
     fw::RectangleWidget* panel_widget = dropdown_widget->getPanelWidget();
@@ -134,4 +141,12 @@ void WidgetTests::dropdownWidgetOptions2Test(test::Test& test) {
     T_COMPARE(dropdown_widget->getOptionText(0), "option1");
     T_COMPARE(dropdown_widget->getOptionText(1), "option3");
     T_COMPARE(dropdown_widget->getOptionText(2), "option2");
+}
+
+sf::RenderWindow& WidgetTestsDropdown::getWindow() {
+    return dynamic_cast<WidgetTests*>(parent)->window;
+}
+
+fw::Font& WidgetTestsDropdown::getFont() {
+    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

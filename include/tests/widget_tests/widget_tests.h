@@ -62,10 +62,6 @@ protected:
 	void afterRunModule() override;
 
 private:
-	void dropdownWidgetBasicTest(test::Test& test);
-	void dropdownWidgetOptions1Test(test::Test& test);
-	void dropdownWidgetOptions2Test(test::Test& test);
-
 	void scrollAreaWidgetBasicTest(test::Test& test);
 	void scrollAreaWidgetScrollTest(test::Test& test);
 	void scrollAreaWidgetScrollbarVisibilityTest(test::Test& test);
