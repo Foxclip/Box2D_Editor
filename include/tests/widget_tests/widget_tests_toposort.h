@@ -2,7 +2,6 @@
 #include "test_lib/test.h"
 #include <random>
 
-class WidgetTests;
 struct Node;
 
 class WidgetTestsToposort : public test::TestModule {

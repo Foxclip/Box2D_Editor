@@ -2,8 +2,6 @@
 #include "widgets/application.h"
 #include "test_lib/test.h"
 
-class WidgetTests;
-
 class WidgetTestsApplication : public test::TestModule {
 public:
 	WidgetTestsApplication(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });

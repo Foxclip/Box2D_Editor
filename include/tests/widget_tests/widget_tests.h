@@ -43,27 +43,13 @@ public:
 	static std::string colorToStr(const sf::Color& color);
 	static std::string anchorToStr(fw::Widget::Anchor anchor);
 	static bool rectApproxCmp(const sf::FloatRect& left, const sf::FloatRect& right);
+	static void genericWidgetTest(const GenericWidgetTest& gwt);
 
 protected:
 	void beforeRunModule() override;
 	void afterRunModule() override;
 
 private:
-	void rootWidgetTest(test::Test& test);
-	void emptyWidgetTest(test::Test& test);
-	void rectangleWidgetTest(test::Test& test);
-	void polygonWidgetBasicTest(test::Test& test);
-	void setParentTest(test::Test& test);
-	void widgetMouseEvents1(test::Test& test);
-	void widgetMouseEvents2(test::Test& test);
-	void dragGestureEventTest(test::Test& test);
-	void eventsTest(test::Test& test);
-	void coordinatesTest(test::Test& test);
-	void findTest(test::Test& test);
-	void anchorTest(test::Test& test);
-	void remove1Test(test::Test& test);
-	void remove2Test(test::Test& test);
-
 	void textWidgetTest(test::Test& test);
 	void textWidgetDefaultFontTest(test::Test& test);
 
@@ -152,7 +138,6 @@ private:
 	void dragWindow(fw::Application& application, fw::WindowWidget* window, const sf::Vector2f& offset);
 	float calcTreeViewEntryHeight(fw::TreeViewEntry* entry);
 	float calcTreeViewHeight(fw::TreeViewWidget* treeview);
-	void genericWidgetTest(const GenericWidgetTest& gwt);
 
 };
 

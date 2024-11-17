@@ -1,7 +1,25 @@
 #include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_basic.h"
 
-void WidgetTests::rootWidgetTest(test::Test& test) {
-    fw::Application application(window);
+WidgetTestsBasic::WidgetTestsBasic(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::Test* root_widget_test = addTest("root_widget", [&](test::Test& test) { rootWidgetTest(test); });
+    test::Test* empty_widget_test = addTest("empty_widget", { root_widget_test }, [&](test::Test& test) { emptyWidgetTest(test); });
+    test::Test* rectangle_widget_test = addTest("rectangle_widget", { root_widget_test }, [&](test::Test& test) { rectangleWidgetTest(test); });
+    test::Test* polygon_widget_basic_test = addTest("polygon_widget_basic", { root_widget_test }, [&](test::Test& test) { polygonWidgetBasicTest(test); });
+    test::Test* set_parent_test = addTest("set_parent", { root_widget_test }, [&](test::Test& test) { setParentTest(test); });
+    test::Test* widget_mouse_events_1_test = addTest("mouse_events_1", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents1(test); });
+    test::Test* widget_mouse_events_2_test = addTest("mouse_events_2", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents2(test); });
+    test::Test* drag_gesture_event_test = addTest("drag_gesture_event", { root_widget_test }, [&](test::Test& test) { dragGestureEventTest(test); });
+    test::Test* events_test = addTest("events", { root_widget_test }, [&](test::Test& test) { eventsTest(test); });
+    test::Test* coordinates_test = addTest("coordinates", { set_parent_test }, [&](test::Test& test) { coordinatesTest(test); });
+    test::Test* find_test = addTest("find", { set_parent_test }, [&](test::Test& test) { findTest(test); });
+    test::Test* anchor_test = addTest("anchor", { set_parent_test }, [&](test::Test& test) { anchorTest(test); });
+    test::Test* remove_1_test = addTest("remove_1", { set_parent_test }, [&](test::Test& test) { remove1Test(test); });
+    test::Test* remove_2_test = addTest("remove_2", { set_parent_test }, [&](test::Test& test) { remove2Test(test); });
+}
+
+void WidgetTestsBasic::rootWidgetTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -39,7 +57,7 @@ void WidgetTests::rootWidgetTest(test::Test& test) {
     gwt.visual_local_bounds = gwt.local_bounds;
     gwt.visual_global_bounds = gwt.local_bounds;
     gwt.visual_parent_local_bounds = gwt.local_bounds;
-    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    T_WRAP_CONTAINER(WidgetTests::genericWidgetTest(gwt));
 
     T_COMPARE(root_widget->getFillColor(), sf::Color::Transparent, &WidgetTests::colorToStr);
 
@@ -47,8 +65,8 @@ void WidgetTests::rootWidgetTest(test::Test& test) {
     T_COMPARE(root_widget->getChildren().size(), 0);
 }
 
-void WidgetTests::emptyWidgetTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::emptyWidgetTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -91,15 +109,15 @@ void WidgetTests::emptyWidgetTest(test::Test& test) {
     gwt.visual_local_bounds = gwt.local_bounds;
     gwt.visual_global_bounds = gwt.global_bounds;
     gwt.visual_parent_local_bounds = gwt.global_bounds;
-    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    T_WRAP_CONTAINER(WidgetTests::genericWidgetTest(gwt));
 
     T_COMPARE(empty_widget->getFillColor(), sf::Color::Transparent, &WidgetTests::colorToStr);
 
     T_COMPARE(empty_widget->getChildren().size(), 0);
 }
 
-void WidgetTests::rectangleWidgetTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::rectangleWidgetTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -141,7 +159,7 @@ void WidgetTests::rectangleWidgetTest(test::Test& test) {
     gwt.visual_local_bounds = gwt.local_bounds;
     gwt.visual_global_bounds = gwt.global_bounds;
     gwt.visual_parent_local_bounds = gwt.global_bounds;
-    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    T_WRAP_CONTAINER(WidgetTests::genericWidgetTest(gwt));
 
     T_CHECK(rectangle_widget->getParent() == root_widget);
     const CompVector<fw::Widget*>& parent_chain = rectangle_widget->getParentChain();
@@ -156,8 +174,8 @@ void WidgetTests::rectangleWidgetTest(test::Test& test) {
     T_COMPARE(rectangle_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
 }
 
-void WidgetTests::polygonWidgetBasicTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::polygonWidgetBasicTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -200,7 +218,7 @@ void WidgetTests::polygonWidgetBasicTest(test::Test& test) {
     gwt.visual_local_bounds = gwt.local_bounds;
     gwt.visual_global_bounds = gwt.global_bounds;
     gwt.visual_parent_local_bounds = gwt.global_bounds;
-    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    T_WRAP_CONTAINER(WidgetTests::genericWidgetTest(gwt));
 
     T_CHECK(polygon_widget->getParent() == root_widget);
     T_COMPARE(polygon_widget->getChildren().size(), 0);
@@ -208,8 +226,8 @@ void WidgetTests::polygonWidgetBasicTest(test::Test& test) {
     T_COMPARE(polygon_widget->getFillColor(), sf::Color::White, &WidgetTests::colorToStr);
 }
 
-void WidgetTests::setParentTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::setParentTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -249,8 +267,8 @@ void WidgetTests::setParentTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(child_global_pos_after, child_global_pos_before);
 }
 
-void WidgetTests::widgetMouseEvents1(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::widgetMouseEvents1(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -464,8 +482,8 @@ void WidgetTests::widgetMouseEvents1(test::Test& test) {
     T_CHECK(mouse_processed);
 }
 
-void WidgetTests::widgetMouseEvents2(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::widgetMouseEvents2(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -663,8 +681,8 @@ void WidgetTests::widgetMouseEvents2(test::Test& test) {
     T_CHECK(mouse_processed_2);
 }
 
-void WidgetTests::dragGestureEventTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::dragGestureEventTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -713,8 +731,8 @@ void WidgetTests::dragGestureEventTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(drag_pos, fw::to2f( mouse_pos_2));
 }
 
-void WidgetTests::eventsTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::eventsTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -763,8 +781,8 @@ void WidgetTests::eventsTest(test::Test& test) {
     T_COMPARE(window_height, 480);
 }
 
-void WidgetTests::coordinatesTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::coordinatesTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -781,8 +799,8 @@ void WidgetTests::coordinatesTest(test::Test& test) {
 
 }
 
-void WidgetTests::findTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::findTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -797,8 +815,8 @@ void WidgetTests::findTest(test::Test& test) {
     T_CHECK(application.getWidgets().find("child") == child_widget);
 }
 
-void WidgetTests::anchorTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::anchorTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -830,8 +848,8 @@ void WidgetTests::anchorTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(child_widget->getPosition(), sf::Vector2f(parent_size.x, parent_size.y) + anchor_offset);
 }
 
-void WidgetTests::remove1Test(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::remove1Test(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -881,8 +899,8 @@ void WidgetTests::remove1Test(test::Test& test) {
     application.advance();
 }
 
-void WidgetTests::remove2Test(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsBasic::remove2Test(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -930,4 +948,8 @@ void WidgetTests::remove2Test(test::Test& test) {
     }
 
     application.advance();
+}
+
+sf::RenderWindow& WidgetTestsBasic::getWindow() {
+    return dynamic_cast<WidgetTests*>(parent)->window;
 }

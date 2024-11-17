@@ -1,27 +1,13 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_application.h"
+#include "tests/widget_tests/widget_tests_basic.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
 #include "common/utils.h"
 
 WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
     test::TestModule* toposort_list = addModule<WidgetTestsToposort>("Toposort");
     test::TestModule* application_list = addModule<WidgetTestsApplication>("Application", { toposort_list });
-
-    test::TestModule* widgets_basic_list = addModule("WidgetsBasic", { application_list });
-    test::Test* root_widget_test = widgets_basic_list->addTest("root_widget", [&](test::Test& test) { rootWidgetTest(test); });
-    test::Test* empty_widget_test = widgets_basic_list->addTest("empty_widget", { root_widget_test }, [&](test::Test& test) { emptyWidgetTest(test); });
-    test::Test* rectangle_widget_test = widgets_basic_list->addTest("rectangle_widget", { root_widget_test }, [&](test::Test& test) { rectangleWidgetTest(test); });
-    test::Test* polygon_widget_basic_test = widgets_basic_list->addTest("polygon_widget_basic", { root_widget_test }, [&](test::Test& test) { polygonWidgetBasicTest(test); });
-    test::Test* set_parent_test = widgets_basic_list->addTest("set_parent", { root_widget_test }, [&](test::Test& test) { setParentTest(test); });
-    test::Test* widget_mouse_events_1_test = widgets_basic_list->addTest("mouse_events_1", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents1(test); });
-    test::Test* widget_mouse_events_2_test = widgets_basic_list->addTest("mouse_events_2", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents2(test); });
-    test::Test* drag_gesture_event_test = widgets_basic_list->addTest("drag_gesture_event", { root_widget_test }, [&](test::Test& test) { dragGestureEventTest(test); });
-    test::Test* events_test = widgets_basic_list->addTest("events", { root_widget_test }, [&](test::Test& test) { eventsTest(test); });
-    test::Test* coordinates_test = widgets_basic_list->addTest("coordinates", { set_parent_test }, [&](test::Test& test) { coordinatesTest(test); });
-    test::Test* find_test = widgets_basic_list->addTest("find", { set_parent_test }, [&](test::Test& test) { findTest(test); });
-    test::Test* anchor_test = widgets_basic_list->addTest("anchor", { set_parent_test }, [&](test::Test& test) { anchorTest(test); });
-    test::Test* remove_1_test = widgets_basic_list->addTest("remove_1", { set_parent_test }, [&](test::Test& test) { remove1Test(test); });
-    test::Test* remove_2_test = widgets_basic_list->addTest("remove_2", { set_parent_test }, [&](test::Test& test) { remove2Test(test); }); 
+    test::TestModule* widgets_basic_list = addModule<WidgetTestsBasic>("WidgetsBasic", { application_list });
 
     test::TestModule* text_widget_list = addModule("TextWidget", { application_list });
     test::Test* text_widget_basic_test = text_widget_list->addTest("basic", [&](test::Test& test) { textWidgetTest(test); });
