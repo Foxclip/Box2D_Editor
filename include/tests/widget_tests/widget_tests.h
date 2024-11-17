@@ -44,22 +44,24 @@ public:
 	static std::string anchorToStr(fw::Widget::Anchor anchor);
 	static bool rectApproxCmp(const sf::FloatRect& left, const sf::FloatRect& right);
 	static void genericWidgetTest(const GenericWidgetTest& gwt);
+	enum class ResizePoint {
+		TOP_LEFT,
+		TOP,
+		TOP_RIGHT,
+		LEFT,
+		RIGHT,
+		BOTTOM_LEFT,
+		BOTTOM,
+		BOTTOM_RIGHT
+	};
+	static void resizeWindow(fw::WindowWidget* window, ResizePoint resize_point, const sf::Vector2f offset);
+	static void dragWindow(fw::Application& application, fw::WindowWidget* window, const sf::Vector2f& offset);
 
 protected:
 	void beforeRunModule() override;
 	void afterRunModule() override;
 
 private:
-	void windowWidgetBasicTest(test::Test& test);
-	void windowWidgetDragTest(test::Test& test);
-	void windowWidgetChildrenTest(test::Test& test);
-	void windowWidgetResizeTest(test::Test& test);
-	void windowWidgetChainTest(test::Test& test);
-	void windowWidgetDragLimitsTest(test::Test& test);
-	void windowWidgetResizeLimitsTest(test::Test& test);
-	void windowWidgetMoveToTopDragTest(test::Test& test);
-	void windowWidgetMoveToTopResizeTest(test::Test& test);
-
 	void dropdownWidgetBasicTest(test::Test& test);
 	void dropdownWidgetOptions1Test(test::Test& test);
 	void dropdownWidgetOptions2Test(test::Test& test);
@@ -80,22 +82,8 @@ private:
 	void treeviewWidgetDrag1Test(test::Test& test);
 	void treeviewWidgetDrag2Test(test::Test& test);
 
-	void mouseDragGesture(fw::Application& application, const sf::Vector2f& begin_pos, const sf::Vector2f& offset);
-	enum class ResizePoint {
-		TOP_LEFT,
-		TOP,
-		TOP_RIGHT,
-		LEFT,
-		RIGHT,
-		BOTTOM_LEFT,
-		BOTTOM,
-		BOTTOM_RIGHT
-	};
-	sf::Vector2f getGrabPos(fw::WindowWidget* window, ResizePoint resize_point);
-	void resizeWindow(fw::WindowWidget* window, ResizePoint resize_point, const sf::Vector2f offset);
-	void resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget);
-	sf::Vector2f getHeaderCenter(fw::WindowWidget* window);
-	void dragWindow(fw::Application& application, fw::WindowWidget* window, const sf::Vector2f& offset);
+	static void mouseDragGesture(fw::Application& application, const sf::Vector2f& begin_pos, const sf::Vector2f& offset);
+	static sf::Vector2f getGrabPos(fw::WindowWidget* window, ResizePoint resize_point);
 	float calcTreeViewEntryHeight(fw::TreeViewEntry* entry);
 	float calcTreeViewHeight(fw::TreeViewWidget* treeview);
 

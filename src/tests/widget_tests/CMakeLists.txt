@@ -12,6 +12,7 @@ set(WIDGET_TESTS_HEADER_FILES
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_textbox.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_toposort.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_widget_link.h"
+    "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_window.h"
 )
 set(WIDGET_TESTS_SOURCE_FILES
     "widget_tests.cpp"

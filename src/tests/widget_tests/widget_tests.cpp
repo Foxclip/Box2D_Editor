@@ -9,6 +9,7 @@
 #include "tests/widget_tests/widget_tests_textbox.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
 #include "tests/widget_tests/widget_tests_widget_link.h"
+#include "tests/widget_tests/widget_tests_window.h"
 #include "common/utils.h"
 
 WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
@@ -22,17 +23,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     test::TestModule* widget_link_list = addModule<WidgetTestsWidgetLink>("WidgetLink", { widgets_basic_list, size_policy_list });
     test::TestModule* textbox_widget_list = addModule<WidgetTestsTextbox>("TextBoxWidget", { widgets_basic_list, text_widget_list });
     test::TestModule* canvas_widget_list = addModule<WidgetTestsCanvas>("CanvasWidget", { widgets_basic_list });
-
-    test::TestModule* window_widget_list = addModule("WindowWidget", { widgets_basic_list, text_widget_list });
-    test::Test* window_widget_basic_test = window_widget_list->addTest("basic", [&](test::Test& test) { windowWidgetBasicTest(test); });
-    test::Test* window_widget_drag_test = window_widget_list->addTest("drag", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetDragTest(test); });
-    test::Test* window_widget_children_test = window_widget_list->addTest("children", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetChildrenTest(test); });
-    test::Test* window_widget_resize_test = window_widget_list->addTest("resize", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetResizeTest(test); });
-    test::Test* window_widget_chain_test = window_widget_list->addTest("chain", { window_widget_children_test, window_widget_resize_test }, [&](test::Test& test) { windowWidgetChainTest(test); });
-    test::Test* window_widget_drag_limits_test = window_widget_list->addTest("drag_limits", { window_widget_drag_test, window_widget_chain_test }, [&](test::Test& test) { windowWidgetDragLimitsTest(test); });
-    test::Test* window_widget_resize_limits_test = window_widget_list->addTest("resize_limits", { window_widget_chain_test }, [&](test::Test& test) { windowWidgetResizeLimitsTest(test); });
-    test::Test* window_widget_move_to_top_drag_test = window_widget_list->addTest("move_to_top_drag", { window_widget_drag_test }, [&](test::Test& test) { windowWidgetMoveToTopDragTest(test); });
-    test::Test* window_widget_move_to_top_resize_test = window_widget_list->addTest("move_to_top_resize", { window_widget_drag_test, window_widget_resize_test }, [&](test::Test& test) { windowWidgetMoveToTopResizeTest(test); });
+    test::TestModule* window_widget_list = addModule<WidgetTestsWindow>("WindowWidget", { widgets_basic_list, text_widget_list });
 
     test::TestModule* dropdown_widget_list = addModule("DropdownWidget", { widgets_basic_list, text_widget_list });
     test::Test* dropdown_widget_basic_test = dropdown_widget_list->addTest("basic", [&](test::Test& test) { dropdownWidgetBasicTest(test); });
@@ -193,89 +184,8 @@ void WidgetTests::resizeWindow(fw::WindowWidget* window, ResizePoint resize_poin
     mouseDragGesture(window->getWidgetList().getApplication(), grab_pos, offset);
 }
 
-void WidgetTests::resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget) {
-    sf::Vector2f resize_offset(15.0f, 10.0f);
-
-    {
-        // top left
-        sf::FloatRect new_bounds = sf::FloatRect(
-            widget->getTopLeft() + resize_offset,
-            widget->getSize() - resize_offset
-        );
-        resizeWindow(widget, ResizePoint::TOP_LEFT, resize_offset);
-        T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
-    }
-    {
-        // top
-        sf::FloatRect new_bounds = sf::FloatRect(
-            widget->getTopLeft() + sf::Vector2f(0.0f, resize_offset.y),
-            widget->getSize() + sf::Vector2f(0.0f, -resize_offset.y)
-        );
-        resizeWindow(widget, ResizePoint::TOP, resize_offset);
-        T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
-    }
-    {
-        // top right
-        sf::FloatRect new_bounds = sf::FloatRect(
-            widget->getTopLeft() + sf::Vector2f(0.0f, resize_offset.y),
-            widget->getSize() + sf::Vector2f(resize_offset.x, -resize_offset.y)
-        );
-        resizeWindow(widget, ResizePoint::TOP_RIGHT, resize_offset);
-        T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
-    }
-    {
-        // left
-        sf::FloatRect new_bounds = sf::FloatRect(
-            widget->getTopLeft() + sf::Vector2f(resize_offset.x, 0.0f),
-            widget->getSize() + sf::Vector2f(-resize_offset.x, 0.0f)
-        );
-        resizeWindow(widget, ResizePoint::LEFT, resize_offset);
-        T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
-    }
-    {
-        // right
-        sf::FloatRect new_bounds = sf::FloatRect(
-            widget->getTopLeft(),
-            widget->getSize() + sf::Vector2f(resize_offset.x, 0.0f)
-        );
-        resizeWindow(widget, ResizePoint::RIGHT, resize_offset);
-        T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
-    }
-    {
-        // bottom left
-        sf::FloatRect new_bounds = sf::FloatRect(
-            widget->getTopLeft() + sf::Vector2f(resize_offset.x, 0.0f),
-            widget->getSize() + sf::Vector2f(-resize_offset.x, resize_offset.y)
-        );
-        resizeWindow(widget, ResizePoint::BOTTOM_LEFT, resize_offset);
-        T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
-    }
-    {
-        // bottom
-        sf::FloatRect new_bounds = sf::FloatRect(
-            widget->getTopLeft(),
-            widget->getSize() + sf::Vector2f(0.0f, resize_offset.y)
-        );
-        resizeWindow(widget, ResizePoint::BOTTOM, resize_offset);
-        T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
-    }
-    {
-        // bottom right
-        sf::FloatRect new_bounds = sf::FloatRect(
-            widget->getTopLeft(),
-            widget->getSize() + resize_offset
-        );
-        resizeWindow(widget, ResizePoint::BOTTOM_RIGHT, resize_offset);
-        T_COMPARE(widget->getParentLocalBounds(), new_bounds, &WidgetTests::floatRectToStr);
-    }
-}
-
-sf::Vector2f WidgetTests::getHeaderCenter(fw::WindowWidget* window) {
-    return window->getHeaderWidget()->getGlobalCenter();
-}
-
 void WidgetTests::dragWindow(fw::Application& application, fw::WindowWidget* window, const sf::Vector2f& offset) {
-    sf::Vector2f header_center = getHeaderCenter(window);
+    sf::Vector2f header_center = window->getHeaderWidget()->getGlobalCenter();
     application.mouseMove(header_center);
     application.advance();
     application.mouseLeftPress();
