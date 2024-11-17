@@ -1,7 +1,15 @@
 #include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_widget_link.h"
 
-void WidgetTests::widgetLinkBasicTest(test::Test& test) {
-    fw::Application application(window);
+WidgetTestsWidgetLink::WidgetTestsWidgetLink(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::Test* widget_link_basic_test = addTest("basic", [&](test::Test& test) { widgetLinkBasicTest(test); });
+    test::Test* widget_link_targets_func_test = addTest("target_func", [&](test::Test& test) { widgetLinkTargetsFuncTest(test); });
+    test::Test* widget_link_container_test = addTest("container", { widget_link_basic_test }, [&](test::Test& test) { widgetLinkContainerTest(test); });
+    test::Test* widget_link_remove_test = addTest("remove", { widget_link_basic_test }, [&](test::Test& test) { widgetLinkRemoveTest(test); });
+}
+
+void WidgetTestsWidgetLink::widgetLinkBasicTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -33,8 +41,8 @@ void WidgetTests::widgetLinkBasicTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position1_2);
 }
 
-void WidgetTests::widgetLinkTargetsFuncTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsWidgetLink::widgetLinkTargetsFuncTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -70,8 +78,8 @@ void WidgetTests::widgetLinkTargetsFuncTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position1_2);
 }
 
-void WidgetTests::widgetLinkContainerTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsWidgetLink::widgetLinkContainerTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -108,8 +116,8 @@ void WidgetTests::widgetLinkContainerTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position1_2);
 }
 
-void WidgetTests::widgetLinkRemoveTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsWidgetLink::widgetLinkRemoveTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -166,4 +174,12 @@ void WidgetTests::widgetLinkRemoveTest(test::Test& test) {
     rectangle_2_widget->setPosition(position3);
     application.advance();
     T_ASSERT(T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position3));
+}
+
+sf::RenderWindow& WidgetTestsWidgetLink::getWindow() {
+    return dynamic_cast<WidgetTests*>(parent)->window;
+}
+
+fw::Font& WidgetTestsWidgetLink::getFont() {
+    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

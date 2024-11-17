@@ -1,6 +1,7 @@
 set(WIDGET_TESTS_INCLUDE_DIR "${TESTS_INCLUDE_DIR}/widget_tests/")
 
 set(WIDGET_TESTS_HEADER_FILES
+    "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_application.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_basic.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_checkbox.h"
@@ -8,7 +9,7 @@ set(WIDGET_TESTS_HEADER_FILES
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_size_policy.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_text.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_toposort.h"
-    "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests.h"
+    "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_widget_link.h"
 )
 set(WIDGET_TESTS_SOURCE_FILES
     "widget_tests.cpp"

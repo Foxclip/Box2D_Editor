@@ -6,6 +6,7 @@
 #include "tests/widget_tests/widget_tests_size_policy.h"
 #include "tests/widget_tests/widget_tests_text.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
+#include "tests/widget_tests/widget_tests_widget_link.h"
 #include "common/utils.h"
 
 WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
@@ -16,12 +17,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     test::TestModule* checkbox_widget_list = addModule<WidgetTestsCheckbox>("CheckboxWidget", { widgets_basic_list });
     test::TestModule* container_widget_list = addModule<WidgetTestsContainer>("ContainerWidget", { widgets_basic_list });
     test::TestModule* size_policy_list = addModule<WidgetTestsSizePolicy>("SizePolicy", { widgets_basic_list });
-
-    test::TestModule* widget_link_list = addModule("WidgetLink", { widgets_basic_list, size_policy_list });
-    test::Test* widget_link_basic_test = widget_link_list->addTest("basic", [&](test::Test& test) { widgetLinkBasicTest(test); });
-    test::Test* widget_link_targets_func_test = widget_link_list->addTest("target_func", [&](test::Test& test) { widgetLinkTargetsFuncTest(test); });
-    test::Test* widget_link_container_test = widget_link_list->addTest("container", { widget_link_basic_test }, [&](test::Test& test) { widgetLinkContainerTest(test); });
-    test::Test* widget_link_remove_test = widget_link_list->addTest("remove", { widget_link_basic_test }, [&](test::Test& test) { widgetLinkRemoveTest(test); });
+    test::TestModule* widget_link_list = addModule<WidgetTestsWidgetLink>("WidgetLink", { widgets_basic_list, size_policy_list });
 
     test::TestModule* textbox_widget_list = addModule("TextBoxWidget", { widgets_basic_list, text_widget_list });
     test::Test* textbox_widget_basic_test = textbox_widget_list->addTest("basic", [&](test::Test& test) { textboxWidgetBasicTest(test); });
