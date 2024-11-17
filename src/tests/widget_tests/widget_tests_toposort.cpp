@@ -1,3 +1,4 @@
+#include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
 
 WidgetTestsToposort::WidgetTestsToposort(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {

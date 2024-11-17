@@ -2,11 +2,12 @@
 #include "test_lib/test.h"
 #include <random>
 
+class WidgetTests;
 struct Node;
 
 class WidgetTestsToposort : public test::TestModule {
 public:
-	WidgetTestsToposort(const std::string& name, test::TestModule* manager, const std::vector<TestNode*>& required_nodes = { });
+	WidgetTestsToposort(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 	void toposortEmptyTest(test::Test& test);
 	void toposort1NodeTest(test::Test& test);
 	void toposort3NodesTest(test::Test& test);

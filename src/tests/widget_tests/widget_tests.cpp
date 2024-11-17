@@ -1,18 +1,11 @@
 #include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_application.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
 #include "common/utils.h"
 
 WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
     test::TestModule* toposort_list = addModule<WidgetTestsToposort>("Toposort");
-
-    test::TestModule* application_list = addModule("Application", { toposort_list });
-    test::Test* basic_test = application_list->addTest("basic", [&](test::Test& test) { basicTest(test); });
-    test::Test* init_test = application_list->addTest("init", { basic_test }, [&](test::Test& test) { initTest(test); });
-    test::Test* start_test = application_list->addTest("start", { init_test }, [&](test::Test& test) { startTest(test); });
-    test::Test* advance_test = application_list->addTest("advance", { start_test }, [&](test::Test& test) { advanceTest(test); });
-    test::Test* close_test = application_list->addTest("close", { start_test }, [&](test::Test& test) { closeTest(test); });
-    test::Test* mouse_events_test = application_list->addTest("mouse_events", { advance_test }, [&](test::Test& test) { mouseEventsTest(test); });
-    test::Test* keyboard_events_test = application_list->addTest("keyboard_events", { advance_test }, [&](test::Test& test) { keyboardEventsTest(test); });
+    test::TestModule* application_list = addModule<WidgetTestsApplication>("Application", { toposort_list });
 
     test::TestModule* widgets_basic_list = addModule("WidgetsBasic", { application_list });
     test::Test* root_widget_test = widgets_basic_list->addTest("root_widget", [&](test::Test& test) { rootWidgetTest(test); });

@@ -1,25 +1,36 @@
 #include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_application.h"
 
-void WidgetTests::basicTest(test::Test& test) {
-    fw::Application application(window);
+WidgetTestsApplication::WidgetTestsApplication(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::Test* basic_test = addTest("basic", [&](test::Test& test) { basicTest(test); });
+    test::Test* init_test = addTest("init", { basic_test }, [&](test::Test& test) { initTest(test); });
+    test::Test* start_test = addTest("start", { init_test }, [&](test::Test& test) { startTest(test); });
+    test::Test* advance_test = addTest("advance", { start_test }, [&](test::Test& test) { advanceTest(test); });
+    test::Test* close_test = addTest("close", { start_test }, [&](test::Test& test) { closeTest(test); });
+    test::Test* mouse_events_test = addTest("mouse_events", { advance_test }, [&](test::Test& test) { mouseEventsTest(test); });
+    test::Test* keyboard_events_test = addTest("keyboard_events", { advance_test }, [&](test::Test& test) { keyboardEventsTest(test); });
 }
 
-void WidgetTests::initTest(test::Test& test) {
-    TestApplication application(window);
+void WidgetTestsApplication::basicTest(test::Test& test) {
+    fw::Application application(getWindow());
+}
+
+void WidgetTestsApplication::initTest(test::Test& test) {
+    TestApplication application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     T_ASSERT(T_CHECK(application.initialized));
     T_COMPARE(application.getWindowSize(), sf::Vector2u(800, 600), &WidgetTests::sfVec2uToStr);
 }
 
-void WidgetTests::startTest(test::Test& test) {
-    TestApplication application(window);
+void WidgetTestsApplication::startTest(test::Test& test) {
+    TestApplication application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     T_ASSERT(T_CHECK(application.started));
 }
 
-void WidgetTests::advanceTest(test::Test& test) {
-    TestApplication application(window);
+void WidgetTestsApplication::advanceTest(test::Test& test) {
+    TestApplication application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -42,8 +53,8 @@ void WidgetTests::advanceTest(test::Test& test) {
     T_CHECK(application.rendered);
 }
 
-void WidgetTests::closeTest(test::Test& test) {
-    TestApplication application(window);
+void WidgetTestsApplication::closeTest(test::Test& test) {
+    TestApplication application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -51,8 +62,8 @@ void WidgetTests::closeTest(test::Test& test) {
     T_CHECK(application.closed);
 }
 
-void WidgetTests::mouseEventsTest(test::Test& test) {
-    TestApplication application(window);
+void WidgetTestsApplication::mouseEventsTest(test::Test& test) {
+    TestApplication application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     {
@@ -119,8 +130,8 @@ void WidgetTests::mouseEventsTest(test::Test& test) {
     }
 }
 
-void WidgetTests::keyboardEventsTest(test::Test& test) {
-    TestApplication application(window);
+void WidgetTestsApplication::keyboardEventsTest(test::Test& test) {
+    TestApplication application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     T_CHECK(!application.space_key_pressed);
@@ -134,6 +145,10 @@ void WidgetTests::keyboardEventsTest(test::Test& test) {
         application.advance();
         T_CHECK(!application.space_key_pressed);
     }
+}
+
+sf::RenderWindow& WidgetTestsApplication::getWindow() {
+    return dynamic_cast<WidgetTests*>(parent)->window;
 }
 
 TestApplication::TestApplication(sf::RenderWindow& window) : Application(window) { }
