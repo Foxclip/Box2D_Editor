@@ -50,12 +50,6 @@ protected:
 	void afterRunModule() override;
 
 private:
-	void sizePolicyTest(test::Test& test);
-	void sizePolicyPositionTest(test::Test& test);
-	void sizePolicyExpandTest(test::Test& test);
-	void sizePolicyLimitsTest(test::Test& test);
-	void sizePolicyCombinedTest(test::Test& test);
-
 	void widgetLinkBasicTest(test::Test& test);
 	void widgetLinkTargetsFuncTest(test::Test& test);
 	void widgetLinkContainerTest(test::Test& test);

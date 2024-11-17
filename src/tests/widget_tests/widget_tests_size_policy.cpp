@@ -1,7 +1,17 @@
 #include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_size_policy.h"
 
-void WidgetTests::sizePolicyTest(test::Test& test) {
-    fw::Application application(window);
+WidgetTestsSizePolicy::WidgetTestsSizePolicy(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::Test* size_policy_basic_test = addTest("basic", [&](test::Test& test) { sizePolicyTest(test); });
+    test::Test* size_policy_position_test = addTest("position", [&](test::Test& test) { sizePolicyPositionTest(test); });
+    test::Test* size_policy_expand_test = addTest("expand", [&](test::Test& test) { sizePolicyExpandTest(test); });
+    test::Test* size_policy_limits_test = addTest("limits", { size_policy_expand_test }, [&](test::Test& test) { sizePolicyLimitsTest(test); });
+    std::vector<test::TestNode*> size_policy_tests = { size_policy_basic_test, size_policy_position_test, size_policy_expand_test, size_policy_limits_test };
+    test::Test* size_policy_combined_test = addTest("combined", size_policy_tests, [&](test::Test& test) { sizePolicyCombinedTest(test); });
+}
+
+void WidgetTestsSizePolicy::sizePolicyTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -34,8 +44,8 @@ void WidgetTests::sizePolicyTest(test::Test& test) {
     T_COMPARE(green_widget->getParentLocalBounds(), sf::FloatRect(container_padding, container_padding * 2 + child_size.y, child_size.x, child_size.y), rect_to_str);
 }
 
-void WidgetTests::sizePolicyPositionTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsSizePolicy::sizePolicyPositionTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -76,8 +86,8 @@ void WidgetTests::sizePolicyPositionTest(test::Test& test) {
     T_COMPARE(child1_widget->getParentLocalBounds(), sf::FloatRect(parent_size.x / 2.0f, parent_size.y / 2.0f, child1_size.x, child1_size.y), rect_to_str);
 }
 
-void WidgetTests::sizePolicyExpandTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsSizePolicy::sizePolicyExpandTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -127,8 +137,8 @@ void WidgetTests::sizePolicyExpandTest(test::Test& test) {
     T_COMPARE(yellow_widget->getParentLocalBounds(), sf::FloatRect(yellow_x, container_padding, yellow_width, child_size.y), rect_to_str);
 }
 
-void WidgetTests::sizePolicyLimitsTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsSizePolicy::sizePolicyLimitsTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -191,8 +201,8 @@ void WidgetTests::sizePolicyLimitsTest(test::Test& test) {
     T_COMPARE(magenta_widget->getParentLocalBounds(), sf::FloatRect(magenta_x, container_padding, magenta_width, child_size.y), rect_to_str);
 }
 
-void WidgetTests::sizePolicyCombinedTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsSizePolicy::sizePolicyCombinedTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -257,4 +267,12 @@ void WidgetTests::sizePolicyCombinedTest(test::Test& test) {
     T_COMPARE(green_widget->getParentLocalBounds(), sf::FloatRect(green_x, container_padding, green_width, child_size.y), rect_to_str);
     T_COMPARE(blue_widget->getParentLocalBounds(), sf::FloatRect(blue_x, container_padding, child_size.x, child_size.y), rect_to_str);
     T_COMPARE(yellow_widget->getParentLocalBounds(), sf::FloatRect(container_padding, yellow_y, child_size.x, yellow_height), rect_to_str);
+}
+
+sf::RenderWindow& WidgetTestsSizePolicy::getWindow() {
+    return dynamic_cast<WidgetTests*>(parent)->window;
+}
+
+fw::Font& WidgetTestsSizePolicy::getFont() {
+    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

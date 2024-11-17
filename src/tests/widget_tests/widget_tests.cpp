@@ -3,6 +3,7 @@
 #include "tests/widget_tests/widget_tests_basic.h"
 #include "tests/widget_tests/widget_tests_checkbox.h"
 #include "tests/widget_tests/widget_tests_container.h"
+#include "tests/widget_tests/widget_tests_size_policy.h"
 #include "tests/widget_tests/widget_tests_text.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
 #include "common/utils.h"
@@ -14,14 +15,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     test::TestModule* text_widget_list = addModule<WidgetTestsText>("TextWidget", { application_list });
     test::TestModule* checkbox_widget_list = addModule<WidgetTestsCheckbox>("CheckboxWidget", { widgets_basic_list });
     test::TestModule* container_widget_list = addModule<WidgetTestsContainer>("ContainerWidget", { widgets_basic_list });
-
-    test::TestModule* size_policy_list = addModule("SizePolicy", { widgets_basic_list });
-    test::Test* size_policy_basic_test = size_policy_list->addTest("basic", [&](test::Test& test) { sizePolicyTest(test); });
-    test::Test* size_policy_position_test = size_policy_list->addTest("position", [&](test::Test& test) { sizePolicyPositionTest(test); });
-    test::Test* size_policy_expand_test = size_policy_list->addTest("expand", [&](test::Test& test) { sizePolicyExpandTest(test); });
-    test::Test* size_policy_limits_test = size_policy_list->addTest("limits", { size_policy_expand_test }, [&](test::Test& test) { sizePolicyLimitsTest(test); });
-    std::vector<test::TestNode*> size_policy_tests = { size_policy_basic_test, size_policy_position_test, size_policy_expand_test, size_policy_limits_test };
-    test::Test* size_policy_combined_test = size_policy_list->addTest("combined", size_policy_tests, [&](test::Test& test) { sizePolicyCombinedTest(test); });
+    test::TestModule* size_policy_list = addModule<WidgetTestsSizePolicy>("SizePolicy", { widgets_basic_list });
 
     test::TestModule* widget_link_list = addModule("WidgetLink", { widgets_basic_list, size_policy_list });
     test::Test* widget_link_basic_test = widget_link_list->addTest("basic", [&](test::Test& test) { widgetLinkBasicTest(test); });
