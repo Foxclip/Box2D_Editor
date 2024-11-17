@@ -50,10 +50,6 @@ protected:
 	void afterRunModule() override;
 
 private:
-	void canvasWidgetBasicTest(test::Test& test);
-	void canvasWidgetDrawTest(test::Test& test);
-	void canvasWidgetAlphaTest(test::Test& test);
-
 	void windowWidgetBasicTest(test::Test& test);
 	void windowWidgetDragTest(test::Test& test);
 	void windowWidgetChildrenTest(test::Test& test);

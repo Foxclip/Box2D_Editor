@@ -1,7 +1,14 @@
 #include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_canvas.h"
 
-void WidgetTests::canvasWidgetBasicTest(test::Test& test) {
-    fw::Application application(window);
+WidgetTestsCanvas::WidgetTestsCanvas(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::Test* canvas_widget_basic_test = addTest("basic", [&](test::Test& test) { canvasWidgetBasicTest(test); });
+    test::Test* canvas_widget_draw_test = addTest("draw", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetDrawTest(test); });
+    test::Test* canvas_widget_alpha_test = addTest("alpha", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetAlphaTest(test); });
+}
+
+void WidgetTestsCanvas::canvasWidgetBasicTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -44,13 +51,13 @@ void WidgetTests::canvasWidgetBasicTest(test::Test& test) {
     gwt.visual_local_bounds = gwt.local_bounds;
     gwt.visual_global_bounds = gwt.global_bounds;
     gwt.visual_parent_local_bounds = gwt.global_bounds;
-    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    T_WRAP_CONTAINER(WidgetTests::genericWidgetTest(gwt));
 
     T_COMPARE(canvas_widget->getChildren().size(), 0);
 }
 
-void WidgetTests::canvasWidgetDrawTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsCanvas::canvasWidgetDrawTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -91,8 +98,8 @@ void WidgetTests::canvasWidgetDrawTest(test::Test& test) {
     }
 }
 
-void WidgetTests::canvasWidgetAlphaTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsCanvas::canvasWidgetAlphaTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.mouseMove(400, 300);
@@ -110,4 +117,12 @@ void WidgetTests::canvasWidgetAlphaTest(test::Test& test) {
         sf::Image image = canvas_widget->getRenderTexture().getTexture().copyToImage();
         T_ASSERT(T_COMPARE(image.getPixel(0, 0), sf::Color(32, 64, 128), color_to_str));
     }
+}
+
+sf::RenderWindow& WidgetTestsCanvas::getWindow() {
+    return dynamic_cast<WidgetTests*>(parent)->window;
+}
+
+fw::Font& WidgetTestsCanvas::getFont() {
+    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

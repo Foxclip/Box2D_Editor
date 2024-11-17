@@ -1,6 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_application.h"
 #include "tests/widget_tests/widget_tests_basic.h"
+#include "tests/widget_tests/widget_tests_canvas.h"
 #include "tests/widget_tests/widget_tests_checkbox.h"
 #include "tests/widget_tests/widget_tests_container.h"
 #include "tests/widget_tests/widget_tests_size_policy.h"
@@ -20,11 +21,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     test::TestModule* size_policy_list = addModule<WidgetTestsSizePolicy>("SizePolicy", { widgets_basic_list });
     test::TestModule* widget_link_list = addModule<WidgetTestsWidgetLink>("WidgetLink", { widgets_basic_list, size_policy_list });
     test::TestModule* textbox_widget_list = addModule<WidgetTestsTextbox>("TextBoxWidget", { widgets_basic_list, text_widget_list });
-
-    test::TestModule* canvas_widget_list = addModule("CanvasWidget", { widgets_basic_list });
-    test::Test* canvas_widget_basic_test = canvas_widget_list->addTest("basic", [&](test::Test& test) { canvasWidgetBasicTest(test); });
-    test::Test* canvas_widget_draw_test = canvas_widget_list->addTest("draw", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetDrawTest(test); });
-    test::Test* canvas_widget_alpha_test = canvas_widget_list->addTest("alpha", { canvas_widget_basic_test }, [&](test::Test& test) { canvasWidgetAlphaTest(test); });
+    test::TestModule* canvas_widget_list = addModule<WidgetTestsCanvas>("CanvasWidget", { widgets_basic_list });
 
     test::TestModule* window_widget_list = addModule("WindowWidget", { widgets_basic_list, text_widget_list });
     test::Test* window_widget_basic_test = window_widget_list->addTest("basic", [&](test::Test& test) { windowWidgetBasicTest(test); });

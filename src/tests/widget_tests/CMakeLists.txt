@@ -4,6 +4,7 @@ set(WIDGET_TESTS_HEADER_FILES
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_application.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_basic.h"
+    "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_canvas.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_checkbox.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_container.h"
     "${WIDGET_TESTS_INCLUDE_DIR}/widget_tests_size_policy.h"
