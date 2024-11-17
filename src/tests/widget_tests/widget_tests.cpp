@@ -5,6 +5,7 @@
 #include "tests/widget_tests/widget_tests_checkbox.h"
 #include "tests/widget_tests/widget_tests_container.h"
 #include "tests/widget_tests/widget_tests_dropdown.h"
+#include "tests/widget_tests/widget_tests_scroll_area.h"
 #include "tests/widget_tests/widget_tests_size_policy.h"
 #include "tests/widget_tests/widget_tests_text.h"
 #include "tests/widget_tests/widget_tests_textbox.h"
@@ -26,12 +27,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     test::TestModule* canvas_widget_list = addModule<WidgetTestsCanvas>("CanvasWidget", { widgets_basic_list });
     test::TestModule* window_widget_list = addModule<WidgetTestsWindow>("WindowWidget", { widgets_basic_list, text_widget_list });
     test::TestModule* dropdown_widget_list = addModule<WidgetTestsDropdown>("DropdownWidget", { widgets_basic_list, text_widget_list });
-
-    test::TestModule* scroll_area_widget_list = addModule("ScrollAreaWidget", { widgets_basic_list });
-    test::Test* scroll_area_widget_basic_test = scroll_area_widget_list->addTest("basic", [&](test::Test& test) { scrollAreaWidgetBasicTest(test); });
-    test::Test* scroll_area_widget_scroll_test = scroll_area_widget_list->addTest("scroll", { scroll_area_widget_basic_test }, [&](test::Test& test) { scrollAreaWidgetScrollTest(test); });
-    test::Test* scroll_area_widget_scrollbar_visibility_test = scroll_area_widget_list->addTest("scrollbar_visibility", { scroll_area_widget_basic_test }, [&](test::Test& test) { scrollAreaWidgetScrollbarVisibilityTest(test); });
-    test::Test* scroll_area_widget_scrollbar_container_test = scroll_area_widget_list->addTest("scrollbar_container", { scroll_area_widget_scrollbar_visibility_test }, [&](test::Test& test) { scrollAreaWidgetScrollbarContainerTest(test); });
+    test::TestModule* scroll_area_widget_list = addModule<WidgetTestsScrollArea>("ScrollAreaWidget", { widgets_basic_list });
 
     test::TestModule* tree_view_widget_list = addModule("TreeViewWidget", { widgets_basic_list });
     test::Test* tree_view_widget_basic_test = tree_view_widget_list->addTest("basic", [&](test::Test& test) { treeviewWidgetBasicTest(test); });

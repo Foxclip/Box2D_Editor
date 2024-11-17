@@ -1,7 +1,15 @@
 #include "tests/widget_tests/widget_tests.h"
+#include "tests/widget_tests/widget_tests_scroll_area.h"
 
-void WidgetTests::scrollAreaWidgetBasicTest(test::Test& test) {
-    fw::Application application(window);
+WidgetTestsScrollArea::WidgetTestsScrollArea(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+    test::Test* scroll_area_widget_basic_test = addTest("basic", [&](test::Test& test) { scrollAreaWidgetBasicTest(test); });
+    test::Test* scroll_area_widget_scroll_test = addTest("scroll", { scroll_area_widget_basic_test }, [&](test::Test& test) { scrollAreaWidgetScrollTest(test); });
+    test::Test* scroll_area_widget_scrollbar_visibility_test = addTest("scrollbar_visibility", { scroll_area_widget_basic_test }, [&](test::Test& test) { scrollAreaWidgetScrollbarVisibilityTest(test); });
+    test::Test* scroll_area_widget_scrollbar_container_test = addTest("scrollbar_container", { scroll_area_widget_scrollbar_visibility_test }, [&](test::Test& test) { scrollAreaWidgetScrollbarContainerTest(test); });
+}
+
+void WidgetTestsScrollArea::scrollAreaWidgetBasicTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
     application.advance();
@@ -42,14 +50,14 @@ void WidgetTests::scrollAreaWidgetBasicTest(test::Test& test) {
     gwt.visual_local_bounds = gwt.local_bounds;
     gwt.visual_global_bounds = gwt.global_bounds;
     gwt.visual_parent_local_bounds = gwt.global_bounds;
-    T_WRAP_CONTAINER(genericWidgetTest(gwt));
+    T_WRAP_CONTAINER(WidgetTests::genericWidgetTest(gwt));
 }
 
-void WidgetTests::scrollAreaWidgetScrollTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsScrollArea::scrollAreaWidgetScrollTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     sf::Vector2f scroll_area_size(300.0f, 200.0f);
     sf::Vector2f container_size(100.0f, 100.0f);
     sf::Vector2f child_size(350.0f, 100.0f);
@@ -106,7 +114,7 @@ void WidgetTests::scrollAreaWidgetScrollTest(test::Test& test) {
     float slider_y_big_offset = 100.0f;
     {
         // scrolling x slider
-        mouseDragGesture(application, scroll_area_widget->getSliderXWidget()->getGlobalCenter(), sf::Vector2f(slider_x_offset, 0.0f));
+        WidgetTests::mouseDragGesture(application, scroll_area_widget->getSliderXWidget()->getGlobalCenter(), sf::Vector2f(slider_x_offset, 0.0f));
         T_WRAP_CONTAINER(check_slider_x(slider_x_offset, true));
         T_WRAP_CONTAINER(check_slider_y(0.0f, true));
         float slider_x_factor = container_widget->getWidth() / scroll_area_widget->getScrollbarXWidget()->getWidth();
@@ -115,7 +123,7 @@ void WidgetTests::scrollAreaWidgetScrollTest(test::Test& test) {
     }
     {
         // scrolling y slider
-        mouseDragGesture(application, scroll_area_widget->getSliderYWidget()->getGlobalCenter(), sf::Vector2f(0.0f, slider_y_offset));
+        WidgetTests::mouseDragGesture(application, scroll_area_widget->getSliderYWidget()->getGlobalCenter(), sf::Vector2f(0.0f, slider_y_offset));
         T_WRAP_CONTAINER(check_slider_y(slider_x_offset, true));
         T_WRAP_CONTAINER(check_slider_y(slider_y_offset, true));
         float slider_y_factor = container_widget->getHeight() / scroll_area_widget->getScrollbarYWidget()->getHeight();
@@ -124,21 +132,21 @@ void WidgetTests::scrollAreaWidgetScrollTest(test::Test& test) {
     }
     {
         // scrolling x slider to the beginning
-        mouseDragGesture(application, scroll_area_widget->getSliderXWidget()->getGlobalCenter(), sf::Vector2f(-slider_x_big_offset, 0.0f));
+        WidgetTests::mouseDragGesture(application, scroll_area_widget->getSliderXWidget()->getGlobalCenter(), sf::Vector2f(-slider_x_big_offset, 0.0f));
         T_WRAP_CONTAINER(check_slider_x(0.0f, true));
         T_WRAP_CONTAINER(check_slider_y(slider_y_offset, true));
         T_APPROX_COMPARE(container_widget->getPosition().x, 0.0f);
     }
     {
         // scrolling y slider to the beginning
-        mouseDragGesture(application, scroll_area_widget->getSliderYWidget()->getGlobalCenter(), sf::Vector2f(0.0f, -slider_y_big_offset));
+        WidgetTests::mouseDragGesture(application, scroll_area_widget->getSliderYWidget()->getGlobalCenter(), sf::Vector2f(0.0f, -slider_y_big_offset));
         T_WRAP_CONTAINER(check_slider_x(0.0f, true));
         T_WRAP_CONTAINER(check_slider_y(0.0f, true));
         T_APPROX_COMPARE(container_widget->getPosition().y, 0.0f);
     }
     {
         // scrolling x slider to the end
-        mouseDragGesture(application, scroll_area_widget->getSliderXWidget()->getGlobalCenter(), sf::Vector2f(slider_x_big_offset, 0.0f));
+        WidgetTests::mouseDragGesture(application, scroll_area_widget->getSliderXWidget()->getGlobalCenter(), sf::Vector2f(slider_x_big_offset, 0.0f));
         float x_range = scroll_area_widget->getScrollbarXWidget()->getWidth() - scroll_area_widget->getSliderXWidget()->getWidth();
         T_WRAP_CONTAINER(check_slider_x(x_range, true));
         T_WRAP_CONTAINER(check_slider_y(0.0f, true));
@@ -148,7 +156,7 @@ void WidgetTests::scrollAreaWidgetScrollTest(test::Test& test) {
     }
     {
         // scrolling y slider to the end
-        mouseDragGesture(application, scroll_area_widget->getSliderYWidget()->getGlobalCenter(), sf::Vector2f(0.0f, slider_y_big_offset));
+        WidgetTests::mouseDragGesture(application, scroll_area_widget->getSliderYWidget()->getGlobalCenter(), sf::Vector2f(0.0f, slider_y_big_offset));
         float x_range = scroll_area_widget->getScrollbarXWidget()->getWidth() - scroll_area_widget->getSliderXWidget()->getWidth();
         float y_range = scroll_area_widget->getScrollbarYWidget()->getHeight() - scroll_area_widget->getSliderYWidget()->getHeight();
         T_WRAP_CONTAINER(check_slider_x(x_range, true));
@@ -159,11 +167,11 @@ void WidgetTests::scrollAreaWidgetScrollTest(test::Test& test) {
     }
 }
 
-void WidgetTests::scrollAreaWidgetScrollbarVisibilityTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsScrollArea::scrollAreaWidgetScrollbarVisibilityTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     sf::Vector2f scroll_area_size(300.0f, 200.0f);
     sf::Vector2f container_size(100.0f, 100.0f);
     sf::Vector2f child_size(350.0f, 100.0f);
@@ -192,14 +200,14 @@ void WidgetTests::scrollAreaWidgetScrollbarVisibilityTest(test::Test& test) {
     {
         float margin = 100.0f;
         float offset = container_widget->getWidth() - scroll_area_widget->getWidth() + margin;
-        resizeWindow(window_widget, ResizePoint::RIGHT, sf::Vector2f(offset, 0.0f));
+        WidgetTests::resizeWindow(window_widget, WidgetTests::ResizePoint::RIGHT, sf::Vector2f(offset, 0.0f));
         T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
         T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
     }
     {
         float margin = 100.0f;
         float offset = container_widget->getHeight() - scroll_area_widget->getHeight() + margin;
-        resizeWindow(window_widget, ResizePoint::BOTTOM, sf::Vector2f(0.0f, offset));
+        WidgetTests::resizeWindow(window_widget, WidgetTests::ResizePoint::BOTTOM, sf::Vector2f(0.0f, offset));
         T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
         T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
     }
@@ -208,10 +216,10 @@ void WidgetTests::scrollAreaWidgetScrollbarVisibilityTest(test::Test& test) {
         float margin = fw::SCROLL_AREA_SCROLLBAR_DEFAULT_WIDTH / 2.0f;
         float offset_x = container_widget->getWidth() - scroll_area_widget->getWidth() + margin;
         float offset_y = container_widget->getHeight() - scroll_area_widget->getHeight() + margin;
-        resizeWindow(window_widget, ResizePoint::BOTTOM_RIGHT, sf::Vector2f(offset_x, offset_y));
+        WidgetTests::resizeWindow(window_widget, WidgetTests::ResizePoint::BOTTOM_RIGHT, sf::Vector2f(offset_x, offset_y));
         T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
         T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
-        resizeWindow(window_widget, ResizePoint::RIGHT, sf::Vector2f(-margin * 2.0f, 0.0f));
+        WidgetTests::resizeWindow(window_widget, WidgetTests::ResizePoint::RIGHT, sf::Vector2f(-margin * 2.0f, 0.0f));
         T_CHECK(scroll_area_widget->getScrollbarXWidget()->isVisible());
         T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
     }
@@ -222,13 +230,13 @@ void WidgetTests::scrollAreaWidgetScrollbarVisibilityTest(test::Test& test) {
         float margin_2 = 100.0f;
         float offset_x = container_widget->getWidth() - scroll_area_widget->getWidth() + margin_1;
         float offset_y = container_widget->getHeight() - scroll_area_widget->getHeight() + margin_1;
-        resizeWindow(window_widget, ResizePoint::BOTTOM_RIGHT, sf::Vector2f(offset_x, offset_y));
+        WidgetTests::resizeWindow(window_widget, WidgetTests::ResizePoint::BOTTOM_RIGHT, sf::Vector2f(offset_x, offset_y));
         T_CHECK(scroll_area_widget->getScrollbarXWidget()->isVisible());
         T_CHECK(scroll_area_widget->getScrollbarYWidget()->isVisible());
-        resizeWindow(window_widget, ResizePoint::BOTTOM, sf::Vector2f(0.0f, margin_2));
-        resizeWindow(window_widget, ResizePoint::RIGHT, sf::Vector2f(margin_2, 0.0f));
+        WidgetTests::resizeWindow(window_widget, WidgetTests::ResizePoint::BOTTOM, sf::Vector2f(0.0f, margin_2));
+        WidgetTests::resizeWindow(window_widget, WidgetTests::ResizePoint::RIGHT, sf::Vector2f(margin_2, 0.0f));
         // not using resizeWindow because it calls advance one more time
-        sf::Vector2f grab_pos = getGrabPos(window_widget, ResizePoint::BOTTOM);
+        sf::Vector2f grab_pos = WidgetTests::getGrabPos(window_widget, WidgetTests::ResizePoint::BOTTOM);
         application.mouseMove(grab_pos);
         application.advance();
         application.mouseLeftPress();
@@ -244,11 +252,11 @@ void WidgetTests::scrollAreaWidgetScrollbarVisibilityTest(test::Test& test) {
     }
 }
 
-void WidgetTests::scrollAreaWidgetScrollbarContainerTest(test::Test& test) {
-    fw::Application application(window);
+void WidgetTestsScrollArea::scrollAreaWidgetScrollbarContainerTest(test::Test& test) {
+    fw::Application application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
-    application.setDefaultFont(textbox_font);
+    application.setDefaultFont(getFont());
     sf::Vector2f scroll_area_size(300.0f, 200.0f);
     sf::Vector2f container_size(100.0f, 100.0f);
     sf::Vector2f child_size(100.0f, 200.0f);
@@ -287,4 +295,12 @@ void WidgetTests::scrollAreaWidgetScrollbarContainerTest(test::Test& test) {
     T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
     T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
     T_COMPARE(container_widget->getWidth(), scroll_area_size.x);
+}
+
+sf::RenderWindow& WidgetTestsScrollArea::getWindow() {
+    return dynamic_cast<WidgetTests*>(parent)->window;
+}
+
+fw::Font& WidgetTestsScrollArea::getFont() {
+    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }
