@@ -616,6 +616,13 @@ void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
     fw::TreeViewEntry* entry_2 = tree_view_widget->addEntry("Entry 2");
     application.advance();
 
+    auto check_top_entries = [&](const std::initializer_list<fw::TreeViewEntry*>& entries) {
+        checkTopEntries(test, tree_view_widget, entries);
+    };
+    auto check_entries = [&](fw::TreeViewEntry* entry, const std::initializer_list<fw::TreeViewEntry*> entries) {
+        checkEntries(test, entry, entries);
+    };
+
     sf::Vector2f center_offset = sf::Vector2f(0.0f, -2.0f);
     fw::Widget* entry_1_widget = entry_1->getWidget();
     fw::Widget* entry_2_widget = entry_2->getWidget();
@@ -660,14 +667,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
     application.advance();
     T_CHECK(!target_highlight_widget->isVisible());
     T_COMPARE(tree_view_widget->getAllEntryCount(), 2);
-    if (T_COMPARE(tree_view_widget->getTopEntryCount(), 2)) {
-        T_CHECK(tree_view_widget->getTopEntry(0) == entry_1);
-        T_CHECK(tree_view_widget->getTopEntry(1) == entry_2);
-    }
-    if (T_COMPARE(tree_view_widget->getChildrenCount(), 3)) {
-        T_CHECK(tree_view_widget->getChild(0) == entry_1_widget);
-        T_CHECK(tree_view_widget->getChild(1) == entry_2_widget);
-    }
+    T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2 }));
 
     // drop to the bottom
     application.mouseMove(drag_start);
@@ -684,14 +684,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
     application.advance();
     T_CHECK(!target_highlight_widget->isVisible());
     T_COMPARE(tree_view_widget->getAllEntryCount(), 2);
-    if (T_COMPARE(tree_view_widget->getTopEntryCount(), 2)) {
-        T_CHECK(tree_view_widget->getTopEntry(0) == entry_2);
-        T_CHECK(tree_view_widget->getTopEntry(1) == entry_1);
-    }
-    if (T_COMPARE(tree_view_widget->getChildrenCount(), 3)) {
-        T_CHECK(tree_view_widget->getChild(0) == entry_2_widget);
-        T_CHECK(tree_view_widget->getChild(1) == entry_1_widget);
-    }
+    T_WRAP_CONTAINER(check_top_entries({ entry_2, entry_1 }));
 }
 
 void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
