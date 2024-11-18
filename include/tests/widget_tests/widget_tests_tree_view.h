@@ -20,5 +20,7 @@ private:
 	fw::Font& getFont();
 	static float calcTreeViewEntryHeight(fw::TreeViewEntry* entry);
 	static float calcTreeViewHeight(fw::TreeViewWidget* treeview);
+	static void checkTopEntries(test::Test& test, fw::TreeViewWidget* tree_view_widget, const std::initializer_list<fw::TreeViewEntry*>& entries);
+	static void checkEntries(test::Test& test, fw::TreeViewEntry* entry, const std::initializer_list<fw::TreeViewEntry*> entries);
 
 };

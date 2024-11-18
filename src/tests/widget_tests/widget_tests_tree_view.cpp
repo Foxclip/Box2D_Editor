@@ -722,25 +722,12 @@ void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
         application.advance();
     };
     application.advance();
+
     auto check_top_entries = [&](const std::initializer_list<fw::TreeViewEntry*>& entries) {
-        std::vector<fw::TreeViewEntry*> entries_vec = std::vector<fw::TreeViewEntry*>(entries);
-        if (T_COMPARE(tree_view_widget->getTopEntryCount(), entries.size()) && T_COMPARE(tree_view_widget->getChildrenCount(), entries.size() + 1)) {
-            for (size_t i = 0; i < entries_vec.size(); i++) {
-                fw::TreeViewEntry* entry = tree_view_widget->getTopEntry(i);
-                T_CHECK(entry == entries_vec[i]);
-                T_CHECK(entry->getWidget() == entries_vec[i]->getWidget());
-            }
-        }
+        checkTopEntries(test, tree_view_widget, entries);
     };
     auto check_entries = [&](fw::TreeViewEntry* entry, const std::initializer_list<fw::TreeViewEntry*> entries) {
-        std::vector<fw::TreeViewEntry*> entries_vec = std::vector<fw::TreeViewEntry*>(entries);
-        fw::Widget* children_widget = entry->getChildrenWidget();
-        if (T_COMPARE(entry->getChildrenCount(), entries_vec.size()) && T_COMPARE(children_widget->getChildrenCount(), entries.size())) {
-            for (size_t i = 0; i < entries_vec.size(); i++) {
-                T_CHECK(entry->getChild(i) == entries_vec[i]);
-                T_CHECK(children_widget->getChild(i) == entries_vec[i]->getWidget());
-            }
-        }
+        checkEntries(test, entry, entries);
     };
 
     // drop to the top
@@ -849,4 +836,26 @@ float WidgetTestsTreeView::calcTreeViewHeight(fw::TreeViewWidget* treeview) {
     }
     result += fw::TREEVIEW_CONTAINER_PADDING;
     return result;
+}
+
+void WidgetTestsTreeView::checkTopEntries(test::Test& test, fw::TreeViewWidget* tree_view_widget, const std::initializer_list<fw::TreeViewEntry*>& entries) {
+    std::vector<fw::TreeViewEntry*> entries_vec = std::vector<fw::TreeViewEntry*>(entries);
+    if (T_COMPARE(tree_view_widget->getTopEntryCount(), entries.size()) && T_COMPARE(tree_view_widget->getChildrenCount(), entries.size() + 1)) {
+        for (size_t i = 0; i < entries_vec.size(); i++) {
+            fw::TreeViewEntry* entry = tree_view_widget->getTopEntry(i);
+            T_CHECK(entry == entries_vec[i]);
+            T_CHECK(entry->getWidget() == entries_vec[i]->getWidget());
+        }
+    }
+}
+
+void WidgetTestsTreeView::checkEntries(test::Test& test, fw::TreeViewEntry* entry, const std::initializer_list<fw::TreeViewEntry*> entries) {
+    std::vector<fw::TreeViewEntry*> entries_vec = std::vector<fw::TreeViewEntry*>(entries);
+    fw::Widget* children_widget = entry->getChildrenWidget();
+    if (T_COMPARE(entry->getChildrenCount(), entries_vec.size()) && T_COMPARE(children_widget->getChildrenCount(), entries.size())) {
+        for (size_t i = 0; i < entries_vec.size(); i++) {
+            T_CHECK(entry->getChild(i) == entries_vec[i]);
+            T_CHECK(children_widget->getChild(i) == entries_vec[i]->getWidget());
+        }
+    }
 }
