@@ -18,11 +18,11 @@ namespace test {
 
 	Test::Test(std::string name, std::vector<TestNode*> required, TestFuncType func)
 	: Test(name, func) {
-		this->required = required;
+		this->required_nodes = required;
 	}
 
 	bool Test::run() {
-		if (!std::all_of(required.begin(), required.end(), [](TestNode* test) {
+		if (!std::all_of(required_nodes.begin(), required_nodes.end(), [](TestNode* test) {
 			return test->result;
 		})) {
 			cancelled = true;
@@ -138,7 +138,7 @@ namespace test {
 	TestModule::TestModule(const std::string& name, TestModule* parent, const std::vector<TestNode*>& required_nodes) {
 		this->name = name;
 		this->parent = parent;
-		this->required = required_nodes;
+		this->required_nodes = required_nodes;
 	}
 
 	Test* TestModule::addTest(const std::string& name, TestFuncType func) {
@@ -258,7 +258,10 @@ namespace test {
 				logger << module->name << "\n";
 				LoggerIndent test_list_indent;
 				bool cancelled = false;
-				for (TestNode* req_node : module->required) {
+				if (module->children.empty()) {
+					empty_module_list.push_back(module->name);
+				}
+				for (TestNode* req_node : module->required_nodes) {
 					if (!req_node->result) {
 						cancelled = true;
 						break;
@@ -283,28 +286,22 @@ namespace test {
 				for (const std::string& name : module->failed_list) {
 					failed_list.push_back(module->name + "/" + name);
 				}
+				for (const std::string& name : module->empty_module_list) {
+					empty_module_list.push_back(module->name + "/" + name);
+				}
 			}
 		}
 		afterRunModule();
 		OnAfterRun();
 		if (print_summary_enabled) {
-			printSummary(passed_list, cancelled_list, failed_list);
-		}
-		if (isRoot()) {
-			if (cancelled_list.empty() && failed_list.empty()) {
-				logger << "ALL PASSED\n";
-			}
+			printSummary();
 		}
 		is_run = true;
 		result = cancelled_list.empty() && failed_list.empty();
 		return result;
 	}
 
-	void TestModule::printSummary(
-		const std::vector<std::string>& passed_list,
-		const std::vector<std::string>& cancelled_list,
-		const std::vector<std::string>& failed_list
-	) {
+	void TestModule::printSummary() {
 		logger << "Passed " << passed_list.size() << " tests, "
 			<< "cancelled " << cancelled_list.size() << " tests, "
 			<< "failed " << failed_list.size() << " tests";
@@ -316,6 +313,18 @@ namespace test {
 			}
 		} else {
 			logger << "\n";
+		}
+		if (empty_module_list.size() > 0) {
+			logger << "WARNING: " << empty_module_list.size() << " empty modules:\n";
+			LoggerIndent empty_modules_list_indent;
+			for (const std::string& module_name : empty_module_list) {
+				logger << module_name << "\n";
+			}
+		}
+		if (isRoot()) {
+			if (passed_list.size() > 0 && cancelled_list.empty() && failed_list.empty()) {
+				logger << "ALL PASSED\n";
+			}
 		}
 	}
 

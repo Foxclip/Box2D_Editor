@@ -55,7 +55,7 @@ namespace test {
 	public:
 		std::string name = "<unnamed>";
 		TestModule* parent = nullptr;
-		std::vector<TestNode*> required;
+		std::vector<TestNode*> required_nodes;
 		bool is_run = false;
 		bool result = false;
 		bool cancelled = false;
@@ -113,6 +113,7 @@ namespace test {
 		std::vector<std::string> passed_list;
 		std::vector<std::string> cancelled_list;
 		std::vector<std::string> failed_list;
+		std::vector<std::string> empty_module_list;
 		size_t max_test_name = 0;
 		bool print_summary_enabled = false;
 		std::function<void(void)> OnBeforeRun = []() { };
@@ -133,11 +134,7 @@ namespace test {
 		std::vector<TestModule*> getChildModules() const;
 		std::vector<Test*> getAllTests() const;
 		bool run() override;
-		static void printSummary(
-			const std::vector<std::string>& passed_list,
-			const std::vector<std::string>& cancelled_list,
-			const std::vector<std::string>& failed_list
-		);
+		void printSummary();
 
 	protected:
 
