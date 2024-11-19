@@ -139,7 +139,7 @@ namespace fw {
 		TreeViewEntry* result = nullptr;
 		size_t current_index = 0;
 		for (TreeViewEntry* entry : entries) {
-			if (entry->getWidget()->isVisible() && !entry->grabbed) {
+			if (entry->getWidget()->isVisible() && !entry->grabbed && !entry->getParentChain().contains(grabbed_entry)) {
 				sf::Vector2f center = entry->getWidget()->getGlobalCenter();
 				if (global_pos.y < center.y) {
 					result = entry;
@@ -327,6 +327,20 @@ namespace fw {
 
 	TreeViewEntry* TreeViewEntry::getParent() const {
 		return parent;
+	}
+
+	const CompVector<TreeViewEntry*> TreeViewEntry::getParentChain() const {
+		CompVector<TreeViewEntry*> chain;
+		const TreeViewEntry* cur = this;
+		while (cur) {
+			if (cur->parent) {
+				chain.add(cur->parent);
+				cur = cur->parent;
+			} else {
+				break;
+			}
+		}
+		return chain;
 	}
 
 	const CompVector<TreeViewEntry*>& TreeViewEntry::getChildren() const {
@@ -531,7 +545,7 @@ namespace fw {
 		text_widget->setFillColor(text_color);
 		grabbed = true;
 		grab_begin = true;
-		treeview.grabbed_widget = entry_widget;
+		treeview.grabbed_entry = this;
 		treeview.widget_list.addPendingSetParent(treeview.target_highlight_widget, treeview.getParent());
 	}
 
@@ -561,7 +575,7 @@ namespace fw {
 		text_widget->setFillColor(text_color);
 		grabbed = false;
 		grab_begin = false;
-		treeview.grabbed_widget = nullptr;
+		treeview.grabbed_entry = nullptr;
 		treeview.widget_list.addPendingSetParent(treeview.target_highlight_widget, &treeview);
 		treeview.target_highlight_widget->setVisible(false);
 	}

@@ -31,6 +31,7 @@ namespace fw {
 		bool isExpanded() const;
 		bool isGrabbed() const;
 		TreeViewEntry* getParent() const;
+		const CompVector<TreeViewEntry*> getParentChain() const;
 		const CompVector<TreeViewEntry*>& getChildren() const;
 		TreeViewEntry* getChild(size_t index) const;
 		size_t getChildrenCount() const;
@@ -122,7 +123,7 @@ namespace fw {
 		friend class TreeViewEntry;
 		CompVectorUptr<TreeViewEntry> all_entries;
 		CompVector<TreeViewEntry*> top_entries;
-		Widget* grabbed_widget = nullptr;
+		TreeViewEntry* grabbed_entry = nullptr;
 		fw::RectangleWidget* target_highlight_widget = nullptr;
 		TreeViewEntry* highlighted_entry = nullptr;
 

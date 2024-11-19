@@ -39,6 +39,8 @@ int main() {
 
     execute_app();
 
+    // TODO: WidgetTestsTreeView: calculate parent chain once per parent widget
+    // TODO: Tests: WidgetTestsTreeView: put getWindow and getFont into base class
     // TODO: TreeViewWidget: reorder entries
     // TODO: TreeViewWidget: reparent entries
     // TODO: Simulation: rename getFromAll to getObject and getFromTop to getTopObject
