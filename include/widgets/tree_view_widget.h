@@ -14,7 +14,7 @@ namespace fw {
 	const sf::Color TREEVIEW_ENTRY_ARROW_AREA_COLOR = sf::Color(80, 80, 80);
 	const sf::Color TREEVIEW_ENTRY_ARROW_COLOR = sf::Color(255, 255, 255);
 	const float TREEVIEW_CONTAINER_PADDING = 2.0f;
-	const float TREEVIEW_ENTRY_DRAG_DISTANCE = 20.0f;
+	const float TREEVIEW_ENTRY_DRAG_DISTANCE = 10.0f;
 	const sf::Color TREEVIEW_TARGET_HIGHLIGHT_COLOR = sf::Color(255, 255, 0);
 
 	class WidgetList;

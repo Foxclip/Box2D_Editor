@@ -722,6 +722,9 @@ void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
     auto check_entries = [&](fw::TreeViewEntry* entry, const std::initializer_list<fw::TreeViewEntry*> entries) {
         checkEntries(test, entry, entries);
     };
+    auto get_bottom_drag_pos = [&]() {
+		return tree_view_widget->getBottom() + sf::Vector2f(0.0f, 50.0f);
+    };
 
     // drop to the top
     sf::Vector2f drag_top = tree_view_widget->getTop() + sf::Vector2f(0.0f, -50.0f);
@@ -736,8 +739,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
 
     // drop to the bottom
     T_ASSERT_NO_ERRORS();
-    sf::Vector2f drag_bottom = tree_view_widget->getBottom() + sf::Vector2f(0.0f, 50.0f);
-    drag_widget(entry_1_widget, drag_bottom);
+    drag_widget(entry_1_widget, get_bottom_drag_pos());
     application.advance();
     T_VEC2_COMPARE(target_highlight_widget->getGlobalPosition(), entry_2_widget->getGlobalBottomLeft());
     application.mouseLeftRelease();
@@ -783,12 +785,42 @@ void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
 
     // drop outside the only child
     T_ASSERT_NO_ERRORS();
-    drag_widget(entry_3_widget, drag_bottom);
+    drag_widget(entry_3_widget, get_bottom_drag_pos());
     application.advance();
     application.mouseLeftRelease();
     application.advance();
     T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
     T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3 }));
+
+    // drop entry with a child to the bottom
+    entry_3->setParent(entry_2);
+    application.advance();
+    sf::Vector2f entry_2_rect_center = entry_2->getRectangleWidget()->getGlobalCenter();
+    application.mouseMove(entry_2_rect_center);
+    application.mouseLeftPress();
+    application.advance();
+    sf::Vector2f bottom_drag_pos = get_bottom_drag_pos();
+    application.mouseMove(bottom_drag_pos);
+    application.advance();
+    application.advance();
+    application.mouseLeftRelease();
+    application.advance();
+	T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
+	T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2 }));
+	T_WRAP_CONTAINER(check_entries(entry_2, { entry_3 }));
+
+    // drop entry with a child to the top
+	application.mouseMove(entry_2_rect_center);
+	application.mouseLeftPress();
+	application.advance();
+	application.mouseMove(drag_top);
+	application.advance();
+	application.advance();
+	application.mouseLeftRelease();
+	application.advance();
+	T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
+	T_WRAP_CONTAINER(check_top_entries({ entry_2, entry_1}));
+	T_WRAP_CONTAINER(check_entries(entry_2, { entry_3 }));
 }
 
 sf::RenderWindow& WidgetTestsTreeView::getWindow() {
