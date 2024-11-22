@@ -15,6 +15,9 @@ namespace fw {
 		setHorizontal(false);
 		setPadding(TREEVIEW_CONTAINER_PADDING);
 		setSizeXPolicy(SizePolicy::NONE);
+		OnLeftClick += [&](const sf::Vector2f& pos) {
+			deselectAll();
+		};
 
 		// target highlight
 		target_highlight_widget = widget_list.createRectangleWidget(100.0f, TREEVIEW_CONTAINER_PADDING);
@@ -244,6 +247,7 @@ namespace fw {
 		rectangle_widget = treeview.widget_list.createRectangleWidget(20.0f, TREEVIEW_ENTRY_HEIGHT);
 		rectangle_widget->setFillColor(TREEVIEW_ENTRY_BACKGROUND_COLOR);
 		rectangle_widget->setClipChildren(true);
+		rectangle_widget->setClickThrough(false);
 		rectangle_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
 		rectangle_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
 			pressed = true;

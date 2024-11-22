@@ -17,7 +17,12 @@ void execute_app() {
         fw::TreeViewEntry* entry_1 = treeview->addEntry("Entry 1");
         fw::TreeViewEntry* entry_2 = treeview->addEntry("Entry 2");
         fw::TreeViewEntry* entry_3 = treeview->addEntry("Entry 3");
-        entry_3->setParent(entry_2);
+        fw::TreeViewEntry* entry_4 = treeview->addEntry("Entry 4");
+        fw::TreeViewEntry* entry_4_1 = treeview->addEntry("Entry 4_1");
+        entry_4_1->setParent(entry_4);
+        fw::TreeViewEntry* entry_5 = treeview->addEntry("Entry 5");
+        fw::TreeViewEntry* entry_5_1 = treeview->addEntry("Entry 5_1");
+        entry_5_1->setParent(entry_5);
 
         app.load("levels/level.txt");
         app.start();
