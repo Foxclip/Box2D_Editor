@@ -101,7 +101,7 @@ namespace fw {
 		TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		const CompVector<TreeViewEntry*>& getAllEntries() const;
 		const CompVector<TreeViewEntry*>& getTopEntries() const;
-		CompVector<TreeViewEntry*> getAllEntriesInOrder() const;
+		CompVector<TreeViewEntry*> getAllVisibleEntriesInOrder() const;
 		size_t getAllEntryCount() const;
 		size_t getTopEntryCount() const;
 		TreeViewEntry* getEntry(size_t index) const;

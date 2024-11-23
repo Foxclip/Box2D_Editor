@@ -15,14 +15,20 @@ void execute_app() {
         treeview->setParentAnchor(fw::Widget::Anchor::CENTER);
         treeview->setSizeYPolicy(fw::Widget::SizePolicy::NONE);
         fw::TreeViewEntry* entry_1 = treeview->addEntry("Entry 1");
+        fw::TreeViewEntry* entry_1_1 = treeview->addEntry("Entry 1_1");
+        fw::TreeViewEntry* entry_1_2 = treeview->addEntry("Entry 1_2");
+        entry_1_1->setParent(entry_1);
+        entry_1_2->setParent(entry_1);
         fw::TreeViewEntry* entry_2 = treeview->addEntry("Entry 2");
+        fw::TreeViewEntry* entry_2_1 = treeview->addEntry("Entry 2_1");
+        fw::TreeViewEntry* entry_2_2 = treeview->addEntry("Entry 2_2");
+        entry_2_1->setParent(entry_2);
+        entry_2_2->setParent(entry_2);
         fw::TreeViewEntry* entry_3 = treeview->addEntry("Entry 3");
-        fw::TreeViewEntry* entry_4 = treeview->addEntry("Entry 4");
-        fw::TreeViewEntry* entry_4_1 = treeview->addEntry("Entry 4_1");
-        entry_4_1->setParent(entry_4);
-        fw::TreeViewEntry* entry_5 = treeview->addEntry("Entry 5");
-        fw::TreeViewEntry* entry_5_1 = treeview->addEntry("Entry 5_1");
-        entry_5_1->setParent(entry_5);
+        fw::TreeViewEntry* entry_3_1 = treeview->addEntry("Entry 3_1");
+        fw::TreeViewEntry* entry_3_2 = treeview->addEntry("Entry 3_2");
+        entry_3_1->setParent(entry_3);
+        entry_3_2->setParent(entry_3);
 
         app.load("levels/level.txt");
         app.start();

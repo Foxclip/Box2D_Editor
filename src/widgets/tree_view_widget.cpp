@@ -71,12 +71,14 @@ namespace fw {
 		return top_entries;
 	}
 
-	CompVector<TreeViewEntry*> TreeViewWidget::getAllEntriesInOrder() const {
+	CompVector<TreeViewEntry*> TreeViewWidget::getAllVisibleEntriesInOrder() const {
 		CompVector<TreeViewEntry*> entries;
 		std::function<void(TreeViewEntry*)> add_to_list = [&](TreeViewEntry* entry) {
 			entries.add(entry);
-			for (TreeViewEntry* child : entry->getChildren()) {
-				add_to_list(child);
+			if (entry->isExpanded()) {
+				for (TreeViewEntry* child : entry->getChildren()) {
+					add_to_list(child);
+				}
 			}
 		};
 		for (TreeViewEntry* entry : top_entries) {
@@ -138,7 +140,7 @@ namespace fw {
 	}
 
 	TreeViewEntry* TreeViewWidget::getTargetHighlightEntry(const sf::Vector2f& global_pos) const {
-		CompVector<TreeViewEntry*> entries = getAllEntriesInOrder();
+		CompVector<TreeViewEntry*> entries = getAllVisibleEntriesInOrder();
 		TreeViewEntry* result = nullptr;
 		size_t current_index = 0;
 		for (TreeViewEntry* entry : entries) {
