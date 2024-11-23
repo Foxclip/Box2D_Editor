@@ -145,7 +145,7 @@ namespace fw {
 		size_t current_index = 0;
 		for (TreeViewEntry* entry : entries) {
 			if (entry->getWidget()->isVisible() && !entry->grabbed && !entry->getParentChain().contains(grabbed_entry)) {
-				sf::Vector2f center = entry->getWidget()->getGlobalCenter();
+				sf::Vector2f center = entry->getRectangleWidget()->getGlobalCenter();
 				if (global_pos.y < center.y) {
 					result = entry;
 					break;
