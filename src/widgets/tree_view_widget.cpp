@@ -169,7 +169,7 @@ namespace fw {
 			target_highlight_widget->setOrigin(Anchor::TOP_LEFT);
 			target_highlight_widget->setWidth(getContentWidth());
 			if (children.empty()) {
-				target_highlight_widget->setGlobalPosition(getGlobalPosition());
+				target_highlight_widget->setGlobalPosition(getGlobalPosition() + sf::Vector2f(getLeftPadding(), 0.0f));
 			} else {
 				Widget* last_entry_widget = children.back();
 				sf::Vector2f last_entry_widget_pos = last_entry_widget->getGlobalBottomLeft();
