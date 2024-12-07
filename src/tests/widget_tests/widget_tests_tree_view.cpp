@@ -841,45 +841,45 @@ void WidgetTestsTreeView::treeviewWidgetDrag3Test(test::Test& test) {
         checkEntries(test, entry, entries);
     };
 
-    fw::TreeViewEntry* entry_1 = tree_view_widget->addEntry("Entry 1");
-    fw::TreeViewEntry* entry_1_1 = tree_view_widget->addEntry("Entry 1_1");
-    fw::TreeViewEntry* entry_1_2 = tree_view_widget->addEntry("Entry 1_2");
-    entry_1_1->setParent(entry_1);
-    entry_1_2->setParent(entry_1);
-    fw::TreeViewEntry* entry_2 = tree_view_widget->addEntry("Entry 2");
-    fw::TreeViewEntry* entry_2_1 = tree_view_widget->addEntry("Entry 2_1");
-    fw::TreeViewEntry* entry_2_2 = tree_view_widget->addEntry("Entry 2_2");
-    entry_2_1->setParent(entry_2);
-    entry_2_2->setParent(entry_2);
-    fw::TreeViewEntry* entry_3 = tree_view_widget->addEntry("Entry 3");
-    fw::TreeViewEntry* entry_3_1 = tree_view_widget->addEntry("Entry 3_1");
-    fw::TreeViewEntry* entry_3_2 = tree_view_widget->addEntry("Entry 3_2");
-    entry_3_1->setParent(entry_3);
-    entry_3_2->setParent(entry_3);
+    fw::TreeViewEntry* entry_4 = tree_view_widget->addEntry("Entry 4");
+    fw::TreeViewEntry* entry_4_1 = tree_view_widget->addEntry("Entry 4_1");
+    fw::TreeViewEntry* entry_4_2 = tree_view_widget->addEntry("Entry 4_2");
+    entry_4_1->setParent(entry_4);
+    entry_4_2->setParent(entry_4);
+    fw::TreeViewEntry* entry_5 = tree_view_widget->addEntry("Entry 5");
+    fw::TreeViewEntry* entry_5_1 = tree_view_widget->addEntry("Entry 5_1");
+    fw::TreeViewEntry* entry_5_2 = tree_view_widget->addEntry("Entry 5_2");
+    entry_5_1->setParent(entry_5);
+    entry_5_2->setParent(entry_5);
+    fw::TreeViewEntry* entry_6 = tree_view_widget->addEntry("Entry 6");
+    fw::TreeViewEntry* entry_6_1 = tree_view_widget->addEntry("Entry 6_1");
+    fw::TreeViewEntry* entry_6_2 = tree_view_widget->addEntry("Entry 6_2");
+    entry_6_1->setParent(entry_6);
+    entry_6_2->setParent(entry_6);
     application.advance();
     T_COMPARE(tree_view_widget->getAllEntryCount(), 9);
-    T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3 }));
-    T_WRAP_CONTAINER(check_entries(entry_1, { entry_1_1, entry_1_2 }));
-	T_WRAP_CONTAINER(check_entries(entry_2, { entry_2_1, entry_2_2 }));
-	T_WRAP_CONTAINER(check_entries(entry_3, { entry_3_1, entry_3_2 }));
+    T_WRAP_CONTAINER(check_top_entries({ entry_4, entry_5, entry_6 }));
+    T_WRAP_CONTAINER(check_entries(entry_4, { entry_4_1, entry_4_2 }));
+    T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
+    T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));
 
-    // drag entry 3 in between entry 1 and entry 2
-    sf::Vector2f drag_pos_1 = entry_2->getRectangleWidget()->getGlobalTop();
-    drag_entry(entry_3, drag_pos_1, true);
-    T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_3, entry_2 }));
-    T_WRAP_CONTAINER(check_entries(entry_1, { entry_1_1, entry_1_2 }));
-    T_WRAP_CONTAINER(check_entries(entry_2, { entry_2_1, entry_2_2 }));
-    T_WRAP_CONTAINER(check_entries(entry_3, { entry_3_1, entry_3_2 }));
+    // drag entry 6 in between entry 4 and entry 5
+    sf::Vector2f drag_pos_1 = entry_5->getRectangleWidget()->getGlobalTop();
+    drag_entry(entry_6, drag_pos_1, true);
+    T_WRAP_CONTAINER(check_top_entries({ entry_4, entry_6, entry_5 }));
+    T_WRAP_CONTAINER(check_entries(entry_4, { entry_4_1, entry_4_2 }));
+    T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
+    T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));
 
-    // drag entry 3 before the first child of entry 1
-    entry_1->expand();
+    // drag entry 6 before the first child of entry 4
+    entry_4->expand();
     application.advance();
-	sf::Vector2f drag_pos_2 = entry_1_1->getRectangleWidget()->getGlobalTop();
-	drag_entry(entry_3, drag_pos_2, true);
-	T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2 }));
-	T_WRAP_CONTAINER(check_entries(entry_1, { entry_3, entry_1_1, entry_1_2 }));
-	T_WRAP_CONTAINER(check_entries(entry_2, { entry_2_1, entry_2_2 }));
-	T_WRAP_CONTAINER(check_entries(entry_3, { entry_3_1, entry_3_2 }));
+    sf::Vector2f drag_pos_2 = entry_4_1->getRectangleWidget()->getGlobalTop();
+    drag_entry(entry_6, drag_pos_2, true);
+    T_WRAP_CONTAINER(check_top_entries({ entry_4, entry_5 }));
+    T_WRAP_CONTAINER(check_entries(entry_4, { entry_6, entry_4_1, entry_4_2 }));
+    T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
+    T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));
 }
 
 sf::RenderWindow& WidgetTestsTreeView::getWindow() {

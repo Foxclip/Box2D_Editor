@@ -14,21 +14,32 @@ void execute_app() {
         fw::TreeViewWidget* treeview = app.getWidgets().createTreeViewWidget(300.0f, 300.0f);
         treeview->setParentAnchor(fw::Widget::Anchor::CENTER);
         treeview->setSizeYPolicy(fw::Widget::SizePolicy::NONE);
-        fw::TreeViewEntry* entry_1 = treeview->addEntry("Entry 1");
-        fw::TreeViewEntry* entry_1_1 = treeview->addEntry("Entry 1_1");
-        fw::TreeViewEntry* entry_1_2 = treeview->addEntry("Entry 1_2");
-        entry_1_1->setParent(entry_1);
-        entry_1_2->setParent(entry_1);
+       fw::TreeViewEntry* entry_1 = treeview->addEntry("Entry 1");
         fw::TreeViewEntry* entry_2 = treeview->addEntry("Entry 2");
-        fw::TreeViewEntry* entry_2_1 = treeview->addEntry("Entry 2_1");
-        fw::TreeViewEntry* entry_2_2 = treeview->addEntry("Entry 2_2");
-        entry_2_1->setParent(entry_2);
-        entry_2_2->setParent(entry_2);
         fw::TreeViewEntry* entry_3 = treeview->addEntry("Entry 3");
-        fw::TreeViewEntry* entry_3_1 = treeview->addEntry("Entry 3_1");
-        fw::TreeViewEntry* entry_3_2 = treeview->addEntry("Entry 3_2");
-        entry_3_1->setParent(entry_3);
-        entry_3_2->setParent(entry_3);
+        fw::TreeViewEntry* entry_4 = treeview->addEntry("Entry 4");
+        fw::TreeViewEntry* entry_5 = treeview->addEntry("Entry 5");
+        fw::TreeViewEntry* entry_6 = treeview->addEntry("Entry 6");
+        fw::TreeViewEntry* entry_6_1 = treeview->addEntry("Entry 6_1");
+        fw::TreeViewEntry* entry_6_2 = treeview->addEntry("Entry 6_2");
+		fw::TreeViewEntry* entry_6_3 = treeview->addEntry("Entry 6_3");
+		entry_6_1->setParent(entry_6);
+		entry_6_2->setParent(entry_6);
+		entry_6_3->setParent(entry_6);
+        fw::TreeViewEntry* entry_7 = treeview->addEntry("Entry 7");
+        fw::TreeViewEntry* entry_7_1 = treeview->addEntry("Entry 7_1");
+        fw::TreeViewEntry* entry_7_2 = treeview->addEntry("Entry 7_2");
+        fw::TreeViewEntry* entry_7_3 = treeview->addEntry("Entry 7_3");
+        entry_7_1->setParent(entry_7);
+        entry_7_2->setParent(entry_7);
+        entry_7_3->setParent(entry_7);
+        fw::TreeViewEntry* entry_8 = treeview->addEntry("Entry 8");
+        fw::TreeViewEntry* entry_8_1 = treeview->addEntry("Entry 8_1");
+        fw::TreeViewEntry* entry_8_2 = treeview->addEntry("Entry 8_2");
+        fw::TreeViewEntry* entry_8_3 = treeview->addEntry("Entry 8_3");
+        entry_8_1->setParent(entry_8);
+        entry_8_2->setParent(entry_8);
+        entry_8_3->setParent(entry_8);
 
         app.load("levels/level.txt");
         app.start();
@@ -50,6 +61,8 @@ int main() {
 
     execute_app();
 
+    // TODO: Outliner: fix entries not deselecting when clicking on empty space
+    // TODO: Outliner: fix crash when dragging entries with children
     // TODO: WidgetTestsTreeView: calculate parent chain once per parent widget
     // TODO: TreeViewWidget: make the whole tree of grabbed entries transparent
     // TODO: Tests: WidgetTestsTreeView: put getWindow and getFont into base class
