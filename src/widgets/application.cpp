@@ -17,9 +17,7 @@ namespace fw {
         unsigned int antialiasing,
         bool vsync
     ) {
-        if (!premultiply.loadFromFile("shaders/premultiply.frag", sf::Shader::Fragment)) {
-            throw std::runtime_error("Shader loading error");
-        }
+        loadShader(premultiply, sf::Shader::Fragment, "shaders/premultiply.frag");
         sf::ContextSettings cs_window;
         cs_window.antialiasingLevel = antialiasing;
         if (external_window) {
@@ -386,6 +384,12 @@ namespace fw {
         LoggerTag tag_mouse_gesture("mouseGesture");
         mouse_gesture_right.active = false;
         logger << "End gesture\n";
+    }
+
+    void Application::loadShader(sf::Shader& shader, sf::Shader::Type type, const std::filesystem::path& path) {
+        if (!shader.loadFromFile(path.string(), type)) {
+            throw std::runtime_error("Shader loading error: " + path.string());
+        }
     }
 
     void Application::mainLoop() {

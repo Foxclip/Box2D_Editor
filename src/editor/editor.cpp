@@ -148,12 +148,8 @@ ChainObject* Editor::createChain(
 void Editor::onInit() {
     sf::ContextSettings cs_mask;
     window_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
-    if (!desat_shader.loadFromFile("shaders/desat.frag", sf::Shader::Fragment)) {
-        throw std::runtime_error("Shader loading error");
-    }
-    if (!selection_shader.loadFromFile("shaders/selection.frag", sf::Shader::Fragment)) {
-        throw std::runtime_error("Shader loading error");
-    }
+    loadShader(desat_shader, sf::Shader::Fragment, "shaders/desat.frag");
+    loadShader(selection_shader, sf::Shader::Fragment, "shaders/selection.frag");
     initTools();
     initUi();
     editor_logger.OnLineWrite = [&](std::string line) { // should be after initUi and preferably before any logging

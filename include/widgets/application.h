@@ -145,6 +145,7 @@ namespace fw {
 		void startMoveGesture(Widget* source);
 		void endGestureLeft();
 		void endGestureRight();
+		void loadShader(sf::Shader& shader, sf::Shader::Type type, const std::filesystem::path& path);
 
 	private:
 		friend class Widget;
