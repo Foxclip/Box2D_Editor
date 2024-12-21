@@ -861,8 +861,8 @@ void WidgetTestsTreeView::treeviewWidgetDrag3Test(test::Test& test) {
     entry_6_1->setParent(entry_6);
     entry_6_2->setParent(entry_6);
     application.advance();
-    T_COMPARE(tree_view_widget->getAllEntryCount(), 9);
-    T_WRAP_CONTAINER(check_top_entries({ entry_4, entry_5, entry_6 }));
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 12);
+    T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3, entry_4, entry_5, entry_6 }));
     T_WRAP_CONTAINER(check_entries(entry_4, { entry_4_1, entry_4_2 }));
     T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
     T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));
@@ -870,7 +870,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag3Test(test::Test& test) {
     // drag entry 6 in between entry 4 and entry 5
     sf::Vector2f drag_pos_1 = entry_5->getRectangleWidget()->getGlobalTop();
     drag_entry(entry_6, drag_pos_1, true);
-    T_WRAP_CONTAINER(check_top_entries({ entry_4, entry_6, entry_5 }));
+    T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3, entry_4, entry_6, entry_5 }));
     T_WRAP_CONTAINER(check_entries(entry_4, { entry_4_1, entry_4_2 }));
     T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
     T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));
@@ -880,7 +880,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag3Test(test::Test& test) {
     application.advance();
     sf::Vector2f drag_pos_2 = entry_4_1->getRectangleWidget()->getGlobalTop();
     drag_entry(entry_6, drag_pos_2, true);
-    T_WRAP_CONTAINER(check_top_entries({ entry_4, entry_5 }));
+    T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3, entry_4, entry_5 }));
     T_WRAP_CONTAINER(check_entries(entry_4, { entry_6, entry_4_1, entry_4_2 }));
     T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
     T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));
@@ -893,7 +893,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag4Test(test::Test& test) {
     application.setDefaultFont(getFont());
     application.start(true);
     application.advance();
-    sf::Vector2f size(200.0f, 100.0f);
+    sf::Vector2f size(200.0f, 200.0f);
     sf::Vector2f position(100.0f, 100.0f);
 	fw::ScrollAreaWidget* scroll_area_widget = application.getWidgets().createScrollAreaWidget(size);
     scroll_area_widget->setPosition(position);
@@ -931,8 +931,8 @@ void WidgetTestsTreeView::treeviewWidgetDrag4Test(test::Test& test) {
     entry_6_1->setParent(entry_6);
     entry_6_2->setParent(entry_6);
     application.advance();
-    T_COMPARE(tree_view_widget->getAllEntryCount(), 9);
-    T_WRAP_CONTAINER(check_top_entries({ entry_4, entry_5, entry_6 }));
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 12);
+    T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3, entry_4, entry_5, entry_6 }));
     T_WRAP_CONTAINER(check_entries(entry_4, { entry_4_1, entry_4_2 }));
     T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
     T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));
@@ -940,7 +940,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag4Test(test::Test& test) {
     // drag entry 6 in between entry 4 and entry 5
     sf::Vector2f drag_pos_1 = entry_5->getRectangleWidget()->getGlobalTop();
     drag_entry(entry_6, drag_pos_1, true);
-    T_WRAP_CONTAINER(check_top_entries({ entry_4, entry_6, entry_5 }));
+    T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3, entry_4, entry_6, entry_5 }));
     T_WRAP_CONTAINER(check_entries(entry_4, { entry_4_1, entry_4_2 }));
     T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
     T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));
@@ -950,7 +950,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag4Test(test::Test& test) {
     application.advance();
     sf::Vector2f drag_pos_2 = entry_4_1->getRectangleWidget()->getGlobalTop();
     drag_entry(entry_6, drag_pos_2, true);
-    T_WRAP_CONTAINER(check_top_entries({ entry_4, entry_5 }));
+    T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3, entry_4, entry_5 }));
     T_WRAP_CONTAINER(check_entries(entry_4, { entry_6, entry_4_1, entry_4_2 }));
     T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
     T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));

@@ -14,7 +14,7 @@ void execute_app() {
         fw::TreeViewWidget* treeview = app.getWidgets().createTreeViewWidget(300.0f, 300.0f);
         treeview->setParentAnchor(fw::Widget::Anchor::CENTER);
         treeview->setSizeYPolicy(fw::Widget::SizePolicy::NONE);
-       fw::TreeViewEntry* entry_1 = treeview->addEntry("Entry 1");
+        fw::TreeViewEntry* entry_1 = treeview->addEntry("Entry 1");
         fw::TreeViewEntry* entry_2 = treeview->addEntry("Entry 2");
         fw::TreeViewEntry* entry_3 = treeview->addEntry("Entry 3");
         fw::TreeViewEntry* entry_4 = treeview->addEntry("Entry 4");
