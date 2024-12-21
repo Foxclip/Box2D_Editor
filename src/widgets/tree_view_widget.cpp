@@ -120,7 +120,6 @@ namespace fw {
 			"PendingEntryMove " + entry->name + " " + std::to_string(index), *this, entry, index
 		);
 		pending_entry_move.add(std::move(uptr));
-		logger << "PendingEntryMove " << entry->name << " -> " << index << "\n";
 	}
 
 	void TreeViewWidget::addPendingEntryDelete(TreeViewEntry* entry, bool with_children) {
@@ -138,7 +137,6 @@ namespace fw {
 			"PendingEntrySetParent " + entry->name + " " + parent_name, *this, entry, new_parent, move_to_index
 		);
 		pending_entry_setparent.add(std::move(uptr));
-		logger << "PendingEntrySetParent " << entry->name << " -> " << parent_name << "\n";
 	}
 
 	void TreeViewWidget::executePendingOperations() {

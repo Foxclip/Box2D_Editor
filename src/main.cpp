@@ -4,6 +4,7 @@
 #include "editor/scenes.h"
 #include "common/logger.h"
 #include "widgets/tree_view_widget.h"
+#include "widgets/scroll_area_widget.h"
 
 void execute_app() {
     logger << "Starting app\n";
@@ -11,9 +12,11 @@ void execute_app() {
     try {
         app.init("Box2D Editor");
         
+        fw::ScrollAreaWidget* scroll_area = app.getWidgets().createScrollAreaWidget(300.0f, 300.0f);
+        scroll_area->setParentAnchor(fw::Widget::Anchor::CENTER);
         fw::TreeViewWidget* treeview = app.getWidgets().createTreeViewWidget(300.0f, 300.0f);
-        treeview->setParentAnchor(fw::Widget::Anchor::CENTER);
-        treeview->setSizeYPolicy(fw::Widget::SizePolicy::NONE);
+        scroll_area->setScrolledWidget(treeview);
+        treeview->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
         fw::TreeViewEntry* entry_1 = treeview->addEntry("Entry 1");
         fw::TreeViewEntry* entry_2 = treeview->addEntry("Entry 2");
         fw::TreeViewEntry* entry_3 = treeview->addEntry("Entry 3");
