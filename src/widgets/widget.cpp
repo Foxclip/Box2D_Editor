@@ -612,6 +612,10 @@ namespace fw {
 		return bounds.getPosition() + bounds.getSize() / 2.0f;
 	}
 
+	float Widget::getAlphaMultiplier() const {
+		return alpha_multiplier;
+	}
+
 	void Widget::setSize(float width, float height) {
 		wAssert(!widget_list.isLocked());
 		setSizeInternal(width, height);
@@ -1043,6 +1047,11 @@ namespace fw {
 		this->shader = shader;
 	}
 
+	void Widget::setAlphaMultiplier(float value) {
+		wAssert(!widget_list.isLocked());
+		this->alpha_multiplier = value;
+	}
+
 	void Widget::removeFocus() {
 		wAssert(!widget_list.isLocked());
 		if (isFocused()) {
@@ -1330,6 +1339,9 @@ namespace fw {
 		}
 		OnBeforeGlobalRender(target);
 		if (isRenderable()) {
+			if (alpha_multiplier == 0.0f) {
+				return;
+			}
 			{
 				// render with straight alpha to texture
 				updateRenderTexture(unclipped_region.getQuantized());
@@ -1356,6 +1368,7 @@ namespace fw {
 					sf::Shader* premultiply = &widget_list.getApplication().premultiply;
 					premultiply->setUniform("type", static_cast<int>(ColorType::TEXTURE));
 					premultiply->setUniform("src_texture", sf::Shader::CurrentTexture);
+					premultiply->setUniform("alpha_multiplier", alpha_multiplier);
 					states.shader = premultiply;
 				}
 				target.draw(sprite, states);

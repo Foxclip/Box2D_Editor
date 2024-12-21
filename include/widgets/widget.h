@@ -228,6 +228,7 @@ namespace fw {
 		sf::Vector2f getVisualGlobalBottomLeft() const;
 		sf::Vector2f getVisualGlobalBottomRight() const;
 		virtual const sf::Color& getFillColor() const = 0;
+		float getAlphaMultiplier() const;
 		virtual void setSize(float width, float height);
 		void setSize(const sf::Vector2f& size);
 		void setWidth(float width);
@@ -301,6 +302,7 @@ namespace fw {
 		void setParentLocalRenderLayer(size_t layer);
 		void setQuantizeRenderedPosition(bool value);
 		void setShader(sf::Shader* shader);
+		void setAlphaMultiplier(float value);
 		void removeFocus();
 		void processKeyboardEvent(const sf::Event& event);
 		void render(sf::RenderTarget& target);
@@ -358,6 +360,7 @@ namespace fw {
 		bool is_right_pressed = false;
 		bool force_custom_cursor = false;
 		bool debug_render = false;
+		float alpha_multiplier = 1.0f;
 
 		sf::Vector2f anchorToPos(Anchor p_anchor, const sf::Vector2f& size);
 		virtual sf::Drawable* getDrawable() = 0;
