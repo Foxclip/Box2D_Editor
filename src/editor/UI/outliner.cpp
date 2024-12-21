@@ -11,10 +11,14 @@ Outliner::Outliner(fw::WidgetList& widget_list, float width, float height, Edito
 	setParentAnchor(Anchor::TOP_RIGHT);
 	setBackgroundColor(OUTLINER_BACKGROUND_COLOR);
 	setScrollbarColor(OUTLINER_SCROLLBAR_COLOR);
+	OnLeftClick += [&](const sf::Vector2f& pos) {
+		treeview_widget->deselectAll();
+	};
 	// container
 	treeview_widget = widget_list.createTreeViewWidget(width, height);
 	treeview_widget->setFillColor(sf::Color::Transparent);
 	treeview_widget->setSizeXPolicy(SizePolicy::PARENT);
+	treeview_widget->setFillColor(sf::Color::Transparent);
 	treeview_widget->OnEntryClicked += [&](fw::TreeViewEntry* entry) {
 		GameObject* object = entry_object[entry];
 		app.setActiveObject(object);
