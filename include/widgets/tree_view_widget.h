@@ -23,6 +23,53 @@ namespace fw {
 	class TextWidget;
 
 	class TreeViewWidget;
+	class TreeViewEntry;
+
+	class PendingEntryOperation {
+	public:
+		PendingEntryOperation(TreeViewWidget& tree_view_widget);
+		virtual void execute() = 0;
+
+	protected:
+		TreeViewWidget& tree_view_widget;
+	};
+
+	class PendingEntryMove : public PendingEntryOperation {
+	public:
+		TreeViewEntry* entry = nullptr;
+		size_t index = 0;
+
+		PendingEntryMove(TreeViewWidget& tree_view_widget, TreeViewEntry* entry, size_t index);
+		void execute() override;
+
+	};
+
+	class PendingEntryDelete : public PendingEntryOperation {
+	public:
+		TreeViewEntry* entry = nullptr;
+		bool with_children = false;
+
+		PendingEntryDelete(TreeViewWidget& tree_view_widget, TreeViewEntry* entry, bool with_children);
+		void execute() override;
+
+	};
+
+	class PendingEntrySetParent : public PendingEntryOperation {
+	public:
+		TreeViewEntry* entry = nullptr;
+		TreeViewEntry* new_parent = nullptr;
+		bool keep_pos = false;
+		ptrdiff_t move_to_index = -1;
+
+		PendingEntrySetParent(
+			TreeViewWidget& tree_view_widget,
+			TreeViewEntry* entry,
+			TreeViewEntry* new_parent,
+			ptrdiff_t move_to_index = -1
+		);
+		void execute() override;
+
+	};
 
 	class TreeViewEntry {
 	public:
@@ -51,7 +98,7 @@ namespace fw {
 		void select(bool with_children = false);
 		void deselect(bool with_children = false);
 		void toggleSelect(bool with_children = false);
-		void setParent(TreeViewEntry* new_parent, bool reparent_widget = true);
+		void setParent(TreeViewEntry* new_parent);
 		void setWidgetParent(TreeViewEntry* new_parent);
 		void moveToIndex(size_t index);
 		void expand();
@@ -62,6 +109,9 @@ namespace fw {
 		void remove(bool with_children);
 	private:
 		friend TreeViewWidget;
+		friend class PendingEntryMove;
+		friend class PendingEntryDelete;
+		friend class PendingEntrySetParent;
 		TreeViewWidget& treeview;
 #ifndef NDEBUG
 		std::string debug_name;
@@ -107,6 +157,10 @@ namespace fw {
 		TreeViewEntry* getEntry(size_t index) const;
 		TreeViewEntry* getTopEntry(size_t index) const;
 		TreeViewEntry* addEntry(const sf::String& name);
+		void addPendingEntryMove(TreeViewEntry* entry, size_t index);
+		void addPendingEntryDelete(TreeViewEntry* entry, bool with_children);
+		void addPendingEntrySetParent(TreeViewEntry* entry, TreeViewEntry* new_parent, ptrdiff_t move_to_index = -1);
+		void executePendingOperations();
 		void selectAll();
 		void deselectAll();
 		void expandAll();
@@ -121,11 +175,17 @@ namespace fw {
 
 	private:
 		friend class TreeViewEntry;
+		friend class PendingEntryMove;
+		friend class PendingEntryDelete;
+		friend class PendingEntrySetParent;
 		CompVectorUptr<TreeViewEntry> all_entries;
 		CompVector<TreeViewEntry*> top_entries;
 		TreeViewEntry* grabbed_entry = nullptr;
 		fw::RectangleWidget* target_highlight_widget = nullptr;
 		TreeViewEntry* highlighted_entry = nullptr;
+		CompVectorUptr<PendingEntryMove> pending_entry_move;
+		CompVectorUptr<PendingEntryDelete> pending_entry_delete;
+		CompVectorUptr<PendingEntrySetParent> pending_entry_setparent;
 
 		void deselectAllExceptEntry(TreeViewEntry* except_entry = nullptr);
 		void deselectAllExceptSubtree(TreeViewEntry* except_subtree = nullptr);
