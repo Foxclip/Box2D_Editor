@@ -436,6 +436,7 @@ namespace fw {
 		pending_move.clear();
 		pending_delete.clear();
 		pending_setparent.clear();
+		OnProcessAfterInput();
 	}
 
 	void WidgetList::updateRenderQueue() {
@@ -551,6 +552,7 @@ namespace fw {
 			"PendingMove " + widget->getFullName() + " " + std::to_string(index), *this, widget, index
 		);
 		pending_move.add(std::move(uptr));
+		logger << "PendingMove " << widget->getFullName() << " -> " << index << "\n";
 	}
 
 	void WidgetList::addPendingDelete(Widget* widget, bool with_children) {
@@ -567,6 +569,7 @@ namespace fw {
 			"PendingSetParent " + widget->getFullName() + " " + new_parent->getFullName(), *this, widget, new_parent, keep_pos, move_to_index
 		);
 		pending_setparent.add(std::move(uptr));
+		logger << "PendingSetParent " << widget->getFullName() << " -> " << new_parent->getFullName() << "\n";
 	}
 
 	Widget* WidgetList::operator[](size_t index) const {

@@ -75,6 +75,7 @@ namespace fw {
 	class WidgetList {
 	public:
 		bool debug_render = false;
+		Event<> OnProcessAfterInput;
 
 		WidgetList(Application& application);
 		virtual ~WidgetList();
