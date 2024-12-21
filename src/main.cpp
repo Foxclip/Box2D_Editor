@@ -64,7 +64,7 @@ int main() {
 
     execute_app();
 
-    // TODO: TreeViewWidget: make the whole tree of grabbed entries transparent
+    // TODO: fix world canvas blinking when grabbing tree view entries
     // TODO: Tests: WidgetTestsTreeView: put getWindow and getFont into base class
     // TODO: Tests: visualize mouse movements and clicks
     // TODO: TreeViewWidget: reorder entries
@@ -78,6 +78,7 @@ int main() {
     // TODO: Objectlist: OnAfterObjectRemoved test
     // TODO: Objectlist: OnObjectRenamed
     // TODO: ContainerWidget: test invisible widgets
+    // TODO: render children of the widget on the texture of the widget itself
     // TODO: Make AbstractHierachy class with methods like setParent, moveToTop, etc.
     // TODO: Editor: render polygon indices
     // TODO: Widgets: make widgets a separate library

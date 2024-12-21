@@ -585,12 +585,7 @@ namespace fw {
 		treeview.widget_list.addPendingSetParent(entry_widget, treeview.widget_list.getRootWidget(), true);
 		entry_widget->setParentAnchor(Widget::Anchor::CUSTOM);
 		entry_widget->setSizeXPolicy(Widget::SizePolicy::NONE);
-		sf::Color rect_color = rectangle_widget->getFillColor();
-		rect_color.a /= 2;
-		rectangle_widget->setFillColor(rect_color);
-		sf::Color text_color = text_widget->getFillColor();
-		text_color.a /= 2;
-		text_widget->setFillColor(text_color);
+		setGrabbedVisualMode();
 		grabbed = true;
 		grab_begin = true;
 		treeview.grabbed_entry = this;
@@ -608,12 +603,7 @@ namespace fw {
 		}
 		entry_widget->setParentAnchor(Widget::Anchor::TOP_LEFT);
 		entry_widget->setSizeXPolicy(Widget::SizePolicy::PARENT);
-		sf::Color rect_color = rectangle_widget->getFillColor();
-		rect_color.a = 255;
-		rectangle_widget->setFillColor(rect_color);
-		sf::Color text_color = text_widget->getFillColor();
-		text_color.a = 255;
-		text_widget->setFillColor(text_color);
+		setNormalVisualMode();
 		grabbed = false;
 		grab_begin = false;
 		treeview.grabbed_entry = nullptr;
@@ -623,6 +613,26 @@ namespace fw {
 
 	void TreeViewEntry::remove(bool with_children) {
 		treeview.removeEntry(this, with_children);
+	}
+
+	void TreeViewEntry::setGrabbedVisualMode() {
+		rectangle_widget->setAlphaMultiplier(0.5f);
+		text_widget->setAlphaMultiplier(0.5f);
+		arrow_area_widget->setAlphaMultiplier(0.5f);
+		arrow_widget->setAlphaMultiplier(0.5f);
+		for (TreeViewEntry* child : children) {
+			child->setGrabbedVisualMode();
+		}
+	}
+
+	void TreeViewEntry::setNormalVisualMode() {
+		rectangle_widget->setAlphaMultiplier(1.0f);
+		text_widget->setAlphaMultiplier(1.0f);
+		arrow_area_widget->setAlphaMultiplier(1.0f);
+		arrow_widget->setAlphaMultiplier(1.0f);
+		for (TreeViewEntry* child : children) {
+			child->setNormalVisualMode();
+		}
 	}
 
 	void TreeViewEntry::updateWidgets() {

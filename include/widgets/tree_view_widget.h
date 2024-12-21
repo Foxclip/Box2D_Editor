@@ -134,6 +134,8 @@ namespace fw {
 		fw::EmptyWidget* children_spacing_widget = nullptr;
 		fw::ContainerWidget* children_widget = nullptr;
 
+		void setGrabbedVisualMode();
+		void setNormalVisualMode();
 		void updateWidgets();
 		void addChild(TreeViewEntry* entry);
 		void moveChildToIndex(TreeViewEntry* entry, size_t index);
