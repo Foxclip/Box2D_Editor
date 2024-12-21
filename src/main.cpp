@@ -64,9 +64,6 @@ int main() {
 
     execute_app();
 
-    // TODO: Outliner: fix entries not deselecting when clicking on empty space
-    // TODO: Outliner: fix crash when dragging entries with children
-    // TODO: WidgetTestsTreeView: calculate parent chain once per parent widget
     // TODO: TreeViewWidget: make the whole tree of grabbed entries transparent
     // TODO: Tests: WidgetTestsTreeView: put getWindow and getFont into base class
     // TODO: Tests: visualize mouse movements and clicks

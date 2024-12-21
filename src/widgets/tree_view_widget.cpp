@@ -187,6 +187,7 @@ namespace fw {
 		TreeViewEntry* result = nullptr;
 		size_t current_index = 0;
 		for (TreeViewEntry* entry : entries) {
+			// TODO: cache parent chain
 			if (entry->getWidget()->isVisible() && !entry->grabbed && !entry->getParentChain().contains(grabbed_entry)) {
 				sf::Vector2f center = entry->getRectangleWidget()->getGlobalCenter();
 				if (global_pos.y < center.y) {
@@ -581,7 +582,7 @@ namespace fw {
 	}
 
 	void TreeViewEntry::take() {
-		treeview.widget_list.addPendingSetParent(entry_widget, treeview.getParent(), true);
+		treeview.widget_list.addPendingSetParent(entry_widget, treeview.widget_list.getRootWidget(), true);
 		entry_widget->setParentAnchor(Widget::Anchor::CUSTOM);
 		entry_widget->setSizeXPolicy(Widget::SizePolicy::NONE);
 		sf::Color rect_color = rectangle_widget->getFillColor();
@@ -593,7 +594,7 @@ namespace fw {
 		grabbed = true;
 		grab_begin = true;
 		treeview.grabbed_entry = this;
-		treeview.widget_list.addPendingSetParent(treeview.target_highlight_widget, treeview.getParent());
+		treeview.widget_list.addPendingSetParent(treeview.target_highlight_widget, treeview.widget_list.getRootWidget());
 	}
 
 	void TreeViewEntry::drop() {
