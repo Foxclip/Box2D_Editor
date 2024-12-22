@@ -1,4 +1,3 @@
-uniform sampler2D texture;
 uniform float saturation;
 uniform float vcenter;
 uniform float vpercent;

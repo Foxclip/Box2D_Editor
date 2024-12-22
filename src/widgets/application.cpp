@@ -17,6 +17,7 @@ namespace fw {
         unsigned int antialiasing,
         bool vsync
     ) {
+        loadDefaultFragmentShader(default_shader, "default");
         loadShader(premultiply, sf::Shader::Fragment, "shaders/premultiply.frag");
         sf::ContextSettings cs_window;
         cs_window.antialiasingLevel = antialiasing;
@@ -392,17 +393,24 @@ namespace fw {
         }
     }
 
+    void Application::loadDefaultFragmentShader(sf::Shader& shader, const std::string& name) {
+        loadFragmentShaderParts(shader, "default", { });
+    }
+
     void Application::loadFragmentShaderPart(sf::Shader& shader, const std::filesystem::path& path) {
-        std::string combined_shader_string = getCombinedShaderString(path, "shaders/combined_template.frag");
+        loadFragmentShaderParts(shader, path.stem().string(), { path });
+    }
+
+    void Application::loadFragmentShaderParts(sf::Shader& shader, const std::string& name, const std::vector<std::filesystem::path>& paths) {
+        std::string combined_shader_string = getCombinedShaderString(paths, "shaders/combined_template.frag");
 #ifndef NDEBUG
-        std::string filename = path.stem().string();
         std::filesystem::create_directory("shaders/combined/");
-        std::filesystem::path combined_path = "shaders/combined/" + filename + "_combined.frag";
+        std::filesystem::path combined_path = "shaders/combined/" + name + "_combined.frag";
         str_to_file(combined_shader_string, combined_path);
 #endif // NDEBUG
 
         if (!shader.loadFromMemory(combined_shader_string, sf::Shader::Fragment)) {
-            throw std::runtime_error("Fragment shader part loading error: " + path.string() + ", " + combined_path.string());
+            throw std::runtime_error("Fragment shader part compilation error: " + combined_path.string());
         }
     }
 
@@ -644,7 +652,7 @@ namespace fw {
         }
     }
 
-    std::string Application::getCombinedShaderString(const std::filesystem::path& shader, const std::filesystem::path& combined_template) {
+    std::string Application::getCombinedShaderString(const std::vector<std::filesystem::path>& shaders, const std::filesystem::path& combined_template) {
         std::vector<std::string> combined_lines = read_file_lines(combined_template);
         ptrdiff_t include_line_index = -1;
         ptrdiff_t apply_line_index = -1;
@@ -663,18 +671,32 @@ namespace fw {
         if (apply_line_index == -1) {
 			throw std::runtime_error("Unable to find %APPLY% in " + combined_template.string());
 		}
-        std::filesystem::path relative_path = std::filesystem::relative(shader, std::filesystem::path("shaders/"));
 
         combined_lines.erase(combined_lines.begin() + include_line_index);
-        std::vector<std::string> shader_lines = read_file_lines(shader);
-        shader_lines.insert(shader_lines.begin(), "// ======== BEGIN " + shader.filename().string() + " ========");
-        shader_lines.insert(shader_lines.end(), "// ======== END " + shader.filename().string() + "========");
-        combined_lines.insert(combined_lines.begin() + include_line_index, shader_lines.begin(), shader_lines.end());
-        apply_line_index += shader_lines.size() - 1;
+        size_t current_line_index = include_line_index;
+        for (const std::filesystem::path& shader : shaders) {
+            std::vector<std::string> shader_lines = read_file_lines(shader);
+            shader_lines.insert(shader_lines.begin(), "// ======== BEGIN " + shader.filename().string() + " ========");
+            shader_lines.insert(shader_lines.end(), "// ======== END " + shader.filename().string() + "========");
+            shader_lines.insert(shader_lines.end(), "");
+            combined_lines.insert(combined_lines.begin() + current_line_index, shader_lines.begin(), shader_lines.end());
+            current_line_index += shader_lines.size();
+            apply_line_index += shader_lines.size();
+        }
+        apply_line_index--; // to account for removed %INCLUDE% line
 
-        combined_lines[apply_line_index] = "    color = " + shader.stem().string() + "_apply(color);";
+        combined_lines.erase(combined_lines.begin() + apply_line_index);
+        size_t current_apply_line_index = apply_line_index;
+        for (const std::filesystem::path& shader : shaders) {
+            combined_lines.insert(
+                combined_lines.begin() + current_apply_line_index,
+                "    color = " + shader.stem().string() + "_apply(color);"
+            );
+            current_apply_line_index++;
+        }
+
         std::string result;
-        for (size_t i = 0; i < combined_lines.size(); ++i) {
+        for (size_t i = 0; i < combined_lines.size(); i++) {
             if (i != 0) {
                 result += "\n";
             }

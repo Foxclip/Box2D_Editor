@@ -1,11 +1,10 @@
-// #version 330 core
-
 uniform float alpha_multiplier;
+uniform sampler2D texture;
 
 %INCLUDE%
 
 void main() {
-    vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
+    vec4 color = texture2D(texture, gl_TexCoord[0].xy);
 
     %APPLY%
 

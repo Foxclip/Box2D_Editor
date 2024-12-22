@@ -146,13 +146,16 @@ namespace fw {
 		void endGestureLeft();
 		void endGestureRight();
 		void loadShader(sf::Shader& shader, sf::Shader::Type type, const std::filesystem::path& path);
+		void loadDefaultFragmentShader(sf::Shader& shader, const std::string& name);
 		void loadFragmentShaderPart(sf::Shader& shader, const std::filesystem::path& path);
+		void loadFragmentShaderParts(sf::Shader& shader, const std::string& name, const std::vector<std::filesystem::path>& paths);
 
 	private:
 		friend class Widget;
 		friend class CanvasWidget;
 		Stage stage = Stage::NONE;
 		sf::Shader premultiply;
+		sf::Shader default_shader;
 
 		void mainLoop();
 		void processWidgets();
@@ -176,7 +179,7 @@ namespace fw {
 		void processWorld();
 		void render();
 		void setCursorType(sf::Cursor::Type type);
-		std::string getCombinedShaderString(const std::filesystem::path& shader, const std::filesystem::path& combined_template);
+		std::string getCombinedShaderString(const std::vector<std::filesystem::path>& shaders, const std::filesystem::path& combined_template);
 
 	};
 

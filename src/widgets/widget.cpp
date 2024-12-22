@@ -5,7 +5,9 @@
 
 namespace fw {
 
-	Widget::Widget(WidgetList& widget_list) : widget_list(widget_list) { }
+	Widget::Widget(WidgetList& widget_list) : widget_list(widget_list) {
+		shader = &widget_list.getApplication().default_shader;
+	}
 
 	Widget::~Widget() { }
 
@@ -1344,14 +1346,15 @@ namespace fw {
 			}
 			{
 				// render with straight alpha to texture
+				wAssert(shader);
 				updateRenderTexture(unclipped_region.getQuantized());
 				sf::Sprite sprite = sf::Sprite(render_textures.getNormal().getTexture());
 				sprite.setTextureRect(sf::IntRect(sf::Vector2i(), to2i(render_textures.getSize())));
 				sf::RenderStates states;
 				states.blendMode = sf::BlendNone;
-				if (shader) {
-					states.shader = shader;
-				}
+				states.shader = shader;
+				shader->setUniform("texture", sf::Shader::CurrentTexture);
+				shader->setUniform("alpha_multiplier", alpha_multiplier);
 				sf::RenderTexture& premultiplied_texture = render_textures.getPremultiplied();
 				premultiplied_texture.clear(sf::Color::Transparent);
 				premultiplied_texture.draw(sprite, states);
@@ -1368,7 +1371,6 @@ namespace fw {
 					sf::Shader* premultiply = &widget_list.getApplication().premultiply;
 					premultiply->setUniform("type", static_cast<int>(ColorType::TEXTURE));
 					premultiply->setUniform("src_texture", sf::Shader::CurrentTexture);
-					premultiply->setUniform("alpha_multiplier", alpha_multiplier);
 					states.shader = premultiply;
 				}
 				target.draw(sprite, states);
