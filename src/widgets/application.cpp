@@ -392,6 +392,20 @@ namespace fw {
         }
     }
 
+    void Application::loadFragmentShaderPart(sf::Shader& shader, const std::filesystem::path& path) {
+        std::string combined_shader_string = getCombinedShaderString(path, "shaders/combined_template.frag");
+#ifndef NDEBUG
+        std::string filename = path.stem().string();
+        std::filesystem::create_directory("shaders/combined/");
+        std::filesystem::path combined_path = "shaders/combined/" + filename + "_combined.frag";
+        str_to_file(combined_shader_string, combined_path);
+#endif // NDEBUG
+
+        if (!shader.loadFromMemory(combined_shader_string, sf::Shader::Fragment)) {
+            throw std::runtime_error("Fragment shader part loading error: " + path.string() + ", " + combined_path.string());
+        }
+    }
+
     void Application::mainLoop() {
         wAssert(!external_window);
         while (window.isOpen() && running) {
@@ -628,6 +642,45 @@ namespace fw {
             case sf::Cursor::SizeBottomRight: window.setMouseCursor(size_bottom_right_cursor); break;
             default: window.setMouseCursor(arrow_cursor); break;
         }
+    }
+
+    std::string Application::getCombinedShaderString(const std::filesystem::path& shader, const std::filesystem::path& combined_template) {
+        std::vector<std::string> combined_lines = read_file_lines(combined_template);
+        ptrdiff_t include_line_index = -1;
+        ptrdiff_t apply_line_index = -1;
+        for (size_t i = 0; i < combined_lines.size(); i++) {
+            std::string& line = combined_lines[i];
+            std::string trimmed_line = trim(line);
+            if (trimmed_line == "%INCLUDE%") {
+                include_line_index = i;
+            } else if (trimmed_line == "%APPLY%") {
+				apply_line_index = i;
+            }
+        }
+        if (include_line_index == -1) {
+            throw std::runtime_error("Unable to find %INCLUDE% in " + combined_template.string());
+        }
+        if (apply_line_index == -1) {
+			throw std::runtime_error("Unable to find %APPLY% in " + combined_template.string());
+		}
+        std::filesystem::path relative_path = std::filesystem::relative(shader, std::filesystem::path("shaders/"));
+
+        combined_lines.erase(combined_lines.begin() + include_line_index);
+        std::vector<std::string> shader_lines = read_file_lines(shader);
+        shader_lines.insert(shader_lines.begin(), "// ======== BEGIN " + shader.filename().string() + " ========");
+        shader_lines.insert(shader_lines.end(), "// ======== END " + shader.filename().string() + "========");
+        combined_lines.insert(combined_lines.begin() + include_line_index, shader_lines.begin(), shader_lines.end());
+        apply_line_index += shader_lines.size() - 1;
+
+        combined_lines[apply_line_index] = "    color = " + shader.stem().string() + "_apply(color);";
+        std::string result;
+        for (size_t i = 0; i < combined_lines.size(); ++i) {
+            if (i != 0) {
+                result += "\n";
+            }
+            result += combined_lines[i];
+        }
+		return result;
     }
 
     MouseGesture::MouseGesture() { }

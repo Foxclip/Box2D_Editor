@@ -146,6 +146,7 @@ namespace fw {
 		void endGestureLeft();
 		void endGestureRight();
 		void loadShader(sf::Shader& shader, sf::Shader::Type type, const std::filesystem::path& path);
+		void loadFragmentShaderPart(sf::Shader& shader, const std::filesystem::path& path);
 
 	private:
 		friend class Widget;
@@ -175,6 +176,8 @@ namespace fw {
 		void processWorld();
 		void render();
 		void setCursorType(sf::Cursor::Type type);
+		std::string getCombinedShaderString(const std::filesystem::path& shader, const std::filesystem::path& combined_template);
+
 	};
 
 }

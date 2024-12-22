@@ -44,6 +44,10 @@ namespace fw {
 		QUANTIZE_MODE_CEIL_SUBTRACT,
 	};
 	sf::FloatRect quantize_rect(const sf::FloatRect& rect, QuantizeMode quantize_mode);
+	void str_to_file(std::string& str, const std::filesystem::path& path);
+	std::string file_to_str(const std::filesystem::path& path);
+	std::vector<std::string> read_file_lines(const std::filesystem::path& path);
+	std::string trim(const std::string &s);
 
 	template <typename TNode>
 	concept NodeLess = requires(const TNode& left, const TNode& right) {

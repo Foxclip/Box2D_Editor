@@ -402,3 +402,4 @@ box2d/
 sfml/
 tests/tmp/
 install/
+shaders/combined/
