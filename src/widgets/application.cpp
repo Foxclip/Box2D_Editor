@@ -685,11 +685,11 @@ namespace fw {
             for (size_t i = 0; i < shaders.size(); i++) {
                 const std::filesystem::path& shader = shaders[i];
                 std::vector<std::string> shader_lines = read_file_lines(shader);
-                if (i > 0) {
-                    shader_lines.insert(shader_lines.end(), "");
-                }
                 shader_lines.insert(shader_lines.begin(), "// " + equal_signs + " BEGIN " + shader.filename().string() + " " + equal_signs);
                 shader_lines.insert(shader_lines.end(), "// " + equal_signs + " END " + shader.filename().string() + " " + equal_signs);
+                if (i < shaders.size() - 1) {
+                    shader_lines.insert(shader_lines.end(), "");
+                }
                 combined_lines.insert(combined_lines.begin() + current_line_index, shader_lines.begin(), shader_lines.end());
                 current_line_index += shader_lines.size();
                 apply_line_index += shader_lines.size();
