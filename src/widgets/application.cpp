@@ -672,27 +672,44 @@ namespace fw {
 			throw std::runtime_error("Unable to find %APPLY% in " + combined_template.string());
 		}
 
-        combined_lines.erase(combined_lines.begin() + include_line_index);
-        size_t current_line_index = include_line_index;
-        for (const std::filesystem::path& shader : shaders) {
-            std::vector<std::string> shader_lines = read_file_lines(shader);
-            shader_lines.insert(shader_lines.begin(), "// ======== BEGIN " + shader.filename().string() + " ========");
-            shader_lines.insert(shader_lines.end(), "// ======== END " + shader.filename().string() + "========");
-            shader_lines.insert(shader_lines.end(), "");
-            combined_lines.insert(combined_lines.begin() + current_line_index, shader_lines.begin(), shader_lines.end());
-            current_line_index += shader_lines.size();
-            apply_line_index += shader_lines.size();
+        if (shaders.size() == 0) {
+            combined_lines[include_line_index] = "// No shaders here";
+        } else {
+            combined_lines.erase(combined_lines.begin() + include_line_index);
+            size_t current_line_index = include_line_index;
+            std::string equal_signs;
+            const int equal_signs_amount = 32;
+            for (size_t i = 0; i < equal_signs_amount; i++) {
+                equal_signs += "=";
+            }
+            for (size_t i = 0; i < shaders.size(); i++) {
+                const std::filesystem::path& shader = shaders[i];
+                std::vector<std::string> shader_lines = read_file_lines(shader);
+                if (i > 0) {
+                    shader_lines.insert(shader_lines.end(), "");
+                }
+                shader_lines.insert(shader_lines.begin(), "// " + equal_signs + " BEGIN " + shader.filename().string() + " " + equal_signs);
+                shader_lines.insert(shader_lines.end(), "// " + equal_signs + " END " + shader.filename().string() + " " + equal_signs);
+                combined_lines.insert(combined_lines.begin() + current_line_index, shader_lines.begin(), shader_lines.end());
+                current_line_index += shader_lines.size();
+                apply_line_index += shader_lines.size();
+            }
+            apply_line_index--; // to account for removed %INCLUDE% line
         }
-        apply_line_index--; // to account for removed %INCLUDE% line
 
-        combined_lines.erase(combined_lines.begin() + apply_line_index);
-        size_t current_apply_line_index = apply_line_index;
-        for (const std::filesystem::path& shader : shaders) {
-            combined_lines.insert(
-                combined_lines.begin() + current_apply_line_index,
-                "    color = " + shader.stem().string() + "_apply(color);"
-            );
-            current_apply_line_index++;
+        if (shaders.size() == 0) {
+            combined_lines[apply_line_index] = "    // No shaders here";
+        } else {
+            combined_lines.erase(combined_lines.begin() + apply_line_index);
+            size_t current_apply_line_index = apply_line_index;
+            for (size_t i = 0; i < shaders.size(); i++) {
+                const std::filesystem::path& shader = shaders[i];
+                combined_lines.insert(
+                    combined_lines.begin() + current_apply_line_index,
+                    "    color = " + shader.stem().string() + "_apply(color);"
+                );
+                current_apply_line_index++;
+            }
         }
 
         std::string result;
