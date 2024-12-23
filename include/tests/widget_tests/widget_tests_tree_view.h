@@ -16,6 +16,7 @@ public:
 	void treeviewWidgetDrag2Test(test::Test& test);
 	void treeviewWidgetDrag3Test(test::Test& test);
 	void treeviewWidgetDrag4Test(test::Test& test);
+	void treeviewWidgetDrag5Test(test::Test& test);
 
 private:
 	sf::RenderWindow& getWindow();

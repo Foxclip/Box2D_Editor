@@ -14,6 +14,7 @@ WidgetTestsTreeView::WidgetTestsTreeView(const std::string& name, test::TestModu
     test::Test* tree_view_widget_drag_2_test = addTest("drag_2", { tree_view_widget_drag_1_test }, [&](test::Test& test) { treeviewWidgetDrag2Test(test); });
 	test::Test* tree_view_widget_drag_3_test = addTest("drag_3", { tree_view_widget_drag_2_test }, [&](test::Test& test) { treeviewWidgetDrag3Test(test); });
     test::Test* tree_view_widget_drag_4_test = addTest("drag_4", { tree_view_widget_drag_3_test }, [&](test::Test& test) { treeviewWidgetDrag4Test(test); });
+    test::Test* tree_view_widget_drag_5_test = addTest("drag_5", { tree_view_widget_drag_2_test }, [&](test::Test& test) { treeviewWidgetDrag5Test(test); });
 }
 
 void WidgetTestsTreeView::treeviewWidgetBasicTest(test::Test& test) {
@@ -954,6 +955,56 @@ void WidgetTestsTreeView::treeviewWidgetDrag4Test(test::Test& test) {
     T_WRAP_CONTAINER(check_entries(entry_4, { entry_6, entry_4_1, entry_4_2 }));
     T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
     T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));
+}
+
+void WidgetTestsTreeView::treeviewWidgetDrag5Test(test::Test& test) {
+    fw::Application application(getWindow());
+    application.init(test.name, 800, 600, 0, false);
+    application.setDefaultFont(getFont());
+    application.start(true);
+    application.advance();
+    sf::Vector2f size(200.0f, 100.0f);
+    fw::TreeViewWidget* tree_view_widget = application.getWidgets().createTreeViewWidget(size);
+    sf::Vector2f position(100.0f, 100.0f);
+    tree_view_widget->setPosition(position);
+
+    fw::TreeViewEntry* entry_1 = tree_view_widget->addEntry("Entry 1");
+    fw::TreeViewEntry* entry_2 = tree_view_widget->addEntry("Entry 2");
+    fw::TreeViewEntry* entry_3 = tree_view_widget->addEntry("Entry 3");
+    fw::TreeViewEntry* entry_4 = tree_view_widget->addEntry("Entry 4");
+    fw::Widget* entry_1_widget = entry_1->getWidget();
+    fw::Widget* entry_2_widget = entry_2->getWidget();
+    fw::Widget* entry_3_widget = entry_3->getWidget();
+    fw::Widget* entry_4_widget = entry_4->getWidget();
+    fw::Widget* target_highlight_widget = tree_view_widget->getTargetHighlightWidget();
+    application.advance();
+
+    auto check_top_entries = [&](const std::initializer_list<fw::TreeViewEntry*>& entries) {
+        checkTopEntries(test, tree_view_widget, entries);
+    };
+    auto drag_entry = [&](fw::TreeViewEntry* entry, const sf::Vector2f& pos, bool drop = false) {
+        dragEntry(application, entry, pos, drop);
+    };
+
+    // drop entry 1 between entries 3 and 4
+    // not using drag_entry because entries shift positions when entry 1 is taken
+    sf::Vector2f entry_1_center = entry_1_widget->getGlobalCenter();
+    application.mouseMove(entry_1_center);
+    application.mouseLeftPress();
+    application.advance();
+    // taking entry 1
+    application.mouseMove(entry_1_center + sf::Vector2f(fw::TREEVIEW_ENTRY_DRAG_DISTANCE + 1.0f, 0.0f));
+    application.advance();
+    // dropping it to the current entry 4 top
+    sf::Vector2f entry_4_top = entry_4_widget->getGlobalTop();
+    application.mouseMove(entry_4_top);
+    application.advance();
+    application.advance();
+    application.mouseLeftRelease();
+    application.advance();
+
+    T_COMPARE(tree_view_widget->getAllEntryCount(), 4);
+    T_WRAP_CONTAINER(check_top_entries({ entry_2, entry_3, entry_1, entry_4 }));
 }
 
 sf::RenderWindow& WidgetTestsTreeView::getWindow() {
