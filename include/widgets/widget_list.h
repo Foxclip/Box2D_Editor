@@ -8,12 +8,15 @@
 namespace fw {
 
 	const float DEBUG_RENDER_ORIGIN_SIZE = 10.0f;
-	const float DEBUG_RENDER_MOUSE_SIZE = 10.0f;
+	const float DEBUG_RENDER_MOUSE_SIZE = 11.0f;
 	const sf::Color DEBUG_RENDER_TRANSFORMED_BOUNDS_COLOR = sf::Color(0, 255, 0);
 	const sf::Color DEBUG_RENDER_BOUNDS_COLOR = sf::Color(0, 128, 0);
 	const sf::Color DEBUG_RENDER_POSITION_COLOR = sf::Color(255, 0, 0);
 	const sf::Color DEBUG_RENDER_TRANSFORM_POSITION_COLOR = sf::Color(0, 0, 255);
-	const sf::Color DEBUG_RENDER_MOUSE_POSITION_COLOR = sf::Color(255, 255, 255);
+	const sf::Color DEBUG_RENDER_MOUSE_POSITION_COLOR = sf::Color(255, 255, 255, 128);
+	const sf::Color DEBUG_RENDER_MOUSE_LEFT_RECT_COLOR = sf::Color(255, 64, 0, 64);
+	const sf::Color DEBUG_RENDER_MOUSE_RIGHT_RECT_COLOR = sf::Color(0, 255, 0, 64);
+	const sf::Color DEBUG_RENDER_MOUSE_MIDDLE_RECT_COLOR = sf::Color(0, 200, 255, 64);
 	const sf::Color DEBUG_RENDER_FOCUSED_WIDGET_BOUNDS_COLOR = sf::Color(0, 200, 255);
 
 	class PendingOperation {
@@ -100,6 +103,9 @@ namespace fw {
 		Widget* getRightGestureSource() const;
 		sf::Vector2f getMousePosf() const;
 		sf::Vector2u getWindowSize() const;
+		bool isLeftButtonPressed() const;
+		bool isRightButtonPressed() const;
+		bool isMiddleButtonPressed() const;
 		bool isLCtrlPressed() const;
 		bool isLAltPressed() const;
 		bool isLShiftPressed() const;

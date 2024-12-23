@@ -260,6 +260,18 @@ namespace fw {
         addExternalEvent(event);
     }
 
+    bool Application::isLeftButtonPressed() const {
+        return leftButtonPressed;
+    }
+
+    bool Application::isRightButtonPressed() const {
+        return rightButtonPressed;
+    }
+
+    bool Application::isMiddleButtonPressed() const {
+        return middleButtonPressed;
+    }
+
     bool Application::isLCtrlPressed() const {
         if (external_control) {
             return external_lctrl_pressed;
@@ -485,6 +497,10 @@ namespace fw {
                     mousePrevPos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
                     processRightPress();
                     break;
+                case sf::Mouse::Middle:
+                    middleButtonPressed = true;
+					processMiddlePress();
+					break;
             }
         } else if (event.type == sf::Event::MouseButtonReleased) {
             switch (event.mouseButton.button) {
@@ -496,6 +512,10 @@ namespace fw {
                     rightButtonPressed = false;
                     processRightRelease();
                     break;
+				case sf::Mouse::Middle:
+					middleButtonPressed = false;
+					processMiddleRelease();
+					break;
             }
         } else if (event.type == sf::Event::MouseMoved) {
             processMouseMove();
@@ -558,6 +578,10 @@ namespace fw {
         }
     }
 
+    void Application::processMiddlePress() {
+        // Not implemented yet
+    }
+
     void Application::processLeftRelease() {
         if (!mouse_gesture_left.active) {
             return;
@@ -574,6 +598,10 @@ namespace fw {
         widgets.processRightRelease(getMousePosf());
         onProcessRightRelease();
         endGestureRight();
+    }
+
+    void Application::processMiddleRelease() {
+        // Not implemented yet
     }
 
     void Application::processMouseMove() {
