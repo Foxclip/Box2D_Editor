@@ -8,10 +8,12 @@
 namespace fw {
 
 	const float DEBUG_RENDER_ORIGIN_SIZE = 10.0f;
+	const float DEBUG_RENDER_MOUSE_SIZE = 10.0f;
 	const sf::Color DEBUG_RENDER_TRANSFORMED_BOUNDS_COLOR = sf::Color(0, 255, 0);
 	const sf::Color DEBUG_RENDER_BOUNDS_COLOR = sf::Color(0, 128, 0);
 	const sf::Color DEBUG_RENDER_POSITION_COLOR = sf::Color(255, 0, 0);
 	const sf::Color DEBUG_RENDER_TRANSFORM_POSITION_COLOR = sf::Color(0, 0, 255);
+	const sf::Color DEBUG_RENDER_MOUSE_POSITION_COLOR = sf::Color(255, 255, 255);
 	const sf::Color DEBUG_RENDER_FOCUSED_WIDGET_BOUNDS_COLOR = sf::Color(0, 200, 255);
 
 	class PendingOperation {
@@ -75,6 +77,7 @@ namespace fw {
 	class WidgetList {
 	public:
 		bool debug_render = false;
+		bool debug_mouse = true;
 		Event<> OnProcessAfterInput;
 
 		WidgetList(Application& application);
