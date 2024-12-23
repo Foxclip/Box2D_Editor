@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_toposort.h"
 
-WidgetTestsToposort::WidgetTestsToposort(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsToposort::WidgetTestsToposort(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* empty_test = addTest("empty", [&](test::Test& test) { toposortEmptyTest(test); });
     test::Test* one_node_test = addTest("one_node", { empty_test }, [&](test::Test& test) { toposort1NodeTest(test); });
     test::Test* three_nodes_test = addTest("three_nodes", { one_node_test }, [&](test::Test& test) { toposort3NodesTest(test); });

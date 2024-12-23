@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_basic.h"
 
-WidgetTestsBasic::WidgetTestsBasic(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsBasic::WidgetTestsBasic(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* root_widget_test = addTest("root_widget", [&](test::Test& test) { rootWidgetTest(test); });
     test::Test* empty_widget_test = addTest("empty_widget", { root_widget_test }, [&](test::Test& test) { emptyWidgetTest(test); });
     test::Test* rectangle_widget_test = addTest("rectangle_widget", { root_widget_test }, [&](test::Test& test) { rectangleWidgetTest(test); });
@@ -948,8 +948,4 @@ void WidgetTestsBasic::remove2Test(test::Test& test) {
     }
 
     application.advance();
-}
-
-sf::RenderWindow& WidgetTestsBasic::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
 }

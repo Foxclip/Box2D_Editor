@@ -1,7 +1,10 @@
+#pragma once
+
 #include "widgets/widget.h"
 #include "test_lib/test.h"
+#include "tests/widget_tests/widget_test.h"
 
-class WidgetTestsTextbox : public test::TestModule {
+class WidgetTestsTextbox : public WidgetTest {
 public:
 	WidgetTestsTextbox(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 	void textboxWidgetBasicTest(test::Test& test);
@@ -19,8 +22,6 @@ public:
 	void textboxWidgetFloatTest(test::Test& test);
 
 private:
-	sf::RenderWindow& getWindow();
-	fw::Font& getFont();
 	fw::TextBoxWidget* initTextBox(fw::Application& application, const std::string& test_name, float width, float height);
 
 };

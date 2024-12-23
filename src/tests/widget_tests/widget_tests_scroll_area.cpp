@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_scroll_area.h"
 
-WidgetTestsScrollArea::WidgetTestsScrollArea(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsScrollArea::WidgetTestsScrollArea(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* scroll_area_widget_basic_test = addTest("basic", [&](test::Test& test) { scrollAreaWidgetBasicTest(test); });
     test::Test* scroll_area_widget_scroll_test = addTest("scroll", { scroll_area_widget_basic_test }, [&](test::Test& test) { scrollAreaWidgetScrollTest(test); });
     test::Test* scroll_area_widget_scrollbar_visibility_test = addTest("scrollbar_visibility", { scroll_area_widget_basic_test }, [&](test::Test& test) { scrollAreaWidgetScrollbarVisibilityTest(test); });
@@ -295,12 +295,4 @@ void WidgetTestsScrollArea::scrollAreaWidgetScrollbarContainerTest(test::Test& t
     T_CHECK(!scroll_area_widget->getScrollbarXWidget()->isVisible());
     T_CHECK(!scroll_area_widget->getScrollbarYWidget()->isVisible());
     T_COMPARE(container_widget->getWidth(), scroll_area_size.x);
-}
-
-sf::RenderWindow& WidgetTestsScrollArea::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
-}
-
-fw::Font& WidgetTestsScrollArea::getFont() {
-    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

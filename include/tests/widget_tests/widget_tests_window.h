@@ -1,7 +1,10 @@
+#pragma once
+
 #include "widgets/widget.h"
 #include "test_lib/test.h"
+#include "tests/widget_tests/widget_test.h"
 
-class WidgetTestsWindow: public test::TestModule {
+class WidgetTestsWindow: public WidgetTest {
 public:
 	WidgetTestsWindow(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 	void windowWidgetBasicTest(test::Test& test);
@@ -15,8 +18,6 @@ public:
 	void windowWidgetMoveToTopResizeTest(test::Test& test);
 
 private:
-	sf::RenderWindow& getWindow();
-	fw::Font& getFont();
 	void resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget);
 
 };

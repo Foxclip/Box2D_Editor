@@ -1,7 +1,10 @@
+#pragma once
+
 #include "widgets/widget.h"
 #include "test_lib/test.h"
+#include "tests/widget_tests/widget_test.h"
 
-class WidgetTestsTreeView: public test::TestModule {
+class WidgetTestsTreeView: public WidgetTest {
 public:
 	WidgetTestsTreeView(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 	void treeviewWidgetBasicTest(test::Test& test);
@@ -19,8 +22,6 @@ public:
 	void treeviewWidgetDrag5Test(test::Test& test);
 
 private:
-	sf::RenderWindow& getWindow();
-	fw::Font& getFont();
 	static float calcTreeViewEntryHeight(fw::TreeViewEntry* entry);
 	static float calcTreeViewHeight(fw::TreeViewWidget* treeview);
 	static void checkTopEntries(test::Test& test, fw::TreeViewWidget* tree_view_widget, const std::initializer_list<fw::TreeViewEntry*>& entries);

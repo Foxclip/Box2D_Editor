@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_application.h"
 
-WidgetTestsApplication::WidgetTestsApplication(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsApplication::WidgetTestsApplication(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* basic_test = addTest("basic", [&](test::Test& test) { basicTest(test); });
     test::Test* init_test = addTest("init", { basic_test }, [&](test::Test& test) { initTest(test); });
     test::Test* start_test = addTest("start", { init_test }, [&](test::Test& test) { startTest(test); });
@@ -145,10 +145,6 @@ void WidgetTestsApplication::keyboardEventsTest(test::Test& test) {
         application.advance();
         T_CHECK(!application.space_key_pressed);
     }
-}
-
-sf::RenderWindow& WidgetTestsApplication::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
 }
 
 TestApplication::TestApplication(sf::RenderWindow& window) : Application(window) { }

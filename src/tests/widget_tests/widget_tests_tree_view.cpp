@@ -2,7 +2,7 @@
 #include "tests/widget_tests/widget_tests_tree_view.h"
 #include "widgets/tree_view_entry.h"
 
-WidgetTestsTreeView::WidgetTestsTreeView(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsTreeView::WidgetTestsTreeView(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* tree_view_widget_basic_test = addTest("basic", [&](test::Test& test) { treeviewWidgetBasicTest(test); });
     test::Test* tree_view_widget_entries_test = addTest("entries", { tree_view_widget_basic_test }, [&](test::Test& test) { treeviewWidgetEntriesTest(test); });
     test::Test* tree_view_widget_parent1_test = addTest("parent_1", { tree_view_widget_entries_test }, [&](test::Test& test) { treeviewWidgetParent1Test(test); });
@@ -1006,14 +1006,6 @@ void WidgetTestsTreeView::treeviewWidgetDrag5Test(test::Test& test) {
 
     T_COMPARE(tree_view_widget->getAllEntryCount(), 4);
     T_WRAP_CONTAINER(check_top_entries({ entry_2, entry_3, entry_1, entry_4 }));
-}
-
-sf::RenderWindow& WidgetTestsTreeView::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
-}
-
-fw::Font& WidgetTestsTreeView::getFont() {
-    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }
 
 float WidgetTestsTreeView::calcTreeViewEntryHeight(fw::TreeViewEntry* entry) {

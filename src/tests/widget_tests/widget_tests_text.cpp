@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_text.h"
 
-WidgetTestsText::WidgetTestsText(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsText::WidgetTestsText(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* text_widget_basic_test = addTest("basic", [&](test::Test& test) { textWidgetTest(test); });
     test::Test* text_widget_default_font_test = addTest("default_font", { text_widget_basic_test }, [&](test::Test& test) { textWidgetDefaultFontTest(test); });
 }
@@ -72,12 +72,4 @@ void WidgetTestsText::textWidgetDefaultFontTest(test::Test& test) {
     sf::Vector2f position(100.0f, 100.0f);
     text_widget->setPosition(position);
     application.advance();
-}
-
-sf::RenderWindow& WidgetTestsText::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
-}
-
-fw::Font& WidgetTestsText::getFont() {
-    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

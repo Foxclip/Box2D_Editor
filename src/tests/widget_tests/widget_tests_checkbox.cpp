@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_checkbox.h"
 
-WidgetTestsCheckbox::WidgetTestsCheckbox(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsCheckbox::WidgetTestsCheckbox(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* checkbox_widget_basic_test = addTest("basic", [&](test::Test& test) { checkboxWidgetBasicTest(test); });
     test::Test* checkbox_widget_toggle_test = addTest("toggle", { checkbox_widget_basic_test }, [&](test::Test& test) { checkboxWidgetToggleTest(test); });
 }
@@ -75,12 +75,4 @@ void WidgetTestsCheckbox::checkboxWidgetToggleTest(test::Test& test) {
     application.mouseLeftRelease();
     application.advance();
     T_CHECK(checkbox_widget->getValue());
-}
-
-sf::RenderWindow& WidgetTestsCheckbox::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
-}
-
-fw::Font& WidgetTestsCheckbox::getFont() {
-    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

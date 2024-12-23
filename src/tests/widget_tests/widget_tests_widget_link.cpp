@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_widget_link.h"
 
-WidgetTestsWidgetLink::WidgetTestsWidgetLink(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsWidgetLink::WidgetTestsWidgetLink(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* widget_link_basic_test = addTest("basic", [&](test::Test& test) { widgetLinkBasicTest(test); });
     test::Test* widget_link_targets_func_test = addTest("target_func", [&](test::Test& test) { widgetLinkTargetsFuncTest(test); });
     test::Test* widget_link_container_test = addTest("container", { widget_link_basic_test }, [&](test::Test& test) { widgetLinkContainerTest(test); });
@@ -174,12 +174,4 @@ void WidgetTestsWidgetLink::widgetLinkRemoveTest(test::Test& test) {
     rectangle_2_widget->setPosition(position3);
     application.advance();
     T_ASSERT(T_VEC2_APPROX_COMPARE(rectangle_2_widget->getPosition(), position3));
-}
-
-sf::RenderWindow& WidgetTestsWidgetLink::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
-}
-
-fw::Font& WidgetTestsWidgetLink::getFont() {
-    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

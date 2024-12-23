@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_dropdown.h"
 
-WidgetTestsDropdown::WidgetTestsDropdown(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsDropdown::WidgetTestsDropdown(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* dropdown_widget_basic_test = addTest("basic", [&](test::Test& test) { dropdownWidgetBasicTest(test); });
     test::Test* dropdown_widget_options_1_test = addTest("options_1", { dropdown_widget_basic_test }, [&](test::Test& test) { dropdownWidgetOptions1Test(test); });
     test::Test* dropdown_widget_options_2_test = addTest("options_2", { dropdown_widget_options_1_test }, [&](test::Test& test) { dropdownWidgetOptions2Test(test); });
@@ -141,12 +141,4 @@ void WidgetTestsDropdown::dropdownWidgetOptions2Test(test::Test& test) {
     T_COMPARE(dropdown_widget->getOptionText(0), "option1");
     T_COMPARE(dropdown_widget->getOptionText(1), "option3");
     T_COMPARE(dropdown_widget->getOptionText(2), "option2");
-}
-
-sf::RenderWindow& WidgetTestsDropdown::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
-}
-
-fw::Font& WidgetTestsDropdown::getFont() {
-    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

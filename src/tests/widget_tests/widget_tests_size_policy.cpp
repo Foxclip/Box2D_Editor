@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_size_policy.h"
 
-WidgetTestsSizePolicy::WidgetTestsSizePolicy(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsSizePolicy::WidgetTestsSizePolicy(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* size_policy_basic_test = addTest("basic", [&](test::Test& test) { sizePolicyTest(test); });
     test::Test* size_policy_position_test = addTest("position", [&](test::Test& test) { sizePolicyPositionTest(test); });
     test::Test* size_policy_expand_test = addTest("expand", [&](test::Test& test) { sizePolicyExpandTest(test); });
@@ -267,12 +267,4 @@ void WidgetTestsSizePolicy::sizePolicyCombinedTest(test::Test& test) {
     T_COMPARE(green_widget->getParentLocalBounds(), sf::FloatRect(green_x, container_padding, green_width, child_size.y), rect_to_str);
     T_COMPARE(blue_widget->getParentLocalBounds(), sf::FloatRect(blue_x, container_padding, child_size.x, child_size.y), rect_to_str);
     T_COMPARE(yellow_widget->getParentLocalBounds(), sf::FloatRect(container_padding, yellow_y, child_size.x, yellow_height), rect_to_str);
-}
-
-sf::RenderWindow& WidgetTestsSizePolicy::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
-}
-
-fw::Font& WidgetTestsSizePolicy::getFont() {
-    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_container.h"
 
-WidgetTestsContainer::WidgetTestsContainer(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsContainer::WidgetTestsContainer(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* container_widget_basic_test = addTest("basic", [&](test::Test& test) { containerWidgetBasicTest(test); });
     test::Test* container_widget_children_test = addTest("children", { container_widget_basic_test }, [&](test::Test& test) { containerWidgetChildrenTest(test); });
     test::Test* container_widget_padding_test = addTest("padding", { container_widget_children_test }, [&](test::Test& test) { containerWidgetPaddingTest(test); });
@@ -151,12 +151,4 @@ void WidgetTestsContainer::containerWidgetPaddingTest(test::Test& test) {
         T_VEC2_APPROX_COMPARE(child_2_widget->getPosition(), sf::Vector2f(left_padding, child_2_y));
         T_VEC2_APPROX_COMPARE(child_3_widget->getPosition(), sf::Vector2f(left_padding, child_3_y));
     }
-}
-
-sf::RenderWindow& WidgetTestsContainer::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
-}
-
-fw::Font& WidgetTestsContainer::getFont() {
-    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }

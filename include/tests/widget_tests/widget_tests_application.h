@@ -1,8 +1,11 @@
+#pragma once
+
 #include "widgets/widget.h"
 #include "widgets/application.h"
 #include "test_lib/test.h"
+#include "tests/widget_tests/widget_test.h"
 
-class WidgetTestsApplication : public test::TestModule {
+class WidgetTestsApplication : public WidgetTest {
 public:
 	WidgetTestsApplication(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 	void basicTest(test::Test& test);
@@ -12,9 +15,6 @@ public:
 	void closeTest(test::Test& test);
 	void mouseEventsTest(test::Test& test);
 	void keyboardEventsTest(test::Test& test);
-
-private:
-	sf::RenderWindow& getWindow();
 
 };
 

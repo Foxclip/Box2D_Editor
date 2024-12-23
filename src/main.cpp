@@ -64,17 +64,18 @@ int main() {
 
     execute_app();
 
-    // TODO: Tests: WidgetTestsTreeView: put getWindow and getFont into WidgetTests
     // TODO: Tests: visualize mouse movements and clicks
     // TODO: TreeViewWidget: cancel dragging with Esc
-    // TODO: TreeViewWidget: reorder entries
-    // TODO: TreeViewWidget: reparent entries
+    // TODO: Outliner: reorder objects
+    // TODO: Outliner: reparent objects
     // TODO: Simulation: rename getFromAll to getObject and getFromTop to getTopObject
     // TODO: Editor: put Camera in separate file
     // TODO: WidgetList: use addPending methods explicitly instead of sneakily calling them from other methods like moveToTop
     // TODO: Widget: make test for setParent with keep_pos = true
     // TODO: Outliner: rename object
     // TODO: Outliner: delete object
+    // TODO: Outliner: buttons up/down for reordering objects
+    // TODO: TreeViewWidget: don't take grabbed widgets out of the hierarchy, create phantom copies instead
     // TODO: Objectlist: OnAfterObjectRemoved test
     // TODO: Objectlist: OnObjectRenamed
     // TODO: ContainerWidget: test invisible widgets

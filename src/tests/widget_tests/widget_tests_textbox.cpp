@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_textbox.h"
 
-WidgetTestsTextbox::WidgetTestsTextbox(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsTextbox::WidgetTestsTextbox(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* textbox_widget_basic_test = addTest("basic", [&](test::Test& test) { textboxWidgetBasicTest(test); });
     test::Test* textbox_widget_input_test = addTest("input", { textbox_widget_basic_test }, [&](test::Test& test) { textboxWidgetInputTest(test); });
     test::Test* textbox_widget_events_test = addTest("events", { textbox_widget_input_test }, [&](test::Test& test) { textboxWidgetEventsTest(test); });
@@ -730,14 +730,6 @@ void WidgetTestsTextbox::textboxWidgetFloatTest(test::Test& test) {
     T_CHECK(!textbox_widget->isValidValue());
 
     ENTER_TEXT(sf::Keyboard::Backspace, '\b');
-}
-
-sf::RenderWindow& WidgetTestsTextbox::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
-}
-
-fw::Font& WidgetTestsTextbox::getFont() {
-    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }
 
 fw::TextBoxWidget* WidgetTestsTextbox::initTextBox(fw::Application& application, const std::string& test_name, float width, float height) {

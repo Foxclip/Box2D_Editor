@@ -1,7 +1,10 @@
+#pragma once
+
 #include "widgets/widget.h"
 #include "test_lib/test.h"
+#include "tests/widget_tests/widget_test.h"
 
-class WidgetTestsBasic : public test::TestModule {
+class WidgetTestsBasic : public WidgetTest {
 public:
 	WidgetTestsBasic(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 	void rootWidgetTest(test::Test& test);
@@ -18,8 +21,5 @@ public:
 	void anchorTest(test::Test& test);
 	void remove1Test(test::Test& test);
 	void remove2Test(test::Test& test);
-
-private:
-	sf::RenderWindow& getWindow();
 
 };

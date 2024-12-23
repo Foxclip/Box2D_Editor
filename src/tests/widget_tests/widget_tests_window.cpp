@@ -1,7 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_window.h"
 
-WidgetTestsWindow::WidgetTestsWindow(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
+WidgetTestsWindow::WidgetTestsWindow(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* window_widget_basic_test = addTest("basic", [&](test::Test& test) { windowWidgetBasicTest(test); });
     test::Test* window_widget_drag_test = addTest("drag", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetDragTest(test); });
     test::Test* window_widget_children_test = addTest("children", { window_widget_basic_test }, [&](test::Test& test) { windowWidgetChildrenTest(test); });
@@ -517,14 +517,6 @@ void WidgetTestsWindow::windowWidgetMoveToTopResizeTest(test::Test& test) {
     WidgetTests::resizeWindow(window_widget, WidgetTests::ResizePoint::BOTTOM, resize_offset);
     WidgetTests::dragWindow(application, window_widget, sf::Vector2f(window_width, 0.0f));
     T_VEC2_APPROX_COMPARE(window_widget->getPosition(), position2);
-}
-
-sf::RenderWindow& WidgetTestsWindow::getWindow() {
-    return dynamic_cast<WidgetTests*>(parent)->window;
-}
-
-fw::Font& WidgetTestsWindow::getFont() {
-    return dynamic_cast<WidgetTests*>(parent)->textbox_font;
 }
 
 void WidgetTestsWindow::resizeWindowTest(fw::Application& application, test::Test& test, fw::WindowWidget* widget) {
