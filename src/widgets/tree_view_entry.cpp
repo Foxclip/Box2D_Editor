@@ -280,7 +280,7 @@ namespace fw {
 		}
 	}
 
-	void TreeViewEntry::setParent(TreeViewEntry* new_parent) {
+	void TreeViewEntry::setParent(TreeViewEntry* new_parent, bool reparent_widget) {
 		if (new_parent) {
 			wAssert(treeview.all_entries.contains(new_parent));
 		}
@@ -294,7 +294,9 @@ namespace fw {
 		} else {
 			treeview.top_entries.add(this);
 		}
-		setWidgetParent(new_parent);
+		if (reparent_widget) {
+			setWidgetParent(new_parent);
+		}
 		this->parent = new_parent;
 	}
 
@@ -335,7 +337,7 @@ namespace fw {
 	}
 
 	void TreeViewEntry::take() {
-		treeview.widget_list.addPendingSetParent(entry_widget, treeview.widget_list.getRootWidget(), true);
+		treeview.addPendingDetach(this);
 		entry_widget->setParentAnchor(Widget::Anchor::CUSTOM);
 		entry_widget->setSizeXPolicy(Widget::SizePolicy::NONE);
 		setGrabbedVisualMode();
@@ -348,7 +350,7 @@ namespace fw {
 	void TreeViewEntry::drop() {
 		ptrdiff_t highlighted_entry_index = -1;
 		if (treeview.highlighted_entry) {
-			highlighted_entry_index = treeview.highlighted_entry->getIndex(this);
+			highlighted_entry_index = treeview.highlighted_entry->getIndex(nullptr);
 			TreeViewEntry* highlighted_entry_parent = treeview.highlighted_entry->getParent();
 			treeview.addPendingEntrySetParent(this, highlighted_entry_parent, highlighted_entry_index);
 		} else {

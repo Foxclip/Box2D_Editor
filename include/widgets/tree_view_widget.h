@@ -58,6 +58,15 @@ namespace fw {
 
 	};
 
+	class PendingEntryDetach : public PendingEntryOperation {
+	public:
+		TreeViewEntry* entry = nullptr;
+
+		PendingEntryDetach(TreeViewWidget& tree_view_widget, TreeViewEntry* entry);
+		void execute() override;
+
+	};
+
 	class TreeViewWidget : public ContainerWidget {
 	public:
 		Event<TreeViewEntry*> OnEntryClicked;
@@ -77,6 +86,7 @@ namespace fw {
 		void addPendingEntryMove(TreeViewEntry* entry, size_t index);
 		void addPendingEntryDelete(TreeViewEntry* entry, bool with_children);
 		void addPendingEntrySetParent(TreeViewEntry* entry, TreeViewEntry* new_parent, ptrdiff_t move_to_index = -1);
+		void addPendingDetach(TreeViewEntry* entry);
 		void executePendingOperations();
 		void selectAll();
 		void deselectAll();
@@ -95,6 +105,7 @@ namespace fw {
 		friend class PendingEntryMove;
 		friend class PendingEntryDelete;
 		friend class PendingEntrySetParent;
+		friend class PendingEntryDetach;
 		CompVectorUptr<TreeViewEntry> all_entries;
 		CompVector<TreeViewEntry*> top_entries;
 		TreeViewEntry* grabbed_entry = nullptr;
@@ -103,6 +114,7 @@ namespace fw {
 		CompVectorUptr<PendingEntryMove> pending_entry_move;
 		CompVectorUptr<PendingEntryDelete> pending_entry_delete;
 		CompVectorUptr<PendingEntrySetParent> pending_entry_setparent;
+		CompVectorUptr<PendingEntryDetach> pending_entry_detach;
 
 		void deselectAllExceptEntry(TreeViewEntry* except_entry = nullptr);
 		void deselectAllExceptSubtree(TreeViewEntry* except_subtree = nullptr);

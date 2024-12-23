@@ -137,6 +137,14 @@ namespace fw {
 		pending_entry_setparent.add(std::move(uptr));
 	}
 
+	void TreeViewWidget::addPendingDetach(TreeViewEntry* entry) {
+		wAssert(!widget_list.isLocked());
+		DataPointer<PendingEntryDetach> uptr = make_data_pointer<PendingEntryDetach>(
+			"PendingEntryDetach " + entry->name, *this, entry
+		);
+		pending_entry_detach.add(std::move(uptr));
+	}
+
 	void TreeViewWidget::executePendingOperations() {
 		for (PendingEntryMove* op : pending_entry_move) {
 			op->execute();
@@ -147,9 +155,13 @@ namespace fw {
 		for (PendingEntryDelete* op : pending_entry_delete) {
 			op->execute();
 		}
+		for (PendingEntryDetach* op : pending_entry_detach) {
+			op->execute();
+		}
 		pending_entry_move.clear();
 		pending_entry_delete.clear();
 		pending_entry_setparent.clear();
+		pending_entry_detach.clear();
 	}
 
 	void TreeViewWidget::selectAll() {
@@ -294,6 +306,17 @@ namespace fw {
 		if (move_to_index >= 0) {
 			entry->moveToIndex(move_to_index);
 		}
+	}
+
+	PendingEntryDetach::PendingEntryDetach(TreeViewWidget& tree_view_widget, TreeViewEntry* entry) : PendingEntryOperation(tree_view_widget) {
+		this->entry = entry;
+	}
+
+	void PendingEntryDetach::execute() {
+		wAssert(tree_view_widget.all_entries.contains(entry));
+		entry->setParent(nullptr, false);
+		entry->getWidget()->setParentKeepPos(nullptr);
+		tree_view_widget.top_entries.remove(entry);
 	}
 
 }
