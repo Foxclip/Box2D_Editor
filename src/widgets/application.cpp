@@ -17,6 +17,7 @@ namespace fw {
         unsigned int antialiasing,
         bool vsync
     ) {
+        loadDefaultFragmentShader(default_shader, "default");
         loadShader(premultiply, sf::Shader::Fragment, "shaders/premultiply.frag");
         sf::ContextSettings cs_window;
         cs_window.antialiasingLevel = antialiasing;
@@ -392,6 +393,27 @@ namespace fw {
         }
     }
 
+    void Application::loadDefaultFragmentShader(sf::Shader& shader, const std::string& name) {
+        loadFragmentShaderParts(shader, "default", { });
+    }
+
+    void Application::loadFragmentShaderPart(sf::Shader& shader, const std::filesystem::path& path) {
+        loadFragmentShaderParts(shader, path.stem().string(), { path });
+    }
+
+    void Application::loadFragmentShaderParts(sf::Shader& shader, const std::string& name, const std::vector<std::filesystem::path>& paths) {
+        std::string combined_shader_string = getCombinedShaderString(paths, "shaders/combined_template.frag");
+#ifndef NDEBUG
+        std::filesystem::create_directory("shaders/combined/");
+        std::filesystem::path combined_path = "shaders/combined/" + name + "_combined.frag";
+        str_to_file(combined_shader_string, combined_path);
+#endif // NDEBUG
+
+        if (!shader.loadFromMemory(combined_shader_string, sf::Shader::Fragment)) {
+            throw std::runtime_error("Fragment shader part compilation error: " + combined_path.string());
+        }
+    }
+
     void Application::mainLoop() {
         wAssert(!external_window);
         while (window.isOpen() && running) {
@@ -628,6 +650,76 @@ namespace fw {
             case sf::Cursor::SizeBottomRight: window.setMouseCursor(size_bottom_right_cursor); break;
             default: window.setMouseCursor(arrow_cursor); break;
         }
+    }
+
+    std::string Application::getCombinedShaderString(const std::vector<std::filesystem::path>& shaders, const std::filesystem::path& combined_template) {
+        std::vector<std::string> combined_lines = read_file_lines(combined_template);
+        ptrdiff_t include_line_index = -1;
+        ptrdiff_t apply_line_index = -1;
+        for (size_t i = 0; i < combined_lines.size(); i++) {
+            std::string& line = combined_lines[i];
+            std::string trimmed_line = trim(line);
+            if (trimmed_line == "%INCLUDE%") {
+                include_line_index = i;
+            } else if (trimmed_line == "%APPLY%") {
+				apply_line_index = i;
+            }
+        }
+        if (include_line_index == -1) {
+            throw std::runtime_error("Unable to find %INCLUDE% in " + combined_template.string());
+        }
+        if (apply_line_index == -1) {
+			throw std::runtime_error("Unable to find %APPLY% in " + combined_template.string());
+		}
+
+        if (shaders.size() == 0) {
+            combined_lines[include_line_index] = "// No shaders here";
+        } else {
+            combined_lines.erase(combined_lines.begin() + include_line_index);
+            size_t current_line_index = include_line_index;
+            std::string equal_signs;
+            const int equal_signs_amount = 32;
+            for (size_t i = 0; i < equal_signs_amount; i++) {
+                equal_signs += "=";
+            }
+            for (size_t i = 0; i < shaders.size(); i++) {
+                const std::filesystem::path& shader = shaders[i];
+                std::vector<std::string> shader_lines = read_file_lines(shader);
+                shader_lines.insert(shader_lines.begin(), "// " + equal_signs + " BEGIN " + shader.filename().string() + " " + equal_signs);
+                shader_lines.insert(shader_lines.end(), "// " + equal_signs + " END " + shader.filename().string() + " " + equal_signs);
+                if (i < shaders.size() - 1) {
+                    shader_lines.insert(shader_lines.end(), "");
+                }
+                combined_lines.insert(combined_lines.begin() + current_line_index, shader_lines.begin(), shader_lines.end());
+                current_line_index += shader_lines.size();
+                apply_line_index += shader_lines.size();
+            }
+            apply_line_index--; // to account for removed %INCLUDE% line
+        }
+
+        if (shaders.size() == 0) {
+            combined_lines[apply_line_index] = "    // No shaders here";
+        } else {
+            combined_lines.erase(combined_lines.begin() + apply_line_index);
+            size_t current_apply_line_index = apply_line_index;
+            for (size_t i = 0; i < shaders.size(); i++) {
+                const std::filesystem::path& shader = shaders[i];
+                combined_lines.insert(
+                    combined_lines.begin() + current_apply_line_index,
+                    "    color = " + shader.stem().string() + "_apply(color);"
+                );
+                current_apply_line_index++;
+            }
+        }
+
+        std::string result;
+        for (size_t i = 0; i < combined_lines.size(); i++) {
+            if (i != 0) {
+                result += "\n";
+            }
+            result += combined_lines[i];
+        }
+		return result;
     }
 
     MouseGesture::MouseGesture() { }

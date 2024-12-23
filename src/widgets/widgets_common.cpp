@@ -1,4 +1,5 @@
 #include "widgets/widgets_common.h"
+#include <fstream>
 
 namespace fw {
 
@@ -135,6 +136,51 @@ namespace fw {
 		float quantized_height = quantized_bottom_right.y - quantized_top_left.y;
 		sf::FloatRect quantized_bounds(quantized_top_left, sf::Vector2f(quantized_width, quantized_height));
 		return quantized_bounds;
+	}
+
+	void str_to_file(std::string& str, const std::filesystem::path& path) {
+		std::ofstream ofstream(path);
+		if (ofstream.is_open()) {
+			ofstream << str;
+		} else {
+			std::string p = path.string();
+			p.resize(FILENAME_MAX);
+			throw std::runtime_error("File write error: " + p);
+		}
+	}
+
+	std::string file_to_str(const std::filesystem::path& path) {
+		if (!std::filesystem::exists(path)) {
+			throw std::format("File not found: {}", path.string());
+		}
+		std::ifstream t(path);
+		std::stringstream buffer;
+		buffer << t.rdbuf();
+		return buffer.str();
+	}
+
+	std::vector<std::string> read_file_lines(const std::filesystem::path& path) {
+		std::vector<std::string> lines;
+		std::ifstream file(path);
+		if (!file.is_open()) {
+			throw(std::runtime_error("Failed to open file: " + path.string()));
+		}
+		std::string line;
+		while (std::getline(file, line)) {
+			lines.push_back(line);
+		}
+		file.close();
+		return lines;
+	}
+
+	std::string trim(const std::string &s) {
+		if (!s.empty()) {
+			std::string copy = s;
+			copy.erase(copy.begin(), std::find_if(copy.begin(), copy.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+			copy.erase(std::find_if(copy.rbegin(), copy.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), copy.end());
+			return copy;
+		}
+		return s;
 	}
 
 }

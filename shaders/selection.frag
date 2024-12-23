@@ -19,11 +19,11 @@ float sqrDist(vec2 v1, vec2 v2) {
     return dot(C, C);
 }
 
-void main() {
+vec4 selection_apply(vec4 color) {
     vec2 coord = gl_TexCoord[0].xy;
     ivec2 pixel_coord = toPixel(coord);
     vec4 mask_value = texture2D(selection_mask, coord);
-    vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
+    vec4 result = vec4(0.0, 0.0, 0.0, 0.0);
     if (mask_value != vec4(1.0, 1.0, 1.0, 1.0)) {
         for (int y = pixel_coord.y - offset; y <= pixel_coord.y + offset; y++) {
             bool exit = false;
@@ -35,7 +35,7 @@ void main() {
                 vec2 coords_here = toCoords(ivec2(x, y));
                 vec4 mask_here = texture2D(selection_mask, coords_here);
                 if (mask_here == vec4(1.0, 1.0, 1.0, 1.0)) {
-                    color = vec4(outline_color, 1.0);
+                    result = vec4(outline_color, 1.0);
                     exit = true;
                     break;
                 }
@@ -45,5 +45,5 @@ void main() {
             }
         }
     }
-    gl_FragColor = color;
+    return result;
 }
