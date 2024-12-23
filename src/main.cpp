@@ -66,6 +66,7 @@ int main() {
 
     // TODO: Tests: WidgetTestsTreeView: put getWindow and getFont into WidgetTests
     // TODO: Tests: visualize mouse movements and clicks
+    // TODO: TreeViewWidget: cancel dragging with Esc
     // TODO: TreeViewWidget: reorder entries
     // TODO: TreeViewWidget: reparent entries
     // TODO: Simulation: rename getFromAll to getObject and getFromTop to getTopObject

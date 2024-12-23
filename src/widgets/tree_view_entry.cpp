@@ -340,6 +340,7 @@ namespace fw {
 		treeview.addPendingDetach(this);
 		entry_widget->setParentAnchor(Widget::Anchor::CUSTOM);
 		entry_widget->setSizeXPolicy(Widget::SizePolicy::NONE);
+		rectangle_widget->setClickThrough(true); // to allow mouse wheel events
 		setGrabbedVisualMode();
 		grabbed = true;
 		grab_begin = true;
@@ -358,6 +359,7 @@ namespace fw {
 		}
 		entry_widget->setParentAnchor(Widget::Anchor::TOP_LEFT);
 		entry_widget->setSizeXPolicy(Widget::SizePolicy::PARENT);
+		rectangle_widget->setClickThrough(false);
 		setNormalVisualMode();
 		grabbed = false;
 		grab_begin = false;
