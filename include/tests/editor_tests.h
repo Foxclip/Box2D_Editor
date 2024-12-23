@@ -8,6 +8,7 @@ public:
 private:
 	sf::RenderWindow window;
 	fw::Font font;
+	std::streambuf* sfml_err;
 
 	void beforeRunModule() override;
 	void afterRunModule() override;
