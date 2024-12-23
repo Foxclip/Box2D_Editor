@@ -16,6 +16,7 @@ target_sources(widgets_lib PRIVATE
     "${INCLUDE_DIR}/widgets/shape_widget.h"
     "${INCLUDE_DIR}/widgets/text_widget.h"
     "${INCLUDE_DIR}/widgets/textbox_widget.h"
+    "${INCLUDE_DIR}/widgets/tree_view_entry.h"
     "${INCLUDE_DIR}/widgets/tree_view_widget.h"
     "${INCLUDE_DIR}/widgets/widget.h"
     "${INCLUDE_DIR}/widgets/widget_link.h"
@@ -45,6 +46,7 @@ target_sources(widgets_lib PRIVATE
     shape_widget.cpp
     text_widget.cpp
     textbox_widget.cpp
+    tree_view_entry.cpp
     tree_view_widget.cpp
     widget.cpp
     widget_link.cpp

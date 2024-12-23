@@ -1,4 +1,5 @@
 #include "editor/UI/outliner.h"
+#include "widgets/tree_view_entry.h"
 #include "widgets/tree_view_widget.h"
 #include "widgets/text_widget.h"
 #include "editor/editor.h"

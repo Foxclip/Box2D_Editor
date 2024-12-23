@@ -1,5 +1,6 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_tree_view.h"
+#include "widgets/tree_view_entry.h"
 
 WidgetTestsTreeView::WidgetTestsTreeView(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
     test::Test* tree_view_widget_basic_test = addTest("basic", [&](test::Test& test) { treeviewWidgetBasicTest(test); });

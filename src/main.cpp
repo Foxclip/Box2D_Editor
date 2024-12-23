@@ -12,10 +12,10 @@ void execute_app() {
     try {
         app.init("Box2D Editor");
         
-        fw::ScrollAreaWidget* scroll_area = app.getWidgets().createScrollAreaWidget(300.0f, 300.0f);
-        scroll_area->setParentAnchor(fw::Widget::Anchor::CENTER);
+        //fw::ScrollAreaWidget* scroll_area = app.getWidgets().createScrollAreaWidget(300.0f, 300.0f);
+        //scroll_area->setParentAnchor(fw::Widget::Anchor::CENTER);
         fw::TreeViewWidget* treeview = app.getWidgets().createTreeViewWidget(300.0f, 300.0f);
-        scroll_area->setScrolledWidget(treeview);
+        //scroll_area->setScrolledWidget(treeview);
         treeview->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
         fw::TreeViewEntry* entry_1 = treeview->addEntry("Entry 1");
         fw::TreeViewEntry* entry_2 = treeview->addEntry("Entry 2");
@@ -64,8 +64,7 @@ int main() {
 
     execute_app();
 
-    // TODO: fix world canvas blinking when grabbing tree view entries
-    // TODO: Tests: WidgetTestsTreeView: put getWindow and getFont into base class
+    // TODO: Tests: WidgetTestsTreeView: put getWindow and getFont into WidgetTests
     // TODO: Tests: visualize mouse movements and clicks
     // TODO: TreeViewWidget: reorder entries
     // TODO: TreeViewWidget: reparent entries
