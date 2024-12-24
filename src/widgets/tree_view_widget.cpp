@@ -19,6 +19,14 @@ namespace fw {
 		widget_list.OnProcessAfterInput += [&]() {
 			executePendingOperations();
 		};
+		widget_list.OnKeyPressed += [&](const sf::Keyboard::Key& key) {
+			if (key == sf::Keyboard::Escape) {
+				if (grabbed_entry) {
+					grabbed_entry->pressed = false;
+					grabbed_entry->dropTo(grabbed_entry_original_parent, grabbed_entry_original_index);
+				}
+			}
+		};
 
 		// target highlight
 		target_highlight_widget = widget_list.createRectangleWidget(100.0f, TREEVIEW_CONTAINER_PADDING);

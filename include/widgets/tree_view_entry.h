@@ -34,7 +34,7 @@ namespace fw {
 		const CompVector<TreeViewEntry*>& getChildren() const;
 		TreeViewEntry* getChild(size_t index) const;
 		size_t getChildrenCount() const;
-		size_t getIndex(TreeViewEntry* skip = nullptr) const;
+		size_t getIndex() const;
 		fw::ContainerWidget* getWidget() const;
 		fw::RectangleWidget* getRectangleWidget() const;
 		fw::TextWidget* getTextWidget() const;
@@ -57,7 +57,7 @@ namespace fw {
 		void collapse();
 		void toggle();
 		void take();
-		void drop();
+		void dropTo(TreeViewEntry* parent, size_t index);
 		void remove(bool with_children);
 	private:
 		friend TreeViewWidget;

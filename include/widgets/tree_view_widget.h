@@ -109,6 +109,8 @@ namespace fw {
 		CompVectorUptr<TreeViewEntry> all_entries;
 		CompVector<TreeViewEntry*> top_entries;
 		TreeViewEntry* grabbed_entry = nullptr;
+		TreeViewEntry* grabbed_entry_original_parent = nullptr;
+		size_t grabbed_entry_original_index = 0;
 		fw::RectangleWidget* target_highlight_widget = nullptr;
 		TreeViewEntry* highlighted_entry = nullptr;
 		CompVectorUptr<PendingEntryMove> pending_entry_move;

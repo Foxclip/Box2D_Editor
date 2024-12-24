@@ -83,6 +83,8 @@ namespace fw {
 	public:
 		static bool debug_render;
 		static bool debug_mouse;
+		Event<sf::Keyboard::Key> OnKeyPressed;
+		Event<sf::Keyboard::Key> OnKeyReleased;
 		Event<> OnProcessAfterInput;
 
 		WidgetList(Application& application);

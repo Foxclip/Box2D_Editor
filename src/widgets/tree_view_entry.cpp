@@ -39,7 +39,13 @@ namespace fw {
 		};
 		entry_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
 			if (grabbed) {
-				drop();
+				if (treeview.highlighted_entry) {
+					TreeViewEntry* highlighted_entry_parent = treeview.highlighted_entry->getParent();
+					size_t highlighted_entry_index = treeview.highlighted_entry->getIndex();
+					dropTo(highlighted_entry_parent, highlighted_entry_index);
+				} else {
+					dropTo(nullptr, treeview.getTopEntryCount());
+				}
 			}
 		};
 		// rectangle
@@ -158,25 +164,12 @@ namespace fw {
 		return children.size();
 	}
 
-	size_t TreeViewEntry::getIndex(TreeViewEntry* skip) const {
+	size_t TreeViewEntry::getIndex() const {
 		CompVector<fw::TreeViewEntry*>* parent_list = &treeview.top_entries;
 		if (parent) {
 			parent_list = &parent->children;
 		}
-		if (skip) {
-			size_t index = 0;
-			for (size_t i = 0; i < parent_list->size(); i++) {
-				if ((*parent_list)[i] == this) {
-					break;
-				}
-				if ((*parent_list)[i] != skip) {
-					index++;
-				}
-			}
-			return index;
-		} else {
-			return (*parent_list).getIndex(const_cast<TreeViewEntry*>(this));
-		}
+		return (*parent_list).getIndex(const_cast<TreeViewEntry*>(this));
 	}
 
 	fw::ContainerWidget* TreeViewEntry::getWidget() const {
@@ -345,18 +338,13 @@ namespace fw {
 		grabbed = true;
 		grab_begin = true;
 		treeview.grabbed_entry = this;
+		treeview.grabbed_entry_original_parent = parent;
+		treeview.grabbed_entry_original_index = getIndex();
 		treeview.widget_list.addPendingSetParent(treeview.target_highlight_widget, treeview.widget_list.getRootWidget());
 	}
 
-	void TreeViewEntry::drop() {
-		ptrdiff_t highlighted_entry_index = -1;
-		if (treeview.highlighted_entry) {
-			highlighted_entry_index = treeview.highlighted_entry->getIndex(nullptr);
-			TreeViewEntry* highlighted_entry_parent = treeview.highlighted_entry->getParent();
-			treeview.addPendingEntrySetParent(this, highlighted_entry_parent, highlighted_entry_index);
-		} else {
-			treeview.addPendingEntrySetParent(this, nullptr, treeview.getTopEntryCount());
-		}
+	void TreeViewEntry::dropTo(TreeViewEntry* parent, size_t index) {
+		treeview.addPendingEntrySetParent(this, parent, index);
 		entry_widget->setParentAnchor(Widget::Anchor::TOP_LEFT);
 		entry_widget->setSizeXPolicy(Widget::SizePolicy::PARENT);
 		rectangle_widget->setClickThrough(false);

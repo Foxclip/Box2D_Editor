@@ -477,9 +477,8 @@ namespace fw {
     }
 
     void Application::processKeyboardEvent(const sf::Event& event) {
-        if (widgets.getFocusedWidget()) {
-            widgets.processKeyboardEvent(event);
-        } else {
+        widgets.processKeyboardEvent(event);
+        if (!widgets.getFocusedWidget()) {
             onProcessKeyboardEvent(event);
         }
     }

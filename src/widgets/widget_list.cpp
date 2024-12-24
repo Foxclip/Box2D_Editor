@@ -409,6 +409,11 @@ namespace fw {
 		if (focused_widget) {
 			focused_widget->processKeyboardEvent(event);
 		}
+		if (event.type == sf::Event::KeyPressed) {
+			OnKeyPressed(event.key.code);
+		} else if (event.type == sf::Event::KeyReleased) {
+			OnKeyReleased(event.key.code);
+		}
 	}
 
 	void WidgetList::removeWidget(Widget* widget, bool with_children) {
