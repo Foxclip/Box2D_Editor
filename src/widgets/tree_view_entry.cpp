@@ -340,7 +340,6 @@ namespace fw {
 		treeview.grabbed_entry = this;
 		treeview.grabbed_entry_original_parent = parent;
 		treeview.grabbed_entry_original_index = getIndex();
-		treeview.widget_list.addPendingSetParent(treeview.target_highlight_widget, treeview.widget_list.getRootWidget());
 	}
 
 	void TreeViewEntry::dropTo(TreeViewEntry* parent, size_t index) {
@@ -352,8 +351,7 @@ namespace fw {
 		grabbed = false;
 		grab_begin = false;
 		treeview.grabbed_entry = nullptr;
-		treeview.widget_list.addPendingSetParent(treeview.target_highlight_widget, &treeview);
-		treeview.target_highlight_widget->setVisible(false);
+		treeview.widget_list.treeview_highlight_widget->setVisible(false);
 	}
 
 	void TreeViewEntry::remove(bool with_children) {

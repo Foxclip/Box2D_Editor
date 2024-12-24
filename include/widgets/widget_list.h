@@ -169,6 +169,8 @@ namespace fw {
 		friend class PendingMove;
 		friend class PendingDelete;
 		friend class PendingSetParent;
+		friend class TreeViewWidget;
+		friend class TreeViewEntry;
 		Application& application;
 		bool locked = false;
 		bool click_blocked = false;
@@ -186,6 +188,7 @@ namespace fw {
 		WidgetUpdateQueue update_queue = WidgetUpdateQueue(*this);
 		WidgetRenderQueue render_queue = WidgetRenderQueue(*this);
 		sf::VertexArray mouse_debug_trace = sf::VertexArray(sf::PrimitiveType::LineStrip);
+		RectangleWidget* treeview_highlight_widget = nullptr;
 
 		void removeWidget(Widget* widget, bool with_children);
 	};

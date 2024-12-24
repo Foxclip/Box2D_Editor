@@ -29,6 +29,11 @@ namespace fw {
 		root_widget->setClickThrough(false);
 		root_widget->setClipChildren(true);
 		root_widget->setName("root");
+		// treeview target highlight
+		treeview_highlight_widget = createRectangleWidget(100.0f, TREEVIEW_CONTAINER_PADDING);
+		treeview_highlight_widget->setName("treeview target highlight");
+		treeview_highlight_widget->setVisible(false);
+		treeview_highlight_widget->setFillColor(TREEVIEW_TARGET_HIGHLIGHT_COLOR);
 	}
 
 	WidgetList::~WidgetList() {
