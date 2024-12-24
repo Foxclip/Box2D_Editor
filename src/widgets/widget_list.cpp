@@ -526,16 +526,16 @@ namespace fw {
 			focused_widget->renderBounds(target, DEBUG_RENDER_FOCUSED_WIDGET_BOUNDS_COLOR, false, true);
 		}
 		if (debug_mouse) {
-			for (ptrdiff_t i = 0; i < (ptrdiff_t)mouse_debug_trace.getVertexCount() - 1; i++) {
-				mouse_debug_trace[i] = mouse_debug_trace[i + 1];
-			}
 			if (mouse_debug_trace.getVertexCount() < DEBUG_RENDER_MOUSE_TRACE_MAX_LENGTH) {
 				mouse_debug_trace.append(getMousePosf());
 			} else {
+				for (ptrdiff_t i = 0; i < (ptrdiff_t)mouse_debug_trace.getVertexCount() - 1; i++) {
+					mouse_debug_trace[i] = mouse_debug_trace[i + 1];
+				}
 				mouse_debug_trace[mouse_debug_trace.getVertexCount() - 1] = getMousePosf();
 			}
 			for (size_t i = 0; i < mouse_debug_trace.getVertexCount(); i++) {
-				float alpha = (float)(i + 1) / (float)mouse_debug_trace.getVertexCount();
+				float alpha = (float)i / ((float)mouse_debug_trace.getVertexCount() - 1);
 				mouse_debug_trace[i].color = DEBUG_RENDER_MOUSE_TRACE_COLOR;
 				mouse_debug_trace[i].color.a = (sf::Uint8)(alpha * 255.0f);
 			}

@@ -66,6 +66,7 @@ void WidgetTestsApplication::mouseEventsTest(test::Test& test) {
     TestApplication application(getWindow());
     application.init(test.name, 800, 600, 0, false);
     application.start(true);
+    application.advance();
     {
         sf::Vector2i pos(100, 100);
         application.mouseMove(pos);
