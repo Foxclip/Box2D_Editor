@@ -89,6 +89,10 @@ namespace fw {
 
 		WidgetList(Application& application);
 		virtual ~WidgetList();
+		// method init() exists because WidgetList is created before Application's constructor,
+		// creating widgets in WidgetList's constructor needs Application to be fully initialized,
+		// and when WidgetList constructor is called, Application is not fully initialized yet
+		void init();
 		Application& getApplication() const;
 		size_t getSize() const;
 		bool contains(const Widget* widget);

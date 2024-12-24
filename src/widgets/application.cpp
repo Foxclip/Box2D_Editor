@@ -17,6 +17,7 @@ namespace fw {
         unsigned int antialiasing,
         bool vsync
     ) {
+        widgets.init();
         loadDefaultFragmentShader(default_shader, "default");
         loadShader(premultiply, sf::Shader::Fragment, "shaders/premultiply.frag");
         sf::ContextSettings cs_window;

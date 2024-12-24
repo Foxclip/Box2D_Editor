@@ -23,7 +23,14 @@ namespace fw {
 		return logger << target.toStr();
 	}
 
-	WidgetList::WidgetList(Application& application) : application(application) {
+	WidgetList::WidgetList(Application& application) : application(application) { }
+
+	WidgetList::~WidgetList() {
+		is_being_destroyed = true;
+	}
+
+	void WidgetList::init() {
+		// root
 		root_widget = createEmptyWidget();
 		root_widget->setFillColor(sf::Color::Transparent);
 		root_widget->setClickThrough(false);
@@ -34,10 +41,6 @@ namespace fw {
 		treeview_highlight_widget->setName("treeview target highlight");
 		treeview_highlight_widget->setVisible(false);
 		treeview_highlight_widget->setFillColor(TREEVIEW_TARGET_HIGHLIGHT_COLOR);
-	}
-
-	WidgetList::~WidgetList() {
-		is_being_destroyed = true;
 	}
 
 	Application& WidgetList::getApplication() const {
