@@ -41,6 +41,7 @@ namespace fw {
 		treeview_highlight_widget->setName("treeview target highlight");
 		treeview_highlight_widget->setVisible(false);
 		treeview_highlight_widget->setFillColor(TREEVIEW_TARGET_HIGHLIGHT_COLOR);
+		treeview_highlight_widget->setGlobalRenderLayer(GlobalRenderLayer::TREEVIEW_TARGET_HIGHLIGHT);
 	}
 
 	Application& WidgetList::getApplication() const {
