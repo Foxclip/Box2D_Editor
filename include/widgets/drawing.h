@@ -50,6 +50,13 @@ namespace fw {
 		const sf::Color& color
 	);
 
+	void draw_rect(
+		sf::RenderTarget& target,
+		const sf::Vector2f& pos,
+		const sf::Vector2f& size,
+		const sf::Color& color
+	);
+
 	void draw_wire_rect(
 		sf::RenderTarget& target,
 		const sf::FloatRect& bounds,

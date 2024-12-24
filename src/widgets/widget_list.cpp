@@ -510,6 +510,11 @@ namespace fw {
 				widget->render(target);
 			}
 		}
+		if (TreeViewWidget::target_highlight.visible) {
+			sf::Vector2f pos = TreeViewWidget::target_highlight.pos;
+			sf::Vector2f size = TreeViewWidget::target_highlight.size;
+			draw_rect(target, pos, size, TREEVIEW_TARGET_HIGHLIGHT_COLOR);
+		}
 		if (debug_render) {
 			root_widget->renderBounds(target, DEBUG_RENDER_BOUNDS_COLOR, true, false);
 			root_widget->renderBounds(target, DEBUG_RENDER_TRANSFORMED_BOUNDS_COLOR, true, true);

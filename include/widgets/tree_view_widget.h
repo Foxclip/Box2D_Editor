@@ -67,11 +67,18 @@ namespace fw {
 
 	};
 
+	struct TreeviewTargetHighlight {
+		bool visible = false;
+		sf::Vector2f pos = sf::Vector2f(0, 0);
+		sf::Vector2f size = sf::Vector2f(0, 0);
+	};
+
 	class TreeViewWidget : public ContainerWidget {
 	public:
 		Event<TreeViewEntry*> OnEntryClicked;
 		Event<TreeViewEntry*> OnEntrySelected;
 		Event<TreeViewEntry*> OnEntryDeselected;
+		static TreeviewTargetHighlight target_highlight;
 
 		TreeViewWidget(WidgetList& widget_list, float width, float height);
 		TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size);
@@ -92,7 +99,6 @@ namespace fw {
 		void deselectAll();
 		void expandAll();
 		void collapseAll();
-		RectangleWidget* getTargetHighlightWidget() const;
 		TreeViewEntry* getTargetHighlightEntry(const sf::Vector2f& global_pos) const;
 		void putTargetHighlight();
 		void removeEntry(TreeViewEntry* entry, bool with_children);
@@ -111,7 +117,6 @@ namespace fw {
 		TreeViewEntry* grabbed_entry = nullptr;
 		TreeViewEntry* grabbed_entry_original_parent = nullptr;
 		size_t grabbed_entry_original_index = 0;
-		fw::RectangleWidget* target_highlight_widget = nullptr;
 		TreeViewEntry* highlighted_entry = nullptr;
 		CompVectorUptr<PendingEntryMove> pending_entry_move;
 		CompVectorUptr<PendingEntryDelete> pending_entry_delete;

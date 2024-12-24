@@ -79,6 +79,22 @@ namespace fw {
 		target.draw(rect_primitive);
 	}
 
+	void draw_rect(sf::RenderTarget& target,
+		const sf::Vector2f& pos,
+		const sf::Vector2f& size,
+		const sf::Color& color
+	) {
+		rect_primitive[0].position = pos;
+		rect_primitive[0].color = color;
+		rect_primitive[1].position = sf::Vector2f(pos.x + size.x, pos.y);
+		rect_primitive[1].color = color;
+		rect_primitive[2].position = sf::Vector2f(pos.x, pos.y + size.y);
+		rect_primitive[2].color = color;
+		rect_primitive[3].position = sf::Vector2f(pos.x + size.x, pos.y + size.y);
+		rect_primitive[3].color = color;
+		target.draw(rect_primitive);
+	}
+
 	void draw_wire_rect(
 		sf::RenderTarget& target,
 		const sf::FloatRect& bounds,

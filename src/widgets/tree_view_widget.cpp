@@ -3,6 +3,8 @@
 
 namespace fw {
 
+	TreeviewTargetHighlight TreeViewWidget::target_highlight;
+
 	TreeViewWidget::TreeViewWidget(WidgetList& widget_list, float width, float height)
 		: ContainerWidget(widget_list, width, height) {
 		type = WidgetType::TreeView;
@@ -27,13 +29,6 @@ namespace fw {
 				}
 			}
 		};
-
-		// target highlight
-		target_highlight_widget = widget_list.createRectangleWidget(100.0f, TREEVIEW_CONTAINER_PADDING);
-		target_highlight_widget->setName("target highlight");
-		target_highlight_widget->setVisible(false);
-		target_highlight_widget->setFillColor(TREEVIEW_TARGET_HIGHLIGHT_COLOR);
-		target_highlight_widget->setParent(this);
 	}
 
 	TreeViewWidget::TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size)
@@ -196,10 +191,6 @@ namespace fw {
 		}
 	}
 
-	RectangleWidget* TreeViewWidget::getTargetHighlightWidget() const {
-		return target_highlight_widget;
-	}
-
 	TreeViewEntry* TreeViewWidget::getTargetHighlightEntry(const sf::Vector2f& global_pos) const {
 		CompVector<TreeViewEntry*> entries = getAllVisibleEntriesInOrder();
 		TreeViewEntry* result = nullptr;
@@ -219,23 +210,21 @@ namespace fw {
 	}
 
 	void TreeViewWidget::putTargetHighlight() {
-		target_highlight_widget->setVisible(true);
+		target_highlight.visible = true;
 		sf::Vector2f mouse_pos = widget_list.getMousePosf();
 		highlighted_entry = getTargetHighlightEntry(mouse_pos);
 		if (highlighted_entry) {
 			sf::Vector2f entry_pos = highlighted_entry->getWidget()->getGlobalPosition();
-			target_highlight_widget->setGlobalPosition(entry_pos);
-			target_highlight_widget->setOrigin(Anchor::BOTTOM_LEFT);
-			target_highlight_widget->setWidth(highlighted_entry->getWidget()->getWidth());
+			target_highlight.pos = entry_pos - sf::Vector2f(0.0f, TREEVIEW_CONTAINER_PADDING);
+			target_highlight.size = sf::Vector2f(highlighted_entry->getWidget()->getWidth(), TREEVIEW_CONTAINER_PADDING);
 		} else {
-			target_highlight_widget->setOrigin(Anchor::TOP_LEFT);
-			target_highlight_widget->setWidth(getContentWidth());
+			target_highlight.size = sf::Vector2f(getContentWidth(), TREEVIEW_CONTAINER_PADDING);
 			if (children.empty()) {
-				target_highlight_widget->setGlobalPosition(getGlobalPosition() + sf::Vector2f(getLeftPadding(), 0.0f));
+				target_highlight.pos = getGlobalPosition() + sf::Vector2f(getLeftPadding(), 0.0f);
 			} else {
 				Widget* last_entry_widget = children.back();
 				sf::Vector2f last_entry_widget_pos = last_entry_widget->getGlobalBottomLeft();
-				target_highlight_widget->setGlobalPosition(last_entry_widget_pos);
+				target_highlight.pos = last_entry_widget_pos;
 			}
 		}
 	}
