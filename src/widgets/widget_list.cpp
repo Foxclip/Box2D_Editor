@@ -16,6 +16,9 @@
 
 namespace fw {
 
+	bool WidgetList::debug_render = false;
+	bool WidgetList::debug_mouse = false;
+
 	Logger& operator<<(Logger& logger, const WidgetUpdateTarget& target) {
 		return logger << target.toStr();
 	}

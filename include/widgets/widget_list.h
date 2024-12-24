@@ -81,8 +81,8 @@ namespace fw {
 	// wAssert(!isLocked());
 	class WidgetList {
 	public:
-		bool debug_render = false;
-		bool debug_mouse = true;
+		static bool debug_render;
+		static bool debug_mouse;
 		Event<> OnProcessAfterInput;
 
 		WidgetList(Application& application);
