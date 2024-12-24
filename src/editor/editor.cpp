@@ -523,7 +523,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                     startMoveGesture(world_widget);
                 }
             } else {
-                widgets.debug_render = !widgets.debug_render;
+                fw::WidgetList::debug_render = !fw::WidgetList::debug_render;
             }
         } else if (event.key.code == sf::Keyboard::I) {
             render_object_info = !render_object_info;

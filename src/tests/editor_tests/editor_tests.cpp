@@ -20,12 +20,14 @@ void EditorTests::beforeRunModule() {
 	sf::ContextSettings cs_window;
 	window.create(sf::VideoMode(800, 600), "Editor tests", sf::Style::Default, cs_window);
 	font = fw::Font("fonts/verdana.ttf");
-	sfml_err = sf::err().rdbuf(nullptr);
+	sfml_err = sf::err().rdbuf(nullptr); // don't need SFML errors in the console
+	fw::WidgetList::debug_mouse = true;
 }
 
 void EditorTests::afterRunModule() {
 	sf::err().rdbuf(sfml_err);
 	window.close();
+	fw::WidgetList::debug_mouse = false;
 }
 
 void EditorTests::basicTest(test::Test& test) {

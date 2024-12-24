@@ -36,10 +36,12 @@ void WidgetTests::beforeRunModule() {
     sf::ContextSettings cs_window;
     window.create(sf::VideoMode(800, 600), "Widget tests", sf::Style::Default, cs_window);
     textbox_font = fw::Font("fonts/verdana.ttf");
+    fw::WidgetList::debug_mouse = true;
 }
 
 void WidgetTests::afterRunModule() {
     window.close();
+    fw::WidgetList::debug_mouse = false;
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {

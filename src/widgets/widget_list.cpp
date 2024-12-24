@@ -16,6 +16,9 @@
 
 namespace fw {
 
+	bool WidgetList::debug_render = false;
+	bool WidgetList::debug_mouse = false;
+
 	Logger& operator<<(Logger& logger, const WidgetUpdateTarget& target) {
 		return logger << target.toStr();
 	}
@@ -141,6 +144,18 @@ namespace fw {
 
 	sf::Vector2u WidgetList::getWindowSize() const {
 		return application.getWindowSize();
+	}
+
+	bool WidgetList::isLeftButtonPressed() const {
+		return application.isLeftButtonPressed();
+	}
+
+	bool WidgetList::isRightButtonPressed() const {
+		return application.isRightButtonPressed();
+	}
+
+	bool WidgetList::isMiddleButtonPressed() const {
+		return application.isMiddleButtonPressed();
 	}
 
 	bool WidgetList::isLCtrlPressed() const {
@@ -509,6 +524,66 @@ namespace fw {
 		}
 		if (focused_widget) {
 			focused_widget->renderBounds(target, DEBUG_RENDER_FOCUSED_WIDGET_BOUNDS_COLOR, false, true);
+		}
+		if (debug_mouse) {
+			if (mouse_debug_trace.getVertexCount() < DEBUG_RENDER_MOUSE_TRACE_MAX_LENGTH) {
+				mouse_debug_trace.append(getMousePosf());
+			} else {
+				for (ptrdiff_t i = 0; i < (ptrdiff_t)mouse_debug_trace.getVertexCount() - 1; i++) {
+					mouse_debug_trace[i] = mouse_debug_trace[i + 1];
+				}
+				mouse_debug_trace[mouse_debug_trace.getVertexCount() - 1] = getMousePosf();
+			}
+			for (size_t i = 0; i < mouse_debug_trace.getVertexCount(); i++) {
+				float alpha = (float)i / ((float)mouse_debug_trace.getVertexCount() - 1);
+				mouse_debug_trace[i].color = DEBUG_RENDER_MOUSE_TRACE_COLOR;
+				mouse_debug_trace[i].color.a = (sf::Uint8)(alpha * 255.0f);
+			}
+			target.draw(mouse_debug_trace);
+
+			float offset_outer = DEBUG_RENDER_MOUSE_SIZE;
+			float offset_inner = 2.0f;
+			float mouse_rect_offset_inner = 2.0f;
+			float middle_mouse_rect_offset = 8.0f;
+			sf::Vector2f hoffset_outer = sf::Vector2f(offset_outer, 0.0f);
+			sf::Vector2f hoffset_inner = sf::Vector2f(offset_inner, 0.0f);
+			sf::Vector2f voffset_outer = sf::Vector2f(0.0f, offset_outer);
+			sf::Vector2f voffset_inner = sf::Vector2f(0.0f, offset_inner);
+			sf::Vector2f mouse_pos = getMousePosf();
+			if (isLeftButtonPressed()) {
+				draw_rect(
+					target,
+					sf::Vector2f(mouse_pos.x - offset_outer, mouse_pos.y - offset_outer),
+					sf::Vector2f(mouse_pos.x - offset_outer, mouse_pos.y + offset_outer + 1.0f),
+					sf::Vector2f(mouse_pos.x - mouse_rect_offset_inner, mouse_pos.y - offset_outer),
+					sf::Vector2f(mouse_pos.x - mouse_rect_offset_inner, mouse_pos.y + offset_outer + 1.0f),
+					DEBUG_RENDER_MOUSE_LEFT_RECT_COLOR
+				);
+			}
+			if (isRightButtonPressed()) {
+				draw_rect(
+					target,
+					sf::Vector2f(mouse_pos.x + mouse_rect_offset_inner + 1.0f, mouse_pos.y - offset_outer),
+					sf::Vector2f(mouse_pos.x + mouse_rect_offset_inner + 1.0f, mouse_pos.y + offset_outer + 1.0f),
+					sf::Vector2f(mouse_pos.x + offset_outer + 1.0f, mouse_pos.y - offset_outer),
+					sf::Vector2f(mouse_pos.x + offset_outer + 1.0f, mouse_pos.y + offset_outer + 1.0f),
+					DEBUG_RENDER_MOUSE_RIGHT_RECT_COLOR
+				);
+			}
+			if (isMiddleButtonPressed()) {
+				draw_rect(
+					target,
+					sf::Vector2f(mouse_pos.x - middle_mouse_rect_offset, mouse_pos.y - middle_mouse_rect_offset),
+					sf::Vector2f(mouse_pos.x - middle_mouse_rect_offset, mouse_pos.y + middle_mouse_rect_offset + 1.0f),
+					sf::Vector2f(mouse_pos.x + middle_mouse_rect_offset + 1.0f, mouse_pos.y - middle_mouse_rect_offset),
+					sf::Vector2f(mouse_pos.x + middle_mouse_rect_offset + 1.0f, mouse_pos.y + middle_mouse_rect_offset + 1.0f),
+					DEBUG_RENDER_MOUSE_MIDDLE_RECT_COLOR
+				);
+			}
+			draw_line(target, mouse_pos - hoffset_outer, mouse_pos - hoffset_inner, DEBUG_RENDER_MOUSE_POSITION_COLOR);
+			draw_line(target, mouse_pos + hoffset_outer, mouse_pos + hoffset_inner, DEBUG_RENDER_MOUSE_POSITION_COLOR);
+			draw_line(target, mouse_pos - voffset_outer, mouse_pos - voffset_inner, DEBUG_RENDER_MOUSE_POSITION_COLOR);
+			draw_line(target, mouse_pos + voffset_outer, mouse_pos + voffset_inner, DEBUG_RENDER_MOUSE_POSITION_COLOR);
 		}
 	}
 

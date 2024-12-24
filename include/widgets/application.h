@@ -75,6 +75,9 @@ namespace fw {
 		void keyPress(sf::Keyboard::Key key);
 		void keyRelease(sf::Keyboard::Key key);
 		void textEntered(sf::Uint32 code);
+		bool isLeftButtonPressed() const;
+		bool isRightButtonPressed() const;
+		bool isMiddleButtonPressed() const;
 		bool isLCtrlPressed() const;
 		bool isLAltPressed() const;
 		bool isLShiftPressed() const;
@@ -100,6 +103,7 @@ namespace fw {
 		sf::Vector2f mousePressPosf;
 		bool leftButtonPressed = false;
 		bool rightButtonPressed = false;
+		bool middleButtonPressed = false;
 		MouseGesture mouse_gesture_left;
 		MouseGesture mouse_gesture_right;
 		sf::Cursor arrow_cursor;
@@ -169,8 +173,10 @@ namespace fw {
 		void startNormalGesture(Widget* source, sf::Mouse::Button button);
 		void processLeftPress();
 		void processRightPress();
+		void processMiddlePress();
 		void processLeftRelease();
 		void processRightRelease();
+		void processMiddleRelease();
 		void processMouseMove();
 		void processScrollX(float delta);
 		void processScrollY(float delta);

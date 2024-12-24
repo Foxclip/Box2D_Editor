@@ -4,6 +4,7 @@
 namespace fw {
 
 	sf::VertexArray line_primitive = sf::VertexArray(sf::Lines, 2);
+	sf::VertexArray rect_primitive = sf::VertexArray(sf::TrianglesStrip, 4);
 
 	void draw_line(
 		sf::RenderTarget& target,
@@ -57,6 +58,25 @@ namespace fw {
 		line_primitive[1].position = quantize_and_offset(transform.transformPoint(v2));
 		line_primitive[1].color = color;
 		canvas->draw(line_primitive);
+	}
+
+	void draw_rect(
+		sf::RenderTarget& target,
+		const sf::Vector2f& v1,
+		const sf::Vector2f& v2,
+		const sf::Vector2f& v3,
+		const sf::Vector2f& v4,
+		const sf::Color& color
+	) {
+		rect_primitive[0].position = v1;
+		rect_primitive[0].color = color;
+		rect_primitive[1].position = v2;
+		rect_primitive[1].color = color;
+		rect_primitive[2].position = v3;
+		rect_primitive[2].color = color;
+		rect_primitive[3].position = v4;
+		rect_primitive[3].color = color;
+		target.draw(rect_primitive);
 	}
 
 	void draw_wire_rect(
