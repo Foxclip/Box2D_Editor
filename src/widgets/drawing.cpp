@@ -68,13 +68,13 @@ namespace fw {
 		const sf::Vector2f& v4,
 		const sf::Color& color
 	) {
-		rect_primitive[0].position = v1;
+		rect_primitive[0].position = quantize(v1);
 		rect_primitive[0].color = color;
-		rect_primitive[1].position = v2;
+		rect_primitive[1].position = quantize(v2);
 		rect_primitive[1].color = color;
-		rect_primitive[2].position = v3;
+		rect_primitive[2].position = quantize(v3);
 		rect_primitive[2].color = color;
-		rect_primitive[3].position = v4;
+		rect_primitive[3].position = quantize(v4);
 		rect_primitive[3].color = color;
 		target.draw(rect_primitive);
 	}
@@ -84,15 +84,11 @@ namespace fw {
 		const sf::Vector2f& size,
 		const sf::Color& color
 	) {
-		rect_primitive[0].position = pos;
-		rect_primitive[0].color = color;
-		rect_primitive[1].position = sf::Vector2f(pos.x + size.x, pos.y);
-		rect_primitive[1].color = color;
-		rect_primitive[2].position = sf::Vector2f(pos.x, pos.y + size.y);
-		rect_primitive[2].color = color;
-		rect_primitive[3].position = sf::Vector2f(pos.x + size.x, pos.y + size.y);
-		rect_primitive[3].color = color;
-		target.draw(rect_primitive);
+		sf::Vector2f v1 = pos;
+		sf::Vector2f v2 = sf::Vector2f(pos.x + size.x, pos.y);
+		sf::Vector2f v3 = sf::Vector2f(pos.x, pos.y + size.y);
+		sf::Vector2f v4 = sf::Vector2f(pos.x + size.x, pos.y + size.y);
+		draw_rect(target, v1, v2, v3, v4, color);
 	}
 
 	void draw_wire_rect(

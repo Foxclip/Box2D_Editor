@@ -64,7 +64,6 @@ int main() {
 
     execute_app();
 
-    // TODO: TreeViewWidget: cancel dragging with Esc
     // TODO: Outliner: reorder objects
     // TODO: Outliner: buttons up/down for reordering objects
     // TODO: Outliner: reparent objects
