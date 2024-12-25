@@ -33,7 +33,7 @@ void WidgetTestsTreeView::treeviewWidgetBasicTest(test::Test& test) {
 
     GenericWidgetTest gwt(application, test);
     gwt.widget = tree_view_widget;
-    gwt.total_widgets = 3;
+    gwt.total_widgets = 2;
     gwt.type = fw::Widget::WidgetType::TreeView;
     gwt.name = "treeview";
     gwt.fullname = "root|treeview";
@@ -631,7 +631,6 @@ void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
     sf::Vector2f center_offset = sf::Vector2f(0.0f, -2.0f);
     fw::Widget* entry_1_widget = entry_1->getWidget();
     fw::Widget* entry_2_widget = entry_2->getWidget();
-    fw::Widget* target_highlight_widget = tree_view_widget->getTargetHighlightWidget();
 
     // drag to the right
     sf::Vector2f entry_1_center = entry_1_widget->getGlobalCenter();
@@ -643,34 +642,38 @@ void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
     application.mouseLeftPress();
     application.advance();
     T_CHECK(!entry_1->isGrabbed());
-    T_CHECK(!target_highlight_widget->isVisible());
+    T_CHECK(!fw::TreeViewWidget::target_highlight.visible);
     application.mouseMove(drag_pos_1);
     application.advance();
     T_CHECK(entry_1->isGrabbed());
-    T_CHECK(!target_highlight_widget->isVisible());
-    target_highlight_widget->setDebugRender(true);
+    T_CHECK(!fw::TreeViewWidget::target_highlight.visible);
     application.advance();
-    target_highlight_widget->setDebugRender(false);
     T_CHECK(entry_1->isGrabbed());
-    T_CHECK(target_highlight_widget->isVisible());
-    T_VEC2_COMPARE(target_highlight_widget->getGlobalOriginPosition(), entry_2_widget->getGlobalPosition());
+    T_CHECK(fw::TreeViewWidget::target_highlight.visible);
+    T_VEC2_COMPARE(
+        fw::TreeViewWidget::target_highlight.pos,
+        entry_2_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
+    );
 
     // drag down
     sf::Vector2f drag_pos_2 = drag_pos_1 + sf::Vector2f(0.0f, 50.0f);
     application.mouseMove(drag_pos_2);
     application.advance();
-    T_VEC2_COMPARE(target_highlight_widget->getGlobalPosition(), entry_2_widget->getGlobalBottomLeft());
+    T_VEC2_COMPARE(fw::TreeViewWidget::target_highlight.pos, entry_2_widget->getGlobalBottomLeft());
 
     // drag up
     sf::Vector2f drag_pos_3 = drag_pos_1 + sf::Vector2f(0.0f, -50.0f);
     application.mouseMove(drag_pos_3);
     application.advance();
-    T_VEC2_COMPARE(target_highlight_widget->getGlobalOriginPosition(), entry_2_widget->getGlobalPosition());
+    T_VEC2_COMPARE(
+        fw::TreeViewWidget::target_highlight.pos,
+        entry_2_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
+    );
 
     // drop to the top
     application.mouseLeftRelease();
     application.advance();
-    T_CHECK(!target_highlight_widget->isVisible());
+    T_CHECK(!fw::TreeViewWidget::target_highlight.visible);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 2);
     T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2 }));
 
@@ -681,13 +684,13 @@ void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
     application.advance();
     application.mouseMove(drag_pos_2);
     application.advance();
-    T_CHECK(!target_highlight_widget->isVisible());
+    T_CHECK(!fw::TreeViewWidget::target_highlight.visible);
     application.advance();
-    T_CHECK(target_highlight_widget->isVisible());
-    T_VEC2_COMPARE(target_highlight_widget->getGlobalPosition(), entry_2_widget->getGlobalBottomLeft());
+    T_CHECK(fw::TreeViewWidget::target_highlight.visible);
+    T_VEC2_COMPARE(fw::TreeViewWidget::target_highlight.pos, entry_2_widget->getGlobalBottomLeft());
     application.mouseLeftRelease();
     application.advance();
-    T_CHECK(!target_highlight_widget->isVisible());
+    T_CHECK(!fw::TreeViewWidget::target_highlight.visible);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 2);
     T_WRAP_CONTAINER(check_top_entries({ entry_2, entry_1 }));
 }
@@ -711,7 +714,6 @@ void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
     fw::Widget* entry_2_widget = entry_2->getWidget();
     fw::Widget* entry_2_children_widget = entry_2->getChildrenWidget();
     fw::Widget* entry_3_widget = entry_3->getWidget();
-    fw::Widget* target_highlight_widget = tree_view_widget->getTargetHighlightWidget();
     application.advance();
 
     auto check_top_entries = [&](const std::initializer_list<fw::TreeViewEntry*>& entries) {
@@ -731,10 +733,13 @@ void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
     sf::Vector2f drag_top = tree_view_widget->getTop() + sf::Vector2f(0.0f, -50.0f);
     drag_entry(entry_1, drag_top);
     application.advance();
-    T_VEC2_COMPARE(target_highlight_widget->getGlobalOriginPosition(), entry_2_widget->getGlobalPosition());
+    T_VEC2_COMPARE(
+        fw::TreeViewWidget::target_highlight.pos,
+        entry_2_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
+    );
     application.mouseLeftRelease();
     application.advance();
-    T_CHECK(!target_highlight_widget->isVisible());
+    T_CHECK(!fw::TreeViewWidget::target_highlight.visible);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
     T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2 }));
 
@@ -742,7 +747,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
     T_ASSERT_NO_ERRORS();
     drag_entry(entry_1, get_bottom_drag_pos());
     application.advance();
-    T_VEC2_COMPARE(target_highlight_widget->getGlobalPosition(), entry_2_widget->getGlobalBottomLeft());
+    T_VEC2_COMPARE(fw::TreeViewWidget::target_highlight.pos, entry_2_widget->getGlobalBottomLeft());
     application.mouseLeftRelease();
     application.advance();
 
@@ -753,7 +758,10 @@ void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
     sf::Vector2f drag_inside = entry_3_widget->getGlobalTop();
     drag_entry(entry_1, drag_inside);
     application.advance();
-    T_VEC2_COMPARE(target_highlight_widget->getGlobalOriginPosition(), entry_3_widget->getGlobalPosition());
+    T_VEC2_COMPARE(
+        fw::TreeViewWidget::target_highlight.pos,
+        entry_3_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
+    );
     application.mouseLeftRelease();
     application.advance();
     T_COMPARE(tree_view_widget->getAllEntryCount(), 3);
@@ -978,7 +986,6 @@ void WidgetTestsTreeView::treeviewWidgetDrag5Test(test::Test& test) {
     fw::Widget* entry_2_widget = entry_2->getWidget();
     fw::Widget* entry_3_widget = entry_3->getWidget();
     fw::Widget* entry_4_widget = entry_4->getWidget();
-    fw::Widget* target_highlight_widget = tree_view_widget->getTargetHighlightWidget();
     application.advance();
 
     auto check_top_entries = [&](const std::initializer_list<fw::TreeViewEntry*>& entries) {
@@ -1109,7 +1116,7 @@ float WidgetTestsTreeView::calcTreeViewHeight(fw::TreeViewWidget* treeview) {
 
 void WidgetTestsTreeView::checkTopEntries(test::Test& test, fw::TreeViewWidget* tree_view_widget, const std::initializer_list<fw::TreeViewEntry*>& entries) {
     std::vector<fw::TreeViewEntry*> entries_vec = std::vector<fw::TreeViewEntry*>(entries);
-    if (T_COMPARE(tree_view_widget->getTopEntryCount(), entries.size()) && T_COMPARE(tree_view_widget->getChildrenCount(), entries.size() + 1)) {
+    if (T_COMPARE(tree_view_widget->getTopEntryCount(), entries.size()) && T_COMPARE(tree_view_widget->getChildrenCount(), entries.size())) {
         for (size_t i = 0; i < entries_vec.size(); i++) {
             fw::TreeViewEntry* entry = tree_view_widget->getTopEntry(i);
             T_CHECK(entry == entries_vec[i]);
