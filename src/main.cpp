@@ -11,39 +11,6 @@ void execute_app() {
     Editor app(true);
     try {
         app.init("Box2D Editor");
-        
-        fw::ScrollAreaWidget* scroll_area = app.getWidgets().createScrollAreaWidget(300.0f, 300.0f);
-        scroll_area->setParentAnchor(fw::Widget::Anchor::CENTER);
-        fw::TreeViewWidget* treeview = app.getWidgets().createTreeViewWidget(300.0f, 300.0f);
-        scroll_area->setScrolledWidget(treeview);
-        treeview->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
-        fw::TreeViewEntry* entry_1 = treeview->addEntry("Entry 1");
-        fw::TreeViewEntry* entry_2 = treeview->addEntry("Entry 2");
-        fw::TreeViewEntry* entry_3 = treeview->addEntry("Entry 3");
-        fw::TreeViewEntry* entry_4 = treeview->addEntry("Entry 4");
-        fw::TreeViewEntry* entry_5 = treeview->addEntry("Entry 5");
-        fw::TreeViewEntry* entry_6 = treeview->addEntry("Entry 6");
-        fw::TreeViewEntry* entry_6_1 = treeview->addEntry("Entry 6_1");
-        fw::TreeViewEntry* entry_6_2 = treeview->addEntry("Entry 6_2");
-		fw::TreeViewEntry* entry_6_3 = treeview->addEntry("Entry 6_3");
-		entry_6_1->setParent(entry_6);
-		entry_6_2->setParent(entry_6);
-		entry_6_3->setParent(entry_6);
-        fw::TreeViewEntry* entry_7 = treeview->addEntry("Entry 7");
-        fw::TreeViewEntry* entry_7_1 = treeview->addEntry("Entry 7_1");
-        fw::TreeViewEntry* entry_7_2 = treeview->addEntry("Entry 7_2");
-        fw::TreeViewEntry* entry_7_3 = treeview->addEntry("Entry 7_3");
-        entry_7_1->setParent(entry_7);
-        entry_7_2->setParent(entry_7);
-        entry_7_3->setParent(entry_7);
-        fw::TreeViewEntry* entry_8 = treeview->addEntry("Entry 8");
-        fw::TreeViewEntry* entry_8_1 = treeview->addEntry("Entry 8_1");
-        fw::TreeViewEntry* entry_8_2 = treeview->addEntry("Entry 8_2");
-        fw::TreeViewEntry* entry_8_3 = treeview->addEntry("Entry 8_3");
-        entry_8_1->setParent(entry_8);
-        entry_8_2->setParent(entry_8);
-        entry_8_3->setParent(entry_8);
-
         app.load("levels/level.txt");
         app.start();
     } catch (std::string msg) {
