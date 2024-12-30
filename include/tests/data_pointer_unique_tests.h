@@ -1,8 +1,10 @@
+#pragma once
+
 #include "test_lib/test.h"
 
-class DataPointerTests : public test::TestModule {
+class DataPointerUniqueTests : public test::TestModule {
 public:
-	DataPointerTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
+	DataPointerUniqueTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 
 private:
 	void nullTest(test::Test& test);

@@ -8,10 +8,9 @@ public:
 	DataPointerShared();
 	DataPointerShared(const std::string& name, T* ptr);
 	DataPointerShared(const std::string& name, T* ptr, const D& deleter);
-	DataPointerShared(DataPointerShared&& dp) noexcept;
-	template<typename T2, typename D2>
-	DataPointerShared(DataPointerShared<T2, D2>&& dp) noexcept;
 	DataPointerShared(const DataPointerShared&);
+	template<typename T2, typename D2>
+	DataPointerShared(const DataPointerShared<T2, D2>&);
 	~DataPointerShared();
 	T* get() const;
 	T* releaseSilent();
@@ -37,3 +36,40 @@ private:
 	D deleter;
 
 };
+
+template<typename T, typename D>
+inline DataPointerShared<T, D>::DataPointerShared() : deleter(D()) {
+	this->ptr = nullptr;
+}
+
+template<typename T, typename D>
+inline DataPointerShared<T, D>::DataPointerShared(const std::string& name, T* ptr) {
+	this->name = name;
+	this->ptr = ptr;
+	if (ptr) {
+		add_to_data_blocks(name, reinterpret_cast<void*>(ptr), sizeof(T));
+		ref_count = new size_t(1);
+	}
+}
+
+template<typename T, typename D>
+inline DataPointerShared<T, D>::DataPointerShared(const std::string& name, T* ptr, const D& deleter) : deleter(deleter) {
+	this->name = name;
+	this->ptr = ptr;
+	if (ptr) {
+		add_to_data_blocks(name, reinterpret_cast<void*>(ptr), sizeof(T));
+		ref_count = new size_t(1);
+	}
+}
+
+template<typename T, typename D>
+inline DataPointerShared<T, D>::~DataPointerShared() {
+	if (ptr) {
+		--(*ref_count);
+		if (*ref_count == 0) {
+			remove_from_data_blocks(reinterpret_cast<void*>(ptr));
+			deleter(ptr);
+			delete ref_count;
+		}
+	}
+}

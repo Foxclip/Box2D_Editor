@@ -46,26 +46,6 @@ inline DataPointerUnique<T> make_data_pointer(const std::string& name, Args&&...
 	return result;
 }
 
-void add_to_data_blocks(const DataBlock& block);
-void add_to_data_blocks(const std::string& name, void* ptr, size_t size);
-void remove_from_data_blocks(void* ptr);
-std::string pointer_to_str(void* ptr);
-std::string data_block_to_str(const DataBlock& block);
-std::string data_block_to_str(void* ptr);
-void print_data_blocks();
-bool check_data_block(void* ptr);
-
-template<typename T>
-template<typename T2>
-inline DataPointerDefaultDelete<T>::DataPointerDefaultDelete(const DataPointerDefaultDelete<T2>& other) { }
-
-template<typename T>
-inline void DataPointerDefaultDelete<T>::operator()(T* ptr) {
-	if (ptr) {
-		delete ptr;
-	}
-}
-
 template<typename T, typename D>
 inline DataPointerUnique<T, D>::DataPointerUnique() : deleter(D()) {
 	this->ptr = nullptr;
