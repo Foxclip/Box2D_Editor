@@ -3,7 +3,7 @@
 #include <vector>
 #include <functional>
 #include <cassert>
-#include "common/data_pointer.h"
+#include "common/data_pointer_unique.h"
 
 template<typename ...TArgs>
 class Event;

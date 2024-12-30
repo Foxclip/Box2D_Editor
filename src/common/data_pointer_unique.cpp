@@ -1,6 +1,4 @@
-#include "common/data_pointer.h"
-
-std::map<void*, DataBlock> data_blocks;
+#include "common/data_pointer_unique.h"
 
 DataBlock::DataBlock(const std::string& name, void* ptr, size_t size) {
 	this->name = name;

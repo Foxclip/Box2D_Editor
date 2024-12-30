@@ -1,7 +1,7 @@
 #pragma once
 
 #include "serializer.h"
-#include "common/data_pointer.h"
+#include "common/data_pointer_unique.h"
 
 class GameObject;
 class GameObjectList;

@@ -5,7 +5,7 @@
 #include <memory>
 #include <cassert>
 #include <string>
-#include "data_pointer.h"
+#include "data_pointer_unique.h"
 
 template<typename T, typename U>
 concept NotSameAs = !std::same_as<T, U>;

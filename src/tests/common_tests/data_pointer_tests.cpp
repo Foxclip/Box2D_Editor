@@ -1,5 +1,5 @@
 #include "tests/data_pointer_tests.h"
-#include "common/data_pointer.h"
+#include "common/data_pointer_unique.h"
 #include <functional>
 #include "common/utils.h"
 
