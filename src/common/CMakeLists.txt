@@ -14,8 +14,6 @@ set(COMMON_HEADER_FILES
 )
 set(COMMON_SOURCE_FILES
     "data_pointer_common.cpp"
-    "data_pointer_unique.cpp"
-    "data_pointer_shared.cpp"
     "filedialog.cpp"
     "logger.cpp"
     "utils.cpp"
