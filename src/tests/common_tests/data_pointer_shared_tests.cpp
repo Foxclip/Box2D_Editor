@@ -18,6 +18,7 @@ DataPointerSharedTests::DataPointerSharedTests(
 
 void DataPointerSharedTests::nullTest(test::Test& test) {
 	DataPointerShared<int> dp("Null", nullptr);
+	T_COMPARE(dp.use_count(), 0);
 
 	T_COMPARE(data_blocks.size(), 0);
 }
@@ -25,6 +26,7 @@ void DataPointerSharedTests::nullTest(test::Test& test) {
 void DataPointerSharedTests::basicTest(test::Test& test) {
 	int* x = new int(5);
 	DataPointerShared<int> dp("x", x);
+	T_COMPARE(dp.use_count(), 1);
 
 	T_WRAP_CONTAINER(checkDataBlock(test, x, sizeof(int)));
 }

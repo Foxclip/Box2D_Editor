@@ -38,6 +38,7 @@ int main() {
     // TODO: Editor: put Camera in separate file
     // TODO: WidgetList: use addPending methods explicitly instead of sneakily calling them from other methods like moveToTop
     // TODO: Widget: make test for setParent with keep_pos = true
+    // TODO: DataPointer: use snake_case for method names
     // TODO: Outliner: rename object
     // TODO: Outliner: delete object
     // TODO: TreeViewWidget: don't take grabbed widgets out of the hierarchy, create phantom copies instead
