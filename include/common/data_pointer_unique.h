@@ -3,34 +3,34 @@
 #include "data_pointer_common.h"
 
 template<typename T, typename D = DataPointerDefaultDelete<T>>
-class DataPointer {
+class DataPointerUnique {
 public:
-	DataPointer();
-	DataPointer(const std::string& name, T* ptr);
-	DataPointer(const std::string& name, T* ptr, const D& deleter);
-	DataPointer(DataPointer&& dp) noexcept;
+	DataPointerUnique();
+	DataPointerUnique(const std::string& name, T* ptr);
+	DataPointerUnique(const std::string& name, T* ptr, const D& deleter);
+	DataPointerUnique(DataPointerUnique&& dp) noexcept;
 	template<typename T2, typename D2>
-	DataPointer(DataPointer<T2, D2>&& dp) noexcept;
-	~DataPointer();
+	DataPointerUnique(DataPointerUnique<T2, D2>&& dp) noexcept;
+	~DataPointerUnique();
 	T* get() const;
 	T* releaseSilent();
 	T* release();
 	void resetSilent(T* new_ptr);
 	void reset(const std::string& name = "", T* new_ptr = nullptr);
-	void swap(DataPointer& dp);
+	void swap(DataPointerUnique& dp);
 	D& getDeleter();
 	const D& getDeleter() const;
 	const std::string& getName() const;
 	void setName(const std::string& name);
 	T& operator*() const;
 	T* operator->() const;
-	DataPointer& operator=(DataPointer&& right);
+	DataPointerUnique& operator=(DataPointerUnique&& right);
 	template<typename T2, typename D2>
-	DataPointer& operator=(DataPointer<T2, D2>&& right);
+	DataPointerUnique& operator=(DataPointerUnique<T2, D2>&& right);
 	operator bool();
 
-	DataPointer(const DataPointer&) = delete;
-	DataPointer& operator=(const DataPointer&) = delete;
+	DataPointerUnique(const DataPointerUnique&) = delete;
+	DataPointerUnique& operator=(const DataPointerUnique&) = delete;
 
 private:
 	std::string name = "<unnamed>";
@@ -40,9 +40,9 @@ private:
 };
 
 template<typename T, typename... Args>
-inline DataPointer<T> make_data_pointer(const std::string& name, Args&&... args) {
+inline DataPointerUnique<T> make_data_pointer(const std::string& name, Args&&... args) {
 	T* ptr = new T(std::forward<Args>(args)...);
-	DataPointer<T> result(name, ptr);
+	DataPointerUnique<T> result(name, ptr);
 	return result;
 }
 
@@ -67,12 +67,12 @@ inline void DataPointerDefaultDelete<T>::operator()(T* ptr) {
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::DataPointer() : deleter(D()) {
+inline DataPointerUnique<T, D>::DataPointerUnique() : deleter(D()) {
 	this->ptr = nullptr;
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr) : deleter(D()) {
+inline DataPointerUnique<T, D>::DataPointerUnique(const std::string& name, T* ptr) : deleter(D()) {
 	this->name = name;
 	this->ptr = ptr;
 	if (ptr) {
@@ -81,7 +81,7 @@ inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr) : deleter
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr, const D& deleter) : deleter(deleter) {
+inline DataPointerUnique<T, D>::DataPointerUnique(const std::string& name, T* ptr, const D& deleter) : deleter(deleter) {
 	this->name = name;
 	this->ptr = ptr;
 	if (ptr) {
@@ -90,7 +90,7 @@ inline DataPointer<T, D>::DataPointer(const std::string& name, T* ptr, const D& 
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::DataPointer(DataPointer&& dp) noexcept {
+inline DataPointerUnique<T, D>::DataPointerUnique(DataPointerUnique&& dp) noexcept {
 	this->name = dp.getName();
 	resetSilent(dp.releaseSilent());
 	this->deleter = dp.getDeleter();
@@ -98,14 +98,14 @@ inline DataPointer<T, D>::DataPointer(DataPointer&& dp) noexcept {
 
 template<typename T, typename D>
 template<typename T2, typename D2>
-inline DataPointer<T, D>::DataPointer(DataPointer<T2, D2>&& dp) noexcept {
+inline DataPointerUnique<T, D>::DataPointerUnique(DataPointerUnique<T2, D2>&& dp) noexcept {
 	this->name = dp.getName();
 	resetSilent(dp.releaseSilent());
 	this->deleter = dp.getDeleter();
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::~DataPointer() {
+inline DataPointerUnique<T, D>::~DataPointerUnique() {
 	if (ptr) {
 		remove_from_data_blocks(reinterpret_cast<void*>(ptr));
 		deleter(ptr);
@@ -113,19 +113,19 @@ inline DataPointer<T, D>::~DataPointer() {
 }
 
 template<typename T, typename D>
-inline T* DataPointer<T, D>::get() const {
+inline T* DataPointerUnique<T, D>::get() const {
 	return ptr;
 }
 
 template<typename T, typename D>
-inline T* DataPointer<T, D>::releaseSilent() {
+inline T* DataPointerUnique<T, D>::releaseSilent() {
 	T* result = ptr;
 	ptr = nullptr;
 	return result;
 }
 
 template<typename T, typename D>
-inline T* DataPointer<T, D>::release() {
+inline T* DataPointerUnique<T, D>::release() {
 	T* result = ptr;
 	if (ptr) {
 		remove_from_data_blocks(reinterpret_cast<void*>(ptr));
@@ -135,7 +135,7 @@ inline T* DataPointer<T, D>::release() {
 }
 
 template<typename T, typename D>
-inline void DataPointer<T, D>::resetSilent(T* new_ptr) {
+inline void DataPointerUnique<T, D>::resetSilent(T* new_ptr) {
 	if (ptr) {
 		deleter(ptr);
 	}
@@ -143,7 +143,7 @@ inline void DataPointer<T, D>::resetSilent(T* new_ptr) {
 }
 
 template<typename T, typename D>
-inline void DataPointer<T, D>::reset(const std::string& new_name, T* new_ptr) {
+inline void DataPointerUnique<T, D>::reset(const std::string& new_name, T* new_ptr) {
 	T* old_ptr = ptr;
 	if (old_ptr == new_ptr) {
 		return;
@@ -159,46 +159,46 @@ inline void DataPointer<T, D>::reset(const std::string& new_name, T* new_ptr) {
 }
 
 template<typename T, typename D>
-inline void DataPointer<T, D>::swap(DataPointer& dp) {
+inline void DataPointerUnique<T, D>::swap(DataPointerUnique& dp) {
 	std::swap(this->name, dp.name);
 	std::swap(this->ptr, dp.ptr);
 	std::swap(this->deleter, dp.deleter);
 }
 
 template<typename T, typename D>
-inline D& DataPointer<T, D>::getDeleter() {
+inline D& DataPointerUnique<T, D>::getDeleter() {
 	return deleter;
 }
 
 template<typename T, typename D>
-inline const D& DataPointer<T, D>::getDeleter() const {
+inline const D& DataPointerUnique<T, D>::getDeleter() const {
 	return deleter;
 }
 
 template<typename T, typename D>
-inline const std::string& DataPointer<T, D>::getName() const {
+inline const std::string& DataPointerUnique<T, D>::getName() const {
 	return name;
 }
 
 template<typename T, typename D>
-inline void DataPointer<T, D>::setName(const std::string& name) {
+inline void DataPointerUnique<T, D>::setName(const std::string& name) {
 	this->name = name;
 	auto it = data_blocks.find(ptr);
 	it->second.name = name;
 }
 
 template<typename T, typename D>
-inline T& DataPointer<T, D>::operator*() const {
+inline T& DataPointerUnique<T, D>::operator*() const {
 	return *ptr;
 }
 
 template<typename T, typename D>
-inline T* DataPointer<T, D>::operator->() const {
+inline T* DataPointerUnique<T, D>::operator->() const {
 	return ptr;
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer&& right) {
+inline DataPointerUnique<T, D>& DataPointerUnique<T, D>::operator=(DataPointerUnique&& right) {
 	this->name = right.getName();
 	reset();
 	resetSilent(right.releaseSilent());
@@ -207,13 +207,13 @@ inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer&& right) {
 }
 
 template<typename T, typename D>
-inline DataPointer<T, D>::operator bool() {
+inline DataPointerUnique<T, D>::operator bool() {
 	return static_cast<bool>(ptr);
 }
 
 template<typename T, typename D>
 template<typename T2, typename D2>
-inline DataPointer<T, D>& DataPointer<T, D>::operator=(DataPointer<T2, D2>&& right) {
+inline DataPointerUnique<T, D>& DataPointerUnique<T, D>::operator=(DataPointerUnique<T2, D2>&& right) {
 	this->name = right.getName();
 	reset();
 	resetSilent(right.releaseSilent());

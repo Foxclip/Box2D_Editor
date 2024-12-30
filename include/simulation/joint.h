@@ -51,12 +51,12 @@ public:
 	float getMaxMotorTorque() const;
 	using Joint::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static DataPointer<RevoluteJoint> deserialize(const std::string& str, GameObjectList* object_list);
-	static DataPointer<RevoluteJoint> deserialize(
+	static DataPointerUnique<RevoluteJoint> deserialize(const std::string& str, GameObjectList* object_list);
+	static DataPointerUnique<RevoluteJoint> deserialize(
 		const std::string& str, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
 	);
-	static DataPointer<RevoluteJoint> deserialize(TokenReader& tr, GameObjectList* object_list);
-	static DataPointer<RevoluteJoint> deserialize(
+	static DataPointerUnique<RevoluteJoint> deserialize(TokenReader& tr, GameObjectList* object_list);
+	static DataPointerUnique<RevoluteJoint> deserialize(
 		TokenReader& tr, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
 	);
 	bool isEqual(const Joint* other) const;

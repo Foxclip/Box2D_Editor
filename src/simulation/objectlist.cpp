@@ -64,7 +64,7 @@ ptrdiff_t GameObjectList::getMaxId() const {
     }
 }
 
-GameObject* GameObjectList::add(DataPointer<GameObject> object, bool assign_new_id) {
+GameObject* GameObjectList::add(DataPointerUnique<GameObject> object, bool assign_new_id) {
     try {
         GameObject* ptr = object.get();
         if (assign_new_id) {
@@ -103,7 +103,7 @@ GameObject* GameObjectList::add(DataPointer<GameObject> object, bool assign_new_
     }
 }
 
-Joint* GameObjectList::addJoint(DataPointer<Joint> joint) {
+Joint* GameObjectList::addJoint(DataPointerUnique<Joint> joint) {
     Joint* ptr = joint.get();
     joint->object1->joints.add(joint.get());
     joint->object2->joints.add(joint.get());
@@ -166,7 +166,7 @@ GameObject* GameObjectList::duplicateObject(const GameObject* object) {
     TokenWriter tw;
     std::string str = object->serialize(tw).toStr();
     TokenReader tr(str);
-    DataPointer<GameObject> new_object;
+    DataPointerUnique<GameObject> new_object;
     if (dynamic_cast<const BoxObject*>(object)) {
         new_object = BoxObject::deserialize(tr, this);
     } else if (dynamic_cast<const BallObject*>(object)) {
@@ -187,7 +187,7 @@ Joint* GameObjectList::duplicateJoint(const Joint* joint, GameObject* new_object
     TokenWriter tw;
     std::string str = joint->serialize(tw).toStr();
     TokenReader tr(str);
-    DataPointer<Joint> new_joint;
+    DataPointerUnique<Joint> new_joint;
     if (dynamic_cast<const RevoluteJoint*>(joint)) {
         new_joint = RevoluteJoint::deserialize(tr, this, new_object_a, new_object_b);
     } else {

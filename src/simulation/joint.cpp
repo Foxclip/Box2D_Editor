@@ -157,26 +157,26 @@ TokenWriter& RevoluteJoint::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-DataPointer<RevoluteJoint> RevoluteJoint::deserialize(const std::string& str, GameObjectList* object_list) {
+DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	DataPointer<RevoluteJoint> uptr = deserialize(tr, object_list);
+	DataPointerUnique<RevoluteJoint> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-DataPointer<RevoluteJoint> RevoluteJoint::deserialize(
+DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(
 	const std::string& str, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
 ) {
 	TokenReader tr(str);
-	DataPointer<RevoluteJoint> uptr = deserialize(tr, object_list, new_object_a, new_object_b);
+	DataPointerUnique<RevoluteJoint> uptr = deserialize(tr, object_list, new_object_a, new_object_b);
 	return uptr;
 }
 
-DataPointer<RevoluteJoint> RevoluteJoint::deserialize(TokenReader& tr, GameObjectList* object_list) {
-	DataPointer<RevoluteJoint> uptr = deserialize(tr, object_list, nullptr, nullptr);
+DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(TokenReader& tr, GameObjectList* object_list) {
+	DataPointerUnique<RevoluteJoint> uptr = deserialize(tr, object_list, nullptr, nullptr);
 	return uptr;
 }
 
-DataPointer<RevoluteJoint> RevoluteJoint::deserialize(
+DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(
 	TokenReader& tr, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
 ) {
 	try {
@@ -228,7 +228,7 @@ DataPointer<RevoluteJoint> RevoluteJoint::deserialize(
 		if (new_object_b) {
 			object2 = new_object_b;
 		}
-		DataPointer<RevoluteJoint> uptr = make_data_pointer<RevoluteJoint>(
+		DataPointerUnique<RevoluteJoint> uptr = make_data_pointer<RevoluteJoint>(
 			"RevoluteJoint A: " + object1->getName() + " B: " + object2->getName(),
 			def,
 			object_list->getWorld(),
