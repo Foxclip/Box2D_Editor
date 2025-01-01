@@ -184,13 +184,15 @@ inline T* DataPointerShared<T, D>::operator->() const {
 
 template<typename T, typename D>
 inline DataPointerShared<T, D>& DataPointerShared<T, D>::operator=(const DataPointerShared& right) {
-	this->name = right.name;
-	dispose();
-	this->ptr = right.ptr;
-	this->deleter = right.deleter;
-	this->ref_count = right.ref_count;
-	if (ptr) {
-		++(*ref_count);
+	if (right.ptr != this->ptr) {
+		this->name = right.name;
+		dispose();
+		this->ptr = right.ptr;
+		this->deleter = right.deleter;
+		this->ref_count = right.ref_count;
+		if (ptr) {
+			++(*ref_count);
+		}
 	}
 	return *this;
 }
