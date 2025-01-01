@@ -82,6 +82,7 @@ DataPointerSharedTests::DataPointerSharedTests(
 	test::Test* copy_constructor_deleter_test = addTest("copy_constructor_deleter", { copy_constructor_test }, [&](test::Test& test) { copyConstructorDeleterTest(test); });
 	test::Test* copy_constructor_derived_test = addTest("copy_constructor_derived", { copy_constructor_test }, [&](test::Test& test) { copyConstructorDerivedTest(test); });
 	test::Test* copy_constructor_derived_deleter_test = addTest("copy_constructor_derived_deleter", { copy_constructor_derived_test }, [&](test::Test& test) { copyConstructorDerivedDeleterTest(test); });
+	test::Test* copy_assignment_test = addTest("copy_assignment", { struct_test }, [&](test::Test& test) { copyAssignmentTest(test); });
 }
 
 void DataPointerSharedTests::nullTest(test::Test& test) {
@@ -453,6 +454,26 @@ void DataPointerSharedTests::copyConstructorDerivedDeleterTest(test::Test& test)
 		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
 	}
 	T_CHECK(flag);
+}
+
+void DataPointerSharedTests::copyAssignmentTest(test::Test& test) {
+	bool flag = false;
+	MyStruct* m1 = new MyStruct(11);
+	m1->destructor_func = [&]() {
+		flag = true;
+	};
+	MyStruct* m2 = new MyStruct(22);
+	DataPointerShared<MyStruct> dp1("MyStruct", m1);
+	DataPointerShared<MyStruct> dp2("MyStruct", m2);
+	dp1 = dp2;
+	MyStruct* m3 = dp1.get();
+	MyStruct* m4 = dp2.get();
+	T_COMPARE(m3, m2, &utils::pointer_to_str);
+	T_COMPARE(m4, m2, &utils::pointer_to_str);
+	T_CHECK(flag);
+
+	T_COMPARE(data_blocks.size(), 1);
+	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
 }
 
 void DataPointerSharedTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {
