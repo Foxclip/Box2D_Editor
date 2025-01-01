@@ -87,6 +87,8 @@ DataPointerSharedTests::DataPointerSharedTests(
 	test::Test* copy_assignment_derived_test = addTest("copy_assignment_derived", { copy_assignment_test }, [&](test::Test& test) { copyAssignmentDerivedTest(test); });
 	test::Test* copy_assignment_derived_deleter_test = addTest("copy_assignment_derived_deleter", { copy_assignment_derived_test }, [&](test::Test& test) { copyAssignmentDerivedDeleterTest(test); });
 	test::Test* swap_test = addTest("swap", { get_test }, [&](test::Test& test) { swapTest(test); });
+	test::Test* dereference_test = addTest("dereference", { get_test }, [&](test::Test& test) { dereferenceTest(test); });
+	test::Test* pointer_access_test = addTest("pointer_access", { get_test }, [&](test::Test& test) { pointerAccessTest(test); });
 }
 
 void DataPointerSharedTests::nullTest(test::Test& test) {
@@ -579,6 +581,20 @@ void DataPointerSharedTests::swapTest(test::Test& test) {
 	T_COMPARE(data_blocks.size(), 2);
 	T_COMPARE(dp1.get(), m2, &utils::pointer_to_str);
 	T_COMPARE(dp2.get(), m1, &utils::pointer_to_str);
+}
+
+void DataPointerSharedTests::dereferenceTest(test::Test& test) {
+	MyStruct* m = new MyStruct(99);
+	DataPointerShared<MyStruct> dp("MyStruct", m);
+	MyStruct mystruct = *dp;
+	T_COMPARE(mystruct.val, 99);
+}
+
+void DataPointerSharedTests::pointerAccessTest(test::Test& test) {
+	MyStruct* m = new MyStruct(111);
+	DataPointerShared<MyStruct> dp("MyStruct", m);
+	int val = dp->val;
+	T_COMPARE(val, 111);
 }
 
 void DataPointerSharedTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {
