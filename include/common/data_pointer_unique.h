@@ -179,10 +179,12 @@ inline T* DataPointerUnique<T, D>::operator->() const {
 
 template<typename T, typename D>
 inline DataPointerUnique<T, D>& DataPointerUnique<T, D>::operator=(DataPointerUnique&& right) {
-	this->name = right.getName();
-	reset();
-	resetSilent(right.releaseSilent());
-	this->deleter = right.getDeleter();
+	if (right.get() != this->ptr) {
+		this->name = right.getName();
+		reset();
+		resetSilent(right.releaseSilent());
+		this->deleter = right.getDeleter();
+	}
 	return *this;
 }
 
@@ -194,9 +196,11 @@ inline DataPointerUnique<T, D>::operator bool() {
 template<typename T, typename D>
 template<typename T2, typename D2>
 inline DataPointerUnique<T, D>& DataPointerUnique<T, D>::operator=(DataPointerUnique<T2, D2>&& right) {
-	this->name = right.getName();
-	reset();
-	resetSilent(right.releaseSilent());
-	this->deleter = right.getDeleter();
+	if (right.get() != this->ptr) {
+		this->name = right.getName();
+		reset();
+		resetSilent(right.releaseSilent());
+		this->deleter = right.getDeleter();
+	}
 	return *this;
 }
