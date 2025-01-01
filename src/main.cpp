@@ -32,6 +32,7 @@ int main() {
     execute_app();
 
     // TODO: DataPointer: add tests for assigning an object to itself
+    // TODO: DataPointer: user friend class in DataPointerUnique and remove resetSilent and releaseSilent
     // TODO: Outliner: reorder objects
     // TODO: Outliner: buttons up/down for reordering objects
     // TODO: Outliner: reparent objects

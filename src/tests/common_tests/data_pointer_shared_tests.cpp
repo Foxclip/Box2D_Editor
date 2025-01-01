@@ -236,14 +236,28 @@ void DataPointerSharedTests::resetDeleterTest(test::Test& test) {
 }
 
 void DataPointerSharedTests::moveConstructorTest(test::Test& test) {
-	MyStruct* m = new MyStruct(11);
-	DataPointerShared<MyStruct> dp("MyStruct", m);
-	DataPointerShared<MyStruct> dp2(std::move(dp));
-	MyStruct* m2 = dp.get();
-	MyStruct* m3 = dp2.get();
-	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+	{
+		// from ptr
+		MyStruct* m = new MyStruct(11);
+		DataPointerShared<MyStruct> dp("MyStruct", m);
+		DataPointerShared<MyStruct> dp2(std::move(dp));
+		MyStruct* m2 = dp.get();
+		MyStruct* m3 = dp2.get();
+		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
 
-	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+	}
+	{
+		// from nullptr
+		DataPointerShared<MyStruct> dp("null", nullptr);
+		DataPointerShared<MyStruct> dp2(std::move(dp));
+		MyStruct* m2 = dp.get();
+		MyStruct* m3 = dp2.get();
+		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
+		T_COMPARE(m3, nullptr, &utils::pointer_to_str);
+
+		T_COMPARE(data_blocks.size(), 0);
+	}
 }
 
 void DataPointerSharedTests::moveConstructorDeleterTest(test::Test& test) {
