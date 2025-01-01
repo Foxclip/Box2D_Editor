@@ -194,7 +194,7 @@ namespace fw {
 	requires std::derived_from<T, Widget>
 	inline T* WidgetList::createWidget(Args&&... args) {
 		wAssert(!isLocked());
-		DataPointer<T> uptr = make_data_pointer<T>("Widget", *this, args...);
+		DataPointerUnique<T> uptr = make_data_pointer<T>("Widget", *this, args...);
 		Widget* widget = uptr.get();
 		uptr.setName("Widget " + widget->full_name);
 		T* ptr = uptr.get();

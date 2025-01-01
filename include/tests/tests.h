@@ -9,4 +9,5 @@
 #include "widget_tests/widget_tests_application.h"
 #include "widget_tests/widget_tests_toposort.h"
 #include "editor_tests.h"
-#include "data_pointer_tests.h"
+#include "data_pointer_unique_tests.h"
+#include "data_pointer_shared_tests.h"

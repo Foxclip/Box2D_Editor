@@ -3,7 +3,7 @@
 #include <vector>
 #include <functional>
 #include <cassert>
-#include "common/data_pointer.h"
+#include "common/data_pointer_unique.h"
 
 template<typename ...TArgs>
 class Event;
@@ -53,31 +53,31 @@ public:
 	void clear();
 
 private:
-	std::vector<DataPointer<EventTarget<TArgs...>>> targets;
+	std::vector<DataPointerUnique<EventTarget<TArgs...>>> targets;
 
 };
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator+=(const std::function<void(TArgs...)>& func) {
-	DataPointer<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerFunc<TArgs...>>("EventHandler func", func);
+	DataPointerUnique<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerFunc<TArgs...>>("EventHandler func", func);
 	targets.push_back(std::move(uptr));
 }
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator+=(const Event<TArgs...>& event) {
-	DataPointer<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerEvent<TArgs...>>("EventHandler event", event);
+	DataPointerUnique<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerEvent<TArgs...>>("EventHandler event", event);
 	targets.push_back(std::move(uptr));
 }
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator+=(const EventHandlerFunc<TArgs...>& handler) {
-	DataPointer<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerFunc<TArgs...>>("EventHandler EventHandlerFunc", handler);
+	DataPointerUnique<EventTarget<TArgs...>> uptr = make_data_pointer<EventHandlerFunc<TArgs...>>("EventHandler EventHandlerFunc", handler);
 	targets.push_back(std::move(uptr));
 }
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator-=(const EventTarget<TArgs...>& target) {
-	auto pred = [&](const DataPointer<EventTarget<TArgs...>>& element) {
+	auto pred = [&](const DataPointerUnique<EventTarget<TArgs...>>& element) {
 		return element->getId() == target.getId();
 	};
 	std::erase_if(targets, pred);
@@ -85,7 +85,7 @@ inline void Event<TArgs...>::operator-=(const EventTarget<TArgs...>& target) {
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator()(TArgs ...args) {
-	for (DataPointer<EventTarget<TArgs...>>& target : targets) {
+	for (DataPointerUnique<EventTarget<TArgs...>>& target : targets) {
 		EventTarget<TArgs...>* ptr = target.get();
 		(*ptr)(args...);
 	}
@@ -93,7 +93,7 @@ inline void Event<TArgs...>::operator()(TArgs ...args) {
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::clear() {
-	targets = std::vector<DataPointer<EventTarget<TArgs...>>>();
+	targets = std::vector<DataPointerUnique<EventTarget<TArgs...>>>();
 }
 
 template<typename ...TArgs>

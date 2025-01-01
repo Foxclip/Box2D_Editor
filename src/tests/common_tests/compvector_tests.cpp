@@ -378,7 +378,7 @@ void CompVectorTests::createCompVectorUptrList(test::TestModule* list) {
 		int* ptr3 = new int(3);
 		int* ptr5 = new int(5);
 		CompVectorUptr<int> vec = { ptr1, ptr2, ptr3 };
-		DataPointer<int> uptr5("ptr5", ptr5);
+		DataPointerUnique<int> uptr5("ptr5", ptr5);
 		vec.insert(vec.begin() + 2, std::move(uptr5));
 		T_CHECK(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr3 }));
 	});
@@ -393,11 +393,11 @@ void CompVectorTests::createCompVectorUptrList(test::TestModule* list) {
 		int* ptr8 = new int(8);
 		int* ptr9 = new int(9);
 		CompVectorUptr<int> vec = { ptr1, ptr2, ptr3 };
-		DataPointer<int> uptr5("ptr5", ptr5);
-		DataPointer<int> uptr6("ptr6", ptr6);
-		DataPointer<int> uptr7("ptr7", ptr7);
-		std::vector<DataPointer<int>> vec1;
-		std::vector<DataPointer<int>> vec1_another;
+		DataPointerUnique<int> uptr5("ptr5", ptr5);
+		DataPointerUnique<int> uptr6("ptr6", ptr6);
+		DataPointerUnique<int> uptr7("ptr7", ptr7);
+		std::vector<DataPointerUnique<int>> vec1;
+		std::vector<DataPointerUnique<int>> vec1_another;
 		vec1.push_back(std::move(uptr5));
 		vec1.push_back(std::move(uptr6));
 		vec1.push_back(std::move(uptr7));
@@ -405,9 +405,9 @@ void CompVectorTests::createCompVectorUptrList(test::TestModule* list) {
 		T_CHECK(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr6, ptr7, ptr3 }));
 		vec.insert(vec.begin() + 2, vec1_another.begin(), vec1_another.end());
 		T_CHECK(vec == std::vector<int*>({ ptr1, ptr2, ptr5, ptr6, ptr7, ptr3 }));
-		DataPointer<int> uptr8("ptr8", ptr8);
-		DataPointer<int> uptr9("ptr9", ptr9);
-		std::vector<DataPointer<int>> vec2;
+		DataPointerUnique<int> uptr8("ptr8", ptr8);
+		DataPointerUnique<int> uptr9("ptr9", ptr9);
+		std::vector<DataPointerUnique<int>> vec2;
 		vec2.push_back(std::move(uptr8));
 		vec2.push_back(std::move(uptr9));
 		vec.insert(vec.begin(), vec2.begin(), vec2.end());

@@ -129,6 +129,6 @@ private:
 template<typename T, typename... Args>
 requires std::derived_from<T, EditWindowParameter>
 inline void EditWindow::createParameter(Args&&... args) {
-	DataPointer<T> parameter = make_data_pointer<T>("EditWindowParameter", *this, args...);
+	DataPointerUnique<T> parameter = make_data_pointer<T>("EditWindowParameter", *this, args...);
 	parameters.add(std::move(parameter));
 }

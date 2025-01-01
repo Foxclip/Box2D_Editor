@@ -828,13 +828,13 @@ TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-DataPointer<BoxObject> BoxObject::deserialize(const std::string& str, GameObjectList* object_list) {
+DataPointerUnique<BoxObject> BoxObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	DataPointer<BoxObject> uptr = deserialize(tr, object_list);
+	DataPointerUnique<BoxObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-DataPointer<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+DataPointerUnique<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -867,7 +867,7 @@ DataPointer<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectList* o
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		DataPointer<BoxObject> box = make_data_pointer<BoxObject>("BoxObject " + name, object_list, bdef, size, color);
+		DataPointerUnique<BoxObject> box = make_data_pointer<BoxObject>("BoxObject " + name, object_list, bdef, size, color);
 		box->id = id;
 		box->parent_id = parent_id;
 		box->name = name;
@@ -961,13 +961,13 @@ TokenWriter& BallObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-DataPointer<BallObject> BallObject::deserialize(const std::string& str, GameObjectList* object_list) {
+DataPointerUnique<BallObject> BallObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	DataPointer<BallObject> uptr = deserialize(tr, object_list);
+	DataPointerUnique<BallObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-DataPointer<BallObject> BallObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+DataPointerUnique<BallObject> BallObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -1008,7 +1008,7 @@ DataPointer<BallObject> BallObject::deserialize(TokenReader& tr, GameObjectList*
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		DataPointer<BallObject> ball = make_data_pointer<BallObject>("BallObject " + name, object_list, bdef, radius, color, notch_color);
+		DataPointerUnique<BallObject> ball = make_data_pointer<BallObject>("BallObject " + name, object_list, bdef, radius, color, notch_color);
 		ball->id = id;
 		ball->parent_id = parent_id;
 		ball->name = name;
@@ -1118,13 +1118,13 @@ TokenWriter& PolygonObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-DataPointer<PolygonObject> PolygonObject::deserialize(const std::string& str, GameObjectList* object_list) {
+DataPointerUnique<PolygonObject> PolygonObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	DataPointer<PolygonObject> uptr = deserialize(tr, object_list);
+	DataPointerUnique<PolygonObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-DataPointer<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+DataPointerUnique<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -1157,7 +1157,7 @@ DataPointer<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameObjec
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		DataPointer<PolygonObject> car = make_data_pointer<PolygonObject>("PolygonObject(car) " + name, object_list, bdef, vertices, color);
+		DataPointerUnique<PolygonObject> car = make_data_pointer<PolygonObject>("PolygonObject(car) " + name, object_list, bdef, vertices, color);
 		car->id = id;
 		car->parent_id = parent_id;
 		car->name = name;
@@ -1261,13 +1261,13 @@ TokenWriter& ChainObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-DataPointer<ChainObject> ChainObject::deserialize(const std::string& str, GameObjectList* object_list) {
+DataPointerUnique<ChainObject> ChainObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	DataPointer<ChainObject> uptr = deserialize(tr, object_list);
+	DataPointerUnique<ChainObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-DataPointer<ChainObject> ChainObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+DataPointerUnique<ChainObject> ChainObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -1300,7 +1300,7 @@ DataPointer<ChainObject> ChainObject::deserialize(TokenReader& tr, GameObjectLis
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		DataPointer<ChainObject> chain = make_data_pointer<ChainObject>("ChainObject " + name, object_list, bdef, vertices, color);
+		DataPointerUnique<ChainObject> chain = make_data_pointer<ChainObject>("ChainObject " + name, object_list, bdef, vertices, color);
 		chain->id = id;
 		chain->parent_id = parent_id;
 		chain->name = name;

@@ -1,5 +1,5 @@
-#include "tests/data_pointer_tests.h"
-#include "common/data_pointer.h"
+#include "tests/data_pointer_unique_tests.h"
+#include "common/data_pointer_unique.h"
 #include <functional>
 #include "common/utils.h"
 
@@ -50,83 +50,82 @@ struct AnotherDeleter {
 	std::function<void(void)> func;
 };
 
-DataPointerTests::DataPointerTests(
-	const std::string& name, test::TestModule* manager, const std::vector<TestNode*>& required_nodes
-) : TestModule(name, manager, required_nodes) {
-	test::TestModule* list = addModule("DataPointer");
-	list->OnAfterRunTest = [&]() {
+DataPointerUniqueTests::DataPointerUniqueTests(
+	const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes
+) : TestModule(name, parent, required_nodes) {
+	OnAfterRunTest = [&]() {
 		data_blocks.clear();
 	};
-	test::Test* null_test = list->addTest("null", [&](test::Test& test) { nullTest(test); });
-	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) { basicTest(test); });
-	test::Test* struct_test = list->addTest("struct", { basic_test }, [&](test::Test& test) { structTest(test); });
-	test::Test* destructor_test = list->addTest("destructor", { struct_test }, [&](test::Test& test) { destructorTest(test); });
-	test::Test* derived_destructor_test = list->addTest("derived_destructor", { destructor_test }, [&](test::Test& test) { derivedDestructorTest(test); });
-	test::Test* vector_destructor_test = list->addTest("vector_destructor", { destructor_test }, [&](test::Test& test) { vectorDestructorTest(test); });
-	test::Test* custom_deleter_test = list->addTest("custom_deleter", { struct_test }, [&](test::Test& test) { customDeleterTest(test); });
-	test::Test* lambda_deleter_test = list->addTest("lambda_deleter", { struct_test }, [&](test::Test& test) { lambdaDeleterTest(test); });
-	test::Test* get_test = list->addTest("get", { struct_test }, [&](test::Test& test) { getTest(test); });
-	test::Test* release_test = list->addTest("release", { get_test }, [&](test::Test& test) { releaseTest(test); });
-	test::Test* reset_test = list->addTest("reset", { get_test }, [&](test::Test& test) { resetTest(test); });
-	test::Test* reset_deleter_test = list->addTest("reset_deleter", { reset_test }, [&](test::Test& test) { resetDeleterTest(test); });
-	test::Test* release_silent_test = list->addTest("release_silent", { release_test }, [&](test::Test& test) { releaseSilentTest(test); });
-	test::Test* reset_silent_test = list->addTest("reset_silent", { reset_test }, [&](test::Test& test) { resetSilentTest(test); });
-	test::Test* move_constructor_test = list->addTest("move_contructor", { release_silent_test }, [&](test::Test& test) { moveConstructorTest(test); });
-	test::Test* move_constructor_deleter_test = list->addTest("move_contructor_deleter", { move_constructor_test }, [&](test::Test& test) { moveConstructorDeleterTest(test); });
-	test::Test* move_constructor_derived_test = list->addTest("move_contructor_derived", { move_constructor_test }, [&](test::Test& test) { moveConstructorDerivedTest(test); });
-	test::Test* move_constructor_derived_deleter_test = list->addTest("move_contructor_derived_deleter", { move_constructor_derived_test }, [&](test::Test& test) { moveConstructorDerivedDeleterTest(test); });
-	test::Test* move_assignment_test = list->addTest("move_assignment", { release_silent_test }, [&](test::Test& test) { moveAssignmentTest(test); });
-	test::Test* move_assignment_deleter_test = list->addTest("move_assignment_deleter", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDeleterTest(test); });
-	test::Test* move_assignment_derived_test = list->addTest("move_assignment_derived", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDerivedTest(test); });
-	test::Test* move_assignment_derived_deleter_test = list->addTest("move_assignment_derived_deleter", { move_assignment_derived_test }, [&](test::Test& test) { moveAssignmentDerivedDeleterTest(test); });
-	test::Test* swap_test = list->addTest("swap", { get_test }, [&](test::Test& test) { swapTest(test); });
-	test::Test* dereference_test = list->addTest("dereference", { struct_test }, [&](test::Test& test) { dereferenceTest(test); });
-	test::Test* pointer_access_test = list->addTest("pointer_access", { struct_test }, [&](test::Test& test) { pointerAccessTest(test); });
-	test::Test* move_test = list->addTest("move", { struct_test }, [&](test::Test& test) { moveTest(test); });
-	test::Test* make_data_pointer_test = list->addTest("make_data_pointer", { struct_test }, [&](test::Test& test) { makeDataPointerTest(test); });
-	test::Test* make_data_pointer_derived_test = list->addTest("make_data_pointer_derived", { make_data_pointer_test }, [&](test::Test& test) { makeDataPointerDerivedTest(test); });
-	test::Test* block_name_test = list->addTest("block_name", { make_data_pointer_test }, [&](test::Test& test) { blockNameTest(test); });
+	test::Test* null_test = addTest("null", [&](test::Test& test) { nullTest(test); });
+	test::Test* basic_test = addTest("basic", [&](test::Test& test) { basicTest(test); });
+	test::Test* struct_test = addTest("struct", { basic_test }, [&](test::Test& test) { structTest(test); });
+	test::Test* destructor_test = addTest("destructor", { struct_test }, [&](test::Test& test) { destructorTest(test); });
+	test::Test* derived_destructor_test = addTest("derived_destructor", { destructor_test }, [&](test::Test& test) { derivedDestructorTest(test); });
+	test::Test* vector_destructor_test = addTest("vector_destructor", { destructor_test }, [&](test::Test& test) { vectorDestructorTest(test); });
+	test::Test* custom_deleter_test = addTest("custom_deleter", { struct_test }, [&](test::Test& test) { customDeleterTest(test); });
+	test::Test* lambda_deleter_test = addTest("lambda_deleter", { struct_test }, [&](test::Test& test) { lambdaDeleterTest(test); });
+	test::Test* get_test = addTest("get", { struct_test }, [&](test::Test& test) { getTest(test); });
+	test::Test* release_test = addTest("release", { get_test }, [&](test::Test& test) { releaseTest(test); });
+	test::Test* reset_test = addTest("reset", { get_test }, [&](test::Test& test) { resetTest(test); });
+	test::Test* reset_deleter_test = addTest("reset_deleter", { reset_test }, [&](test::Test& test) { resetDeleterTest(test); });
+	test::Test* release_silent_test = addTest("release_silent", { release_test }, [&](test::Test& test) { releaseSilentTest(test); });
+	test::Test* reset_silent_test = addTest("reset_silent", { reset_test }, [&](test::Test& test) { resetSilentTest(test); });
+	test::Test* move_constructor_test = addTest("move_contructor", { release_silent_test }, [&](test::Test& test) { moveConstructorTest(test); });
+	test::Test* move_constructor_deleter_test = addTest("move_contructor_deleter", { move_constructor_test }, [&](test::Test& test) { moveConstructorDeleterTest(test); });
+	test::Test* move_constructor_derived_test = addTest("move_contructor_derived", { move_constructor_test }, [&](test::Test& test) { moveConstructorDerivedTest(test); });
+	test::Test* move_constructor_derived_deleter_test = addTest("move_contructor_derived_deleter", { move_constructor_derived_test }, [&](test::Test& test) { moveConstructorDerivedDeleterTest(test); });
+	test::Test* move_assignment_test = addTest("move_assignment", { release_silent_test }, [&](test::Test& test) { moveAssignmentTest(test); });
+	test::Test* move_assignment_deleter_test = addTest("move_assignment_deleter", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDeleterTest(test); });
+	test::Test* move_assignment_derived_test = addTest("move_assignment_derived", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDerivedTest(test); });
+	test::Test* move_assignment_derived_deleter_test = addTest("move_assignment_derived_deleter", { move_assignment_derived_test }, [&](test::Test& test) { moveAssignmentDerivedDeleterTest(test); });
+	test::Test* swap_test = addTest("swap", { get_test }, [&](test::Test& test) { swapTest(test); });
+	test::Test* dereference_test = addTest("dereference", { struct_test }, [&](test::Test& test) { dereferenceTest(test); });
+	test::Test* pointer_access_test = addTest("pointer_access", { struct_test }, [&](test::Test& test) { pointerAccessTest(test); });
+	test::Test* move_test = addTest("move", { struct_test }, [&](test::Test& test) { moveTest(test); });
+	test::Test* make_data_pointer_test = addTest("make_data_pointer", { struct_test }, [&](test::Test& test) { makeDataPointerTest(test); });
+	test::Test* make_data_pointer_derived_test = addTest("make_data_pointer_derived", { make_data_pointer_test }, [&](test::Test& test) { makeDataPointerDerivedTest(test); });
+	test::Test* block_name_test = addTest("block_name", { make_data_pointer_test }, [&](test::Test& test) { blockNameTest(test); });
 }
 
-void DataPointerTests::nullTest(test::Test& test) {
-	DataPointer<int> dp("Null", nullptr);
+void DataPointerUniqueTests::nullTest(test::Test& test) {
+	DataPointerUnique<int> dp("Null", nullptr);
 
 	T_COMPARE(data_blocks.size(), 0);
 }
 
-void DataPointerTests::basicTest(test::Test& test) {
+void DataPointerUniqueTests::basicTest(test::Test& test) {
 	int* x = new int(5);
-	DataPointer<int> dp("x", x);
+	DataPointerUnique<int> dp("x", x);
 
 	T_WRAP_CONTAINER(checkDataBlock(test, x, sizeof(int)));
 }
 
-void DataPointerTests::structTest(test::Test& test) {
+void DataPointerUniqueTests::structTest(test::Test& test) {
 	MyStruct* m = new MyStruct(11);
-	DataPointer<MyStruct> dp("MyStruct", m);
+	DataPointerUnique<MyStruct> dp("MyStruct", m);
 	static_assert(sizeof(MyStruct) != sizeof(int));
 
 	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
 }
 
-void DataPointerTests::destructorTest(test::Test& test) {
+void DataPointerUniqueTests::destructorTest(test::Test& test) {
 	bool flag = false;
 	MyStruct* m = new MyStruct(11);
 	m->destructor_func = [&]() {
 		flag = true;
 	};
 	{
-		DataPointer<MyStruct> dp("MyStruct", m);
+		DataPointerUnique<MyStruct> dp("MyStruct", m);
 	}
 	T_CHECK(flag);
 
 	T_COMPARE(data_blocks.size(), 0);
 }
 
-void DataPointerTests::derivedDestructorTest(test::Test& test) {
+void DataPointerUniqueTests::derivedDestructorTest(test::Test& test) {
 	bool flag = false;
 	{
-		DataPointer<MyStruct> dp = make_data_pointer<ChildStruct>("ChildStruct", 11);
+		DataPointerUnique<MyStruct> dp = make_data_pointer<ChildStruct>("ChildStruct", 11);
 		dp->destructor_func = [&]() {
 			flag = true;
 		};
@@ -136,15 +135,15 @@ void DataPointerTests::derivedDestructorTest(test::Test& test) {
 	T_COMPARE(data_blocks.size(), 0);
 }
 
-void DataPointerTests::vectorDestructorTest(test::Test& test) {
+void DataPointerUniqueTests::vectorDestructorTest(test::Test& test) {
 	bool flag = false;
 	MyStruct* m = new MyStruct(11);
 	m->destructor_func = [&]() {
 		flag = true;
 	};
-	std::vector<DataPointer<MyStruct>> vec;
-	DataPointer<MyStruct> dp("MyStruct", m);
-	DataPointer<MyStruct> dp2;
+	std::vector<DataPointerUnique<MyStruct>> vec;
+	DataPointerUnique<MyStruct> dp("MyStruct", m);
+	DataPointerUnique<MyStruct> dp2;
 	vec.push_back(std::move(dp));
 	vec.push_back(std::move(dp2));
 	vec.erase(vec.begin());
@@ -153,7 +152,7 @@ void DataPointerTests::vectorDestructorTest(test::Test& test) {
 	T_COMPARE(data_blocks.size(), 0);
 }
 
-void DataPointerTests::customDeleterTest(test::Test& test) {
+void DataPointerUniqueTests::customDeleterTest(test::Test& test) {
 	MyStruct* m = new MyStruct(22);
 	bool flag = false;
 	auto func = [&]() {
@@ -161,14 +160,14 @@ void DataPointerTests::customDeleterTest(test::Test& test) {
 	};
 	CustomDeleter<MyStruct> cd(func);
 	{
-		DataPointer<MyStruct, CustomDeleter<MyStruct>> dp("MyStruct", m, cd);
+		DataPointerUnique<MyStruct, CustomDeleter<MyStruct>> dp("MyStruct", m, cd);
 	}
 	T_CHECK(flag);
 
 	T_COMPARE(data_blocks.size(), 0);
 }
 
-void DataPointerTests::lambdaDeleterTest(test::Test& test) {
+void DataPointerUniqueTests::lambdaDeleterTest(test::Test& test) {
 	MyStruct* m = new MyStruct(22);
 	bool flag = false;
 	auto func = [&](MyStruct* ptr) {
@@ -176,23 +175,23 @@ void DataPointerTests::lambdaDeleterTest(test::Test& test) {
 		delete ptr;
 	};
 	{
-		DataPointer<MyStruct, decltype(func)> dp("MyStruct", m, func);
+		DataPointerUnique<MyStruct, decltype(func)> dp("MyStruct", m, func);
 	}
 	T_CHECK(flag);
 
 	T_COMPARE(data_blocks.size(), 0);
 }
 
-void DataPointerTests::getTest(test::Test& test) {
+void DataPointerUniqueTests::getTest(test::Test& test) {
 	MyStruct* m = new MyStruct(33);
-	DataPointer<MyStruct> dp("MyStruct", m);
+	DataPointerUnique<MyStruct> dp("MyStruct", m);
 	MyStruct* m2 = dp.get();
 	T_COMPARE(m2, m, &utils::pointer_to_str);
 }
 
-void DataPointerTests::releaseTest(test::Test& test) {
+void DataPointerUniqueTests::releaseTest(test::Test& test) {
 	MyStruct* m = new MyStruct(44);
-	DataPointer<MyStruct> dp("MyStruct", m);
+	DataPointerUnique<MyStruct> dp("MyStruct", m);
 	MyStruct* m2 = dp.release();
 	T_COMPARE(m2, m, &utils::pointer_to_str);
 	MyStruct* m3 = dp.get();
@@ -201,10 +200,10 @@ void DataPointerTests::releaseTest(test::Test& test) {
 	T_COMPARE(data_blocks.size(), 0);
 }
 
-void DataPointerTests::resetTest(test::Test& test) {
+void DataPointerUniqueTests::resetTest(test::Test& test) {
 	MyStruct* m = new MyStruct(55);
 	MyStruct* m2 = new MyStruct(66);
-	DataPointer<MyStruct> dp("MyStruct", m);
+	DataPointerUnique<MyStruct> dp("MyStruct", m);
 	MyStruct* mt1 = dp.get();
 	T_COMPARE(mt1, m, &utils::pointer_to_str);
 	dp.reset("m2", m2);
@@ -214,7 +213,7 @@ void DataPointerTests::resetTest(test::Test& test) {
 	T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
 }
 
-void DataPointerTests::resetDeleterTest(test::Test& test) {
+void DataPointerUniqueTests::resetDeleterTest(test::Test& test) {
 	bool flag = false;
 	MyStruct* del_ptr = nullptr;
 	auto deleter = [&](MyStruct* ptr) {
@@ -224,7 +223,7 @@ void DataPointerTests::resetDeleterTest(test::Test& test) {
 	};
 	MyStruct* m = new MyStruct(55);
 	MyStruct* m2 = new MyStruct(66);
-	DataPointer<MyStruct, decltype(deleter)> dp("MyStruct", m, deleter);
+	DataPointerUnique<MyStruct, decltype(deleter)> dp("MyStruct", m, deleter);
 	MyStruct* m3 = dp.get();
 	T_COMPARE(m3, m, &utils::pointer_to_str);
 	dp.reset("m2", m2);
@@ -236,9 +235,9 @@ void DataPointerTests::resetDeleterTest(test::Test& test) {
 	T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
 }
 
-void DataPointerTests::releaseSilentTest(test::Test& test) {
+void DataPointerUniqueTests::releaseSilentTest(test::Test& test) {
 	MyStruct* m = new MyStruct(66);
-	DataPointer<MyStruct> dp("MyStruct", m);
+	DataPointerUnique<MyStruct> dp("MyStruct", m);
 	MyStruct* m2 = dp.releaseSilent();
 	T_COMPARE(m2, m, &utils::pointer_to_str);
 	MyStruct* m3 = dp.get();
@@ -247,7 +246,7 @@ void DataPointerTests::releaseSilentTest(test::Test& test) {
 	T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
 }
 
-void DataPointerTests::resetSilentTest(test::Test& test) {
+void DataPointerUniqueTests::resetSilentTest(test::Test& test) {
 	bool flag = false;
 	MyStruct* del_ptr = nullptr;
 	auto deleter = [&](MyStruct* ptr) {
@@ -257,7 +256,7 @@ void DataPointerTests::resetSilentTest(test::Test& test) {
 	};
 	MyStruct* m = new MyStruct(77);
 	MyStruct* m2 = new MyStruct(88);
-	DataPointer<MyStruct, decltype(deleter)> dp("MyStruct", m, deleter);
+	DataPointerUnique<MyStruct, decltype(deleter)> dp("MyStruct", m, deleter);
 	MyStruct* mt1 = dp.get();
 	T_COMPARE(mt1, m, &utils::pointer_to_str);
 	dp.resetSilent(m2);
@@ -273,10 +272,10 @@ void DataPointerTests::resetSilentTest(test::Test& test) {
 	remove_from_data_blocks(m);
 }
 
-void DataPointerTests::moveConstructorTest(test::Test& test) {
+void DataPointerUniqueTests::moveConstructorTest(test::Test& test) {
 	MyStruct* m = new MyStruct(11);
-	DataPointer<MyStruct> dp("MyStruct", m);
-	DataPointer<MyStruct> dp2(std::move(dp));
+	DataPointerUnique<MyStruct> dp("MyStruct", m);
+	DataPointerUnique<MyStruct> dp2(std::move(dp));
 	MyStruct* m2 = dp.get();
 	MyStruct* m3 = dp2.get();
 	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
@@ -284,7 +283,7 @@ void DataPointerTests::moveConstructorTest(test::Test& test) {
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
 }
 
-void DataPointerTests::moveConstructorDeleterTest(test::Test& test) {
+void DataPointerUniqueTests::moveConstructorDeleterTest(test::Test& test) {
 	bool flag = false;
 	auto func = [&]() {
 		flag = true;
@@ -292,8 +291,8 @@ void DataPointerTests::moveConstructorDeleterTest(test::Test& test) {
 	CustomDeleter<MyStruct> cd(func);
 	{
 		MyStruct* m = new MyStruct(11);
-		DataPointer<MyStruct, CustomDeleter<MyStruct>> dp("MyStruct", m, cd);
-		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp2(std::move(dp));
+		DataPointerUnique<MyStruct, CustomDeleter<MyStruct>> dp("MyStruct", m, cd);
+		DataPointerUnique<MyStruct, AnotherDeleter<MyStruct>> dp2(std::move(dp));
 		MyStruct* m2 = dp.get();
 		MyStruct* m3 = dp2.get();
 		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
@@ -303,10 +302,10 @@ void DataPointerTests::moveConstructorDeleterTest(test::Test& test) {
 	T_CHECK(flag);
 }
 
-void DataPointerTests::moveConstructorDerivedTest(test::Test& test) {
+void DataPointerUniqueTests::moveConstructorDerivedTest(test::Test& test) {
 	ChildStruct* m = new ChildStruct(11);
-	DataPointer<ChildStruct> dp("ChildStruct", m);
-	DataPointer<MyStruct> dp2(std::move(dp));
+	DataPointerUnique<ChildStruct> dp("ChildStruct", m);
+	DataPointerUnique<MyStruct> dp2(std::move(dp));
 	MyStruct* m2 = dp.get();
 	MyStruct* m3 = dp2.get();
 	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
@@ -314,7 +313,7 @@ void DataPointerTests::moveConstructorDerivedTest(test::Test& test) {
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
 }
 
-void DataPointerTests::moveConstructorDerivedDeleterTest(test::Test& test) {
+void DataPointerUniqueTests::moveConstructorDerivedDeleterTest(test::Test& test) {
 	bool flag = false;
 	auto func = [&]() {
 		flag = true;
@@ -322,8 +321,8 @@ void DataPointerTests::moveConstructorDerivedDeleterTest(test::Test& test) {
 	CustomDeleter<ChildStruct> cd(func);
 	{
 		ChildStruct* m = new ChildStruct(11);
-		DataPointer<ChildStruct, CustomDeleter<ChildStruct>> dp("ChildStruct", m, cd);
-		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp2(std::move(dp));
+		DataPointerUnique<ChildStruct, CustomDeleter<ChildStruct>> dp("ChildStruct", m, cd);
+		DataPointerUnique<MyStruct, AnotherDeleter<MyStruct>> dp2(std::move(dp));
 		ChildStruct* m2 = dp.get();
 		MyStruct* m3 = dp2.get();
 		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
@@ -333,15 +332,15 @@ void DataPointerTests::moveConstructorDerivedDeleterTest(test::Test& test) {
 	T_CHECK(flag);
 }
 
-void DataPointerTests::moveAssignmentTest(test::Test& test) {
+void DataPointerUniqueTests::moveAssignmentTest(test::Test& test) {
 	bool flag = false;
 	MyStruct* m1 = new MyStruct(11);
 	m1->destructor_func = [&]() {
 		flag = true;
 	};
 	MyStruct* m2 = new MyStruct(22);
-	DataPointer<MyStruct> dp1("MyStruct", m1);
-	DataPointer<MyStruct> dp2("MyStruct", m2);
+	DataPointerUnique<MyStruct> dp1("MyStruct", m1);
+	DataPointerUnique<MyStruct> dp2("MyStruct", m2);
 	dp1 = std::move(dp2);
 	MyStruct* m3 = dp1.get();
 	MyStruct* m4 = dp2.get();
@@ -352,7 +351,7 @@ void DataPointerTests::moveAssignmentTest(test::Test& test) {
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
 }
 
-void DataPointerTests::moveAssignmentDeleterTest(test::Test& test) {
+void DataPointerUniqueTests::moveAssignmentDeleterTest(test::Test& test) {
 	bool flag1 = false;
 	auto func = [&]() {
 		flag1 = true;
@@ -365,8 +364,8 @@ void DataPointerTests::moveAssignmentDeleterTest(test::Test& test) {
 			flag2 = true;
 		};
 		MyStruct* m2 = new MyStruct(22);
-		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp1("MyStruct", m1, cd);
-		DataPointer<MyStruct, CustomDeleter<MyStruct>> dp2("MyStruct", m2);
+		DataPointerUnique<MyStruct, AnotherDeleter<MyStruct>> dp1("MyStruct", m1, cd);
+		DataPointerUnique<MyStruct, CustomDeleter<MyStruct>> dp2("MyStruct", m2);
 		dp1 = std::move(dp2);
 		MyStruct* m3 = dp1.get();
 		MyStruct* m4 = dp2.get();
@@ -378,15 +377,15 @@ void DataPointerTests::moveAssignmentDeleterTest(test::Test& test) {
 	T_CHECK(flag1);
 }
 
-void DataPointerTests::moveAssignmentDerivedTest(test::Test& test) {
+void DataPointerUniqueTests::moveAssignmentDerivedTest(test::Test& test) {
 	bool flag = false;
 	MyStruct* m1 = new MyStruct(11);
 	m1->destructor_func = [&]() {
 		flag = true;
 	};
 	ChildStruct* m2 = new ChildStruct(22);
-	DataPointer<MyStruct> dp1("MyStruct", m1);
-	DataPointer<ChildStruct> dp2("ChildStruct", m2);
+	DataPointerUnique<MyStruct> dp1("MyStruct", m1);
+	DataPointerUnique<ChildStruct> dp2("ChildStruct", m2);
 	dp1 = std::move(dp2);
 	MyStruct* m3 = dp1.get();
 	ChildStruct* m4 = dp2.get();
@@ -397,7 +396,7 @@ void DataPointerTests::moveAssignmentDerivedTest(test::Test& test) {
 	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
 }
 
-void DataPointerTests::moveAssignmentDerivedDeleterTest(test::Test& test) {
+void DataPointerUniqueTests::moveAssignmentDerivedDeleterTest(test::Test& test) {
 	bool flag1 = false;
 	auto func = [&]() {
 		flag1 = true;
@@ -410,8 +409,8 @@ void DataPointerTests::moveAssignmentDerivedDeleterTest(test::Test& test) {
 			flag2 = true;
 		};
 		ChildStruct* m2 = new ChildStruct(22);
-		DataPointer<MyStruct, AnotherDeleter<MyStruct>> dp1("MyStruct", m1, cd);
-		DataPointer<ChildStruct, CustomDeleter<ChildStruct>> dp2("ChildStruct", m2);
+		DataPointerUnique<MyStruct, AnotherDeleter<MyStruct>> dp1("MyStruct", m1, cd);
+		DataPointerUnique<ChildStruct, CustomDeleter<ChildStruct>> dp2("ChildStruct", m2);
 		dp1 = std::move(dp2);
 		MyStruct* m3 = dp1.get();
 		ChildStruct* m4 = dp2.get();
@@ -423,35 +422,35 @@ void DataPointerTests::moveAssignmentDerivedDeleterTest(test::Test& test) {
 	T_CHECK(flag1);
 }
 
-void DataPointerTests::swapTest(test::Test& test) {
+void DataPointerUniqueTests::swapTest(test::Test& test) {
 	MyStruct* m1 = new MyStruct(123);
 	MyStruct* m2 = new MyStruct(567);
-	DataPointer<MyStruct> dp1("MyStruct", m1);
-	DataPointer<MyStruct> dp2("MyStruct", m2);
+	DataPointerUnique<MyStruct> dp1("MyStruct", m1);
+	DataPointerUnique<MyStruct> dp2("MyStruct", m2);
 	dp1.swap(dp2);
 	T_COMPARE(dp1.get(), m2, &utils::pointer_to_str);
 	T_COMPARE(dp2.get(), m1, &utils::pointer_to_str);
 }
 
-void DataPointerTests::dereferenceTest(test::Test& test) {
+void DataPointerUniqueTests::dereferenceTest(test::Test& test) {
 	MyStruct* m = new MyStruct(99);
-	DataPointer<MyStruct> dp("MyStruct", m);
+	DataPointerUnique<MyStruct> dp("MyStruct", m);
 	MyStruct mystruct = *dp;
 	T_COMPARE(mystruct.val, 99);
 }
 
-void DataPointerTests::pointerAccessTest(test::Test& test) {
+void DataPointerUniqueTests::pointerAccessTest(test::Test& test) {
 	MyStruct* m = new MyStruct(111);
-	DataPointer<MyStruct> dp("MyStruct", m);
+	DataPointerUnique<MyStruct> dp("MyStruct", m);
 	int val = dp->val;
 	T_COMPARE(val, 111);
 }
 
-void DataPointerTests::moveTest(test::Test& test) {
-	std::vector<DataPointer<MyStruct>> vec;
+void DataPointerUniqueTests::moveTest(test::Test& test) {
+	std::vector<DataPointerUnique<MyStruct>> vec;
 	MyStruct* m = new MyStruct(222);
 	{
-		DataPointer<MyStruct> dp("MyStruct", m);
+		DataPointerUnique<MyStruct> dp("MyStruct", m);
 		vec.push_back(std::move(dp));
 	}
 	T_COMPARE(vec[0]->val, 222);
@@ -459,9 +458,9 @@ void DataPointerTests::moveTest(test::Test& test) {
 	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
 }
 
-void DataPointerTests::makeDataPointerTest(test::Test& test) {
+void DataPointerUniqueTests::makeDataPointerTest(test::Test& test) {
 	{
-		DataPointer<MyStruct> dp = make_data_pointer<MyStruct>("MyStruct", 333);
+		DataPointerUnique<MyStruct> dp = make_data_pointer<MyStruct>("MyStruct", 333);
 		T_COMPARE(dp->val, 333);
 
 		MyStruct* m = dp.get();
@@ -471,9 +470,9 @@ void DataPointerTests::makeDataPointerTest(test::Test& test) {
 	T_COMPARE(data_blocks.size(), 0);
 }
 
-void DataPointerTests::makeDataPointerDerivedTest(test::Test& test) {
+void DataPointerUniqueTests::makeDataPointerDerivedTest(test::Test& test) {
 	{
-		DataPointer<MyStruct> dp = make_data_pointer<ChildStruct>("ChildStruct", 444);
+		DataPointerUnique<MyStruct> dp = make_data_pointer<ChildStruct>("ChildStruct", 444);
 		T_COMPARE(dp->val, 444);
 
 		MyStruct* m = dp.get();
@@ -483,13 +482,13 @@ void DataPointerTests::makeDataPointerDerivedTest(test::Test& test) {
 	T_COMPARE(data_blocks.size(), 0);
 }
 
-void DataPointerTests::blockNameTest(test::Test& test) {
+void DataPointerUniqueTests::blockNameTest(test::Test& test) {
 
 	{
 		MyStruct* m1 = new MyStruct(11);
 		CustomDeleter<MyStruct> cd([]() { });
-		DataPointer<MyStruct, CustomDeleter<MyStruct>> dp1("m1", m1, cd);
-		DataPointer<MyStruct> dp2 = make_data_pointer<MyStruct>("m2", 22);
+		DataPointerUnique<MyStruct, CustomDeleter<MyStruct>> dp1("m1", m1, cd);
+		DataPointerUnique<MyStruct> dp2 = make_data_pointer<MyStruct>("m2", 22);
 		MyStruct* m2 = dp2.get();
 		{
 			auto it1 = data_blocks.find(m1);
@@ -515,8 +514,8 @@ void DataPointerTests::blockNameTest(test::Test& test) {
 	{
 		MyStruct* m4 = new MyStruct(44);
 		MyStruct* m5 = new MyStruct(55);
-		DataPointer<MyStruct> dp4("m4", m4);
-		DataPointer<MyStruct> dp5("m5", m5);
+		DataPointerUnique<MyStruct> dp4("m4", m4);
+		DataPointerUnique<MyStruct> dp5("m5", m5);
 		dp4 = std::move(dp5);
 		{
 			auto it = data_blocks.find(m5);
@@ -526,8 +525,8 @@ void DataPointerTests::blockNameTest(test::Test& test) {
 
 	{
 		MyStruct* m6 = new MyStruct(66);
-		DataPointer<MyStruct> dp6("m6", m6);
-		DataPointer<MyStruct> dp7(std::move(dp6));
+		DataPointerUnique<MyStruct> dp6("m6", m6);
+		DataPointerUnique<MyStruct> dp7(std::move(dp6));
 		{
 			auto it = data_blocks.find(m6);
 			T_COMPARE(it->second.name, "m6");
@@ -537,8 +536,8 @@ void DataPointerTests::blockNameTest(test::Test& test) {
 	{
 		MyStruct* m8 = new MyStruct(88);
 		MyStruct* m9 = new MyStruct(99);
-		DataPointer<MyStruct> dp8("m8", m8);
-		DataPointer<MyStruct> dp9("m9", m9);
+		DataPointerUnique<MyStruct> dp8("m8", m8);
+		DataPointerUnique<MyStruct> dp9("m9", m9);
 		dp8.swap(dp9);
 		{
 			auto it1 = data_blocks.find(m8);
@@ -550,7 +549,7 @@ void DataPointerTests::blockNameTest(test::Test& test) {
 
 }
 
-void DataPointerTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {
+void DataPointerUniqueTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {
 	if (T_CHECK(data_blocks.size() > 0)) {
 		auto it = data_blocks.find(p_block);
 		if (T_CHECK(it != data_blocks.end())) {
@@ -562,7 +561,7 @@ void DataPointerTests::checkDataBlock(test::Test& test, void* p_block, size_t p_
 	}
 }
 
-void DataPointerTests::checkNoDataBlock(test::Test& test, void* p_block) {
+void DataPointerUniqueTests::checkNoDataBlock(test::Test& test, void* p_block) {
 	auto it = data_blocks.find(p_block);
 	T_CHECK(it == data_blocks.end());
 }

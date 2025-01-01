@@ -633,7 +633,7 @@ namespace fw {
 
 	void WidgetList::addPendingMove(Widget* widget, size_t index) {
 		wAssert(!isLocked());
-		DataPointer<PendingMove> uptr = make_data_pointer<PendingMove>(
+		DataPointerUnique<PendingMove> uptr = make_data_pointer<PendingMove>(
 			"PendingMove " + widget->getFullName() + " " + std::to_string(index), *this, widget, index
 		);
 		pending_move.add(std::move(uptr));
@@ -641,7 +641,7 @@ namespace fw {
 
 	void WidgetList::addPendingDelete(Widget* widget, bool with_children) {
 		wAssert(!isLocked());
-		DataPointer<PendingDelete> uptr = make_data_pointer<PendingDelete>(
+		DataPointerUnique<PendingDelete> uptr = make_data_pointer<PendingDelete>(
 			"PendingDelete " + widget->getFullName() + " " + std::to_string(with_children), *this, widget, with_children
 		);
 		pending_delete.add(std::move(uptr));
@@ -649,7 +649,7 @@ namespace fw {
 
 	void WidgetList::addPendingSetParent(Widget* widget, Widget* new_parent, bool keep_pos, ptrdiff_t move_to_index) {
 		wAssert(!isLocked());
-		DataPointer<PendingSetParent> uptr = make_data_pointer<PendingSetParent>(
+		DataPointerUnique<PendingSetParent> uptr = make_data_pointer<PendingSetParent>(
 			"PendingSetParent " + widget->getFullName() + " " + new_parent->getFullName(), *this, widget, new_parent, keep_pos, move_to_index
 		);
 		pending_setparent.add(std::move(uptr));
