@@ -143,6 +143,14 @@ inline void DataPointerShared<T, D>::reset(const std::string& new_name, T* new_p
 }
 
 template<typename T, typename D>
+inline void DataPointerShared<T, D>::swap(DataPointerShared& dp) {
+	std::swap(this->name, dp.name);
+	std::swap(this->ptr, dp.ptr);
+	std::swap(this->ref_count, dp.ref_count);
+	std::swap(this->deleter, dp.deleter);
+}
+
+template<typename T, typename D>
 inline D& DataPointerShared<T, D>::getDeleter() {
 	return deleter;
 }
