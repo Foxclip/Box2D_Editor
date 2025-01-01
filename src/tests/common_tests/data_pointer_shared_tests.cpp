@@ -68,6 +68,8 @@ DataPointerSharedTests::DataPointerSharedTests(
 	test::Test* lambda_deleter_test = addTest("lambda_deleter", { struct_test }, [&](test::Test& test) { lambdaDeleterTest(test); });
 	test::Test* get_test = addTest("get", { struct_test }, [&](test::Test& test) { getTest(test); });
 	test::Test* copy_test = addTest("copy", { get_test }, [&](test::Test& test) { copyTest(test); });
+	test::Test* reset_test = addTest("reset", { get_test }, [&](test::Test& test) { resetTest(test); });
+	test::Test* reset_deleter_test = addTest("reset_deleter", { reset_test }, [&](test::Test& test) { resetDeleterTest(test); });
 }
 
 void DataPointerSharedTests::nullTest(test::Test& test) {
@@ -190,6 +192,41 @@ void DataPointerSharedTests::copyTest(test::Test& test) {
 		T_WRAP_CONTAINER(checkDataBlock(test, m1, sizeof(MyStruct)));
 	}
 	T_COMPARE(data_blocks.size(), 0);
+}
+
+void DataPointerSharedTests::resetTest(test::Test& test) {
+	MyStruct* m = new MyStruct(55);
+	MyStruct* m2 = new MyStruct(66);
+	DataPointerShared<MyStruct> dp("MyStruct", m);
+	MyStruct* mt1 = dp.get();
+	T_COMPARE(mt1, m, &utils::pointer_to_str);
+	dp.reset("m2", m2);
+	MyStruct* mt2 = dp.get();
+	T_COMPARE(mt2, m2, &utils::pointer_to_str);
+
+	T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
+}
+
+void DataPointerSharedTests::resetDeleterTest(test::Test& test) {
+	bool flag = false;
+	MyStruct* del_ptr = nullptr;
+	auto deleter = [&](MyStruct* ptr) {
+		flag = true;
+		del_ptr = ptr;
+		delete ptr;
+	};
+	MyStruct* m = new MyStruct(55);
+	MyStruct* m2 = new MyStruct(66);
+	DataPointerShared<MyStruct, decltype(deleter)> dp("MyStruct", m, deleter);
+	MyStruct* m3 = dp.get();
+	T_COMPARE(m3, m, &utils::pointer_to_str);
+	dp.reset("m2", m2);
+	MyStruct* m4 = dp.get();
+	T_COMPARE(m4, m2, &utils::pointer_to_str);
+	T_CHECK(flag);
+	T_COMPARE(del_ptr, m, &utils::pointer_to_str);
+
+	T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
 }
 
 void DataPointerSharedTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {
