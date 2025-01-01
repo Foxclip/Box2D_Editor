@@ -197,24 +197,28 @@ inline DataPointerShared<T, D>& DataPointerShared<T, D>::operator=(const DataPoi
 
 template<typename T, typename D>
 inline DataPointerShared<T, D>& DataPointerShared<T, D>::operator=(DataPointerShared&& right) {
-	this->name = right.name;
-	dispose();
-	this->ptr = right.ptr;
-	right.ptr = nullptr;
-	this->deleter = right.deleter;
-	this->ref_count = right.ref_count;
+	if (right.ptr != this->ptr) {
+		this->name = right.name;
+		dispose();
+		this->ptr = right.ptr;
+		right.ptr = nullptr;
+		this->deleter = right.deleter;
+		this->ref_count = right.ref_count;
+	}
 	return *this;
 }
 
 template<typename T, typename D>
 template<typename T2, typename D2>
 inline DataPointerShared<T, D>& DataPointerShared<T, D>::operator=(DataPointerShared<T2, D2>&& right) {
-	this->name = right.name;
-	dispose();
-	this->ptr = right.ptr;
-	right.ptr = nullptr;
-	this->deleter = right.deleter;
-	this->ref_count = right.ref_count;
+	if (right.ptr != this->ptr) {
+		this->name = right.name;
+		dispose();
+		this->ptr = right.ptr;
+		right.ptr = nullptr;
+		this->deleter = right.deleter;
+		this->ref_count = right.ref_count;
+	}
 	return *this;
 }
 
