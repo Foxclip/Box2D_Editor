@@ -19,6 +19,10 @@ private:
 	void copyTest(test::Test& test);
 	void resetTest(test::Test& test);
 	void resetDeleterTest(test::Test& test);
+	void moveConstructorTest(test::Test& test);
+	void moveConstructorDeleterTest(test::Test& test);
+	void moveConstructorDerivedTest(test::Test& test);
+	void moveConstructorDerivedDeleterTest(test::Test& test);
 
 	void checkDataBlock(test::Test& test, void* p_block, size_t p_size);
 	void checkNoDataBlock(test::Test& test, void* p_block);
