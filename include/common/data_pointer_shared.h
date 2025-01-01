@@ -166,6 +166,13 @@ inline const std::string& DataPointerShared<T, D>::getName() const {
 }
 
 template<typename T, typename D>
+inline void DataPointerShared<T, D>::setName(const std::string& name) {
+	this->name = name;
+	auto it = data_blocks.find(ptr);
+	it->second.name = name;
+}
+
+template<typename T, typename D>
 inline T& DataPointerShared<T, D>::operator*() const {
 	return *ptr;
 }
