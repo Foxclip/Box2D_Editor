@@ -53,39 +53,38 @@ struct AnotherDeleter {
 DataPointerUniqueTests::DataPointerUniqueTests(
 	const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes
 ) : TestModule(name, parent, required_nodes) {
-	test::TestModule* list = addModule("DataPointer");
-	list->OnAfterRunTest = [&]() {
+	OnAfterRunTest = [&]() {
 		data_blocks.clear();
 	};
-	test::Test* null_test = list->addTest("null", [&](test::Test& test) { nullTest(test); });
-	test::Test* basic_test = list->addTest("basic", [&](test::Test& test) { basicTest(test); });
-	test::Test* struct_test = list->addTest("struct", { basic_test }, [&](test::Test& test) { structTest(test); });
-	test::Test* destructor_test = list->addTest("destructor", { struct_test }, [&](test::Test& test) { destructorTest(test); });
-	test::Test* derived_destructor_test = list->addTest("derived_destructor", { destructor_test }, [&](test::Test& test) { derivedDestructorTest(test); });
-	test::Test* vector_destructor_test = list->addTest("vector_destructor", { destructor_test }, [&](test::Test& test) { vectorDestructorTest(test); });
-	test::Test* custom_deleter_test = list->addTest("custom_deleter", { struct_test }, [&](test::Test& test) { customDeleterTest(test); });
-	test::Test* lambda_deleter_test = list->addTest("lambda_deleter", { struct_test }, [&](test::Test& test) { lambdaDeleterTest(test); });
-	test::Test* get_test = list->addTest("get", { struct_test }, [&](test::Test& test) { getTest(test); });
-	test::Test* release_test = list->addTest("release", { get_test }, [&](test::Test& test) { releaseTest(test); });
-	test::Test* reset_test = list->addTest("reset", { get_test }, [&](test::Test& test) { resetTest(test); });
-	test::Test* reset_deleter_test = list->addTest("reset_deleter", { reset_test }, [&](test::Test& test) { resetDeleterTest(test); });
-	test::Test* release_silent_test = list->addTest("release_silent", { release_test }, [&](test::Test& test) { releaseSilentTest(test); });
-	test::Test* reset_silent_test = list->addTest("reset_silent", { reset_test }, [&](test::Test& test) { resetSilentTest(test); });
-	test::Test* move_constructor_test = list->addTest("move_contructor", { release_silent_test }, [&](test::Test& test) { moveConstructorTest(test); });
-	test::Test* move_constructor_deleter_test = list->addTest("move_contructor_deleter", { move_constructor_test }, [&](test::Test& test) { moveConstructorDeleterTest(test); });
-	test::Test* move_constructor_derived_test = list->addTest("move_contructor_derived", { move_constructor_test }, [&](test::Test& test) { moveConstructorDerivedTest(test); });
-	test::Test* move_constructor_derived_deleter_test = list->addTest("move_contructor_derived_deleter", { move_constructor_derived_test }, [&](test::Test& test) { moveConstructorDerivedDeleterTest(test); });
-	test::Test* move_assignment_test = list->addTest("move_assignment", { release_silent_test }, [&](test::Test& test) { moveAssignmentTest(test); });
-	test::Test* move_assignment_deleter_test = list->addTest("move_assignment_deleter", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDeleterTest(test); });
-	test::Test* move_assignment_derived_test = list->addTest("move_assignment_derived", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDerivedTest(test); });
-	test::Test* move_assignment_derived_deleter_test = list->addTest("move_assignment_derived_deleter", { move_assignment_derived_test }, [&](test::Test& test) { moveAssignmentDerivedDeleterTest(test); });
-	test::Test* swap_test = list->addTest("swap", { get_test }, [&](test::Test& test) { swapTest(test); });
-	test::Test* dereference_test = list->addTest("dereference", { struct_test }, [&](test::Test& test) { dereferenceTest(test); });
-	test::Test* pointer_access_test = list->addTest("pointer_access", { struct_test }, [&](test::Test& test) { pointerAccessTest(test); });
-	test::Test* move_test = list->addTest("move", { struct_test }, [&](test::Test& test) { moveTest(test); });
-	test::Test* make_data_pointer_test = list->addTest("make_data_pointer", { struct_test }, [&](test::Test& test) { makeDataPointerTest(test); });
-	test::Test* make_data_pointer_derived_test = list->addTest("make_data_pointer_derived", { make_data_pointer_test }, [&](test::Test& test) { makeDataPointerDerivedTest(test); });
-	test::Test* block_name_test = list->addTest("block_name", { make_data_pointer_test }, [&](test::Test& test) { blockNameTest(test); });
+	test::Test* null_test = addTest("null", [&](test::Test& test) { nullTest(test); });
+	test::Test* basic_test = addTest("basic", [&](test::Test& test) { basicTest(test); });
+	test::Test* struct_test = addTest("struct", { basic_test }, [&](test::Test& test) { structTest(test); });
+	test::Test* destructor_test = addTest("destructor", { struct_test }, [&](test::Test& test) { destructorTest(test); });
+	test::Test* derived_destructor_test = addTest("derived_destructor", { destructor_test }, [&](test::Test& test) { derivedDestructorTest(test); });
+	test::Test* vector_destructor_test = addTest("vector_destructor", { destructor_test }, [&](test::Test& test) { vectorDestructorTest(test); });
+	test::Test* custom_deleter_test = addTest("custom_deleter", { struct_test }, [&](test::Test& test) { customDeleterTest(test); });
+	test::Test* lambda_deleter_test = addTest("lambda_deleter", { struct_test }, [&](test::Test& test) { lambdaDeleterTest(test); });
+	test::Test* get_test = addTest("get", { struct_test }, [&](test::Test& test) { getTest(test); });
+	test::Test* release_test = addTest("release", { get_test }, [&](test::Test& test) { releaseTest(test); });
+	test::Test* reset_test = addTest("reset", { get_test }, [&](test::Test& test) { resetTest(test); });
+	test::Test* reset_deleter_test = addTest("reset_deleter", { reset_test }, [&](test::Test& test) { resetDeleterTest(test); });
+	test::Test* release_silent_test = addTest("release_silent", { release_test }, [&](test::Test& test) { releaseSilentTest(test); });
+	test::Test* reset_silent_test = addTest("reset_silent", { reset_test }, [&](test::Test& test) { resetSilentTest(test); });
+	test::Test* move_constructor_test = addTest("move_contructor", { release_silent_test }, [&](test::Test& test) { moveConstructorTest(test); });
+	test::Test* move_constructor_deleter_test = addTest("move_contructor_deleter", { move_constructor_test }, [&](test::Test& test) { moveConstructorDeleterTest(test); });
+	test::Test* move_constructor_derived_test = addTest("move_contructor_derived", { move_constructor_test }, [&](test::Test& test) { moveConstructorDerivedTest(test); });
+	test::Test* move_constructor_derived_deleter_test = addTest("move_contructor_derived_deleter", { move_constructor_derived_test }, [&](test::Test& test) { moveConstructorDerivedDeleterTest(test); });
+	test::Test* move_assignment_test = addTest("move_assignment", { release_silent_test }, [&](test::Test& test) { moveAssignmentTest(test); });
+	test::Test* move_assignment_deleter_test = addTest("move_assignment_deleter", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDeleterTest(test); });
+	test::Test* move_assignment_derived_test = addTest("move_assignment_derived", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDerivedTest(test); });
+	test::Test* move_assignment_derived_deleter_test = addTest("move_assignment_derived_deleter", { move_assignment_derived_test }, [&](test::Test& test) { moveAssignmentDerivedDeleterTest(test); });
+	test::Test* swap_test = addTest("swap", { get_test }, [&](test::Test& test) { swapTest(test); });
+	test::Test* dereference_test = addTest("dereference", { struct_test }, [&](test::Test& test) { dereferenceTest(test); });
+	test::Test* pointer_access_test = addTest("pointer_access", { struct_test }, [&](test::Test& test) { pointerAccessTest(test); });
+	test::Test* move_test = addTest("move", { struct_test }, [&](test::Test& test) { moveTest(test); });
+	test::Test* make_data_pointer_test = addTest("make_data_pointer", { struct_test }, [&](test::Test& test) { makeDataPointerTest(test); });
+	test::Test* make_data_pointer_derived_test = addTest("make_data_pointer_derived", { make_data_pointer_test }, [&](test::Test& test) { makeDataPointerDerivedTest(test); });
+	test::Test* block_name_test = addTest("block_name", { make_data_pointer_test }, [&](test::Test& test) { blockNameTest(test); });
 }
 
 void DataPointerUniqueTests::nullTest(test::Test& test) {
