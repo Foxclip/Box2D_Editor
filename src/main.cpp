@@ -31,6 +31,7 @@ int main() {
 
     execute_app();
 
+    // TODO: DataPointer: add tests for assigning an object to itself
     // TODO: Outliner: reorder objects
     // TODO: Outliner: buttons up/down for reordering objects
     // TODO: Outliner: reparent objects
