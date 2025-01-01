@@ -89,6 +89,7 @@ DataPointerSharedTests::DataPointerSharedTests(
 	test::Test* swap_test = addTest("swap", { get_test }, [&](test::Test& test) { swapTest(test); });
 	test::Test* dereference_test = addTest("dereference", { get_test }, [&](test::Test& test) { dereferenceTest(test); });
 	test::Test* pointer_access_test = addTest("pointer_access", { get_test }, [&](test::Test& test) { pointerAccessTest(test); });
+	test::Test* move_test = addTest("move", { get_test }, [&](test::Test& test) { moveTest(test); });
 }
 
 void DataPointerSharedTests::nullTest(test::Test& test) {
@@ -595,6 +596,22 @@ void DataPointerSharedTests::pointerAccessTest(test::Test& test) {
 	DataPointerShared<MyStruct> dp("MyStruct", m);
 	int val = dp->val;
 	T_COMPARE(val, 111);
+}
+
+void DataPointerSharedTests::moveTest(test::Test& test) {
+	std::vector<DataPointerShared<MyStruct>> vec;
+	MyStruct* m = new MyStruct(222);
+	{
+		DataPointerShared<MyStruct> dp("MyStruct", m);
+		T_COMPARE(dp.use_count(), 1);
+		vec.push_back(std::move(dp));
+		MyStruct* m = dp.get();
+		T_COMPARE(m, nullptr, &utils::pointer_to_str);
+	}
+	T_COMPARE(vec[0]->val, 222);
+
+	T_COMPARE(data_blocks.size(), 1);
+	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
 }
 
 void DataPointerSharedTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {
