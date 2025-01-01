@@ -16,7 +16,6 @@ private:
 	void customDeleterTest(test::Test& test);
 	void lambdaDeleterTest(test::Test& test);
 	void getTest(test::Test& test);
-	void copyTest(test::Test& test);
 	void resetTest(test::Test& test);
 	void resetDeleterTest(test::Test& test);
 	void moveConstructorTest(test::Test& test);
@@ -35,6 +34,7 @@ private:
 	void copyAssignmentDeleterTest(test::Test& test);
 	void copyAssignmentDerivedTest(test::Test& test);
 	void copyAssignmentDerivedDeleterTest(test::Test& test);
+	void copyTest(test::Test& test);
 	void swapTest(test::Test& test);
 	void dereferenceTest(test::Test& test);
 	void pointerAccessTest(test::Test& test);
