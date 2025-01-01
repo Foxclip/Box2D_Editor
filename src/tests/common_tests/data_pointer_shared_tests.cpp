@@ -74,6 +74,10 @@ DataPointerSharedTests::DataPointerSharedTests(
 	test::Test* move_constructor_deleter_test = addTest("move_contructor_deleter", { move_constructor_test }, [&](test::Test& test) { moveConstructorDeleterTest(test); });
 	test::Test* move_constructor_derived_test = addTest("move_contructor_derived", { move_constructor_test }, [&](test::Test& test) { moveConstructorDerivedTest(test); });
 	test::Test* move_constructor_derived_deleter_test = addTest("move_contructor_derived_deleter", { move_constructor_derived_test }, [&](test::Test& test) { moveConstructorDerivedDeleterTest(test); });
+	test::Test* move_assignment_test = addTest("move_assignment", { struct_test }, [&](test::Test& test) { moveAssignmentTest(test); });
+	test::Test* move_assignment_deleter_test = addTest("move_assignment_deleter", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDeleterTest(test); });
+	test::Test* move_assignment_derived_test = addTest("move_assignment_derived", { move_assignment_test }, [&](test::Test& test) { moveAssignmentDerivedTest(test); });
+	test::Test* move_assignment_derived_deleter_test = addTest("move_assignment_derived_deleter", { move_assignment_derived_test }, [&](test::Test& test) { moveAssignmentDerivedDeleterTest(test); });
 }
 
 void DataPointerSharedTests::nullTest(test::Test& test) {
@@ -291,6 +295,96 @@ void DataPointerSharedTests::moveConstructorDerivedDeleterTest(test::Test& test)
 		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
 	}
 	T_CHECK(flag);
+}
+
+void DataPointerSharedTests::moveAssignmentTest(test::Test& test) {
+	bool flag = false;
+	MyStruct* m1 = new MyStruct(11);
+	m1->destructor_func = [&]() {
+		flag = true;
+	};
+	MyStruct* m2 = new MyStruct(22);
+	DataPointerShared<MyStruct> dp1("MyStruct", m1);
+	DataPointerShared<MyStruct> dp2("MyStruct", m2);
+	dp1 = std::move(dp2);
+	MyStruct* m3 = dp1.get();
+	MyStruct* m4 = dp2.get();
+	T_COMPARE(m4, nullptr, &utils::pointer_to_str);
+	T_CHECK(flag);
+
+	T_COMPARE(data_blocks.size(), 1);
+	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+}
+
+void DataPointerSharedTests::moveAssignmentDeleterTest(test::Test& test) {
+	bool flag1 = false;
+	auto func = [&]() {
+		flag1 = true;
+	};
+	CustomDeleter<MyStruct> cd(func);
+	{
+		bool flag2 = false;
+		MyStruct* m1 = new MyStruct(11);
+		m1->destructor_func = [&]() {
+			flag2 = true;
+		};
+		MyStruct* m2 = new MyStruct(22);
+		DataPointerShared<MyStruct, AnotherDeleter<MyStruct>> dp1("MyStruct", m1, cd);
+		DataPointerShared<MyStruct, CustomDeleter<MyStruct>> dp2("MyStruct", m2);
+		dp1 = std::move(dp2);
+		MyStruct* m3 = dp1.get();
+		MyStruct* m4 = dp2.get();
+		T_COMPARE(m4, nullptr, &utils::pointer_to_str);
+		T_CHECK(flag2);
+
+		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+	}
+	T_CHECK(flag1);
+}
+
+void DataPointerSharedTests::moveAssignmentDerivedTest(test::Test& test) {
+	bool flag = false;
+	MyStruct* m1 = new MyStruct(11);
+	m1->destructor_func = [&]() {
+		flag = true;
+	};
+	ChildStruct* m2 = new ChildStruct(22);
+	DataPointerShared<MyStruct> dp1("MyStruct", m1);
+	DataPointerShared<ChildStruct> dp2("ChildStruct", m2);
+	dp1 = std::move(dp2);
+	MyStruct* m3 = dp1.get();
+	ChildStruct* m4 = dp2.get();
+	T_COMPARE(m4, nullptr, &utils::pointer_to_str);
+	T_CHECK(flag);
+
+	T_COMPARE(data_blocks.size(), 1);
+	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+}
+
+void DataPointerSharedTests::moveAssignmentDerivedDeleterTest(test::Test& test) {
+	bool flag1 = false;
+	auto func = [&]() {
+		flag1 = true;
+	};
+	CustomDeleter<ChildStruct> cd(func);
+	{
+		bool flag2 = false;
+		MyStruct* m1 = new MyStruct(11);
+		m1->destructor_func = [&]() {
+			flag2 = true;
+		};
+		ChildStruct* m2 = new ChildStruct(22);
+		DataPointerShared<MyStruct, AnotherDeleter<MyStruct>> dp1("MyStruct", m1, cd);
+		DataPointerShared<ChildStruct, CustomDeleter<ChildStruct>> dp2("ChildStruct", m2);
+		dp1 = std::move(dp2);
+		MyStruct* m3 = dp1.get();
+		ChildStruct* m4 = dp2.get();
+		T_COMPARE(m4, nullptr, &utils::pointer_to_str);
+		T_CHECK(flag2);
+
+		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+	}
+	T_CHECK(flag1);
 }
 
 void DataPointerSharedTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {

@@ -23,6 +23,10 @@ private:
 	void moveConstructorDeleterTest(test::Test& test);
 	void moveConstructorDerivedTest(test::Test& test);
 	void moveConstructorDerivedDeleterTest(test::Test& test);
+	void moveAssignmentTest(test::Test& test);
+	void moveAssignmentDeleterTest(test::Test& test);
+	void moveAssignmentDerivedTest(test::Test& test);
+	void moveAssignmentDerivedDeleterTest(test::Test& test);
 
 	void checkDataBlock(test::Test& test, void* p_block, size_t p_size);
 	void checkNoDataBlock(test::Test& test, void* p_block);
