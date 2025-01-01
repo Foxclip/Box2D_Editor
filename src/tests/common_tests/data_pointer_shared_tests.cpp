@@ -90,6 +90,9 @@ DataPointerSharedTests::DataPointerSharedTests(
 	test::Test* dereference_test = addTest("dereference", { get_test }, [&](test::Test& test) { dereferenceTest(test); });
 	test::Test* pointer_access_test = addTest("pointer_access", { get_test }, [&](test::Test& test) { pointerAccessTest(test); });
 	test::Test* move_test = addTest("move", { get_test }, [&](test::Test& test) { moveTest(test); });
+	test::Test* make_data_pointer_test = addTest("make_data_pointer", { get_test }, [&](test::Test& test) { makeDataPointerTest(test); });
+	test::Test* make_data_pointer_derived_test = addTest("make_data_pointer_derived", { get_test }, [&](test::Test& test) { makeDataPointerDerivedTest(test); });
+
 }
 
 void DataPointerSharedTests::nullTest(test::Test& test) {
@@ -612,6 +615,34 @@ void DataPointerSharedTests::moveTest(test::Test& test) {
 
 	T_COMPARE(data_blocks.size(), 1);
 	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
+}
+
+void DataPointerSharedTests::makeDataPointerTest(test::Test& test) {
+	{
+		DataPointerShared<MyStruct> dp = make_shared_data_pointer<MyStruct>("MyStruct", 333);
+		T_COMPARE(dp->val, 333);
+
+		MyStruct* m = dp.get();
+
+		T_COMPARE(data_blocks.size(), 1);
+		T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
+	}
+
+	T_COMPARE(data_blocks.size(), 0);
+}
+
+void DataPointerSharedTests::makeDataPointerDerivedTest(test::Test& test) {
+	{
+		DataPointerShared<MyStruct> dp = make_shared_data_pointer<ChildStruct>("ChildStruct", 444);
+		T_COMPARE(dp->val, 444);
+
+		MyStruct* m = dp.get();
+
+		T_COMPARE(data_blocks.size(), 1);
+		T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(ChildStruct)));
+	}
+
+	T_COMPARE(data_blocks.size(), 0);
 }
 
 void DataPointerSharedTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {
