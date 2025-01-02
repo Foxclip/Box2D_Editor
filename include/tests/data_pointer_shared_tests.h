@@ -43,7 +43,4 @@ private:
 	void makeDataPointerDerivedTest(test::Test& test);
 	void blockNameTest(test::Test& test);
 
-	void checkDataBlock(test::Test& test, void* p_block, size_t p_size);
-	void checkNoDataBlock(test::Test& test, void* p_block);
-
 };

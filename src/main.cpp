@@ -31,7 +31,6 @@ int main() {
 
     execute_app();
 
-    // TODO: Event: make Event copyable
     // TODO: TreeViewWidget: create copy of widget tree when dragging
     // TODO: Outliner: reorder objects
     // TODO: Outliner: buttons up/down for reordering objects

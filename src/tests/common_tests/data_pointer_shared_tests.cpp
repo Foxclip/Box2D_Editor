@@ -2,6 +2,7 @@
 #include "common/data_pointer_shared.h"
 #include <functional>
 #include "common/utils.h"
+#include "tests/data_pointer_tests.h"
 
 struct MyStruct {
 	MyStruct(int val) {
@@ -108,7 +109,7 @@ void DataPointerSharedTests::basicTest(test::Test& test) {
 	dp::DataPointerShared<int> dp("x", x);
 	T_COMPARE(dp.use_count(), 1);
 
-	T_WRAP_CONTAINER(checkDataBlock(test, x, sizeof(int)));
+	T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, x, sizeof(int)));
 }
 
 void DataPointerSharedTests::structTest(test::Test& test) {
@@ -116,7 +117,7 @@ void DataPointerSharedTests::structTest(test::Test& test) {
 	dp::DataPointerShared<MyStruct> dp("MyStruct", m);
 	static_assert(sizeof(MyStruct) != sizeof(int));
 
-	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
+	T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m, sizeof(MyStruct)));
 }
 
 void DataPointerSharedTests::destructorTest(test::Test& test) {
@@ -210,7 +211,7 @@ void DataPointerSharedTests::resetTest(test::Test& test) {
 	MyStruct* mt2 = dp.get();
 	T_COMPARE(mt2, m2, &utils::pointer_to_str);
 
-	T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
+	T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m2, sizeof(MyStruct)));
 }
 
 void DataPointerSharedTests::resetDeleterTest(test::Test& test) {
@@ -232,7 +233,7 @@ void DataPointerSharedTests::resetDeleterTest(test::Test& test) {
 	T_CHECK(flag);
 	T_COMPARE(del_ptr, m, &utils::pointer_to_str);
 
-	T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
+	T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m2, sizeof(MyStruct)));
 }
 
 void DataPointerSharedTests::moveConstructorTest(test::Test& test) {
@@ -245,7 +246,7 @@ void DataPointerSharedTests::moveConstructorTest(test::Test& test) {
 		MyStruct* m3 = dp2.get();
 		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
 
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(MyStruct)));
 	}
 	{
 		// from nullptr
@@ -274,7 +275,7 @@ void DataPointerSharedTests::moveConstructorDeleterTest(test::Test& test) {
 		MyStruct* m3 = dp2.get();
 		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
 
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(MyStruct)));
 	}
 	T_CHECK(flag);
 }
@@ -287,7 +288,7 @@ void DataPointerSharedTests::moveConstructorDerivedTest(test::Test& test) {
 	MyStruct* m3 = dp2.get();
 	T_COMPARE(m2, nullptr, &utils::pointer_to_str);
 
-	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+	T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(ChildStruct)));
 }
 
 void DataPointerSharedTests::moveConstructorDerivedDeleterTest(test::Test& test) {
@@ -304,7 +305,7 @@ void DataPointerSharedTests::moveConstructorDerivedDeleterTest(test::Test& test)
 		MyStruct* m3 = dp2.get();
 		T_COMPARE(m2, nullptr, &utils::pointer_to_str);
 
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(ChildStruct)));
 	}
 	T_CHECK(flag);
 }
@@ -326,7 +327,7 @@ void DataPointerSharedTests::moveAssignmentTest(test::Test& test) {
 		T_CHECK(flag);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(MyStruct)));
 	}
 	{
 		// self to self
@@ -342,7 +343,7 @@ void DataPointerSharedTests::moveAssignmentTest(test::Test& test) {
 		T_CHECK(!flag);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m2, sizeof(MyStruct)));
 	}
 	{
 		// nullptr to ptr
@@ -374,7 +375,7 @@ void DataPointerSharedTests::moveAssignmentTest(test::Test& test) {
 		T_COMPARE(m4, nullptr, &utils::pointer_to_str);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(MyStruct)));
 	}
 }
 
@@ -399,7 +400,7 @@ void DataPointerSharedTests::moveAssignmentDeleterTest(test::Test& test) {
 		T_COMPARE(m4, nullptr, &utils::pointer_to_str);
 		T_CHECK(flag2);
 
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(MyStruct)));
 	}
 	T_CHECK(flag1);
 }
@@ -420,7 +421,7 @@ void DataPointerSharedTests::moveAssignmentDerivedTest(test::Test& test) {
 	T_CHECK(flag);
 
 	T_COMPARE(dp::data_blocks.size(), 1);
-	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+	T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(ChildStruct)));
 }
 
 void DataPointerSharedTests::moveAssignmentDerivedDeleterTest(test::Test& test) {
@@ -444,7 +445,7 @@ void DataPointerSharedTests::moveAssignmentDerivedDeleterTest(test::Test& test) 
 		T_COMPARE(m4, nullptr, &utils::pointer_to_str);
 		T_CHECK(flag2);
 
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(ChildStruct)));
 	}
 	T_CHECK(flag1);
 }
@@ -461,7 +462,7 @@ void DataPointerSharedTests::copyConstructorTest(test::Test& test) {
 		T_COMPARE(m3, m, &utils::pointer_to_str);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(MyStruct)));
 	}
 	{
 		// nullptr to ptr
@@ -492,7 +493,7 @@ void DataPointerSharedTests::copyConstructorDeleterTest(test::Test& test) {
 		T_COMPARE(m3, m, &utils::pointer_to_str);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(MyStruct)));
 	}
 	T_CHECK(flag);
 
@@ -509,7 +510,7 @@ void DataPointerSharedTests::copyConstructorDerivedTest(test::Test& test) {
 	T_COMPARE(m3, m, &utils::pointer_to_str);
 
 	T_COMPARE(dp::data_blocks.size(), 1);
-	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+	T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(ChildStruct)));
 }
 
 void DataPointerSharedTests::copyConstructorDerivedDeleterTest(test::Test& test) {
@@ -528,7 +529,7 @@ void DataPointerSharedTests::copyConstructorDerivedDeleterTest(test::Test& test)
 		T_COMPARE(m3, m, &utils::pointer_to_str);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(ChildStruct)));
 	}
 	T_CHECK(flag);
 
@@ -554,7 +555,7 @@ void DataPointerSharedTests::copyAssignmentTest(test::Test& test) {
 		T_CHECK(flag);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(MyStruct)));
 	}
 	{
 		// self to self
@@ -570,7 +571,7 @@ void DataPointerSharedTests::copyAssignmentTest(test::Test& test) {
 		T_CHECK(!flag);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m2, sizeof(MyStruct)));
 	}
 	{
 		// nullptr to ptr
@@ -602,7 +603,7 @@ void DataPointerSharedTests::copyAssignmentTest(test::Test& test) {
 		T_COMPARE(m4, m2, &utils::pointer_to_str);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(MyStruct)));
 	}
 }
 
@@ -629,7 +630,7 @@ void DataPointerSharedTests::copyAssignmentDeleterTest(test::Test& test) {
 		T_CHECK(flag2);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(MyStruct)));
 	}
 
 	T_CHECK(flag1);
@@ -654,7 +655,7 @@ void DataPointerSharedTests::copyAssignmentDerivedTest(test::Test& test) {
 	T_CHECK(flag);
 
 	T_COMPARE(dp::data_blocks.size(), 1);
-	T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+	T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(ChildStruct)));
 }
 
 void DataPointerSharedTests::copyAssignmentDerivedDeleterTest(test::Test& test) {
@@ -680,7 +681,7 @@ void DataPointerSharedTests::copyAssignmentDerivedDeleterTest(test::Test& test) 
 		T_CHECK(flag2);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m3, sizeof(ChildStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m3, sizeof(ChildStruct)));
 	}
 	T_CHECK(flag1);
 
@@ -691,16 +692,16 @@ void DataPointerSharedTests::copyTest(test::Test& test) {
 	MyStruct* m1 = new MyStruct(44);
 	{
 		dp::DataPointerShared<MyStruct> dp1("MyStruct", m1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m1, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m1, sizeof(MyStruct)));
 		T_COMPARE(dp1.use_count(), 1);
 		{
 			dp::DataPointerShared<MyStruct> dp2(dp1);
 			T_COMPARE(dp1.use_count(), 2);
 			T_COMPARE(dp2.use_count(), 2);
-			T_WRAP_CONTAINER(checkDataBlock(test, m1, sizeof(MyStruct)));
+			T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m1, sizeof(MyStruct)));
 		}
 		T_COMPARE(dp1.use_count(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m1, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m1, sizeof(MyStruct)));
 	}
 	T_COMPARE(dp::data_blocks.size(), 0);
 }
@@ -716,8 +717,8 @@ void DataPointerSharedTests::swapTest(test::Test& test) {
 		T_COMPARE(dp2.get(), m1, &utils::pointer_to_str);
 
 		T_COMPARE(dp::data_blocks.size(), 2);
-		T_WRAP_CONTAINER(checkDataBlock(test, m1, sizeof(MyStruct)));
-		T_WRAP_CONTAINER(checkDataBlock(test, m2, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m1, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m2, sizeof(MyStruct)));
 	}
 	{
 		// self with self
@@ -727,7 +728,7 @@ void DataPointerSharedTests::swapTest(test::Test& test) {
 		T_COMPARE(dp1.get(), m1, &utils::pointer_to_str);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m1, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m1, sizeof(MyStruct)));
 	}
 	{
 		// ptr with nullptr
@@ -739,7 +740,7 @@ void DataPointerSharedTests::swapTest(test::Test& test) {
 		T_COMPARE(dp2.get(), m1, &utils::pointer_to_str);
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m1, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m1, sizeof(MyStruct)));
 	}
 }
 
@@ -770,7 +771,7 @@ void DataPointerSharedTests::moveTest(test::Test& test) {
 	T_COMPARE(vec[0]->val, 222);
 
 	T_COMPARE(dp::data_blocks.size(), 1);
-	T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
+	T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m, sizeof(MyStruct)));
 }
 
 void DataPointerSharedTests::makeDataPointerTest(test::Test& test) {
@@ -781,7 +782,7 @@ void DataPointerSharedTests::makeDataPointerTest(test::Test& test) {
 		MyStruct* m = dp.get();
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(MyStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m, sizeof(MyStruct)));
 	}
 
 	T_COMPARE(dp::data_blocks.size(), 0);
@@ -795,7 +796,7 @@ void DataPointerSharedTests::makeDataPointerDerivedTest(test::Test& test) {
 		MyStruct* m = dp.get();
 
 		T_COMPARE(dp::data_blocks.size(), 1);
-		T_WRAP_CONTAINER(checkDataBlock(test, m, sizeof(ChildStruct)));
+		T_WRAP_CONTAINER(DataPointerTests::checkDataBlock(test, m, sizeof(ChildStruct)));
 	}
 
 	T_COMPARE(dp::data_blocks.size(), 0);
@@ -886,21 +887,4 @@ void DataPointerSharedTests::blockNameTest(test::Test& test) {
 			T_COMPARE(it2->second.name, "m9");
 		}
 	}
-}
-
-void DataPointerSharedTests::checkDataBlock(test::Test& test, void* p_block, size_t p_size) {
-	if (T_CHECK(dp::data_blocks.size() > 0)) {
-		auto it = dp::data_blocks.find(p_block);
-		if (T_CHECK(it != dp::data_blocks.end())) {
-			void* ptr = it->second.ptr;
-			size_t size = it->second.size;
-			T_COMPARE(ptr, p_block, &utils::pointer_to_str);
-			T_COMPARE(size, p_size);
-		}
-	}
-}
-
-void DataPointerSharedTests::checkNoDataBlock(test::Test& test, void* p_block) {
-	auto it = dp::data_blocks.find(p_block);
-	T_CHECK(it == dp::data_blocks.end());
 }
