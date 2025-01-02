@@ -81,8 +81,8 @@ private:
 
 class DragTool : public Tool {
 public:
-	DataPointerUnique<b2Body, std::function<void(b2Body*)>> mouse_body = DataPointerUnique<b2Body, std::function<void(b2Body*)>>("Mouse body", nullptr);
-	DataPointerUnique<b2MouseJoint, std::function<void(b2MouseJoint*)>> mouse_joint = DataPointerUnique<b2MouseJoint, std::function<void(b2MouseJoint*)>>("Mouse joint", nullptr);
+	dp::DataPointerUnique<b2Body, std::function<void(b2Body*)>> mouse_body = dp::DataPointerUnique<b2Body, std::function<void(b2Body*)>>("Mouse body", nullptr);
+	dp::DataPointerUnique<b2MouseJoint, std::function<void(b2MouseJoint*)>> mouse_joint = dp::DataPointerUnique<b2MouseJoint, std::function<void(b2MouseJoint*)>>("Mouse joint", nullptr);
 
 	DragTool();
 	void reset() override;

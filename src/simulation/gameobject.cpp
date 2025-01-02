@@ -828,13 +828,13 @@ TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-DataPointerUnique<BoxObject> BoxObject::deserialize(const std::string& str, GameObjectList* object_list) {
+dp::DataPointerUnique<BoxObject> BoxObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	DataPointerUnique<BoxObject> uptr = deserialize(tr, object_list);
+	dp::DataPointerUnique<BoxObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-DataPointerUnique<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+dp::DataPointerUnique<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -867,7 +867,7 @@ DataPointerUnique<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObjectL
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		DataPointerUnique<BoxObject> box = make_data_pointer<BoxObject>("BoxObject " + name, object_list, bdef, size, color);
+		dp::DataPointerUnique<BoxObject> box = dp::make_data_pointer<BoxObject>("BoxObject " + name, object_list, bdef, size, color);
 		box->id = id;
 		box->parent_id = parent_id;
 		box->name = name;
@@ -889,7 +889,7 @@ void BoxObject::internalSyncVertices() {
 	b2PolygonShape box_shape;
 	box_shape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
 	b2Fixture* fixture = rigid_body->CreateFixture(&box_shape, 1.0f);
-	rect_shape = make_data_pointer<sf::RectangleShape>("BoxObject " + name + " rect_shape", tosf(size));
+	rect_shape = dp::make_data_pointer<sf::RectangleShape>("BoxObject " + name + " rect_shape", tosf(size));
 	rect_shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
 	rect_shape->setFillColor(color);
 }
@@ -961,13 +961,13 @@ TokenWriter& BallObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-DataPointerUnique<BallObject> BallObject::deserialize(const std::string& str, GameObjectList* object_list) {
+dp::DataPointerUnique<BallObject> BallObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	DataPointerUnique<BallObject> uptr = deserialize(tr, object_list);
+	dp::DataPointerUnique<BallObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-DataPointerUnique<BallObject> BallObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+dp::DataPointerUnique<BallObject> BallObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -1008,7 +1008,7 @@ DataPointerUnique<BallObject> BallObject::deserialize(TokenReader& tr, GameObjec
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		DataPointerUnique<BallObject> ball = make_data_pointer<BallObject>("BallObject " + name, object_list, bdef, radius, color, notch_color);
+		dp::DataPointerUnique<BallObject> ball = dp::make_data_pointer<BallObject>("BallObject " + name, object_list, bdef, radius, color, notch_color);
 		ball->id = id;
 		ball->parent_id = parent_id;
 		ball->name = name;
@@ -1030,7 +1030,7 @@ void BallObject::internalSyncVertices() {
 	b2CircleShape circle_shape;
 	circle_shape.m_radius = radius;
 	b2Fixture* fixture = rigid_body->CreateFixture(&circle_shape, 1.0f);
-	circle_notch_shape = make_data_pointer<CircleNotchShape>("BallObject " + name + " circle_notch_shape", radius, 30, 4);
+	circle_notch_shape = dp::make_data_pointer<CircleNotchShape>("BallObject " + name + " circle_notch_shape", radius, 30, 4);
 	circle_notch_shape->setCircleColor(color);
 	circle_notch_shape->setNotchColor(notch_color);
 }
@@ -1058,7 +1058,7 @@ PolygonObject::PolygonObject(
 	for (size_t i = 0; i < vertices.size(); i++) {
 		this->vertices.push_back(EditableVertex(vertices[i]));
 	}
-	polygon = make_data_pointer<SplittablePolygon>("PolygonObject " + name + " SplittablePolygon");
+	polygon = dp::make_data_pointer<SplittablePolygon>("PolygonObject " + name + " SplittablePolygon");
 	syncVertices(true);
 	transformFromRigidbody();
 	polygon->setFillColor(color);
@@ -1118,13 +1118,13 @@ TokenWriter& PolygonObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-DataPointerUnique<PolygonObject> PolygonObject::deserialize(const std::string& str, GameObjectList* object_list) {
+dp::DataPointerUnique<PolygonObject> PolygonObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	DataPointerUnique<PolygonObject> uptr = deserialize(tr, object_list);
+	dp::DataPointerUnique<PolygonObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-DataPointerUnique<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+dp::DataPointerUnique<PolygonObject> PolygonObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -1157,7 +1157,7 @@ DataPointerUnique<PolygonObject> PolygonObject::deserialize(TokenReader& tr, Gam
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		DataPointerUnique<PolygonObject> car = make_data_pointer<PolygonObject>("PolygonObject(car) " + name, object_list, bdef, vertices, color);
+		dp::DataPointerUnique<PolygonObject> car = dp::make_data_pointer<PolygonObject>("PolygonObject(car) " + name, object_list, bdef, vertices, color);
 		car->id = id;
 		car->parent_id = parent_id;
 		car->name = name;
@@ -1212,7 +1212,7 @@ ChainObject::ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector
 		EditableVertex ev(p_vertices[i]);
 		vertices.push_back(ev);
 	}
-	line_strip_shape = make_data_pointer<LineStripShape>("ChainObject " + name + " line_strip_shape", drawable_vertices);
+	line_strip_shape = dp::make_data_pointer<LineStripShape>("ChainObject " + name + " line_strip_shape", drawable_vertices);
 	syncVertices(true);
 	transformFromRigidbody();
 	line_strip_shape->setLineColor(color);
@@ -1261,13 +1261,13 @@ TokenWriter& ChainObject::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-DataPointerUnique<ChainObject> ChainObject::deserialize(const std::string& str, GameObjectList* object_list) {
+dp::DataPointerUnique<ChainObject> ChainObject::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	DataPointerUnique<ChainObject> uptr = deserialize(tr, object_list);
+	dp::DataPointerUnique<ChainObject> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-DataPointerUnique<ChainObject> ChainObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
+dp::DataPointerUnique<ChainObject> ChainObject::deserialize(TokenReader& tr, GameObjectList* object_list) {
 	try {
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
@@ -1300,7 +1300,7 @@ DataPointerUnique<ChainObject> ChainObject::deserialize(TokenReader& tr, GameObj
 		}
 		b2BodyDef bdef = body_def.body_def;
 		b2FixtureDef fdef = body_def.fixture_defs.front();
-		DataPointerUnique<ChainObject> chain = make_data_pointer<ChainObject>("ChainObject " + name, object_list, bdef, vertices, color);
+		dp::DataPointerUnique<ChainObject> chain = dp::make_data_pointer<ChainObject>("ChainObject " + name, object_list, bdef, vertices, color);
 		chain->id = id;
 		chain->parent_id = parent_id;
 		chain->name = name;

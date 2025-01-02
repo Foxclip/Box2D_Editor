@@ -8,7 +8,7 @@
 
 class GameObjectList {
 public:
-	DataPointerUnique<b2World> world;
+	dp::DataPointerUnique<b2World> world;
 	Event<GameObject*> OnObjectAdded;
 	Event<GameObject*> OnBeforeObjectRemoved;
 	Event<GameObject*> OnAfterObjectRemoved;
@@ -31,8 +31,8 @@ public:
 	const CompVector<GameObject*>& getTopObjects() const;
 	const CompVector<GameObject*>& getAllObjects() const;
 	ptrdiff_t getMaxId() const;
-	GameObject* add(DataPointerUnique<GameObject> object, bool assign_new_id);
-	Joint* addJoint(DataPointerUnique<Joint> joint);
+	GameObject* add(dp::DataPointerUnique<GameObject> object, bool assign_new_id);
+	Joint* addJoint(dp::DataPointerUnique<Joint> joint);
 	GameObject* duplicate(const GameObject* object, bool with_children = false);
 	CompVector<GameObject*> duplicate(const CompVector<GameObject*>& old_objects);
 	void transformFromRigidbody();

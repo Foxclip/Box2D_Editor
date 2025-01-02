@@ -39,7 +39,7 @@ void Simulation::save(const std::string& filename) const {
 void Simulation::reset() {
     clear();
     b2Vec2 gravity(0.0f, -9.8f);
-    world = make_data_pointer<b2World>("Simulation World", gravity);
+    world = dp::make_data_pointer<b2World>("Simulation World", gravity);
 }
 
 std::string Simulation::serialize() const {
@@ -120,7 +120,7 @@ void Simulation::deserialize(TokenReader& tr) {
         while (tr.validRange()) {
             std::string entity = tr.readString();
             if (entity == "object") {
-                DataPointerUnique<GameObject> gameobject;
+                dp::DataPointerUnique<GameObject> gameobject;
                 std::string type = tr.readString();
                 if (type == "box") {
                     gameobject = BoxObject::deserialize(tr, this);
@@ -137,7 +137,7 @@ void Simulation::deserialize(TokenReader& tr) {
             } else if (entity == "joint") {
                 std::string type = tr.readString();
                 if (type == "revolute") {
-                    DataPointerUnique<RevoluteJoint> uptr = RevoluteJoint::deserialize(tr, this);
+                    dp::DataPointerUnique<RevoluteJoint> uptr = RevoluteJoint::deserialize(tr, this);
                     addJoint(std::move(uptr));
                 } else {
                     throw std::runtime_error("Unknown joint type: " + type);
@@ -164,7 +164,7 @@ BoxObject* Simulation::createBox(
     def.type = b2_dynamicBody;
     def.position = pos;
     def.angle = angle;
-    DataPointerUnique<BoxObject> uptr = make_data_pointer<BoxObject>(
+    dp::DataPointerUnique<BoxObject> uptr = dp::make_data_pointer<BoxObject>(
         "BoxObject " + name, this, def, size, color
     );
     BoxObject* ptr = uptr.get();
@@ -183,7 +183,7 @@ BallObject* Simulation::createBall(
     b2BodyDef def;
     def.type = b2_dynamicBody;
     def.position = pos;
-    DataPointerUnique<BallObject> uptr = make_data_pointer<BallObject>(
+    dp::DataPointerUnique<BallObject> uptr = dp::make_data_pointer<BallObject>(
         "BallObject " + name, this, def, radius, color, notch_color
     );
     BallObject* ptr = uptr.get();
@@ -203,7 +203,7 @@ PolygonObject* Simulation::createPolygon(
     def.type = b2_dynamicBody;
     def.position = pos;
     def.angle = angle;
-    DataPointerUnique<PolygonObject> uptr = make_data_pointer<PolygonObject>(
+    dp::DataPointerUnique<PolygonObject> uptr = dp::make_data_pointer<PolygonObject>(
         "PolygonObject " + name, this, def, vertices, color
     );
     PolygonObject* ptr = uptr.get();
@@ -284,7 +284,7 @@ ChainObject* Simulation::createChain(
     b2BodyDef def;
     def.position = pos;
     def.angle = angle;
-    DataPointerUnique<ChainObject> uptr = make_data_pointer<ChainObject>(
+    dp::DataPointerUnique<ChainObject> uptr = dp::make_data_pointer<ChainObject>(
         "ChainObject " + name, this, def, vertices, color
     );
     ChainObject* ptr = uptr.get();
@@ -298,7 +298,7 @@ RevoluteJoint* Simulation::createRevoluteJoint(
     GameObject* obj1,
     GameObject* obj2
 ) {
-    DataPointerUnique<RevoluteJoint> uptr = make_data_pointer<RevoluteJoint>(
+    dp::DataPointerUnique<RevoluteJoint> uptr = dp::make_data_pointer<RevoluteJoint>(
         "RevoluteJoint A: " + obj1->getName() + " B: " + obj2->getName(), def, world.get(), obj1, obj2
     );
     RevoluteJoint* ptr = uptr.get();

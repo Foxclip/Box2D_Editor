@@ -421,7 +421,7 @@ const std::vector<Node*>& Node::getParents(Node* node) {
 }
 
 Node* NodeList::createNode(const std::string& name) {
-    DataPointerUnique<Node> uptr = make_data_pointer<Node>("Node " + name, name);
+    dp::DataPointerUnique<Node> uptr = dp::make_data_pointer<Node>("Node " + name, name);
     Node* ptr = uptr.get();
     nodes.add(std::move(uptr));
     return ptr;

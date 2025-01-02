@@ -108,7 +108,7 @@ namespace fw {
 	}
 
 	TreeViewEntry* TreeViewWidget::addEntry(const sf::String& name) {
-		DataPointerUnique<TreeViewEntry> entry_uptr = make_data_pointer<TreeViewEntry>("TreeViewWidget Entry " + name, *this, name);
+		dp::DataPointerUnique<TreeViewEntry> entry_uptr = dp::make_data_pointer<TreeViewEntry>("TreeViewWidget Entry " + name, *this, name);
 		TreeViewEntry* ptr = entry_uptr.get();
 		top_entries.add(ptr);
 		all_entries.add(std::move(entry_uptr));
@@ -117,7 +117,7 @@ namespace fw {
 
 	void TreeViewWidget::addPendingEntryMove(TreeViewEntry* entry, size_t index) {
 		wAssert(!widget_list.isLocked());
-		DataPointerUnique<PendingEntryMove> uptr = make_data_pointer<PendingEntryMove>(
+		dp::DataPointerUnique<PendingEntryMove> uptr = dp::make_data_pointer<PendingEntryMove>(
 			"PendingEntryMove " + entry->name + " " + std::to_string(index), *this, entry, index
 		);
 		pending_entry_move.add(std::move(uptr));
@@ -125,7 +125,7 @@ namespace fw {
 
 	void TreeViewWidget::addPendingEntryDelete(TreeViewEntry* entry, bool with_children) {
 		wAssert(!widget_list.isLocked());
-		DataPointerUnique<PendingEntryDelete> uptr = make_data_pointer<PendingEntryDelete>(
+		dp::DataPointerUnique<PendingEntryDelete> uptr = dp::make_data_pointer<PendingEntryDelete>(
 			"PendingEntryDelete " + entry->name + " " + std::to_string(with_children), *this, entry, with_children
 		);
 		pending_entry_delete.add(std::move(uptr));
@@ -134,7 +134,7 @@ namespace fw {
 	void TreeViewWidget::addPendingEntrySetParent(TreeViewEntry* entry, TreeViewEntry* new_parent, ptrdiff_t move_to_index) {
 		wAssert(!widget_list.isLocked());
 		sf::String parent_name = new_parent ? new_parent->name : "null";
-		DataPointerUnique<PendingEntrySetParent> uptr = make_data_pointer<PendingEntrySetParent>(
+		dp::DataPointerUnique<PendingEntrySetParent> uptr = dp::make_data_pointer<PendingEntrySetParent>(
 			"PendingEntrySetParent " + entry->name + " " + parent_name, *this, entry, new_parent, move_to_index
 		);
 		pending_entry_setparent.add(std::move(uptr));
@@ -142,7 +142,7 @@ namespace fw {
 
 	void TreeViewWidget::addPendingDetach(TreeViewEntry* entry) {
 		wAssert(!widget_list.isLocked());
-		DataPointerUnique<PendingEntryDetach> uptr = make_data_pointer<PendingEntryDetach>(
+		dp::DataPointerUnique<PendingEntryDetach> uptr = dp::make_data_pointer<PendingEntryDetach>(
 			"PendingEntryDetach " + entry->name, *this, entry
 		);
 		pending_entry_detach.add(std::move(uptr));

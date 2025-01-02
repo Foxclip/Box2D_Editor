@@ -45,7 +45,7 @@ private:
 template<typename ...TArgs>
 class Event : public EventTarget<TArgs...> {
 public:
-	const std::vector<DataPointerShared<EventTarget<TArgs...>>>& getTargets() const;
+	const std::vector<dp::DataPointerShared<EventTarget<TArgs...>>>& getTargets() const;
 	void operator+=(const std::function<void(TArgs...)>& func);
 	void operator+=(const Event<TArgs...>& event);
 	void operator+=(const EventHandlerFunc<TArgs...>& handler);
@@ -54,36 +54,36 @@ public:
 	void clear();
 
 private:
-	std::vector<DataPointerShared<EventTarget<TArgs...>>> targets;
+	std::vector<dp::DataPointerShared<EventTarget<TArgs...>>> targets;
 
 };
 
 template<typename ...TArgs>
-inline const std::vector<DataPointerShared<EventTarget<TArgs...>>>& Event<TArgs...>::getTargets() const {
+inline const std::vector<dp::DataPointerShared<EventTarget<TArgs...>>>& Event<TArgs...>::getTargets() const {
 	return targets;
 }
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator+=(const std::function<void(TArgs...)>& func) {
-	DataPointerShared<EventTarget<TArgs...>> uptr = make_shared_data_pointer<EventHandlerFunc<TArgs...>>("EventHandler func", func);
+	dp::DataPointerShared<EventTarget<TArgs...>> uptr = dp::make_shared_data_pointer<EventHandlerFunc<TArgs...>>("EventHandler func", func);
 	targets.push_back(std::move(uptr));
 }
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator+=(const Event<TArgs...>& event) {
-	DataPointerShared<EventTarget<TArgs...>> uptr = make_shared_data_pointer<EventHandlerEvent<TArgs...>>("EventHandler event", event);
+	dp::DataPointerShared<EventTarget<TArgs...>> uptr = dp::make_shared_data_pointer<EventHandlerEvent<TArgs...>>("EventHandler event", event);
 	targets.push_back(std::move(uptr));
 }
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator+=(const EventHandlerFunc<TArgs...>& handler) {
-	DataPointerShared<EventTarget<TArgs...>> uptr = make_shared_data_pointer<EventHandlerFunc<TArgs...>>("EventHandler EventHandlerFunc", handler);
+	dp::DataPointerShared<EventTarget<TArgs...>> uptr = dp::make_shared_data_pointer<EventHandlerFunc<TArgs...>>("EventHandler EventHandlerFunc", handler);
 	targets.push_back(std::move(uptr));
 }
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator-=(const EventTarget<TArgs...>& target) {
-	auto pred = [&](const DataPointerShared<EventTarget<TArgs...>>& element) {
+	auto pred = [&](const dp::DataPointerShared<EventTarget<TArgs...>>& element) {
 		return element->getId() == target.getId();
 	};
 	std::erase_if(targets, pred);
@@ -91,7 +91,7 @@ inline void Event<TArgs...>::operator-=(const EventTarget<TArgs...>& target) {
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::operator()(TArgs ...args) {
-	for (DataPointerShared<EventTarget<TArgs...>>& target : targets) {
+	for (dp::DataPointerShared<EventTarget<TArgs...>>& target : targets) {
 		EventTarget<TArgs...>* ptr = target.get();
 		(*ptr)(args...);
 	}
@@ -99,7 +99,7 @@ inline void Event<TArgs...>::operator()(TArgs ...args) {
 
 template<typename ...TArgs>
 inline void Event<TArgs...>::clear() {
-	targets = std::vector<DataPointerShared<EventTarget<TArgs...>>>();
+	targets = std::vector<dp::DataPointerShared<EventTarget<TArgs...>>>();
 }
 
 template<typename ...TArgs>

@@ -184,13 +184,13 @@ public:
 	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static DataPointerUnique<BoxObject> deserialize(const std::string& str, GameObjectList* object_list);
-	static DataPointerUnique<BoxObject> deserialize(TokenReader& tr, GameObjectList* object_list);
+	static dp::DataPointerUnique<BoxObject> deserialize(const std::string& str, GameObjectList* object_list);
+	static dp::DataPointerUnique<BoxObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
 	bool isEqual(const GameObject* other) const;
 
 private:
-	DataPointerUnique<sf::RectangleShape> rect_shape;
+	dp::DataPointerUnique<sf::RectangleShape> rect_shape;
 };
 
 class BallObject : public GameObject {
@@ -211,13 +211,13 @@ public:
 	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static DataPointerUnique<BallObject> deserialize(const std::string& str, GameObjectList* object_list);
-	static DataPointerUnique<BallObject> deserialize(TokenReader& tr, GameObjectList* object_list);
+	static dp::DataPointerUnique<BallObject> deserialize(const std::string& str, GameObjectList* object_list);
+	static dp::DataPointerUnique<BallObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
 	bool isEqual(const GameObject* other) const;
 
 private:
-	DataPointerUnique<CircleNotchShape> circle_notch_shape;
+	dp::DataPointerUnique<CircleNotchShape> circle_notch_shape;
 	sf::Color notch_color;
 
 };
@@ -239,13 +239,13 @@ public:
 	void setDrawVarray(bool value) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static DataPointerUnique<PolygonObject> deserialize(const std::string& str, GameObjectList* object_list);
-	static DataPointerUnique<PolygonObject> deserialize(TokenReader& tr, GameObjectList* object_list);
+	static dp::DataPointerUnique<PolygonObject> deserialize(const std::string& str, GameObjectList* object_list);
+	static dp::DataPointerUnique<PolygonObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
 	bool isEqual(const GameObject* other) const;
 
 private:
-	DataPointerUnique<SplittablePolygon> polygon;
+	dp::DataPointerUnique<SplittablePolygon> polygon;
 };
 
 class ChainObject : public GameObject {
@@ -258,13 +258,13 @@ public:
 	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
-	static DataPointerUnique<ChainObject> deserialize(const std::string& str, GameObjectList* object_list);
-	static DataPointerUnique<ChainObject> deserialize(TokenReader& tr, GameObjectList* object_list);
+	static dp::DataPointerUnique<ChainObject> deserialize(const std::string& str, GameObjectList* object_list);
+	static dp::DataPointerUnique<ChainObject> deserialize(TokenReader& tr, GameObjectList* object_list);
 	void internalSyncVertices() override;
 	bool isEqual(const GameObject* other) const;
 
 private:
-	DataPointerUnique<LineStripShape> line_strip_shape;
+	dp::DataPointerUnique<LineStripShape> line_strip_shape;
 
 	b2ChainShape* getShape() const;
 

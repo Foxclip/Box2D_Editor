@@ -157,26 +157,26 @@ TokenWriter& RevoluteJoint::serialize(TokenWriter& tw) const {
 	return tw;
 }
 
-DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(const std::string& str, GameObjectList* object_list) {
+dp::DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(const std::string& str, GameObjectList* object_list) {
 	TokenReader tr(str);
-	DataPointerUnique<RevoluteJoint> uptr = deserialize(tr, object_list);
+	dp::DataPointerUnique<RevoluteJoint> uptr = deserialize(tr, object_list);
 	return uptr;
 }
 
-DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(
+dp::DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(
 	const std::string& str, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
 ) {
 	TokenReader tr(str);
-	DataPointerUnique<RevoluteJoint> uptr = deserialize(tr, object_list, new_object_a, new_object_b);
+	dp::DataPointerUnique<RevoluteJoint> uptr = deserialize(tr, object_list, new_object_a, new_object_b);
 	return uptr;
 }
 
-DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(TokenReader& tr, GameObjectList* object_list) {
-	DataPointerUnique<RevoluteJoint> uptr = deserialize(tr, object_list, nullptr, nullptr);
+dp::DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(TokenReader& tr, GameObjectList* object_list) {
+	dp::DataPointerUnique<RevoluteJoint> uptr = deserialize(tr, object_list, nullptr, nullptr);
 	return uptr;
 }
 
-DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(
+dp::DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(
 	TokenReader& tr, GameObjectList* object_list, GameObject* new_object_a, GameObject* new_object_b
 ) {
 	try {
@@ -228,7 +228,7 @@ DataPointerUnique<RevoluteJoint> RevoluteJoint::deserialize(
 		if (new_object_b) {
 			object2 = new_object_b;
 		}
-		DataPointerUnique<RevoluteJoint> uptr = make_data_pointer<RevoluteJoint>(
+		dp::DataPointerUnique<RevoluteJoint> uptr = dp::make_data_pointer<RevoluteJoint>(
 			"RevoluteJoint A: " + object1->getName() + " B: " + object2->getName(),
 			def,
 			object_list->getWorld(),
