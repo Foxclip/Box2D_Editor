@@ -27,6 +27,7 @@ namespace fw {
 		void setScale(const sf::Vector2f& scale);
 		void setOrigin(float x, float y);
 		void setOrigin(const sf::Vector2f origin);
+		void copyFrom(const WidgetTransform& other);
 
 	private:
 		Widget* widget = nullptr;

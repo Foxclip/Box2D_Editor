@@ -12,7 +12,8 @@ public:
 	void rectangleWidgetTest(test::Test& test);
 	void polygonWidgetBasicTest(test::Test& test);
 	void setParentTest(test::Test& test);
-	void duplicateTest(test::Test& test);
+	void duplicateRectangleTest(test::Test& test);
+	void duplicatePolygonTest(test::Test& test);
 	void widgetMouseEvents1(test::Test& test);
 	void widgetMouseEvents2(test::Test& test);
 	void dragGestureEventTest(test::Test& test);

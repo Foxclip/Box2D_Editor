@@ -38,8 +38,7 @@ namespace fw {
 		this->type = other.type;
 		this->name = other.name;
 		this->full_name = other.full_name;
-		//this->transforms
-		this->parent = other.parent;
+		this->transforms.copyFrom(other.transforms);
 		//this->parent_chain
 		//this->children
 		this->children_locked = other.children_locked;
@@ -671,6 +670,10 @@ namespace fw {
 	sf::Vector2f Widget::getVisualGlobalBottomRight() const {
 		sf::FloatRect bounds = getVisualGlobalBounds();
 		return sf::Vector2f(bounds.left + bounds.width, bounds.top + bounds.height);
+	}
+
+	float Widget::getRotation() const {
+		return transforms.getRotation();
 	}
 
 	sf::Vector2f Widget::getCenter() const {

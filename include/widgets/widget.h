@@ -228,6 +228,7 @@ namespace fw {
 		sf::Vector2f getVisualGlobalTopRight() const;
 		sf::Vector2f getVisualGlobalBottomLeft() const;
 		sf::Vector2f getVisualGlobalBottomRight() const;
+		float getRotation() const;
 		virtual const sf::Color& getFillColor() const = 0;
 		float getAlphaMultiplier() const;
 		virtual void setSize(float width, float height);

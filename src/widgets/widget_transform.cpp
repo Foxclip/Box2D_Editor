@@ -109,6 +109,13 @@ namespace fw {
 		setOrigin(origin.x, origin.y);
 	}
 
+	void WidgetTransform::copyFrom(const WidgetTransform& other) {
+		this->position = other.position;
+		this->rotation = other.rotation;
+		this->scale = other.scale;
+		this->origin = other.origin;
+	}
+
 	void WidgetTransform::recalcTransform() const {
 		float angle  = (float)(-rotation * std::numbers::pi / 180.f);
 		float cosine = std::cos(angle);

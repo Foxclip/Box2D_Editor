@@ -123,6 +123,7 @@ namespace fw {
 		RectangleWidget* createRectangleWidget(const sf::Vector2f& size);
 		TextWidget* createTextWidget();
 		PolygonWidget* createPolygonWidget(const std::vector<sf::Vector2f>& vertices);
+		PolygonWidget* createPolygonWidget(size_t vertex_count, float radius = 10.0f, float angle_offset = 0.0f);
 		ContainerWidget* createContainerWidget(float width, float height);
 		ContainerWidget* createContainerWidget(const sf::Vector2f& size);
 		EmptyWidget* createEmptyWidget();
@@ -216,6 +217,7 @@ namespace fw {
 		uptr.setName(name);
 		T* ptr = uptr.get();
 		widgets.add(std::move(uptr));
+		ptr->setParent(widget->parent);
 		return ptr;
 	}
 

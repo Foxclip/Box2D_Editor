@@ -8,6 +8,22 @@ namespace fw {
 		setVertices(vertices);
 	}
 
+	PolygonWidget::PolygonWidget(WidgetList& widget_list, size_t vertex_count, float radius, float angle_offset) : ShapeWidget(widget_list) {
+		type = WidgetType::Polygon;
+		setName("polygon");
+		std::vector<sf::Vector2f> vertices = get_regular_polygon<sf::Vector2f>(vertex_count, radius, angle_offset);
+		setVertices(vertices);
+	}
+
+	const std::vector<sf::Vector2f>& PolygonWidget::getVertices() const {
+		return vertices;
+	}
+
+	void PolygonWidget::setVertices(const std::vector<sf::Vector2f>& vertices) {
+		this->vertices = vertices;
+		syncVertices();
+	}
+
 	sf::Drawable* PolygonWidget::getDrawable() {
 		return &polygon;
 	}
@@ -32,15 +48,15 @@ namespace fw {
 		return polygon;
 	}
 
-	void PolygonWidget::setVertices(const std::vector<sf::Vector2f>& vertices) {
+	void PolygonWidget::setSizeInternal(float width, float height) {
+		// nothing
+	}
+
+	void PolygonWidget::syncVertices() {
 		polygon.setPointCount(vertices.size());
 		for (size_t i = 0; i < vertices.size(); i++) {
 			polygon.setPoint(i, vertices[i]);
 		}
-	}
-
-	void PolygonWidget::setSizeInternal(float width, float height) {
-		// nothing
 	}
 
 }
