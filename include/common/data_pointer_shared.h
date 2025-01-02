@@ -95,7 +95,6 @@ inline DataPointerShared<T, D>::DataPointerShared(const DataPointerShared<T2, D2
 template<typename T, typename D>
 inline DataPointerShared<T, D>::DataPointerShared(DataPointerShared&& dp) noexcept {
 	this->name = dp.name;
-	dispose();
 	this->ptr = dp.ptr;
 	dp.ptr = nullptr;
 	this->deleter = dp.deleter;
@@ -106,7 +105,6 @@ template<typename T, typename D>
 template<typename T2, typename D2>
 inline DataPointerShared<T, D>::DataPointerShared(DataPointerShared<T2, D2>&& dp) noexcept {
 	this->name = dp.name;
-	dispose();
 	this->ptr = dp.ptr;
 	dp.ptr = nullptr;
 	this->deleter = dp.deleter;

@@ -19,8 +19,6 @@ private:
 	void releaseTest(test::Test& test);
 	void resetTest(test::Test& test);
 	void resetDeleterTest(test::Test& test);
-	void releaseSilentTest(test::Test& test);
-	void resetSilentTest(test::Test& test);
 	void moveConstructorTest(test::Test& test);
 	void moveConstructorDeleterTest(test::Test& test);
 	void moveConstructorDerivedTest(test::Test& test);

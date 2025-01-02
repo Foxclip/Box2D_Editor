@@ -13,9 +13,7 @@ public:
 	DataPointerUnique(DataPointerUnique<T2, D2>&& dp) noexcept;
 	~DataPointerUnique();
 	T* get() const;
-	T* releaseSilent();
 	T* release();
-	void resetSilent(T* new_ptr);
 	void reset(const std::string& name = "", T* new_ptr = nullptr);
 	void swap(DataPointerUnique& dp);
 	D& getDeleter();
@@ -33,9 +31,13 @@ public:
 	DataPointerUnique& operator=(const DataPointerUnique&) = delete;
 
 private:
+	template<typename T2, typename D2> friend class DataPointerUnique;
 	std::string name = "<unnamed>";
 	T* ptr = nullptr;
 	D deleter;
+
+	void create(const std::string& new_name, T* new_ptr);
+	void dispose();
 
 };
 
@@ -54,54 +56,40 @@ inline DataPointerUnique<T, D>::DataPointerUnique() : deleter(D()) {
 template<typename T, typename D>
 inline DataPointerUnique<T, D>::DataPointerUnique(const std::string& name, T* ptr) : deleter(D()) {
 	this->name = name;
-	this->ptr = ptr;
-	if (ptr) {
-		add_to_data_blocks(name, reinterpret_cast<void*>(ptr), sizeof(T));
-	}
+	create(name, ptr);
 }
 
 template<typename T, typename D>
 inline DataPointerUnique<T, D>::DataPointerUnique(const std::string& name, T* ptr, const D& deleter) : deleter(deleter) {
 	this->name = name;
-	this->ptr = ptr;
-	if (ptr) {
-		add_to_data_blocks(name, reinterpret_cast<void*>(ptr), sizeof(T));
-	}
+	create(name, ptr);
 }
 
 template<typename T, typename D>
 inline DataPointerUnique<T, D>::DataPointerUnique(DataPointerUnique&& dp) noexcept {
-	this->name = dp.getName();
-	resetSilent(dp.releaseSilent());
-	this->deleter = dp.getDeleter();
+	this->name = dp.name;
+	this->ptr = dp.ptr;
+	dp.ptr = nullptr;
+	this->deleter = dp.deleter;
 }
 
 template<typename T, typename D>
 template<typename T2, typename D2>
 inline DataPointerUnique<T, D>::DataPointerUnique(DataPointerUnique<T2, D2>&& dp) noexcept {
-	this->name = dp.getName();
-	resetSilent(dp.releaseSilent());
-	this->deleter = dp.getDeleter();
+	this->name = dp.name;
+	this->ptr = dp.ptr;
+	dp.ptr = nullptr;
+	this->deleter = dp.deleter;
 }
 
 template<typename T, typename D>
 inline DataPointerUnique<T, D>::~DataPointerUnique() {
-	if (ptr) {
-		remove_from_data_blocks(reinterpret_cast<void*>(ptr));
-		deleter(ptr);
-	}
+	dispose();
 }
 
 template<typename T, typename D>
 inline T* DataPointerUnique<T, D>::get() const {
 	return ptr;
-}
-
-template<typename T, typename D>
-inline T* DataPointerUnique<T, D>::releaseSilent() {
-	T* result = ptr;
-	ptr = nullptr;
-	return result;
 }
 
 template<typename T, typename D>
@@ -115,27 +103,12 @@ inline T* DataPointerUnique<T, D>::release() {
 }
 
 template<typename T, typename D>
-inline void DataPointerUnique<T, D>::resetSilent(T* new_ptr) {
-	if (ptr) {
-		deleter(ptr);
-	}
-	ptr = new_ptr;
-}
-
-template<typename T, typename D>
 inline void DataPointerUnique<T, D>::reset(const std::string& new_name, T* new_ptr) {
-	T* old_ptr = ptr;
-	if (old_ptr == new_ptr) {
+	if (ptr == new_ptr) {
 		return;
 	}
-	if (old_ptr) {
-		remove_from_data_blocks(reinterpret_cast<void*>(old_ptr));
-		deleter(ptr);
-	}
-	if (new_ptr) {
-		add_to_data_blocks(new_name, reinterpret_cast<void*>(new_ptr), sizeof(T));
-	}
-	ptr = new_ptr;
+	dispose();
+	create(new_name, new_ptr);
 }
 
 template<typename T, typename D>
@@ -179,11 +152,25 @@ inline T* DataPointerUnique<T, D>::operator->() const {
 
 template<typename T, typename D>
 inline DataPointerUnique<T, D>& DataPointerUnique<T, D>::operator=(DataPointerUnique&& right) {
-	if (right.get() != this->ptr) {
-		this->name = right.getName();
-		reset();
-		resetSilent(right.releaseSilent());
-		this->deleter = right.getDeleter();
+	if (right.ptr != this->ptr) {
+		this->name = right.name;
+		dispose();
+		this->ptr = right.ptr;
+		right.ptr = nullptr;
+		this->deleter = right.deleter;
+	}
+	return *this;
+}
+
+template<typename T, typename D>
+template<typename T2, typename D2>
+inline DataPointerUnique<T, D>& DataPointerUnique<T, D>::operator=(DataPointerUnique<T2, D2>&& right) {
+	if (right.ptr != this->ptr) {
+		this->name = right.name;
+		dispose();
+		this->ptr = right.ptr;
+		right.ptr = nullptr;
+		this->deleter = right.deleter;
 	}
 	return *this;
 }
@@ -194,13 +181,18 @@ inline DataPointerUnique<T, D>::operator bool() {
 }
 
 template<typename T, typename D>
-template<typename T2, typename D2>
-inline DataPointerUnique<T, D>& DataPointerUnique<T, D>::operator=(DataPointerUnique<T2, D2>&& right) {
-	if (right.get() != this->ptr) {
-		this->name = right.getName();
-		reset();
-		resetSilent(right.releaseSilent());
-		this->deleter = right.getDeleter();
+inline void DataPointerUnique<T, D>::create(const std::string& new_name, T* new_ptr) {
+	if (new_ptr) {
+		add_to_data_blocks(new_name, reinterpret_cast<void*>(new_ptr), sizeof(T));
+		this->ptr = new_ptr;
 	}
-	return *this;
+}
+
+template<typename T, typename D>
+inline void DataPointerUnique<T, D>::dispose() {
+	if (ptr) {
+		remove_from_data_blocks(reinterpret_cast<void*>(ptr));
+		deleter(ptr);
+		ptr = nullptr;
+	}
 }
