@@ -9,6 +9,80 @@ namespace fw {
 		shader = &widget_list.getApplication().default_shader;
 	}
 
+	Widget::Widget(const Widget& other) : widget_list(other.widget_list), render_textures(RenderTexture()) {
+		this->OnLeftPress = other.OnLeftPress;
+		this->OnRightPress = other.OnRightPress;
+		this->OnGlobalLeftRelease = other.OnGlobalLeftRelease;
+		this->OnBlockableLeftRelease = other.OnBlockableLeftRelease;
+		this->OnGlobalRightRelease = other.OnGlobalRightRelease;
+		this->OnBlockableRightRelease = other.OnBlockableRightRelease;
+		this->OnLeftClick = other.OnLeftClick;
+		this->OnRightClick = other.OnRightClick;
+		this->OnScrollX = other.OnScrollX;
+		this->OnScrollY = other.OnScrollY;
+		this->OnMouseMoved = other.OnMouseMoved;
+		this->OnMouseEnter = other.OnMouseEnter;
+		this->OnMouseExit = other.OnMouseExit;
+		this->OnProcessMouse = other.OnProcessMouse;
+		this->OnProcessDragGesture = other.OnProcessDragGesture;
+		this->OnFocused = other.OnFocused;
+		this->OnFocusLost = other.OnFocusLost;
+		this->OnPreUpdate = other.OnPreUpdate;
+		this->OnPostUpdate = other.OnPostUpdate;
+		this->OnBeforeGlobalRender = other.OnBeforeGlobalRender;
+		this->OnBeforeRender = other.OnBeforeRender;
+		this->OnAfterRender = other.OnAfterRender;
+		this->OnAfterGlobalRender = other.OnAfterGlobalRender;
+		this->OnWindowResized = other.OnWindowResized;
+		this->GetCursorType = other.GetCursorType;
+		this->type = other.type;
+		this->name = other.name;
+		this->full_name = other.full_name;
+		//this->transforms
+		this->parent = other.parent;
+		//this->parent_chain
+		//this->children
+		this->children_locked = other.children_locked;
+		//this->children_names
+		this->shader = other.shader;
+		this->global_layer = other.global_layer;
+		this->local_layers = other.local_layers;
+		this->origin_anchor = other.origin_anchor;
+		this->parent_anchor = other.parent_anchor;
+		this->anchor_offset = other.anchor_offset;
+		//this->unclipped_region
+		this->size_policy_x = other.size_policy_x;
+		this->size_policy_y = other.size_policy_y;
+		//this->pos_x_target
+		//this->pos_y_target
+		//this->size_x_target
+		//this->size_y_target
+		//this->children_x_target
+		//this->children_y_target
+		//this->links
+		if (other.links.size() > 0) {
+			throw std::runtime_error("Copying widget links is not implemented yet");
+		}
+		this->min_size = other.min_size;
+		this->max_size = other.max_size;
+		this->visible = other.visible;
+		this->renderable = other.renderable;
+		this->quantize_position = other.quantize_position;
+		this->focusable_type = other.focusable_type;
+		this->click_through = other.click_through;
+		this->clip_children = other.clip_children;
+		this->mouseIn = other.mouseIn; // ?
+		this->is_left_pressed = other.is_left_pressed; // ?
+		this->is_right_pressed = other.is_right_pressed; // ?
+		this->force_custom_cursor = other.force_custom_cursor;
+		this->debug_render = other.debug_render;
+		this->alpha_multiplier = other.alpha_multiplier;
+		//this->visibility
+		//this->render_textures
+		this->render_iterations = other.render_iterations;
+		//this->render_view
+	}
+
 	Widget::~Widget() { }
 
 	Widget::WidgetType Widget::getType() const {

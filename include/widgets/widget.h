@@ -118,6 +118,7 @@ namespace fw {
 		std::function<sf::Cursor::Type()> GetCursorType = []() { return sf::Cursor::Arrow; };
 
 		Widget(WidgetList& list);
+		Widget(const Widget& other);
 		virtual ~Widget();
 		WidgetType getType() const;
 		bool isContainer() const;

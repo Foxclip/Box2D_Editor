@@ -139,6 +139,9 @@ namespace fw {
 		ScrollAreaWidget* createScrollAreaWidget(const sf::Vector2f& size);
 		TreeViewWidget* createTreeViewWidget(float width, float height);
 		TreeViewWidget* createTreeViewWidget(const sf::Vector2f& size);
+		template<typename T>
+		requires std::derived_from<T, Widget>
+		T* duplicateWidget(T* widget);
 		bool isLocked() const;
 		void lock();
 		void unlock();
@@ -195,12 +198,23 @@ namespace fw {
 	inline T* WidgetList::createWidget(Args&&... args) {
 		wAssert(!isLocked());
 		dp::DataPointerUnique<T> uptr = dp::make_data_pointer<T>("Widget", *this, args...);
-		Widget* widget = uptr.get();
-		uptr.setName("Widget " + widget->full_name);
 		T* ptr = uptr.get();
+		uptr.setName("Widget " + ptr->full_name);
 		if (root_widget) {
 			ptr->setParentSilent(root_widget);
 		}
+		widgets.add(std::move(uptr));
+		return ptr;
+	}
+
+	template<typename T>
+	requires std::derived_from<T, Widget>
+	inline T* WidgetList::duplicateWidget(T* widget) {
+		wAssert(!isLocked());
+		std::string name = widget->getName() + " copy";
+		dp::DataPointerUnique<T> uptr = dp::make_data_pointer<T>(name, *widget);
+		uptr.setName(name);
+		T* ptr = uptr.get();
 		widgets.add(std::move(uptr));
 		return ptr;
 	}

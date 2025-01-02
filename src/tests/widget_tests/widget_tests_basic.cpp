@@ -7,6 +7,7 @@ WidgetTestsBasic::WidgetTestsBasic(const std::string& name, test::TestModule* pa
     test::Test* rectangle_widget_test = addTest("rectangle_widget", { root_widget_test }, [&](test::Test& test) { rectangleWidgetTest(test); });
     test::Test* polygon_widget_basic_test = addTest("polygon_widget_basic", { root_widget_test }, [&](test::Test& test) { polygonWidgetBasicTest(test); });
     test::Test* set_parent_test = addTest("set_parent", { root_widget_test }, [&](test::Test& test) { setParentTest(test); });
+    test::Test* duplicate_test = addTest("duplicate", { rectangle_widget_test }, [&](test::Test& test) { duplicateTest(test); });
     test::Test* widget_mouse_events_1_test = addTest("mouse_events_1", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents1(test); });
     test::Test* widget_mouse_events_2_test = addTest("mouse_events_2", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents2(test); });
     test::Test* drag_gesture_event_test = addTest("drag_gesture_event", { root_widget_test }, [&](test::Test& test) { dragGestureEventTest(test); });
@@ -265,6 +266,28 @@ void WidgetTestsBasic::setParentTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(parent_global_pos_after, parent_global_pos_before);
     T_VEC2_APPROX_COMPARE(child_local_pos_after, child_local_pos_before - parent_local_pos_before);
     T_VEC2_APPROX_COMPARE(child_global_pos_after, child_global_pos_before);
+}
+
+void WidgetTestsBasic::duplicateTest(test::Test& test) {
+    fw::Application application(getWindow());
+    application.init(test.name, 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+
+    fw::WidgetList& widgets = application.getWidgets();
+    fw::RectangleWidget* widget = widgets.createRectangleWidget(100.0f, 100.0f);
+    fw::RectangleWidget* copy = widgets.duplicateWidget(widget);
+    application.advance();
+    if (T_COMPARE(widgets.getAllWidgets().size(), 3)) {
+        T_CHECK(widgets.getAllWidgets()[0] == widgets.getRootWidget());
+        T_CHECK(widgets.getAllWidgets()[1] == widget);
+		T_CHECK(widgets.getAllWidgets()[2] == copy);
+    }
+    T_CHECK(copy->getGlobalTransform() == widget->getGlobalTransform());
+	T_VEC2_COMPARE(copy->getGlobalPosition(), widget->getGlobalPosition());
+    T_VEC2_COMPARE(copy->getSize(), widget->getSize());
+	T_CHECK(copy->getParent() == widget->getParent());
 }
 
 void WidgetTestsBasic::widgetMouseEvents1(test::Test& test) {
