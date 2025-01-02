@@ -10,9 +10,13 @@ EventTests::EventTests(
 	test::Test* invoke_arg1_test = event_list->addTest("invoke_arg1", { invoke_test }, [&](test::Test& test) { invokeArg1Test(test); });
 	test::Test* invoke_arg2_test = event_list->addTest("invoke_arg2", { invoke_arg1_test }, [&](test::Test& test) { invokeArg2Test(test); });
 	test::Test* handler_test = event_list->addTest("handler", { invoke_arg2_test }, [&](test::Test& test) { handlerTest(test); });
+	test::Test* multi_test = event_list->addTest("multi", { invoke_arg2_test }, [&](test::Test& test) { multiTest(test); });
 	test::Test* chain_test = event_list->addTest("chain", { invoke_arg2_test }, [&](test::Test& test) { chainTest(test); });
 	test::Test* unsubscribe_func_test = event_list->addTest("unsubscribe_func", { invoke_test }, [&](test::Test& test) { unsubscribeFuncTest(test); });
 	test::Test* unsubscribe_event_test = event_list->addTest("unsubscribe_event", { invoke_test }, [&](test::Test& test) { unsubscribeEventTest(test); });
+	test::Test* copy_simple_test = event_list->addTest("copy_simple", { unsubscribe_event_test }, [&](test::Test& test) { copySimpleTest(test); });
+	test::Test* copy_multi_test = event_list->addTest("copy_multi", { copy_simple_test }, [&](test::Test& test) { copyMultiTest(test); });
+	test::Test* copy_chain_test = event_list->addTest("copy_chain", { copy_simple_test }, [&](test::Test& test) { copyChainTest(test); });
 	test::Test* clear_test = event_list->addTest("clear", { handler_test }, [&](test::Test& test) { clearTest(test); });
 }
 
@@ -132,6 +136,79 @@ void EventTests::unsubscribeEventTest(test::Test& test) {
 	event1 -= event2;
 	event1();
 	T_COMPARE(invoke_count, 1);
+}
+
+void EventTests::copySimpleTest(test::Test& test) {
+	size_t invoke_count = 0;
+	Event<> event;
+	event += [&]() {
+		invoke_count++;
+	};
+	Event<> copy = event;
+	copy();
+	T_COMPARE(invoke_count, 1);
+}
+
+void EventTests::copyMultiTest(test::Test& test) {
+	size_t invoke_count_2 = 0;
+	size_t invoke_count_3 = 0;
+	Event<> event1;
+	Event<> event2;
+	Event<> event3;
+	event1 += event2;
+	event1 += event3;
+	event2 += [&]() {
+		invoke_count_2++;
+	};
+	event3 += [&]() {
+		invoke_count_3++;
+	};
+	Event<> copy = event1;
+	event1();
+	T_COMPARE(invoke_count_2, 1);
+	T_COMPARE(invoke_count_3, 1);
+	copy();
+	T_COMPARE(invoke_count_2, 2);
+	T_COMPARE(invoke_count_3, 2);
+}
+
+void EventTests::copyChainTest(test::Test& test) {
+	size_t invoke_count_1 = 0;
+	size_t invoke_count_2 = 0;
+	size_t invoke_count_3 = 0;
+	Event<> event1;
+	Event<> event2;
+	Event<> event3;
+	event1 += [&] {
+		invoke_count_1++;
+	};
+	event1 += event2;
+	event2 += [&] {
+		invoke_count_2++;
+	};
+	event2 += event3;
+	event3 += [&]() {
+		invoke_count_3++;
+	};
+	Event<> copy1 = event1;
+	Event<> copy2 = event2;
+	Event<> copy3 = event3;
+	event1();
+	T_COMPARE(invoke_count_1, 1);
+	T_COMPARE(invoke_count_2, 1);
+	T_COMPARE(invoke_count_3, 1);
+	copy1();
+	T_COMPARE(invoke_count_1, 2);
+	T_COMPARE(invoke_count_2, 2);
+	T_COMPARE(invoke_count_3, 2);
+	copy2();
+	T_COMPARE(invoke_count_1, 2);
+	T_COMPARE(invoke_count_2, 3);
+	T_COMPARE(invoke_count_3, 3);
+	copy3();
+	T_COMPARE(invoke_count_1, 2);
+	T_COMPARE(invoke_count_2, 3);
+	T_COMPARE(invoke_count_3, 4);
 }
 
 void EventTests::clearTest(test::Test& test) {

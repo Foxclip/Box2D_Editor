@@ -9,7 +9,7 @@ void run_tests() {
     DataPointerSharedTests* data_pointer_shared_module = root_module.addModule<DataPointerSharedTests>("DataPointerShared", { logger_module });
     CompVectorTests* compvector_module = root_module.addModule<CompVectorTests>("CompVector", { logger_module, data_pointer_unique_module });
     SearchIndexTests* searchindex_module = root_module.addModule<SearchIndexTests>("SearchIndex", { logger_module, data_pointer_unique_module });
-    EventTests* event_module = root_module.addModule<EventTests>("Event", { logger_module, data_pointer_unique_module });
+    EventTests* event_module = root_module.addModule<EventTests>("Event", { logger_module, data_pointer_shared_module });
     SimulationTests* simulation_module = root_module.addModule<SimulationTests>("Simulation", { logger_module, data_pointer_unique_module, compvector_module });
     WidgetTests* widget_module = root_module.addModule<WidgetTests>("Widget", { logger_module, data_pointer_unique_module, event_module, compvector_module, searchindex_module });
     EditorTests* editor_module = root_module.addModule<EditorTests>("Editor", { simulation_module, widget_module });

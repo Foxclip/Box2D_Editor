@@ -16,6 +16,9 @@ private:
 	void chainTest(test::Test& test);
 	void unsubscribeFuncTest(test::Test& test);
 	void unsubscribeEventTest(test::Test& test);
+	void copySimpleTest(test::Test& test);
+	void copyMultiTest(test::Test& test);
+	void copyChainTest(test::Test& test);
 	void clearTest(test::Test& test);
 
 };
