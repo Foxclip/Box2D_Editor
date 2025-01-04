@@ -34,6 +34,19 @@ namespace fw {
 	TreeViewWidget::TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size)
 		: TreeViewWidget(widget_list, size.x, size.y) { }
 
+	TreeViewWidget::TreeViewWidget(const TreeViewWidget& other)
+		: ContainerWidget(other) {
+		std::function<void(TreeViewEntry*)> addEntryWithChildren = [&](TreeViewEntry* entry) {
+			addEntry(entry->name);
+			for (TreeViewEntry* child : entry->getChildren()) {
+				addEntryWithChildren(child);
+			}
+		};
+		for (TreeViewEntry* entry : other.top_entries) {
+			addEntryWithChildren(entry);
+		}
+	}
+
 	void TreeViewWidget::deselectAllExceptEntry(TreeViewEntry* except_entry) {
 		wAssert(all_entries.contains(except_entry));
 		for (size_t i = 0; i < all_entries.size(); i++) {
@@ -258,6 +271,10 @@ namespace fw {
 			TreeViewEntry* entry = top_entries[i];
 			entry->remove(true);
 		}
+	}
+
+	TreeViewWidget* TreeViewWidget::clone(bool with_children) {
+		return widget_list.duplicateWidget(this, with_children);
 	}
 
 	PendingEntryOperation::PendingEntryOperation(TreeViewWidget& tree_view_widget) : tree_view_widget(tree_view_widget) {

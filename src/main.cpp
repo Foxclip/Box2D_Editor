@@ -31,6 +31,7 @@ int main() {
 
     execute_app();
 
+    // TODO: Widgets: duplicate widgets
     // TODO: TreeViewWidget: create copy of widget tree when dragging
     // TODO: Outliner: reorder objects
     // TODO: Outliner: buttons up/down for reordering objects

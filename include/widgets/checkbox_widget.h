@@ -23,6 +23,7 @@ namespace fw {
 		void setValueSilent(bool value);
 		void setValue(bool value);
 		void toggleValue();
+		CheckboxWidget* clone(bool with_children = true) override;
 
 	protected:
 		void internalOnLeftPress(const sf::Vector2f& pos, bool became_focused) override;

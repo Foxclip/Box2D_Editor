@@ -239,6 +239,10 @@ namespace fw {
 		this->scrollbar_y_policy = policy;
 	}
 
+	ScrollAreaWidget* ScrollAreaWidget::clone(bool with_children) {
+		return widget_list.duplicateWidget(this, with_children);
+	}
+
 	void ScrollAreaWidget::internalPostUpdate() {
 		scrollbar_x_widget->setWidth(getWidth() - getSliderBgYEffectiveWidth());
 		scrollbar_y_widget->setHeight(getHeight() - getSliderBgXEffectiveHeight());

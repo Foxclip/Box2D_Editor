@@ -1,5 +1,6 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_basic.h"
+#include "widgets/widgets_common.h"
 
 WidgetTestsBasic::WidgetTestsBasic(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* root_widget_test = addTest("root_widget", [&](test::Test& test) { rootWidgetTest(test); });
@@ -7,6 +8,10 @@ WidgetTestsBasic::WidgetTestsBasic(const std::string& name, test::TestModule* pa
     test::Test* rectangle_widget_test = addTest("rectangle_widget", { root_widget_test }, [&](test::Test& test) { rectangleWidgetTest(test); });
     test::Test* polygon_widget_basic_test = addTest("polygon_widget_basic", { root_widget_test }, [&](test::Test& test) { polygonWidgetBasicTest(test); });
     test::Test* set_parent_test = addTest("set_parent", { root_widget_test }, [&](test::Test& test) { setParentTest(test); });
+    test::Test* duplicate_rect_test = addTest("duplicate_rect", { rectangle_widget_test }, [&](test::Test& test) { duplicateRectangleTest(test); });
+    test::Test* duplicate_polygon_test = addTest("duplicate_polygon", { polygon_widget_basic_test }, [&](test::Test& test) { duplicatePolygonTest(test); });
+    test::Test* duplicate_children_test = addTest("duplicate_children", { set_parent_test }, [&](test::Test& test) { duplicateChildrenTest(test); });
+    test::Test* duplicate_without_children_test = addTest("duplicate_without_children", { set_parent_test }, [&](test::Test& test) { duplicateWithoutChildrenTest(test); });
     test::Test* widget_mouse_events_1_test = addTest("mouse_events_1", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents1(test); });
     test::Test* widget_mouse_events_2_test = addTest("mouse_events_2", { root_widget_test }, [&](test::Test& test) { widgetMouseEvents2(test); });
     test::Test* drag_gesture_event_test = addTest("drag_gesture_event", { root_widget_test }, [&](test::Test& test) { dragGestureEventTest(test); });
@@ -265,6 +270,185 @@ void WidgetTestsBasic::setParentTest(test::Test& test) {
     T_VEC2_APPROX_COMPARE(parent_global_pos_after, parent_global_pos_before);
     T_VEC2_APPROX_COMPARE(child_local_pos_after, child_local_pos_before - parent_local_pos_before);
     T_VEC2_APPROX_COMPARE(child_global_pos_after, child_global_pos_before);
+}
+
+void WidgetTestsBasic::duplicateRectangleTest(test::Test& test) {
+    fw::Application application(getWindow());
+    application.init(test.name, 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+
+    fw::WidgetList& widgets = application.getWidgets();
+    fw::RectangleWidget* widget = widgets.createRectangleWidget(100.0f, 100.0f);
+    fw::RectangleWidget* copy = widgets.duplicateWidget(widget);
+    application.advance();
+    if (T_COMPARE(widgets.getAllWidgets().size(), 3)) {
+        T_CHECK(widgets.getAllWidgets()[0] == widgets.getRootWidget());
+        T_CHECK(widgets.getAllWidgets()[1] == widget);
+		T_CHECK(widgets.getAllWidgets()[2] == copy);
+    }
+    T_CHECK(copy->getGlobalTransform() == widget->getGlobalTransform());
+	T_VEC2_COMPARE(copy->getGlobalPosition(), widget->getGlobalPosition());
+    T_VEC2_COMPARE(copy->getSize(), widget->getSize());
+	T_CHECK(copy->getParent() == widget->getParent());
+}
+
+void WidgetTestsBasic::duplicatePolygonTest(test::Test& test) {
+    fw::Application application(getWindow());
+    application.init(test.name, 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+
+    sf::Vector2f pos = sf::Vector2f(100.0f, 100.0f);
+    sf::Vector2f offset = sf::Vector2f(100.0f, 0.0f);
+    fw::WidgetList& widgets = application.getWidgets();
+    fw::PolygonWidget* widget = widgets.createPolygonWidget(6);
+    widget->setFillColor(sf::Color::Red);
+    widget->setPosition(pos);
+    fw::PolygonWidget* copy = widgets.duplicateWidget(widget);
+    copy->setFillColor(sf::Color::Green);
+    copy->setPosition(copy->getPosition() + offset);
+    copy->setRotation(fw::to_radians(180.0f));
+    application.advance();
+    if (T_COMPARE(widgets.getAllWidgets().size(), 3)) {
+        T_CHECK(widgets.getAllWidgets()[0] == widgets.getRootWidget());
+        T_CHECK(widgets.getAllWidgets()[1] == widget);
+        T_CHECK(widgets.getAllWidgets()[2] == copy);
+    }
+    T_VEC2_COMPARE(copy->getGlobalPosition(), widget->getGlobalPosition() + offset);
+    T_COMPARE(copy->getRotation(), fw::to_radians(180.0f));
+    T_CHECK(copy->getParent() == widget->getParent());
+    T_CHECK(copy->getVertices() == widget->getVertices());
+}
+
+void WidgetTestsBasic::duplicateChildrenTest(test::Test& test) {
+    fw::Application application(getWindow());
+    application.init(test.name, 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+
+    sf::Vector2f pos = sf::Vector2f(100.0f, 100.0f);
+    sf::Vector2f child_1_offset = sf::Vector2f(-20.0f, 20.0f);
+	sf::Vector2f child_2_offset = sf::Vector2f(0.0f, 20.0f);
+    sf::Vector2f child_3_offset = sf::Vector2f(20.0f, 20.0f);
+    fw::WidgetList& widgets = application.getWidgets();
+    fw::RectangleWidget* widget = widgets.createRectangleWidget(10.0f, 10.0f);
+    widget->setPosition(pos);
+    fw::RectangleWidget* child_1 = widgets.createRectangleWidget(10.0f, 10.0f);
+    child_1->setName("red rectangle");
+    child_1->setFillColor(sf::Color::Red);
+    child_1->setParent(widget);
+    child_1->setPosition(child_1_offset);
+    fw::RectangleWidget* child_2 = widgets.createRectangleWidget(10.0f, 10.0f);
+	child_2->setName("green rectangle");
+	child_2->setFillColor(sf::Color::Green);
+    child_2->setParent(widget);
+    child_2->setPosition(child_2_offset);
+    fw::RectangleWidget* child_3 = widgets.createRectangleWidget(10.0f, 10.0f);
+	child_3->setName("blue rectangle");
+	child_3->setFillColor(sf::Color::Blue);
+	child_3->setParent(widget);
+    child_3->setPosition(child_3_offset);
+    application.advance();
+
+    sf::Vector2f offset = sf::Vector2f(100.0f, 0.0f);
+    sf::Vector2f pos2 = pos + offset;
+    fw::RectangleWidget* copy = widgets.duplicateWidget(widget);
+    copy->setPosition(pos2);
+    application.advance();
+
+    T_COMPARE(widgets.getAllWidgets().size(), 9);
+    fw::Widget* root_widget = widgets.getRootWidget();
+    const CompVector<fw::Widget*>& root_children = root_widget->getChildren();
+    if (T_COMPARE(root_children.size(), 2)) {
+        T_CHECK(root_children[0] == widget);
+        T_CHECK(root_children[1] == copy);
+    }
+    const CompVector<fw::Widget*>& widget_children = widget->getChildren();
+    if (T_COMPARE(widget_children.size(), 3)) {
+        T_CHECK(widget_children[0] == child_1);
+		T_CHECK(widget_children[1] == child_2);
+		T_CHECK(widget_children[2] == child_3);
+    }
+    const CompVector<fw::Widget*>& copy_children = copy->getChildren();
+    if (T_COMPARE(copy_children.size(), 3)) {
+        T_COMPARE(copy_children[0]->getName(), child_1->getName());
+		T_COMPARE(copy_children[1]->getName(), child_2->getName());
+		T_COMPARE(copy_children[2]->getName(), child_3->getName());
+    }
+
+    T_ASSERT_NO_ERRORS();
+    T_VEC2_COMPARE(widget->getGlobalPosition(), pos);
+    T_VEC2_COMPARE(copy->getGlobalPosition(), pos2);
+    sf::Vector2f child_1_copy_pos = child_1->getGlobalPosition() + offset;
+    sf::Vector2f child_2_copy_pos = child_2->getGlobalPosition() + offset;
+    sf::Vector2f child_3_copy_pos = child_3->getGlobalPosition() + offset;
+    T_VEC2_COMPARE(copy_children[0]->getGlobalPosition(), child_1_copy_pos);
+    T_VEC2_COMPARE(copy_children[1]->getGlobalPosition(), child_2_copy_pos);
+    T_VEC2_COMPARE(copy_children[2]->getGlobalPosition(), child_3_copy_pos);
+    T_COMPARE(widget_children[0]->getFillColor(), child_1->getFillColor(), &WidgetTests::colorToStr);
+    T_COMPARE(widget_children[1]->getFillColor(), child_2->getFillColor(), &WidgetTests::colorToStr);
+    T_COMPARE(widget_children[2]->getFillColor(), child_3->getFillColor(), &WidgetTests::colorToStr);
+}
+
+void WidgetTestsBasic::duplicateWithoutChildrenTest(test::Test& test) {
+    fw::Application application(getWindow());
+    application.init(test.name, 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+
+    sf::Vector2f pos = sf::Vector2f(100.0f, 100.0f);
+    sf::Vector2f child_1_offset = sf::Vector2f(-20.0f, 20.0f);
+    sf::Vector2f child_2_offset = sf::Vector2f(0.0f, 20.0f);
+    sf::Vector2f child_3_offset = sf::Vector2f(20.0f, 20.0f);
+    fw::WidgetList& widgets = application.getWidgets();
+    fw::RectangleWidget* widget = widgets.createRectangleWidget(10.0f, 10.0f);
+    widget->setPosition(pos);
+    fw::RectangleWidget* child_1 = widgets.createRectangleWidget(10.0f, 10.0f);
+    child_1->setName("red rectangle");
+    child_1->setFillColor(sf::Color::Red);
+    child_1->setParent(widget);
+    child_1->setPosition(child_1_offset);
+    fw::RectangleWidget* child_2 = widgets.createRectangleWidget(10.0f, 10.0f);
+    child_2->setName("green rectangle");
+    child_2->setFillColor(sf::Color::Green);
+    child_2->setParent(widget);
+    child_2->setPosition(child_2_offset);
+    fw::RectangleWidget* child_3 = widgets.createRectangleWidget(10.0f, 10.0f);
+    child_3->setName("blue rectangle");
+    child_3->setFillColor(sf::Color::Blue);
+    child_3->setParent(widget);
+    child_3->setPosition(child_3_offset);
+    application.advance();
+
+    sf::Vector2f offset = sf::Vector2f(100.0f, 0.0f);
+    sf::Vector2f pos2 = pos + offset;
+    fw::RectangleWidget* copy = widgets.duplicateWidget(widget, false);
+    copy->setPosition(pos2);
+    application.advance();
+
+    T_COMPARE(widgets.getAllWidgets().size(), 6);
+    fw::Widget* root_widget = widgets.getRootWidget();
+    const CompVector<fw::Widget*>& root_children = root_widget->getChildren();
+    if (T_COMPARE(root_children.size(), 2)) {
+        T_CHECK(root_children[0] == widget);
+        T_CHECK(root_children[1] == copy);
+    }
+    const CompVector<fw::Widget*>& widget_children = widget->getChildren();
+    if (T_COMPARE(widget_children.size(), 3)) {
+        T_CHECK(widget_children[0] == child_1);
+        T_CHECK(widget_children[1] == child_2);
+        T_CHECK(widget_children[2] == child_3);
+    }
+    const CompVector<fw::Widget*>& copy_children = copy->getChildren();
+    T_COMPARE(copy_children.size(), 0);
+
+    T_VEC2_COMPARE(widget->getGlobalPosition(), pos);
+    T_VEC2_COMPARE(copy->getGlobalPosition(), pos2);
 }
 
 void WidgetTestsBasic::widgetMouseEvents1(test::Test& test) {

@@ -118,6 +118,7 @@ namespace fw {
 		std::function<sf::Cursor::Type()> GetCursorType = []() { return sf::Cursor::Arrow; };
 
 		Widget(WidgetList& list);
+		Widget(const Widget& other);
 		virtual ~Widget();
 		WidgetType getType() const;
 		bool isContainer() const;
@@ -227,6 +228,7 @@ namespace fw {
 		sf::Vector2f getVisualGlobalTopRight() const;
 		sf::Vector2f getVisualGlobalBottomLeft() const;
 		sf::Vector2f getVisualGlobalBottomRight() const;
+		float getRotation() const;
 		virtual const sf::Color& getFillColor() const = 0;
 		float getAlphaMultiplier() const;
 		virtual void setSize(float width, float height);
@@ -373,6 +375,7 @@ namespace fw {
 		void setOriginInternal(const sf::Vector2f& origin);
 		void setSizeInternal(const sf::Vector2f& size);
 		void setRenderIterations(size_t iterations);
+		virtual Widget* clone(bool with_children = true) = 0;
 		virtual void addChild(Widget* child);
 		virtual void removeChild(Widget* child);
 		void removeSocket(WidgetUpdateSocket* socket);

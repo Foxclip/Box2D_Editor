@@ -11,6 +11,7 @@ namespace fw {
 	public:
 		CanvasWidget(WidgetList& widget_list, float width, float height, unsigned int texture_width, unsigned int texture_height);
 		CanvasWidget(WidgetList& widget_list, const sf::Vector2f& size, const sf::Vector2u& texture_size);
+		CanvasWidget(const CanvasWidget& widget);
 		sf::RenderTexture& getRenderTexture();
 		sf::Vector2f getTextureSize() const;
 		const sf::View& getView() const;
@@ -28,6 +29,7 @@ namespace fw {
 		void draw(const sf::Text& text, const sf::RenderStates& states = sf::RenderStates::Default);
 		void display();
 		void saveToFile(std::filesystem::path path);
+		CanvasWidget* clone(bool with_children = true) override;
 
 	protected:
 		sf::RenderTexture texture;

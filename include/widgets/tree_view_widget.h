@@ -82,6 +82,7 @@ namespace fw {
 
 		TreeViewWidget(WidgetList& widget_list, float width, float height);
 		TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size);
+		TreeViewWidget(const TreeViewWidget& other);
 		const CompVector<TreeViewEntry*>& getAllEntries() const;
 		const CompVector<TreeViewEntry*>& getTopEntries() const;
 		CompVector<TreeViewEntry*> getAllVisibleEntriesInOrder() const;
@@ -103,6 +104,7 @@ namespace fw {
 		void putTargetHighlight();
 		void removeEntry(TreeViewEntry* entry, bool with_children);
 		void clear();
+		TreeViewWidget* clone(bool with_children = true) override;
 
 	protected:
 

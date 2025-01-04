@@ -298,6 +298,10 @@ namespace fw {
 		deselectAll();
 	}
 
+	TextBoxWidget* TextBoxWidget::clone(bool with_children) {
+		return widget_list.duplicateWidget(this, with_children);
+	}
+
 	void TextBoxWidget::internalPreUpdate() {
 		sf::Vector2f char_pos = text_widget->getLocalCharPos(cursor_pos, true, true);
 		cursor_widget->setPosition(char_pos - sf::Vector2f(0.0f, TEXTBOX_CURSOR_MARGIN) + TEXTBOX_CURSOR_OFFSET);

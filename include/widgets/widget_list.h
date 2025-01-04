@@ -123,6 +123,7 @@ namespace fw {
 		RectangleWidget* createRectangleWidget(const sf::Vector2f& size);
 		TextWidget* createTextWidget();
 		PolygonWidget* createPolygonWidget(const std::vector<sf::Vector2f>& vertices);
+		PolygonWidget* createPolygonWidget(size_t vertex_count, float radius = 10.0f, float angle_offset = 0.0f);
 		ContainerWidget* createContainerWidget(float width, float height);
 		ContainerWidget* createContainerWidget(const sf::Vector2f& size);
 		EmptyWidget* createEmptyWidget();
@@ -139,6 +140,9 @@ namespace fw {
 		ScrollAreaWidget* createScrollAreaWidget(const sf::Vector2f& size);
 		TreeViewWidget* createTreeViewWidget(float width, float height);
 		TreeViewWidget* createTreeViewWidget(const sf::Vector2f& size);
+		template<typename T>
+		requires std::derived_from<T, Widget>
+		T* duplicateWidget(T* widget, bool with_children = true);
 		bool isLocked() const;
 		void lock();
 		void unlock();
@@ -195,13 +199,32 @@ namespace fw {
 	inline T* WidgetList::createWidget(Args&&... args) {
 		wAssert(!isLocked());
 		dp::DataPointerUnique<T> uptr = dp::make_data_pointer<T>("Widget", *this, args...);
-		Widget* widget = uptr.get();
-		uptr.setName("Widget " + widget->full_name);
 		T* ptr = uptr.get();
+		uptr.setName("Widget " + ptr->full_name);
 		if (root_widget) {
 			ptr->setParentSilent(root_widget);
 		}
 		widgets.add(std::move(uptr));
+		return ptr;
+	}
+
+	template<typename T>
+	requires std::derived_from<T, Widget>
+	inline T* WidgetList::duplicateWidget(T* widget, bool with_children) {
+		wAssert(!isLocked());
+		std::string name = widget->getName() + " copy";
+		dp::DataPointerUnique<T> uptr = dp::make_data_pointer<T>(name, *widget);
+		uptr.setName(name);
+		T* ptr = uptr.get();
+		widgets.add(std::move(uptr));
+		ptr->setParent(widget->parent);
+		if (with_children) {
+			for (size_t i = 0; i < widget->children.size(); i++) {
+				Widget* child = widget->children[i];
+				Widget* child_copy = child->clone(true);
+				child_copy->setParent(ptr);
+			}
+		}
 		return ptr;
 	}
 

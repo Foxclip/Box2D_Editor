@@ -115,6 +115,10 @@ namespace fw {
 		this->alignment_x = alignment;
 	}
 
+	ContainerWidget* ContainerWidget::clone(bool with_children) {
+		return widget_list.duplicateWidget(this, with_children);
+	}
+
 	void ContainerWidget::updateSizeX() {
 		sf::Vector2f new_pos = getPosition();
 		sf::Vector2f new_size = getSize();
