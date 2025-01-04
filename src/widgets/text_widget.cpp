@@ -152,6 +152,10 @@ namespace fw {
 		text.setString(str);
 	}
 
+	TextWidget* TextWidget::clone(bool with_children) {
+		return widget_list.duplicateWidget(this, with_children);
+	}
+
 	sf::Drawable* TextWidget::getDrawable() {
 		return &text;
 	}

@@ -16,6 +16,18 @@ namespace fw {
 		: CanvasWidget(widget_list, size.x, size.y, texture_size.x, texture_size.y) {
 	}
 
+	CanvasWidget::CanvasWidget(const CanvasWidget& other) : RectangleWidget(other) {
+		type = WidgetType::Canvas;
+		setName(other.name);
+		setTextureSize(other.texture.getSize().x, other.texture.getSize().y);
+		sf::Sprite sprite(other.texture.getTexture());
+		texture.clear(sf::Color::Transparent);
+		texture.draw(sprite);
+		texture.display();
+		rect.setTexture(&texture.getTexture(), true);
+		this->view = other.view;
+	}
+
 	sf::RenderTexture& CanvasWidget::getRenderTexture() {
 		return texture;
 	}
@@ -79,6 +91,10 @@ namespace fw {
 
 	void CanvasWidget::saveToFile(std::filesystem::path path) {
 		texture.getTexture().copyToImage().saveToFile(path.string());
+	}
+
+	CanvasWidget* CanvasWidget::clone(bool with_children) {
+		return widget_list.duplicateWidget(this, with_children);
 	}
 
 	void CanvasWidget::draw(const sf::VertexArray& varray, const sf::RenderStates& states) {

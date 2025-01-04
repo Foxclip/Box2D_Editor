@@ -10,6 +10,7 @@ namespace fw {
 	public:
 		RectangleWidget(WidgetList& widget_list, float width, float height);
 		RectangleWidget(WidgetList& widget_list, const sf::Vector2f& size);
+		RectangleWidget* clone(bool with_children = true) override;
 
 	protected:
 		sf::RectangleShape rect;

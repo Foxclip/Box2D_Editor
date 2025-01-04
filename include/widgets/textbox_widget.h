@@ -86,6 +86,8 @@ namespace fw {
 		void insert(size_t pos, const sf::String& str);
 		void erase(size_t index_first, size_t count);
 		void eraseSelection();
+		TextBoxWidget* clone(bool with_children = true) override;
+
 
 	protected:
 		enum ActionType {

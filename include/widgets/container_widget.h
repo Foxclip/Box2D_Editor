@@ -33,6 +33,7 @@ namespace fw {
 		void setRightPadding(float padding);
 		void setAlignmentX(Alignment alignment);
 		void setAlignmentY(Alignment alignment);
+		ContainerWidget* clone(bool with_children = true) override;
 
 	protected:
 		void updateSizeX() override;

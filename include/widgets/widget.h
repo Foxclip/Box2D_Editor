@@ -375,6 +375,7 @@ namespace fw {
 		void setOriginInternal(const sf::Vector2f& origin);
 		void setSizeInternal(const sf::Vector2f& size);
 		void setRenderIterations(size_t iterations);
+		virtual Widget* clone(bool with_children = true) = 0;
 		virtual void addChild(Widget* child);
 		virtual void removeChild(Widget* child);
 		void removeSocket(WidgetUpdateSocket* socket);

@@ -13,6 +13,7 @@ namespace fw {
 		const sf::Color& getFillColor() const override;
 		void setFillColor(const sf::Color& color) override;
 		void setRenderable(bool value) override;
+		EmptyWidget* clone(bool with_children = true) override;
 
 	protected:
 		sf::Drawable* getDrawable() override;

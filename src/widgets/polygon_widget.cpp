@@ -1,4 +1,5 @@
 #include "widgets/polygon_widget.h"
+#include "widgets/widget_list.h"
 
 namespace fw {
 
@@ -22,6 +23,10 @@ namespace fw {
 	void PolygonWidget::setVertices(const std::vector<sf::Vector2f>& vertices) {
 		this->vertices = vertices;
 		syncVertices();
+	}
+
+	PolygonWidget* PolygonWidget::clone(bool with_children) {
+		return widget_list.duplicateWidget(this, with_children);
 	}
 
 	sf::Drawable* PolygonWidget::getDrawable() {

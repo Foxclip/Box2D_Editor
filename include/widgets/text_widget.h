@@ -30,6 +30,7 @@ namespace fw {
 		void setString(const sf::String& string);
 		void insert(size_t pos, const sf::String& str);
 		void erase(size_t index_first, size_t count = 1);
+		TextWidget* clone(bool with_children = true) override;
 
 	protected:
 		bool adjust_local_bounds = true;

@@ -60,6 +60,10 @@ namespace fw {
 		OnValueChanged(checked);
 	}
 
+	CheckboxWidget* CheckboxWidget::clone(bool with_children) {
+		return widget_list.duplicateWidget(this, with_children);
+	}
+
 	void CheckboxWidget::internalOnLeftPress(const sf::Vector2f& pos, bool became_focused) {
 		toggleValue();
 	}

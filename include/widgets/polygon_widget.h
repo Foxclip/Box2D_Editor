@@ -12,6 +12,7 @@ namespace fw {
 		PolygonWidget(WidgetList& widget_list, size_t vertex_count, float radius = 10.0f, float angle_offset = 0.0f);
 		const std::vector<sf::Vector2f>& getVertices() const;
 		void setVertices(const std::vector<sf::Vector2f>& vertices);
+		PolygonWidget* clone(bool with_children = true) override;
 
 	protected:
 		sf::ConvexShape polygon;

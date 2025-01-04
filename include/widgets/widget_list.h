@@ -142,7 +142,7 @@ namespace fw {
 		TreeViewWidget* createTreeViewWidget(const sf::Vector2f& size);
 		template<typename T>
 		requires std::derived_from<T, Widget>
-		T* duplicateWidget(T* widget);
+		T* duplicateWidget(T* widget, bool with_children = true);
 		bool isLocked() const;
 		void lock();
 		void unlock();
@@ -210,7 +210,7 @@ namespace fw {
 
 	template<typename T>
 	requires std::derived_from<T, Widget>
-	inline T* WidgetList::duplicateWidget(T* widget) {
+	inline T* WidgetList::duplicateWidget(T* widget, bool with_children) {
 		wAssert(!isLocked());
 		std::string name = widget->getName() + " copy";
 		dp::DataPointerUnique<T> uptr = dp::make_data_pointer<T>(name, *widget);
@@ -218,6 +218,13 @@ namespace fw {
 		T* ptr = uptr.get();
 		widgets.add(std::move(uptr));
 		ptr->setParent(widget->parent);
+		if (with_children) {
+			for (size_t i = 0; i < widget->children.size(); i++) {
+				Widget* child = widget->children[i];
+				Widget* child_copy = child->clone(true);
+				child_copy->setParent(ptr);
+			}
+		}
 		return ptr;
 	}
 

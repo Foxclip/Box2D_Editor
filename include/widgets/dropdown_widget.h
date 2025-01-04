@@ -59,6 +59,7 @@ namespace fw {
 		void setOptionText(size_t index, const sf::String& text);
 		void removeOption(size_t index);
 		void removeOption(const sf::String& text);
+		DropdownWidget* clone(bool with_children = true) override;
 
 	protected:
 		RectangleWidget* main_widget = nullptr;

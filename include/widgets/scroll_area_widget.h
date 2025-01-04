@@ -43,6 +43,7 @@ namespace fw {
 		void setScrollbarPolicy(ScrollbarPolicy policy);
 		void setScrollbarXPolicy(ScrollbarPolicy policy);
 		void setScrollbarYPolicy(ScrollbarPolicy policy);
+		ScrollAreaWidget* clone(bool with_children = true) override;
 
 	protected:
 		RectangleWidget* area_widget = nullptr;

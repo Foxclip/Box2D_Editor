@@ -41,4 +41,8 @@ namespace fw {
 		updateOrigin();
 	}
 
+	RectangleWidget* RectangleWidget::clone(bool with_children) {
+		return widget_list.duplicateWidget(this, with_children);
+	}
+
 }

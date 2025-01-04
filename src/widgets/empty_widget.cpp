@@ -1,4 +1,5 @@
 #include "widgets/empty_widget.h"
+#include "widgets/widget_list.h"
 
 namespace fw {
 
@@ -25,6 +26,10 @@ namespace fw {
 			Widget::setRenderable(value);
 		}
 
+	}
+
+	EmptyWidget* EmptyWidget::clone(bool with_children) {
+		return widget_list.duplicateWidget(this, with_children);
 	}
 
 	sf::Drawable* EmptyWidget::getDrawable() {

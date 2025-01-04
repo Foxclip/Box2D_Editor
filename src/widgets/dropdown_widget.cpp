@@ -194,6 +194,10 @@ namespace fw {
 		wAssert(false, "Option not found: " + text); 
 	}
 
+	DropdownWidget* DropdownWidget::clone(bool with_children) {
+		return widget_list.duplicateWidget(this, with_children);
+	}
+
 	void DropdownWidget::updateOptions() {
 		for (size_t i = 0; i < option_widgets.size(); i++) {
 			RectangleWidget* option_widget = option_widgets[i];
