@@ -312,6 +312,11 @@ namespace fw {
         return mousePressPosf;
     }
 
+    sf::Vector2f Application::getWindowCenter() const {
+        sf::Vector2f center = to2f(window.getSize()) / 2.0f;
+		return center;
+    }
+
     WidgetList& Application::getWidgets() {
         return widgets;
     }

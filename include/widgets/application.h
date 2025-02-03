@@ -84,6 +84,7 @@ namespace fw {
 		sf::Vector2i getMousePos() const;
 		sf::Vector2f getMousePosf() const;
 		const sf::Vector2f& getMousePressPosf() const;
+		sf::Vector2f getWindowCenter() const;
 		WidgetList& getWidgets();
 		void setBackgroundColor(const sf::Color& color);
 		void setDefaultFont(const fw::Font& font);
