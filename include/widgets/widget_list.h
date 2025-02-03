@@ -21,47 +21,6 @@ namespace fw {
 	const sf::Color DEBUG_RENDER_MOUSE_TRACE_COLOR = sf::Color(255, 255, 255);
 	const sf::Color DEBUG_RENDER_FOCUSED_WIDGET_BOUNDS_COLOR = sf::Color(0, 200, 255);
 
-	class PendingOperation {
-	public:
-		PendingOperation(WidgetList& widget_list);
-		virtual void execute() = 0;
-
-	protected:
-		WidgetList& widget_list;
-	};
-
-	class PendingMove : public PendingOperation {
-	public:
-		Widget* widget = nullptr;
-		size_t index = 0;
-
-		PendingMove(WidgetList& widget_list, Widget* widget, size_t index);
-		void execute() override;
-
-	};
-
-	class PendingDelete : public PendingOperation {
-	public:
-		Widget* widget = nullptr;
-		bool with_children = false;
-
-		PendingDelete(WidgetList& widget_list, Widget* widget, bool with_children);
-		void execute() override;
-
-	};
-
-	class PendingSetParent : public PendingOperation {
-	public:
-		Widget* widget = nullptr;
-		Widget* new_parent = nullptr;
-		bool keep_pos = false;
-		ptrdiff_t move_to_index = -1;
-
-		PendingSetParent(WidgetList& widget_list, Widget* widget, Widget* new_parent, bool keep_pos, ptrdiff_t move_to_index = -1);
-		void execute() override;
-
-	};
-
 	class Application;
 	class RectangleWidget;
 	class TextWidget;
@@ -75,6 +34,26 @@ namespace fw {
 	class WindowWidget;
 	class ScrollAreaWidget;
 	class TreeViewWidget;
+
+	enum class PostActionStage {
+		FIRST,
+		MOVE,
+		DUPLICATE,
+		SET_PARENT,
+		REMOVE,
+		LAST,
+	};
+	const int STAGE_COUNT = static_cast<int>(PostActionStage::LAST) + 1;
+	using PostActionFuncType = std::function<void(void)>;
+	class PostAction {
+	public:
+		PostAction(WidgetList& widget_list, const PostActionFuncType& action);
+		void execute() const;
+
+	private:
+		WidgetList& widget_list;
+		PostActionFuncType action;
+	};
 
 	// Adding methods:
 	// If method changes widgets, check this:
@@ -146,6 +125,7 @@ namespace fw {
 		bool isLocked() const;
 		void lock();
 		void unlock();
+		void processBeforeInput();
 		void processLeftPress(const sf::Vector2f pos);
 		void processRightPress(const sf::Vector2f pos);
 		void processLeftRelease(const sf::Vector2f pos);
@@ -163,9 +143,7 @@ namespace fw {
 		void render(sf::RenderTarget& target);
 		void reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_pos);
 		void setFocusedWidget(Widget* widget);
-		void addPendingMove(Widget* widget, size_t index);
-		void addPendingDelete(Widget* widget, bool with_children);
-		void addPendingSetParent(Widget* widget, Widget* new_parent, bool keep_pos = false, ptrdiff_t move_to_index = -1);
+		void addPostAction(const PostActionFuncType& func, PostActionStage stage = PostActionStage::FIRST);
 		Widget* operator[](size_t index) const;
 
 	private:
@@ -184,9 +162,7 @@ namespace fw {
 		Widget* focused_widget = nullptr;
 		bool print_update_queue = false;
 		bool is_being_destroyed = false;
-		CompVectorUptr<PendingMove> pending_move;
-		CompVectorUptr<PendingDelete> pending_delete;
-		CompVectorUptr<PendingSetParent> pending_setparent;
+		std::vector<PostAction> post_actions[STAGE_COUNT];
 		WidgetUpdateQueue update_queue = WidgetUpdateQueue(*this);
 		WidgetRenderQueue render_queue = WidgetRenderQueue(*this);
 		sf::VertexArray mouse_debug_trace = sf::VertexArray(sf::PrimitiveType::LineStrip);
