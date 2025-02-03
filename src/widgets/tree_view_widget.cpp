@@ -18,9 +18,6 @@ namespace fw {
 		OnLeftClick += [&](const sf::Vector2f& pos) {
 			deselectAll();
 		};
-		widget_list.OnProcessAfterInput += [&]() {
-			executePendingOperations();
-		};
 		widget_list.OnKeyPressed += [&](const sf::Keyboard::Key& key) {
 			if (key == sf::Keyboard::Escape) {
 				if (grabbed_entry) {
@@ -128,58 +125,6 @@ namespace fw {
 		return ptr;
 	}
 
-	void TreeViewWidget::addPendingEntryMove(TreeViewEntry* entry, size_t index) {
-		wAssert(!widget_list.isLocked());
-		dp::DataPointerUnique<PendingEntryMove> uptr = dp::make_data_pointer<PendingEntryMove>(
-			"PendingEntryMove " + entry->name + " " + std::to_string(index), *this, entry, index
-		);
-		pending_entry_move.add(std::move(uptr));
-	}
-
-	void TreeViewWidget::addPendingEntryDelete(TreeViewEntry* entry, bool with_children) {
-		wAssert(!widget_list.isLocked());
-		dp::DataPointerUnique<PendingEntryDelete> uptr = dp::make_data_pointer<PendingEntryDelete>(
-			"PendingEntryDelete " + entry->name + " " + std::to_string(with_children), *this, entry, with_children
-		);
-		pending_entry_delete.add(std::move(uptr));
-	}
-
-	void TreeViewWidget::addPendingEntrySetParent(TreeViewEntry* entry, TreeViewEntry* new_parent, ptrdiff_t move_to_index) {
-		wAssert(!widget_list.isLocked());
-		sf::String parent_name = new_parent ? new_parent->name : "null";
-		dp::DataPointerUnique<PendingEntrySetParent> uptr = dp::make_data_pointer<PendingEntrySetParent>(
-			"PendingEntrySetParent " + entry->name + " " + parent_name, *this, entry, new_parent, move_to_index
-		);
-		pending_entry_setparent.add(std::move(uptr));
-	}
-
-	void TreeViewWidget::addPendingDetach(TreeViewEntry* entry) {
-		wAssert(!widget_list.isLocked());
-		dp::DataPointerUnique<PendingEntryDetach> uptr = dp::make_data_pointer<PendingEntryDetach>(
-			"PendingEntryDetach " + entry->name, *this, entry
-		);
-		pending_entry_detach.add(std::move(uptr));
-	}
-
-	void TreeViewWidget::executePendingOperations() {
-		for (PendingEntryMove* op : pending_entry_move) {
-			op->execute();
-		}
-		for (PendingEntrySetParent* op : pending_entry_setparent) {
-			op->execute();
-		}
-		for (PendingEntryDelete* op : pending_entry_delete) {
-			op->execute();
-		}
-		for (PendingEntryDetach* op : pending_entry_detach) {
-			op->execute();
-		}
-		pending_entry_move.clear();
-		pending_entry_delete.clear();
-		pending_entry_setparent.clear();
-		pending_entry_detach.clear();
-	}
-
 	void TreeViewWidget::selectAll() {
 		for (size_t i = 0; i < top_entries.size(); i++) {
 			top_entries[i]->select(true);
@@ -275,62 +220,6 @@ namespace fw {
 
 	TreeViewWidget* TreeViewWidget::clone(bool with_children) {
 		return widget_list.duplicateWidget(this, with_children);
-	}
-
-	PendingEntryOperation::PendingEntryOperation(TreeViewWidget& tree_view_widget) : tree_view_widget(tree_view_widget) {
-	}
-
-	PendingEntryMove::PendingEntryMove(TreeViewWidget& tree_view_widget, TreeViewEntry* entry, size_t index) : PendingEntryOperation(tree_view_widget) {
-		this->entry = entry;
-		this->index = index;
-	}
-
-	void PendingEntryMove::execute() {
-		wAssert(tree_view_widget.all_entries.contains(entry));
-		wAssert(tree_view_widget.all_entries.contains(entry->getParent()));
-		TreeViewEntry* parent = entry->getParent();
-		parent->moveChildToIndex(entry, index);
-	}
-
-	PendingEntryDelete::PendingEntryDelete(TreeViewWidget& tree_view_widget, TreeViewEntry* entry, bool with_children) : PendingEntryOperation(tree_view_widget) {
-		this->entry = entry;
-		this->with_children = with_children;
-	}
-
-	void PendingEntryDelete::execute() {
-		wAssert(tree_view_widget.all_entries.contains(entry));
-		tree_view_widget.removeEntry(entry, with_children);
-	}
-
-	PendingEntrySetParent::PendingEntrySetParent(
-		TreeViewWidget& tree_view_widget,
-		TreeViewEntry* entry,
-		TreeViewEntry* new_parent,
-		ptrdiff_t move_to_index
-	) : PendingEntryOperation(tree_view_widget) {
-		this->entry = entry;
-		this->new_parent = new_parent;
-		this->move_to_index = move_to_index;
-	}
-
-	void PendingEntrySetParent::execute() {
-		wAssert(tree_view_widget.all_entries.contains(entry));
-		wAssert(new_parent == nullptr || tree_view_widget.all_entries.contains(new_parent));
-		entry->setParent(new_parent);
-		if (move_to_index >= 0) {
-			entry->moveToIndex(move_to_index);
-		}
-	}
-
-	PendingEntryDetach::PendingEntryDetach(TreeViewWidget& tree_view_widget, TreeViewEntry* entry) : PendingEntryOperation(tree_view_widget) {
-		this->entry = entry;
-	}
-
-	void PendingEntryDetach::execute() {
-		wAssert(tree_view_widget.all_entries.contains(entry));
-		entry->setParent(nullptr, false);
-		entry->getWidget()->setParentKeepPos(nullptr);
-		tree_view_widget.top_entries.remove(entry);
 	}
 
 }

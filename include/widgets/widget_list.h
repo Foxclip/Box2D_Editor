@@ -143,7 +143,7 @@ namespace fw {
 		void render(sf::RenderTarget& target);
 		void reset(const sf::Vector2f& root_size, const sf::Vector2f& mouse_pos);
 		void setFocusedWidget(Widget* widget);
-		void addPostAction(const PostActionFuncType& func, PostActionStage stage = PostActionStage::FIRST);
+		void addPostAction(const PostActionFuncType& func, PostActionStage stage);
 		Widget* operator[](size_t index) const;
 
 	private:

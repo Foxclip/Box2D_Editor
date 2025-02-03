@@ -31,7 +31,8 @@ int main() {
 
     execute_app();
 
-    // TODO: Widgets: tests for pending operations
+    // TODO: Widgets: add wAssert to addPostAction calls
+    // TODO: Widgets: tests for post actions
     // TODO: Widgets: pending duplicate
     // TODO: TreeViewWidget: create copy of widget tree when dragging
     // TODO: Outliner: reorder objects
