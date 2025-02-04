@@ -6,6 +6,7 @@ WidgetTestsPostActions::WidgetTestsPostActions(const std::string& name, test::Te
     test::Test* move_test = addTest("move", [&](test::Test& test) { moveTest(test); });
     test::Test* delete_test = addTest("delete", [&](test::Test& test) { deleteTest(test); });
     test::Test* set_parent_test = addTest("set_parent", [&](test::Test& test) { setParentTest(test); });
+    test::Test* set_parent_move_test = addTest("set_parent_move", [&](test::Test& test) { setParentMoveTest(test); });
 }
 
 void WidgetTestsPostActions::moveTest(test::Test& test) {
@@ -95,6 +96,7 @@ void WidgetTestsPostActions::setParentTest(test::Test& test) {
     rectangle_3_widget->setParent(rectangle_1_widget);
     rectangle_1_widget->setPosition(position);
     rectangle_2_widget->setPosition(position);
+    rectangle_3_widget->setPosition(position);
     rectangle_3_widget->OnLeftClick += [&](const sf::Vector2f& pos) {
         widgets.addPostAction([=](fw::WidgetList& widget_list) {
             rectangle_3_widget->setParent(rectangle_2_widget);
@@ -122,6 +124,87 @@ void WidgetTestsPostActions::setParentTest(test::Test& test) {
         T_COMPARE(rectangle_1_widget->getChildrenCount(), 0);
         if (T_COMPARE(rectangle_2_widget->getChildrenCount(), 1)) {
             T_CHECK(rectangle_2_widget->getChild(0) == rectangle_3_widget);
+        }
+    }
+}
+
+void WidgetTestsPostActions::setParentMoveTest(test::Test& test) {
+    fw::Application application(getWindow());
+    application.init(test.name, 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::WidgetList& widgets = application.getWidgets();
+    fw::Widget* root_widget = widgets.getRootWidget();
+    fw::RectangleWidget* rectangle_1_widget = application.getWidgets().createRectangleWidget(size);
+    fw::RectangleWidget* rectangle_2_widget = application.getWidgets().createRectangleWidget(size);
+    fw::RectangleWidget* rectangle_2_child_1_widget = application.getWidgets().createRectangleWidget(size);
+    fw::RectangleWidget* rectangle_3_widget = application.getWidgets().createRectangleWidget(size);
+    rectangle_2_child_1_widget->setParent(rectangle_2_widget);
+    rectangle_3_widget->setParent(rectangle_1_widget);
+    rectangle_1_widget->setPosition(position);
+    rectangle_2_widget->setPosition(position);
+    rectangle_3_widget->setPosition(position);
+    std::function<void(const sf::Vector2f)> move_then_set_parent = [&](const sf::Vector2f& pos) {
+        widgets.addPostAction([=](fw::WidgetList& widget_list) {
+            rectangle_3_widget->setParent(rectangle_2_widget);
+        }, fw::PostActionStage::SET_PARENT);
+        widgets.addPostAction([=](fw::WidgetList& widget_list) {
+            rectangle_3_widget->moveToIndex(0);
+        }, fw::PostActionStage::MOVE);
+    };
+    std::function<void(const sf::Vector2f)> set_parent_then_move = [&](const sf::Vector2f& pos) {
+        widgets.addPostAction([=](fw::WidgetList& widget_list) {
+            rectangle_3_widget->setParent(rectangle_2_widget);
+        }, fw::PostActionStage::SET_PARENT);
+        widgets.addPostAction([=](fw::WidgetList& widget_list) {
+            rectangle_3_widget->moveToIndex(0);
+        }, fw::PostActionStage::LAST);
+    };
+    rectangle_3_widget->OnLeftClick += move_then_set_parent;
+    application.advance();
+    if (T_COMPARE(root_widget->getChildrenCount(), 2)) {
+        T_CHECK(root_widget->getChild(0) == rectangle_1_widget);
+        T_CHECK(root_widget->getChild(1) == rectangle_2_widget);
+        if (T_COMPARE(rectangle_1_widget->getChildrenCount(), 1)) {
+            T_CHECK(rectangle_1_widget->getChild(0) == rectangle_3_widget);
+        }
+        if (T_COMPARE(rectangle_2_widget->getChildrenCount(), 1)) {
+            T_CHECK(rectangle_2_widget->getChild(0) == rectangle_2_child_1_widget);
+        }
+    }
+
+    T_ASSERT_NO_ERRORS();
+    sf::Vector2f rect_3_center = rectangle_3_widget->getGlobalCenter();
+    application.mouseLeftClick(rect_3_center);
+    application.advance();
+    if (T_COMPARE(root_widget->getChildrenCount(), 2)) {
+        T_CHECK(root_widget->getChild(0) == rectangle_1_widget);
+        T_CHECK(root_widget->getChild(1) == rectangle_2_widget);
+        T_COMPARE(rectangle_1_widget->getChildrenCount(), 0);
+        if (T_COMPARE(rectangle_2_widget->getChildrenCount(), 2)) {
+            T_CHECK(rectangle_2_widget->getChild(0) == rectangle_2_child_1_widget);
+            T_CHECK(rectangle_2_widget->getChild(1) == rectangle_3_widget);
+        }
+    }
+
+    T_ASSERT_NO_ERRORS();
+    rectangle_3_widget->setParent(rectangle_1_widget);
+    rectangle_3_widget->OnLeftClick += set_parent_then_move;
+    application.mouseLeftClick(rect_3_center);
+    application.advance();
+    application.mouseLeftClick(rect_3_center);
+    application.advance();
+    if (T_COMPARE(root_widget->getChildrenCount(), 2)) {
+        T_CHECK(root_widget->getChild(0) == rectangle_1_widget);
+        T_CHECK(root_widget->getChild(1) == rectangle_2_widget);
+        T_COMPARE(rectangle_1_widget->getChildrenCount(), 0);
+        if (T_COMPARE(rectangle_2_widget->getChildrenCount(), 2)) {
+            T_CHECK(rectangle_2_widget->getChild(0) == rectangle_3_widget);
+            T_CHECK(rectangle_2_widget->getChild(1) == rectangle_2_child_1_widget);
         }
     }
 }
