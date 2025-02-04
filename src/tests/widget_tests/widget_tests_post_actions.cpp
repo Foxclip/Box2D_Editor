@@ -7,6 +7,7 @@ WidgetTestsPostActions::WidgetTestsPostActions(const std::string& name, test::Te
     test::Test* delete_test = addTest("delete", [&](test::Test& test) { deleteTest(test); });
     test::Test* set_parent_test = addTest("set_parent", [&](test::Test& test) { setParentTest(test); });
     test::Test* set_parent_move_test = addTest("set_parent_move", [&](test::Test& test) { setParentMoveTest(test); });
+    test::Test* duplicate_test = addTest("duplicate", [&](test::Test& test) { duplicateTest(test); });
 }
 
 void WidgetTestsPostActions::moveTest(test::Test& test) {
@@ -206,5 +207,38 @@ void WidgetTestsPostActions::setParentMoveTest(test::Test& test) {
             T_CHECK(rectangle_2_widget->getChild(0) == rectangle_3_widget);
             T_CHECK(rectangle_2_widget->getChild(1) == rectangle_2_child_1_widget);
         }
+    }
+}
+
+void WidgetTestsPostActions::duplicateTest(test::Test& test) {
+    fw::Application application(getWindow());
+    application.init(test.name, 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::WidgetList& widgets = application.getWidgets();
+    fw::Widget* root_widget = widgets.getRootWidget();
+    fw::RectangleWidget* rectangle_1_widget = application.getWidgets().createRectangleWidget(size);
+    rectangle_1_widget->setPosition(position);
+    rectangle_1_widget->OnLeftClick += [&](const sf::Vector2f& pos) {
+        widgets.addPostAction([=](fw::WidgetList& widget_list) {
+            fw::Widget* clone = rectangle_1_widget->clone();
+            clone->setName("clone");
+            clone->setGlobalPosition(rectangle_1_widget->getGlobalTopRight());
+        }, fw::PostActionStage::DUPLICATE);
+    };
+    application.advance();
+
+    sf::Vector2f rect_1_center = rectangle_1_widget->getGlobalCenter();
+	application.mouseLeftClick(rect_1_center);
+    application.advance();
+    if (T_COMPARE(root_widget->getChildrenCount(), 2)) {
+        T_CHECK(root_widget->getChild(0) == rectangle_1_widget);
+        fw::Widget* clone = root_widget->getChild(1);
+        T_COMPARE(clone->getName(), "clone");
+        T_VEC2_COMPARE(clone->getGlobalPosition(), rectangle_1_widget->getGlobalTopRight());
     }
 }
