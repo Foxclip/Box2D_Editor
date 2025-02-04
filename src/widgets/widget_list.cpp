@@ -652,7 +652,7 @@ namespace fw {
 		: widget_list(widget_list), action(action) { }
 
 	void PostAction::execute() const {
-		action();
+		action(widget_list);
 	}
 
 }

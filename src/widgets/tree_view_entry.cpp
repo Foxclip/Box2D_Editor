@@ -330,7 +330,7 @@ namespace fw {
 	}
 
 	void TreeViewEntry::take() {
-		treeview.widget_list.addPostAction([=]() {
+		treeview.widget_list.addPostAction([=](WidgetList& widget_list) {
 			wAssert(treeview.all_entries.contains(this));
 			setParent(nullptr, false);
 			getWidget()->setParentKeepPos(nullptr);
@@ -348,7 +348,7 @@ namespace fw {
 	}
 
 	void TreeViewEntry::dropTo(TreeViewEntry* parent, size_t index) {
-		treeview.widget_list.addPostAction([=]() {
+		treeview.widget_list.addPostAction([=](WidgetList& widget_list) {
 			wAssert(treeview.all_entries.contains(this));
 			wAssert(parent == nullptr || treeview.all_entries.contains(parent));
 			setParent(parent);

@@ -44,7 +44,7 @@ namespace fw {
 		LAST,
 	};
 	const int STAGE_COUNT = static_cast<int>(PostActionStage::LAST) + 1;
-	using PostActionFuncType = std::function<void(void)>;
+	using PostActionFuncType = std::function<void(WidgetList&)>;
 	class PostAction {
 	public:
 		PostAction(WidgetList& widget_list, const PostActionFuncType& action);

@@ -24,7 +24,7 @@ void WidgetTestsPostActions::moveTest(test::Test& test) {
     rectangle_1_widget->setPosition(position);
     rectangle_2_widget->setPosition(position);
     rectangle_2_widget->OnLeftClick += [&](const sf::Vector2f& pos) {
-        widgets.addPostAction([=]() {
+        widgets.addPostAction([=](fw::WidgetList& widget_list) {
             rectangle_2_widget->moveToIndex(0);
         }, fw::PostActionStage::MOVE);
     };
@@ -60,7 +60,7 @@ void WidgetTestsPostActions::deleteTest(test::Test& test) {
     fw::RectangleWidget* rectangle_widget = application.getWidgets().createRectangleWidget(size);
     rectangle_widget->setPosition(position);
     rectangle_widget->OnLeftClick += [&](const sf::Vector2f& pos) {
-        widgets.addPostAction([=]() {
+        widgets.addPostAction([=](fw::WidgetList& widget_list) {
             rectangle_widget->remove();
         }, fw::PostActionStage::REMOVE);
     };
@@ -96,7 +96,7 @@ void WidgetTestsPostActions::setParentTest(test::Test& test) {
     rectangle_1_widget->setPosition(position);
     rectangle_2_widget->setPosition(position);
     rectangle_3_widget->OnLeftClick += [&](const sf::Vector2f& pos) {
-        widgets.addPostAction([=]() {
+        widgets.addPostAction([=](fw::WidgetList& widget_list) {
             rectangle_3_widget->setParent(rectangle_2_widget);
         }, fw::PostActionStage::SET_PARENT);
     };
