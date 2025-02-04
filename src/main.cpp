@@ -31,7 +31,7 @@ int main() {
 
     execute_app();
 
-    // TODO: Widgets: tests for post actions
+    // TODO: Widgets: make widget list an argument for post action lambda
     // TODO: Widgets: pending duplicate
     // TODO: TreeViewWidget: create copy of widget tree when dragging
     // TODO: Outliner: reorder objects
