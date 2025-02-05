@@ -30,7 +30,7 @@ namespace fw {
 		entry_widget->OnProcessMouse += [&](const sf::Vector2f& pos) {
 			if (grabbed) {
 				sf::Vector2f new_pos = pos - grab_offset;
-				entry_widget->setGlobalPosition(new_pos);
+				treeview.grabbed_widget->setGlobalPosition(new_pos);
 				if (!grab_begin) {
 					treeview.putTargetHighlight();
 				}
@@ -330,64 +330,34 @@ namespace fw {
 	}
 
 	void TreeViewEntry::take() {
-		treeview.widget_list.addPostAction([=](WidgetList& widget_list) {
-			wAssert(treeview.all_entries.contains(this));
-			setParent(nullptr, false);
-			getWidget()->setParentKeepPos(nullptr);
-			treeview.top_entries.remove(this);
-		}, PostActionStage::SET_PARENT);
-		entry_widget->setParentAnchor(Widget::Anchor::CUSTOM);
-		entry_widget->setSizeXPolicy(Widget::SizePolicy::NONE);
-		rectangle_widget->setClickThrough(true); // to allow mouse wheel events
-		setGrabbedVisualMode();
-		grabbed = true;
-		grab_begin = true;
-		treeview.grabbed_entry = this;
-		treeview.grabbed_entry_original_parent = parent;
-		treeview.grabbed_entry_original_index = getIndex();
+		treeview.widget_list.addPostAction([this](WidgetList& widget_list) {
+			Widget* copy = entry_widget->clone();
+			copy->setParentAnchor(Widget::Anchor::CUSTOM);
+			copy->setSizeXPolicy(Widget::SizePolicy::NONE);
+			copy->find("rectangle")->setClickThrough(true); // to allow mouse wheel events
+			copy->setParent(nullptr);
+			grabbed = true;
+			grab_begin = true;
+			treeview.grabbed_entry = this;
+			treeview.grabbed_widget = copy;
+		}, PostActionStage::DUPLICATE);
 	}
 
 	void TreeViewEntry::dropTo(TreeViewEntry* parent, size_t index) {
-		treeview.widget_list.addPostAction([=](WidgetList& widget_list) {
-			wAssert(treeview.all_entries.contains(this));
-			wAssert(parent == nullptr || treeview.all_entries.contains(parent));
-			setParent(parent);
-			if (index >= 0) {
-				moveToIndex(index);
-			}
+		treeview.widget_list.addPostAction([this, parent](WidgetList& widget_list) {
+			this->setParent(parent); 
 		}, PostActionStage::SET_PARENT);
-		entry_widget->setParentAnchor(Widget::Anchor::TOP_LEFT);
-		entry_widget->setSizeXPolicy(Widget::SizePolicy::PARENT);
-		rectangle_widget->setClickThrough(false);
-		setNormalVisualMode();
 		grabbed = false;
 		grab_begin = false;
 		treeview.grabbed_entry = nullptr;
+		treeview.widget_list.addPostAction([this](WidgetList& widget_list) {
+			treeview.grabbed_widget->remove();
+		}, PostActionStage::REMOVE);
 		TreeViewWidget::target_highlight.visible = false;
 	}
 
 	void TreeViewEntry::remove(bool with_children) {
 		treeview.removeEntry(this, with_children);
-	}
-
-	void TreeViewEntry::setGrabbedVisualMode() {
-		rectangle_widget->setAlphaMultiplier(0.5f);
-		text_widget->setAlphaMultiplier(0.5f);
-		arrow_area_widget->setAlphaMultiplier(0.5f);
-		arrow_widget->setAlphaMultiplier(0.5f);
-		for (TreeViewEntry* child : children) {
-			child->setGrabbedVisualMode();
-		}
-	}
-
-	void TreeViewEntry::setNormalVisualMode() {
-		rectangle_widget->setAlphaMultiplier(1.0f);
-		text_widget->setAlphaMultiplier(1.0f);
-		arrow_area_widget->setAlphaMultiplier(1.0f);
-		arrow_widget->setAlphaMultiplier(1.0f);
-		for (TreeViewEntry* child : children) {
-			child->setNormalVisualMode();
-		}
 	}
 
 	void TreeViewEntry::updateWidgets() {

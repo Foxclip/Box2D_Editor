@@ -22,7 +22,9 @@ namespace fw {
 			if (key == sf::Keyboard::Escape) {
 				if (grabbed_entry) {
 					grabbed_entry->pressed = false;
-					grabbed_entry->dropTo(grabbed_entry_original_parent, grabbed_entry_original_index);
+					widget_list.addPostAction([this](WidgetList& widget_list) {
+						grabbed_widget->remove();
+					}, PostActionStage::REMOVE);
 				}
 			}
 		};

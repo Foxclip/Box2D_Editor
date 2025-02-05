@@ -57,8 +57,7 @@ namespace fw {
 		CompVectorUptr<TreeViewEntry> all_entries;
 		CompVector<TreeViewEntry*> top_entries;
 		TreeViewEntry* grabbed_entry = nullptr;
-		TreeViewEntry* grabbed_entry_original_parent = nullptr;
-		size_t grabbed_entry_original_index = 0;
+		Widget* grabbed_widget = nullptr;
 		TreeViewEntry* highlighted_entry = nullptr;
 
 		void deselectAllExceptEntry(TreeViewEntry* except_entry = nullptr);

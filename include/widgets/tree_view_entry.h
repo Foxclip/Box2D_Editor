@@ -16,6 +16,7 @@ namespace fw {
 	const float TREEVIEW_ENTRY_DRAG_DISTANCE = 10.0f;
 
 	class WidgetList;
+	class Widget;
 	class PolygonWidget;
 	class EmptyWidget;
 	class TextWidget;
@@ -87,8 +88,6 @@ namespace fw {
 		fw::EmptyWidget* children_spacing_widget = nullptr;
 		fw::ContainerWidget* children_widget = nullptr;
 
-		void setGrabbedVisualMode();
-		void setNormalVisualMode();
 		void updateWidgets();
 		void addChild(TreeViewEntry* entry);
 		void moveChildToIndex(TreeViewEntry* entry, size_t index);
