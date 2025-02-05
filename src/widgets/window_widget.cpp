@@ -27,7 +27,10 @@ namespace fw {
 		header_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
 			is_grabbed = true;
 			header_click_offset = getGlobalPosition() - pos;
-			moveToTop();
+			widget_list.addPostAction([this](WidgetList& widget_list) {
+				wAssert(widget_list.contains(this));
+				moveToTop();
+			}, PostActionStage::MOVE);
 		};
 		header_widget->OnProcessMouse += [&](const sf::Vector2f& pos) {
 			if (is_grabbed) {
@@ -128,7 +131,10 @@ namespace fw {
 				resizing_anchor = getTopLeft();
 				resizing_cursor_offset = parent_local_pos - getBottomRight();
 			}
-			moveToTop();
+			widget_list.addPostAction([this](WidgetList& widget_list) {
+				wAssert(widget_list.contains(this));
+				moveToTop();
+			}, PostActionStage::MOVE);
 		};
 		resize_widget->OnProcessMouse += [&](const sf::Vector2f& pos) {
 			if (active_resizing_type == Resizing::NONE) {

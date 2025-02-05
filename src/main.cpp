@@ -31,8 +31,6 @@ int main() {
 
     execute_app();
 
-    // TODO: Widgets: tests for pending operations
-    // TODO: Widgets: pending duplicate
     // TODO: TreeViewWidget: create copy of widget tree when dragging
     // TODO: Outliner: reorder objects
     // TODO: Outliner: buttons up/down for reordering objects

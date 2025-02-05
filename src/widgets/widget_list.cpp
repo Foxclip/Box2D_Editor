@@ -29,6 +29,10 @@ namespace fw {
 		root_widget->setClickThrough(false);
 		root_widget->setClipChildren(true);
 		root_widget->setName("root");
+
+		for (size_t i = 0; i < STAGE_COUNT; i++) {
+			post_actions[i] = std::vector<PostAction>();
+		}
 	}
 
 	WidgetList::~WidgetList() {
@@ -304,6 +308,8 @@ namespace fw {
 		locked = false;
 	}
 
+	void WidgetList::processBeforeInput() { }
+
 	void WidgetList::processLeftPress(const sf::Vector2f pos) {
 		wAssert(!isLocked());
 		CompVector<Widget*> widgets = getWidgetsUnderCursor(true, click_blocked);
@@ -449,18 +455,14 @@ namespace fw {
 	}
 
 	void WidgetList::processAfterInput() {
-		for (PendingMove* op : pending_move) {
-			op->execute();
+		for (size_t i = 0; i < STAGE_COUNT; i++) {
+			for (const PostAction& action : post_actions[i]) {
+				action.execute();
+			}
 		}
-		for (PendingSetParent* op : pending_setparent) {
-			op->execute();
+		for (size_t i = 0; i < STAGE_COUNT; i++) {
+			post_actions[i].clear();
 		}
-		for (PendingDelete* op : pending_delete) {
-			op->execute();
-		}
-		pending_move.clear();
-		pending_delete.clear();
-		pending_setparent.clear();
 		OnProcessAfterInput();
 	}
 
@@ -636,82 +638,21 @@ namespace fw {
 		}
 	}
 
-	void WidgetList::addPendingMove(Widget* widget, size_t index) {
-		wAssert(!isLocked());
-		dp::DataPointerUnique<PendingMove> uptr = dp::make_data_pointer<PendingMove>(
-			"PendingMove " + widget->getFullName() + " " + std::to_string(index), *this, widget, index
-		);
-		pending_move.add(std::move(uptr));
-	}
-
-	void WidgetList::addPendingDelete(Widget* widget, bool with_children) {
-		wAssert(!isLocked());
-		dp::DataPointerUnique<PendingDelete> uptr = dp::make_data_pointer<PendingDelete>(
-			"PendingDelete " + widget->getFullName() + " " + std::to_string(with_children), *this, widget, with_children
-		);
-		pending_delete.add(std::move(uptr));
-	}
-
-	void WidgetList::addPendingSetParent(Widget* widget, Widget* new_parent, bool keep_pos, ptrdiff_t move_to_index) {
-		wAssert(!isLocked());
-		dp::DataPointerUnique<PendingSetParent> uptr = dp::make_data_pointer<PendingSetParent>(
-			"PendingSetParent " + widget->getFullName() + " " + new_parent->getFullName(), *this, widget, new_parent, keep_pos, move_to_index
-		);
-		pending_setparent.add(std::move(uptr));
+	void WidgetList::addPostAction(const PostActionFuncType& func, PostActionStage stage) {
+		PostAction post_action(*this, func);
+		int stage_index = static_cast<int>(stage);
+		post_actions[stage_index].push_back(post_action);
 	}
 
 	Widget* WidgetList::operator[](size_t index) const {
 		return widgets[index];
 	}
 
-	PendingOperation::PendingOperation(WidgetList& widget_list) : widget_list(widget_list) { }
+	PostAction::PostAction(WidgetList& widget_list, const PostActionFuncType& action)
+		: widget_list(widget_list), action(action) { }
 
-	PendingMove::PendingMove(WidgetList& widget_list, Widget* widget, size_t index) : PendingOperation(widget_list) {
-		this->widget = widget;
-		this->index = index;
-	}
-
-	void PendingMove::execute() {
-		wAssert(widget_list.widgets.contains(widget));
-		wAssert(widget_list.widgets.contains(widget->getParent()));
-		Widget* parent = widget->getParent();
-		parent->moveChildToIndex(widget, index);
-	}
-
-	PendingDelete::PendingDelete(WidgetList& widget_list, Widget* widget, bool with_children) : PendingOperation(widget_list) {
-		this->widget = widget;
-		this->with_children = with_children;
-	}
-
-	void PendingDelete::execute() {
-		wAssert(widget_list.widgets.contains(widget));
-		widget_list.removeWidget(widget, with_children);
-	}
-
-	PendingSetParent::PendingSetParent(
-		WidgetList& widget_list,
-		Widget* widget,
-		Widget* new_parent,
-		bool keep_pos,
-		ptrdiff_t move_to_index
-	) : PendingOperation(widget_list) {
-		this->widget = widget;
-		this->new_parent = new_parent;
-		this->keep_pos = keep_pos;
-		this->move_to_index = move_to_index;
-	}
-
-	void PendingSetParent::execute() {
-		wAssert(widget_list.widgets.contains(widget));
-		wAssert(new_parent == nullptr || widget_list.widgets.contains(new_parent));
-		if (keep_pos) {
-			widget->setParentKeepPos(new_parent);
-		} else {
-			widget->setParent(new_parent);
-		}
-		if (move_to_index >= 0) {
-			widget->moveToIndex(move_to_index);
-		}
+	void PostAction::execute() const {
+		action(widget_list);
 	}
 
 }

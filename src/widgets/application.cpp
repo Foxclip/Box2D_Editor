@@ -446,6 +446,7 @@ namespace fw {
 
     void Application::processBeforeInput() {
         internal_mouse_pos = sf::Mouse::getPosition(window);
+        widgets.processBeforeInput();
     }
 
     void Application::processInput() {

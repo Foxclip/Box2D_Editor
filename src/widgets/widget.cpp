@@ -1000,9 +1000,7 @@ namespace fw {
 		wAssert(!widget_list.isLocked());
 		wAssert(parent);
 		Stage stage = widget_list.application.getStage();
-		if (stage == Stage::INPUT) {
-			widget_list.addPendingMove(this, index);
-		} else if (stage == Stage::NONE || stage == Stage::AFTER_INPUT) {
+		if (stage == Stage::NONE || stage == Stage::AFTER_INPUT) {
 			parent->moveChildToIndex(this, index);
 		} else {
 			wAssert(false, "Cannot reorder children in this stage");
@@ -1507,9 +1505,7 @@ namespace fw {
 	void Widget::remove(bool with_clildren) {
 		wAssert(!widget_list.isLocked());
 		Stage stage = widget_list.application.getStage();
-		if (stage == Stage::INPUT) {
-			widget_list.addPendingDelete(this, with_clildren);
-		} else if (stage == Stage::NONE || stage == Stage::AFTER_INPUT) {
+		if (stage == Stage::NONE || stage == Stage::AFTER_INPUT) {
 			widget_list.removeWidget(this, with_clildren);
 		} else {
 			wAssert(false, "Cannot remove children in this stage");

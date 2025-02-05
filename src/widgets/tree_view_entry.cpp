@@ -330,7 +330,12 @@ namespace fw {
 	}
 
 	void TreeViewEntry::take() {
-		treeview.addPendingDetach(this);
+		treeview.widget_list.addPostAction([=](WidgetList& widget_list) {
+			wAssert(treeview.all_entries.contains(this));
+			setParent(nullptr, false);
+			getWidget()->setParentKeepPos(nullptr);
+			treeview.top_entries.remove(this);
+		}, PostActionStage::SET_PARENT);
 		entry_widget->setParentAnchor(Widget::Anchor::CUSTOM);
 		entry_widget->setSizeXPolicy(Widget::SizePolicy::NONE);
 		rectangle_widget->setClickThrough(true); // to allow mouse wheel events
@@ -343,7 +348,14 @@ namespace fw {
 	}
 
 	void TreeViewEntry::dropTo(TreeViewEntry* parent, size_t index) {
-		treeview.addPendingEntrySetParent(this, parent, index);
+		treeview.widget_list.addPostAction([=](WidgetList& widget_list) {
+			wAssert(treeview.all_entries.contains(this));
+			wAssert(parent == nullptr || treeview.all_entries.contains(parent));
+			setParent(parent);
+			if (index >= 0) {
+				moveToIndex(index);
+			}
+		}, PostActionStage::SET_PARENT);
 		entry_widget->setParentAnchor(Widget::Anchor::TOP_LEFT);
 		entry_widget->setSizeXPolicy(Widget::SizePolicy::PARENT);
 		rectangle_widget->setClickThrough(false);

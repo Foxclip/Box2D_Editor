@@ -5,7 +5,7 @@
 #include "tests/widget_tests/widget_tests_checkbox.h"
 #include "tests/widget_tests/widget_tests_container.h"
 #include "tests/widget_tests/widget_tests_dropdown.h"
-#include "tests/widget_tests/widget_tests_pending.h"
+#include "tests/widget_tests/widget_tests_post_actions.h"
 #include "tests/widget_tests/widget_tests_scroll_area.h"
 #include "tests/widget_tests/widget_tests_size_policy.h"
 #include "tests/widget_tests/widget_tests_text.h"
@@ -20,7 +20,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     WidgetTestsToposort* toposort_list = addModule<WidgetTestsToposort>("Toposort");
     WidgetTestsApplication* application_list = addModule<WidgetTestsApplication>("Application", { toposort_list });
     WidgetTestsBasic* widgets_basic_list = addModule<WidgetTestsBasic>("WidgetsBasic", { application_list });
-    WidgetTestsPending* pending_list = addModule<WidgetTestsPending>("Pending", { widgets_basic_list });
+    WidgetTestsPostActions* pending_list = addModule<WidgetTestsPostActions>("PostActions", { widgets_basic_list });
     WidgetTestsText* text_widget_list = addModule<WidgetTestsText>("TextWidget", { application_list });
     WidgetTestsCheckbox* checkbox_widget_list = addModule<WidgetTestsCheckbox>("CheckboxWidget", { widgets_basic_list });
     WidgetTestsContainer* container_widget_list = addModule<WidgetTestsContainer>("ContainerWidget", { widgets_basic_list });
