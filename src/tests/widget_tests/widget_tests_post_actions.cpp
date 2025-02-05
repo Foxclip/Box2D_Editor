@@ -9,6 +9,7 @@ WidgetTestsPostActions::WidgetTestsPostActions(const std::string& name, test::Te
     test::Test* set_parent_move_test = addTest("set_parent_move", [&](test::Test& test) { setParentMoveTest(test); });
     test::Test* duplicate_test = addTest("duplicate", [&](test::Test& test) { duplicateTest(test); });
     test::Test* remove_test = addTest("remove", [&](test::Test& test) { removeTest(test); });
+    test::Test* remove_move_test = addTest("remove_move", [&](test::Test& test) { removeMoveTest(test); });
 }
 
 void WidgetTestsPostActions::moveTest(test::Test& test) {
@@ -268,10 +269,50 @@ void WidgetTestsPostActions::removeTest(test::Test& test) {
     }
 
     T_ASSERT_NO_ERRORS();
-    sf::Vector2f rect_2_center = rectangle_1_widget->getGlobalCenter();
+    sf::Vector2f rect_1_center = rectangle_1_widget->getGlobalCenter();
+    application.mouseMove(rect_1_center);
+    application.advance();
+    application.mouseLeftClick(rect_1_center);
+    application.advance();
+    T_COMPARE(root_widget->getChildrenCount(), 0);
+}
+
+void WidgetTestsPostActions::removeMoveTest(test::Test& test) {
+    fw::Application application(getWindow());
+    application.init(test.name, 800, 600, 0, false);
+    application.start(true);
+    application.mouseMove(400, 300);
+    application.advance();
+
+    sf::Vector2f position(100.0f, 100.0f);
+    sf::Vector2f size(100.0f, 100.0f);
+    fw::WidgetList& widgets = application.getWidgets();
+    fw::Widget* root_widget = widgets.getRootWidget();
+    fw::RectangleWidget* rectangle_1_widget = widgets.createRectangleWidget(size);
+    fw::RectangleWidget* rectangle_2_widget = widgets.createRectangleWidget(size);
+    rectangle_1_widget->setPosition(position);
+    rectangle_2_widget->setPosition(position);
+    rectangle_2_widget->OnLeftClick += [&](const sf::Vector2f& pos) {
+        widgets.addPostAction([=](fw::WidgetList& widget_list) {
+            rectangle_2_widget->remove();
+        }, fw::PostActionStage::REMOVE);
+        widgets.addPostAction([=](fw::WidgetList& widget_list) {
+            rectangle_2_widget->moveToIndex(0);
+        }, fw::PostActionStage::MOVE);
+    };
+    application.advance();
+    if (T_COMPARE(root_widget->getChildrenCount(), 2)) {
+        T_CHECK(root_widget->getChild(0) == rectangle_1_widget);
+        T_CHECK(root_widget->getChild(1) == rectangle_2_widget);
+    }
+
+    T_ASSERT_NO_ERRORS();
+    sf::Vector2f rect_2_center = rectangle_2_widget->getGlobalCenter();
     application.mouseMove(rect_2_center);
     application.advance();
     application.mouseLeftClick(rect_2_center);
     application.advance();
-    T_COMPARE(root_widget->getChildrenCount(), 0);
+    if (T_COMPARE(root_widget->getChildrenCount(), 1)) {
+        T_CHECK(root_widget->getChild(0) == rectangle_1_widget);
+    }
 }

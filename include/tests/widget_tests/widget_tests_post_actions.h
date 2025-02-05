@@ -13,5 +13,6 @@ public:
 	void setParentMoveTest(test::Test& test);
 	void duplicateTest(test::Test& test);
 	void removeTest(test::Test& test);
+	void removeMoveTest(test::Test& test);
 
 };
