@@ -13,6 +13,8 @@ namespace fw {
 	public:
 		TreeViewEntryWidget(WidgetList& widget_list, TreeViewEntry& entry, const std::string& name, float width, float height);
 		void updateWidgets();
+		void setGrabbedVisualMode();
+		TreeViewEntryWidget* clone(bool with_children = true);
 
 	private:
 		friend class TreeViewEntry;

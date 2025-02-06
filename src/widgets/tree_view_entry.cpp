@@ -274,15 +274,16 @@ namespace fw {
 
 	void TreeViewEntry::take() {
 		treeview.widget_list.addPostAction([this](WidgetList& widget_list) {
-			Widget* copy = entry_widget->clone();
-			copy->setParentAnchor(Widget::Anchor::CUSTOM);
-			copy->setSizeXPolicy(Widget::SizePolicy::NONE);
-			copy->find("rectangle")->setClickThrough(true); // to allow mouse wheel events
-			copy->setParent(nullptr);
+			TreeViewEntryWidget* widget_copy = entry_widget->clone();
+			widget_copy->setParentAnchor(Widget::Anchor::CUSTOM);
+			widget_copy->setSizeXPolicy(Widget::SizePolicy::NONE);
+			widget_copy->find("rectangle")->setClickThrough(true); // to allow mouse wheel events
+			widget_copy->setParent(nullptr);
 			grabbed = true;
 			grab_begin = true;
 			treeview.grabbed_entry = this;
-			treeview.grabbed_widget = copy;
+			widget_copy->setGrabbedVisualMode();
+			treeview.grabbed_widget = widget_copy;
 		}, PostActionStage::DUPLICATE);
 	}
 
