@@ -32,6 +32,7 @@ int main() {
     execute_app();
 
     // TODO: TreeViewWidget: create copy of widget tree when dragging
+    // TODO: TreeViewEntry: remove grab_begin
     // TODO: Outliner: reorder objects
     // TODO: Outliner: buttons up/down for reordering objects
     // TODO: Outliner: reparent objects

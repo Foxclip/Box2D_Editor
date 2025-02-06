@@ -50,6 +50,7 @@ namespace fw {
 
 	private:
 		friend class TreeViewEntry;
+		friend class TreeViewEntryWidget;
 		friend class PendingEntryMove;
 		friend class PendingEntryDelete;
 		friend class PendingEntrySetParent;
