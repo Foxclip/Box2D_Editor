@@ -91,7 +91,7 @@ fw::TreeViewEntryWidget::TreeViewEntryWidget(WidgetList& widget_list, TreeViewEn
 }
 
 void fw::TreeViewEntryWidget::updateWidgets() {
-	if (getChildrenCount() == 0) {
+	if (entry.getChildrenCount() == 0) {
 		arrow_area_widget->setVisible(false);
 		children_box_widget->setVisible(false);
 	} else {
