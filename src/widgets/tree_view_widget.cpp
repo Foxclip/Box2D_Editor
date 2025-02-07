@@ -111,6 +111,10 @@ namespace fw {
 		return top_entries.size();
 	}
 
+	Widget* TreeViewWidget::getGrabbedWidget() const {
+		return grabbed_widget;
+	}
+
 	TreeViewEntry* TreeViewWidget::getEntry(size_t index) const {
 		return all_entries[index];
 	}

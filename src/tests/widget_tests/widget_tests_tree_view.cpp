@@ -645,6 +645,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
     T_CHECK(!fw::TreeViewWidget::target_highlight.visible);
     application.mouseMove(drag_pos_1);
     application.advance();
+    T_VEC2_COMPARE(tree_view_widget->getGrabbedWidget()->getGlobalPosition(), entry_1_widget->getGlobalPosition());
     T_CHECK(entry_1->isGrabbed());
     T_CHECK(!fw::TreeViewWidget::target_highlight.visible);
     application.advance();

@@ -31,7 +31,8 @@ int main() {
 
     execute_app();
 
-    // TODO: TreeViewWidget: create copy of widget tree when dragging
+    // TODO: TreeViewWidget: fix target highlight position
+    // TODO: TreeViewWidget: fix drag cancelling with Esc
     // TODO: TreeViewEntry: remove grab_begin
     // TODO: Outliner: reorder objects
     // TODO: Outliner: buttons up/down for reordering objects
