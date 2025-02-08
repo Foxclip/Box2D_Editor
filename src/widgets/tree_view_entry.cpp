@@ -289,8 +289,11 @@ namespace fw {
 	}
 
 	void TreeViewEntry::dropTo(TreeViewEntry* parent, size_t index) {
-		treeview.widget_list.addPostAction([this, parent](WidgetList& widget_list) {
-			this->setParent(parent); 
+		treeview.widget_list.addPostAction([this, parent, index](WidgetList& widget_list) {
+			setParent(parent);
+			if (index >= 0) {
+				moveToIndex(index);
+			}
 		}, PostActionStage::SET_PARENT);
 		grabbed = false;
 		grab_begin = false;

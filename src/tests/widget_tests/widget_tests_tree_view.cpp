@@ -653,7 +653,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
     T_CHECK(fw::TreeViewWidget::target_highlight.visible);
     T_VEC2_COMPARE(
         fw::TreeViewWidget::target_highlight.pos,
-        entry_2_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
+        entry_1_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
     );
 
     // drag down
@@ -668,7 +668,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
     application.advance();
     T_VEC2_COMPARE(
         fw::TreeViewWidget::target_highlight.pos,
-        entry_2_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
+        entry_1_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
     );
 
     // drop to the top
@@ -1121,7 +1121,7 @@ void WidgetTestsTreeView::checkTopEntries(test::Test& test, fw::TreeViewWidget* 
         for (size_t i = 0; i < entries_vec.size(); i++) {
             fw::TreeViewEntry* entry = tree_view_widget->getTopEntry(i);
             T_CHECK(entry == entries_vec[i]);
-            T_CHECK(entry->getWidget() == entries_vec[i]->getWidget());
+            T_CHECK(tree_view_widget->getChild(i) == entries_vec[i]->getWidget());
         }
     }
 }

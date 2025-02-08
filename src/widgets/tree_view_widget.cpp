@@ -159,15 +159,14 @@ namespace fw {
 		CompVector<TreeViewEntry*> entries = getAllVisibleEntriesInOrder();
 		TreeViewEntry* result = nullptr;
 		size_t current_index = 0;
-		for (TreeViewEntry* entry : entries) {
-			// TODO: cache parent chain
-			if (entry->getWidget()->isVisible() && !entry->grabbed && !entry->getParentChain().contains(grabbed_entry)) {
+		for (size_t i = 0; i < entries.size(); i++) {
+			TreeViewEntry* entry = entries[i];
+			if (entry->getWidget()->isVisible()) {
 				sf::Vector2f center = entry->getRectangleWidget()->getGlobalCenter();
 				if (global_pos.y < center.y) {
 					result = entry;
 					break;
 				}
-				current_index++;
 			}
 		}
 		return result;
