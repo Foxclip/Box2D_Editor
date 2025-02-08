@@ -298,11 +298,20 @@ namespace fw {
 				moveToIndex(index);
 			}
 		}, PostActionStage::SET_PARENT);
+		releaseGrab();
+	}
+
+	void TreeViewEntry::releaseGrab() {
+		if (!grabbed) {
+			return;
+		}
 		grabbed = false;
 		grab_begin = false;
+		pressed = false;
 		treeview.grabbed_entry = nullptr;
 		treeview.widget_list.addPostAction([this](WidgetList& widget_list) {
 			treeview.grabbed_widget->remove();
+			treeview.grabbed_widget = nullptr;
 		}, PostActionStage::REMOVE);
 		TreeViewWidget::target_highlight.visible = false;
 	}

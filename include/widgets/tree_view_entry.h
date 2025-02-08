@@ -66,6 +66,7 @@ namespace fw {
 		void toggle();
 		void take();
 		void dropTo(TreeViewEntry* parent, size_t index);
+		void releaseGrab();
 		void remove(bool with_children);
 
 	private:

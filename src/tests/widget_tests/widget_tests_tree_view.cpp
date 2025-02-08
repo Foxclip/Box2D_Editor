@@ -736,7 +736,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
     application.advance();
     T_VEC2_COMPARE(
         fw::TreeViewWidget::target_highlight.pos,
-        entry_2_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
+        entry_1_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
     );
     application.mouseLeftRelease();
     application.advance();
@@ -1070,13 +1070,21 @@ void WidgetTestsTreeView::treeviewWidgetDragCancelTest(test::Test& test) {
     // drag entry 1
     sf::Vector2f drag_pos_1 = tree_view_widget->getGlobalTop();
     drag_entry(entry_1, drag_pos_1, false);
-    T_WRAP_CONTAINER(check_top_entries({ entry_2, entry_3, entry_4, entry_5, entry_6 }));
+    T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3, entry_4, entry_5, entry_6 }));
     T_WRAP_CONTAINER(check_entries(entry_4, { entry_4_1, entry_4_2 }));
     T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
     T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));
 
     // cancel dragging
     TAP_KEY(sf::Keyboard::Escape);
+    T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3, entry_4, entry_5, entry_6 }));
+    T_WRAP_CONTAINER(check_entries(entry_4, { entry_4_1, entry_4_2 }));
+    T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));
+    T_WRAP_CONTAINER(check_entries(entry_6, { entry_6_1, entry_6_2 }));
+
+    // release left mouse
+    application.mouseLeftRelease();
+    application.advance();
     T_WRAP_CONTAINER(check_top_entries({ entry_1, entry_2, entry_3, entry_4, entry_5, entry_6 }));
     T_WRAP_CONTAINER(check_entries(entry_4, { entry_4_1, entry_4_2 }));
     T_WRAP_CONTAINER(check_entries(entry_5, { entry_5_1, entry_5_2 }));

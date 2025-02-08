@@ -21,10 +21,7 @@ namespace fw {
 		widget_list.OnKeyPressed += [&](const sf::Keyboard::Key& key) {
 			if (key == sf::Keyboard::Escape) {
 				if (grabbed_entry) {
-					grabbed_entry->pressed = false;
-					widget_list.addPostAction([this](WidgetList& widget_list) {
-						grabbed_widget->remove();
-					}, PostActionStage::REMOVE);
+					grabbed_entry->releaseGrab();
 				}
 			}
 		};
