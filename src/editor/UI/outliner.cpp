@@ -12,7 +12,7 @@ Outliner::Outliner(fw::WidgetList& widget_list, float width, float height, Edito
 	setParentAnchor(Anchor::TOP_RIGHT);
 	setBackgroundColor(OUTLINER_BACKGROUND_COLOR);
 	setScrollbarColor(OUTLINER_SCROLLBAR_COLOR);
-	OnLeftClick += [&](const sf::Vector2f& pos) {
+	area_widget->OnLeftClick += [&](const sf::Vector2f& pos) {
 		treeview_widget->deselectAll();
 	};
 	// container

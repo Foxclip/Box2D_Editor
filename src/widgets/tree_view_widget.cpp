@@ -21,8 +21,7 @@ namespace fw {
 		widget_list.OnKeyPressed += [&](const sf::Keyboard::Key& key) {
 			if (key == sf::Keyboard::Escape) {
 				if (grabbed_entry) {
-					grabbed_entry->pressed = false;
-					grabbed_entry->dropTo(grabbed_entry_original_parent, grabbed_entry_original_index);
+					grabbed_entry->releaseGrab();
 				}
 			}
 		};
@@ -109,6 +108,10 @@ namespace fw {
 		return top_entries.size();
 	}
 
+	Widget* TreeViewWidget::getGrabbedWidget() const {
+		return grabbed_widget;
+	}
+
 	TreeViewEntry* TreeViewWidget::getEntry(size_t index) const {
 		return all_entries[index];
 	}
@@ -153,15 +156,14 @@ namespace fw {
 		CompVector<TreeViewEntry*> entries = getAllVisibleEntriesInOrder();
 		TreeViewEntry* result = nullptr;
 		size_t current_index = 0;
-		for (TreeViewEntry* entry : entries) {
-			// TODO: cache parent chain
-			if (entry->getWidget()->isVisible() && !entry->grabbed && !entry->getParentChain().contains(grabbed_entry)) {
+		for (size_t i = 0; i < entries.size(); i++) {
+			TreeViewEntry* entry = entries[i];
+			if (entry->getWidget()->isVisible()) {
 				sf::Vector2f center = entry->getRectangleWidget()->getGlobalCenter();
 				if (global_pos.y < center.y) {
 					result = entry;
 					break;
 				}
-				current_index++;
 			}
 		}
 		return result;

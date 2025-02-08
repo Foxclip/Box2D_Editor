@@ -939,6 +939,9 @@ namespace fw {
 			updateFullName();
 			throw std::runtime_error("Cannot parent object to itself: " + full_name);
 		}
+		if (new_parent == parent) {
+			return;
+		}
 		if (new_parent) {
 			const CompVector<Widget*>& parent_chain = new_parent->getParentChain();
 			if (parent_chain.contains(this)) {

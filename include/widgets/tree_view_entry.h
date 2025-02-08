@@ -16,12 +16,14 @@ namespace fw {
 	const float TREEVIEW_ENTRY_DRAG_DISTANCE = 10.0f;
 
 	class WidgetList;
+	class Widget;
 	class PolygonWidget;
 	class EmptyWidget;
 	class TextWidget;
 	class TreeViewWidget;
 	class ContainerWidget;
 	class RectangleWidget;
+	class TreeViewEntryWidget;
 
 	class TreeViewEntry {
 	public:
@@ -43,6 +45,12 @@ namespace fw {
 		fw::ContainerWidget* getChildrenBoxWidget() const;
 		fw::EmptyWidget* getChildrenSpacingWidget() const;
 		fw::ContainerWidget* getChildrenWidget() const;
+		void processMouseMove(const sf::Vector2f& pos);
+		void processMouse(const sf::Vector2f& pos);
+		void processLeftPress(const sf::Vector2f& pos);
+		void processLeftClick(const sf::Vector2f& pos);
+		void processLeftRelease(const sf::Vector2f& pos);
+		void processGlobalLeftRelease(const sf::Vector2f& pos);
 		void selectSilent(bool with_children = false);
 		void deselectSilent(bool with_children = false);
 		void toggleSelectSilent(bool with_children = false);
@@ -58,10 +66,12 @@ namespace fw {
 		void toggle();
 		void take();
 		void dropTo(TreeViewEntry* parent, size_t index);
+		void releaseGrab();
 		void remove(bool with_children);
 
 	private:
 		friend TreeViewWidget;
+		friend TreeViewEntryWidget;
 		friend class PendingEntryMove;
 		friend class PendingEntryDelete;
 		friend class PendingEntrySetParent;
@@ -78,18 +88,8 @@ namespace fw {
 		bool grabbed = false;
 		bool grab_begin = true;
 		sf::Vector2f grab_offset;
-		fw::ContainerWidget* entry_widget = nullptr;
-		fw::RectangleWidget* rectangle_widget = nullptr;
-		fw::TextWidget* text_widget = nullptr;
-		fw::RectangleWidget* arrow_area_widget = nullptr;
-		fw::PolygonWidget* arrow_widget = nullptr;
-		fw::ContainerWidget* children_box_widget = nullptr;
-		fw::EmptyWidget* children_spacing_widget = nullptr;
-		fw::ContainerWidget* children_widget = nullptr;
+		TreeViewEntryWidget* entry_widget = nullptr;
 
-		void setGrabbedVisualMode();
-		void setNormalVisualMode();
-		void updateWidgets();
 		void addChild(TreeViewEntry* entry);
 		void moveChildToIndex(TreeViewEntry* entry, size_t index);
 		void removeChild(TreeViewEntry* entry);

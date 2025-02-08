@@ -33,6 +33,7 @@ namespace fw {
 		CompVector<TreeViewEntry*> getAllVisibleEntriesInOrder() const;
 		size_t getAllEntryCount() const;
 		size_t getTopEntryCount() const;
+		Widget* getGrabbedWidget() const;
 		TreeViewEntry* getEntry(size_t index) const;
 		TreeViewEntry* getTopEntry(size_t index) const;
 		TreeViewEntry* addEntry(const sf::String& name);
@@ -50,15 +51,11 @@ namespace fw {
 
 	private:
 		friend class TreeViewEntry;
-		friend class PendingEntryMove;
-		friend class PendingEntryDelete;
-		friend class PendingEntrySetParent;
-		friend class PendingEntryDetach;
+		friend class TreeViewEntryWidget;
 		CompVectorUptr<TreeViewEntry> all_entries;
 		CompVector<TreeViewEntry*> top_entries;
 		TreeViewEntry* grabbed_entry = nullptr;
-		TreeViewEntry* grabbed_entry_original_parent = nullptr;
-		size_t grabbed_entry_original_index = 0;
+		Widget* grabbed_widget = nullptr;
 		TreeViewEntry* highlighted_entry = nullptr;
 
 		void deselectAllExceptEntry(TreeViewEntry* except_entry = nullptr);
