@@ -220,6 +220,9 @@ namespace fw {
 		if (new_parent) {
 			wAssert(treeview.all_entries.contains(new_parent));
 		}
+		if (new_parent == parent) {
+			return;
+		}
 		TreeViewEntry* old_parent = parent;
 		if (old_parent) {
 			old_parent->removeChild(this);
