@@ -436,6 +436,10 @@ namespace fw {
 		return unclipped_region.getQuantized();
 	}
 
+	sf::RenderTexture& Widget::getRenderTexture() {
+		return render_textures.getNormal();
+	}
+
 	sf::Vector2f Widget::toGlobal(const sf::Vector2f& pos) const {
 		return getGlobalTransform().transformPoint(pos);
 	}

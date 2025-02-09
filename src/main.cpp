@@ -31,8 +31,11 @@ int main() {
 
     execute_app();
 
+    // TODO: Widgets: render tests
+    // TODO: Widgets: render wigets on the parent's texture if parent has clipChildren = true
+    // TODO: TreeViewWidget: make grabbed widget transparent with all children
+    // TODO: TreeViewWidget: buttons up/down for reordering objects
     // TODO: Outliner: reorder objects
-    // TODO: Outliner: buttons up/down for reordering objects
     // TODO: Outliner: reparent objects
     // TODO: Simulation: rename getFromAll to getObject and getFromTop to getTopObject
     // TODO: Editor: put Camera in separate file

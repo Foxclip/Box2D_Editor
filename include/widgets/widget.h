@@ -171,6 +171,7 @@ namespace fw {
 		sf::FloatRect getVisualGlobalBounds() const;
 		const sf::FloatRect& getUnclippedRegion() const;
 		const sf::FloatRect& getQuantizedUnclippedRegion() const;
+		sf::RenderTexture& getRenderTexture();
 		sf::Vector2f toGlobal(const sf::Vector2f& pos) const;
 		sf::Vector2f toLocal(const sf::Vector2f& pos) const;
 		sf::Vector2f getSize() const;
