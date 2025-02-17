@@ -9,6 +9,7 @@ public:
 	WidgetTestsRender(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 	void emptyTest(test::Test& test);
 	void rectangleTest(test::Test& test);
+	void visibilityTest(test::Test& test);
 
 protected:
 	void beforeRunModule() override;
@@ -16,5 +17,12 @@ protected:
 
 private:
 	bool debug_mouse_saved = false;
+
+	void checkPixels(
+		test::Test& test,
+		fw::Application& application,
+		const sf::Vector2u& size,
+		const std::function<void(test::Test&, const sf::Image&, unsigned int x, unsigned int y)> func
+	) const;
 
 };
