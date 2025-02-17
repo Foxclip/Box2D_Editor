@@ -4,6 +4,7 @@
 
 WidgetTestsRender::WidgetTestsRender(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
     test::Test* empty_test = addTest("empty", [&](test::Test& test) { emptyTest(test); });
+    test::Test* rectangle_test = addTest("rectangle", { empty_test }, [&](test::Test& test) { rectangleTest(test); });
 }
 
 void WidgetTestsRender::emptyTest(test::Test& test) {
@@ -37,6 +38,37 @@ void WidgetTestsRender::emptyTest(test::Test& test) {
             for (unsigned int x = 0; x < image.getSize().x; x++) {
                 T_CONTAINER("Pixel (" + std::to_string(x) + ", " + std::to_string(y) + ")");
                 T_ASSERT(T_COMPARE(image.getPixel(x, y), bg_color, &WidgetTests::colorToStr));
+            }
+        }
+    }
+}
+
+void WidgetTestsRender::rectangleTest(test::Test& test) {
+    sf::Vector2u size(4, 4);
+    sf::RenderWindow& window = getWindow();
+    fw::Application application(window);
+    application.init(test.name, size.x, size.y, 0, false);
+    application.start(true);
+    application.mouseMove(size.x / 2, size.y / 2);
+    application.advance();
+
+    sf::Color rect_color = sf::Color::Red;
+    sf::Color bg_color = sf::Color::Black;
+    fw::WidgetList& widgets = application.getWidgets();
+    fw::RectangleWidget* rectangle_widget = widgets.createRectangleWidget(2.0f, 2.0f);
+    rectangle_widget->setPosition(sf::Vector2f(1.0f, 1.0f));
+    rectangle_widget->setFillColor(rect_color);
+    application.advance();
+
+    const sf::Image& image = application.getRenderedImage();
+    T_ASSERT(T_VEC2_COMPARE(image.getSize(), size));
+    for (unsigned int y = 0; y < image.getSize().y; y++) {
+        for (unsigned int x = 0; x < image.getSize().x; x++) {
+            T_CONTAINER("Pixel (" + std::to_string(x) + ", " + std::to_string(y) + ")");
+            if (x == 0 || x == image.getSize().x - 1 || y == 0 || y == image.getSize().y - 1) {
+                T_ASSERT(T_COMPARE(image.getPixel(x, y), bg_color, &WidgetTests::colorToStr));
+            } else {
+                T_ASSERT(T_COMPARE(image.getPixel(x, y), rect_color, &WidgetTests::colorToStr));
             }
         }
     }
