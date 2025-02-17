@@ -16,13 +16,21 @@ void WidgetTestsRender::emptyTest(test::Test& test) {
     application.mouseMove(5, 5);
     application.advance();
 
-    sf::RenderTexture& render_texture = application.getWidgets().getRootWidget()->getRenderTexture();
-    const sf::Texture& texture = render_texture.getTexture();
-    sf::Image image = texture.copyToImage();
+    const sf::Image& image = application.getRenderedImage();
     T_ASSERT(T_VEC2_COMPARE(image.getSize(), size));
     for (unsigned int y = 0; y < image.getSize().y; y++) {
 		for (unsigned int x = 0; x < image.getSize().x; x++) {
-			T_COMPARE(image.getPixel(x, y), sf::Color::Red, &WidgetTests::colorToStr);
+            T_CONTAINER("Pixel (" + std::to_string(x) + ", " + std::to_string(y) + ")");
+            T_ASSERT(T_COMPARE(image.getPixel(x, y), sf::Color::Black, &WidgetTests::colorToStr));
 		}
     }
+}
+
+void WidgetTestsRender::beforeRunModule() {
+    debug_mouse_saved = fw::WidgetList::debug_mouse;
+    fw::WidgetList::debug_mouse = false; // mouse cursor will be on rendered textures otherwise
+}
+
+void WidgetTestsRender::afterRunModule() {
+	fw::WidgetList::debug_mouse = debug_mouse_saved;
 }

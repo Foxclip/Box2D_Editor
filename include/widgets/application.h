@@ -55,6 +55,8 @@ namespace fw {
 		Stage getStage() const;
 		Widget* getLeftGestureSource() const;
 		Widget* getRightGestureSource() const;
+		const sf::RenderTexture& getRenderTexture() const;
+		sf::Image getRenderedImage() const;
 		void setWindowSize(unsigned int width, unsigned int height);
 		void setWindowSize(const sf::Vector2u& size);
 		void addExternalEvent(const sf::Event& event);

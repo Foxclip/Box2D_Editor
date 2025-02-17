@@ -94,6 +94,16 @@ namespace fw {
         }
     }
 
+    const sf::RenderTexture& Application::getRenderTexture() const {
+        return render_texture;
+    }
+
+    sf::Image Application::getRenderedImage() const {
+        const sf::Texture& texture = render_texture.getTexture();
+        sf::Image image = texture.copyToImage();
+		return image;
+    }
+
     void Application::setWindowSize(unsigned int width, unsigned int height) {
         window.setSize(sf::Vector2u(width, height));
         if (external_control) {
@@ -663,7 +673,6 @@ namespace fw {
     void Application::render() {
         widgets.updateRenderQueue();
         widgets.lock();
-        window.clear(background_color);
         window_view.setCenter(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
         window_view.setSize((float)window.getSize().x, (float)window.getSize().y);
         window.setView(window_view);
@@ -671,7 +680,7 @@ namespace fw {
         if (window.getSize() != render_texture.getSize()) {
 			render_texture.create(window.getSize().x, window.getSize().y);
         }
-        render_texture.clear(sf::Color::Transparent);
+        render_texture.clear(background_color);
         widgets.render(render_texture);
         render_texture.display();
 		sf::Sprite sprite(render_texture.getTexture(), sf::IntRect(0, 0, window.getSize().x, window.getSize().y));

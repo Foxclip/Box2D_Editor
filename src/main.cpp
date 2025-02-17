@@ -37,6 +37,7 @@ int main() {
     // TODO: TreeViewWidget: buttons up/down for reordering objects
     // TODO: Outliner: reorder objects
     // TODO: Outliner: reparent objects
+    // TODO: Move widget library to the separate project
     // TODO: Simulation: rename getFromAll to getObject and getFromTop to getTopObject
     // TODO: Editor: put Camera in separate file
     // TODO: WidgetList: use addPending methods explicitly instead of sneakily calling them from other methods like moveToTop
