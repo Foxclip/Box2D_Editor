@@ -420,15 +420,23 @@ namespace fw {
 
     void Application::loadFragmentShaderParts(sf::Shader& shader, const std::string& name, const std::vector<std::filesystem::path>& paths) {
         std::string combined_shader_string = getCombinedShaderString(paths, "shaders/combined_template.frag");
+        std::string path_str;
 #ifndef NDEBUG
         std::filesystem::create_directory("shaders/combined/");
         std::filesystem::path combined_path = "shaders/combined/" + name + "_combined.frag";
         str_to_file(combined_shader_string, combined_path);
+        if (!shader.loadFromMemory(combined_shader_string, sf::Shader::Fragment)) {
+            throw std::runtime_error("Fragment shader compilation error: " + combined_path.string());
+        }
+#else
+        if (!shader.loadFromMemory(combined_shader_string, sf::Shader::Fragment)) {
+            for (size_t i = 0; i < paths.size(); i++) {
+                path_str += "    " + paths[i].string() + "\n";
+            }
+            throw std::runtime_error("Fragment shader compilation error. Files in shader:\n" + path_str);
+        }
 #endif // NDEBUG
 
-        if (!shader.loadFromMemory(combined_shader_string, sf::Shader::Fragment)) {
-            throw std::runtime_error("Fragment shader part compilation error: " + combined_path.string());
-        }
     }
 
     void Application::mainLoop() {
