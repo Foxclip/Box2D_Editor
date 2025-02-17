@@ -10,6 +10,7 @@ public:
 	void emptyTest(test::Test& test);
 	void rectangleTest(test::Test& test);
 	void visibilityTest(test::Test& test);
+	void localLayersTest(test::Test& test);
 
 protected:
 	void beforeRunModule() override;
