@@ -61,6 +61,7 @@ namespace fw {
 		void setWindowSize(const sf::Vector2u& size);
 		void addExternalEvent(const sf::Event& event);
 		void mouseMove(int x, int y);
+		void mouseMove(unsigned int x, unsigned int y);
 		void mouseMove(float x, float y);
 		void mouseMove(const sf::Vector2i& pos);
 		void mouseMove(const sf::Vector2f& pos);

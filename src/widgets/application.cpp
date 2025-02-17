@@ -134,6 +134,10 @@ namespace fw {
         addExternalEvent(event);
     }
 
+    void Application::mouseMove(unsigned int x, unsigned int y) {
+		mouseMove((int)x, (int)y);
+    }
+
     void Application::mouseMove(float x, float y) {
         mouseMove((int)x, (int)y);
     }

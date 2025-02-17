@@ -7,13 +7,13 @@ WidgetTestsRender::WidgetTestsRender(const std::string& name, test::TestModule* 
 }
 
 void WidgetTestsRender::emptyTest(test::Test& test) {
-    sf::Vector2u size(10, 10);
+    sf::Vector2u size(3, 3);
 
     sf::RenderWindow& window = getWindow();
     fw::Application application(window);
     application.init(test.name, size.x, size.y, 0, false);
     application.start(true);
-    application.mouseMove(5, 5);
+    application.mouseMove(size.x / 2, size.y / 2);
     application.advance();
 
     const sf::Image& image = application.getRenderedImage();
