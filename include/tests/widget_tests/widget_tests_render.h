@@ -8,6 +8,8 @@ class WidgetTestsRender : public WidgetTest {
 public:
 	WidgetTestsRender(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 	void emptyTest(test::Test& test);
+
+protected:
 	void beforeRunModule() override;
 	void afterRunModule() override;
 

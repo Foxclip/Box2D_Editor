@@ -8,7 +8,6 @@ WidgetTestsRender::WidgetTestsRender(const std::string& name, test::TestModule* 
 
 void WidgetTestsRender::emptyTest(test::Test& test) {
     sf::Vector2u size(3, 3);
-
     sf::RenderWindow& window = getWindow();
     fw::Application application(window);
     application.init(test.name, size.x, size.y, 0, false);
@@ -16,13 +15,30 @@ void WidgetTestsRender::emptyTest(test::Test& test) {
     application.mouseMove(size.x / 2, size.y / 2);
     application.advance();
 
-    const sf::Image& image = application.getRenderedImage();
-    T_ASSERT(T_VEC2_COMPARE(image.getSize(), size));
-    for (unsigned int y = 0; y < image.getSize().y; y++) {
-		for (unsigned int x = 0; x < image.getSize().x; x++) {
-            T_CONTAINER("Pixel (" + std::to_string(x) + ", " + std::to_string(y) + ")");
-            T_ASSERT(T_COMPARE(image.getPixel(x, y), sf::Color::Black, &WidgetTests::colorToStr));
-		}
+    {
+        const sf::Image& image = application.getRenderedImage();
+        T_ASSERT(T_VEC2_COMPARE(image.getSize(), size));
+        for (unsigned int y = 0; y < image.getSize().y; y++) {
+            for (unsigned int x = 0; x < image.getSize().x; x++) {
+                T_CONTAINER("Pixel (" + std::to_string(x) + ", " + std::to_string(y) + ")");
+                T_ASSERT(T_COMPARE(image.getPixel(x, y), sf::Color::Black, &WidgetTests::colorToStr));
+            }
+        }
+    }
+
+    sf::Color bg_color = sf::Color::Red;
+    application.setBackgroundColor(bg_color);
+    application.advance();
+
+    {
+        const sf::Image& image = application.getRenderedImage();
+        T_ASSERT(T_VEC2_COMPARE(image.getSize(), size));
+        for (unsigned int y = 0; y < image.getSize().y; y++) {
+            for (unsigned int x = 0; x < image.getSize().x; x++) {
+                T_CONTAINER("Pixel (" + std::to_string(x) + ", " + std::to_string(y) + ")");
+                T_ASSERT(T_COMPARE(image.getPixel(x, y), bg_color, &WidgetTests::colorToStr));
+            }
+        }
     }
 }
 
