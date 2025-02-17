@@ -11,6 +11,7 @@ public:
 	void rectangleTest(test::Test& test);
 	void visibilityTest(test::Test& test);
 	void localLayersTest(test::Test& test);
+	void globalLayersTest(test::Test& test);
 
 protected:
 	void beforeRunModule() override;

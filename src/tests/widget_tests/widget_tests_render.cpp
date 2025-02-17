@@ -7,6 +7,7 @@ WidgetTestsRender::WidgetTestsRender(const std::string& name, test::TestModule* 
     test::Test* rectangle_test = addTest("rectangle", { empty_test }, [&](test::Test& test) { rectangleTest(test); });
     test::Test* visibility_test = addTest("visibility", { rectangle_test }, [&](test::Test& test) { visibilityTest(test); });
     test::Test* local_layers_test = addTest("local_layers", { rectangle_test }, [&](test::Test& test) { localLayersTest(test); });
+    test::Test* global_layers_test = addTest("global_layers", { rectangle_test }, [&](test::Test& test) { globalLayersTest(test); });
 }
 
 void WidgetTestsRender::emptyTest(test::Test& test) {
@@ -128,6 +129,32 @@ void WidgetTestsRender::localLayersTest(test::Test& test) {
         T_ASSERT(T_COMPARE(image.getPixel(x, y), sf::Color::Green, &WidgetTests::colorToStr));
     });
     rectangle_1_widget->moveToTop();
+    application.advance();
+    checkPixels(test, application, size, [&](test::Test&, const sf::Image& image, unsigned int x, unsigned int y) {
+        T_ASSERT(T_COMPARE(image.getPixel(x, y), sf::Color::Red, &WidgetTests::colorToStr));
+    });
+}
+
+void WidgetTestsRender::globalLayersTest(test::Test& test) {
+    sf::Vector2u size(3, 3);
+    sf::RenderWindow& window = getWindow();
+    fw::Application application(window);
+    application.init(test.name, size.x, size.y, 0, false);
+    application.start(true);
+    application.mouseMove(size.x / 2, size.y / 2);
+    application.advance();
+
+    fw::WidgetList& widgets = application.getWidgets();
+    fw::RectangleWidget* rectangle_1_widget = widgets.createRectangleWidget(3.0f, 3.0f);
+    fw::RectangleWidget* rectangle_2_widget = widgets.createRectangleWidget(3.0f, 3.0f);
+    rectangle_1_widget->setFillColor(sf::Color::Red);
+    rectangle_2_widget->setFillColor(sf::Color::Green);
+    application.advance();
+
+    checkPixels(test, application, size, [&](test::Test&, const sf::Image& image, unsigned int x, unsigned int y) {
+        T_ASSERT(T_COMPARE(image.getPixel(x, y), sf::Color::Green, &WidgetTests::colorToStr));
+    });
+    rectangle_1_widget->setGlobalRenderLayer(fw::GlobalRenderLayer::TOP);
     application.advance();
     checkPixels(test, application, size, [&](test::Test&, const sf::Image& image, unsigned int x, unsigned int y) {
         T_ASSERT(T_COMPARE(image.getPixel(x, y), sf::Color::Red, &WidgetTests::colorToStr));
