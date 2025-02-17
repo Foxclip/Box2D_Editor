@@ -660,7 +660,14 @@ namespace fw {
         window_view.setSize((float)window.getSize().x, (float)window.getSize().y);
         window.setView(window_view);
         onRender();
-        widgets.render(window);
+        if (window.getSize() != render_texture.getSize()) {
+			render_texture.create(window.getSize().x, window.getSize().y);
+        }
+        render_texture.clear(sf::Color::Transparent);
+        widgets.render(render_texture);
+        render_texture.display();
+		sf::Sprite sprite(render_texture.getTexture(), sf::IntRect(0, 0, window.getSize().x, window.getSize().y));
+		window.draw(sprite);
         window.display();
         widgets.unlock();
     }

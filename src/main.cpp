@@ -32,7 +32,7 @@ int main() {
     execute_app();
 
     // TODO: Widgets: render tests
-    // TODO: Widgets: render wigets on the parent's texture if parent has clipChildren = true
+    // TODO: TreeViewWidget: prohibit dragging parent into its children
     // TODO: TreeViewWidget: make grabbed widget transparent with all children
     // TODO: TreeViewWidget: buttons up/down for reordering objects
     // TODO: Outliner: reorder objects

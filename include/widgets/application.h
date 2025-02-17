@@ -161,6 +161,7 @@ namespace fw {
 		Stage stage = Stage::NONE;
 		sf::Shader premultiply;
 		sf::Shader default_shader;
+		sf::RenderTexture render_texture;
 
 		void mainLoop();
 		void processWidgets();
