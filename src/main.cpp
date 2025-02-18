@@ -31,7 +31,6 @@ int main() {
 
     execute_app();
 
-    // TODO: Widgets: render tests: layer test
     // TODO: TreeViewWidget: prohibit dragging parent into its children
     // TODO: TreeViewWidget: grabbed widget is shown without children
     // TODO: TreeViewWidget: buttons up/down for reordering objects
