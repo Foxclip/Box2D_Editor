@@ -31,9 +31,15 @@ int main() {
 
     execute_app();
 
+    // TODO: Widgets: render tests: layer test
+    // TODO: TreeViewWidget: prohibit dragging parent into its children
+    // TODO: TreeViewWidget: grabbed widget is shown without children
+    // TODO: TreeViewWidget: buttons up/down for reordering objects
     // TODO: Outliner: reorder objects
-    // TODO: Outliner: buttons up/down for reordering objects
     // TODO: Outliner: reparent objects
+    // TODO: RectangleWidget: rounded corners
+    // TODO: Widget: remove quantize_rendered_position
+    // TODO: Move widget library to the separate project
     // TODO: Simulation: rename getFromAll to getObject and getFromTop to getTopObject
     // TODO: Editor: put Camera in separate file
     // TODO: WidgetList: use addPending methods explicitly instead of sneakily calling them from other methods like moveToTop

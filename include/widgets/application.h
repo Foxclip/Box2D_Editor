@@ -55,10 +55,13 @@ namespace fw {
 		Stage getStage() const;
 		Widget* getLeftGestureSource() const;
 		Widget* getRightGestureSource() const;
+		const sf::RenderTexture& getRenderTexture() const;
+		sf::Image getRenderedImage() const;
 		void setWindowSize(unsigned int width, unsigned int height);
 		void setWindowSize(const sf::Vector2u& size);
 		void addExternalEvent(const sf::Event& event);
 		void mouseMove(int x, int y);
+		void mouseMove(unsigned int x, unsigned int y);
 		void mouseMove(float x, float y);
 		void mouseMove(const sf::Vector2i& pos);
 		void mouseMove(const sf::Vector2f& pos);
@@ -161,6 +164,7 @@ namespace fw {
 		Stage stage = Stage::NONE;
 		sf::Shader premultiply;
 		sf::Shader default_shader;
+		sf::RenderTexture render_texture;
 
 		void mainLoop();
 		void processWidgets();

@@ -94,6 +94,16 @@ namespace fw {
         }
     }
 
+    const sf::RenderTexture& Application::getRenderTexture() const {
+        return render_texture;
+    }
+
+    sf::Image Application::getRenderedImage() const {
+        const sf::Texture& texture = render_texture.getTexture();
+        sf::Image image = texture.copyToImage();
+		return image;
+    }
+
     void Application::setWindowSize(unsigned int width, unsigned int height) {
         window.setSize(sf::Vector2u(width, height));
         if (external_control) {
@@ -122,6 +132,10 @@ namespace fw {
         event.mouseMove.x = x;
         event.mouseMove.y = y;
         addExternalEvent(event);
+    }
+
+    void Application::mouseMove(unsigned int x, unsigned int y) {
+		mouseMove((int)x, (int)y);
     }
 
     void Application::mouseMove(float x, float y) {
@@ -420,15 +434,23 @@ namespace fw {
 
     void Application::loadFragmentShaderParts(sf::Shader& shader, const std::string& name, const std::vector<std::filesystem::path>& paths) {
         std::string combined_shader_string = getCombinedShaderString(paths, "shaders/combined_template.frag");
+        std::string path_str;
 #ifndef NDEBUG
         std::filesystem::create_directory("shaders/combined/");
         std::filesystem::path combined_path = "shaders/combined/" + name + "_combined.frag";
         str_to_file(combined_shader_string, combined_path);
+        if (!shader.loadFromMemory(combined_shader_string, sf::Shader::Fragment)) {
+            throw std::runtime_error("Fragment shader compilation error: " + combined_path.string());
+        }
+#else
+        if (!shader.loadFromMemory(combined_shader_string, sf::Shader::Fragment)) {
+            for (size_t i = 0; i < paths.size(); i++) {
+                path_str += "    " + paths[i].string() + "\n";
+            }
+            throw std::runtime_error("Fragment shader compilation error. Files in shader:\n" + path_str);
+        }
 #endif // NDEBUG
 
-        if (!shader.loadFromMemory(combined_shader_string, sf::Shader::Fragment)) {
-            throw std::runtime_error("Fragment shader part compilation error: " + combined_path.string());
-        }
     }
 
     void Application::mainLoop() {
@@ -655,12 +677,18 @@ namespace fw {
     void Application::render() {
         widgets.updateRenderQueue();
         widgets.lock();
-        window.clear(background_color);
         window_view.setCenter(window.getSize().x / 2.0f, window.getSize().y / 2.0f);
         window_view.setSize((float)window.getSize().x, (float)window.getSize().y);
         window.setView(window_view);
         onRender();
-        widgets.render(window);
+        if (window.getSize() != render_texture.getSize()) {
+			render_texture.create(window.getSize().x, window.getSize().y);
+        }
+        render_texture.clear(background_color);
+        widgets.render(render_texture);
+        render_texture.display();
+		sf::Sprite sprite(render_texture.getTexture(), sf::IntRect(0, 0, window.getSize().x, window.getSize().y));
+		window.draw(sprite);
         window.display();
         widgets.unlock();
     }
