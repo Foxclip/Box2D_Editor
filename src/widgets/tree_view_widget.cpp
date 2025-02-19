@@ -108,7 +108,7 @@ namespace fw {
 		return top_entries.size();
 	}
 
-	Widget* TreeViewWidget::getGrabbedWidget() const {
+	TreeViewEntryWidget* TreeViewWidget::getGrabbedWidget() const {
 		return grabbed_widget;
 	}
 

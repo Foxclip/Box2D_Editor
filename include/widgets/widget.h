@@ -161,6 +161,7 @@ namespace fw {
 		size_t getChildrenCount() const;
 		CompVector<Widget*> getAllChildren() const;
 		Widget* getChild(size_t index) const;
+		Widget* tryFind(const std::string& name) const;
 		Widget* find(const std::string& name) const;
 		CompVector<Widget*> getRenderQueue() const;
 		virtual sf::FloatRect getLocalBounds() const = 0;

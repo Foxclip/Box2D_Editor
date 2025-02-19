@@ -106,7 +106,7 @@ namespace fw {
 	TextWidget* DropdownWidget::getOptionTextWidget(size_t index) const {
 		wAssert(index >= 0 && index < option_widgets.size());
 		RectangleWidget* option_widget = option_widgets[index];
-		TextWidget* text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
+		TextWidget* text_widget = dynamic_cast<TextWidget*>(option_widget->tryFind("text"));
 		return text_widget;
 	}
 
@@ -164,14 +164,14 @@ namespace fw {
 		selected = index;
 		OnValueChanged(index);
 		RectangleWidget* option = option_widgets[index];
-		std::string text = dynamic_cast<TextWidget*>(option->find("text"))->getString();
+		std::string text = dynamic_cast<TextWidget*>(option->tryFind("text"))->getString();
 		text_widget->setString(text);
 	}
 
 	void DropdownWidget::setOptionText(size_t index, const sf::String& text) {
 		wAssert(index >= 0 && index < option_widgets.size());
 		RectangleWidget* option_widget = option_widgets[index];
-		TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
+		TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->tryFind("text"));
 		option_text_widget->setString(text);
 	}
 
@@ -185,7 +185,7 @@ namespace fw {
 	void DropdownWidget::removeOption(const sf::String& text) {
 		for (size_t i = 0; i < option_widgets.size(); i++) {
 			RectangleWidget* option_widget = option_widgets[i];
-			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
+			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->tryFind("text"));
 			if (option_text_widget->getString() == text) {
 				removeOption(i);
 				return;
@@ -214,7 +214,7 @@ namespace fw {
 		float max_text_width = 0.0f;
 		for (size_t i = 0; i < option_widgets.size(); i++) {
 			RectangleWidget* option_widget = option_widgets[i];
-			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
+			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->tryFind("text"));
 			float text_width = option_text_widget->getWidth();
 			max_text_width = std::max(max_text_width, text_width);
 		}
@@ -257,7 +257,7 @@ namespace fw {
 		panel_text_color = color;
 		for (size_t i = 0; i < option_widgets.size(); i++) {
 			RectangleWidget* option_widget = option_widgets[i];
-			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
+			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->tryFind("text"));
 			option_text_widget->setFillColor(color);
 		}
 	}
@@ -266,7 +266,7 @@ namespace fw {
 		text_widget->setFont(font);
 		for (size_t i = 0; i < option_widgets.size(); i++) {
 			RectangleWidget* option_widget = option_widgets[i];
-			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
+			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->tryFind("text"));
 			option_text_widget->setFont(font);
 		}
 	}
@@ -275,7 +275,7 @@ namespace fw {
 		text_widget->setCharacterSize(size);
 		for (size_t i = 0; i < option_widgets.size(); i++) {
 			RectangleWidget* option_widget = option_widgets[i];
-			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->find("text"));
+			TextWidget* option_text_widget = dynamic_cast<TextWidget*>(option_widget->tryFind("text"));
 			option_text_widget->setCharacterSize(size);
 		}
 	}

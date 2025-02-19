@@ -354,18 +354,26 @@ namespace fw {
 		return children[index];
 	}
 
-	Widget* Widget::find(const std::string& name) const {
+	Widget* Widget::tryFind(const std::string& name) const {
 		Widget* widget = children_names.find(name);
 		if (widget) {
 			return widget;
 		}
 		for (size_t i = 0; i < children.size(); i++) {
-			Widget* result = children[i]->find(name);
+			Widget* result = children[i]->tryFind(name);
 			if (result) {
 				return result;
 			}
 		}
 		return nullptr;
+	}
+
+	Widget* Widget::find(const std::string& name) const {
+		Widget* result = tryFind(name);
+		if (!result) {
+			throw std::runtime_error("Widget not found in: " + this->full_name + ", name: " + name);
+		}
+		return result;
 	}
 
 	CompVector<Widget*> Widget::getRenderQueue() const {

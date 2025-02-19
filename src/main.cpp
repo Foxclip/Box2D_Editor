@@ -31,8 +31,7 @@ int main() {
 
     execute_app();
 
-    // TODO: TreeViewWidget: prohibit dragging parent into its children
-    // TODO: TreeViewWidget: grabbed widget is shown without children
+    // TODO: replace checks after tryFind with find
     // TODO: TreeViewWidget: buttons up/down for reordering objects
     // TODO: Outliner: reorder objects
     // TODO: Outliner: reparent objects

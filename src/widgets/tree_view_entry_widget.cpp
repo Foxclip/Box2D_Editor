@@ -116,13 +116,13 @@ namespace fw {
 
 	TreeViewEntryWidget* TreeViewEntryWidget::clone(bool with_children) {
 		TreeViewEntryWidget* copy = widget_list.duplicateWidget(this, with_children);
-		RectangleWidget* rectangle_widget_copy = dynamic_cast<RectangleWidget*>(copy->find("rectangle"));
-		TextWidget* text_widget_copy = dynamic_cast<TextWidget*>(copy->find("text"));
-		RectangleWidget* arrow_area_widget_copy = dynamic_cast<RectangleWidget*>(copy->find("arrow area"));
-		PolygonWidget* arrow_widget_copy = dynamic_cast<PolygonWidget*>(copy->find("arrow"));
-		ContainerWidget* children_box_widget_copy = dynamic_cast<ContainerWidget*>(copy->find("children box"));
-		EmptyWidget* children_spacing_widget = dynamic_cast<EmptyWidget*>(copy->find("spacing"));
-		ContainerWidget* children_widget = dynamic_cast<ContainerWidget*>(copy->find("children"));
+		RectangleWidget* rectangle_widget_copy = dynamic_cast<RectangleWidget*>(copy->tryFind("rectangle"));
+		TextWidget* text_widget_copy = dynamic_cast<TextWidget*>(copy->tryFind("text"));
+		RectangleWidget* arrow_area_widget_copy = dynamic_cast<RectangleWidget*>(copy->tryFind("arrow area"));
+		PolygonWidget* arrow_widget_copy = dynamic_cast<PolygonWidget*>(copy->tryFind("arrow"));
+		ContainerWidget* children_box_widget_copy = dynamic_cast<ContainerWidget*>(copy->tryFind("children box"));
+		EmptyWidget* children_spacing_widget = dynamic_cast<EmptyWidget*>(copy->tryFind("spacing"));
+		ContainerWidget* children_widget = dynamic_cast<ContainerWidget*>(copy->tryFind("children"));
 		wAssert(
 			rectangle_widget_copy
 			&& text_widget_copy

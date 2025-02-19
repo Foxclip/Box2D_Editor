@@ -145,14 +145,14 @@ void EditWindow::setSpacingWidgets() {
     float max_text_width = 0.0f;
     for (size_t i = 0; i < parameters.size(); i++) {
         EditWindowParameter* parameter = parameters[i];
-        fw::TextWidget* text_widget = dynamic_cast<fw::TextWidget*>(parameter->getWidget()->find("text"));
+        fw::TextWidget* text_widget = dynamic_cast<fw::TextWidget*>(parameter->getWidget()->tryFind("text"));
         mAssert(text_widget);
         max_text_width = std::max(max_text_width, text_widget->getWidth());
     }
     for (size_t i = 0; i < parameters.size(); i++) {
         EditWindowParameter* parameter = parameters[i];
-        fw::TextWidget* text_widget = dynamic_cast<fw::TextWidget*>(parameter->getWidget()->find("text"));
-        EmptyWidget* spacing_widget = dynamic_cast<fw::EmptyWidget*>(parameter->getWidget()->find("spacing"));
+        fw::TextWidget* text_widget = dynamic_cast<fw::TextWidget*>(parameter->getWidget()->tryFind("text"));
+        EmptyWidget* spacing_widget = dynamic_cast<fw::EmptyWidget*>(parameter->getWidget()->tryFind("spacing"));
         mAssert(spacing_widget);
         float padding = container_widget->getInnerPaddingX();
         spacing_widget->setWidth(max_text_width + padding - text_widget->getWidth());

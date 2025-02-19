@@ -283,12 +283,15 @@ namespace fw {
 			TreeViewEntryWidget* widget_copy = entry_widget->clone();
 			widget_copy->setParentAnchor(Widget::Anchor::CUSTOM);
 			widget_copy->setSizeXPolicy(Widget::SizePolicy::NONE);
-			widget_copy->find("rectangle")->setClickThrough(true); // to allow mouse wheel events
+			widget_copy->rectangle_widget->setClickThrough(true); // to allow mouse wheel events
 			widget_copy->setParent(nullptr);
 			widget_copy->setGrabbedVisualMode();
 			widget_copy->setGlobalPosition(entry_widget->getGlobalPosition());
 			treeview.grabbed_widget = widget_copy;
 		}, PostActionStage::DUPLICATE);
+		treeview.widget_list.addPostAction([this](WidgetList& widget_list) {
+			treeview.grabbed_widget->children_box_widget->remove();
+		}, PostActionStage::REMOVE);
 	}
 
 	void TreeViewEntry::dropTo(TreeViewEntry* parent, size_t index) {
