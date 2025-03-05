@@ -34,6 +34,7 @@ namespace fw {
 	class WindowWidget;
 	class ScrollAreaWidget;
 	class TreeViewWidget;
+	class ButtonWidget;
 
 	enum class PostActionStage {
 		FIRST,
@@ -119,6 +120,8 @@ namespace fw {
 		ScrollAreaWidget* createScrollAreaWidget(const sf::Vector2f& size);
 		TreeViewWidget* createTreeViewWidget(float width, float height);
 		TreeViewWidget* createTreeViewWidget(const sf::Vector2f& size);
+		ButtonWidget* createButtonWidget(float width, float height);
+		ButtonWidget* createButtonWidget(const sf::Vector2f& size);
 		template<typename T>
 		requires std::derived_from<T, Widget>
 		T* duplicateWidget(T* widget, bool with_children = true);

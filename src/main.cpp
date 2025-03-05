@@ -3,8 +3,11 @@
 #include "editor/editor.h"
 #include "editor/scenes.h"
 #include "common/logger.h"
-#include "widgets/tree_view_widget.h"
-#include "widgets/scroll_area_widget.h"
+#include "widgets/button_widget.h"
+
+namespace fw {
+    class fw::ButtonWidget;
+}
 
 void execute_app() {
     logger << "Starting app\n";
@@ -12,6 +15,10 @@ void execute_app() {
     try {
         app.init("Box2D Editor");
         app.load("levels/level.txt");
+
+        fw::ButtonWidget* button_widget = app.getWidgets().createButtonWidget(100.0f, 20.0f);
+        button_widget->setGlobalPosition(app.getWindowCenter());
+
         app.start();
     } catch (std::string msg) {
         logger << "ERROR: " << msg << "\n";
@@ -31,7 +38,7 @@ int main() {
 
     execute_app();
 
-    // TODO: replace checks after tryFind with find
+    // TODO: Add ButtonWidget
     // TODO: TreeViewWidget: buttons up/down for reordering objects
     // TODO: Outliner: reorder objects
     // TODO: Outliner: reparent objects
