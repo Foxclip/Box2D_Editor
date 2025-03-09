@@ -16,6 +16,7 @@ namespace fw {
 
 		ButtonWidget(WidgetList& widget_list, float width, float height);
 		ButtonWidget(WidgetList& widget_list, const sf::Vector2f& size);
+		bool isPressed() const;
 		ButtonWidget* clone(bool with_children = true) override;
 		void setNormalColor(const sf::Color& color);
 		void setPressedColor(const sf::Color& color);

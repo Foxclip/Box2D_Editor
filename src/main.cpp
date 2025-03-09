@@ -38,8 +38,8 @@ int main() {
 
     execute_app();
 
-    // TODO: Add ButtonWidget
     // TODO: TreeViewWidget: buttons up/down for reordering objects
+    // TODOL TreeViewWidget: reparent object by dragging
     // TODO: Outliner: reorder objects
     // TODO: Outliner: reparent objects
     // TODO: RectangleWidget: rounded corners

@@ -13,6 +13,10 @@ namespace fw {
 	ButtonWidget::ButtonWidget(WidgetList& widget_list, const sf::Vector2f& size)
 		: RectangleWidget(widget_list, size.x, size.y) { }
 
+	bool ButtonWidget::isPressed() const {
+		return pressed;
+	}
+
 	ButtonWidget* ButtonWidget::clone(bool with_children) {
 		return widget_list.duplicateWidget(this, with_children);
 	}

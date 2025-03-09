@@ -3,6 +3,7 @@
 
 WidgetTestsButton::WidgetTestsButton(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : WidgetTest(name, parent, required_nodes) {
 	test::Test* basic_test = addTest("basic", [&](test::Test& test) { basicTest(test); });
+    test::Test* press_test = addTest("press", { basic_test }, [&](test::Test& test) { pressTest(test); });
 }
 
 void WidgetTestsButton::basicTest(test::Test& test) {
@@ -52,5 +53,47 @@ void WidgetTestsButton::basicTest(test::Test& test) {
 
     T_COMPARE(button_widget->getChildren().size(), 0);
 
+    T_COMPARE(button_widget->getFillColor(), fw::BUTTON_DEFAULT_NORMAL_COLOR, &WidgetTests::colorToStr);
+}
+
+void WidgetTestsButton::pressTest(test::Test& test) {
+    fw::Application application(getWindow());
+    application.init(test.name, 800, 600, 0, false);
+    application.setDefaultFont(getFont());
+    application.start(true);
+    application.advance();
+
+    sf::Vector2f size(200.0f, 200.0f);
+    sf::Vector2f position(100.0f, 100.0f);
+    fw::ButtonWidget* button_widget = application.getWidgets().createButtonWidget(size);
+    button_widget->setPosition(position);
+    bool pressed = false;
+    bool released = false;
+    button_widget->OnPress += [&]() {
+        pressed = true;
+    };
+    button_widget->OnRelease += [&]() {
+		released = true;
+	};
+    T_CHECK(!button_widget->isPressed());
+    T_CHECK(!pressed);
+    T_CHECK(!released);
+    T_COMPARE(button_widget->getFillColor(), fw::BUTTON_DEFAULT_NORMAL_COLOR, &WidgetTests::colorToStr);
+    application.advance();
+
+    sf::Vector2f button_center = button_widget->getGlobalCenter();
+    application.mouseMove(button_center);
+    application.mouseLeftPress();
+    application.advance();
+    T_CHECK(button_widget->isPressed());
+    T_CHECK(pressed);
+    T_CHECK(!released);
+    T_COMPARE(button_widget->getFillColor(), fw::BUTTON_DEFAULT_PRESSED_COLOR, &WidgetTests::colorToStr);
+
+    application.mouseLeftRelease();
+    application.advance();
+    T_CHECK(!button_widget->isPressed());
+    T_CHECK(pressed);
+    T_CHECK(released);
     T_COMPARE(button_widget->getFillColor(), fw::BUTTON_DEFAULT_NORMAL_COLOR, &WidgetTests::colorToStr);
 }
