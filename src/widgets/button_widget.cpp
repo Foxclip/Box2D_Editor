@@ -30,11 +30,13 @@ namespace fw {
 	void ButtonWidget::internalOnLeftPress(const sf::Vector2f& pos, bool became_focused) {
 		pressed = true;
 		updateColors();
+		OnPress();
 	}
 
 	void ButtonWidget::internalOnGlobalLeftRelease(const sf::Vector2f& pos) {
 		pressed = false;
 		updateColors();
+		OnRelease();
 	}
 
 	void ButtonWidget::updateColors() {

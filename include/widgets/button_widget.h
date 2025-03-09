@@ -11,6 +11,9 @@ namespace fw {
 
 	class ButtonWidget : public RectangleWidget {
 	public:
+		Event<> OnPress;
+		Event<> OnRelease;
+
 		ButtonWidget(WidgetList& widget_list, float width, float height);
 		ButtonWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		ButtonWidget* clone(bool with_children = true) override;
