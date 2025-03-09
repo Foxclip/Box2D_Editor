@@ -9,7 +9,7 @@ namespace fw {
 	TreeViewEntryWidget::TreeViewEntryWidget(WidgetList& widget_list, TreeViewEntry& entry, const std::string& name, float width, float height) : ContainerWidget(widget_list, width, height), entry(entry) {
 		setName(name + " entry");
 		setHorizontal(false);
-		setInnerPaddingY(TREEVIEW_CONTAINER_PADDING);
+		setInnerPaddingY(TREEVIEW_MAIN_PANEL_PADDING);
 		setFillColor(sf::Color::Transparent);
 		setSizeXPolicy(Widget::SizePolicy::PARENT);
 		setParent(&entry.treeview);
@@ -85,7 +85,7 @@ namespace fw {
 		children_widget = entry.treeview.widget_list.createContainerWidget(20.0f, TREEVIEW_ENTRY_HEIGHT);
 		children_widget->setName("children");
 		children_widget->setHorizontal(false);
-		children_widget->setInnerPaddingY(TREEVIEW_CONTAINER_PADDING);
+		children_widget->setInnerPaddingY(TREEVIEW_MAIN_PANEL_PADDING);
 		children_widget->setRenderable(false);
 		children_widget->setSizeXPolicy(Widget::SizePolicy::EXPAND);
 		children_widget->setParent(children_box_widget);

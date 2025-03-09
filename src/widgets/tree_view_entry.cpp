@@ -13,7 +13,7 @@ namespace fw {
 #endif
 		this->name = name;
 		entry_widget = treeview.widget_list.createWidget<TreeViewEntryWidget>(*this, name, 20.0f, TREEVIEW_ENTRY_HEIGHT);
-		entry_widget->setParent(&treeview);
+		entry_widget->setParent(treeview.main_panel);
 	}
 
 	TreeViewEntry::~TreeViewEntry() {

@@ -1,5 +1,6 @@
 #include "widgets/tree_view_widget.h"
 #include "widgets/widget_list.h"
+#include "widgets/button_widget.h"
 
 namespace fw {
 
@@ -7,17 +8,44 @@ namespace fw {
 
 	TreeViewWidget::TreeViewWidget(WidgetList& widget_list, float width, float height)
 		: ContainerWidget(widget_list, width, height) {
+		// treeview
 		type = WidgetType::TreeView;
 		setName("treeview");
 		setFillColor(TREEVIEW_BACKGROUND_COLOR);
 		setClipChildren(true);
 		setClickThrough(false);
 		setHorizontal(false);
-		setPadding(TREEVIEW_CONTAINER_PADDING);
+		setPadding(TREEVIEW_PADDING);
 		setSizeXPolicy(SizePolicy::NONE);
-		OnLeftClick += [&](const sf::Vector2f& pos) {
+
+		// button panel
+		button_panel = widget_list.createContainerWidget(width, height);
+		button_panel->setFillColor(sf::Color::Transparent);
+		button_panel->setSizeXPolicy(SizePolicy::PARENT);
+		button_panel->setInnerPaddingX(TREEVIEW_BUTTON_PANEL_PADDING);
+		button_panel->setParent(this);
+
+		// button up
+		button_up_widget = widget_list.createButtonWidget(TREEVIEW_BUTTON_SIZE);
+		button_up_widget->setNormalColor(TREEVIEW_BUTTON_COLOR);
+		button_up_widget->setParent(button_panel);
+
+		// button down
+		button_down_widget = widget_list.createButtonWidget(TREEVIEW_BUTTON_SIZE);
+		button_down_widget->setNormalColor(TREEVIEW_BUTTON_COLOR);
+		button_down_widget->setParent(button_panel);
+
+		// main panel
+		main_panel = widget_list.createContainerWidget(width, height);
+		main_panel->setFillColor(sf::Color::Transparent);
+		main_panel->setHorizontal(false);
+		main_panel->setInnerPaddingY(TREEVIEW_MAIN_PANEL_PADDING);
+		main_panel->setSizeXPolicy(SizePolicy::PARENT);
+		main_panel->setParent(this);
+		main_panel->OnLeftClick += [&](const sf::Vector2f& pos) {
 			deselectAll();
 		};
+
 		widget_list.OnKeyPressed += [&](const sf::Keyboard::Key& key) {
 			if (key == sf::Keyboard::Escape) {
 				if (grabbed_entry) {
@@ -175,10 +203,10 @@ namespace fw {
 		highlighted_entry = getTargetHighlightEntry(mouse_pos);
 		if (highlighted_entry) {
 			sf::Vector2f entry_pos = highlighted_entry->getWidget()->getGlobalPosition();
-			target_highlight.pos = entry_pos - sf::Vector2f(0.0f, TREEVIEW_CONTAINER_PADDING);
-			target_highlight.size = sf::Vector2f(highlighted_entry->getWidget()->getWidth(), TREEVIEW_CONTAINER_PADDING);
+			target_highlight.pos = entry_pos - sf::Vector2f(0.0f, TREEVIEW_MAIN_PANEL_PADDING);
+			target_highlight.size = sf::Vector2f(highlighted_entry->getWidget()->getWidth(), TREEVIEW_MAIN_PANEL_PADDING);
 		} else {
-			target_highlight.size = sf::Vector2f(getContentWidth(), TREEVIEW_CONTAINER_PADDING);
+			target_highlight.size = sf::Vector2f(getContentWidth(), TREEVIEW_MAIN_PANEL_PADDING);
 			if (children.empty()) {
 				target_highlight.pos = getGlobalPosition() + sf::Vector2f(getLeftPadding(), 0.0f);
 			} else {

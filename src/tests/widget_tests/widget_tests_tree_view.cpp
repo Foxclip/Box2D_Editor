@@ -83,7 +83,7 @@ void WidgetTestsTreeView::treeviewWidgetEntriesTest(test::Test& test) {
     application.advance();
     auto rect_to_str = &WidgetTests::floatRectToStr;
     auto rect_approx_cmp = &WidgetTests::rectApproxCmp;
-    float treeview_height = calcTreeViewHeight(tree_view_widget);
+    float treeview_height = calcTreeViewMainPanelHeight(tree_view_widget);
     sf::FloatRect local_bounds(0.0f, 0.0f, size.x, treeview_height);
     T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
 }
@@ -112,7 +112,7 @@ void WidgetTestsTreeView::treeviewWidgetParent1Test(test::Test& test) {
     application.advance();
     auto rect_to_str = &WidgetTests::floatRectToStr;
     auto rect_approx_cmp = &WidgetTests::rectApproxCmp;
-    float treeview_height = calcTreeViewHeight(tree_view_widget);
+    float treeview_height = calcTreeViewMainPanelHeight(tree_view_widget);
     sf::FloatRect local_bounds(0.0f, 0.0f, size.x, treeview_height);
     T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
 }
@@ -137,7 +137,7 @@ void WidgetTestsTreeView::treeviewWidgetParent2Test(test::Test& test) {
     application.advance();
     auto rect_to_str = &WidgetTests::floatRectToStr;
     auto rect_approx_cmp = &WidgetTests::rectApproxCmp;
-    float treeview_height = calcTreeViewHeight(tree_view_widget);
+    float treeview_height = calcTreeViewMainPanelHeight(tree_view_widget);
     sf::FloatRect local_bounds(0.0f, 0.0f, size.x, treeview_height);
     T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
 }
@@ -393,7 +393,7 @@ void WidgetTestsTreeView::treeviewWidgetReorderTest(test::Test& test) {
     T_CHECK(top_entries[1] == entry_2);
     T_CHECK(top_entries[2] == entry_3);
     T_CHECK(top_entries[3] == entry_4);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
     {
         entry_1->moveToIndex(2);
         application.advance();
@@ -402,7 +402,7 @@ void WidgetTestsTreeView::treeviewWidgetReorderTest(test::Test& test) {
         T_CHECK(top_entries[1] == entry_1);
         T_CHECK(top_entries[2] == entry_3);
         T_CHECK(top_entries[3] == entry_4);
-        T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+        T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
     }
     {
         entry_3_child_2->moveToIndex(0);
@@ -411,7 +411,7 @@ void WidgetTestsTreeView::treeviewWidgetReorderTest(test::Test& test) {
         T_ASSERT(T_COMPARE(children.size(), 2));
         T_CHECK(children[0] == entry_3_child_2);
         T_CHECK(children[1] == entry_3_child_1);
-        T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+        T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
     }
     {
         entry_4_child_1_child_1->moveToIndex(2);
@@ -420,7 +420,7 @@ void WidgetTestsTreeView::treeviewWidgetReorderTest(test::Test& test) {
         T_ASSERT(T_COMPARE(children.size(), 2));
         T_CHECK(children[0] == entry_4_child_1_child_2);
         T_CHECK(children[1] == entry_4_child_1_child_1);
-        T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+        T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
     }
 }
 
@@ -461,33 +461,33 @@ void WidgetTestsTreeView::treeviewWidgetRemoveTest(test::Test& test) {
 
     const CompVector<fw::TreeViewEntry*>& top_entries = tree_view_widget->getTopEntries();
     auto check_treeview_height = [&]() {
-        float treeview_height = calcTreeViewHeight(tree_view_widget);
+        float treeview_height = calcTreeViewMainPanelHeight(tree_view_widget);
         return tree_view_widget->getHeight() == treeview_height;
     };
     T_ASSERT(T_COMPARE(tree_view_widget->getTopEntryCount(), 5));
     T_ASSERT(T_COMPARE(tree_view_widget->getAllEntryCount(), 13));
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 
     // remove single
     entry_1->remove(false);
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 4);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 12);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 
     // remove the olny child
     entry_2_child_1->remove(false);
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 4);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 11);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 
     // remove single
     entry_2->remove(false);
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 3);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 10);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 
     // remove without children
     entry_4->remove(false);
@@ -500,21 +500,21 @@ void WidgetTestsTreeView::treeviewWidgetRemoveTest(test::Test& test) {
         T_CHECK(top_entries[4] == entry_5);
     }
     T_COMPARE(tree_view_widget->getAllEntryCount(), 9);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 
     // remove with children
     entry_3->remove(true);
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 4);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 6);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 
     // remove child with a child
     entry_5_child_1->remove(true);
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 4);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 4);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 
     // add widgets
     fw::TreeViewEntry* entry_5_child_2 = tree_view_widget->addEntry("Entry 5 Child 2");
@@ -533,7 +533,7 @@ void WidgetTestsTreeView::treeviewWidgetRemoveTest(test::Test& test) {
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 4);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 10);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 
     // remove child without children
     entry_5_child_3->remove(false);
@@ -546,7 +546,7 @@ void WidgetTestsTreeView::treeviewWidgetRemoveTest(test::Test& test) {
         T_CHECK(entry_5->getChild(4) == entry_5_child_4);
     }
     T_COMPARE(tree_view_widget->getAllEntryCount(), 9);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 
     // remove all widgets
     entry_4_child_1->remove(true);
@@ -556,7 +556,7 @@ void WidgetTestsTreeView::treeviewWidgetRemoveTest(test::Test& test) {
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 0);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 0);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 }
 
 void WidgetTestsTreeView::treeviewWidgetClearTest(test::Test& test) {
@@ -599,13 +599,13 @@ void WidgetTestsTreeView::treeviewWidgetClearTest(test::Test& test) {
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 0);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 0);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 
     fw::TreeViewEntry* entry_6 = tree_view_widget->addEntry("Entry 6");
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 1);
     T_COMPARE(tree_view_widget->getAllEntryCount(), 1);
-    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewHeight(tree_view_widget));
+    T_COMPARE(tree_view_widget->getHeight(), calcTreeViewMainPanelHeight(tree_view_widget));
 }
 
 void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
@@ -655,7 +655,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
     T_CHECK(fw::TreeViewWidget::target_highlight.visible);
     T_VEC2_COMPARE(
         fw::TreeViewWidget::target_highlight.pos,
-        entry_1_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
+        entry_1_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_MAIN_PANEL_PADDING)
     );
 
     // drag down
@@ -670,7 +670,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag1Test(test::Test& test) {
     application.advance();
     T_VEC2_COMPARE(
         fw::TreeViewWidget::target_highlight.pos,
-        entry_1_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
+        entry_1_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_MAIN_PANEL_PADDING)
     );
 
     // drop to the top
@@ -738,7 +738,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
     application.advance();
     T_VEC2_COMPARE(
         fw::TreeViewWidget::target_highlight.pos,
-        entry_1_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
+        entry_1_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_MAIN_PANEL_PADDING)
     );
     application.mouseLeftRelease();
     application.advance();
@@ -763,7 +763,7 @@ void WidgetTestsTreeView::treeviewWidgetDrag2Test(test::Test& test) {
     application.advance();
     T_VEC2_COMPARE(
         fw::TreeViewWidget::target_highlight.pos,
-        entry_3_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_CONTAINER_PADDING)
+        entry_3_widget->getGlobalPosition() - sf::Vector2f(0.0f, fw::TREEVIEW_MAIN_PANEL_PADDING)
     );
     application.mouseLeftRelease();
     application.advance();
@@ -1144,7 +1144,7 @@ float WidgetTestsTreeView::calcTreeViewEntryHeight(fw::TreeViewEntry* entry) {
     result += fw::TREEVIEW_ENTRY_HEIGHT;
     if (entry->isExpanded()) {
         for (size_t i = 0; i < entry->getChildrenCount(); i++) {
-            result += fw::TREEVIEW_CONTAINER_PADDING;
+            result += fw::TREEVIEW_MAIN_PANEL_PADDING;
             fw::TreeViewEntry* child = entry->getChild(i);
             float child_height = calcTreeViewEntryHeight(child);
             result += child_height;
@@ -1153,21 +1153,21 @@ float WidgetTestsTreeView::calcTreeViewEntryHeight(fw::TreeViewEntry* entry) {
     return result;
 }
 
-float WidgetTestsTreeView::calcTreeViewHeight(fw::TreeViewWidget* treeview) {
+float WidgetTestsTreeView::calcTreeViewMainPanelHeight(fw::TreeViewWidget* treeview) {
     float result = 0.0f;
     if (treeview->getChildrenCount() == 0) {
-        return fw::TREEVIEW_CONTAINER_PADDING;
+        return fw::TREEVIEW_MAIN_PANEL_PADDING;
     }
-    result += fw::TREEVIEW_CONTAINER_PADDING;
+    result += fw::TREEVIEW_MAIN_PANEL_PADDING;
     for (size_t i = 0; i < treeview->getTopEntryCount(); i++) {
         fw::TreeViewEntry* entry = treeview->getTopEntry(i);
         float entry_height = calcTreeViewEntryHeight(entry);
         result += entry_height;
         if (i < treeview->getTopEntryCount() - 1) {
-            result += fw::TREEVIEW_CONTAINER_PADDING;
+            result += fw::TREEVIEW_MAIN_PANEL_PADDING;
         }
     }
-    result += fw::TREEVIEW_CONTAINER_PADDING;
+    result += fw::TREEVIEW_MAIN_PANEL_PADDING;
     return result;
 }
 
