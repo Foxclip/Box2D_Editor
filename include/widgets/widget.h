@@ -46,6 +46,7 @@ namespace fw {
 	public:
 		enum class WidgetType {
 			None,
+			Button,
 			Canvas,
 			Checkbox,
 			Container,

@@ -12,6 +12,7 @@
 #include "widgets/window_widget.h"
 #include "widgets/scroll_area_widget.h"
 #include "widgets/tree_view_widget.h"
+#include "widgets/button_widget.h"
 #include <ranges>
 
 namespace fw {
@@ -292,6 +293,16 @@ namespace fw {
 	TreeViewWidget* WidgetList::createTreeViewWidget(const sf::Vector2f& size) {
 		TreeViewWidget* tree_view_widget = createTreeViewWidget(size.x, size.y);
 		return tree_view_widget;
+	}
+
+	ButtonWidget* WidgetList::createButtonWidget(float width, float height) {
+		ButtonWidget* button_widget = createWidget<ButtonWidget>(width, height);
+		return button_widget;
+	}
+
+	ButtonWidget* WidgetList::createButtonWidget(const sf::Vector2f& size) {
+		ButtonWidget* button_widget = createButtonWidget(size.x, size.y);
+		return button_widget;
 	}
 
 	bool WidgetList::isLocked() const {

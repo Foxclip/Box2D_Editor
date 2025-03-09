@@ -3,8 +3,11 @@
 #include "editor/editor.h"
 #include "editor/scenes.h"
 #include "common/logger.h"
-#include "widgets/tree_view_widget.h"
-#include "widgets/scroll_area_widget.h"
+#include "widgets/button_widget.h"
+
+namespace fw {
+    class fw::ButtonWidget;
+}
 
 void execute_app() {
     logger << "Starting app\n";
@@ -31,8 +34,8 @@ int main() {
 
     execute_app();
 
-    // TODO: replace checks after tryFind with find
     // TODO: TreeViewWidget: buttons up/down for reordering objects
+    // TODOL TreeViewWidget: reparent object by dragging
     // TODO: Outliner: reorder objects
     // TODO: Outliner: reparent objects
     // TODO: RectangleWidget: rounded corners
