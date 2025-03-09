@@ -1,6 +1,7 @@
 #include "tests/widget_tests/widget_tests.h"
 #include "tests/widget_tests/widget_tests_application.h"
 #include "tests/widget_tests/widget_tests_basic.h"
+#include "tests/widget_tests/widget_tests_button.h"
 #include "tests/widget_tests/widget_tests_canvas.h"
 #include "tests/widget_tests/widget_tests_checkbox.h"
 #include "tests/widget_tests/widget_tests_container.h"
@@ -34,6 +35,7 @@ WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, cons
     WidgetTestsDropdown* dropdown_widget_list = addModule<WidgetTestsDropdown>("DropdownWidget", { widgets_basic_list, text_widget_list });
     WidgetTestsScrollArea* scroll_area_widget_list = addModule<WidgetTestsScrollArea>("ScrollAreaWidget", { widgets_basic_list });
     WidgetTestsTreeView* tree_view_widget_list = addModule<WidgetTestsTreeView>("TreeViewWidget", { widgets_basic_list });
+    WidgetTestsButton* button_widget_list = addModule<WidgetTestsButton>("ButtonWidget", { widgets_basic_list });
 }
 
 void WidgetTests::beforeRunModule() {

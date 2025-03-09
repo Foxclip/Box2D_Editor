@@ -18,3 +18,4 @@
 #include "polygon_widget.h"
 #include "scroll_area_widget.h"
 #include "tree_view_widget.h"
+#include "button_widget.h"
