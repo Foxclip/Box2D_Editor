@@ -15,10 +15,6 @@ void execute_app() {
     try {
         app.init("Box2D Editor");
         app.load("levels/level.txt");
-
-        fw::ButtonWidget* button_widget = app.getWidgets().createButtonWidget(100.0f, 20.0f);
-        button_widget->setGlobalPosition(app.getWindowCenter());
-
         app.start();
     } catch (std::string msg) {
         logger << "ERROR: " << msg << "\n";
