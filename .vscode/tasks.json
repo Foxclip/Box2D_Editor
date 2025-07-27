@@ -41,11 +41,11 @@
       "problemMatcher": ["$msCompile"]
     },
     {
-      "label": "Build RUN_ALL_TESTS Release",
+      "label": "Build RUN_ALL_TESTS Debug",
       "dependsOn": ["CMake Configure"],
       "type": "shell",
       "command": "cmake",
-      "args": ["--build", "build", "--target", "RUN_ALL_TESTS", "--config", "Release"],
+      "args": ["--build", "build", "--target", "RUN_ALL_TESTS", "--config", "Debug"],
       "group": {
         "kind": "build",
         "isDefault": false

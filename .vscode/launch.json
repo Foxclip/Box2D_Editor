@@ -26,16 +26,16 @@
       "preLaunchTask": "Build Editor Release"
     },
     {
-      "name": "RUN_ALL_TESTS Release",
+      "name": "RUN_ALL_TESTS Debug",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/src/tests/Release/RUN_ALL_TESTS.exe",
+      "program": "${workspaceFolder}/build/src/tests/Debug/RUN_ALL_TESTS.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
       "console": "externalTerminal",
-      "preLaunchTask": "Build RUN_ALL_TESTS Release"
+      "preLaunchTask": "Build RUN_ALL_TESTS Debug"
     }
   ]
 }
