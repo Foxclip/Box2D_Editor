@@ -26,6 +26,7 @@ public:
 private:
 	static float calcTreeViewEntryHeight(fw::TreeViewEntry* entry);
 	static float calcTreeViewMainPanelHeight(fw::TreeViewWidget* treeview);
+	static float calcTreeViewTotalHeight(fw::TreeViewWidget* treeview);
 	static void checkTopEntries(test::Test& test, fw::TreeViewWidget* tree_view_widget, const std::initializer_list<fw::TreeViewEntry*>& entries);
 	static void checkEntries(test::Test& test, fw::TreeViewEntry* entry, const std::initializer_list<fw::TreeViewEntry*> entries);
 	static void dragEntry(fw::Application& application, fw::TreeViewEntry* entry, const sf::Vector2f& pos, bool drop = false);

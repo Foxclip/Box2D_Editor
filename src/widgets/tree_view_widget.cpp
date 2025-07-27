@@ -20,6 +20,7 @@ namespace fw {
 
 		// button panel
 		button_panel = widget_list.createContainerWidget(width, height);
+		button_panel->setName("button panel");
 		button_panel->setFillColor(sf::Color::Transparent);
 		button_panel->setSizeXPolicy(SizePolicy::PARENT);
 		button_panel->setInnerPaddingX(TREEVIEW_BUTTON_PANEL_PADDING);
@@ -27,16 +28,20 @@ namespace fw {
 
 		// button up
 		button_up_widget = widget_list.createButtonWidget(TREEVIEW_BUTTON_SIZE);
+		button_up_widget->setName("button up");
 		button_up_widget->setNormalColor(TREEVIEW_BUTTON_COLOR);
 		button_up_widget->setParent(button_panel);
 
 		// button down
 		button_down_widget = widget_list.createButtonWidget(TREEVIEW_BUTTON_SIZE);
+		button_down_widget->setName("button down");
 		button_down_widget->setNormalColor(TREEVIEW_BUTTON_COLOR);
 		button_down_widget->setParent(button_panel);
 
 		// main panel
 		main_panel = widget_list.createContainerWidget(width, height);
+		main_panel->setName("main panel");
+		main_panel->setVisible(false);
 		main_panel->setFillColor(sf::Color::Transparent);
 		main_panel->setHorizontal(false);
 		main_panel->setInnerPaddingY(TREEVIEW_MAIN_PANEL_PADDING);
@@ -71,17 +76,34 @@ namespace fw {
 		}
 	}
 
-	void TreeViewWidget::deselectAllExceptEntry(TreeViewEntry* except_entry) {
-		wAssert(all_entries.contains(except_entry));
+    ContainerWidget* TreeViewWidget::getButtonPanelWidget() {
+        return button_panel;
+    }
+
+    ContainerWidget* TreeViewWidget::getMainPanelWidget() {
+        return main_panel;
+    }
+
+    ButtonWidget* TreeViewWidget::getButtonUpWidget() {
+        return button_up_widget;
+    }
+
+	ButtonWidget* TreeViewWidget::getButtonDownWidget() {
+		return button_down_widget;
+	}
+
+    void TreeViewWidget::deselectAllExceptEntry(TreeViewEntry *except_entry)
+    {
+        wAssert(all_entries.contains(except_entry));
 		for (size_t i = 0; i < all_entries.size(); i++) {
 			TreeViewEntry* entry = all_entries[i];
 			if (entry != except_entry) {
 				all_entries[i]->deselect();
 			}
 		}
-	}
+    }
 
-	void TreeViewWidget::deselectAllExceptSubtree(TreeViewEntry* except_subtree) {
+    void TreeViewWidget::deselectAllExceptSubtree(TreeViewEntry* except_subtree) {
 		wAssert(all_entries.contains(except_subtree));
 		std::function<void(TreeViewEntry*)> deselect_subtree = [&](TreeViewEntry* entry) {
 			if (entry == except_subtree) {
@@ -153,6 +175,9 @@ namespace fw {
 		TreeViewEntry* ptr = entry_uptr.get();
 		top_entries.add(ptr);
 		all_entries.add(std::move(entry_uptr));
+
+		main_panel->setVisible(true);
+
 		return ptr;
 	}
 
@@ -239,6 +264,9 @@ namespace fw {
 		}
 		top_entries.remove(entry);
 		all_entries.remove(entry);
+		if (getAllEntryCount() == 0) {
+			main_panel->setVisible(false);
+		}
 	}
 
 	void TreeViewWidget::clear() {

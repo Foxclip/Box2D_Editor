@@ -35,7 +35,7 @@ void WidgetTestsTreeView::treeviewWidgetBasicTest(test::Test& test) {
 
     GenericWidgetTest gwt(application, test);
     gwt.widget = tree_view_widget;
-    gwt.total_widgets = 2;
+    gwt.total_widgets = 6;
     gwt.type = fw::Widget::WidgetType::TreeView;
     gwt.name = "treeview";
     gwt.fullname = "root|treeview";
@@ -76,16 +76,25 @@ void WidgetTestsTreeView::treeviewWidgetEntriesTest(test::Test& test) {
     fw::TreeViewWidget* tree_view_widget = application.getWidgets().createTreeViewWidget(size);
     sf::Vector2f position(100.0f, 100.0f);
     tree_view_widget->setPosition(position);
-
-    tree_view_widget->addEntry("Entry 1");
-    tree_view_widget->addEntry("Entry 2");
-    tree_view_widget->addEntry("Entry 3");
     application.advance();
+
     auto rect_to_str = &WidgetTests::floatRectToStr;
     auto rect_approx_cmp = &WidgetTests::rectApproxCmp;
-    float treeview_height = calcTreeViewMainPanelHeight(tree_view_widget);
-    sf::FloatRect local_bounds(0.0f, 0.0f, size.x, treeview_height);
-    T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
+
+    {
+        float treeview_height = calcTreeViewTotalHeight(tree_view_widget);
+        sf::FloatRect local_bounds(0.0f, 0.0f, size.x, treeview_height);
+        T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
+    }
+    {
+        tree_view_widget->addEntry("Entry 1");
+        tree_view_widget->addEntry("Entry 2");
+        tree_view_widget->addEntry("Entry 3");
+        application.advance();
+        float treeview_height = calcTreeViewTotalHeight(tree_view_widget);
+        sf::FloatRect local_bounds(0.0f, 0.0f, size.x, treeview_height);
+        T_COMPARE(tree_view_widget->getLocalBounds(), local_bounds, rect_to_str, rect_approx_cmp);
+    }
 }
 
 void WidgetTestsTreeView::treeviewWidgetParent1Test(test::Test& test) {
@@ -1158,7 +1167,6 @@ float WidgetTestsTreeView::calcTreeViewMainPanelHeight(fw::TreeViewWidget* treev
     if (treeview->getChildrenCount() == 0) {
         return fw::TREEVIEW_MAIN_PANEL_PADDING;
     }
-    result += fw::TREEVIEW_MAIN_PANEL_PADDING;
     for (size_t i = 0; i < treeview->getTopEntryCount(); i++) {
         fw::TreeViewEntry* entry = treeview->getTopEntry(i);
         float entry_height = calcTreeViewEntryHeight(entry);
@@ -1167,7 +1175,19 @@ float WidgetTestsTreeView::calcTreeViewMainPanelHeight(fw::TreeViewWidget* treev
             result += fw::TREEVIEW_MAIN_PANEL_PADDING;
         }
     }
-    result += fw::TREEVIEW_MAIN_PANEL_PADDING;
+    return result;
+}
+
+float WidgetTestsTreeView::calcTreeViewTotalHeight(fw::TreeViewWidget* treeview) {
+    float result = 0.0f;
+    float padding = fw::TREEVIEW_PADDING;
+    float buttons_height = fw::TREEVIEW_BUTTON_SIZE.y;
+    if (treeview->getAllEntryCount() == 0) {
+        result = padding * 2 + buttons_height;
+    } else {
+        float main_panel_height = calcTreeViewMainPanelHeight(treeview);
+        result = padding * 3 + buttons_height + main_panel_height;
+    }
     return result;
 }
 

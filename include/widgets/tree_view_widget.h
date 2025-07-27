@@ -33,6 +33,10 @@ namespace fw {
 		TreeViewWidget(WidgetList& widget_list, float width, float height);
 		TreeViewWidget(WidgetList& widget_list, const sf::Vector2f& size);
 		TreeViewWidget(const TreeViewWidget& other);
+		ContainerWidget* getButtonPanelWidget();
+		ContainerWidget* getMainPanelWidget();
+		ButtonWidget* getButtonUpWidget();
+		ButtonWidget* getButtonDownWidget();
 		const CompVector<TreeViewEntry*>& getAllEntries() const;
 		const CompVector<TreeViewEntry*>& getTopEntries() const;
 		CompVector<TreeViewEntry*> getAllVisibleEntriesInOrder() const;
