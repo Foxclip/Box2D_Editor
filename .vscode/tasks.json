@@ -17,11 +17,23 @@
       "problemMatcher": []
     },
     {
-      "label": "CMake Build Debug",
+      "label": "Build Editor Debug",
       "dependsOn": ["CMake Configure"],
       "type": "shell",
       "command": "cmake",
-      "args": ["--build", "build", "--config", "Debug"],
+      "args": ["--build", "build", "--target", "Box2D_Editor", "--config", "Debug"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$msCompile"]
+    },
+    {
+      "label": "Build Editor Release",
+      "dependsOn": ["CMake Configure"],
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "build", "--target", "Box2D_Editor", "--config", "Release"],
       "group": {
         "kind": "build",
         "isDefault": false
@@ -29,14 +41,14 @@
       "problemMatcher": ["$msCompile"]
     },
     {
-      "label": "CMake Build Release",
+      "label": "Build RUN_ALL_TESTS Release",
       "dependsOn": ["CMake Configure"],
       "type": "shell",
       "command": "cmake",
-      "args": ["--build", "build", "--config", "Release"],
+      "args": ["--build", "build", "--target", "RUN_ALL_TESTS", "--config", "Release"],
       "group": {
         "kind": "build",
-        "isDefault": true
+        "isDefault": false
       },
       "problemMatcher": ["$msCompile"]
     }
