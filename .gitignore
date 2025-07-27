@@ -403,3 +403,4 @@ sfml/
 tests/tmp/
 install/
 shaders/combined/
+!.vscode/c_cpp_properties.json
