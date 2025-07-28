@@ -332,6 +332,9 @@ namespace fw {
 		float secondary_pos = get_secondary_outer_padding_1() + alignmentToOffset(get_alignment(), max_secondary_size);
 		for (size_t i = 0; i < children.size(); i++) {
 			Widget* child = children[i];
+			if (!child->isVisible()) {
+				continue;
+			}
 			sf::Vector2f child_pos =
 				horizontal
 				? sf::Vector2f(child->getPosition().x, secondary_pos)
