@@ -244,7 +244,7 @@ namespace fw {
 			fw::ContainerWidget* parent_children_widget = new_parent->getChildrenWidget();
 			entry_widget->setParent(parent_children_widget);
 		} else {
-			entry_widget->setParent(&treeview);
+			entry_widget->setParent(treeview.main_panel);
 		}
 	}
 

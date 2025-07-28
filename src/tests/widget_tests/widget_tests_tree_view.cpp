@@ -484,7 +484,7 @@ void WidgetTestsTreeView::treeviewWidgetRemoveTest(test::Test& test) {
     T_COMPARE(tree_view_widget->getAllEntryCount(), 12);
     T_COMPARE(tree_view_widget->getHeight(), calcTreeViewTotalHeight(tree_view_widget));
 
-    // remove the olny child
+    // remove the only child
     entry_2_child_1->remove(false);
     application.advance();
     T_COMPARE(tree_view_widget->getTopEntryCount(), 4);
