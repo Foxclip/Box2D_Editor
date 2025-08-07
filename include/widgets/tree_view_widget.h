@@ -12,10 +12,12 @@ namespace fw {
 	const sf::Color TREEVIEW_TARGET_HIGHLIGHT_COLOR = sf::Color(255, 255, 0);
 	const sf::Vector2f TREEVIEW_BUTTON_SIZE = sf::Vector2f(20, 20);
 	const sf::Color TREEVIEW_BUTTON_COLOR = sf::Color(175, 175, 175);
+	const sf::Color TREEVIEW_BUTTON_ARROW_COLOR = sf::Color(255, 255, 255);
 
 	class TreeViewEntry;
 	class TreeViewWidget;
 	class ButtonWidget;
+	class PolygonWidget;
 
 	struct TreeviewTargetHighlight {
 		bool visible = false;
@@ -65,6 +67,8 @@ namespace fw {
 		ContainerWidget* main_panel = nullptr;
 		ButtonWidget* button_up_widget = nullptr;
 		ButtonWidget* button_down_widget = nullptr;
+		PolygonWidget* button_arrow_up_widget = nullptr;
+		PolygonWidget* button_arrow_down_widget = nullptr;
 		CompVectorUptr<TreeViewEntry> all_entries;
 		CompVector<TreeViewEntry*> top_entries;
 		TreeViewEntry* grabbed_entry = nullptr;

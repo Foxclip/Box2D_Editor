@@ -1,6 +1,7 @@
 #include "widgets/tree_view_widget.h"
 #include "widgets/widget_list.h"
 #include "widgets/button_widget.h"
+#include "widgets/polygon_widget.h"
 
 namespace fw {
 
@@ -31,12 +32,32 @@ namespace fw {
 		button_up_widget->setName("button up");
 		button_up_widget->setNormalColor(TREEVIEW_BUTTON_COLOR);
 		button_up_widget->setParent(button_panel);
+		std::vector<sf::Vector2f> vertices = {
+			sf::Vector2f(0.0, -4.0f),
+			sf::Vector2f(5.0, 4.0f),
+			sf::Vector2f(-5.0, 4.0f),
+		};
+		button_arrow_up_widget = widget_list.createPolygonWidget(vertices);
+		button_arrow_up_widget->setName("button arrow up");
+		button_arrow_up_widget->setFillColor(TREEVIEW_BUTTON_ARROW_COLOR);
+		button_arrow_up_widget->setParentAnchor(Anchor::CENTER);
+		button_arrow_up_widget->setParent(button_up_widget);
 
 		// button down
 		button_down_widget = widget_list.createButtonWidget(TREEVIEW_BUTTON_SIZE);
 		button_down_widget->setName("button down");
 		button_down_widget->setNormalColor(TREEVIEW_BUTTON_COLOR);
 		button_down_widget->setParent(button_panel);
+		vertices = {
+			sf::Vector2f(0.0, 5.0f),
+			sf::Vector2f(5.0, -3.0f),
+			sf::Vector2f(-5.0, -3.0f),
+		};
+		button_arrow_down_widget = widget_list.createPolygonWidget(vertices);
+		button_arrow_down_widget->setName("button arrow down");
+		button_arrow_down_widget->setFillColor(TREEVIEW_BUTTON_ARROW_COLOR);
+		button_arrow_down_widget->setParentAnchor(Anchor::CENTER);
+		button_arrow_down_widget->setParent(button_down_widget);
 
 		// main panel
 		main_panel = widget_list.createContainerWidget(width, height);
