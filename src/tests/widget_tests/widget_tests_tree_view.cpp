@@ -1197,7 +1197,7 @@ void WidgetTestsTreeView::checkTopEntries(test::Test& test, fw::TreeViewWidget* 
         for (size_t i = 0; i < entries_vec.size(); i++) {
             fw::TreeViewEntry* entry = tree_view_widget->getTopEntry(i);
             T_CHECK(entry == entries_vec[i]);
-            T_CHECK(tree_view_widget->getChild(i) == entries_vec[i]->getWidget());
+            T_CHECK(tree_view_widget->getMainPanelWidget()->getChild(i) == entries_vec[i]->getWidget());
         }
     }
 }
