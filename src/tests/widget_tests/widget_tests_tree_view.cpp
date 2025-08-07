@@ -35,7 +35,7 @@ void WidgetTestsTreeView::treeviewWidgetBasicTest(test::Test& test) {
 
     GenericWidgetTest gwt(application, test);
     gwt.widget = tree_view_widget;
-    gwt.total_widgets = 6;
+    gwt.total_widgets = 8;
     gwt.type = fw::Widget::WidgetType::TreeView;
     gwt.name = "treeview";
     gwt.fullname = "root|treeview";

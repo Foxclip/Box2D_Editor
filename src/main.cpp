@@ -34,8 +34,8 @@ int main() {
 
     execute_app();
 
-    // TODO: TreeViewWidget: buttons up/down for reordering objects
     // TODO: TreeViewWidget: make button panel stick to the top
+    // TODO: TreeViewWidget: buttons up/down for reordering objects
     // TODO: TreeViewWidget: reparent object by dragging
     // TODO: Outliner: reorder objects
     // TODO: Outliner: reparent objects
