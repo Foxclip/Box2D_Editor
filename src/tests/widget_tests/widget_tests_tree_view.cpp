@@ -1193,11 +1193,12 @@ float WidgetTestsTreeView::calcTreeViewTotalHeight(fw::TreeViewWidget* treeview)
 
 void WidgetTestsTreeView::checkTopEntries(test::Test& test, fw::TreeViewWidget* tree_view_widget, const std::initializer_list<fw::TreeViewEntry*>& entries) {
     std::vector<fw::TreeViewEntry*> entries_vec = std::vector<fw::TreeViewEntry*>(entries);
-    if (T_COMPARE(tree_view_widget->getTopEntryCount(), entries.size()) && T_COMPARE(tree_view_widget->getChildrenCount(), entries.size())) {
+    fw::ContainerWidget* main_panel_widget = tree_view_widget->getMainPanelWidget();
+    if (T_COMPARE(tree_view_widget->getTopEntryCount(), entries.size()) && T_COMPARE(main_panel_widget->getChildrenCount(), entries.size())) {
         for (size_t i = 0; i < entries_vec.size(); i++) {
             fw::TreeViewEntry* entry = tree_view_widget->getTopEntry(i);
             T_CHECK(entry == entries_vec[i]);
-            T_CHECK(tree_view_widget->getMainPanelWidget()->getChild(i) == entries_vec[i]->getWidget());
+            T_CHECK(main_panel_widget->getChild(i) == entries_vec[i]->getWidget());
         }
     }
 }
