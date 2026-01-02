@@ -41,7 +41,9 @@ set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 add_subdirectory(clip)
 target_compile_options(clip PRIVATE -w)
 
+
 add_subdirectory(test_lib)
+add_subdirectory(logger)
 
 set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 add_subdirectory(src/common)

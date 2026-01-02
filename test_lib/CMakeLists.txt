@@ -35,4 +35,5 @@ source_group(TREE "${TEST_LIB_SOURCE_DIR}/example" PREFIX "Source Files" FILES $
 set_property(TARGET test_lib_example PROPERTY FOLDER "test_lib")
 
 target_include_directories(test_lib_example PRIVATE "${TEST_LIB_INCLUDE_DIR}")
+target_include_directories(test_lib PUBLIC "${CMAKE_SOURCE_DIR}/logger/include/")
 target_link_libraries(test_lib_example PUBLIC test_lib)

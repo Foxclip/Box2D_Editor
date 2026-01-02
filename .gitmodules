@@ -7,3 +7,6 @@
 [submodule "clip"]
 	path = clip
 	url = https://github.com/dacap/clip.git
+[submodule "logger"]
+	path = logger
+	url = https://github.com/Foxclip/cpp-logger.git

@@ -5,7 +5,7 @@
 #include <string>
 #include <iostream>
 #include <numbers>
-#include "common/logger.h"
+#include "logger/logger.h"
 #include "font.h"
 
 namespace fw {

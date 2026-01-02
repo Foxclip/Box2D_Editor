@@ -5,7 +5,7 @@
 #include "tools.h"
 #include "simulation/simulation.h"
 #include "common/history.h"
-#include "common/logger.h"
+#include "logger/logger.h"
 #include "widgets/application.h"
 
 const sf::String WINDOW_TITLE = "Box2D Editor";

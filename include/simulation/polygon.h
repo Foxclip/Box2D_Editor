@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "common/logger.h"
+#include "logger/logger.h"
 #include "common/utils.h"
 
 extern sf::Text vertex_text;

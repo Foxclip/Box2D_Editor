@@ -8,14 +8,12 @@ set(COMMON_HEADER_FILES
     "${COMMON_INCLUDE_DIR}/event.h"
     "${COMMON_INCLUDE_DIR}/filedialog.h"
     "${COMMON_INCLUDE_DIR}/history.h"
-    "${COMMON_INCLUDE_DIR}/logger.h"
     "${COMMON_INCLUDE_DIR}/searchindex.h"
     "${COMMON_INCLUDE_DIR}/utils.h"
 )
 set(COMMON_SOURCE_FILES
     "data_pointer_common.cpp"
     "filedialog.cpp"
-    "logger.cpp"
     "utils.cpp"
 )
 

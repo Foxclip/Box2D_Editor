@@ -2,7 +2,7 @@
 #include <iostream>
 #include "editor/editor.h"
 #include "editor/scenes.h"
-#include "common/logger.h"
+#include "logger/logger.h"
 #include "widgets/button_widget.h"
 
 namespace fw {

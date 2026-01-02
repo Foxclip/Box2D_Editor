@@ -2,7 +2,7 @@
 
 #include <string>
 #include <functional>
-#include "common/logger.h"
+#include "logger/logger.h"
 
 template<typename T>
 class HistoryEntry {

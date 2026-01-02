@@ -4,7 +4,6 @@ set(COMMON_TESTS_HEADER_FILES
     "${TESTS_INCLUDE_DIR}/data_pointer_tests.h"
     "${TESTS_INCLUDE_DIR}/data_pointer_unique_tests.h"
     "${TESTS_INCLUDE_DIR}/event_tests.h"
-    "${TESTS_INCLUDE_DIR}/logger_tests.h"
     "${TESTS_INCLUDE_DIR}/searchindex_tests.h"
     "${TESTS_INCLUDE_DIR}/simulation_tests.h"
 )
@@ -14,7 +13,6 @@ set(COMMON_TESTS_SOURCE_FILES
     "data_pointer_tests.cpp"
     "data_pointer_unique_tests.cpp"
     "event_tests.cpp"
-    "logger_tests.cpp"
     "searchindex_tests.cpp"
     "simulation_tests.cpp"
 )
