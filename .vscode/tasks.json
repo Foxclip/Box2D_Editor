@@ -18,7 +18,6 @@
     },
     {
       "label": "Build Editor Debug",
-      "dependsOn": ["CMake Configure"],
       "type": "shell",
       "command": "cmake",
       "args": ["--build", "build", "--target", "Box2D_Editor", "--config", "Debug"],
@@ -30,7 +29,6 @@
     },
     {
       "label": "Build Editor Release",
-      "dependsOn": ["CMake Configure"],
       "type": "shell",
       "command": "cmake",
       "args": ["--build", "build", "--target", "Box2D_Editor", "--config", "Release"],
@@ -42,7 +40,6 @@
     },
     {
       "label": "Build RUN_ALL_TESTS Debug",
-      "dependsOn": ["CMake Configure"],
       "type": "shell",
       "command": "cmake",
       "args": ["--build", "build", "--target", "RUN_ALL_TESTS", "--config", "Debug"],
