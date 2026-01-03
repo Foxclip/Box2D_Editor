@@ -10,3 +10,6 @@
 [submodule "logger"]
 	path = logger
 	url = https://github.com/Foxclip/cpp-logger.git
+[submodule "test_lib"]
+	path = test_lib
+	url = https://github.com/Foxclip/cpp-test-lib.git

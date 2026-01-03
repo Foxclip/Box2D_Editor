@@ -35,7 +35,8 @@ int main() {
     execute_app();
 
     // TODO: TreeViewWidget: buttons up/down for reordering objects
-    // TODOL TreeViewWidget: reparent object by dragging
+    // TODO: TreeViewWidget: reparent object by dragging
+    // TODO: Editor: add mouse zooming
     // TODO: Outliner: reorder objects
     // TODO: Outliner: reparent objects
     // TODO: RectangleWidget: rounded corners

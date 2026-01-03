@@ -41,9 +41,9 @@ set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 add_subdirectory(clip)
 target_compile_options(clip PRIVATE -w)
 
-
-add_subdirectory(test_lib)
+# logger should come before test_lib, so that test_lib skips including logger submodule
 add_subdirectory(logger)
+add_subdirectory(test_lib)
 
 set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 add_subdirectory(src/common)
