@@ -102,3 +102,5 @@ target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/SFML/include/
 target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/logger/include/")
 target_link_libraries(widgets_lib PUBLIC sfml-graphics sfml-system sfml-window)
 target_link_libraries(widgets_lib PUBLIC clip)
+
+add_subdirectory(tests)
