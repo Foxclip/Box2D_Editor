@@ -113,6 +113,14 @@ if(NOT TARGET logger)
     endif()
 endif()
 
+if(NOT TARGET test_lib)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/test_lib/CMakeLists.txt")
+        add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/test_lib")
+    else()
+        message(FATAL_ERROR "test_lib target not found and third_party/test_lib not available")
+    endif()
+endif()
+
 target_link_libraries(widgets_lib PUBLIC sfml-graphics sfml-system sfml-window)
 target_link_libraries(widgets_lib PUBLIC clip)
 target_link_libraries(widgets_lib PUBLIC logger)
@@ -131,7 +139,4 @@ elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/logger/include/")
     target_include_directories(widgets_lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/third_party/logger/include/")
 endif()
 
-# Tests only in embedded builds where test_lib target exists
-if(TARGET test_lib)
-    add_subdirectory(tests)
-endif()
+add_subdirectory(tests)
