@@ -16,7 +16,6 @@
 #include "widget_tests/widget_tests_toposort.h"
 #include "widget_tests/widget_tests_widget_link.h"
 #include "widget_tests/widget_tests_window.h"
-#include "common/utils.h"
 
 WidgetTests::WidgetTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes) : TestModule(name, parent, required_nodes) {
     WidgetTestsToposort* toposort_list = addModule<WidgetTestsToposort>("Toposort");
@@ -51,15 +50,15 @@ void WidgetTests::afterRunModule() {
 }
 
 std::string WidgetTests::sfVec2fToStr(const sf::Vector2f& vec) {
-    return "(" + utils::vec_to_str(vec) + ")";
+    return "(" + fw::vec_to_str(vec) + ")";
 }
 
 std::string WidgetTests::sfVec2iToStr(const sf::Vector2i& vec) {
-    return "(" + utils::vec_to_str(vec) + ")";
+    return "(" + fw::vec_to_str(vec) + ")";
 }
 
 std::string WidgetTests::sfVec2uToStr(const sf::Vector2u& vec) {
-    return "(" + utils::vec_to_str(vec) + ")";
+    return "(" + fw::vec_to_str(vec) + ")";
 }
 
 std::string WidgetTests::cursorTypeToStr(sf::Cursor::Type type) {
@@ -94,7 +93,7 @@ std::string WidgetTests::floatRectToStr(const sf::FloatRect& rect) {
 }
 
 std::string WidgetTests::colorToStr(const sf::Color& color) {
-    return "(" + utils::color_to_str(color) + ")";
+    return "(" + fw::color_to_str(color) + ")";
 }
 
 std::string WidgetTests::anchorToStr(fw::Widget::Anchor anchor) {

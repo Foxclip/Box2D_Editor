@@ -48,6 +48,12 @@ namespace fw {
 	std::string file_to_str(const std::filesystem::path& path);
 	std::vector<std::string> read_file_lines(const std::filesystem::path& path);
 	std::string trim(const std::string &s);
+	std::string color_to_str(sf::Color color);
+
+	template <typename T>
+	std::string vec_to_str(const T& vec) {
+		return std::to_string(vec.x) + " " + std::to_string(vec.y);
+	}
 
 	template <typename TNode>
 	concept NodeLess = requires(const TNode& left, const TNode& right) {
