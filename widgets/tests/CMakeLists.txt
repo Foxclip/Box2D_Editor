@@ -51,9 +51,7 @@ target_include_directories(widgets_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/..
 target_include_directories(widgets_tests PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(widgets_tests PUBLIC "${CMAKE_SOURCE_DIR}")
 target_include_directories(widgets_tests PUBLIC "${INCLUDE_DIR}")
-if(EXISTS "${CMAKE_SOURCE_DIR}/box2d/include/")
-    target_include_directories(widgets_tests PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
-endif()
+
 target_link_libraries(widgets_tests PUBLIC logger)
 target_link_libraries(widgets_tests PUBLIC test_lib)
 target_link_libraries(widgets_tests PUBLIC widgets_lib)
