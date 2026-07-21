@@ -1,1 +1,0 @@
-- This project is built with CMake, build folder is build/
