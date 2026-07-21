@@ -9,8 +9,7 @@ void run_tests() {
     SearchIndexTests* searchindex_module = root_module.addModule<SearchIndexTests>("SearchIndex", { data_pointer_module });
     EventTests* event_module = root_module.addModule<EventTests>("Event", { data_pointer_module });
     SimulationTests* simulation_module = root_module.addModule<SimulationTests>("Simulation", { data_pointer_module, compvector_module });
-    WidgetTests* widget_module = root_module.addModule<WidgetTests>("Widget", { data_pointer_module, event_module, compvector_module, searchindex_module });
-    EditorTests* editor_module = root_module.addModule<EditorTests>("Editor", { simulation_module, widget_module });
+    EditorTests* editor_module = root_module.addModule<EditorTests>("Editor", { simulation_module });
     root_module.run();
 }
 

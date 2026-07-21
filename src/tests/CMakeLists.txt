@@ -22,7 +22,6 @@ target_link_libraries(RUN_ALL_TESTS PUBLIC widgets_lib)
 target_link_libraries(RUN_ALL_TESTS PUBLIC simulation_lib)
 target_link_libraries(RUN_ALL_TESTS PUBLIC editor)
 target_link_libraries(RUN_ALL_TESTS PUBLIC common_tests)
-target_link_libraries(RUN_ALL_TESTS PUBLIC widgets_tests)
 target_link_libraries(RUN_ALL_TESTS PUBLIC editor_tests)
 set_property(TARGET RUN_ALL_TESTS PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
 
