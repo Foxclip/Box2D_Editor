@@ -46,12 +46,11 @@ add_subdirectory(logger)
 add_subdirectory(test_lib)
 
 set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
+add_subdirectory(widgets)
 add_subdirectory(src/common)
 add_subdirectory(src/editor)
 add_subdirectory(src/simulation)
-add_subdirectory(widgets)
 add_subdirectory(src/tests)
-target_include_directories(widgets_lib PUBLIC "${INCLUDE_DIR}")
 add_executable(Box2D_Editor src/main.cpp)
 
 target_link_libraries(Box2D_Editor PUBLIC common_lib)

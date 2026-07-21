@@ -1,3 +1,8 @@
+cmake_minimum_required(VERSION 3.14)
+project(widgets LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+
 add_library(widgets_lib)
 
 target_sources(widgets_lib PRIVATE
@@ -62,13 +67,71 @@ target_sources(widgets_lib PRIVATE
     src/widget_update_queue.cpp
     src/widgets_common.cpp
     src/window_widget.cpp
+    src/data_pointer_common.cpp
 )
 
 target_include_directories(widgets_lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}")
-target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/SFML/include/")
-target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/logger/include/")
+
+# Handle dependencies: check if targets already exist (parent project) or fetch local submodules
+if(NOT TARGET sfml-graphics)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/SFML/CMakeLists.txt")
+        set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
+        set(SFML_BUILD_DOC OFF CACHE BOOL "" FORCE)
+        set(SFML_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+        set(SFML_BUILD_GRAPHICS ON CACHE BOOL "" FORCE)
+        set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
+        set(SFML_BUILD_TEST_SUITE OFF CACHE BOOL "" FORCE)
+        set(SFML_BUILD_WINDOW ON CACHE BOOL "" FORCE)
+        set(SFML_GENERATE_PDB OFF CACHE BOOL "" FORCE)
+        set(SFML_INSTALL_PKGCONFIG_FILES OFF CACHE BOOL "" FORCE)
+        set(SFML_OPENGL_ES OFF CACHE BOOL "" FORCE)
+        set(SFML_USE_STATIC_STD_LIBS OFF CACHE BOOL "" FORCE)
+        set(SFML_USE_SYSTEM_DEPS OFF CACHE BOOL "" FORCE)
+        add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/SFML")
+    else()
+        message(FATAL_ERROR "sfml-graphics target not found and third_party/SFML not available")
+    endif()
+endif()
+
+if(NOT TARGET clip)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/clip/CMakeLists.txt")
+        set(CLIP_ENABLE_IMAGE OFF CACHE BOOL "" FORCE)
+        set(CLIP_EXAMPLES OFF CACHE BOOL "" FORCE)
+        set(CLIP_SUPPORT_WINXP OFF CACHE BOOL "" FORCE)
+        set(CLIP_TESTS OFF CACHE BOOL "" FORCE)
+        add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/clip")
+    else()
+        message(FATAL_ERROR "clip target not found and third_party/clip not available")
+    endif()
+endif()
+
+if(NOT TARGET logger)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/logger/CMakeLists.txt")
+        add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/logger")
+    else()
+        message(FATAL_ERROR "logger target not found and third_party/logger not available")
+    endif()
+endif()
+
 target_link_libraries(widgets_lib PUBLIC sfml-graphics sfml-system sfml-window)
 target_link_libraries(widgets_lib PUBLIC clip)
+target_link_libraries(widgets_lib PUBLIC logger)
 
-add_subdirectory(tests)
+# Clip include directories (clip doesn't set PUBLIC include dirs, so consumers need explicit path)
+if(EXISTS "${CMAKE_SOURCE_DIR}/clip/")
+    target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}")
+elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/clip/")
+    target_include_directories(widgets_lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/third_party")
+endif()
+
+# Logger include directories (logger uses PRIVATE, so consumers need explicit path)
+if(EXISTS "${CMAKE_SOURCE_DIR}/logger/include/")
+    target_include_directories(widgets_lib PUBLIC "${CMAKE_SOURCE_DIR}/logger/include/")
+elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/logger/include/")
+    target_include_directories(widgets_lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/third_party/logger/include/")
+endif()
+
+# Tests only in embedded builds where test_lib target exists
+if(TARGET test_lib)
+    add_subdirectory(tests)
+endif()

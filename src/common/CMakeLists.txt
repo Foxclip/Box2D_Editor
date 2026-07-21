@@ -1,18 +1,10 @@
 set(COMMON_INCLUDE_DIR "${INCLUDE_DIR}/common")
 
 set(COMMON_HEADER_FILES
-    "${COMMON_INCLUDE_DIR}/compvector.h"
-    "${COMMON_INCLUDE_DIR}/data_pointer_common.h"
-    "${COMMON_INCLUDE_DIR}/data_pointer_unique.h"
-    "${COMMON_INCLUDE_DIR}/data_pointer_shared.h"
-    "${COMMON_INCLUDE_DIR}/event.h"
     "${COMMON_INCLUDE_DIR}/filedialog.h"
-    "${COMMON_INCLUDE_DIR}/history.h"
-    "${COMMON_INCLUDE_DIR}/searchindex.h"
     "${COMMON_INCLUDE_DIR}/utils.h"
 )
 set(COMMON_SOURCE_FILES
-    "data_pointer_common.cpp"
     "filedialog.cpp"
     "utils.cpp"
 )
@@ -25,3 +17,4 @@ target_include_directories(common_lib PUBLIC "${INCLUDE_DIR}")
 target_include_directories(common_lib PUBLIC "${CMAKE_SOURCE_DIR}")
 target_include_directories(common_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(common_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
+target_link_libraries(common_lib PUBLIC widgets_lib)

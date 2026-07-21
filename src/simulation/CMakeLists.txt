@@ -31,3 +31,4 @@ target_include_directories(simulation_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/incl
 target_include_directories(simulation_lib PUBLIC "${CMAKE_SOURCE_DIR}/logger/include/")
 target_link_libraries(simulation_lib PUBLIC sfml-graphics)
 target_link_libraries(simulation_lib PUBLIC box2d)
+target_link_libraries(simulation_lib PUBLIC common_lib)
