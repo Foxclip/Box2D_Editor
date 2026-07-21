@@ -20,6 +20,7 @@ set(WIDGET_TESTS_HEADER_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/widget_tests/widget_tests_window.h"
 )
 set(WIDGET_TESTS_SOURCE_FILES
+    "src/main.cpp"
     "src/widget_test.cpp"
     "src/widget_tests.cpp"
     "src/widget_tests_application.cpp"
@@ -40,13 +41,11 @@ set(WIDGET_TESTS_SOURCE_FILES
     "src/widget_tests_widget_link.cpp"
     "src/widget_tests_window.cpp"
 )
-add_library(widgets_tests ${WIDGET_TESTS_HEADER_FILES} ${WIDGET_TESTS_SOURCE_FILES})
+add_executable(widgets_tests ${WIDGET_TESTS_HEADER_FILES} ${WIDGET_TESTS_SOURCE_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include PREFIX "Header Files" FILES ${WIDGET_TESTS_HEADER_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Source Files" FILES ${WIDGET_TESTS_SOURCE_FILES})
 set_property(TARGET widgets_tests PROPERTY FOLDER "tests")
 
-add_executable(RUN_WIDGET_TESTS "src/main.cpp")
-target_link_libraries(RUN_WIDGET_TESTS PUBLIC widgets_tests)
 target_include_directories(widgets_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 target_include_directories(widgets_tests PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(widgets_tests PUBLIC "${CMAKE_SOURCE_DIR}")
