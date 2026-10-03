@@ -1,12 +1,20 @@
 #pragma once
 
 #include <utility>
-#include <SFML/Graphics.hpp>
+#include <cmath>
+#include <glvx/vector.h>
+#include <glvx/color.h>
+#include <glvx/float_rect.h>
+#include <glvx/rectangle.h>
+#include <glvx/text.h>
+#include <glvx/transform.h>
 #include "box2d/box2d.h"
 #include <fstream>
 #include <filesystem>
 #include <vector>
 #include <numbers>
+#include <algorithm>
+#include <cassert>
 
 namespace utils {
 
@@ -27,30 +35,30 @@ namespace utils {
 
 	float to_degrees(float angle);
 	float to_radians(float angle);
-	b2Vec2 tob2(const sf::Vector2f& vec);
-	sf::Vector2f tosf(const b2Vec2& vec);
-	float get_max_offset(const sf::Vector2i& v1, const sf::Vector2i& v2);
-	void set_origin_to_center_normal(sf::Text& text);
-	void set_origin_to_center_bounds(sf::Text& text);
-	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point);
-	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point);
+	b2Vec2 tob2(const glvx::Vector2f& vec);
+	glvx::Vector2f tosf(const b2Vec2& vec);
+	float get_max_offset(const glvx::Vector2i& v1, const glvx::Vector2i& v2);
+	void set_origin_to_center_normal(glvx::Text& text);
+	void set_origin_to_center_bounds(glvx::Text& text);
+	bool contains_point(const glvx::FloatRect& rect, const glvx::Vector2f& point);
+	bool contains_point(const glvx::Rectangle& shape, const glvx::Vector2f& point);
 	std::string body_type_to_str(b2BodyType type);
 	b2BodyType str_to_body_type(std::string str);
 	void str_to_file(std::string& str, const std::filesystem::path& path);
 	std::string file_to_str(const std::filesystem::path& path);
-	std::string color_to_str(sf::Color color);
+	std::string color_to_str(glvx::Color color);
 	std::string farr_to_str(std::vector<float>& vec);
 	std::string bool_to_str(bool value);
 	std::vector<std::string> splitString(std::string str);
 	std::string current_time();
-	void extend_bounds(sf::FloatRect& rect1, const sf::FloatRect& rect2);
-	void extend_bounds(sf::FloatRect& rect, const sf::Vector2f point);
+	void extend_bounds(glvx::FloatRect& rect1, const glvx::FloatRect& rect2);
+	void extend_bounds(glvx::FloatRect& rect, const glvx::Vector2f point);
 	bool rect_fixture_intersect(const b2Vec2& lower_bound, const b2Vec2& upper_bound, const b2Fixture* fixture);
 	float sgn(float value);
 	std::string char_to_str(char c);
 	std::string char_to_esc(std::string str, bool convert_quotes = true);
 	std::string esc_to_char(std::string str);
-	void quantize_position(sf::Transform& transform);
+	void quantize_position(glvx::Transform& transform);
 	bool parseLL(const std::string& str, long long& result);
 	bool parseFloat(const std::string& str, float& result);
 	std::string floatToStr(float value, size_t precision = 9);
@@ -69,7 +77,7 @@ namespace utils {
 		float angle = (float)i / lengths.size() * 2 * b2_pi;
 		TVec2 vector = TVec2(std::cos(angle), std::sin(angle));
 		size_t index = i < (ptrdiff_t)lengths.size() ? i : i % lengths.size();
-		TVec2 pos = lengths[index] * vector;
+		TVec2 pos = TVec2(vector.x * lengths[index], vector.y * lengths[index]);
 		return pos;
 	}
 
@@ -95,8 +103,8 @@ namespace utils {
 
 	template <typename T>
 	T normalize(const T& vec) {
-		float inv_length = 1.0f / length(vec);
-		return inv_length * vec;
+		float inv_length = 1.0f / utils::length(vec);
+		return T(vec.x * inv_length, vec.y * inv_length);
 	}
 
 	template <typename T>
@@ -117,14 +125,15 @@ namespace utils {
 
 	template <typename T>
 	float distance_to_line(const T& p0, const T& p1, const T& p2) {
-		return abs(get_line_D(p0, p1, p2)) / (p2 - p1).Length();
+		return abs(get_line_D(p0, p1, p2)) / utils::length(p2 - p1);
 	}
 
 	template <typename T>
 	T line_project(const T& p0, const T& p1, const T& p2) {
 		T A = p0 - p1;
 		T B = p2 - p1;
-		return p1 + dot(A, B) / dot(B, B) * B;
+		float t = utils::dot(A, B) / utils::dot(B, B);
+		return T(p1.x + t * B.x, p1.y + t * B.y);
 	}
 
 	template <typename TVec2>
@@ -134,7 +143,7 @@ namespace utils {
 
 	template <typename TVec2>
 	bool line_intersect(const TVec2& v1, const TVec2& v2, const TVec2& v3, const TVec2& v4, float epsilon, TVec2& intersection) {
-		if (length(v1 - v2) <= abs(epsilon) || length(v3 - v4) <= abs(epsilon)) {
+		if (utils::length(v1 - v2) <= abs(epsilon) || utils::length(v3 - v4) <= abs(epsilon)) {
 			return false;
 		}
 		TVec2 p = v1;
@@ -148,7 +157,7 @@ namespace utils {
 		float t = qps / rs;
 		float u = qpr / rs;
 		if (abs(rs) >= epsilon && t >= 0.0f + epsilon && t <= 1.0f - epsilon && u >= 0.0f + epsilon && u <= 1.0f - epsilon) {
-			intersection = p + t * r;
+			intersection = TVec2(p.x + t * r.x, p.y + t * r.y);
 			return true;
 		} else {
 			return false;
@@ -157,14 +166,14 @@ namespace utils {
 
 	template <typename TVec2>
 	int line_circle_intersect(const TVec2& v1, const TVec2& v2, const TVec2& center, float radius, float epsilon, TVec2& intersection1, TVec2& intersection2) {
-		if (length(v1 - v2) <= abs(epsilon)) {
+		if (utils::length(v1 - v2) <= abs(epsilon)) {
 			return 0;
 		}
 		TVec2 l1 = v1 - center;
 		TVec2 l2 = v2 - center;
 		float dx = l2.x - l1.x;
 		float dy = l2.y - l1.y;
-		float dr = length(l2 - l1);
+		float dr = utils::length(l2 - l1);
 		float D = cross2d(l1, l2);
 		float discr = (radius * radius) * (dr * dr) - (D * D);
 		if (discr < 0) {
@@ -194,7 +203,7 @@ namespace utils {
 		} else if (line_intersect == 1) {
 			TVec2 B = v2 - v1;
 			TVec2 A = i1 - v1;
-			float t = dot(A, B) / dot(B, B);
+			float t = utils::dot(A, B) / utils::dot(B, B);
 			bool ti = t >= 0.0f + epsilon2 && t <= 1.0f - epsilon2;
 			if (!ti) {
 				return 0;
@@ -205,9 +214,9 @@ namespace utils {
 		} else {
 			TVec2 B = v2 - v1;
 			TVec2 A1 = i1 - v1;
-			float t1 = dot(A1, B) / dot(B, B);
+			float t1 = utils::dot(A1, B) / utils::dot(B, B);
 			TVec2 A2 = i2 - v1;
-			float t2 = dot(A2, B) / dot(B, B);
+			float t2 = utils::dot(A2, B) / utils::dot(B, B);
 			bool t1i = t1 >= 0.0f + epsilon2 && t1 <= 1.0f - epsilon2;
 			bool t2i = t2 >= 0.0f + epsilon2 && t2 <= 1.0f - epsilon2;
 			if (!t1i && !t2i) {
@@ -229,13 +238,13 @@ namespace utils {
 	template <typename TVec2>
 	float sqr_distance(const TVec2& v1, const TVec2& v2) {
 		TVec2 C = v1 - v2;
-		return dot(C, C);
+		return utils::dot(C, C);
 	}
 
 	template <typename TVec2>
 	float vector_angle(const TVec2& v1, const TVec2& v2) {
-		float d = dot(v1, v2);
-		float l = length(v1) * length(v2);
+		float d = utils::dot(v1, v2);
+		float l = utils::length(v1) * utils::length(v2);
 		float dl = d / l;
 		return acos(dl);
 	}
@@ -272,7 +281,7 @@ namespace utils {
 		TVec2 rel_pos = point - pivot;
 		float old_angle = atan2(rel_pos.y, rel_pos.x);
 		float new_angle = old_angle + angle;
-		float radius = length(rel_pos);
+		float radius = utils::length(rel_pos);
 		float new_x = cos(new_angle) * radius;
 		float new_y = sin(new_angle) * radius;
 		TVec2 new_rel_pos = TVec2(new_x, new_y);

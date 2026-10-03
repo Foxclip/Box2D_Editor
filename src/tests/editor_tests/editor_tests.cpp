@@ -17,15 +17,12 @@ EditorTests::EditorTests(
 }
 
 void EditorTests::beforeRunModule() {
-	sf::ContextSettings cs_window;
-	window.create(sf::VideoMode(800, 600), "Editor tests", sf::Style::Default, cs_window);
+	window.create(800, 600, "Editor tests", 0);
 	font = fw::Font("fonts/verdana.ttf");
-	sfml_err = sf::err().rdbuf(nullptr); // don't need SFML errors in the console
 	fw::WidgetList::debug_mouse = true;
 }
 
 void EditorTests::afterRunModule() {
-	sf::err().rdbuf(sfml_err);
 	window.close();
 	fw::WidgetList::debug_mouse = false;
 }
@@ -53,25 +50,25 @@ void EditorTests::panTest(test::Test& test) {
 	editor.outliner_widget->setSize(150.0f, 100.0f);
 	editor.advance();
 
-	sf::Vector2f box_offset = sf::Vector2f(100.0f, 50.0f);
+	glvx::Vector2f box_offset = glvx::Vector2f(100.0f, 50.0f);
 	BoxObject* box0 = editor.getSimulation().createBox(
-		"box0", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+		"box0", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), glvx::Color::Green
 	);
-	sf::Vector2f box_pos_1 = editor.getObjectScreenPos(box0);
-	sf::Vector2f box_pos_2 = box_pos_1 - box_offset;
+	glvx::Vector2f box_pos_1 = editor.getObjectScreenPos(box0);
+	glvx::Vector2f box_pos_2 = box_pos_1 - box_offset;
 	editor.mouseMove(box_pos_1);
 	editor.mouseRightPress();
 	editor.advance();
 	editor.mouseMove(box_pos_2);
 	editor.advance();
 	{
-		sf::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
+		glvx::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
 		T_VEC2_APPROX_COMPARE(box_pos_2_actual, box_pos_2);
 	}
 	editor.mouseRightRelease();
 	editor.advance();
 	{
-		sf::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
+		glvx::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
 		T_VEC2_APPROX_COMPARE(box_pos_2_actual, box_pos_2);
 	}
 }
@@ -85,18 +82,18 @@ void EditorTests::selectTest(test::Test& test) {
 	editor.advance();
 
 	BoxObject* box0 = editor.getSimulation().createBox(
-		"box0", b2Vec2(-2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+		"box0", b2Vec2(-2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), glvx::Color::Green
 	);
 	BoxObject* box1 = editor.getSimulation().createBox(
-		"box1", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+		"box1", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), glvx::Color::Green
 	);
 	BoxObject* box2 = editor.getSimulation().createBox(
-		"box2", b2Vec2(2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+		"box2", b2Vec2(2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), glvx::Color::Green
 	);
 	const CompVector<GameObject*>& selected_objects = editor.getSelectTool().getSelectedObjects();
 	T_ASSERT(T_COMPARE(selected_objects.size(), 0));
 
-	sf::Vector2f box_0_pos = editor.getObjectScreenPos(box0);
+	glvx::Vector2f box_0_pos = editor.getObjectScreenPos(box0);
 	editor.mouseMove(box_0_pos);
 	editor.mouseLeftPress();
 	editor.advance();
@@ -117,7 +114,7 @@ void EditorTests::selectTest(test::Test& test) {
 		T_CHECK(selected_objects[0] == box2);
 	}
 
-	sf::Vector2f click_pos = editor.worldToScreen(box2->getGlobalPosition() + box2->size);
+	glvx::Vector2f click_pos = editor.worldToScreen(box2->getGlobalPosition() + box2->size);
 	editor.mouseMove(click_pos);
 	editor.mouseLeftPress();
 	editor.advance();
@@ -135,13 +132,13 @@ void EditorTests::multiSelectTest(test::Test& test) {
 	editor.advance();
 
 	BoxObject* box0 = editor.getSimulation().createBox(
-		"box0", b2Vec2(-2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+		"box0", b2Vec2(-2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), glvx::Color::Green
 	);
 	BoxObject* box1 = editor.getSimulation().createBox(
-		"box1", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+		"box1", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), glvx::Color::Green
 	);
 	BoxObject* box2 = editor.getSimulation().createBox(
-		"box2", b2Vec2(2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+		"box2", b2Vec2(2.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), glvx::Color::Green
 	);
 	const CompVector<GameObject*>& selected_objects = editor.getSelectTool().getSelectedObjects();
 	T_ASSERT(T_COMPARE(selected_objects.size(), 0));
@@ -170,7 +167,7 @@ void EditorTests::multiSelectTest(test::Test& test) {
 	if (T_COMPARE(selected_objects.size(), 1)) {
 		T_CHECK(selected_objects[0] == box2);
 	}
-	sf::Vector2f click_pos = editor.worldToScreen(box2->getGlobalPosition() + box2->size);
+	glvx::Vector2f click_pos = editor.worldToScreen(box2->getGlobalPosition() + box2->size);
 	clickMouse(editor, click_pos);
 	T_COMPARE(selected_objects.size(), 0);
 }
@@ -182,27 +179,27 @@ void EditorTests::moveTest(test::Test& test) {
 	editor.outliner_widget->setSize(150.0f, 100.0f);
 	editor.advance();
 
-	sf::Vector2f box_offset = sf::Vector2f(100.0f, 50.0f);
+	glvx::Vector2f box_offset = glvx::Vector2f(100.0f, 50.0f);
 	BoxObject* box0 = editor.getSimulation().createBox(
-		"box0", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+		"box0", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), glvx::Color::Green
 	);
 	clickObject(editor, box0);
-	sf::Vector2f box_pos_1 = editor.getObjectScreenPos(box0);
-	sf::Vector2f box_pos_2 = box_pos_1 - box_offset;
+	glvx::Vector2f box_pos_1 = editor.getObjectScreenPos(box0);
+	glvx::Vector2f box_pos_2 = box_pos_1 - box_offset;
 	editor.mouseMove(box_pos_1);
-	tapKey(editor, sf::Keyboard::G);
+	tapKey(editor, glvx::Key::G);
 	editor.mouseMove(box_pos_2);
 	editor.advance();
 	editor.mouseLeftPress();
 	editor.advance();
 	{
-		sf::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
+		glvx::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
 		T_VEC2_APPROX_COMPARE(box_pos_2_actual, box_pos_2);
 	}
 	editor.mouseLeftRelease();
 	editor.advance();
 	{
-		sf::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
+		glvx::Vector2f box_pos_2_actual = editor.getObjectScreenPos(box0);
 		T_VEC2_APPROX_COMPARE(box_pos_2_actual, box_pos_2);
 	}
 }
@@ -214,22 +211,22 @@ void EditorTests::panMoveTest(test::Test& test) {
 	editor.outliner_widget->setSize(150.0f, 100.0f);
 	editor.advance();
 
-	sf::Vector2f box_offset = sf::Vector2f(100.0f, 100.0f);
+	glvx::Vector2f box_offset = glvx::Vector2f(100.0f, 100.0f);
 	BoxObject* box0 = editor.getSimulation().createBox(
-		"box0", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), sf::Color::Green
+		"box0", b2Vec2(0.0f, 0.0f), 0.0f, b2Vec2(1.0f, 1.0f), glvx::Color::Green
 	);
 	clickObject(editor, box0);
 	b2Vec2 box_world_pos = box0->getGlobalPosition();
-	sf::Vector2f box_pos_1 = editor.getObjectScreenPos(box0);
-	sf::Vector2f box_pos_2 = box_pos_1 - box_offset;
+	glvx::Vector2f box_pos_1 = editor.getObjectScreenPos(box0);
+	glvx::Vector2f box_pos_2 = box_pos_1 - box_offset;
 	editor.mouseMove(box_pos_1);
-	tapKey(editor, sf::Keyboard::G);
+	tapKey(editor, glvx::Key::G);
 	editor.mouseRightPress();
 	editor.advance();
 	editor.mouseMove(box_pos_2);
 	editor.advance();
 	{
-		sf::Vector2f box_screen_pos_actual = editor.getObjectScreenPos(box0);
+		glvx::Vector2f box_screen_pos_actual = editor.getObjectScreenPos(box0);
 		T_VEC2_APPROX_COMPARE(box_screen_pos_actual, box_pos_2);
 		b2Vec2 box_world_pos_actual = box0->getGlobalPosition();
 		T_VEC2_APPROX_COMPARE(box_world_pos_actual, box_world_pos);
@@ -241,7 +238,7 @@ void EditorTests::panMoveTest(test::Test& test) {
 	editor.mouseLeftRelease();
 	editor.advance();
 	{
-		sf::Vector2f box_screen_pos_actual = editor.getObjectScreenPos(box0);
+		glvx::Vector2f box_screen_pos_actual = editor.getObjectScreenPos(box0);
 		T_VEC2_APPROX_COMPARE(box_screen_pos_actual, box_pos_2);
 		b2Vec2 box_world_pos_actual = box0->getGlobalPosition();
 		T_VEC2_APPROX_COMPARE(box_world_pos_actual, box_world_pos);
@@ -258,7 +255,7 @@ void EditorTests::serializeEmptyTest(test::Test& test) {
 	camera.setPosition(1.0f, 2.0f);
 	camera.setZoom(4.4f);
 	std::string str = editor.serialize();
-	editor.createBox("added box", b2Vec2(10.0f, 15.0f), 45.0f, b2Vec2(1.0f, 1.0f), sf::Color::Red);
+	editor.createBox("added box", b2Vec2(10.0f, 15.0f), 45.0f, b2Vec2(1.0f, 1.0f), glvx::Color::Red);
 	b2Vec2 prev_pos = camera.getPosition();
 	float prev_zoom = camera.getZoom();
 	camera.setPosition(2.0f, 3.0f);
@@ -270,7 +267,7 @@ void EditorTests::serializeEmptyTest(test::Test& test) {
 	T_COMPARE(camera.getZoom(), prev_zoom);
 }
 
-void EditorTests::clickMouse(Editor& editor, const sf::Vector2f& pos) {
+void EditorTests::clickMouse(Editor& editor, const glvx::Vector2f& pos) {
 	editor.mouseMove(pos);
 	editor.mouseLeftPress();
 	editor.advance();
@@ -279,28 +276,28 @@ void EditorTests::clickMouse(Editor& editor, const sf::Vector2f& pos) {
 }
 
 void EditorTests::clickObject(Editor& editor, GameObject* object, bool shift, bool ctrl) {
-	sf::Vector2f pos = editor.getObjectScreenPos(object);
+	glvx::Vector2f pos = editor.getObjectScreenPos(object);
 	editor.mouseMove(pos);
 	if (shift) {
-		editor.keyPress(sf::Keyboard::LShift);
+		editor.keyPress(glvx::Key::LShift);
 	}
 	if (ctrl) {
-		editor.keyPress(sf::Keyboard::LControl);
+		editor.keyPress(glvx::Key::LControl);
 	}
 	editor.mouseLeftPress();
 	editor.advance();
 	editor.mouseLeftRelease();
 	editor.advance();
 	if (ctrl) {
-		editor.keyRelease(sf::Keyboard::LControl);
+		editor.keyRelease(glvx::Key::LControl);
 	}
 	if (shift) {
-		editor.keyRelease(sf::Keyboard::LShift);
+		editor.keyRelease(glvx::Key::LShift);
 	}
 	editor.advance();
 }
 
-void EditorTests::tapKey(Editor& editor, sf::Keyboard::Key key) {
+void EditorTests::tapKey(Editor& editor, glvx::Key key) {
 	editor.keyPress(key);
 	editor.advance();
 	editor.keyRelease(key);

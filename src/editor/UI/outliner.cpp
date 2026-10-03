@@ -12,14 +12,14 @@ Outliner::Outliner(fw::WidgetList& widget_list, float width, float height, Edito
 	setParentAnchor(Anchor::TOP_RIGHT);
 	setBackgroundColor(OUTLINER_BACKGROUND_COLOR);
 	setScrollbarColor(OUTLINER_SCROLLBAR_COLOR);
-	area_widget->OnLeftClick += [&](const sf::Vector2f& pos) {
+	area_widget->OnLeftClick += [&](const glvx::Vector2f& pos) {
 		treeview_widget->deselectAll();
 	};
 	// container
 	treeview_widget = widget_list.createTreeViewWidget(width, height);
-	treeview_widget->setFillColor(sf::Color::Transparent);
+	treeview_widget->setFillColor(glvx::Color::Transparent);
 	treeview_widget->setSizeXPolicy(SizePolicy::PARENT);
-	treeview_widget->setFillColor(sf::Color::Transparent);
+	treeview_widget->setFillColor(glvx::Color::Transparent);
 	treeview_widget->OnEntryClicked += [&](fw::TreeViewEntry* entry) {
 		GameObject* object = entry_object[entry];
 		app.setActiveObject(object);
@@ -60,7 +60,7 @@ Outliner::Outliner(fw::WidgetList& widget_list, float width, float height, Edito
 	};
 }
 
-Outliner::Outliner(fw::WidgetList& widget_list, const sf::Vector2f& size, Editor& p_app)
+Outliner::Outliner(fw::WidgetList& widget_list, const glvx::Vector2f& size, Editor& p_app)
 	: Outliner(widget_list, size.x, size.y, p_app) { }
 
 void Outliner::addObject(GameObject* object) {

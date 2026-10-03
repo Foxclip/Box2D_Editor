@@ -9,7 +9,7 @@ EditWindow::EditWindow(fw::WidgetList& widget_list, float width, float height, E
     : fw::WindowWidget(widget_list, width, height), app(p_app) {
     setName("edit window");
     setVisible(false);
-    setFillColor(sf::Color(128, 128, 128));
+    setFillColor(glvx::Color(128, 128, 128));
     setClickThrough(false);
     setHeaderFont(app.console_font);
     setHeaderTextCharacterSize(15);
@@ -19,7 +19,7 @@ EditWindow::EditWindow(fw::WidgetList& widget_list, float width, float height, E
     container_widget->setPadding(EDIT_WINDOW_PARAMETER_PADDING);
     container_widget->setSizeXPolicy(SizePolicy::PARENT);
     container_widget->setSizeYPolicy(SizePolicy::CHILDREN);
-    container_widget->setFillColor(sf::Color(75, 75, 75));
+    container_widget->setFillColor(glvx::Color(75, 75, 75));
     container_widget->setName("container");
     container_widget->setParent(this);
     lockChildren();
@@ -27,7 +27,7 @@ EditWindow::EditWindow(fw::WidgetList& widget_list, float width, float height, E
     setSpacingWidgets();
 }
 
-EditWindow::EditWindow(fw::WidgetList& widget_list, const sf::Vector2f& size, Editor& p_app) 
+EditWindow::EditWindow(fw::WidgetList& widget_list, const glvx::Vector2f& size, Editor& p_app) 
     : fw::WindowWidget(widget_list, size), app(p_app) { }
 
 void EditWindow::updateParameters() {
@@ -59,7 +59,7 @@ void EditWindow::createParameters() {
         [=]() {
             return app.active_object->getName();
         },
-        [=](const sf::String& str) {
+        [=](const std::string& str) {
             app.active_object->setName(str);
             app.commit_action = true;
         }
@@ -167,7 +167,7 @@ fw::ContainerWidget* EditWindowParameter::getWidget() const {
 fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::string& name, const std::string& text) {
     fw::ContainerWidget* parameter_widget = app.widgets.createContainerWidget(100.0f, 20.0f);
     parameter_widget->setName(name);
-    parameter_widget->setFillColor(sf::Color::Transparent);
+    parameter_widget->setFillColor(glvx::Color::Transparent);
     parameter_widget->setAlignmentX(fw::Widget::Alignment::ALIGN_CENTER);
     parameter_widget->setSizeXPolicy(fw::Widget::SizePolicy::PARENT);
     parameter_widget->setSizeYPolicy(fw::Widget::SizePolicy::CHILDREN);
@@ -180,7 +180,7 @@ fw::ContainerWidget* EditWindowParameter::createParameterWidget(const std::strin
     fw::EmptyWidget* spacing_widget = app.widgets.createEmptyWidget();
     spacing_widget->setName("spacing");
     spacing_widget->setSize(10.0f, 0.0f);
-    spacing_widget->setFillColor(sf::Color::Transparent);
+    spacing_widget->setFillColor(glvx::Color::Transparent);
     spacing_widget->setParent(parameter_widget);
     return parameter_widget;
 }
@@ -214,14 +214,14 @@ TextParameter::TextParameter(
     EditWindow& p_edit_window,
     const std::string& name,
     const std::string& text,
-    std::function<sf::String(void)> get_value,
-    std::function<void(const sf::String&)> set_value
+    std::function<std::string(void)> get_value,
+    std::function<void(const std::string&)> set_value
 ) : EditWindowParameter(p_edit_window) {
     this->get_value = get_value;
     this->set_value = set_value;
     this->widget = createParameterWidget(name, text);
     this->textbox_widget = createTextBoxWidget();
-    this->textbox_widget->OnConfirm = [&](const sf::String& value) {
+    this->textbox_widget->OnConfirm = [&](const std::string& value) {
         if (this->get_value() != value) {
             this->set_value(value);
         }
@@ -270,9 +270,9 @@ FloatParameter::FloatParameter(
     this->widget = createParameterWidget(name, text);
     this->textbox_widget = createTextBoxWidget();
     this->textbox_widget->setType(fw::TextBoxWidget::TextBoxType::FLOAT);
-    this->textbox_widget->OnConfirm = [&](const sf::String& str) {
+    this->textbox_widget->OnConfirm = [&](const std::string& str) {
         if (textbox_widget->isValidValue()) {
-            float new_value = std::stof(str.toAnsiString());
+            float new_value = std::stof(str);
             if (this->get_value() != new_value) {
                 this->set_value(new_value);
             }

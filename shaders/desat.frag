@@ -1,3 +1,20 @@
+#version 420 core
+
+in vec2 TexCoords;
+in vec4 VertexColor;
+
+out vec4 FragColor;
+
+layout (binding = 1) uniform Object {
+    mat4 vp;
+    mat4 model;
+    vec4 color;
+    bool hasTexture;
+    bool premultiplyOutput;
+} object;
+
+uniform sampler2D tex;
+
 uniform float saturation;
 uniform float vcenter;
 uniform float vpercent;
@@ -20,16 +37,12 @@ vec3 hsv2rgb(vec3 c) {
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-float scale_to(float f, float target, float percent) {
-    return ((f - target) * percent) + target;
-}
-
-vec4 desat_apply(vec4 color) {
-    vec4 tex_color = texture2D(texture, gl_TexCoord[0].xy);
+void main() {
+    vec4 tex_color = texture(tex, TexCoords);
     vec3 hsv = rgb2hsv(vec3(tex_color));
     hsv.y = hsv.y * saturation;
     hsv.z = ((hsv.z - vcenter) * vpercent) + vcenter;
     vec3 rgb = hsv2rgb(hsv);
     vec4 result = vec4(rgb * tex_color.a, tex_color.a); // premultiplied alpha
-    return result;
+    FragColor = result;
 }

@@ -158,7 +158,7 @@ BoxObject* Simulation::createBox(
     const b2Vec2& pos,
     float angle,
     const b2Vec2& size,
-    const sf::Color& color
+    const glvx::Color& color
 ) {
     b2BodyDef def;
     def.type = b2_dynamicBody;
@@ -177,8 +177,8 @@ BallObject* Simulation::createBall(
     const std::string& name,
     const b2Vec2& pos,
     float radius,
-    const sf::Color& color,
-    const sf::Color& notch_color
+    const glvx::Color& color,
+    const glvx::Color& notch_color
 ) {
     b2BodyDef def;
     def.type = b2_dynamicBody;
@@ -197,7 +197,7 @@ PolygonObject* Simulation::createPolygon(
     const b2Vec2& pos,
     float angle,
     const std::vector<b2Vec2>& vertices,
-    const sf::Color& color
+    const glvx::Color& color
 ) {
     b2BodyDef def;
     def.type = b2_dynamicBody;
@@ -218,7 +218,7 @@ PolygonObject* Simulation::createRegularPolygon(
     float angle,
     size_t vertex_count,
     float radius,
-    const sf::Color& color
+    const glvx::Color& color
 ) {
     std::vector<b2Vec2> vertices;
     for (size_t i = 0; i < vertex_count; i++) {
@@ -234,7 +234,7 @@ PolygonObject* Simulation::createCar(
     const b2Vec2& pos,
     const std::vector<float>& lengths,
     const std::vector<float>& wheels,
-    const sf::Color& color
+    const glvx::Color& color
 ) {
     b2BodyDef def;
     def.type = b2_dynamicBody;
@@ -256,7 +256,7 @@ PolygonObject* Simulation::createCar(
         float radius = wheels[i];
         std::string wheel_name = car->getName() + " wheel" + std::to_string(wheel_count);
         BallObject* wheel = createBall(
-            wheel_name, anchor_pos_world, radius, sf::Color(255, 255, 0), sf::Color(64, 64, 0)
+            wheel_name, anchor_pos_world, radius, glvx::Color(255, 255, 0), glvx::Color(64, 64, 0)
         );
         wheel->setDensity(1.0f, false);
         wheel->setFriction(0.3f, false);
@@ -279,7 +279,7 @@ ChainObject* Simulation::createChain(
     const b2Vec2& pos,
     float angle,
     const std::vector<b2Vec2>& vertices,
-    const sf::Color& color
+    const glvx::Color& color
 ) {
     b2BodyDef def;
     def.position = pos;

@@ -39,7 +39,7 @@ const std::string& GameObject::getName() const {
 	return name;
 }
 
-const sf::Color& GameObject::getColor() const {
+const glvx::Color& GameObject::getColor() const {
 	return color;
 }
 
@@ -312,7 +312,7 @@ void GameObject::updateVisual() {
 	setVisualRotation(utils::to_degrees(angle));
 }
 
-void GameObject::renderMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) {
+void GameObject::renderMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func) {
 	updateVisual();
 	drawMask(draw_func);
 }
@@ -321,13 +321,13 @@ void GameObject::setDrawVarray(bool value) {
 	draw_varray = value;
 }
 
-void GameObject::setVisualPosition(const sf::Vector2f& pos) {
-	sf::Transformable* tr = getTransformable();
+void GameObject::setVisualPosition(const glvx::Vector2f& pos) {
+	glvx::Transformable* tr = getTransformable();
 	tr->setPosition(pos);
 }
 
 void GameObject::setVisualRotation(float angle) {
-	getTransformable()->setRotation(angle);
+	getTransformable()->setRotation(glvx::Angle::fromDegrees(angle));
 }
 
 void GameObject::setEnabled(bool enabled, bool include_children) {
@@ -778,7 +778,7 @@ bool GameObject::operator==(const GameObject& other) const {
 	return compare(other);
 }
 
-BoxObject::BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, sf::Color color) {
+BoxObject::BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, glvx::Color color) {
 	this->object_list = object_list;
 	this->color = color;
 	rigid_body = object_list->world->CreateBody(&def);
@@ -796,19 +796,19 @@ bool BoxObject::isClosed() const {
 	return false;
 }
 
-sf::Drawable* BoxObject::getDrawable() const {
+glvx::Drawable* BoxObject::getDrawable() const {
 	return rect_shape.get();
 }
 
-sf::Transformable* BoxObject::getTransformable() const {
+glvx::Transformable* BoxObject::getTransformable() const {
 	return rect_shape.get();
 }
 
-void BoxObject::drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) {
-	sf::Color orig_color = rect_shape->getFillColor();
-	rect_shape->setFillColor(sf::Color::White);
+void BoxObject::drawMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func) {
+	glvx::Color orig_color = rect_shape->getColor();
+	rect_shape->setColor(glvx::Color::White);
 	draw_func(*rect_shape);
-	rect_shape->setFillColor(orig_color);
+	rect_shape->setColor(orig_color);
 }
 
 TokenWriter& BoxObject::serialize(TokenWriter& tw) const {
@@ -840,7 +840,7 @@ dp::DataPointerUnique<BoxObject> BoxObject::deserialize(TokenReader& tr, GameObj
 		ptrdiff_t parent_id = -1;
 		std::string name = "<unnamed>";
 		b2Vec2 size = b2Vec2(1.0f, 1.0f);
-		sf::Color color = sf::Color::White;
+		glvx::Color color = glvx::Color::White;
 		BodyDef body_def;
 		if (tr.tryEat("object")) {
 			tr.eat("box");
@@ -889,9 +889,9 @@ void BoxObject::internalSyncVertices() {
 	b2PolygonShape box_shape;
 	box_shape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
 	b2Fixture* fixture = rigid_body->CreateFixture(&box_shape, 1.0f);
-	rect_shape = dp::make_data_pointer<sf::RectangleShape>("BoxObject " + name + " rect_shape", tosf(size));
+	rect_shape = dp::make_data_pointer<glvx::Rectangle>("BoxObject " + name + " rect_shape", tosf(size));
 	rect_shape->setOrigin(size.x / 2.0f, size.y / 2.0f);
-	rect_shape->setFillColor(color);
+	rect_shape->setColor(color);
 }
 
 bool BoxObject::isEqual(const GameObject* other) const {
@@ -905,7 +905,7 @@ bool BoxObject::isEqual(const GameObject* other) const {
 	return true;
 }
 
-BallObject::BallObject(GameObjectList* object_list, b2BodyDef def, float radius, sf::Color color, sf::Color notch_color) {
+BallObject::BallObject(GameObjectList* object_list, b2BodyDef def, float radius, glvx::Color color, glvx::Color notch_color) {
 	this->object_list = object_list;
 	this->radius = radius;
 	this->color = color;
@@ -925,19 +925,19 @@ bool BallObject::isClosed() const {
 	return false;
 }
 
-sf::Drawable* BallObject::getDrawable() const {
+glvx::Drawable* BallObject::getDrawable() const {
 	return circle_notch_shape.get();
 }
 
-sf::Transformable* BallObject::getTransformable() const {
+glvx::Transformable* BallObject::getTransformable() const {
 	return circle_notch_shape.get();
 }
 
-void BallObject::drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) {
-	sf::Color orig_circle_color = circle_notch_shape->getCircleColor();
-	sf::Color orig_notch_color = circle_notch_shape->getNotchColor();
-	circle_notch_shape->setCircleColor(sf::Color::White);
-	circle_notch_shape->setNotchColor(sf::Color::White);
+void BallObject::drawMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func) {
+	glvx::Color orig_circle_color = circle_notch_shape->getCircleColor();
+	glvx::Color orig_notch_color = circle_notch_shape->getNotchColor();
+	circle_notch_shape->setCircleColor(glvx::Color::White);
+	circle_notch_shape->setNotchColor(glvx::Color::White);
 	draw_func(*circle_notch_shape);
 	circle_notch_shape->setCircleColor(orig_circle_color);
 	circle_notch_shape->setNotchColor(orig_notch_color);
@@ -973,8 +973,8 @@ dp::DataPointerUnique<BallObject> BallObject::deserialize(TokenReader& tr, GameO
 		ptrdiff_t parent_id = -1;
 		std::string name = "<unnamed>";
 		float radius = 1.0f;
-		sf::Color color = sf::Color::White;
-		sf::Color notch_color = sf::Color(128, 128, 128);
+		glvx::Color color = glvx::Color::White;
+		glvx::Color notch_color = glvx::Color(128, 128, 128);
 		bool notch_color_set = false;
 		BodyDef body_def;
 		if (tr.tryEat("object")) {
@@ -1050,7 +1050,7 @@ PolygonObject::PolygonObject(
 	GameObjectList* object_list,
 	b2BodyDef def,
 	const std::vector<b2Vec2>& vertices,
-	const sf::Color& color
+	const glvx::Color& color
 ) {
 	this->object_list = object_list;
 	this->color = color;
@@ -1077,17 +1077,17 @@ SplittablePolygon* PolygonObject::getSplittablePolygon() const {
 	return polygon.get();
 }
 
-sf::Drawable* PolygonObject::getDrawable() const {
+glvx::Drawable* PolygonObject::getDrawable() const {
 	return polygon.get();
 }
 
-sf::Transformable* PolygonObject::getTransformable() const {
+glvx::Transformable* PolygonObject::getTransformable() const {
 	return polygon.get();
 }
 
-void PolygonObject::drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) {
-	sf::Color orig_color = polygon->getFillColor();
-	polygon->setFillColor(sf::Color::White);
+void PolygonObject::drawMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func) {
+	glvx::Color orig_color = polygon->getFillColor();
+	polygon->setFillColor(glvx::Color::White);
 	draw_func(*polygon);
 	polygon->setFillColor(orig_color);
 }
@@ -1129,7 +1129,7 @@ dp::DataPointerUnique<PolygonObject> PolygonObject::deserialize(TokenReader& tr,
 		ptrdiff_t id = -1;
 		ptrdiff_t parent_id = -1;
 		std::string name = "<unnamed>";
-		sf::Color color = sf::Color::White;
+		glvx::Color color = glvx::Color::White;
 		std::vector<b2Vec2> vertices;
 		BodyDef body_def;
 		if (tr.tryEat("object")) {
@@ -1182,7 +1182,7 @@ void PolygonObject::internalSyncVertices() {
 		SplittablePolygon& polygon = convex_polygons[polygon_i];
 		std::vector<b2Vec2> b2points;
 		for (size_t vertex_i = 0; vertex_i < polygon.getPointCount(); vertex_i++) {
-			sf::Vector2f point = polygon.getPoint(vertex_i);
+			glvx::Vector2f point = polygon.getPoint(vertex_i);
 			point = point + polygon.getPosition();
 			b2points.push_back(tob2(point));
 		}
@@ -1202,11 +1202,11 @@ bool PolygonObject::isEqual(const GameObject* other) const {
 	return true;
 }
 
-ChainObject::ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color) {
+ChainObject::ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector<b2Vec2> p_vertices, glvx::Color color) {
 	this->object_list = object_list;
 	this->color = color;
 	rigid_body = object_list->world->CreateBody(&def);
-	sf::VertexArray drawable_vertices(sf::LinesStrip, p_vertices.size());
+	glvx::VertexArray drawable_vertices(glvx::PrimitiveType::LineStrip, p_vertices.size());
 	for (size_t i = 0; i < p_vertices.size(); i++) {
 		drawable_vertices[i].position = tosf(p_vertices[i]);
 		EditableVertex ev(p_vertices[i]);
@@ -1227,15 +1227,15 @@ bool ChainObject::isClosed() const {
 	return false;
 }
 
-sf::Drawable* ChainObject::getDrawable() const {
+glvx::Drawable* ChainObject::getDrawable() const {
 	return line_strip_shape.get();
 }
 
-sf::Transformable* ChainObject::getTransformable() const {
+glvx::Transformable* ChainObject::getTransformable() const {
 	return line_strip_shape.get();
 }
 
-void ChainObject::drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) {
+void ChainObject::drawMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func) {
 	draw_func(*line_strip_shape);
 }
 
@@ -1273,7 +1273,7 @@ dp::DataPointerUnique<ChainObject> ChainObject::deserialize(TokenReader& tr, Gam
 		ptrdiff_t parent_id = -1;
 		std::string name = "<unnamed>";
 		std::vector<b2Vec2> vertices;
-		sf::Color color = sf::Color::White;
+		glvx::Color color = glvx::Color::White;
 		BodyDef body_def;
 		if (tr.tryEat("object")) {
 			tr.eat("chain");
@@ -1326,7 +1326,7 @@ void ChainObject::internalSyncVertices() {
 	b2ChainShape new_chain;
 	new_chain.CreateChain(b2vertices.data(), (int32)b2vertices.size(), b2vertices.front(), b2vertices.back());
 	b2Fixture* new_fixture = rigid_body->CreateFixture(&new_chain, 1.0f);
-	line_strip_shape->varray = sf::VertexArray(sf::LinesStrip, b2vertices.size());
+	line_strip_shape->varray = glvx::VertexArray(glvx::PrimitiveType::LineStrip, b2vertices.size());
 	for (size_t i = 0; i < b2vertices.size(); i++) {
 		line_strip_shape->varray[i].position = tosf(b2vertices[i]);
 		line_strip_shape->varray[i].color = color;

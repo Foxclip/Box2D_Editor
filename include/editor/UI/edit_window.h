@@ -44,14 +44,14 @@ public:
 		EditWindow& p_edit_window,
 		const std::string& name,
 		const std::string& text,
-		std::function<sf::String(void)> get_value,
-		std::function<void(const sf::String&)> set_value
+		std::function<std::string(void)> get_value,
+		std::function<void(const std::string&)> set_value
 	);
 	void getValue() const override;
 
 private:
-	std::function<sf::String(void)> get_value;
-	std::function<void(const sf::String&)> set_value;
+	std::function<std::string(void)> get_value;
+	std::function<void(const std::string&)> set_value;
 	fw::TextBoxWidget* textbox_widget = nullptr;
 };
 
@@ -110,7 +110,7 @@ private:
 class EditWindow : public fw::WindowWidget {
 public:
 	EditWindow(fw::WidgetList& widget_list, float width, float height, Editor& p_app);
-	EditWindow(fw::WidgetList& widget_list, const sf::Vector2f& size, Editor& p_app);
+	EditWindow(fw::WidgetList& widget_list, const glvx::Vector2f& size, Editor& p_app);
 	void updateParameters();
 
 private:

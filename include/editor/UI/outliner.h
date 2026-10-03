@@ -10,11 +10,11 @@ class Editor;
 class Outliner : public fw::ScrollAreaWidget {
 public:
 	
-	const sf::Color OUTLINER_BACKGROUND_COLOR = sf::Color(128, 128, 128);
-	const sf::Color OUTLINER_SCROLLBAR_COLOR = sf::Color(110, 110, 110);
+	const glvx::Color OUTLINER_BACKGROUND_COLOR = glvx::Color(128, 128, 128);
+	const glvx::Color OUTLINER_SCROLLBAR_COLOR = glvx::Color(110, 110, 110);
 
 	Outliner(fw::WidgetList& widget_list, float width, float height, Editor& p_app);
-	Outliner(fw::WidgetList& widget_list, const sf::Vector2f& size, Editor& p_app);
+	Outliner(fw::WidgetList& widget_list, const glvx::Vector2f& size, Editor& p_app);
 
 private:
 	Editor& app;

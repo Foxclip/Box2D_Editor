@@ -1,14 +1,18 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <set>
 #include "tools.h"
 #include "simulation/simulation.h"
 #include "common/history.h"
 #include "logger/logger.h"
 #include "widgets/application.h"
+#include "widgets/font.h"
+#include <glvx/circle.h>
+#include <glvx/shader.h>
 
-const sf::String WINDOW_TITLE = "Box2D Editor";
+const std::string WINDOW_TITLE = "Box2D Editor";
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 const int ANTIALIASING = 0;
@@ -17,8 +21,8 @@ const int FPS = 60;
 const float WORLD_SATURATION = 0.75f;
 const float WORLD_COLOR_SCALE_CENTER = 0.25f;
 const float WORLD_COLOR_SCALE_PERCENT = 0.6f;
-const sf::Glsl::Vec3 SELECTION_OUTLINE_COLOR = sf::Glsl::Vec3(1.0f, 1.0f, 0.0f);
-const sf::Glsl::Vec3 HOVER_OUTLINE_COLOR = sf::Glsl::Vec3(1.0f, 1.0f, 0.0f);
+const glvx::Vector3 SELECTION_OUTLINE_COLOR = glvx::Vector3(1.0f, 1.0f, 0.0f);
+const glvx::Vector3 HOVER_OUTLINE_COLOR = glvx::Vector3(1.0f, 1.0f, 0.0f);
 const int SELECTION_OUTLINE_THICKNESS = 3;
 const int HOVER_OUTLINE_THICKNESS = 1;
 const int MOUSE_DRAG_THRESHOLD = 10;
@@ -69,8 +73,8 @@ private:
 	float zoom = 30.0f;
 };
 
-sf::Vector2f to2f(sf::Vector2i vec);
-sf::Vector2f to2f(sf::Vector2u vec);
+glvx::Vector2f to2f(glvx::Vector2i vec);
+glvx::Vector2f to2f(glvx::Vector2u vec);
 
 namespace fw {
 	class RectangleWidget;
@@ -85,7 +89,7 @@ class Menu;
 class Editor : public fw::Application {
 public:
 	Editor(bool maximized = false);
-	Editor(sf::RenderWindow& window, bool maximized = false);
+	Editor(glvx::Window& window, bool maximized = false);
 	void init(const std::string& title, bool vsync = true);
 	void load(const std::string& filename);
 	void setCameraPos(float x, float y);
@@ -103,35 +107,35 @@ public:
 		const b2Vec2& pos,
 		float angle,
 		const b2Vec2& size,
-		const sf::Color& color
+		const glvx::Color& color
 	);
 	BallObject* createBall(
 		const std::string& name,
 		const b2Vec2& pos,
 		float radius,
-		const sf::Color& color,
-		const sf::Color& notch_color = sf::Color::Transparent
+		const glvx::Color& color,
+		const glvx::Color& notch_color = glvx::Color::Transparent
 	);
 	PolygonObject* createPolygon(
 		const std::string& name,
 		const b2Vec2& pos,
 		float angle,
 		const std::vector<b2Vec2>& vertices,
-		const sf::Color& color
+		const glvx::Color& color
 	);
 	PolygonObject* createCar(
 		const std::string& name,
 		const b2Vec2& pos,
 		const std::vector<float>& lengths,
 		const std::vector<float>& wheels,
-		const sf::Color& color
+		const glvx::Color& color
 	);
 	ChainObject* createChain(
 		const std::string& name,
 		const b2Vec2& pos,
 		float angle,
 		const std::vector<b2Vec2>& vertices,
-		const sf::Color& color
+		const glvx::Color& color
 	);
 
 private:
@@ -149,8 +153,8 @@ private:
 	fw::CanvasWidget* world_widget = nullptr;
 	fw::CanvasWidget* ui_widget = nullptr;
 	fw::CanvasWidget* selection_mask_widget = nullptr;
-	sf::Shader desat_shader;
-	sf::Shader selection_shader;
+	std::unique_ptr<glvx::Shader> desat_shader;
+	std::unique_ptr<glvx::Shader> selection_shader;
 	Camera camera = Camera(*this);
 	SelectTool select_tool;
 	CreateTool create_tool;
@@ -181,9 +185,10 @@ private:
 	fw::RectangleWidget* logger_widget = nullptr;
 	fw::TextWidget* logger_text_widget = nullptr;
 	fw::TextWidget* step_widget = nullptr;
-	sf::CircleShape origin_shape;
-	sf::Text object_info_text;
-	sf::Text id_text;
+	glvx::Circle origin_shape;
+	glvx::Circle origin_shape_outline;
+	glvx::Text object_info_text;
+	glvx::Text id_text;
 	Outliner* outliner_widget = nullptr;
 	Menu* menu_widget = nullptr;
 	fw::TextWidget* debug_release_widget = nullptr;
@@ -196,7 +201,7 @@ private:
 	GameObject* follow_object = nullptr;
 	Simulation simulation;
 
-	sf::Vector2f mouse_world_pos;
+	glvx::Vector2f mouse_world_pos;
 	History<std::string> history;
 	bool commit_action = false;
 	struct LoadRequest {
@@ -216,15 +221,15 @@ private:
 	void onFrameBegin() override;
 	void onFrameEnd() override;
 	void onProcessWidgets() override;
-	void onProcessWindowEvent(const sf::Event& event) override;
-	void onProcessKeyboardEvent(const sf::Event& event) override;
-	void processLeftPress(const sf::Vector2f& pos);
-	void processGlobalLeftRelease(const sf::Vector2f& pos);
-	void processBlockableLeftRelease(const sf::Vector2f& pos);
+	void onProcessWindowEvent(const glvx::Event& event) override;
+	void onProcessKeyboardEvent(const glvx::Event& event) override;
+	void processLeftPress(const glvx::Vector2f& pos);
+	void processGlobalLeftRelease(const glvx::Vector2f& pos);
+	void processBlockableLeftRelease(const glvx::Vector2f& pos);
 	void processMouseScrollY(float delta);
-	void processMouse(const sf::Vector2f& pos);
-	void processDragGestureLeft(const sf::Vector2f& pos);
-	void processDragGestureRight(const sf::Vector2f& pos);
+	void processMouse(const glvx::Vector2f& pos);
+	void processDragGestureLeft(const glvx::Vector2f& pos);
+	void processDragGestureRight(const glvx::Vector2f& pos);
 	void onAfterProcessInput() override;
 	void onProcessWorld() override;
 	void onRender() override;
@@ -247,29 +252,29 @@ private:
 	Tool* trySelectTool(Tool* tool);
 	void selectCreateType(size_t type);
 	void togglePause();
-	sf::Vector2f screenToWorld(const sf::Vector2f& screen_pos) const;
-	sf::Vector2f pixelToWorld(const sf::Vector2i& screen_pos) const;
-	sf::Vector2f worldToScreen(const sf::Vector2f& world_pos) const;
-	sf::Vector2f worldToScreen(const b2Vec2& world_pos) const;
-	sf::Vector2i worldToPixel(const sf::Vector2f& world_pos) const;
-	sf::Vector2i worldToPixel(const b2Vec2& world_pos) const;
-	sf::Vector2f worldDirToScreenf(const b2Vec2& world_dir) const;
-	sf::Vector2f getMouseWorldPos() const;
+	glvx::Vector2f screenToWorld(const glvx::Vector2f& screen_pos) const;
+	glvx::Vector2f pixelToWorld(const glvx::Vector2i& screen_pos) const;
+	glvx::Vector2f worldToScreen(const glvx::Vector2f& world_pos) const;
+	glvx::Vector2f worldToScreen(const b2Vec2& world_pos) const;
+	glvx::Vector2i worldToPixel(const glvx::Vector2f& world_pos) const;
+	glvx::Vector2i worldToPixel(const b2Vec2& world_pos) const;
+	glvx::Vector2f worldDirToScreenf(const b2Vec2& world_dir) const;
+	glvx::Vector2f getMouseWorldPos() const;
 	b2Vec2 getMouseWorldPosb2() const;
 	ptrdiff_t mouseGetChainEdge(const b2Fixture* fixture) const;
-	b2Fixture* getFixtureAt(const sf::Vector2f& screen_pos) const;
-	GameObject* getObjectAt(const sf::Vector2f& screen_pos) const;
-	sf::Vector2f getObjectScreenPos(GameObject* object) const;
+	b2Fixture* getFixtureAt(const glvx::Vector2f& screen_pos) const;
+	GameObject* getObjectAt(const glvx::Vector2f& screen_pos) const;
+	glvx::Vector2f getObjectScreenPos(GameObject* object) const;
 	b2AABB getObjectsAABB(const CompVector<GameObject*>& objects) const;
 	ptrdiff_t mouseGetObjectVertex() const;
 	ptrdiff_t mouseGetObjectEdge() const;
 	ptrdiff_t mouseGetEdgeVertex() const;
 	void selectVerticesInRect(const RectangleSelect& rectangle_select);
 	void selectObjectsInRect(const RectangleSelect& rectangle_select);
-	void renderRectangleSelect(sf::RenderTarget& target, RectangleSelect& rectangle_select);
+	void renderRectangleSelect(glvx::RenderTarget& target, RectangleSelect& rectangle_select);
 	void renderRectangleSelect(fw::CanvasWidget* canvas, RectangleSelect& rectangle_select);
-	void getScreenNormal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const;
-	void getScreenNormal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const;
+	void getScreenNormal(const b2Vec2& v1, const b2Vec2& v2, glvx::Vector2f& norm_v1, glvx::Vector2f& norm_v2) const;
+	void getScreenNormal(const glvx::Vector2i& v1, const glvx::Vector2i& v2, glvx::Vector2f& norm_v1, glvx::Vector2f& norm_v2) const;
 	bool isParentSelected(const GameObject* object) const;
 	void grabSelected(Tool* selected_tool);
 	void rotateSelected(Tool* selected_tool);
@@ -278,6 +283,6 @@ private:
 	void deleteObject(GameObject* object, bool remove_children);
 	void viewSelectedObjects();
 	void checkDebugbreak();
-	void canvasDraw(fw::CanvasWidget* canvas, const sf::Drawable& drawable, const sf::RenderStates& states = sf::RenderStates::Default);
+	void canvasDraw(fw::CanvasWidget* canvas, const glvx::Drawable& drawable, const glvx::RenderStates& states = glvx::RenderStates());
 
 };

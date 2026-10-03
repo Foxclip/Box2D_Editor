@@ -6,9 +6,8 @@ public:
 	EditorTests(const std::string& name, test::TestModule* parent, const std::vector<TestNode*>& required_nodes = { });
 
 private:
-	sf::RenderWindow window;
+	glvx::Window window;
 	fw::Font font;
-	std::streambuf* sfml_err;
 
 	void beforeRunModule() override;
 	void afterRunModule() override;
@@ -23,8 +22,8 @@ private:
 	void panMoveTest(test::Test& test);
 	void serializeEmptyTest(test::Test& test);
 
-	void clickMouse(Editor& editor, const sf::Vector2f& pos);
+	void clickMouse(Editor& editor, const glvx::Vector2f& pos);
 	void clickObject(Editor& editor, GameObject* object, bool shift = false, bool ctrl = false);
-	void tapKey(Editor& editor, sf::Keyboard::Key key);
+	void tapKey(Editor& editor, glvx::Key key);
 
 };

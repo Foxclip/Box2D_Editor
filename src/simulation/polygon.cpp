@@ -1,11 +1,12 @@
 #include <cassert>
+#include <algorithm>
+#include <cmath>
 #include "simulation/polygon.h"
+#include "widgets/widgets_common.h"
 
-sf::Text vertex_text;
+using fw::operator<<;
 
-Logger& operator<<(Logger& lg, const sf::Vector2f& value) {
-	return lg << "(" << value.x << " " << value.y << ")";
-}
+glvx::Text vertex_text;
 
 bool CutInfo::isGG() const {
 	return green_zone && has_reciprocal && green_reciprocal;
@@ -66,7 +67,7 @@ SplittablePolygon::SplittablePolygon(size_t count) {
 	resetVarray(count);
 }
 
-SplittablePolygon::SplittablePolygon(const sf::VertexArray& varray) {
+SplittablePolygon::SplittablePolygon(const glvx::VertexArray& varray) {
 	assert(varray.getVertexCount() > 0);
 	this->varray = varray;
 }
@@ -75,42 +76,42 @@ size_t SplittablePolygon::getPointCount() const {
 	return varray.getVertexCount() - 1;
 }
 
-sf::Vector2f SplittablePolygon::getPoint(size_t index) const {
+glvx::Vector2f SplittablePolygon::getPoint(size_t index) const {
 	return varray[index].position;
 }
 
-sf::Vector2f SplittablePolygon::getLocalCenter() const {
-	sf::Vector2f sum = sf::Vector2f(0.0f, 0.0f);
+glvx::Vector2f SplittablePolygon::getLocalCenter() const {
+	glvx::Vector2f sum = glvx::Vector2f(0.0f, 0.0f);
 	for (size_t i = 0; i < getPointCount(); i++) {
 		sum += getPoint(i);
 	}
 	return sum / (float)getPointCount();
 }
 
-sf::Vector2f SplittablePolygon::getGlobalCenter() const {
-	sf::Vector2f local_center = getLocalCenter();
+glvx::Vector2f SplittablePolygon::getGlobalCenter() const {
+	glvx::Vector2f local_center = getLocalCenter();
 	return getTransform() * getLocalCenter();
 }
 
-sf::FloatRect SplittablePolygon::getLocalBounds() const {
-	sf::FloatRect result = sf::FloatRect(getPoint(0), sf::Vector2f(0.0f, 0.0f));
+glvx::FloatRect SplittablePolygon::getLocalBounds() const {
+	glvx::FloatRect result = glvx::FloatRect(getPoint(0), glvx::Vector2f(0.0f, 0.0f));
 	for (size_t i = 0; i < getPointCount(); i++) {
-		sf::Vector2f point = getPoint(i);
+		glvx::Vector2f point = getPoint(i);
 		utils::extend_bounds(result, point);
 	}
 	return result;
 }
 
-sf::FloatRect SplittablePolygon::getGlobalBounds() const {
-	sf::FloatRect result = sf::FloatRect(getTransform() * getPoint(0), sf::Vector2f(0.0f, 0.0f));
+glvx::FloatRect SplittablePolygon::getGlobalBounds() const {
+	glvx::FloatRect result = glvx::FloatRect(getTransform() * getPoint(0), glvx::Vector2f(0.0f, 0.0f));
 	for (size_t i = 0; i < getPointCount(); i++) {
-		sf::Vector2f point = getTransform() * getPoint(i);
+		glvx::Vector2f point = getTransform() * getPoint(i);
 		utils::extend_bounds(result, point);
 	}
 	return result;
 }
 
-sf::Color SplittablePolygon::getFillColor() const {
+glvx::Color SplittablePolygon::getFillColor() const {
 	return fill_color;
 }
 
@@ -118,15 +119,19 @@ std::vector<SplittablePolygon> SplittablePolygon::getConvexPolygons() const {
 	return convex_polygons;
 }
 
-sf::Transform SplittablePolygon::getParentGlobalTransform() const {
+glvx::Transform SplittablePolygon::getParentGlobalTransform() const {
 	if (parent) {
 		return parent->getGlobalTransform();
 	}
-	return sf::Transform::Identity;
+	return glvx::Transform();
 }
 
-sf::Transform SplittablePolygon::getGlobalTransform() const {
+glvx::Transform SplittablePolygon::getGlobalTransform() const {
 	return getParentGlobalTransform() * getTransform();
+}
+
+glvx::Transform SplittablePolygon::getTransform() const {
+	return Transformable::getTransform();
 }
 
 bool SplittablePolygon::isConvex() const {
@@ -138,7 +143,7 @@ bool SplittablePolygon::isConvex() const {
 	return true;
 }
 
-void SplittablePolygon::setPoint(size_t index, const sf::Vector2f& point) {
+void SplittablePolygon::setPoint(size_t index, const glvx::Vector2f& point) {
 	assert(index < getPointCount());
 	setCutsValid(false);
 	varray[index].position = point;
@@ -149,14 +154,14 @@ void SplittablePolygon::setPoint(size_t index, const sf::Vector2f& point) {
 	}
 }
 
-void SplittablePolygon::setLineColor(const sf::Color& color) {
+void SplittablePolygon::setLineColor(const glvx::Color& color) {
 	for (int i = 0; i < varray.getVertexCount(); i++) {
 		varray[i].color = color;
 	}
 	line_color = color;
 }
 
-void SplittablePolygon::setFillColor(const sf::Color& color) {
+void SplittablePolygon::setFillColor(const glvx::Color& color) {
 	fill_color = color;
 	if (is_convex) {
 		for (size_t i = 0; i < triangle_fan.getVertexCount(); i++) {
@@ -178,7 +183,7 @@ void SplittablePolygon::calcPotentialCuts(bool consider_convex_vertices) {
 		is_convex_vertex[vert_i] = isConvexVertex(vert_i);
 	}
 	for (size_t vert_i = 0; vert_i < getPointCount(); vert_i++) {
-		sf::Vector2f vertex = getPoint(vert_i);
+		glvx::Vector2f vertex = getPoint(vert_i);
 		if (is_convex_vertex[vert_i]) {
 			logger << "Vertex: " << vert_i << ", pos: " << vertex << ", convex" << "\n";
 			if (!consider_convex_vertices) {
@@ -188,13 +193,13 @@ void SplittablePolygon::calcPotentialCuts(bool consider_convex_vertices) {
 			logger << "Vertex: " << vert_i << ", pos: " << vertex << ", concave" << "\n";
 		}
 		LoggerIndent vertex_indent;
-		sf::Vector2f prev_vertex = getPoint(indexLoop(vert_i - 1));
-		sf::Vector2f next_vertex = getPoint(indexLoop(vert_i + 1));
-		sf::Vector2f side1_dir = utils::normalize(vertex - prev_vertex);
-		sf::Vector2f side2_dir = utils::normalize(vertex - next_vertex);
-		sf::Vector2f side1_dir_rot = utils::rot90CCW(side1_dir);
-		sf::Vector2f side2_dir_rot = utils::rot90CW(side2_dir);
-		sf::Vector2f vertex_normal = utils::normalize(side1_dir_rot + side2_dir_rot);
+		glvx::Vector2f prev_vertex = getPoint(indexLoop(vert_i - 1));
+		glvx::Vector2f next_vertex = getPoint(indexLoop(vert_i + 1));
+		glvx::Vector2f side1_dir = utils::normalize(vertex - prev_vertex);
+		glvx::Vector2f side2_dir = utils::normalize(vertex - next_vertex);
+		glvx::Vector2f side1_dir_rot = utils::rot90CCW(side1_dir);
+		glvx::Vector2f side2_dir_rot = utils::rot90CW(side2_dir);
+		glvx::Vector2f vertex_normal = utils::normalize(side1_dir_rot + side2_dir_rot);
 		for (size_t cut_i = 0; cut_i < getPointCount(); cut_i++) {
 			bool prev = cut_i == indexLoop(vert_i - 1);
 			bool curr = cut_i == indexLoop(vert_i);
@@ -203,7 +208,7 @@ void SplittablePolygon::calcPotentialCuts(bool consider_convex_vertices) {
 				logger << "Vertex cut " << vert_i << "-" << cut_i << " is adjacent edge" << "\n";
 				continue;
 			}
-			sf::Vector2f vertex_cut = getPoint(cut_i);
+			glvx::Vector2f vertex_cut = getPoint(cut_i);
 			bool right_side_1 = utils::right_side(vertex_cut, prev_vertex, vertex);
 			bool right_side_2 = utils::right_side(vertex_cut, vertex, next_vertex);
 			bool red_zone = right_side_1 && right_side_2;
@@ -223,7 +228,7 @@ void SplittablePolygon::calcPotentialCuts(bool consider_convex_vertices) {
 				std::string to_concave_str = to_concave ? ", to concave" : "";
 				logger << "Vertex cut " << vert_i << "-" << cut_i << " OK" << green_zone_str << to_concave_str << "\n";
 			}
-			sf::Vector2f cut_vector = vertex_cut - vertex;
+			glvx::Vector2f cut_vector = vertex_cut - vertex;
 			CutInfo pv;
 			pv.from = vert_i;
 			pv.to = cut_i;
@@ -283,8 +288,10 @@ size_t SplittablePolygon::getPotentialCutsCount() const {
 	return potential_cuts.size();
 }
 
-void SplittablePolygon::drawPotentialCuts(sf::RenderTarget& target) {
-	target.draw(cuts_varray, getTransform());
+void SplittablePolygon::drawPotentialCuts(glvx::RenderTarget& target) {
+	glvx::RenderStates states;
+	states.transform = getTransform();
+	target.draw(cuts_varray, states);
 }
 
 CutInfo SplittablePolygon::getBestCut(BestCutCriterion criterion) const {
@@ -395,17 +402,17 @@ std::vector<SplittablePolygon> SplittablePolygon::cutIntoConvex(size_t max_verti
 
 void SplittablePolygon::resetVarray(size_t vertex_count) {
 	assert(vertex_count > 0);
-	varray = sf::VertexArray(sf::LinesStrip, vertex_count + 1);
+	varray = glvx::VertexArray(glvx::PrimitiveType::LineStrip, vertex_count + 1);
 }
 
 void SplittablePolygon::recenter() {
-	sf::Vector2f local_center = getLocalCenter();
+	glvx::Vector2f local_center = getLocalCenter();
 	for (size_t i = 0; i < getPointCount(); i++) {
-		sf::Vector2f new_pos = getPoint(i) - local_center;
+		glvx::Vector2f new_pos = getPoint(i) - local_center;
 		setPoint(i, new_pos);
 	}
 	setPosition(local_center);
-	setRotation(0.0f);
+	setRotation(glvx::Angle());
 }
 
 void SplittablePolygon::recut() {
@@ -416,14 +423,14 @@ void SplittablePolygon::recut() {
 	for (size_t polygon_i = 0; polygon_i < convex_polygons.size(); polygon_i++) {
 		SplittablePolygon& polygon = convex_polygons[polygon_i];
 		polygon.recenter();
-		polygon.triangle_fan = sf::VertexArray(sf::TriangleFan, polygon.getPointCount() + 2);
-		auto set_vertex = [&](size_t index, sf::Vector2f pos) {
-			sf::Vertex vertex;
+		polygon.triangle_fan = glvx::VertexArray(glvx::PrimitiveType::TriangleFan, polygon.getPointCount() + 2);
+		auto set_vertex = [&](size_t index, glvx::Vector2f pos) {
+			glvx::Vertex vertex;
 			vertex.position = pos;
 			vertex.color = fill_color;
 			polygon.triangle_fan[index] = vertex;
 		};
-		set_vertex(0, sf::Vector2f());
+		set_vertex(0, glvx::Vector2f());
 		for (size_t vertex_i = 0; vertex_i < polygon.getPointCount() + 1; vertex_i++) {
 			set_vertex(vertex_i + 1, polygon.getPoint(polygon.indexLoop(vertex_i)));
 		}
@@ -433,42 +440,53 @@ void SplittablePolygon::recut() {
 	}
 }
 
-SplittablePolygon SplittablePolygon::createRect(sf::Vector2f size) {
+SplittablePolygon SplittablePolygon::createRect(glvx::Vector2f size) {
 	SplittablePolygon rect(4);
-	rect.setPoint(0, sf::Vector2f(size.x / 2.0f, size.y / 2.0f));
-	rect.setPoint(1, sf::Vector2f(-size.x / 2.0f, size.y / 2.0f));
-	rect.setPoint(2, sf::Vector2f(-size.x / 2.0f, -size.y / 2.0f));
-	rect.setPoint(3, sf::Vector2f(size.x / 2.0f, -size.y / 2.0f));
+	rect.setPoint(0, glvx::Vector2f(size.x / 2.0f, size.y / 2.0f));
+	rect.setPoint(1, glvx::Vector2f(-size.x / 2.0f, size.y / 2.0f));
+	rect.setPoint(2, glvx::Vector2f(-size.x / 2.0f, -size.y / 2.0f));
+	rect.setPoint(3, glvx::Vector2f(size.x / 2.0f, -size.y / 2.0f));
 	return rect;
 }
 
-void SplittablePolygon::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-	states.transform *= getTransform();
+const glvx::VertexBuffer& SplittablePolygon::getVertexBuffer() const {
+	return varray.getVertexBuffer();
+}
+
+void SplittablePolygon::render(const glvx::Matrix4& view, const glvx::Matrix4& projection, const glvx::RenderStates& states) const {
+	glvx::RenderStates states_copy = states;
+	states_copy.transform *= getTransform();
+	drawGeometry(view, projection, states_copy);
+}
+
+void SplittablePolygon::drawGeometry(const glvx::Matrix4& view, const glvx::Matrix4& projection, const glvx::RenderStates& states) const {
 	if (is_convex) {
-		target.draw(triangle_fan, states);
+		triangle_fan.render(view, projection, states);
 	} else {
 		for (size_t i = 0; i < convex_polygons.size(); i++) {
-			target.draw(convex_polygons[i], states);
+			glvx::RenderStates child_states = states;
+			child_states.transform *= convex_polygons[i].getTransform();
+			convex_polygons[i].drawGeometry(view, projection, child_states);
 		}
 	}
 	if (draw_varray || (parent && parent->draw_varray)) {
-		target.draw(varray, states);
+		varray.render(view, projection, states);
 	}
 }
 
 bool SplittablePolygon::isConvexVertex(size_t index) const {
 	assert(getPointCount() >= 3);
-	sf::Vector2f v1 = getPoint(indexLoop(index - 1));
-	sf::Vector2f v2 = getPoint(indexLoop(index));
-	sf::Vector2f v3 = getPoint(indexLoop(index + 1));
+	glvx::Vector2f v1 = getPoint(indexLoop(index - 1));
+	glvx::Vector2f v2 = getPoint(indexLoop(index));
+	glvx::Vector2f v3 = getPoint(indexLoop(index + 1));
 	return !utils::left_side(v2, v1, v3);
 }
 
-bool SplittablePolygon::intersectsEdge(const sf::Vector2f& v1, const sf::Vector2f& v2, size_t& intersect) const {
+bool SplittablePolygon::intersectsEdge(const glvx::Vector2f& v1, const glvx::Vector2f& v2, size_t& intersect) const {
 	for (size_t i = 0; i < getPointCount(); i++) {
-		sf::Vector2f e1 = getPoint(i);
-		sf::Vector2f e2 = getPoint(indexLoop(i + 1));
-		sf::Vector2f intersection;
+		glvx::Vector2f e1 = getPoint(i);
+		glvx::Vector2f e2 = getPoint(indexLoop(i + 1));
+		glvx::Vector2f intersection;
 		if (utils::line_intersect(v1, v2, e1, e2, 0.000001f, intersection)) {
 			intersect = i;
 			return true;
@@ -485,17 +503,17 @@ void SplittablePolygon::createCutsVarray() {
 	if (!cuts_valid) {
 		return;
 	}
-	cuts_varray = sf::VertexArray(sf::Lines, potential_cuts.size() * 2);
+	cuts_varray = glvx::VertexArray(glvx::PrimitiveType::Lines, potential_cuts.size() * 2);
 	for (size_t i = 0; i < potential_cuts.size(); i++) {
 		CutInfo& cut = potential_cuts[i];
-		sf::Color color;
+		glvx::Color color;
 		switch (cut.getType()) {
-			case CutInfo::GG: color = sf::Color(0, 255, 0); break;
-			case CutInfo::GY: color = sf::Color(210, 210, 0); break;
-			case CutInfo::YY: color = sf::Color(255, 128, 0); break;
-			case CutInfo::G: color = sf::Color(0, 128, 0); break;
-			case CutInfo::Y: color = sf::Color(128, 64, 0); break;
-			default: color = sf::Color(255, 0, 255); break;
+			case CutInfo::GG: color = glvx::Color(0, 255, 0); break;
+			case CutInfo::GY: color = glvx::Color(210, 210, 0); break;
+			case CutInfo::YY: color = glvx::Color(255, 128, 0); break;
+			case CutInfo::G: color = glvx::Color(0, 128, 0); break;
+			case CutInfo::Y: color = glvx::Color(128, 64, 0); break;
+			default: color = glvx::Color(255, 0, 255); break;
 		}
 		cuts_varray[i * 2].position = cut.pos_from;
 		cuts_varray[i * 2].color = color;
@@ -509,7 +527,7 @@ void SplittablePolygon::setCutsValid(bool value) {
 		cuts_valid = true;
 	} else {
 		cuts_valid = false;
-		cuts_varray = sf::VertexArray();
+		cuts_varray = glvx::VertexArray();
 		convex_polygons = std::vector<SplittablePolygon>();
 	}
 }

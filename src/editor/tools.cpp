@@ -50,17 +50,14 @@ void RotateTool::reset() {
 EditTool::EditTool() : Tool() {
     name = "edit";
     assert(VERTEX_SIZE % 2 == 1);
-    vertex_rect.setSize(sf::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
-    vertex_rect.setFillColor(sf::Color::Red);
+    vertex_rect.setSize(glvx::Vector2f(VERTEX_SIZE, VERTEX_SIZE));
+    vertex_rect.setColor(glvx::Color::Red);
     vertex_rect.setOrigin(vertex_rect.getSize() / 2.0f);
     float vertex_distance = VERTEX_HIGHLIGHT_DISTANCE * 2.0f + 1.0f;
-    vertex_highlight_rect.setSize(sf::Vector2f(vertex_distance, vertex_distance));
-    vertex_highlight_rect.setFillColor(sf::Color::Transparent);
-    vertex_highlight_rect.setOutlineThickness(-1.0f);
-    vertex_highlight_rect.setOutlineColor(sf::Color::Yellow);
-    vertex_highlight_rect.setOrigin(vertex_highlight_rect.getSize() / 2.0f);
-    edge_highlight.setFillColor(sf::Color::Yellow);
-    edge_highlight.setOrigin(sf::Vector2f(0.0f, 1.5f));
+    vertex_highlight_rect.setSize(glvx::Vector2f(vertex_distance, vertex_distance));
+    vertex_highlight_rect.setColor(glvx::Color::Transparent);
+    edge_highlight.setColor(glvx::Color::Yellow);
+    edge_highlight.setOrigin(glvx::Vector2f(0.0f, 1.5f));
 }
 
 void EditTool::reset() {
@@ -182,12 +179,10 @@ void SelectTool::applyRectSelection() {
 }
 
 RectangleSelect::RectangleSelect() {
-    select_rect.setFillColor(sf::Color::Transparent);
-    select_rect.setOutlineThickness(-1.0f);
-    select_rect.setOutlineColor(sf::Color::Yellow);
+    select_rect.setColor(glvx::Color::Transparent);
 }
 
 void RectangleSelect::reset() {
     active = false;
-    select_origin = sf::Vector2f(0.0f, 0.0f);
+    select_origin = glvx::Vector2f(0.0f, 0.0f);
 }

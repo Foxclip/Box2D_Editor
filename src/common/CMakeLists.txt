@@ -15,6 +15,5 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Source Files" FILES ${COMM
 
 target_include_directories(common_lib PUBLIC "${INCLUDE_DIR}")
 target_include_directories(common_lib PUBLIC "${CMAKE_SOURCE_DIR}")
-target_include_directories(common_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(common_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
 target_link_libraries(common_lib PUBLIC widgets_lib)

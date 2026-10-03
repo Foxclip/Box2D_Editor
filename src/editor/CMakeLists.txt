@@ -25,7 +25,6 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Source Files" FILES ${EDIT
 
 target_include_directories(editor PUBLIC "${INCLUDE_DIR}")
 target_include_directories(editor PUBLIC "${CMAKE_SOURCE_DIR}")
-target_include_directories(editor PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(editor PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
 target_link_libraries(editor PUBLIC common_lib)
 target_link_libraries(editor PUBLIC simulation_lib)

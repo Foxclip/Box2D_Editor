@@ -2,6 +2,8 @@
 
 #include "simulation/gameobject.h"
 #include "common/event.h"
+#include <glvx/color.h>
+#include <glvx/rectangle.h>
 #include <set>
 
 const float TOOL_RECT_WIDTH = 60.0f;
@@ -11,17 +13,17 @@ const float CREATE_RECT_WIDTH = 40.0f;
 const float CREATE_RECT_HEIGHT = 40.0f;
 const int CREATE_PANEL_PADDING = 10;
 const b2Vec2 NEW_BOX_SIZE = b2Vec2(1.0f, 1.0f);
-const sf::Color NEW_BOX_COLOR = sf::Color(0, 255, 0);
+const glvx::Color NEW_BOX_COLOR = glvx::Color(0, 255, 0);
 const float NEW_BALL_RADIUS = 0.5f;
-const sf::Color NEW_BALL_COLOR = sf::Color(0, 255, 0);
-const sf::Color NEW_BALL_NOTCH_COLOR = sf::Color(0, 64, 0);
+const glvx::Color NEW_BALL_COLOR = glvx::Color(0, 255, 0);
+const glvx::Color NEW_BALL_NOTCH_COLOR = glvx::Color(0, 64, 0);
 const float ROTATE_ANGLE_STEP = 5.0f;
 
 class RectangleSelect {
 public:
 	bool active = false;
-	sf::Vector2f select_origin = sf::Vector2f(0.0f, 0.0f);
-	sf::RectangleShape select_rect;
+	glvx::Vector2f select_origin = glvx::Vector2f(0.0f, 0.0f);
+	glvx::Rectangle select_rect;
 
 	RectangleSelect();
 	void reset();
@@ -139,9 +141,9 @@ public:
 	b2Vec2 grabbed_vertex_offset = b2Vec2(0.0f, 0.0f);
 	b2Vec2 insertVertexPos = b2Vec2(0.0f, 0.0f);
 	RectangleSelect rectangle_select;
-	sf::RectangleShape vertex_highlight_rect;
-	sf::RectangleShape vertex_rect;
-	sf::RectangleShape edge_highlight;
+	glvx::Rectangle vertex_highlight_rect;
+	glvx::Rectangle vertex_rect;
+	glvx::Rectangle edge_highlight;
 	EditWindow* edit_window_widget = nullptr;
 	Tool* selected_tool = nullptr;
 

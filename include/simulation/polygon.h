@@ -1,16 +1,24 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include <glvx/vertex_array.h>
+#include <glvx/transformable.h>
+#include <glvx/render_target.h>
+#include <glvx/render_states.h>
+#include <glvx/color.h>
+#include <glvx/float_rect.h>
+#include <glvx/transform.h>
+#include <glvx/matrix.h>
+#include <glvx/text.h>
 #include "logger/logger.h"
 #include "common/utils.h"
 
-extern sf::Text vertex_text;
+extern glvx::Text vertex_text;
 
 struct CutInfo {
 	size_t from;
 	size_t to;
-	sf::Vector2f pos_from;
-	sf::Vector2f pos_to;
+	glvx::Vector2f pos_from;
+	glvx::Vector2f pos_to;
 	bool to_concave;
 	bool green_zone;
 	bool has_reciprocal;
@@ -37,7 +45,7 @@ struct CutInfo {
 	std::string toStr() const;
 };
 
-class SplittablePolygon : public sf::Drawable, public sf::Transformable {
+class SplittablePolygon : public glvx::Drawable, public glvx::Transformable {
 public:
 	enum BestCutCriterion {
 		MIN_DIST,
@@ -48,24 +56,24 @@ public:
 
 	SplittablePolygon();
 	SplittablePolygon(size_t count);
-	SplittablePolygon(const sf::VertexArray& varray);
+	SplittablePolygon(const glvx::VertexArray& varray);
 	size_t getPointCount() const;
-	sf::Vector2f getPoint(size_t index) const;
-	sf::Vector2f getLocalCenter() const;
-	sf::Vector2f getGlobalCenter() const;
-	sf::FloatRect getLocalBounds() const;
-	sf::FloatRect getGlobalBounds() const;
-	sf::Color getFillColor() const;
+	glvx::Vector2f getPoint(size_t index) const;
+	glvx::Vector2f getLocalCenter() const;
+	glvx::Vector2f getGlobalCenter() const;
+	glvx::FloatRect getLocalBounds() const;
+	glvx::FloatRect getGlobalBounds() const;
+	glvx::Color getFillColor() const;
 	std::vector<SplittablePolygon> getConvexPolygons() const;
-	sf::Transform getParentGlobalTransform() const;
-	sf::Transform getGlobalTransform() const;
+	glvx::Transform getParentGlobalTransform() const;
+	glvx::Transform getGlobalTransform() const;
 	bool isConvex() const;
-	void setPoint(size_t index, const sf::Vector2f& point);
-	void setLineColor(const sf::Color& color);
-	void setFillColor(const sf::Color& color);
+	void setPoint(size_t index, const glvx::Vector2f& point);
+	void setLineColor(const glvx::Color& color);
+	void setFillColor(const glvx::Color& color);
 	void calcPotentialCuts(bool consider_convex_vertices);
 	size_t getPotentialCutsCount() const;
-	void drawPotentialCuts(sf::RenderTarget& target);
+	void drawPotentialCuts(glvx::RenderTarget& target);
 	CutInfo getBestCut(BestCutCriterion criterion) const;
 	std::vector<SplittablePolygon> getCutPolygons(const CutInfo& cut) const;
 	std::vector<SplittablePolygon> cutWithBestCut(bool cut_convex);
@@ -73,22 +81,25 @@ public:
 	void resetVarray(size_t vertex_count);
 	void recenter();
 	void recut();
-	static SplittablePolygon createRect(sf::Vector2f size);
+	static SplittablePolygon createRect(glvx::Vector2f size);
+	glvx::Transform getTransform() const override;
+	const glvx::VertexBuffer& getVertexBuffer() const override;
 private:
-	sf::VertexArray varray;
-	sf::VertexArray triangle_fan;
+	glvx::VertexArray varray;
+	glvx::VertexArray triangle_fan;
 	std::vector<SplittablePolygon> convex_polygons;
-	sf::VertexArray cuts_varray;
+	glvx::VertexArray cuts_varray;
 	SplittablePolygon* parent = nullptr;
-	sf::Color line_color;
-	sf::Color fill_color;
+	glvx::Color line_color;
+	glvx::Color fill_color;
 	std::vector<CutInfo> potential_cuts;
 	bool cuts_valid = false;
 	bool is_convex = false;
 
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+	void render(const glvx::Matrix4& view, const glvx::Matrix4& projection, const glvx::RenderStates& states) const override;
+	void drawGeometry(const glvx::Matrix4& view, const glvx::Matrix4& projection, const glvx::RenderStates& states) const;
 	bool isConvexVertex(size_t index) const;
-	bool intersectsEdge(const sf::Vector2f& v1, const sf::Vector2f& v2, size_t& intersect) const;
+	bool intersectsEdge(const glvx::Vector2f& v1, const glvx::Vector2f& v2, size_t& intersect) const;
 	size_t indexLoop(ptrdiff_t index) const;
 	void createCutsVarray();
 	void setCutsValid(bool value);

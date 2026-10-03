@@ -134,15 +134,15 @@ std::vector<float> TokenReader::readFloatArr() {
 	return result;
 }
 
-sf::Color TokenReader::readColor() {
+glvx::Color TokenReader::readColor() {
 	if (fail_state) {
-		return sf::Color();
+		return glvx::Color();
 	}
-	sf::Color color;
-	color.r = (sf::Uint8)readLL();
-	color.g = (sf::Uint8)readLL();
-	color.b = (sf::Uint8)readLL();
-	color.a = (sf::Uint8)readLL();
+	glvx::Color color;
+	color.r = (std::uint8_t)readLL();
+	color.g = (std::uint8_t)readLL();
+	color.b = (std::uint8_t)readLL();
+	color.a = (std::uint8_t)readLL();
 	return color;
 }
 
@@ -352,7 +352,7 @@ TokenWriter& TokenWriter::writeFloatArr(std::vector<float> value) {
 	return *this;
 }
 
-TokenWriter& TokenWriter::writeColor(sf::Color value) {
+TokenWriter& TokenWriter::writeColor(glvx::Color value) {
 	writeInt(value.r);
 	writeInt(value.g);
 	writeInt(value.b);
@@ -401,7 +401,7 @@ void TokenWriter::writeFloatArrParam(std::string name, std::vector<float> value)
 	writeString(name).writeFloatArr(value).writeNewLine();
 }
 
-void TokenWriter::writeColorParam(std::string name, sf::Color value) {
+void TokenWriter::writeColorParam(std::string name, glvx::Color value) {
 	writeString(name).writeColor(value).writeNewLine();
 }
 
@@ -454,7 +454,7 @@ TokenWriter& TokenWriter::operator<<(std::vector<float> value) {
 	return writeFloatArr(value);
 }
 
-TokenWriter& TokenWriter::operator<<(sf::Color value) {
+TokenWriter& TokenWriter::operator<<(glvx::Color value) {
 	return writeColor(value);
 }
 

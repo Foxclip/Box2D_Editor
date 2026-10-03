@@ -5,7 +5,7 @@
 CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
     : fw::ContainerWidget(widget_list, 50.0f, 500.0f), app(p_app) {
     setVisible(false);
-    setFillColor(sf::Color(255, 0, 0, 0));
+    setFillColor(glvx::Color(255, 0, 0, 0));
     setOrigin(Anchor::CENTER_LEFT);
     setParentAnchor(Anchor::CENTER_LEFT);
     setHorizontal(false);
@@ -16,15 +16,15 @@ CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
         RectangleWidget* button_widget = widget_list.createRectangleWidget(
             CREATE_RECT_WIDTH, CREATE_RECT_HEIGHT
         );
-        button_widget->setFillColor(sf::Color(128, 128, 128));
-        button_widget->setOutlineColor(sf::Color(0, 175, 255));
-        button_widget->OnLeftPress += [=](const sf::Vector2f& pos) {
+        button_widget->setFillColor(glvx::Color(128, 128, 128));
+        button_widget->setOutlineColor(glvx::Color(0, 175, 255));
+        button_widget->OnLeftPress += [=](const glvx::Vector2f& pos) {
             app.selectCreateType(i);
         };
-        button_widget->OnMouseEnter += [=](const sf::Vector2f pos) {
+        button_widget->OnMouseEnter += [=](const glvx::Vector2f pos) {
             button_widget->setOutlineThickness(-1.0f);
         };
-        button_widget->OnMouseExit += [=](const sf::Vector2f pos) {
+        button_widget->OnMouseExit += [=](const glvx::Vector2f pos) {
             button_widget->setOutlineThickness(0.0f);
         };
         button_widget->setName("button " + std::to_string(i));
@@ -32,7 +32,7 @@ CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
         text_widget->setFont(app.ui_font);
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
         text_widget->setString(CreateTool::create_type_name(static_cast<CreateTool::ObjectType>(i)));
-        text_widget->setFillColor(sf::Color::Black);
+        text_widget->setFillColor(glvx::Color::Black);
         text_widget->setOrigin(Anchor::CENTER);
         text_widget->setParentAnchor(Anchor::CENTER);
         text_widget->setParent(button_widget);

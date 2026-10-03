@@ -3,11 +3,6 @@
 #include "editor/editor.h"
 #include "editor/scenes.h"
 #include "logger/logger.h"
-#include "widgets/button_widget.h"
-
-namespace fw {
-    class fw::ButtonWidget;
-}
 
 void execute_app() {
     logger << "Starting app\n";

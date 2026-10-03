@@ -57,7 +57,7 @@ void SimulationTests::basicTest(test::Test& test) {
 void SimulationTests::boxTest(test::Test& test) {
     Simulation simulation;
     BoxObject* box = simulation.createBox(
-        "box0", b2Vec2(1.0f, 1.0f), utils::to_radians(45.0f), b2Vec2(1.0f, 1.0f), sf::Color::Green
+        "box0", b2Vec2(1.0f, 1.0f), utils::to_radians(45.0f), b2Vec2(1.0f, 1.0f), glvx::Color::Green
     );
     T_ASSERT(T_CHECK(box));
     T_COMPARE(box->getName(), "box0");
@@ -69,7 +69,7 @@ void SimulationTests::boxTest(test::Test& test) {
 void SimulationTests::ballTest(test::Test& test) {
     Simulation simulation;
     BallObject* ball = simulation.createBall(
-        "ball0", b2Vec2(1.0f, 1.0f), 1.0f, sf::Color::Green, sf::Color::Green
+        "ball0", b2Vec2(1.0f, 1.0f), 1.0f, glvx::Color::Green, glvx::Color::Green
     );
     T_ASSERT(T_CHECK(ball));
     T_COMPARE(ball->getName(), "ball0");
@@ -86,7 +86,7 @@ void SimulationTests::polygonTest(test::Test& test) {
         vertices.push_back(vertex);
     }
     PolygonObject* polygon = simulation.createPolygon(
-        "polygon0", b2Vec2(1.0f, 1.0f), utils::to_radians(45.0f), vertices, sf::Color::Green
+        "polygon0", b2Vec2(1.0f, 1.0f), utils::to_radians(45.0f), vertices, glvx::Color::Green
     );
     T_ASSERT(T_CHECK(polygon));
     T_COMPARE(polygon->getName(), "polygon0");
@@ -106,7 +106,7 @@ void SimulationTests::chainTest(test::Test& test) {
         b2Vec2(-25.0f, 8.0f),
     };
     ChainObject* chain = simulation.createChain(
-        "chain0", b2Vec2(1.0f, 1.0f), utils::to_radians(45.0f), vertices, sf::Color(255, 255, 255)
+        "chain0", b2Vec2(1.0f, 1.0f), utils::to_radians(45.0f), vertices, glvx::Color(255, 255, 255)
     );
     T_ASSERT(T_CHECK(chain));
     T_COMPARE(chain->getName(), "chain0");
@@ -136,7 +136,7 @@ void SimulationTests::carTest(test::Test& test) {
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
     std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
     PolygonObject* car = simulation.createCar(
-        "car0", b2Vec2(0.0f, 0.0f), lengths, wheels, sf::Color(255, 0, 0)
+        "car0", b2Vec2(0.0f, 0.0f), lengths, wheels, glvx::Color(255, 0, 0)
     );
     T_ASSERT(T_COMPARE(simulation.getAllSize(), 4));
     {
@@ -183,7 +183,7 @@ void SimulationTests::serializeTest(test::Test& test) {
 void SimulationTests::boxSerializeTest(test::Test& test) {
     Simulation simulation;
     BoxObject* boxA = simulation.createBox(
-        "box0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), b2Vec2(1.1f, 2.0f), sf::Color::Green
+        "box0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), b2Vec2(1.1f, 2.0f), glvx::Color::Green
     );
     std::string str = boxA->serialize();
     dp::DataPointerUnique<BoxObject> uptr = BoxObject::deserialize(str, &simulation);
@@ -194,7 +194,7 @@ void SimulationTests::boxSerializeTest(test::Test& test) {
 void SimulationTests::ballSerializeTest(test::Test& test) {
     Simulation simulation;
     BallObject* ballA = simulation.createBall(
-        "ball0", b2Vec2(1.5f, -3.5f), 2.2f, sf::Color::Green, sf::Color::Green
+        "ball0", b2Vec2(1.5f, -3.5f), 2.2f, glvx::Color::Green, glvx::Color::Green
     );
     std::string str = ballA->serialize();
     dp::DataPointerUnique<BallObject> uptr = BallObject::deserialize(str, &simulation);
@@ -210,7 +210,7 @@ void SimulationTests::polygonSerializeTest(test::Test& test) {
         vertices.push_back(vertex);
     }
     PolygonObject* polygonA = simulation.createPolygon(
-        "polygon0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), vertices, sf::Color::Green
+        "polygon0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), vertices, glvx::Color::Green
     );
     std::string str = polygonA->serialize();
     dp::DataPointerUnique<PolygonObject> uptr = PolygonObject::deserialize(str, &simulation);
@@ -229,7 +229,7 @@ void SimulationTests::chainSerializeTest(test::Test& test) {
         b2Vec2(-25.0f, 8.0f),
     };
     ChainObject* chainA = simulation.createChain(
-        "chain0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), vertices, sf::Color::Green
+        "chain0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), vertices, glvx::Color::Green
     );
     std::string str = chainA->serialize();
     dp::DataPointerUnique<ChainObject> uptr = ChainObject::deserialize(str, &simulation);
@@ -240,10 +240,10 @@ void SimulationTests::chainSerializeTest(test::Test& test) {
 void SimulationTests::revoluteJointSerializeTest(test::Test& test) {
     Simulation simulation;
     BoxObject* box0 = simulation.createBox(
-        "box0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), b2Vec2(1.5f, 2.0f), sf::Color::Green
+        "box0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), b2Vec2(1.5f, 2.0f), glvx::Color::Green
     );
     BoxObject* box1 = simulation.createBox(
-        "box1", b2Vec2(0.0f, 5.0f), utils::to_radians(-10.0f), b2Vec2(3.0f, 0.5f), sf::Color::Green
+        "box1", b2Vec2(0.0f, 5.0f), utils::to_radians(-10.0f), b2Vec2(3.0f, 0.5f), glvx::Color::Green
     );
     b2RevoluteJointDef joint_def;
     joint_def.Initialize(box0->getRigidBody(), box1->getRigidBody(), b2Vec2(0.0f, 5.0f));
@@ -273,7 +273,7 @@ void SimulationTests::carSerializeTest(test::Test& test) {
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
     std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
     simulationA.createCar(
-        "car0", b2Vec2(0.0f, 0.0f), lengths, wheels, sf::Color(255, 0, 0)
+        "car0", b2Vec2(0.0f, 0.0f), lengths, wheels, glvx::Color(255, 0, 0)
     );
     std::string str = simulationA.serialize();
     Simulation simulationB;
@@ -291,7 +291,7 @@ void SimulationTests::advanceTest(test::Test& test) {
 void SimulationTests::saveloadTest(test::Test& test) {
     Simulation simulationA;
     BoxObject* boxA = simulationA.createBox(
-        "box0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), b2Vec2(1.1f, 2.0f), sf::Color::Green
+        "box0", b2Vec2(1.5f, -3.5f), utils::to_radians(45.0f), b2Vec2(1.1f, 2.0f), glvx::Color::Green
     );
     const std::filesystem::path tmp_dir = "tests/tmp";
     if (!std::filesystem::exists(tmp_dir)) {
@@ -311,7 +311,7 @@ void SimulationTests::boxStackTest(test::Test& test) {
         b2Vec2(-8.0f, 0.0f),
     };
     ChainObject* ground = simulationA.createChain(
-        "ground", b2Vec2(0.0f, 0.0f), utils::to_radians(0.0f), ground_vertices, sf::Color(255, 255, 255)
+        "ground", b2Vec2(0.0f, 0.0f), utils::to_radians(0.0f), ground_vertices, glvx::Color(255, 255, 255)
     );
     BoxObject* box0 = createBox(simulationA, "box0", b2Vec2(0.0f, 0.6f));
     BoxObject* box1 = createBox(simulationA, "box1", b2Vec2(0.5f, 1.7f));
@@ -333,12 +333,12 @@ void SimulationTests::movingCarTest(test::Test& test) {
         b2Vec2(-8.0f, 0.0f),
     };
     ChainObject* ground = simulationA.createChain(
-        "ground", b2Vec2(0.0f, 0.0f), utils::to_radians(0.0f), ground_vertices, sf::Color(255, 255, 255)
+        "ground", b2Vec2(0.0f, 0.0f), utils::to_radians(0.0f), ground_vertices, glvx::Color(255, 255, 255)
     );
     std::vector<float> lengths = { 5.0f, 1.0f, 5.0f, 1.0f, 5.0f, 1.0f };
     std::vector<float> wheels = { 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
     GameObject* car = simulationA.createCar(
-        "car0", b2Vec2(0.0f, 6.0f), lengths, wheels, sf::Color(255, 0, 0)
+        "car0", b2Vec2(0.0f, 6.0f), lengths, wheels, glvx::Color(255, 0, 0)
     );
     car->setType(b2_dynamicBody, false);
     car->setDensity(1.0f, false);
@@ -516,7 +516,7 @@ void SimulationTests::setAngleTest(test::Test& test) {
 void SimulationTests::setVertexPosTest(test::Test& test) {
     Simulation simulation;
     PolygonObject* polygon = simulation.createRegularPolygon(
-        "polygon", b2Vec2(0.0f, 0.0f), 0.0f, 6, 1.0f, sf::Color::Red
+        "polygon", b2Vec2(0.0f, 0.0f), 0.0f, 6, 1.0f, glvx::Color::Red
     );
     b2Vec2 old_vertex_pos = polygon->getGlobalVertexPos(0);
     b2Vec2 new_vertex_pos = old_vertex_pos + b2Vec2(1.0f, 0.0f);
@@ -527,7 +527,7 @@ void SimulationTests::setVertexPosTest(test::Test& test) {
 void SimulationTests::addVertexTest(test::Test& test) {
     Simulation simulation;
     PolygonObject* polygon = simulation.createRegularPolygon(
-        "polygon", b2Vec2(0.0f, 0.0f), 0.0f, 6, 1.0f, sf::Color::Red
+        "polygon", b2Vec2(0.0f, 0.0f), 0.0f, 6, 1.0f, glvx::Color::Red
     );
     b2Vec2 midpoint = 0.5f * (polygon->getGlobalVertexPos(0) + polygon->getGlobalVertexPos(1));
     polygon->addVertexGlobal(1, midpoint);
@@ -537,7 +537,7 @@ void SimulationTests::addVertexTest(test::Test& test) {
 void SimulationTests::deleteVertexTest(test::Test& test) {
     Simulation simulation;
     PolygonObject* polygon = simulation.createRegularPolygon(
-        "polygon", b2Vec2(0.0f, 0.0f), 0.0f, 6, 1.0f, sf::Color::Red
+        "polygon", b2Vec2(0.0f, 0.0f), 0.0f, 6, 1.0f, glvx::Color::Red
     );
     std::vector<EditableVertex> vertices = polygon->getVertices();
     polygon->tryDeleteVertex(5);
@@ -938,7 +938,7 @@ void SimulationTests::clearTest(test::Test& test) {
     T_CHECK(simulation.getByName("box2") == nullptr);
 }
 
-std::string SimulationTests::colorToStr(const sf::Color& color) {
+std::string SimulationTests::colorToStr(const glvx::Color& color) {
     return "(" + utils::color_to_str(color) + ")";
 }
 
@@ -952,7 +952,7 @@ BoxObject* SimulationTests::createBox(Simulation& simulation, const std::string&
         pos,
         utils::to_radians(0.0f),
         b2Vec2(1.0f, 1.0f),
-        sf::Color(0, 255, 0)
+        glvx::Color(0, 255, 0)
     );
     return box;
 }

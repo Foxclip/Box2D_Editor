@@ -8,6 +8,7 @@
 #include "editor/UI/menu.h"
 #include "common/utils.h"
 #include "common/filedialog.h"
+#include <glvx/utils.h>
 #include <numbers>
 #include <iostream>
 #include <ranges>
@@ -19,11 +20,11 @@ Logger& operator<<(Logger& lg, const b2Vec2& value) {
     return lg << "(" << value.x << " " << value.y << ")";
 }
 
-sf::Vector2f to2f(sf::Vector2i vec) {
+glvx::Vector2f to2f(glvx::Vector2i vec) {
     return fw::to2f(vec);
 }
 
-sf::Vector2f to2f(sf::Vector2u vec) {
+glvx::Vector2f to2f(glvx::Vector2u vec) {
     return fw::to2f(vec);
 }
 
@@ -36,7 +37,7 @@ Editor::Editor(bool maximized) {
     this->maximize_window = maximized;
 }
 
-Editor::Editor(sf::RenderWindow& window, bool maximized) : Application(window) {
+Editor::Editor(glvx::Window& window, bool maximized) : Application(window) {
     this->maximize_window = maximized;
 }
 
@@ -100,7 +101,7 @@ BoxObject* Editor::createBox(
     const b2Vec2& pos,
     float angle,
     const b2Vec2& size,
-    const sf::Color& color
+    const glvx::Color& color
 ) {
     return simulation.createBox(name, pos, angle, size, color);
 }
@@ -109,8 +110,8 @@ BallObject* Editor::createBall(
     const std::string& name,
     const b2Vec2& pos,
     float radius,
-    const sf::Color& color,
-    const sf::Color& notch_color
+    const glvx::Color& color,
+    const glvx::Color& notch_color
 ) {
     return simulation.createBall(name, pos, radius, color, notch_color);
 }
@@ -120,7 +121,7 @@ PolygonObject* Editor::createPolygon(
     const b2Vec2& pos,
     float angle,
     const std::vector<b2Vec2>& vertices,
-    const sf::Color& color
+    const glvx::Color& color
 ) {
     return simulation.createPolygon(name, pos, angle, vertices, color);
 }
@@ -130,7 +131,7 @@ PolygonObject* Editor::createCar(
     const b2Vec2& pos,
     const std::vector<float>& lengths,
     const std::vector<float>& wheels,
-    const sf::Color& color
+    const glvx::Color& color
 ) {
     return simulation.createCar(name, pos, lengths, wheels, color);
 }
@@ -140,16 +141,21 @@ ChainObject* Editor::createChain(
     const b2Vec2& pos,
     float angle,
     const std::vector<b2Vec2>& vertices,
-    const sf::Color& color
+    const glvx::Color& color
 ) {
     return simulation.createChain(name, pos, angle, vertices, color);
 }
 
 void Editor::onInit() {
-    sf::ContextSettings cs_mask;
-    window_view = sf::View(sf::FloatRect(0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT));
-    loadFragmentShaderPart(desat_shader, "shaders/desat.frag");
-    loadFragmentShaderPart(selection_shader, "shaders/selection.frag");
+    desat_shader = std::make_unique<glvx::Shader>(std::filesystem::path("shaders/default.vert"), std::filesystem::path("shaders/desat.frag"), true);
+    selection_shader = std::make_unique<glvx::Shader>(std::filesystem::path("shaders/default.vert"), std::filesystem::path("shaders/selection.frag"), true);
+    desat_shader->use();
+    desat_shader->setFloat("saturation", WORLD_SATURATION);
+    desat_shader->setFloat("vcenter", WORLD_COLOR_SCALE_CENTER);
+    desat_shader->setFloat("vpercent", WORLD_COLOR_SCALE_PERCENT);
+    selection_shader->use();
+    selection_shader->setVec3("outline_color", SELECTION_OUTLINE_COLOR);
+    selection_shader->setInt("offset", SELECTION_OUTLINE_THICKNESS);
     initTools();
     initUi();
     editor_logger.OnLineWrite = [&](std::string line) { // should be after initUi and preferably before any logging
@@ -192,9 +198,9 @@ void Editor::onProcessWidgets() {
     }
 }
 
-void Editor::onProcessWindowEvent(const sf::Event& event) {
-    if (event.type == sf::Event::Closed) {
-        window.close();
+void Editor::onProcessWindowEvent(const glvx::Event& event) {
+    if (event.type == glvx::EventType::Closed) {
+        close();
     }
 }
 
@@ -230,32 +236,18 @@ void Editor::initUi() {
     textbox_font = fw::Font("fonts/verdana.ttf", true);
     setDefaultFont(textbox_font);
 
-    arrow_cursor.loadFromSystem(sf::Cursor::Arrow);
-    text_cursor.loadFromSystem(sf::Cursor::Text);
-    size_top_left_cursor.loadFromSystem(sf::Cursor::SizeTopLeft);
-    size_top_cursor.loadFromSystem(sf::Cursor::SizeTop);
-    size_top_right_cursor.loadFromSystem(sf::Cursor::SizeTopRight);
-    size_left_cursor.loadFromSystem(sf::Cursor::SizeLeft);
-    size_right_cursor.loadFromSystem(sf::Cursor::SizeRight);
-    size_bottom_left_cursor.loadFromSystem(sf::Cursor::SizeBottomLeft);
-    size_bottom_cursor.loadFromSystem(sf::Cursor::SizeBottom);
-    size_bottom_right_cursor.loadFromSystem(sf::Cursor::SizeBottomRight);
-    window.setMouseCursor(arrow_cursor);
-
-    vertex_text.setFont(ui_font.getSfmlFont());
-    vertex_text.setCharacterSize(20);
-    vertex_text.setFillColor(sf::Color::White);
+    vertex_text.setFont(&ui_font.getFont(20));
 
     origin_shape.setRadius(3.0f);
-    origin_shape.setOrigin(origin_shape.getRadius(), origin_shape.getRadius());
-    origin_shape.setOutlineColor(sf::Color::Black);
-    origin_shape.setOutlineThickness(1.0f);
+    origin_shape.setOrigin(3.0f, 3.0f);
+    origin_shape.setColor(glvx::Color::White);
+    origin_shape_outline.setRadius(4.0f);
+    origin_shape_outline.setOrigin(4.0f, 4.0f);
+    origin_shape_outline.setColor(glvx::Color::Black);
 
-    object_info_text.setFont(small_font.getSfmlFont());
-    object_info_text.setCharacterSize(16);
-    object_info_text.setFillColor(sf::Color::White);
+    object_info_text.setFont(&small_font.getFont(16));
 
-    setBackgroundColor(sf::Color(25, 25, 25));
+    setBackgroundColor(glvx::Color(25, 25, 25));
 
     initWidgets();
 }
@@ -266,38 +258,32 @@ void Editor::initWidgets() {
         (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
     );
     world_widget->setName("world_canvas");
-    world_widget->setShader(&desat_shader);
+    world_widget->setShader(desat_shader.get());
     world_widget->setClickThrough(false);
-    world_widget->OnBeforeRender += [&](sf::RenderTarget& target) {
-        desat_shader.setUniform("texture", sf::Shader::CurrentTexture);
-        desat_shader.setUniform("saturation", WORLD_SATURATION);
-        desat_shader.setUniform("vcenter", WORLD_COLOR_SCALE_CENTER);
-        desat_shader.setUniform("vpercent", WORLD_COLOR_SCALE_PERCENT);
-    };
     world_widget->OnPreUpdate += [&]() {
         world_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
         world_widget->setTextureSize(window.getSize().x, window.getSize().y);
     };
-    world_widget->OnLeftPress += [&](const sf::Vector2f& pos) {
+    world_widget->OnLeftPress += [&](const glvx::Vector2f& pos) {
         processLeftPress(pos);
     };
-    world_widget->OnGlobalLeftRelease += [&](const sf::Vector2f& pos) {
+    world_widget->OnGlobalLeftRelease += [&](const glvx::Vector2f& pos) {
         processGlobalLeftRelease(pos);
     };
-    world_widget->OnBlockableLeftRelease += [&](const sf::Vector2f& pos) {
+    world_widget->OnBlockableLeftRelease += [&](const glvx::Vector2f& pos) {
         processBlockableLeftRelease(pos);
     };
-    world_widget->OnProcessMouse += [&](const sf::Vector2f& pos) {
+    world_widget->OnProcessMouse += [&](const glvx::Vector2f& pos) {
         processMouse(pos);
     };
-    world_widget->OnProcessDragGesture += [&](sf::Mouse::Button button, const sf::Vector2f& pos) {
-        if (button == sf::Mouse::Left) {
+    world_widget->OnProcessDragGesture += [&](glvx::Mouse::Button button, const glvx::Vector2f& pos) {
+        if (button == glvx::Mouse::Button::Left) {
             processDragGestureLeft(pos);
-        } else if (button == sf::Mouse::Right) {
+        } else if (button == glvx::Mouse::Button::Right) {
             processDragGestureRight(pos);
         }
     };
-    world_widget->OnScrollY += [&](const sf::Vector2f& pos, float delta) {
+    world_widget->OnScrollY += [&](const glvx::Vector2f& pos, float delta) {
         processMouseScrollY(delta);
     };
 
@@ -305,12 +291,7 @@ void Editor::initWidgets() {
         (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
     );
     selection_mask_widget->setName("selection_mask_canvas");
-    selection_mask_widget->setShader(&selection_shader);
-    selection_mask_widget->OnBeforeRender += [&](sf::RenderTarget& target) {
-        selection_shader.setUniform("selection_mask", sf::Shader::CurrentTexture);
-        selection_shader.setUniform("outline_color", SELECTION_OUTLINE_COLOR);
-        selection_shader.setUniform("offset", SELECTION_OUTLINE_THICKNESS);
-    };
+    selection_mask_widget->setShader(selection_shader.get());
     selection_mask_widget->OnPreUpdate += [&]() {
         selection_mask_widget->setSize((float)window.getSize().x, (float)window.getSize().y);
         selection_mask_widget->setTextureSize(window.getSize().x, window.getSize().y);
@@ -338,14 +319,14 @@ void Editor::initWidgets() {
     step_widget->setFont(ui_font);
     step_widget->setString(std::to_string(simulation.getStep()));
     step_widget->setCharacterSize(10);
-    step_widget->setFillColor(sf::Color::White);
+    step_widget->setFillColor(glvx::Color::White);
     step_widget->setOrigin(fw::Widget::Anchor::TOP_RIGHT);
     step_widget->setParentAnchor(fw::Widget::Anchor::TOP_RIGHT);
     step_widget->setName("step text");
 
     // pause widget
     paused_rect_widget = widgets.createContainerWidget(20.0f, 20.0f);
-    paused_rect_widget->setFillColor(sf::Color(0, 0, 0, 128));
+    paused_rect_widget->setFillColor(glvx::Color(0, 0, 0, 128));
     paused_rect_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     paused_rect_widget->setPadding(10.0f);
     paused_rect_widget->setName("paused rect");
@@ -353,13 +334,13 @@ void Editor::initWidgets() {
     paused_text_widget->setFont(ui_font);
     paused_text_widget->setString("PAUSED");
     paused_text_widget->setCharacterSize(24);
-    paused_text_widget->setFillColor(sf::Color::Yellow);
+    paused_text_widget->setFillColor(glvx::Color::Yellow);
     paused_text_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     paused_text_widget->setParent(paused_rect_widget);
 
     // fps
     fps_widget = widgets.createContainerWidget(20.0f, 20.0f);
-    fps_widget->setFillColor(sf::Color::Yellow);
+    fps_widget->setFillColor(glvx::Color::Yellow);
     fps_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     fps_widget->setPosition(120.0f, 0.0f);
     fps_widget->setPadding(0.0f);
@@ -367,14 +348,14 @@ void Editor::initWidgets() {
     fps_text_widget = widgets.createTextWidget();
     fps_text_widget->setFont(fps_font);
     fps_text_widget->setCharacterSize(32);
-    fps_text_widget->setFillColor(sf::Color::Black);
+    fps_text_widget->setFillColor(glvx::Color::Black);
     fps_text_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     fps_text_widget->setAdjustLocalBounds(false);
     fps_text_widget->setParent(fps_widget);
 
     // logger
     logger_widget = widgets.createRectangleWidget(500.0f, 20.0f);
-    logger_widget->setFillColor(sf::Color(0, 0, 0));
+    logger_widget->setFillColor(glvx::Color(0, 0, 0));
     logger_widget->setOrigin(fw::Widget::Anchor::BOTTOM_LEFT);
     logger_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_LEFT);
     logger_widget->setClipChildren(true);
@@ -382,7 +363,7 @@ void Editor::initWidgets() {
     logger_text_widget = widgets.createTextWidget();
     logger_text_widget->setFont(console_font);
     logger_text_widget->setCharacterSize(15);
-    logger_text_widget->setFillColor(sf::Color::White);
+    logger_text_widget->setFillColor(glvx::Color::White);
     logger_text_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
     logger_text_widget->setParentAnchor(fw::Widget::Anchor::TOP_LEFT);
     logger_text_widget->setString("Logger message");
@@ -397,7 +378,7 @@ void Editor::initWidgets() {
     debug_release_widget->setString("RELEASE");
 #endif // !NDEBUG
     debug_release_widget->setCharacterSize(10);
-    debug_release_widget->setFillColor(sf::Color::White);
+    debug_release_widget->setFillColor(glvx::Color::White);
     debug_release_widget->setOrigin(fw::Widget::Anchor::BOTTOM_RIGHT);
     debug_release_widget->setParentAnchor(fw::Widget::Anchor::BOTTOM_RIGHT);
     debug_release_widget->setName("debug_release text");
@@ -405,9 +386,9 @@ void Editor::initWidgets() {
     edit_tool.edit_window_widget->moveToTop();
 }
 
-void Editor::onProcessKeyboardEvent(const sf::Event& event) {
-    if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::Escape) {
+void Editor::onProcessKeyboardEvent(const glvx::Event& event) {
+    if (event.type == glvx::EventType::KeyPressed) {
+        if (event.key.code == glvx::Key::Escape) {
             if (selected_tool == &move_tool) {
                 endMove(false);
                 trySelectTool(move_tool.selected_tool);
@@ -417,29 +398,29 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                 trySelectTool(rotate_tool.selected_tool);
                 endGestureLeft();
             }
-        } else if (event.key.code == sf::Keyboard::Space) {
+        } else if (event.key.code == glvx::Key::Space) {
             togglePause();
-        } else if (event.key.code == sf::Keyboard::Num1) {
+        } else if (event.key.code == glvx::Key::Num1) {
             trySelectToolByIndex(0);
-        } else if (event.key.code == sf::Keyboard::Num2) {
+        } else if (event.key.code == glvx::Key::Num2) {
             trySelectToolByIndex(1);
-        } else if (event.key.code == sf::Keyboard::Num3) {
+        } else if (event.key.code == glvx::Key::Num3) {
             trySelectToolByIndex(2);
-        } else if (event.key.code == sf::Keyboard::Num4) {
+        } else if (event.key.code == glvx::Key::Num4) {
             trySelectToolByIndex(3);
-        } else if (event.key.code == sf::Keyboard::Num5) {
+        } else if (event.key.code == glvx::Key::Num5) {
             trySelectToolByIndex(4);
-        } else if (event.key.code == sf::Keyboard::Num6) {
+        } else if (event.key.code == glvx::Key::Num6) {
             trySelectToolByIndex(5);
-        } else if (event.key.code == sf::Keyboard::Num7) {
+        } else if (event.key.code == glvx::Key::Num7) {
             trySelectToolByIndex(6);
-        } else if (event.key.code == sf::Keyboard::Num8) {
+        } else if (event.key.code == glvx::Key::Num8) {
             trySelectToolByIndex(7);
-        } else if (event.key.code == sf::Keyboard::Num9) {
+        } else if (event.key.code == glvx::Key::Num9) {
             trySelectToolByIndex(8);
-        } else if (event.key.code == sf::Keyboard::Num0) {
+        } else if (event.key.code == glvx::Key::Num0) {
             trySelectToolByIndex(9);
-        } else if (event.key.code == sf::Keyboard::X) {
+        } else if (event.key.code == glvx::Key::X) {
             if (selected_tool == &select_tool) {
                 CompVector<GameObject*> selected_copy = select_tool.getSelectedObjects();
                 for (GameObject* obj : selected_copy | std::views::reverse) {
@@ -451,15 +432,15 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                     commit_action = true;
                 }
             }
-        } else if (event.key.code == sf::Keyboard::LControl) {
+        } else if (event.key.code == glvx::Key::LControl) {
             edit_tool.mode = EditTool::ADD;
-        } else if (event.key.code == sf::Keyboard::LAlt) {
+        } else if (event.key.code == glvx::Key::LAlt) {
             edit_tool.mode = EditTool::INSERT;
-        } else if (event.key.code == sf::Keyboard::S) {
+        } else if (event.key.code == glvx::Key::S) {
             if (isLCtrlPressed()) {
                 saveToFile("levels/level.txt");
             }
-        } else if (event.key.code == sf::Keyboard::Z) {
+        } else if (event.key.code == glvx::Key::Z) {
             if (isLCtrlPressed()) {
                 if (isLShiftPressed()) {
                     history.redo();
@@ -467,11 +448,11 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                     history.undo();
                 }
             }
-        } else if (event.key.code == sf::Keyboard::Z) {
+        } else if (event.key.code == glvx::Key::Z) {
             quicksave();
-        } else if (event.key.code == sf::Keyboard::W) {
+        } else if (event.key.code == glvx::Key::W) {
             quickload_requested = true;
-        } else if (event.key.code == sf::Keyboard::A) {
+        } else if (event.key.code == glvx::Key::A) {
             if (selected_tool == &select_tool) {
                 if (isLAltPressed()) {
                     for (GameObject* obj : simulation.getAllObjects()) {
@@ -489,28 +470,28 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
                     active_object->selectAllVertices();
                 }
             }
-        } else if (event.key.code == sf::Keyboard::Tab) {
+        } else if (event.key.code == glvx::Key::Tab) {
             if (selected_tool == &edit_tool) {
                 trySelectTool(edit_tool.selected_tool);
             } else if (active_object) {
                 edit_tool.selected_tool = selected_tool;
                 trySelectTool(&edit_tool);
             }
-        } else if (event.key.code == sf::Keyboard::G) {
+        } else if (event.key.code == glvx::Key::G) {
             if (select_tool.selectedCount() > 0) {
                 Tool* s_tool = selected_tool;
                 trySelectTool(&move_tool);
                 grabSelected(s_tool);
                 startMoveGesture(world_widget);
             }
-        } else if (event.key.code == sf::Keyboard::R) {
+        } else if (event.key.code == glvx::Key::R) {
             if (select_tool.selectedCount() > 0) {
                 Tool* s_tool = selected_tool;
                 trySelectTool(&rotate_tool);
                 rotateSelected(s_tool);
                 startMoveGesture(world_widget);
             }
-        } else if (event.key.code == sf::Keyboard::D) {
+        } else if (event.key.code == glvx::Key::D) {
             if (isLShiftPressed()) {
                 if (selected_tool == &select_tool && select_tool.selectedCount() > 0) {
                     CompVector<GameObject*> old_objects = select_tool.getSelectedObjects();
@@ -525,15 +506,15 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
             } else {
                 fw::WidgetList::debug_render = !fw::WidgetList::debug_render;
             }
-        } else if (event.key.code == sf::Keyboard::I) {
+        } else if (event.key.code == glvx::Key::I) {
             render_object_info = !render_object_info;
-        } else if (event.key.code == sf::Keyboard::B) {
+        } else if (event.key.code == glvx::Key::B) {
             debug_break = true;
-        } else if (event.key.code == sf::Keyboard::E) {
+        } else if (event.key.code == glvx::Key::E) {
             simulation.advance(timeStep);
-        } else if (event.key.code == sf::Keyboard::Slash) {
+        } else if (event.key.code == glvx::Key::Slash) {
             viewSelectedObjects();
-        } else if (event.key.code == sf::Keyboard::F) {
+        } else if (event.key.code == glvx::Key::F) {
             if (follow_object) {
                 follow_object = nullptr;
             } else {
@@ -541,12 +522,12 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
             }
         }
     }
-    if (event.type == sf::Event::KeyReleased) {
-        if (event.key.code == sf::Keyboard::LControl) {
+    if (event.type == glvx::EventType::KeyReleased) {
+        if (event.key.code == glvx::Key::LControl) {
             if (edit_tool.mode == EditTool::ADD) {
                 edit_tool.mode = EditTool::HOVER;
             }
-        } else if (event.key.code == sf::Keyboard::LAlt) {
+        } else if (event.key.code == glvx::Key::LAlt) {
             if (edit_tool.mode == EditTool::INSERT) {
                 edit_tool.mode = EditTool::HOVER;
             }
@@ -554,7 +535,7 @@ void Editor::onProcessKeyboardEvent(const sf::Event& event) {
     }
 }
 
-void Editor::processLeftPress(const sf::Vector2f& pos) {
+void Editor::processLeftPress(const glvx::Vector2f& pos) {
     if (selected_tool == &create_tool) {
         std::string id_string = std::to_string(simulation.getMaxId() + 1);
         switch (create_tool.type) {
@@ -648,7 +629,7 @@ void Editor::processLeftPress(const sf::Vector2f& pos) {
     }
 }
 
-void Editor::processGlobalLeftRelease(const sf::Vector2f& pos) {
+void Editor::processGlobalLeftRelease(const glvx::Vector2f& pos) {
     if (selected_tool == &move_tool) {
         endMove(true);
     } else if (selected_tool == &rotate_tool) {
@@ -677,7 +658,7 @@ void Editor::processGlobalLeftRelease(const sf::Vector2f& pos) {
     }
 }
 
-void Editor::processBlockableLeftRelease(const sf::Vector2f& pos) {
+void Editor::processBlockableLeftRelease(const glvx::Vector2f& pos) {
     if (selected_tool == &select_tool) {
         if (utils::length(getMousePosf() - getMousePressPosf()) < MOUSE_DRAG_THRESHOLD) {
             GameObject* object = getObjectAt(getMousePosf());
@@ -696,7 +677,7 @@ void Editor::processMouseScrollY(float delta) {
     camera.setZoom(camera.getZoom() * pow(MOUSE_SCROLL_ZOOM, delta));
 }
 
-void Editor::processMouse(const sf::Vector2f& pos) {
+void Editor::processMouse(const glvx::Vector2f& pos) {
     if (selected_tool == &select_tool) {
         {
             GameObject* old_hover = select_tool.hover_object;
@@ -740,7 +721,7 @@ void Editor::processMouse(const sf::Vector2f& pos) {
     }
 }
 
-void Editor::processDragGestureLeft(const sf::Vector2f& pos) {
+void Editor::processDragGestureLeft(const glvx::Vector2f& pos) {
     if (selected_tool == &select_tool) {
         if (select_tool.rectangle_select.active) {
             selectObjectsInRect(select_tool.rectangle_select);
@@ -773,8 +754,8 @@ void Editor::processDragGestureLeft(const sf::Vector2f& pos) {
     }
 }
 
-void Editor::processDragGestureRight(const sf::Vector2f& pos) {
-    sf::Vector2i mouseDelta = mousePrevPos - getMousePos();
+void Editor::processDragGestureRight(const glvx::Vector2f& pos) {
+    glvx::Vector2i mouseDelta = mousePrevPos - getMousePos();
     float x_offset = mouseDelta.x / camera.getZoom();
     float y_offset = -mouseDelta.y / camera.getZoom();
     camera.move(x_offset, y_offset);
@@ -829,7 +810,7 @@ void Editor::onRender() {
 }
 
 void Editor::renderWorld() {
-    world_widget->clear(sf::Color::Transparent);
+    world_widget->clear(glvx::Color::Transparent);
     world_widget->setViewCenter(tosf(camera.getPosition()));
     world_widget->setViewSize(world_widget->getSize().x / camera.getZoom(), -1.0f * world_widget->getSize().y / camera.getZoom());
     for (size_t i = 0; i < simulation.getTopSize(); i++) {
@@ -848,7 +829,7 @@ void Editor::renderWorld() {
 
     selection_mask_widget->clear();
     selection_mask_widget->setView(world_widget->getView());
-    auto render_func = [&](const sf::Drawable& drawable) {
+    auto render_func = [&](const glvx::Drawable& drawable) {
         canvasDraw(selection_mask_widget, drawable);
     };
     if (selected_tool != &edit_tool) {
@@ -860,24 +841,27 @@ void Editor::renderWorld() {
 }
 
 void Editor::renderUi() {
-    ui_widget->clear(sf::Color::Transparent);
+    ui_widget->clear(glvx::Color::Transparent);
     ui_widget->resetView();
 
     if (render_object_info) {
         // parent relation lines
         for (GameObject* object : simulation.getAllObjects()) {
             for (GameObject* child : object->getChildren()) {
-                sf::Vector2f v1 = worldToScreen(object->getGlobalPosition());
-                sf::Vector2f v2 = worldToScreen(child->getGlobalPosition());
-                fw::draw_line(ui_widget, v1, v2, sf::Color(128, 128, 128));
+                glvx::Vector2f v1 = worldToScreen(object->getGlobalPosition());
+                glvx::Vector2f v2 = worldToScreen(child->getGlobalPosition());
+                fw::draw_line(ui_widget, v1, v2, glvx::Color(128, 128, 128));
             }
         }
         // object origin circles
         for (size_t i = 0; i < simulation.getAllSize(); i++) {
             GameObject* gameobject = simulation.getFromAll(i);
-            sf::Color circle_color = gameobject == active_object ? sf::Color(255, 255, 0) : sf::Color(255, 159, 44);
-            origin_shape.setFillColor(circle_color);
-            origin_shape.setPosition(worldToScreen(gameobject->getGlobalPosition()));
+            glvx::Color circle_color = gameobject == active_object ? glvx::Color(255, 255, 0) : glvx::Color(255, 159, 44);
+            glvx::Vector2f screen_pos = worldToScreen(gameobject->getGlobalPosition());
+            origin_shape.setColor(circle_color);
+            origin_shape.setPosition(screen_pos);
+            origin_shape_outline.setPosition(screen_pos);
+            ui_widget->draw(origin_shape_outline);
             ui_widget->draw(origin_shape);
         }
         // object info
@@ -885,10 +869,10 @@ void Editor::renderUi() {
             GameObject* gameobject = simulation.getFromAll(i);
             size_t info_index = 0;
             auto render_info = [&](const std::string& str) {
-                sf::Vector2f object_screen_pos = worldToScreen(gameobject->getGlobalPosition());
+                glvx::Vector2f object_screen_pos = worldToScreen(gameobject->getGlobalPosition());
                 float line_scaling = 3.0f / 4.0f;
-                sf::Vector2f offset = sf::Vector2f(0.0f, info_index * object_info_text.getCharacterSize() * line_scaling);
-                sf::Vector2f pos = object_screen_pos + offset;
+                glvx::Vector2f offset = glvx::Vector2f(0.0f, info_index * object_info_text.getCharacterSize() * line_scaling);
+                glvx::Vector2f pos = object_screen_pos + offset;
                 object_info_text.setPosition(utils::quantize(pos));
                 object_info_text.setString(str);
                 ui_widget->draw(object_info_text);
@@ -914,47 +898,47 @@ void Editor::renderUi() {
         }
     } else if (selected_tool == &drag_tool) {
         if (drag_tool.mouse_joint) {
-            sf::Vector2f grabbed_point = worldToScreen(drag_tool.mouse_joint->GetAnchorB());
-            fw::draw_line(ui_widget, grabbed_point, getMousePosf(), sf::Color::Yellow);
+            glvx::Vector2f grabbed_point = worldToScreen(drag_tool.mouse_joint->GetAnchorB());
+            fw::draw_line(ui_widget, grabbed_point, getMousePosf(), glvx::Color::Yellow);
         }
     } else if (selected_tool == &rotate_tool) {
         for (size_t i = 0; i < rotate_tool.rotating_objects.size(); i++) {
-            fw::draw_line(ui_widget, worldToScreen(rotate_tool.pivot_pos), getMousePosf(), sf::Color::Yellow);
+            fw::draw_line(ui_widget, worldToScreen(rotate_tool.pivot_pos), getMousePosf(), glvx::Color::Yellow);
         }
     } else if (selected_tool == &edit_tool && active_object) {
         if (edit_tool.mode == EditTool::ADD && edit_tool.edge_vertex != -1) {
             // ghost edge
-            sf::Vector2i v1 = worldToPixel(active_object->getGlobalVertexPos(edit_tool.edge_vertex));
-            sf::Vector2i v2 = getMousePos();
-            fw::draw_line(ui_widget, to2f(v1), to2f(v2), sf::Color(255, 0, 0, 128));
+            glvx::Vector2i v1 = worldToPixel(active_object->getGlobalVertexPos(edit_tool.edge_vertex));
+            glvx::Vector2i v2 = getMousePos();
+            fw::draw_line(ui_widget, to2f(v1), to2f(v2), glvx::Color(255, 0, 0, 128));
             // ghost edge normal
-            sf::Vector2f norm_v1, norm_v2;
+            glvx::Vector2f norm_v1, norm_v2;
             if (edit_tool.edge_vertex == 0) {
                 getScreenNormal(v1, v2, norm_v1, norm_v2);
             } else {
                 getScreenNormal(v2, v1, norm_v1, norm_v2);
             }
-            fw::draw_line(ui_widget, norm_v1, norm_v2, sf::Color(0, 255, 255, 128));
+            fw::draw_line(ui_widget, norm_v1, norm_v2, glvx::Color(0, 255, 255, 128));
             // ghost vertex
-            sf::Vector2f ghost_vertex_pos = to2f(getMousePos());
+            glvx::Vector2f ghost_vertex_pos = to2f(getMousePos());
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
-            edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
+            edit_tool.vertex_rect.setColor(glvx::Color(255, 0, 0, 128));
             ui_widget->draw(edit_tool.vertex_rect);
         } else if (edit_tool.mode == EditTool::INSERT && edit_tool.highlighted_edge != -1) {
             // edge highlight
             b2Vec2 v1 = active_object->getGlobalVertexPos(edit_tool.highlighted_edge);
             b2Vec2 v2 = active_object->getGlobalVertexPos(active_object->indexLoop(edit_tool.highlighted_edge + 1));
-            sf::Vector2f v1_screen = worldToScreen(v1);
-            sf::Vector2f v2_screen = worldToScreen(v2);
-            sf::Vector2f vec = v2_screen - v1_screen;
+            glvx::Vector2f v1_screen = worldToScreen(v1);
+            glvx::Vector2f v2_screen = worldToScreen(v2);
+            glvx::Vector2f vec = v2_screen - v1_screen;
             float angle = atan2(vec.y, vec.x);
             edit_tool.edge_highlight.setPosition(v1_screen);
-            edit_tool.edge_highlight.setRotation(utils::to_degrees(angle));
-            edit_tool.edge_highlight.setSize(sf::Vector2f(utils::length(vec), 3.0f));
+            edit_tool.edge_highlight.setRotation(glvx::Angle::fromRadians(angle));
+            edit_tool.edge_highlight.setSize(glvx::Vector2f(utils::length(vec), 3.0f));
             ui_widget->draw(edit_tool.edge_highlight);
             // ghost vertex on the edge
-            sf::Vector2f ghost_vertex_pos = worldToScreen(edit_tool.insertVertexPos);
-            edit_tool.vertex_rect.setFillColor(sf::Color(255, 0, 0, 128));
+            glvx::Vector2f ghost_vertex_pos = worldToScreen(edit_tool.insertVertexPos);
+            edit_tool.vertex_rect.setColor(glvx::Color(255, 0, 0, 128));
             edit_tool.vertex_rect.setPosition(ghost_vertex_pos);
             ui_widget->draw(edit_tool.vertex_rect);
         }
@@ -962,26 +946,31 @@ void Editor::renderUi() {
         for (size_t i = 0; i < active_object->getVertexCount(); i++) {
             edit_tool.vertex_rect.setPosition(worldToScreen(active_object->getGlobalVertexPos(i)));
             bool selected = active_object->isVertexSelected(i);
-            sf::Color vertex_color = selected ? sf::Color(255, 255, 0) : sf::Color(255, 0, 0);
-            edit_tool.vertex_rect.setFillColor(vertex_color);
+            glvx::Color vertex_color = selected ? glvx::Color(255, 255, 0) : glvx::Color(255, 0, 0);
+            edit_tool.vertex_rect.setColor(vertex_color);
             ui_widget->draw(edit_tool.vertex_rect);
         }
         // edge normals
         for (size_t i = 0; i < active_object->getEdgeCount(); i++) {
-            sf::Vector2f norm_v1, norm_v2;
+            glvx::Vector2f norm_v1, norm_v2;
             getScreenNormal(
                 active_object->getGlobalVertexPos(i),
                 active_object->getGlobalVertexPos(active_object->indexLoop(i + 1)),
                 norm_v1, 
                 norm_v2
             );
-            fw::draw_line(ui_widget, norm_v1, norm_v2, sf::Color(0, 255, 255));
+            fw::draw_line(ui_widget, norm_v1, norm_v2, glvx::Color(0, 255, 255));
         }
         if (edit_tool.mode == EditTool::HOVER && edit_tool.highlighted_vertex != -1) {
             // highlighted vertex
-            sf::Vector2f vertex_pos = worldToScreen(active_object->getGlobalVertexPos(edit_tool.highlighted_vertex));
+            glvx::Vector2f vertex_pos = worldToScreen(active_object->getGlobalVertexPos(edit_tool.highlighted_vertex));
             edit_tool.vertex_highlight_rect.setPosition(vertex_pos);
-            ui_widget->draw(edit_tool.vertex_highlight_rect);
+            glvx::Vector2f size = edit_tool.vertex_highlight_rect.getSize();
+            fw::draw_wire_rect(
+                ui_widget,
+                glvx::FloatRect(vertex_pos.x - size.x / 2.0f, vertex_pos.y - size.y / 2.0f, size.x, size.y),
+                glvx::Color::Yellow
+            );
         } else if (edit_tool.mode == EditTool::SELECT && edit_tool.rectangle_select.active) {
             //selection box
             renderRectangleSelect(ui_widget, edit_tool.rectangle_select);
@@ -1036,7 +1025,7 @@ void Editor::deserialize(const std::string& str, bool set_camera) {
             follow_object = object;
         }
     } catch (std::exception exc) {
-        throw std::runtime_error(__FUNCTION__": Line " + std::to_string(tr.getLine(-1)) + ": " + exc.what());
+        throw std::runtime_error(std::string(__FUNCTION__) + ": Line " + std::to_string(tr.getLine(-1)) + ": " + exc.what());
     }
 }
 
@@ -1073,7 +1062,7 @@ void Editor::loadFromFile(const std::filesystem::path& path) {
         save_file_location = path;
         editor_logger << "Editor loaded from " << path << "\n";
     } catch (std::exception exc) {
-        throw std::runtime_error(__FUNCTION__": " + path.string() + ": " + std::string(exc.what()));
+        throw std::runtime_error(std::string(__FUNCTION__) + ": " + path.string() + ": " + std::string(exc.what()));
     }
 }
 
@@ -1129,10 +1118,10 @@ Tool* Editor::trySelectTool(Tool* tool) {
     selected_tool = tool;
     tool->OnSetSelected(true);
     for (size_t i = 0; i < tools_in_tool_panel.size(); i++) {
-        tools_in_tool_panel[i]->widget->setFillColor(sf::Color(128, 128, 128));
+        tools_in_tool_panel[i]->widget->setFillColor(glvx::Color(128, 128, 128));
     }
     if (tool->widget) {
-        tool->widget->setFillColor(sf::Color::Yellow);
+        tool->widget->setFillColor(glvx::Color::Yellow);
     }
     return tool;
 }
@@ -1140,9 +1129,9 @@ Tool* Editor::trySelectTool(Tool* tool) {
 void Editor::selectCreateType(size_t type) {
     create_tool.type = static_cast<CreateTool::ObjectType>(type);
     for (size_t j = 0; j < create_tool.create_buttons.size(); j++) {
-        create_tool.create_buttons[j]->setFillColor(sf::Color(128, 128, 128));
+        create_tool.create_buttons[j]->setFillColor(glvx::Color(128, 128, 128));
     }
-    create_tool.create_buttons[type]->setFillColor(sf::Color(0, 175, 255));
+    create_tool.create_buttons[type]->setFillColor(glvx::Color(0, 175, 255));
 }
 
 void Editor::togglePause() {
@@ -1150,40 +1139,42 @@ void Editor::togglePause() {
     paused_rect_widget->setVisible(paused);
 }
 
-sf::Vector2f Editor::screenToWorld(const sf::Vector2f& screen_pos) const {
-    sf::Transform combined = world_widget->getView().getInverseTransform() * ui_widget->getView().getTransform();
-    sf::Vector2f result = combined.transformPoint(screen_pos);
-    return result;
+glvx::Vector2f Editor::screenToWorld(const glvx::Vector2f& screen_pos) const {
+    glvx::Vector2f tex_size = world_widget->getTextureSize();
+    glm::mat4 matrix = glvx::to_glmMat4(world_widget->getView().getInvViewMatrix(tex_size.x, tex_size.y));
+    glm::vec4 result = matrix * glm::vec4(screen_pos.x, screen_pos.y, 0.0f, 1.0f);
+    return glvx::from_glmVec2(glm::vec2(result.x / result.w, result.y / result.w));
 }
 
-sf::Vector2f Editor::pixelToWorld(const sf::Vector2i& screen_pos) const {
-    return screenToWorld(to2f(screen_pos) + sf::Vector2f(0.5f, 0.5f));
+glvx::Vector2f Editor::pixelToWorld(const glvx::Vector2i& screen_pos) const {
+    return screenToWorld(to2f(screen_pos) + glvx::Vector2f(0.5f, 0.5f));
 }
 
-sf::Vector2f Editor::worldToScreen(const sf::Vector2f& world_pos) const {
-    sf::Transform combined = ui_widget->getView().getInverseTransform() * world_widget->getView().getTransform();
-    sf::Vector2f result = combined.transformPoint(world_pos);
-    return result;
+glvx::Vector2f Editor::worldToScreen(const glvx::Vector2f& world_pos) const {
+    glvx::Vector2f tex_size = world_widget->getTextureSize();
+    glm::mat4 matrix = glvx::to_glmMat4(world_widget->getView().getViewMatrix(tex_size.x, tex_size.y));
+    glm::vec4 result = matrix * glm::vec4(world_pos.x, world_pos.y, 0.0f, 1.0f);
+    return glvx::from_glmVec2(glm::vec2(result.x / result.w, result.y / result.w));
 }
 
-sf::Vector2f Editor::worldToScreen(const b2Vec2& world_pos) const {
+glvx::Vector2f Editor::worldToScreen(const b2Vec2& world_pos) const {
     return worldToScreen(tosf(world_pos));
 }
 
-sf::Vector2i Editor::worldToPixel(const sf::Vector2f& world_pos) const {
+glvx::Vector2i Editor::worldToPixel(const glvx::Vector2f& world_pos) const {
     return fw::to2i(worldToScreen(world_pos));
 }
 
-sf::Vector2i Editor::worldToPixel(const b2Vec2& world_pos) const {
+glvx::Vector2i Editor::worldToPixel(const b2Vec2& world_pos) const {
     return fw::to2i(worldToScreen(tosf(world_pos)));
 }
 
-sf::Vector2f Editor::worldDirToScreenf(const b2Vec2& world_dir) const {
-    //TODO: calculate new direction using an actual sf::View
-    return sf::Vector2f(world_dir.x, -world_dir.y);
+glvx::Vector2f Editor::worldDirToScreenf(const b2Vec2& world_dir) const {
+    //TODO: calculate new direction using an actual glvx::View
+    return glvx::Vector2f(world_dir.x, -world_dir.y);
 }
 
-sf::Vector2f Editor::getMouseWorldPos() const {
+glvx::Vector2f Editor::getMouseWorldPos() const {
     return pixelToWorld(getMousePos());
 }
 
@@ -1219,9 +1210,9 @@ ptrdiff_t Editor::mouseGetChainEdge(const b2Fixture* fixture) const {
     return -1;
 }
 
-b2Fixture* Editor::getFixtureAt(const sf::Vector2f& screen_pos) const {
+b2Fixture* Editor::getFixtureAt(const glvx::Vector2f& screen_pos) const {
     b2Vec2 world_pos = tob2(screenToWorld(screen_pos));
-    b2Vec2 world_pos_next = tob2(screenToWorld(screen_pos + sf::Vector2f(1.0f, 1.0f)));
+    b2Vec2 world_pos_next = tob2(screenToWorld(screen_pos + glvx::Vector2f(1.0f, 1.0f)));
     b2Vec2 midpoint = 0.5f * (world_pos + world_pos_next);
     QueryCallback callback;
     b2AABB aabb;
@@ -1241,7 +1232,7 @@ b2Fixture* Editor::getFixtureAt(const sf::Vector2f& screen_pos) const {
     return nullptr;
 }
 
-GameObject* Editor::getObjectAt(const sf::Vector2f& screen_pos) const {
+GameObject* Editor::getObjectAt(const glvx::Vector2f& screen_pos) const {
     GameObject* result = nullptr;
     b2Fixture* fixture = getFixtureAt(getMousePosf());
     if (fixture) {
@@ -1251,7 +1242,7 @@ GameObject* Editor::getObjectAt(const sf::Vector2f& screen_pos) const {
     return result;
 }
 
-sf::Vector2f Editor::getObjectScreenPos(GameObject* object) const {
+glvx::Vector2f Editor::getObjectScreenPos(GameObject* object) const {
     return worldToScreen(object->getGlobalPosition());
 }
 
@@ -1276,10 +1267,10 @@ ptrdiff_t Editor::mouseGetObjectVertex() const {
         return -1;
     }
     ptrdiff_t closest_vertex_i = 0;
-    sf::Vector2i closest_vertex_pos = worldToPixel(active_object->getGlobalVertexPos(0));
+    glvx::Vector2i closest_vertex_pos = worldToPixel(active_object->getGlobalVertexPos(0));
     float closest_vertex_offset = utils::get_max_offset(closest_vertex_pos, getMousePos());
     for (size_t i = 1; i < active_object->getVertexCount(); i++) {
-        sf::Vector2i vertex_pos = worldToPixel(active_object->getGlobalVertexPos(i));
+        glvx::Vector2i vertex_pos = worldToPixel(active_object->getGlobalVertexPos(i));
         float offset = (float)utils::get_max_offset(vertex_pos, getMousePos());
         if (offset < closest_vertex_offset) {
             closest_vertex_i = i;
@@ -1331,8 +1322,8 @@ ptrdiff_t Editor::mouseGetEdgeVertex() const {
     }
     ptrdiff_t v_start_i = 0;
     ptrdiff_t v_end_i = active_object->getEdgeCount();
-    sf::Vector2f v_start = worldToScreen(active_object->getGlobalVertexPos(v_start_i));
-    sf::Vector2f v_end = worldToScreen(active_object->getGlobalVertexPos(v_end_i));
+    glvx::Vector2f v_start = worldToScreen(active_object->getGlobalVertexPos(v_start_i));
+    glvx::Vector2f v_end = worldToScreen(active_object->getGlobalVertexPos(v_end_i));
     float v_start_dist = utils::length(getMousePosf() - v_start);
     float v_end_dist = utils::length(getMousePosf() - v_end);
     if (v_start_dist <= v_end_dist) {
@@ -1343,15 +1334,15 @@ ptrdiff_t Editor::mouseGetEdgeVertex() const {
 }
 
 void Editor::selectVerticesInRect(const RectangleSelect& rectangle_select) {
-    sf::Vector2f mpos = getMouseWorldPos();
-    sf::Vector2f origin = rectangle_select.select_origin;
+    glvx::Vector2f mpos = getMouseWorldPos();
+    glvx::Vector2f origin = rectangle_select.select_origin;
     float left = std::min(mpos.x, origin.x);
     float top = std::min(mpos.y, origin.y);
     float right = std::max(mpos.x, origin.x);
     float bottom = std::max(mpos.y, origin.y);
     float width = right - left;
     float height = bottom - top;
-    sf::FloatRect rect(left, top, width, height);
+    glvx::FloatRect rect(left, top, width, height);
     for (size_t i = 0; i < active_object->getVertexCount(); i++) {
         if (utils::contains_point(rect, tosf(active_object->getGlobalVertexPos(i)))) {
             active_object->selectVertex(i);
@@ -1378,35 +1369,43 @@ void Editor::selectObjectsInRect(const RectangleSelect& rectangle_select) {
     }
 }
 
-void Editor::renderRectangleSelect(sf::RenderTarget& target, RectangleSelect& rectangle_select) {
-    sf::Vector2f pos = worldToScreen(rectangle_select.select_origin);
+void Editor::renderRectangleSelect(glvx::RenderTarget& target, RectangleSelect& rectangle_select) {
+    glvx::Vector2f pos = worldToScreen(rectangle_select.select_origin);
+    glvx::Vector2f mouse = getMousePosf();
     rectangle_select.select_rect.setPosition(pos);
-    rectangle_select.select_rect.setSize(getMousePosf() - pos);
+    rectangle_select.select_rect.setSize(mouse - pos);
     target.draw(rectangle_select.select_rect);
+    glvx::Vector2f min_pos = glvx::Vector2f(std::min(pos.x, mouse.x), std::min(pos.y, mouse.y));
+    glvx::Vector2f max_pos = glvx::Vector2f(std::max(pos.x, mouse.x), std::max(pos.y, mouse.y));
+    fw::draw_wire_rect(target, glvx::FloatRect(min_pos.x, min_pos.y, max_pos.x - min_pos.x, max_pos.y - min_pos.y), glvx::Color::Yellow);
 }
 
 void Editor::renderRectangleSelect(fw::CanvasWidget* canvas, RectangleSelect& rectangle_select) {
-    sf::Vector2f pos = worldToScreen(rectangle_select.select_origin);
+    glvx::Vector2f pos = worldToScreen(rectangle_select.select_origin);
+    glvx::Vector2f mouse = getMousePosf();
     rectangle_select.select_rect.setPosition(pos);
-    rectangle_select.select_rect.setSize(getMousePosf() - pos);
+    rectangle_select.select_rect.setSize(mouse - pos);
     canvas->draw(rectangle_select.select_rect);
+    glvx::Vector2f min_pos = glvx::Vector2f(std::min(pos.x, mouse.x), std::min(pos.y, mouse.y));
+    glvx::Vector2f max_pos = glvx::Vector2f(std::max(pos.x, mouse.x), std::max(pos.y, mouse.y));
+    fw::draw_wire_rect(canvas, glvx::FloatRect(min_pos.x, min_pos.y, max_pos.x - min_pos.x, max_pos.y - min_pos.y), glvx::Color::Yellow);
 }
 
-void Editor::getScreenNormal(const b2Vec2& v1, const b2Vec2& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
+void Editor::getScreenNormal(const b2Vec2& v1, const b2Vec2& v2, glvx::Vector2f& norm_v1, glvx::Vector2f& norm_v2) const {
     b2Vec2 midpoint = 0.5f * (v1 + v2);
     norm_v1 = worldToScreen(midpoint);
-    sf::Vector2f edge_dir = utils::normalize(worldDirToScreenf(v2 - v1));
-    sf::Vector2f norm_dir = utils::rot90CCW(edge_dir);
+    glvx::Vector2f edge_dir = utils::normalize(worldDirToScreenf(v2 - v1));
+    glvx::Vector2f norm_dir = utils::rot90CCW(edge_dir);
     norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
 }
 
-void Editor::getScreenNormal(const sf::Vector2i& v1, const sf::Vector2i& v2, sf::Vector2f& norm_v1, sf::Vector2f& norm_v2) const {
-    sf::Vector2f v1f = to2f(v1);
-    sf::Vector2f v2f = to2f(v2);
-    sf::Vector2f midpoint = (v1f + v2f) / 2.0f;
+void Editor::getScreenNormal(const glvx::Vector2i& v1, const glvx::Vector2i& v2, glvx::Vector2f& norm_v1, glvx::Vector2f& norm_v2) const {
+    glvx::Vector2f v1f = to2f(v1);
+    glvx::Vector2f v2f = to2f(v2);
+    glvx::Vector2f midpoint = (v1f + v2f) / 2.0f;
     norm_v1 = midpoint;
-    sf::Vector2f edge_dir = utils::normalize(v2f - v1f);
-    sf::Vector2f norm_dir = utils::rot90CW(edge_dir);
+    glvx::Vector2f edge_dir = utils::normalize(v2f - v1f);
+    glvx::Vector2f norm_dir = utils::rot90CW(edge_dir);
     norm_v2 = norm_v1 + norm_dir * (float)EditTool::NORMAL_LENGTH;
 }
 
@@ -1536,18 +1535,8 @@ void Editor::checkDebugbreak() {
     }
 }
 
-void Editor::canvasDraw(fw::CanvasWidget* canvas, const sf::Drawable& drawable, const sf::RenderStates& states) {
-    if (const sf::Shape* shape = dynamic_cast<const sf::Shape*>(&drawable)) {
-        canvas->draw(*shape);
-    } else if (dynamic_cast<const LineStripShape*>(&drawable)) {
-        canvas->draw(drawable, fw::ColorType::VERTEX);
-    } else if (dynamic_cast<const CircleNotchShape*>(&drawable)) {
-        canvas->draw(drawable, fw::ColorType::VERTEX);
-    } else if (dynamic_cast<const SplittablePolygon*>(&drawable)) {
-        canvas->draw(drawable, fw::ColorType::VERTEX);
-    } else {
-        mAssert(false, "This Drawable is not implemented yet");
-    }
+void Editor::canvasDraw(fw::CanvasWidget* canvas, const glvx::Drawable& drawable, const glvx::RenderStates& states) {
+    canvas->draw(drawable, states);
 }
 
 void FpsCounter::init() {
@@ -1653,7 +1642,7 @@ void Camera::deserialize(TokenReader& tr) {
             }
         }
     } catch (std::exception exc) {
-        throw std::runtime_error(__FUNCTION__": " + std::string(exc.what()));
+        throw std::runtime_error(std::string(__FUNCTION__) + ": " + std::string(exc.what()));
     }
 }
 

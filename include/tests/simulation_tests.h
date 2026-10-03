@@ -51,7 +51,7 @@ private:
 	void eventTest(test::Test& test);
 	void clearTest(test::Test& test);
 
-	static std::string colorToStr(const sf::Color& color);
+	static std::string colorToStr(const glvx::Color& color);
 	static std::string b2Vec2ToStr(const b2Vec2& vec);
 	BoxObject* createBox(Simulation& simulation, const std::string& name, const b2Vec2& pos) const;
 	void objCmpCommon(test::Test& test, const GameObject* objA, const GameObject* objB, bool cmp_id = true);

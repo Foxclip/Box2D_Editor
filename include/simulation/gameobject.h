@@ -1,7 +1,11 @@
 #pragma once
 
 #include <set>
-#include <SFML/Graphics.hpp>
+#include <glvx/color.h>
+#include <glvx/drawable.h>
+#include <glvx/transformable.h>
+#include <glvx/rectangle.h>
+#include <glvx/vector.h>
 #include <box2d/box2d.h>
 #include "serializer.h"
 #include "polygon.h"
@@ -59,9 +63,9 @@ public:
 	ptrdiff_t getId() const;
 	ptrdiff_t getParentId() const;
 	const std::string& getName() const;
-	const sf::Color& getColor() const;
-	virtual sf::Drawable* getDrawable() const = 0;
-	virtual sf::Transformable* getTransformable() const = 0;
+	const glvx::Color& getColor() const;
+	virtual glvx::Drawable* getDrawable() const = 0;
+	virtual glvx::Transformable* getTransformable() const = 0;
 	b2BodyType getBodyType() const;
 	b2Body* getRigidBody() const;
 	const b2Vec2& getPosition() const;
@@ -93,7 +97,7 @@ public:
 	float toParentLocalAngle(float angle) const;
 	ptrdiff_t getChildIndex(const GameObject* object) const;
 	void updateVisual();
-	void renderMask(const std::function<void(const sf::Drawable& drawable)>& draw_func);
+	void renderMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func);
 	virtual void setDrawVarray(bool value);
 	void setParent(GameObject* new_parent);
 	void setName(const std::string& new_name);
@@ -150,12 +154,12 @@ protected:
 	std::vector<EditableVertex> vertices;
 	GameObject* parent = nullptr;
 	GameObjectList* object_list = nullptr;
-	sf::Color color;
+	glvx::Color color;
 	bool draw_varray = false;
 
-	virtual void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) = 0;
+	virtual void drawMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func) = 0;
 	std::vector<b2Vec2> getPositions() const;
-	void setVisualPosition(const sf::Vector2f& pos);
+	void setVisualPosition(const glvx::Vector2f& pos);
 	void setVisualRotation(float angle);
 	void vertexSet(size_t index, const b2Vec2& new_pos);
 	void destroyFixtures();
@@ -176,12 +180,12 @@ class BoxObject : public GameObject {
 public:
 	b2Vec2 size = b2Vec2();
 
-	BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, sf::Color color);
+	BoxObject(GameObjectList* object_list, b2BodyDef def, b2Vec2 size, glvx::Color color);
 	GameObjectType getType() const;
 	bool isClosed() const override;
-	sf::Drawable* getDrawable() const override;
-	sf::Transformable* getTransformable() const override;
-	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
+	glvx::Drawable* getDrawable() const override;
+	glvx::Transformable* getTransformable() const override;
+	void drawMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static dp::DataPointerUnique<BoxObject> deserialize(const std::string& str, GameObjectList* object_list);
@@ -190,7 +194,7 @@ public:
 	bool isEqual(const GameObject* other) const;
 
 private:
-	dp::DataPointerUnique<sf::RectangleShape> rect_shape;
+	dp::DataPointerUnique<glvx::Rectangle> rect_shape;
 };
 
 class BallObject : public GameObject {
@@ -201,14 +205,14 @@ public:
 		GameObjectList* object_list,
 		b2BodyDef def,
 		float radius,
-		sf::Color color,
-		sf::Color notch_color = sf::Color::Transparent
+		glvx::Color color,
+		glvx::Color notch_color = glvx::Color::Transparent
 	);
 	GameObjectType getType() const;
 	bool isClosed() const override;
-	sf::Drawable* getDrawable() const override;
-	sf::Transformable* getTransformable() const override;
-	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
+	glvx::Drawable* getDrawable() const override;
+	glvx::Transformable* getTransformable() const override;
+	void drawMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static dp::DataPointerUnique<BallObject> deserialize(const std::string& str, GameObjectList* object_list);
@@ -218,7 +222,7 @@ public:
 
 private:
 	dp::DataPointerUnique<CircleNotchShape> circle_notch_shape;
-	sf::Color notch_color;
+	glvx::Color notch_color;
 
 };
 
@@ -228,14 +232,14 @@ public:
 		GameObjectList* object_list,
 		b2BodyDef def,
 		const std::vector<b2Vec2>& vertices,
-		const sf::Color& color
+		const glvx::Color& color
 	);
 	GameObjectType getType() const;
 	bool isClosed() const override;
 	SplittablePolygon* getSplittablePolygon() const;
-	sf::Drawable* getDrawable() const override;
-	sf::Transformable* getTransformable() const override;
-	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
+	glvx::Drawable* getDrawable() const override;
+	glvx::Transformable* getTransformable() const override;
+	void drawMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func) override;
 	void setDrawVarray(bool value) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
@@ -250,12 +254,12 @@ private:
 
 class ChainObject : public GameObject {
 public:
-	ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector<b2Vec2> p_vertices, sf::Color color);
+	ChainObject(GameObjectList* object_list, b2BodyDef def, std::vector<b2Vec2> p_vertices, glvx::Color color);
 	GameObjectType getType() const;
 	bool isClosed() const override;
-	sf::Drawable* getDrawable() const override;
-	sf::Transformable* getTransformable() const override;
-	void drawMask(const std::function<void(const sf::Drawable& drawable)>& draw_func) override;
+	glvx::Drawable* getDrawable() const override;
+	glvx::Transformable* getTransformable() const override;
+	void drawMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func) override;
 	using GameObject::serialize;
 	TokenWriter& serialize(TokenWriter& tw) const override;
 	static dp::DataPointerUnique<ChainObject> deserialize(const std::string& str, GameObjectList* object_list);

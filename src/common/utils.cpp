@@ -29,42 +29,42 @@ namespace utils {
 		return RAD_IN_DEG * angle;
 	}
 
-	b2Vec2 tob2(const sf::Vector2f& vec) {
+	b2Vec2 tob2(const glvx::Vector2f& vec) {
 		return b2Vec2(vec.x, vec.y);
 	}
 
-	sf::Vector2f tosf(const b2Vec2& vec) {
-		return sf::Vector2f(vec.x, vec.y);
+	glvx::Vector2f tosf(const b2Vec2& vec) {
+		return glvx::Vector2f(vec.x, vec.y);
 	}
 
-	float get_max_offset(const sf::Vector2i& v1, const sf::Vector2i& v2) {
+	float get_max_offset(const glvx::Vector2i& v1, const glvx::Vector2i& v2) {
 		float offset_x = (float)abs(v1.x - v2.x);
 		float offset_y = (float)abs(v1.y - v2.y);
 		return std::max(offset_x, offset_y);
 	}
 
-	void set_origin_to_center_normal(sf::Text& text) {
-		float x = text.getLocalBounds().width / 2.0f;
+	void set_origin_to_center_normal(glvx::Text& text) {
+		float x = text.getWidth() / 2.0f;
 		float y = text.getCharacterSize() / 2.0f;
 		text.setOrigin(x, y);
 	}
 
-	void set_origin_to_center_bounds(sf::Text& text) {
-		sf::FloatRect text_bounds = text.getLocalBounds();
-		text.setOrigin(text_bounds.width / 2.0f, text_bounds.height / 2.0f);
+	void set_origin_to_center_bounds(glvx::Text& text) {
+		text.setOrigin(text.getWidth() / 2.0f, text.getHeight() / 2.0f);
 	}
 
-	bool contains_point(const sf::FloatRect& rect, const sf::Vector2f& point) {
+	bool contains_point(const glvx::FloatRect& rect, const glvx::Vector2f& point) {
 		return (
-			point.x >= rect.left
-			&& point.x <= rect.left + rect.width
-			&& point.y >= rect.top
-			&& point.y <= rect.top + rect.height
+			point.x >= rect.position.x
+			&& point.x <= rect.position.x + rect.size.x
+			&& point.y >= rect.position.y
+			&& point.y <= rect.position.y + rect.size.y
 		);
 	}
 
-	bool contains_point(const sf::RectangleShape& shape, const sf::Vector2f& point) {
-		return contains_point(shape.getGlobalBounds(), point);
+	bool contains_point(const glvx::Rectangle& shape, const glvx::Vector2f& point) {
+		glvx::FloatRect local_bounds(0.0f, 0.0f, shape.getWidth(), shape.getHeight());
+		return contains_point(shape.getTransform().transformRect(local_bounds), point);
 	}
 
 	std::string body_type_to_str(b2BodyType type) {
@@ -114,7 +114,7 @@ namespace utils {
 		return buffer.str();
 	}
 
-	std::string color_to_str(sf::Color color) {
+	std::string color_to_str(glvx::Color color) {
 		return
 			std::to_string(color.r)
 			+ " " + std::to_string(color.g)
@@ -171,41 +171,26 @@ namespace utils {
 		return ss.str();
 	}
 
-	void extend_bounds(sf::FloatRect& rect1, const sf::FloatRect& rect2) {
-		float rect1_right = rect1.left + rect1.width;
-		float rect2_right = rect2.left + rect2.width;
-		float rect1_bottom = rect1.top + rect1.height;
-		float rect2_bottom = rect2.top + rect2.height;
-		if (rect2.left < rect1.left) {
-			rect1.left = rect2.left;
-		}
-		if (rect2.top < rect1.top) {
-			rect1.top = rect2.top;
-		}
-		if (rect2_right > rect1_right) {
-			rect1.width += rect2_right - rect1_right;
-		}
-		if (rect2_bottom > rect1_bottom) {
-			rect1.height += rect2_bottom - rect1_bottom;
-		}
+	void extend_bounds(glvx::FloatRect& rect1, const glvx::FloatRect& rect2) {
+		rect1.extend(rect2);
 	}
 
-	void extend_bounds(sf::FloatRect& rect, const sf::Vector2f point) {
-		float rect_right = rect.left + rect.width;
-		float rect_bottom = rect.top + rect.height;
-		if (point.x < rect.left) {
-			rect.width += rect.left - point.x;
-			rect.left = point.x;
+	void extend_bounds(glvx::FloatRect& rect, const glvx::Vector2f point) {
+		float rect_right = rect.position.x + rect.size.x;
+		float rect_bottom = rect.position.y + rect.size.y;
+		if (point.x < rect.position.x) {
+			rect.size.x += rect.position.x - point.x;
+			rect.position.x = point.x;
 		}
-		if (point.y < rect.top) {
-			rect.height += rect.top - point.y;
-			rect.top = point.y;
+		if (point.y < rect.position.y) {
+			rect.size.y += rect.position.y - point.y;
+			rect.position.y = point.y;
 		}
 		if (point.x > rect_right) {
-			rect.width += point.x - rect_right;
+			rect.size.x += point.x - rect_right;
 		}
 		if (point.y > rect_bottom) {
-			rect.height += point.y - rect_bottom;
+			rect.size.y += point.y - rect_bottom;
 		}
 	}
 
@@ -405,12 +390,13 @@ namespace utils {
 		}
 	}
 
-	void quantize_position(sf::Transform& transform) {
-		float x_pos = transform.getMatrix()[12];
-		float y_pos = transform.getMatrix()[13];
+	void quantize_position(glvx::Transform& transform) {
+		const float* data = transform.getData();
+		float x_pos = data[12];
+		float y_pos = data[13];
 		float x_offset = x_pos - floor(x_pos);
 		float y_offset = y_pos - floor(y_pos);
-		sf::Vector2f subpixel_offset = sf::Vector2f(x_offset, y_offset);
+		glvx::Vector2f subpixel_offset = glvx::Vector2f(x_offset, y_offset);
 		transform.translate(-subpixel_offset);
 	}
 

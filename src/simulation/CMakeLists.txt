@@ -26,9 +26,9 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Source Files" FILES ${SIMU
 
 target_include_directories(simulation_lib PUBLIC "${INCLUDE_DIR}")
 target_include_directories(simulation_lib PUBLIC "${CMAKE_SOURCE_DIR}")
-target_include_directories(simulation_lib PUBLIC "${CMAKE_SOURCE_DIR}/sfml/include/")
 target_include_directories(simulation_lib PUBLIC "${CMAKE_SOURCE_DIR}/box2d/include/")
 target_include_directories(simulation_lib PUBLIC "${CMAKE_SOURCE_DIR}/logger/include/")
-target_link_libraries(simulation_lib PUBLIC sfml-graphics)
+target_link_libraries(simulation_lib PUBLIC widgets_lib)
+target_link_libraries(simulation_lib PUBLIC glvx)
 target_link_libraries(simulation_lib PUBLIC box2d)
 target_link_libraries(simulation_lib PUBLIC common_lib)

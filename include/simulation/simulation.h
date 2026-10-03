@@ -20,21 +20,21 @@ public:
 		const b2Vec2& pos,
 		float angle,
 		const b2Vec2& size,
-		const sf::Color& color
+		const glvx::Color& color
 	);
 	BallObject* createBall(
 		const std::string& name,
 		const b2Vec2& pos,
 		float radius,
-		const sf::Color& color,
-		const sf::Color& notch_color = sf::Color::Transparent
+		const glvx::Color& color,
+		const glvx::Color& notch_color = glvx::Color::Transparent
 	);
 	PolygonObject* createPolygon(
 		const std::string& name,
 		const b2Vec2& pos,
 		float angle,
 		const std::vector<b2Vec2>& vertices,
-		const sf::Color& color
+		const glvx::Color& color
 	);
 	PolygonObject* createRegularPolygon(
 		const std::string& name,
@@ -42,21 +42,21 @@ public:
 		float angle,
 		size_t vertex_count,
 		float radius,
-		const sf::Color& color
+		const glvx::Color& color
 	);
 	PolygonObject* createCar(
 		const std::string& name,
 		const b2Vec2& pos,
 		const std::vector<float>& lengths,
 		const std::vector<float>& wheels,
-		const sf::Color& color
+		const glvx::Color& color
 	);
 	ChainObject* createChain(
 		const std::string& name,
 		const b2Vec2& pos,
 		float angle,
 		const std::vector<b2Vec2>& vertices,
-		const sf::Color& color
+		const glvx::Color& color
 	);
 	RevoluteJoint* createRevoluteJoint(
 		const b2RevoluteJointDef& def,

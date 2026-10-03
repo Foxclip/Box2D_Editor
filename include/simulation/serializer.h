@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include <glvx/color.h>
 #include "box2d/box2d.h"
 #include <string>
 #include <vector>
@@ -29,7 +29,7 @@ public:
 	float readFloat();
 	bool readBool();
 	std::vector<float> readFloatArr();
-	sf::Color readColor();
+	glvx::Color readColor();
 	b2Vec2 readb2Vec2();
 	std::vector<b2Vec2> readb2Vec2Arr();
 	const WordToken& peek(ptrdiff_t offset = 0) const;
@@ -62,7 +62,7 @@ public:
 	TokenWriter& operator<<(float value);
 	TokenWriter& operator<<(bool value);
 	TokenWriter& operator<<(std::vector<float> value);
-	TokenWriter& operator<<(sf::Color value);
+	TokenWriter& operator<<(glvx::Color value);
 	TokenWriter& operator<<(b2Vec2 value);
 	void writeStringParam(std::string name, std::string value);
 	void writeQuotedStringParam(std::string name, std::string value);
@@ -72,7 +72,7 @@ public:
 	void writeFloatParam(std::string name, float value);
 	void writeBoolParam(std::string name, bool value);
 	void writeFloatArrParam(std::string name, std::vector<float> value);
-	void writeColorParam(std::string name, sf::Color value);
+	void writeColorParam(std::string name, glvx::Color value);
 	void writeb2Vec2Param(std::string name, b2Vec2 value);
 	size_t getIndentLevel() const;
 	std::string toStr() const;
@@ -96,7 +96,7 @@ private:
 	TokenWriter& writeFloat(float value);
 	TokenWriter& writeBool(bool value);
 	TokenWriter& writeFloatArr(std::vector<float> value);
-	TokenWriter& writeColor(sf::Color value);
+	TokenWriter& writeColor(glvx::Color value);
 	TokenWriter& writeb2Vec2(b2Vec2 value);
 
 	friend class TokenWriterIndent;
