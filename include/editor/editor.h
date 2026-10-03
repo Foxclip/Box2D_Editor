@@ -18,6 +18,7 @@ const int WINDOW_HEIGHT = 600;
 const int ANTIALIASING = 0;
 const float MOUSE_SCROLL_ZOOM = 1.2f;
 const int FPS = 60;
+const int SCREENSHOT_WARMUP_FRAMES = 8;
 const float WORLD_SATURATION = 0.75f;
 const float WORLD_COLOR_SCALE_CENTER = 0.25f;
 const float WORLD_COLOR_SCALE_PERCENT = 0.6f;
@@ -90,8 +91,9 @@ class Editor : public fw::Application {
 public:
 	Editor(bool maximized = false);
 	Editor(glvx::Window& window, bool maximized = false);
-	void init(const std::string& title, bool vsync = true);
+	void init(const std::string& title, bool vsync = true, bool minimized = false);
 	void load(const std::string& filename);
+	bool saveScreenshot(const std::string& file_path);
 	void setCameraPos(float x, float y);
 	void setCameraPos(const b2Vec2& pos);
 	void setCameraZoom(float zoom);

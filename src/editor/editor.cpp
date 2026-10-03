@@ -41,12 +41,20 @@ Editor::Editor(glvx::Window& window, bool maximized) : Application(window) {
     this->maximize_window = maximized;
 }
 
-void Editor::init(const std::string& title, bool vsync) {
-    fw::Application::init(title, WINDOW_WIDTH, WINDOW_HEIGHT, ANTIALIASING, vsync);
+void Editor::init(const std::string& title, bool vsync, bool minimized) {
+    fw::Application::init(title, WINDOW_WIDTH, WINDOW_HEIGHT, ANTIALIASING, vsync, minimized);
 }
 
 void Editor::load(const std::string& filename) {
     loadFromFile(filename);
+}
+
+bool Editor::saveScreenshot(const std::string& file_path) {
+    start(true);
+    for (int i = 0; i < SCREENSHOT_WARMUP_FRAMES; i++) {
+        advance();
+    }
+    return window.saveScreenshot(file_path);
 }
 
 void Editor::setCameraPos(float x, float y) {

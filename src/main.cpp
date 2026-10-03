@@ -1,24 +1,47 @@
 #include <cstdio>
+#include <cstring>
 #include <iostream>
+#include <string>
 #include "editor/editor.h"
 #include "editor/scenes.h"
 #include "logger/logger.h"
 
-void execute_app() {
+int execute_app(bool screenshot, const std::string& screenshot_path) {
     logger << "Starting app\n";
-    Editor app(true);
+    const bool maximized = !screenshot;
+    Editor app(maximized);
     try {
-        app.init("Box2D Editor");
+        app.init("Box2D Editor", true, screenshot);
         app.load("levels/level.txt");
+        if (screenshot) {
+            if (!app.saveScreenshot(screenshot_path)) {
+                logger << "ERROR: Failed to save screenshot to " << screenshot_path << "\n";
+                return 1;
+            }
+            return 0;
+        }
         app.start();
     } catch (std::string msg) {
         logger << "ERROR: " << msg << "\n";
     } catch (std::exception exc) {
         logger << "ERROR: " << exc.what() << "\n";
     }
+    return 0;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    bool screenshot = false;
+    std::string screenshot_path;
+    for (int i = 1; i < argc; i++) {
+        if (std::strcmp(argv[i], "--screenshot") == 0) {
+            if (i + 1 >= argc) {
+                std::cerr << "ERROR: --screenshot requires a file path argument" << std::endl;
+                return 1;
+            }
+            screenshot = true;
+            screenshot_path = argv[i + 1];
+        }
+    }
 
     LoggerDisableTag disable_serialize_tag("serialize");
     LoggerDisableTag disable_recut_tag("recut");
@@ -27,7 +50,7 @@ int main() {
     LoggerDisableTag disable_outliner("outliner");
     LoggerDisableTag disable_history("history");
 
-    execute_app();
+    int exit_code = execute_app(screenshot, screenshot_path);
 
     // TODO: TreeViewWidget: buttons up/down for reordering objects
     // TODO: TreeViewWidget: reparent object by dragging
@@ -58,5 +81,5 @@ int main() {
     // TODO: rename project to EvolvingCars
     // TODO: Editor: edit and simulate modes
 
-    return 0;
+    return exit_code;
 }
