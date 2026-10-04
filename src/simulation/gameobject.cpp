@@ -309,7 +309,11 @@ void GameObject::updateVisual() {
 	b2Vec2 position = getGlobalPosition();
 	float angle = getGlobalRotation();
 	setVisualPosition(tosf(position));
-	setVisualRotation(utils::to_degrees(angle));
+	// Box2D angles are CCW-positive in y-up world space, but glvx::Transformable
+	// applies rotation in y-down screen space with the opposite sign
+	// (Transformable::getTransform rotates by -rotation). Flip the sign to keep
+	// the visual aligned with the physics body.
+	setVisualRotation(-utils::to_degrees(angle));
 }
 
 void GameObject::renderMask(const std::function<void(const glvx::Drawable& drawable)>& draw_func) {
