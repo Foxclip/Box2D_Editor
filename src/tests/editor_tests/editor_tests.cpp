@@ -18,7 +18,7 @@ EditorTests::EditorTests(
 
 void EditorTests::beforeRunModule() {
 	window.create(800, 600, "Editor tests", 0);
-	font = fw::Font("fonts/verdana.ttf");
+	font.openFromFile("fonts/verdana.ttf");
 	fw::WidgetList::debug_mouse = true;
 }
 

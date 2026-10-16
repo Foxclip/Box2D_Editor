@@ -237,14 +237,15 @@ void Editor::initTools() {
 }
 
 void Editor::initUi() {
-    ui_font = fw::Font("fonts/STAN0757.TTF");
-    fps_font = fw::Font("fonts/fraps.ttf");
-    console_font = fw::Font("fonts/courbd.ttf");
-    small_font = fw::Font("fonts/HelvetiPixel.ttf");
-    textbox_font = fw::Font("fonts/verdana.ttf", true);
-    setDefaultFont(textbox_font);
+    ui_font.openFromFile("fonts/STAN0757.TTF");
+    fps_font.openFromFile("fonts/fraps.ttf");
+    console_font.openFromFile("fonts/courbd.ttf");
+    small_font.openFromFile("fonts/HelvetiPixel.ttf");
+    textbox_font.openFromFile("fonts/verdana.ttf", true);
+    setDefaultFont(&textbox_font);
 
-    vertex_text.setFont(&ui_font.getFont(20));
+    vertex_text.setFont(&ui_font);
+    vertex_text.setCharacterSize(20);
 
     origin_shape.setRadius(3.0f);
     origin_shape.setOrigin(3.0f, 3.0f);
@@ -253,7 +254,8 @@ void Editor::initUi() {
     origin_shape_outline.setOrigin(4.0f, 4.0f);
     origin_shape_outline.setColor(glvx::Color::Black);
 
-    object_info_text.setFont(&small_font.getFont(16));
+    object_info_text.setFont(&small_font);
+    object_info_text.setCharacterSize(16);
 
     setBackgroundColor(glvx::Color(25, 25, 25));
 
@@ -324,7 +326,7 @@ void Editor::initWidgets() {
 
     // step text
     step_widget = widgets.createTextWidget();
-    step_widget->setFont(ui_font);
+    step_widget->setFont(&ui_font);
     step_widget->setString(std::to_string(simulation.getStep()));
     step_widget->setCharacterSize(10);
     step_widget->setFillColor(glvx::Color::White);
@@ -339,7 +341,7 @@ void Editor::initWidgets() {
     paused_rect_widget->setPadding(10.0f);
     paused_rect_widget->setName("paused rect");
     fw::TextWidget* paused_text_widget = widgets.createTextWidget();
-    paused_text_widget->setFont(ui_font);
+    paused_text_widget->setFont(&ui_font);
     paused_text_widget->setString("PAUSED");
     paused_text_widget->setCharacterSize(24);
     paused_text_widget->setFillColor(glvx::Color::Yellow);
@@ -354,7 +356,7 @@ void Editor::initWidgets() {
     fps_widget->setPadding(0.0f);
     fps_widget->setName("fps");
     fps_text_widget = widgets.createTextWidget();
-    fps_text_widget->setFont(fps_font);
+    fps_text_widget->setFont(&fps_font);
     fps_text_widget->setCharacterSize(32);
     fps_text_widget->setFillColor(glvx::Color::Black);
     fps_text_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
@@ -369,7 +371,7 @@ void Editor::initWidgets() {
     logger_widget->setClipChildren(true);
     logger_widget->setName("logger");
     logger_text_widget = widgets.createTextWidget();
-    logger_text_widget->setFont(console_font);
+    logger_text_widget->setFont(&console_font);
     logger_text_widget->setCharacterSize(15);
     logger_text_widget->setFillColor(glvx::Color::White);
     logger_text_widget->setOrigin(fw::Widget::Anchor::TOP_LEFT);
@@ -379,7 +381,7 @@ void Editor::initWidgets() {
 
     // debug/release text
     debug_release_widget = widgets.createTextWidget();
-    debug_release_widget->setFont(ui_font);
+    debug_release_widget->setFont(&ui_font);
 #ifndef NDEBUG
     debug_release_widget->setString("DEBUG");
 #else

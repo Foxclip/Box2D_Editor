@@ -3,7 +3,6 @@
 
 void run_tests() {
     test::TestModule root_module("Project tests", nullptr);
-    root_module.print_summary_enabled = true;
     DataPointerTests* data_pointer_module = root_module.addModule<DataPointerTests>("DataPointer", { });
     CompVectorTests* compvector_module = root_module.addModule<CompVectorTests>("CompVector", { data_pointer_module });
     SearchIndexTests* searchindex_module = root_module.addModule<SearchIndexTests>("SearchIndex", { data_pointer_module });
@@ -11,6 +10,7 @@ void run_tests() {
     SimulationTests* simulation_module = root_module.addModule<SimulationTests>("Simulation", { data_pointer_module, compvector_module });
     EditorTests* editor_module = root_module.addModule<EditorTests>("Editor", { simulation_module });
     root_module.run();
+    root_module.printSummary();
 }
 
 int main() {

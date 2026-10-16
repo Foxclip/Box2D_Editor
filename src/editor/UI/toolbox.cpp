@@ -33,7 +33,7 @@ Toolbox::Toolbox(fw::WidgetList& widget_list, Editor& p_app)
         tool_widget->setParent(this);
         tool_widget->setName("tool " + tool->name);
         fw::TextWidget* text_widget = app.widgets.createTextWidget();
-        text_widget->setFont(app.ui_font);
+        text_widget->setFont(&app.ui_font);
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
         text_widget->setString(app.tools[i]->name);
         text_widget->setFillColor(glvx::Color::Black);

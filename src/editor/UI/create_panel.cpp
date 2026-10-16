@@ -29,7 +29,7 @@ CreatePanel::CreatePanel(fw::WidgetList& widget_list, Editor& p_app)
         };
         button_widget->setName("button " + std::to_string(i));
         fw::TextWidget* text_widget = widget_list.createTextWidget();
-        text_widget->setFont(app.ui_font);
+        text_widget->setFont(&app.ui_font);
         text_widget->setCharacterSize(TOOL_TEXT_SIZE);
         text_widget->setString(CreateTool::create_type_name(static_cast<CreateTool::ObjectType>(i)));
         text_widget->setFillColor(glvx::Color::Black);

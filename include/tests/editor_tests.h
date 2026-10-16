@@ -7,7 +7,7 @@ public:
 
 private:
 	glvx::Window window;
-	fw::Font font;
+	glvx::Font font;
 
 	void beforeRunModule() override;
 	void afterRunModule() override;

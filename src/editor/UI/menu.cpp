@@ -40,7 +40,7 @@ fw::RectangleWidget* Menu::createButton(const std::string& name, const std::stri
     button_widget->setParent(this);
     button_widget->setName(name);
     fw::TextWidget* text_widget = app.widgets.createTextWidget();
-    text_widget->setFont(app.ui_font);
+    text_widget->setFont(&app.ui_font);
     text_widget->setCharacterSize(MENU_BUTTON_TEXT_SIZE);
     text_widget->setString(display_name);
     text_widget->setFillColor(glvx::Color::Black);

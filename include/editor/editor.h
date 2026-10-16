@@ -8,7 +8,7 @@
 #include "common/history.h"
 #include "logger/logger.h"
 #include "widgets/application.h"
-#include "widgets/font.h"
+#include <glvx/font.h>
 #include <glvx/circle.h>
 #include <glvx/shader.h>
 
@@ -172,11 +172,11 @@ private:
 		&edit_tool,
 		&create_tool,
 	};
-	fw::Font ui_font;
-	fw::Font fps_font;
-	fw::Font console_font;
-	fw::Font small_font;
-	fw::Font textbox_font;
+	glvx::Font ui_font;
+	glvx::Font fps_font;
+	glvx::Font console_font;
+	glvx::Font small_font;
+	glvx::Font textbox_font;
 	fw::ContainerWidget* paused_rect_widget = nullptr;
 	Toolbox* toolbox_widget = nullptr;
 	Tool* selected_tool = nullptr;
