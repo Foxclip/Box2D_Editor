@@ -1,3 +1,7 @@
+# Editing
+
+- Do not change any directly included third party code (like stb_image or glad)
+
 # Tests
 
 - Before running tests, make sure that they are built with CMake (CMake executable RUN_ALL_TESTS)
